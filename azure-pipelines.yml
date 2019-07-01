@@ -13,5 +13,6 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    publishWebProjects: false
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
   displayName: 'Publish Solution'
