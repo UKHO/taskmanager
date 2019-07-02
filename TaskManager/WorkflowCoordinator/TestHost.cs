@@ -1,11 +1,17 @@
 ﻿using System;
+
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Logging;
+using NServiceBus.Transport.SQLServer;
 
 namespace WorkflowCoordinator
 {
@@ -31,7 +37,32 @@ namespace WorkflowCoordinator
 
                 var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
                 transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-                transport.ConnectionString("TBC");
+                transport.UseCustomSqlConnectionFactory(
+                    sqlConnectionFactory: async () =>
+                    {
+                        //var connection = new SqlConnection("Data Source=tcp:taskmanager-dev-sqlserver.database.windows.net,1433;Initial Catalog=NServiceBus;");
+                        var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyDbConnection"].ConnectionString);
+                        try
+                        {
+                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                            var connectionAccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").Result;
+                            connection.AccessToken = connectionAccessToken;
+                            await connection.OpenAsync()
+                                .ConfigureAwait(false);
+
+
+                            
+                            // perform custom operations
+
+                            return connection;
+                        }
+                        catch
+                        {
+                            connection.Dispose();
+                            throw;
+                        }
+                    });
+                //transport.UseCustomSqlConnectionFactory() ??
                 //transport.UseConventionalRoutingTopology();
 
                 #endregion

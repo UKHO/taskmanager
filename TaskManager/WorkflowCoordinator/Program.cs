@@ -14,7 +14,7 @@ namespace WorkflowCoordinator
                 .UseEnvironment("Development")
                 .ConfigureWebJobs(b =>
                 {
-                    b.UseHostId("TBC")
+                    b.UseHostId("workflowcoordinator-1")
                         .AddAzureStorageCoreServices();
                 })
                 .ConfigureAppConfiguration(b =>
