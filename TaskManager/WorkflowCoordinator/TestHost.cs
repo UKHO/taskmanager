@@ -1,11 +1,8 @@
 ﻿using System;
-
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using NServiceBus;
@@ -40,30 +37,33 @@ namespace WorkflowCoordinator
                 transport.UseCustomSqlConnectionFactory(
                     sqlConnectionFactory: async () =>
                     {
-                        //var connection = new SqlConnection("Data Source=tcp:taskmanager-dev-sqlserver.database.windows.net,1433;Initial Catalog=NServiceBus;");
-                        var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyDbConnection"].ConnectionString);
+                        var con = new SqlConnection();
                         try
                         {
-                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                            var connectionAccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").Result;
-                            connection.AccessToken = connectionAccessToken;
-                            await connection.OpenAsync()
-                                .ConfigureAwait(false);
+                            var authority = string.Format("https://login.windows.net/{0}", "tenant Id");
+                            var token = await GetAccessTokenAsync();
 
+                            var builder = new SqlConnectionStringBuilder();
+                            builder["Data Source"] = "DB-FQDN";
+                            builder["Initial Catalog"] = "DBName";
+                            builder["Connect Timeout"] = 30;
+                            builder["Persist Security Info"] = false;
+                            builder["TrustServerCertificate"] = false;
+                            builder["Encrypt"] = true;
+                            builder["MultipleActiveResultSets"] = false;
 
-                            
-                            // perform custom operations
+                            con.ConnectionString = builder.ToString();
+                            con.AccessToken = token;
+                            await con.OpenAsync().ConfigureAwait(false);
 
-                            return connection;
+                            return con;
                         }
                         catch
                         {
-                            connection.Dispose();
+                            con.Dispose();
                             throw;
                         }
                     });
-                //transport.UseCustomSqlConnectionFactory() ??
-                //transport.UseConventionalRoutingTopology();
 
                 #endregion
                 endpointConfiguration.DisableFeature<TimeoutManager>();
@@ -77,6 +77,20 @@ namespace WorkflowCoordinator
             {
                 FailFast("Failed to start.", ex);
             }
+        }
+
+        private static async Task<string> GetAccessTokenAsync()
+        {
+            var authContext = new AuthenticationContext("https://login.windows.net/Azure-tenant-Id", TokenCache.DefaultShared);
+            var clientCred = new ClientCredential("SP App Id", "SP Pwd");
+            var result = await authContext.AcquireTokenAsync("https://database.windows.net/", clientCred);
+
+            if (result == null)
+            {
+                throw new InvalidOperationException("Could not get token");
+            }
+
+            return result.AccessToken;
         }
 
         public async Task StopAsync()
