@@ -27,7 +27,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinatortests.csproj'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore workflowcoordinatortests'
 
