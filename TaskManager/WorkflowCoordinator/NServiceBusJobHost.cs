@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Logging;
@@ -9,16 +10,25 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkflowCoordinator.Config;
 
 namespace WorkflowCoordinator
 {
-    public class TestHost : IJobHost
+    public class NServiceBusJobHost : IJobHost
     {
-        static readonly ILog log = LogManager.GetLogger<TestHost>();
+        private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IOptions<SecretsConfig> _secretsConfig;
+        static readonly ILog log = LogManager.GetLogger<NServiceBusJobHost>();
 
         IEndpointInstance endpoint;
 
         public string EndpointName => "UKHO.TaskManager.WorkflowCoordinator";
+
+        public NServiceBusJobHost(IOptions<GeneralConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
+        {
+            _generalConfig = generalConfig;
+            _secretsConfig = secretsConfig;
+        }
 
         // TODO check which attributes we need
         [FunctionName("StartAsync")]
@@ -38,13 +48,14 @@ namespace WorkflowCoordinator
                         try
                         {
                             var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                            var token = await azureServiceTokenProvider.GetAccessTokenAsync(
-                                "https://database.windows.net/");
+                            var azureDbTokenUrl = _generalConfig.Value.ConnectionStrings.AzureDbTokenUrl;
+                            var token = await azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString());
 
                             var builder = new SqlConnectionStringBuilder();
                             builder["Data Source"] = "";
                             builder["Initial Catalog"] = "";
                             builder["Connect Timeout"] = 30;
+                            // TODO - do we need all this?
                             builder["Persist Security Info"] = false;
                             builder["TrustServerCertificate"] = false;
                             builder["Encrypt"] = true;
