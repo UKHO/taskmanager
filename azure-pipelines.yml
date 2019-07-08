@@ -10,9 +10,49 @@ pool:
   vmImage: 'windows-2019'
 
 steps:
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore workflowcoordinator'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
+  displayName: 'dotnet build workflowcoordinator'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore workflowcoordinatortests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
+  displayName: 'dotnet build workflowcoordinatortests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
+  displayName: 'dotnet test workflowcoordinatortests'
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
   displayName: 'Publish Solution'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\bin\\Debug\\netcoreapp2.1\\publish.zip'
+    ArtifactName: 'workflowcoordinator'
+    publishLocation: 'Container'
+  displayName: 'Publish workflowcoordinator Artifact'
