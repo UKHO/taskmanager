@@ -49,8 +49,15 @@ steps:
     publishWebProjects: false
     projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
     zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\App_Data\\jobs\\continuous\\WorkflowCoordinator'
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
   displayName: 'Publish Solution'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
+  displayName: 'Generate run.cmd'
 
 - task: PublishBuildArtifacts@1
   inputs:
