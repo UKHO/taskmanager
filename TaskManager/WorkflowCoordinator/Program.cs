@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using WorkflowCoordinator.Config;
@@ -17,40 +18,47 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
-            .ConfigureHostConfiguration(configHost =>
-            {
-                // TODO - review this!
-                configHost.AddEnvironmentVariables();
-            })
+            .UseEnvironment(Environment.GetEnvironmentVariable("environment"))
             .ConfigureWebJobs(b =>
             {
                 b.AddAzureStorageCoreServices();
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var env = hostingContext.HostingEnvironment;
-                var keyVaultAddress = hostingContext.Configuration.GetValue<string>("KeyVaultAddress");
+                var keyVaultAddress = Environment.GetEnvironmentVariable("KeyVaultAddress");
+
                 var tokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
                 config.SetBasePath(Directory.GetCurrentDirectory())
-                      .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                      .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                      .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager());
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
             })
             .ConfigureLogging((hostingContext, b) =>
             {
                 b.SetMinimumLevel(LogLevel.Debug);
             })
-            .ConfigureServices((hostingContext, serviceCollection) =>
+            .ConfigureServices((hostingContext, services) =>
             {
-                serviceCollection.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("General"));
+                services.AddOptions<ExampleConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("ExampleConfig"));
+                //.PostConfigure(o =>
+                //{
+                //    var errors = string.Join(",", o.ValidateDataAnnotations().Concat(o.Validate()));
+                //    if (errors.Any())
+                //    {
+                //        var message = $"Found configuration error(s) in {o.GetType().Name}: {errors}";
+                //        _logger.LogError(message);
+                //        throw new ApplicationException(message);
+                //    }
+                //});
 
-                serviceCollection.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("MySecretSection")); // Still the single entry in AKV as example
+                services.AddOptions<SecretsConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("MySecretSection"));
 
-                serviceCollection.AddScoped<IJobHost, NServiceBusJobHost>();
+                services.AddScoped<IJobHost, NServiceBusJobHost>();
             })
             .UseConsoleLifetime();
 

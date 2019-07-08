@@ -16,13 +16,13 @@ namespace WorkflowCoordinator
 {
     public class NServiceBusJobHost : IJobHost
     {
-        private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IOptions<ExampleConfig> _generalConfig;
         private readonly IOptions<SecretsConfig> _secretsConfig;
         static readonly ILog Log = LogManager.GetLogger<NServiceBusJobHost>();
 
         private IEndpointInstance _endpoint;
 
-        public NServiceBusJobHost(IOptions<GeneralConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
+        public NServiceBusJobHost(IOptions<ExampleConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
         {
             _generalConfig = generalConfig;
             _secretsConfig = secretsConfig;
@@ -48,15 +48,16 @@ namespace WorkflowCoordinator
                             var azureDbTokenUrl = _generalConfig.Value.ConnectionStrings.AzureDbTokenUrl;
                             var token = await azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString());
 
-                            var builder = new SqlConnectionStringBuilder();
-                            builder["Data Source"] = "";
-                            builder["Initial Catalog"] = "";
-                            builder["Connect Timeout"] = 30;
-                            // TODO - do we need all this?
-                            builder["Persist Security Info"] = false;
-                            builder["TrustServerCertificate"] = false;
-                            builder["Encrypt"] = true;
-                            builder["MultipleActiveResultSets"] = false;
+                            var builder = new SqlConnectionStringBuilder
+                            {
+                                ["Data Source"] = "",
+                                ["Initial Catalog"] = "",
+                                ["Connect Timeout"] = 30,
+                                ["Persist Security Info"] = false,
+                                ["TrustServerCertificate"] = false,
+                                ["Encrypt"] = true,
+                                ["MultipleActiveResultSets"] = false
+                            };
 
                             con.ConnectionString = builder.ToString();
                             con.AccessToken = token;

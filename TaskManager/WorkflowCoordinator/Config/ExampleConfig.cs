@@ -2,7 +2,7 @@
 
 namespace WorkflowCoordinator.Config
 {
-    public class GeneralConfig
+    public class ExampleConfig
     {
         public string NsbEndpointName { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
@@ -12,4 +12,11 @@ namespace WorkflowCoordinator.Config
     {
         public Uri AzureDbTokenUrl { get; set; }
     }
+
+    // e.g.
+    //public IEnumerable<string> Validate()
+    //{
+    //     if ....
+    //     yield return $"Valid ... not ... {nameof(MySecret)}";
+    //}
 }
