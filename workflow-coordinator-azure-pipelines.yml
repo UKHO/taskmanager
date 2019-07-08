@@ -48,6 +48,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
+    zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\App_Data\\jobs\\continuous\\WorkflowCoordinator'
   displayName: 'Publish Solution'
 
