@@ -4,6 +4,7 @@ namespace WorkflowCoordinator.Config
 {
     public class GeneralConfig
     {
+        public string NsbEndpointName { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
     }
 

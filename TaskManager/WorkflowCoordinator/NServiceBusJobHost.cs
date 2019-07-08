@@ -22,8 +22,6 @@ namespace WorkflowCoordinator
 
         private IEndpointInstance _endpoint;
 
-        public string EndpointName => "UKHO.TaskManager.WorkflowCoordinator";
-
         public NServiceBusJobHost(IOptions<GeneralConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
         {
             _generalConfig = generalConfig;
@@ -36,7 +34,7 @@ namespace WorkflowCoordinator
         {
             try
             {
-                var endpointConfiguration = new EndpointConfiguration(EndpointName);
+                var endpointConfiguration = new EndpointConfiguration(_generalConfig.Value.NsbEndpointName);
 
                 var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
                 transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
