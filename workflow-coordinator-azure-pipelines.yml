@@ -48,11 +48,13 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\App_Data\\jobs\\continuous\\WorkflowCoordinator'
   displayName: 'Publish Solution'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\bin\\Debug\\netcoreapp2.1\\publish.zip'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'workflowcoordinator'
     publishLocation: 'Container'
   displayName: 'Publish workflowcoordinator Artifact'
+
