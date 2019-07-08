@@ -18,9 +18,9 @@ namespace WorkflowCoordinator
     {
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IOptions<SecretsConfig> _secretsConfig;
-        static readonly ILog log = LogManager.GetLogger<NServiceBusJobHost>();
+        static readonly ILog Log = LogManager.GetLogger<NServiceBusJobHost>();
 
-        IEndpointInstance endpoint;
+        private IEndpointInstance _endpoint;
 
         public string EndpointName => "UKHO.TaskManager.WorkflowCoordinator";
 
@@ -30,7 +30,6 @@ namespace WorkflowCoordinator
             _secretsConfig = secretsConfig;
         }
 
-        // TODO check which attributes we need
         [FunctionName("StartAsync")]
         [NoAutomaticTrigger]
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -79,7 +78,7 @@ namespace WorkflowCoordinator
 
                 endpointConfiguration.EnableInstallers();
 
-                endpoint = await Endpoint.Start(endpointConfiguration);
+                _endpoint = await Endpoint.Start(endpointConfiguration);
             }
             catch (Exception ex)
             {
@@ -91,7 +90,7 @@ namespace WorkflowCoordinator
         {
             try
             {
-                await endpoint?.Stop();
+                await _endpoint?.Stop();
             }
             catch (Exception ex)
             {
@@ -115,7 +114,7 @@ namespace WorkflowCoordinator
         {
             try
             {
-                log.Fatal(message, exception);
+                Log.Fatal(message, exception);
             }
             finally
             {
