@@ -1,0 +1,81 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore sourcedocumentcoordinator'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+  displayName: 'dotnet build sourcedocumentcoordinator'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore sourcedocumentcoordinatortests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+  displayName: 'dotnet build sourcedocumentcoordinatortests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+  displayName: 'dotnet test sourcedocumentcoordinatortests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+    zipAfterPublish: false
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
+  displayName: 'Publish Solution'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: '"dotnet sourcedocumentcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\sourcedocumentcoordinator'
+  displayName: 'Generate run.cmd'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'License.xml'
+  name: 'nsblicense'
+  displayName: 'Download NSB License from Secure Files'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'copy-item $(nsblicense.secureFilePath) .\\'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\sourcedocumentcoordinator'
+  displayName: 'Copy NSB License'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'sourcedocumentcoordinator'
+    publishLocation: 'Container'
+  displayName: 'Publish sourcedocumentcoordinator Artifact'
+
