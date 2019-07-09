@@ -1,3 +1,7 @@
+variables:
+  workflowCoordinator: $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj
+  workflowCoordinatorTests: $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj
+
 trigger:
 - master
 
@@ -6,19 +10,19 @@ pool:
 
 steps:
 
-- powershell: dotnet restore $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj
+- powershell: dotnet restore $(workflowCoordinator)
   displayName: Restore Workflow Coordinator packages
 
-- powershell: dotnet restore $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj
+- powershell: dotnet restore $(workflowCoordinatorTests)
   displayName: Restore Workflow Coordinator test packages
 
-- powershell: dotnet build $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj --no-restore
+- powershell: dotnet build $(workflowCoordinator) --no-restore
   displayName: Build Workflow Coordinator
 
-- powershell: dotnet build $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj --no-restore
+- powershell: dotnet build $(workflowCoordinatorTests) --no-restore
   displayName: Build Workflow Coordinator Tests
 
-- powershell: dotnet test $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj --no-build --logger:trx -r $(Agent.BuildDirectory)/TestResults 
+- powershell: dotnet test $(workflowCoordinatorTests) --no-build --logger:trx -r $(Agent.BuildDirectory)/TestResults 
   displayName: Test Workflow Coordinator
 
 - task: PublishTestResults@2
@@ -29,7 +33,7 @@ steps:
     failTaskOnFailedTests: true
     mergeTestResults: true
 
-- powershell: dotnet publish $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj --no-build --output $(Build.ArtifactStagingDirectory)\workflowCoordinator
+- powershell: dotnet publish $(workflowCoordinator) --no-build --output $(Build.ArtifactStagingDirectory)\workflowCoordinator
   displayName: Publish Workflow Coordinator
 
 - powershell: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
@@ -40,6 +44,5 @@ steps:
 #   inputs:
 #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
 #     ArtifactName: 'workflowcoordinator'
-#     publishLocation: 'Container'
 #   displayName: 'Publish workflowcoordinator Artifact'
 
