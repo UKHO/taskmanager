@@ -48,7 +48,7 @@ steps:
 
 - powershell: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
   workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator  
-  displayName: Generate run.cmd and add to the artiface 
+  displayName: Generate run.cmd and add to the artifact
 
 # - task: PublishBuildArtifacts@1
 #   inputs:
