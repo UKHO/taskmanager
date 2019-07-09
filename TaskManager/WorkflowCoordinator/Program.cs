@@ -25,7 +25,7 @@ namespace WorkflowCoordinator
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var keyVaultAddress = Environment.GetEnvironmentVariable("KeyVaultAddress");
+                var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
 
                 var tokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
@@ -56,7 +56,7 @@ namespace WorkflowCoordinator
                 //});
 
                 services.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("MySecretSection"));
+                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })
