@@ -50,8 +50,8 @@ namespace WorkflowCoordinator
 
                             var builder = new SqlConnectionStringBuilder
                             {
-                                ["Data Source"] = "",
-                                ["Initial Catalog"] = "",
+                                ["Data Source"] = _secretsConfig.Value.NsbDataSource,
+                                ["Initial Catalog"] = _secretsConfig.Value.NsbInitialCatalog,
                                 ["Connect Timeout"] = 30,
                                 ["Persist Security Info"] = false,
                                 ["TrustServerCertificate"] = false,

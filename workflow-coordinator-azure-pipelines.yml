@@ -59,6 +59,19 @@ steps:
     workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
   displayName: 'Generate run.cmd'
 
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'License.xml'
+  name: 'nsblicense'
+  displayName: 'Download NSB License from Secure Files'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'copy-item $(nsblicense.secureFilePath) .\\'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
+  displayName: 'Copy NSB License'
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'

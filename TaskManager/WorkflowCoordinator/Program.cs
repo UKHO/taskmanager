@@ -18,14 +18,14 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
-            .UseEnvironment(Environment.GetEnvironmentVariable("environment"))
+            .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
             .ConfigureWebJobs(b =>
             {
                 b.AddAzureStorageCoreServices();
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var keyVaultAddress = Environment.GetEnvironmentVariable("KeyVaultAddress");
+                var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
 
                 var tokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
@@ -56,7 +56,7 @@ namespace WorkflowCoordinator
                 //});
 
                 services.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("MySecretSection"));
+                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })

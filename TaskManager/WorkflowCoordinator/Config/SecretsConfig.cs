@@ -1,8 +1,10 @@
 ﻿namespace WorkflowCoordinator.Config
 {
     public class SecretsConfig
-    {
-        public string MySecret { get; set; }
+    { 
+        public string NsbDataSource { get; set; }
+
+        public string NsbInitialCatalog { get; set; }
 
         // e.g.
         //public IEnumerable<string> Validate()
