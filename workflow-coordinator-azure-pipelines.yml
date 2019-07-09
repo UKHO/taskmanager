@@ -1,6 +1,7 @@
 variables:
   workflowCoordinator: $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj
   workflowCoordinatorTests: $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj
+  taskmanagerDir: $(Build.SourcesDirectory)\TaskManager
 
 trigger:
 - master
@@ -10,6 +11,13 @@ pool:
 
 steps:
 
+- powershell: |
+    dotnet sln remove (dir **/*.csproj)
+    dotnet sln add $(workflowCoordinator) $(workflowCoordinatorTests)
+    dotnet sln list
+  workingDirectory: $(taskmanagerDir)
+  displayName: Remove all .csprojs and add relevent projects
+  
 - powershell: dotnet restore $(workflowCoordinator)
   displayName: Restore Workflow Coordinator packages
 
