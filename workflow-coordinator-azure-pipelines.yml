@@ -36,9 +36,19 @@ steps:
 - powershell: dotnet publish $(workflowCoordinator) --no-build --output $(Build.ArtifactStagingDirectory)\workflowCoordinator
   displayName: Publish Workflow Coordinator
 
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'License.xml'
+  name: 'nsblicense'
+  displayName: 'Download NSB License from Secure Files'
+
+- powershell: copy-item $(nsblicense.secureFilePath) .\
+  workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator 
+  displayName: Copy NSB License into the artifact 
+
 - powershell: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
   workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator  
-  displayName: Generate run.cmd
+  displayName: Generate run.cmd and add to the artiface 
 
 # - task: PublishBuildArtifacts@1
 #   inputs:
