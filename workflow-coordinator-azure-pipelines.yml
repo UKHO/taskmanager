@@ -50,9 +50,9 @@ steps:
   workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator  
   displayName: Generate run.cmd and add to the artifact
 
-# - task: PublishBuildArtifacts@1
-#   inputs:
-#     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-#     ArtifactName: 'workflowcoordinator'
-#   displayName: 'Publish workflowcoordinator Artifact'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)
+    ArtifactName: workflowcoordinator
+  displayName: Publish workflowcoordinator Artifact
 
