@@ -2,6 +2,8 @@ variables:
   workflowCoordinator: $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj
   workflowCoordinatorTests: $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj
   taskmanagerDir: $(Build.SourcesDirectory)\TaskManager
+  taskmanagerSln: $(taskmanagerDir)\TaskManager.sln
+  configuration: Release
 
 trigger:
 - master
@@ -14,23 +16,16 @@ steps:
 - powershell: |
     dotnet sln remove (dir **/*.csproj)
     dotnet sln add $(workflowCoordinator) $(workflowCoordinatorTests)
-    dotnet sln list
   workingDirectory: $(taskmanagerDir)
   displayName: Remove all .csprojs and add relevent projects
   
-- powershell: dotnet restore $(workflowCoordinator)
-  displayName: Restore Workflow Coordinator packages
+- powershell: dotnet restore $(taskmanagerSln)
+  displayName: Restore packages
 
-- powershell: dotnet restore $(workflowCoordinatorTests)
-  displayName: Restore Workflow Coordinator test packages
-
-- powershell: dotnet build $(workflowCoordinator) --no-restore
-  displayName: Build Workflow Coordinator
-
-- powershell: dotnet build $(workflowCoordinatorTests) --no-restore
+- powershell: dotnet build $(taskmanagerSln) --no-restore -c $(configuration)
   displayName: Build Workflow Coordinator Tests
 
-- powershell: dotnet test $(workflowCoordinatorTests) --no-build --logger:trx -r $(Agent.BuildDirectory)/TestResults 
+- powershell: dotnet test $(taskmanagerSln) --no-build -c $(configuration) --logger:trx -r $(Agent.BuildDirectory)/TestResults 
   displayName: Test Workflow Coordinator
 
 - task: PublishTestResults@2
