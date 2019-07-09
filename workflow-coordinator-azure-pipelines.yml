@@ -33,7 +33,7 @@ steps:
   displayName: Publish Workflow Coordinator
 
 - powershell: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
-  workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator'  
+  workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator  
   displayName: Generate run.cmd
 
 # - task: PublishBuildArtifacts@1
