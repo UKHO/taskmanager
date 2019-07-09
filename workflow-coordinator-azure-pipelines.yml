@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
@@ -11,58 +6,40 @@ pool:
 
 steps:
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore workflowcoordinator'
+- powershell: dotnet restore $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj
+  displayName: Restore Workflow Coordinator packages
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
-  displayName: 'dotnet build workflowcoordinator'
+- powershell: dotnet restore $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj
+  displayName: Restore Workflow Coordinator test packages
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore workflowcoordinatortests'
+- powershell: dotnet build $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj --no-restore
+  displayName: Build Workflow Coordinator
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
-  displayName: 'dotnet build workflowcoordinatortests'
+- powershell: dotnet build $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj --no-restore
+  displayName: Build Workflow Coordinator Tests
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinatortests\\workflowcoordinatortests.csproj'
-  displayName: 'dotnet test workflowcoordinatortests'
+- powershell: dotnet test $(Build.SourcesDirectory)\taskmanager\workflowcoordinatortests\workflowcoordinatortests.csproj --no-build --logger:trx -r $(Agent.BuildDirectory)/TestResults 
+  displayName: Test Workflow Coordinator
 
-- task: DotNetCoreCLI@2
+- task: PublishTestResults@2
+  displayName: Publish Test Results
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\workflowcoordinator\\workflowcoordinator.csproj'
-    zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
-  displayName: 'Publish Solution'
+    testRunner: VSTest
+    testResultsFiles: '$(Agent.BuildDirectory)/TestResults/*.trx'
+    failTaskOnFailedTests: true
+    mergeTestResults: true
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
-  displayName: 'Generate run.cmd'
+- powershell: dotnet publish $(Build.SourcesDirectory)\taskmanager\workflowcoordinator\workflowcoordinator.csproj --no-build --output $(Build.ArtifactStagingDirectory)\workflowCoordinator
+  displayName: Publish Workflow Coordinator
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'workflowcoordinator'
-    publishLocation: 'Container'
-  displayName: 'Publish workflowcoordinator Artifact'
+- powershell: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
+  workingDirectory: $(Build.ArtifactStagingDirectory)\workflowCoordinator\workflowcoordinator'  
+  displayName: Generate run.cmd
+
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#     ArtifactName: 'workflowcoordinator'
+#     publishLocation: 'Container'
+#   displayName: 'Publish workflowcoordinator Artifact'
 
