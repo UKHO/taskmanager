@@ -18,7 +18,7 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
-            .UseEnvironment(Environment.GetEnvironmentVariable("environment"))
+            .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
             .ConfigureWebJobs(b =>
             {
                 b.AddAzureStorageCoreServices();
