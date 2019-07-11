@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WorkflowCoordinator\WorkflowCoordinator.csproj" />
+    <ProjectReference Include="..\SourceDocumentCoordinator\SourceDocumentCoordinator.csproj" />
   </ItemGroup>
 
 </Project>
