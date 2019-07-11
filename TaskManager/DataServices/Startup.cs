@@ -10,6 +10,7 @@
 
 using System;
 using System.IO;
+using System.ServiceModel;
 using DataServices.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -88,6 +89,38 @@ namespace DataServices
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
+
+            // DI our asmx service...
+            services.AddScoped<SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap>(provider =>
+            {
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                result.MaxBufferSize = int.MaxValue;
+                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
+                result.MaxReceivedMessageSize = int.MaxValue;
+                //result.AllowCookies = true;
+
+                var client = new SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoapClient(
+                    result,
+                    new System.ServiceModel.EndpointAddress(Configuration["SDRAAssessmentWebService:BaseUrl"])
+                );
+                return client;
+            });
+
+            // DI our asmx service...
+            services.AddScoped<SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap>(provider =>
+            {
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                result.MaxBufferSize = int.MaxValue;
+                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
+                result.MaxReceivedMessageSize = int.MaxValue;
+                //result.AllowCookies = true;
+
+                var client = new SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoapClient(
+                    result,
+                    new System.ServiceModel.EndpointAddress(Configuration["SDRADataAccessWebService:BaseUrl"])
+                );
+                return client;
+            });
         }
 
         /// <summary>
