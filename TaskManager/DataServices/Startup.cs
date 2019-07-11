@@ -80,7 +80,7 @@ namespace DataServices
                     });
                     c.CustomSchemaIds(type => type.FriendlyId(true));
                     c.DescribeAllEnumsAsStrings();
-                    c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnv.ApplicationName}.xml");
+                    c.IncludeXmlComments(Path.Combine(Directory.GetCurrentDirectory(), "DataServices.xml"));
                     // Sets the basePath property in the Swagger document generated
                     c.DocumentFilter<BasePathFilter>("/DataServices/v1/");
 
