@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SDRAAssessmentWebService;
 
 namespace DataServices.Controllers
@@ -13,16 +14,22 @@ namespace DataServices.Controllers
 
         public readonly SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap _sdraDataAccessWebService;
 
+        private readonly ILogger _logger;
+
         public HealthcheckController(SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap sdraAssessmentWebService,
-            SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap sdraDataAccessWebService)
+            SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap sdraDataAccessWebService,
+            ILogger<HealthcheckController> logger)
         {
             _sdraAssessmentWebService = sdraAssessmentWebService;
             _sdraDataAccessWebService = sdraDataAccessWebService;
+            _logger = logger;
         }
+
         [HttpGet]
         [Route("healthcheck")]
         public IActionResult Get()
         {
+            _logger.LogInformation("Healthcheck GET");
             return Ok(Assembly.GetExecutingAssembly().GetName().Name + " is ok.");
         }
 
@@ -30,6 +37,7 @@ namespace DataServices.Controllers
         [Route("healthcheck/SDRAAssessment")]
         public IActionResult GetSDRAAssessmentWebService()
         {
+            _logger.LogInformation("Healthcheck/SDRAAssessment GET");
             try
             {
                 //TODO: Change the SDRA method to request to something less intensive
@@ -50,6 +58,7 @@ namespace DataServices.Controllers
         [Route("healthcheck/SDRAData")]
         public IActionResult GetSDRADataAccessWebService()
         {
+            _logger.LogInformation("Healthcheck/SDRAData GET");
             try
             {
                 //TODO: Change the SDRA method to request to something less intensive
