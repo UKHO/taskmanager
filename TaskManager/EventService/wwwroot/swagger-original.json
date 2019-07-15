@@ -1,0 +1,327 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Task Manager Events API",
+    "description" : "This API is for Task manager Events\n",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "http://ukho.gov.uk/EventService/v1/"
+  } ],
+  "paths" : {
+    "/Workflow/Event/" : {
+      "get" : {
+        "tags" : [ "Events" ],
+        "summary" : "Get events",
+        "operationId" : "getEvents",
+        "responses" : {
+          "200" : {
+            "description" : "An array of event objects",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EventObjects"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorised.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Not acceptable.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Workflow/Event/{eventName}" : {
+      "get" : {
+        "tags" : [ "Events" ],
+        "summary" : "Get specific event by name",
+        "operationId" : "getEvent",
+        "parameters" : [ {
+          "name" : "eventName",
+          "in" : "path",
+          "description" : "The name of the event\nExample: HDB\n",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the event requested",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorised.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Not acceptable.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Events" ],
+        "summary" : "Create a new event.",
+        "operationId" : "postEvent",
+        "parameters" : [ {
+          "name" : "eventName",
+          "in" : "path",
+          "description" : "The name of the event\nExample: HDB\n",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The body of the event to post",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EventBody"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Event successfully posted"
+          },
+          "400" : {
+            "description" : "Bad request.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorised.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Not acceptable.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Event" : {
+        "required" : [ "body", "name" ],
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "The name of the event"
+          },
+          "body" : {
+            "type" : "string",
+            "description" : "The JSON which holds the event data"
+          }
+        },
+        "example" : {
+          "name" : "name",
+          "body" : "body"
+        }
+      },
+      "EventObjects" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Event"
+        }
+      },
+      "EventBody" : {
+        "type" : "object",
+        "example" : { }
+      },
+      "DefaultErrorResponse" : {
+        "title" : "Error",
+        "type" : "object",
+        "properties" : {
+          "detail" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "eventName" : {
+        "name" : "eventName",
+        "in" : "path",
+        "description" : "The name of the event\nExample: HDB\n",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

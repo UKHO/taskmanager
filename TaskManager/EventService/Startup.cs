@@ -1,7 +1,7 @@
 /*
- * SDRA API
+ * Task Manager Events API
  *
- * This API is for SDRA  It provides Source Document Assessment Data and Data Access 
+ * This API is for Task manager Events 
  *
  * OpenAPI spec version: 1.0.0
  * 
@@ -9,7 +9,7 @@
  */
 
 using System.IO;
-using DataServices.Filters;
+using EventService.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace DataServices
+namespace EventService
 {
     /// <summary>
     /// Startup
@@ -67,8 +67,8 @@ namespace DataServices
                     c.SwaggerDoc("1.0.0", new Info
                     {
                         Version = "1.0.0",
-                        Title = "SDRA API",
-                        Description = "SDRA API (ASP.NET Core 2.0)",
+                        Title = "Task Manager Events API",
+                        Description = "Task Manager Events API (ASP.NET Core 2.0)",
                         Contact = new Contact()
                         {
                            Name = "Swagger Codegen Contributors",
@@ -79,46 +79,14 @@ namespace DataServices
                     });
                     c.CustomSchemaIds(type => type.FriendlyId(true));
                     c.DescribeAllEnumsAsStrings();
-                    c.IncludeXmlComments(Path.Combine(Directory.GetCurrentDirectory(), "DataServices.xml"));
+                    c.IncludeXmlComments(Path.Combine(Directory.GetCurrentDirectory(), "EventService.xml"));
                     // Sets the basePath property in the Swagger document generated
-                    c.DocumentFilter<BasePathFilter>("/DataServices/v1/");
+                    c.DocumentFilter<BasePathFilter>("/EventService/v1/");
 
                     // Include DataAnnotation attributes on Controller Action parameters as Swagger validation rules (e.g required, pattern, ..)
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
-
-            // DI our asmx service...
-            services.AddScoped<SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap>(provider =>
-            {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
-                result.MaxBufferSize = int.MaxValue;
-                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
-                result.MaxReceivedMessageSize = int.MaxValue;
-                //result.AllowCookies = true;
-
-                var client = new SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoapClient(
-                    result,
-                    new System.ServiceModel.EndpointAddress(Configuration["SDRAAssessmentWebService:BaseUrl"])
-                );
-                return client;
-            });
-
-            // DI our asmx service...
-            services.AddScoped<SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap>(provider =>
-            {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
-                result.MaxBufferSize = int.MaxValue;
-                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
-                result.MaxReceivedMessageSize = int.MaxValue;
-                //result.AllowCookies = true;
-
-                var client = new SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoapClient(
-                    result,
-                    new System.ServiceModel.EndpointAddress(Configuration["SDRADataAccessWebService:BaseUrl"])
-                );
-                return client;
-            });
         }
 
         /// <summary>
@@ -136,7 +104,7 @@ namespace DataServices
                 .UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger-original.json", "SDRA API Original");
+                    c.SwaggerEndpoint("/swagger-original.json", "Task Manager Events API");
                 });
 
             if (env.IsDevelopment())
