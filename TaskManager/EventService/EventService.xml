@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EventService</name>
+    </assembly>
+    <members>
+        <member name="T:EventService.Attributes.ValidateModelStateAttribute">
+            <summary>
+            Model state validation attribute
+            </summary>
+        </member>
+        <member name="M:EventService.Attributes.ValidateModelStateAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>
+            Called before the action method is invoked
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="T:EventService.Controllers.EventsApiController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EventService.Controllers.EventsApiController.GetEvent(System.String)">
+            <summary>
+            Get specific event by name
+            </summary>
+            <param name="eventName">The name of the event Example: HDB </param>
+            <response code="200">Returns the event requested</response>
+            <response code="400">Bad request.</response>
+            <response code="401">Unauthorised.</response>
+            <response code="403">Forbidden.</response>
+            <response code="404">Not found.</response>
+            <response code="406">Not acceptable.</response>
+            <response code="500">Internal Server Error.</response>
+        </member>
+        <member name="M:EventService.Controllers.EventsApiController.GetEvents">
+            <summary>
+            Get events
+            </summary>
+            <response code="200">An array of event objects</response>
+            <response code="400">Bad request.</response>
+            <response code="401">Unauthorised.</response>
+            <response code="403">Forbidden.</response>
+            <response code="404">Not found.</response>
+            <response code="406">Not acceptable.</response>
+            <response code="500">Internal Server Error.</response>
+        </member>
+        <member name="M:EventService.Controllers.EventsApiController.PostEvent(System.String,System.Object)">
+            <summary>
+            Create a new event.
+            </summary>
+            <param name="body">The body of the event to post</param>
+            <param name="eventName">The name of the event Example: HDB </param>
+            <response code="200">Event successfully posted</response>
+            <response code="400">Bad request.</response>
+            <response code="401">Unauthorised.</response>
+            <response code="403">Forbidden.</response>
+            <response code="404">Not found.</response>
+            <response code="406">Not acceptable.</response>
+            <response code="500">Internal Server Error.</response>
+        </member>
+        <member name="T:EventService.Filters.BasePathFilter">
+            <summary>
+            BasePath Document Filter sets BasePath property of Swagger and removes it from the individual URL paths
+            </summary>
+        </member>
+        <member name="M:EventService.Filters.BasePathFilter.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="basePath">BasePath to remove from Operations</param>
+        </member>
+        <member name="P:EventService.Filters.BasePathFilter.BasePath">
+            <summary>
+            Gets the BasePath of the Swagger Doc
+            </summary>
+            <returns>The BasePath of the Swagger Doc</returns>
+        </member>
+        <member name="M:EventService.Filters.BasePathFilter.Apply(Swashbuckle.AspNetCore.Swagger.SwaggerDocument,Swashbuckle.AspNetCore.SwaggerGen.DocumentFilterContext)">
+            <summary>
+            Apply the filter
+            </summary>
+            <param name="swaggerDoc">SwaggerDocument</param>
+            <param name="context">FilterContext</param>
+        </member>
+        <member name="T:EventService.Filters.GeneratePathParamsValidationFilter">
+            <summary>
+            Path Parameter Validation Rules Filter
+            </summary>
+        </member>
+        <member name="M:EventService.Filters.GeneratePathParamsValidationFilter.Apply(Swashbuckle.AspNetCore.Swagger.Operation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="operation">Operation</param>
+            <param name="context">OperationFilterContext</param>
+        </member>
+        <member name="T:EventService.Models.DefaultErrorResponse">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:EventService.Models.DefaultErrorResponse.Detail">
+            <summary>
+            Gets or Sets Detail
+            </summary>
+        </member>
+        <member name="M:EventService.Models.DefaultErrorResponse.ToString">
+            <summary>
+            Returns the string presentation of the object
+            </summary>
+            <returns>String presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.DefaultErrorResponse.ToJson">
+            <summary>
+            Returns the JSON string presentation of the object
+            </summary>
+            <returns>JSON string presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.DefaultErrorResponse.Equals(System.Object)">
+            <summary>
+            Returns true if objects are equal
+            </summary>
+            <param name="obj">Object to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.DefaultErrorResponse.Equals(EventService.Models.DefaultErrorResponse)">
+            <summary>
+            Returns true if DefaultErrorResponse instances are equal
+            </summary>
+            <param name="other">Instance of DefaultErrorResponse to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.DefaultErrorResponse.GetHashCode">
+            <summary>
+            Gets the hash code
+            </summary>
+            <returns>Hash code</returns>
+        </member>
+        <member name="T:EventService.Models.Event">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:EventService.Models.Event.Name">
+            <summary>
+            The name of the event
+            </summary>
+            <value>The name of the event</value>
+        </member>
+        <member name="P:EventService.Models.Event.Body">
+            <summary>
+            The JSON which holds the event data
+            </summary>
+            <value>The JSON which holds the event data</value>
+        </member>
+        <member name="M:EventService.Models.Event.ToString">
+            <summary>
+            Returns the string presentation of the object
+            </summary>
+            <returns>String presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.Event.ToJson">
+            <summary>
+            Returns the JSON string presentation of the object
+            </summary>
+            <returns>JSON string presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.Event.Equals(System.Object)">
+            <summary>
+            Returns true if objects are equal
+            </summary>
+            <param name="obj">Object to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.Event.Equals(EventService.Models.Event)">
+            <summary>
+            Returns true if Event instances are equal
+            </summary>
+            <param name="other">Instance of Event to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.Event.GetHashCode">
+            <summary>
+            Gets the hash code
+            </summary>
+            <returns>Hash code</returns>
+        </member>
+        <member name="T:EventService.Models.EventBody">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EventService.Models.EventBody.ToString">
+            <summary>
+            Returns the string presentation of the object
+            </summary>
+            <returns>String presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.EventBody.ToJson">
+            <summary>
+            Returns the JSON string presentation of the object
+            </summary>
+            <returns>JSON string presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.EventBody.Equals(System.Object)">
+            <summary>
+            Returns true if objects are equal
+            </summary>
+            <param name="obj">Object to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.EventBody.Equals(EventService.Models.EventBody)">
+            <summary>
+            Returns true if EventBody instances are equal
+            </summary>
+            <param name="other">Instance of EventBody to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.EventBody.GetHashCode">
+            <summary>
+            Gets the hash code
+            </summary>
+            <returns>Hash code</returns>
+        </member>
+        <member name="T:EventService.Models.EventObjects">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EventService.Models.EventObjects.ToString">
+            <summary>
+            Returns the string presentation of the object
+            </summary>
+            <returns>String presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.EventObjects.ToJson">
+            <summary>
+            Returns the JSON string presentation of the object
+            </summary>
+            <returns>JSON string presentation of the object</returns>
+        </member>
+        <member name="M:EventService.Models.EventObjects.Equals(System.Object)">
+            <summary>
+            Returns true if objects are equal
+            </summary>
+            <param name="obj">Object to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.EventObjects.Equals(EventService.Models.EventObjects)">
+            <summary>
+            Returns true if EventObjects instances are equal
+            </summary>
+            <param name="other">Instance of EventObjects to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:EventService.Models.EventObjects.GetHashCode">
+            <summary>
+            Gets the hash code
+            </summary>
+            <returns>Hash code</returns>
+        </member>
+        <member name="T:EventService.Program">
+            <summary>
+            Program
+            </summary>
+        </member>
+        <member name="M:EventService.Program.Main(System.String[])">
+            <summary>
+            Main
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:EventService.Program.CreateWebHostBuilder(System.String[])">
+            <summary>
+            Create the web host builder.
+            </summary>
+            <param name="args"></param>
+            <returns>IWebHostBuilder</returns>
+        </member>
+        <member name="T:EventService.Startup">
+            <summary>
+            Startup
+            </summary>
+        </member>
+        <member name="M:EventService.Startup.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="env"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:EventService.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:EventService.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+            <param name="loggerFactory"></param>
+        </member>
+    </members>
+</doc>

@@ -80,7 +80,7 @@ namespace EventService
                     });
                     c.CustomSchemaIds(type => type.FriendlyId(true));
                     c.DescribeAllEnumsAsStrings();
-                    c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnv.ApplicationName}.xml");
+                    c.IncludeXmlComments(Path.Combine(Directory.GetCurrentDirectory(), "EventService.xml"));
                     // Sets the basePath property in the Swagger document generated
                     c.DocumentFilter<BasePathFilter>("/EventService/v1/");
 
@@ -105,7 +105,7 @@ namespace EventService
                 .UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/1.0.0/swagger.json", "Task Manager Events API");
+                    c.SwaggerEndpoint("/swagger-original.json", "Task Manager Events API");
                 });
 
             if (env.IsDevelopment())
