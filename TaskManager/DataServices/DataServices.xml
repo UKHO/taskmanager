@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>IO.Swagger</name>
+        <name>DataServices</name>
     </assembly>
     <members>
-        <member name="T:IO.Swagger.Attributes.ValidateModelStateAttribute">
+        <member name="T:DataServices.Attributes.ValidateModelStateAttribute">
             <summary>
             Model state validation attribute
             </summary>
         </member>
-        <member name="M:IO.Swagger.Attributes.ValidateModelStateAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+        <member name="M:DataServices.Attributes.ValidateModelStateAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>
             Called before the action method is invoked
             </summary>
             <param name="context"></param>
         </member>
-        <member name="T:IO.Swagger.Controllers.AssessmentApiController">
+        <member name="T:DataServices.Controllers.AssessmentApiController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:IO.Swagger.Controllers.AssessmentApiController.ListDocumentsForAssessment(System.String)">
+        <member name="M:DataServices.Controllers.AssessmentApiController.ListDocumentsForAssessment(System.String)">
             <summary>
             Get a list of open source document objects
             </summary>
@@ -33,7 +33,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.AssessmentApiController.PutAssessmentCompleted(System.String,System.Nullable{System.Int32},System.String)">
+        <member name="M:DataServices.Controllers.AssessmentApiController.PutAssessmentCompleted(System.String,System.Nullable{System.Int32},System.String)">
             <summary>
             Notify SDRA that assessment job has been completed.
             </summary>
@@ -48,7 +48,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.AssessmentApiController.PutDocumentAssessed(System.String,System.String,System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:DataServices.Controllers.AssessmentApiController.PutDocumentAssessed(System.String,System.String,System.Nullable{System.Int32},System.String,System.String)">
             <summary>
             Create assessment record for specified document.
             </summary>
@@ -65,12 +65,12 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="T:IO.Swagger.Controllers.DataAccessApiController">
+        <member name="T:DataServices.Controllers.DataAccessApiController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.DeleteDocumentRequestJobFromQueue(System.String,System.Nullable{System.Int32},System.String)">
+        <member name="M:DataServices.Controllers.DataAccessApiController.DeleteDocumentRequestJobFromQueue(System.String,System.Nullable{System.Int32},System.String)">
             <summary>
             Clear the document request job from the queue
             </summary>
@@ -85,7 +85,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetBackwardDocumentLinks(System.Nullable{System.Int32})">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetBackwardDocumentLinks(System.Nullable{System.Int32})">
             <summary>
             Get documents linked to source document assessment
             </summary>
@@ -98,7 +98,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetDocumentAssessmentData(System.String,System.Nullable{System.Int32})">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetDocumentAssessmentData(System.String,System.Nullable{System.Int32})">
             <summary>
             Get the data for the document assessment
             </summary>
@@ -112,7 +112,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetDocumentForViewing(System.String,System.Nullable{System.Int32},System.String,System.Nullable{System.Boolean})">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetDocumentForViewing(System.String,System.Nullable{System.Int32},System.String,System.Nullable{System.Boolean})">
             <summary>
             Get the Document URL for the Id specified.
             </summary>
@@ -128,7 +128,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetDocumentRequestQueueStatus(System.String)">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetDocumentRequestQueueStatus(System.String)">
             <summary>
             Get the status of all queued documents
             </summary>
@@ -141,7 +141,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetForwardDocumentLinks(System.Nullable{System.Int32})">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetForwardDocumentLinks(System.Nullable{System.Int32})">
             <summary>
             Get documents linked to source document assessment
             </summary>
@@ -154,7 +154,7 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="M:IO.Swagger.Controllers.DataAccessApiController.GetSEPDocumentLinks(System.Nullable{System.Int32})">
+        <member name="M:DataServices.Controllers.DataAccessApiController.GetSEPDocumentLinks(System.Nullable{System.Int32})">
             <summary>
             Get list of document objects linked to source document assessment
             </summary>
@@ -167,593 +167,809 @@
             <response code="406">Not acceptable.</response>
             <response code="500">Internal Server Error.</response>
         </member>
-        <member name="T:IO.Swagger.Filters.BasePathFilter">
+        <member name="T:DataServices.Filters.BasePathFilter">
             <summary>
             BasePath Document Filter sets BasePath property of Swagger and removes it from the individual URL paths
             </summary>
         </member>
-        <member name="M:IO.Swagger.Filters.BasePathFilter.#ctor(System.String)">
+        <member name="M:DataServices.Filters.BasePathFilter.#ctor(System.String)">
             <summary>
             Constructor
             </summary>
             <param name="basePath">BasePath to remove from Operations</param>
         </member>
-        <member name="P:IO.Swagger.Filters.BasePathFilter.BasePath">
+        <member name="P:DataServices.Filters.BasePathFilter.BasePath">
             <summary>
             Gets the BasePath of the Swagger Doc
             </summary>
             <returns>The BasePath of the Swagger Doc</returns>
         </member>
-        <member name="M:IO.Swagger.Filters.BasePathFilter.Apply(Swashbuckle.AspNetCore.Swagger.SwaggerDocument,Swashbuckle.AspNetCore.SwaggerGen.DocumentFilterContext)">
+        <member name="M:DataServices.Filters.BasePathFilter.Apply(Swashbuckle.AspNetCore.Swagger.SwaggerDocument,Swashbuckle.AspNetCore.SwaggerGen.DocumentFilterContext)">
             <summary>
             Apply the filter
             </summary>
             <param name="swaggerDoc">SwaggerDocument</param>
             <param name="context">FilterContext</param>
         </member>
-        <member name="T:IO.Swagger.Filters.GeneratePathParamsValidationFilter">
+        <member name="T:DataServices.Filters.GeneratePathParamsValidationFilter">
             <summary>
             Path Parameter Validation Rules Filter
             </summary>
         </member>
-        <member name="M:IO.Swagger.Filters.GeneratePathParamsValidationFilter.Apply(Swashbuckle.AspNetCore.Swagger.Operation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+        <member name="M:DataServices.Filters.GeneratePathParamsValidationFilter.Apply(Swashbuckle.AspNetCore.Swagger.Operation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
             <summary>
             Constructor
             </summary>
             <param name="operation">Operation</param>
             <param name="context">OperationFilterContext</param>
         </member>
-        <member name="T:IO.Swagger.Models.DefaultErrorResponse">
+        <member name="T:DataServices.Models.DefaultErrorResponse">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.DefaultErrorResponse.Detail">
+        <member name="P:DataServices.Models.DefaultErrorResponse.Detail">
             <summary>
             Gets or Sets Detail
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.DefaultErrorResponse.ToString">
+        <member name="M:DataServices.Models.DefaultErrorResponse.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DefaultErrorResponse.ToJson">
+        <member name="M:DataServices.Models.DefaultErrorResponse.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DefaultErrorResponse.Equals(System.Object)">
+        <member name="M:DataServices.Models.DefaultErrorResponse.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DefaultErrorResponse.Equals(IO.Swagger.Models.DefaultErrorResponse)">
+        <member name="M:DataServices.Models.DefaultErrorResponse.Equals(DataServices.Models.DefaultErrorResponse)">
             <summary>
             Returns true if DefaultErrorResponse instances are equal
             </summary>
             <param name="other">Instance of DefaultErrorResponse to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DefaultErrorResponse.GetHashCode">
+        <member name="M:DataServices.Models.DefaultErrorResponse.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.DocumentAssessmentData">
+        <member name="T:DataServices.Models.DocumentAssessmentData">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.SdocId">
+        <member name="P:DataServices.Models.DocumentAssessmentData.SdocId">
             <summary>
             Gets or Sets SdocId
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.Name">
+        <member name="P:DataServices.Models.DocumentAssessmentData.Name">
             <summary>
             SOURCE_DOCUMENT_NAME
             </summary>
             <value>SOURCE_DOCUMENT_NAME</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.SourceName">
+        <member name="P:DataServices.Models.DocumentAssessmentData.SourceName">
             <summary>
             name of source
             </summary>
             <value>name of source</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.ReceiptDate">
+        <member name="P:DataServices.Models.DocumentAssessmentData.ReceiptDate">
             <summary>
             RECEIPT_DATE
             </summary>
             <value>RECEIPT_DATE</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.SDODate">
+        <member name="P:DataServices.Models.DocumentAssessmentData.SDODate">
             <summary>
             TO_SDO_DATE
             </summary>
             <value>TO_SDO_DATE</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.EffectiveStartDate">
+        <member name="P:DataServices.Models.DocumentAssessmentData.EffectiveStartDate">
             <summary>
             The Effective start date, based on either the Receipt Date or To_SDO_Date
             </summary>
             <value>The Effective start date, based on either the Receipt Date or To_SDO_Date</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.Notes">
+        <member name="P:DataServices.Models.DocumentAssessmentData.Notes">
             <summary>
             Notes about the source document assessment.
             </summary>
             <value>Notes about the source document assessment.</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.Team">
+        <member name="P:DataServices.Models.DocumentAssessmentData.Team">
             <summary>
             The team to which the source document assessment has been assigned
             </summary>
             <value>The team to which the source document assessment has been assigned</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.DocumentType">
+        <member name="P:DataServices.Models.DocumentAssessmentData.DocumentType">
             <summary>
             The type of source document from SDRA SOURCE_DOCUMENT_TYPE
             </summary>
             <value>The type of source document from SDRA SOURCE_DOCUMENT_TYPE</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.DocumentNature">
+        <member name="P:DataServices.Models.DocumentAssessmentData.DocumentNature">
             <summary>
             SOURCE_NATURE
             </summary>
             <value>SOURCE_NATURE</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentAssessmentData.Datum">
+        <member name="P:DataServices.Models.DocumentAssessmentData.Datum">
             <summary>
             Datum
             </summary>
             <value>Datum</value>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentAssessmentData.ToString">
+        <member name="M:DataServices.Models.DocumentAssessmentData.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentAssessmentData.ToJson">
+        <member name="M:DataServices.Models.DocumentAssessmentData.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentAssessmentData.Equals(System.Object)">
+        <member name="M:DataServices.Models.DocumentAssessmentData.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentAssessmentData.Equals(IO.Swagger.Models.DocumentAssessmentData)">
+        <member name="M:DataServices.Models.DocumentAssessmentData.Equals(DataServices.Models.DocumentAssessmentData)">
             <summary>
             Returns true if DocumentAssessmentData instances are equal
             </summary>
             <param name="other">Instance of DocumentAssessmentData to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentAssessmentData.GetHashCode">
+        <member name="M:DataServices.Models.DocumentAssessmentData.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.DocumentObject">
+        <member name="T:DataServices.Models.DocumentObject">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentObject.Id">
+        <member name="P:DataServices.Models.DocumentObject.Id">
             <summary>
             The unique identifier for the SDRA assessment doucument i.e. the sdoc_id
             </summary>
             <value>The unique identifier for the SDRA assessment doucument i.e. the sdoc_id</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentObject.Name">
+        <member name="P:DataServices.Models.DocumentObject.Name">
             <summary>
             The name of the SDRA document
             </summary>
             <value>The name of the SDRA document</value>
         </member>
-        <member name="P:IO.Swagger.Models.DocumentObject.SourceName">
+        <member name="P:DataServices.Models.DocumentObject.SourceName">
             <summary>
             The unqiue TRIM identifier for the document i.e. the RSDRA number
             </summary>
             <value>The unqiue TRIM identifier for the document i.e. the RSDRA number</value>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObject.ToString">
+        <member name="M:DataServices.Models.DocumentObject.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObject.ToJson">
+        <member name="M:DataServices.Models.DocumentObject.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObject.Equals(System.Object)">
+        <member name="M:DataServices.Models.DocumentObject.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObject.Equals(IO.Swagger.Models.DocumentObject)">
+        <member name="M:DataServices.Models.DocumentObject.Equals(DataServices.Models.DocumentObject)">
             <summary>
             Returns true if DocumentObject instances are equal
             </summary>
             <param name="other">Instance of DocumentObject to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObject.GetHashCode">
+        <member name="M:DataServices.Models.DocumentObject.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.DocumentObjects">
+        <member name="T:DataServices.Models.DocumentObjects">
             <summary>
             
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObjects.ToString">
+        <member name="M:DataServices.Models.DocumentObjects.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObjects.ToJson">
+        <member name="M:DataServices.Models.DocumentObjects.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObjects.Equals(System.Object)">
+        <member name="M:DataServices.Models.DocumentObjects.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObjects.Equals(IO.Swagger.Models.DocumentObjects)">
+        <member name="M:DataServices.Models.DocumentObjects.Equals(DataServices.Models.DocumentObjects)">
             <summary>
             Returns true if DocumentObjects instances are equal
             </summary>
             <param name="other">Instance of DocumentObjects to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.DocumentObjects.GetHashCode">
+        <member name="M:DataServices.Models.DocumentObjects.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.LinkedDocument">
+        <member name="T:DataServices.Models.LinkedDocument">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.LinkedDocument.DocId1">
+        <member name="P:DataServices.Models.LinkedDocument.DocId1">
             <summary>
             The sdocId of the forward linked document or the source document sdocId
             </summary>
             <value>The sdocId of the forward linked document or the source document sdocId</value>
         </member>
-        <member name="P:IO.Swagger.Models.LinkedDocument.DocId2">
+        <member name="P:DataServices.Models.LinkedDocument.DocId2">
             <summary>
             The sdocId of the backward linked document or the source document sdocId
             </summary>
             <value>The sdocId of the backward linked document or the source document sdocId</value>
         </member>
-        <member name="P:IO.Swagger.Models.LinkedDocument.LinkType">
+        <member name="P:DataServices.Models.LinkedDocument.LinkType">
             <summary>
             Gets or Sets LinkType
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocument.ToString">
+        <member name="M:DataServices.Models.LinkedDocument.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocument.ToJson">
+        <member name="M:DataServices.Models.LinkedDocument.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocument.Equals(System.Object)">
+        <member name="M:DataServices.Models.LinkedDocument.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocument.Equals(IO.Swagger.Models.LinkedDocument)">
+        <member name="M:DataServices.Models.LinkedDocument.Equals(DataServices.Models.LinkedDocument)">
             <summary>
             Returns true if LinkedDocument instances are equal
             </summary>
             <param name="other">Instance of LinkedDocument to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocument.GetHashCode">
+        <member name="M:DataServices.Models.LinkedDocument.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.LinkedDocuments">
+        <member name="T:DataServices.Models.LinkedDocuments">
             <summary>
             
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocuments.ToString">
+        <member name="M:DataServices.Models.LinkedDocuments.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocuments.ToJson">
+        <member name="M:DataServices.Models.LinkedDocuments.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocuments.Equals(System.Object)">
+        <member name="M:DataServices.Models.LinkedDocuments.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocuments.Equals(IO.Swagger.Models.LinkedDocuments)">
+        <member name="M:DataServices.Models.LinkedDocuments.Equals(DataServices.Models.LinkedDocuments)">
             <summary>
             Returns true if LinkedDocuments instances are equal
             </summary>
             <param name="other">Instance of LinkedDocuments to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.LinkedDocuments.GetHashCode">
+        <member name="M:DataServices.Models.LinkedDocuments.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.QueuedDocumentObject">
+        <member name="T:DataServices.Models.QueuedDocumentObject">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.QueuedDocumentObject.SodcId">
+        <member name="P:DataServices.Models.QueuedDocumentObject.SodcId">
             <summary>
             Gets or Sets SodcId
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.QueuedDocumentObject.Code">
+        <member name="P:DataServices.Models.QueuedDocumentObject.Code">
             <summary>
             The &#x27;error&#x27; code number returned by SDRA webservice
             </summary>
             <value>The &#x27;error&#x27; code number returned by SDRA webservice</value>
         </member>
-        <member name="P:IO.Swagger.Models.QueuedDocumentObject.Message">
+        <member name="P:DataServices.Models.QueuedDocumentObject.Message">
             <summary>
             Gets or Sets Message
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.QueuedDocumentObject.StatusTime">
+        <member name="P:DataServices.Models.QueuedDocumentObject.StatusTime">
             <summary>
             Gets or Sets StatusTime
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObject.ToString">
+        <member name="M:DataServices.Models.QueuedDocumentObject.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObject.ToJson">
+        <member name="M:DataServices.Models.QueuedDocumentObject.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObject.Equals(System.Object)">
+        <member name="M:DataServices.Models.QueuedDocumentObject.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObject.Equals(IO.Swagger.Models.QueuedDocumentObject)">
+        <member name="M:DataServices.Models.QueuedDocumentObject.Equals(DataServices.Models.QueuedDocumentObject)">
             <summary>
             Returns true if QueuedDocumentObject instances are equal
             </summary>
             <param name="other">Instance of QueuedDocumentObject to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObject.GetHashCode">
+        <member name="M:DataServices.Models.QueuedDocumentObject.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.QueuedDocumentObjects">
+        <member name="T:DataServices.Models.QueuedDocumentObjects">
             <summary>
             
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObjects.ToString">
+        <member name="M:DataServices.Models.QueuedDocumentObjects.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObjects.ToJson">
+        <member name="M:DataServices.Models.QueuedDocumentObjects.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObjects.Equals(System.Object)">
+        <member name="M:DataServices.Models.QueuedDocumentObjects.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObjects.Equals(IO.Swagger.Models.QueuedDocumentObjects)">
+        <member name="M:DataServices.Models.QueuedDocumentObjects.Equals(DataServices.Models.QueuedDocumentObjects)">
             <summary>
             Returns true if QueuedDocumentObjects instances are equal
             </summary>
             <param name="other">Instance of QueuedDocumentObjects to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.QueuedDocumentObjects.GetHashCode">
+        <member name="M:DataServices.Models.QueuedDocumentObjects.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.ReturnCode">
+        <member name="T:DataServices.Models.ReturnCode">
             <summary>
             
             </summary>
         </member>
-        <member name="P:IO.Swagger.Models.ReturnCode.Code">
+        <member name="P:DataServices.Models.ReturnCode.Code">
             <summary>
             The &#x27;error&#x27; code number returned by SDRA webservice
             </summary>
             <value>The &#x27;error&#x27; code number returned by SDRA webservice</value>
         </member>
-        <member name="P:IO.Swagger.Models.ReturnCode.Message">
+        <member name="P:DataServices.Models.ReturnCode.Message">
             <summary>
             The description of the &#x27;error&#x27; or state
             </summary>
             <value>The description of the &#x27;error&#x27; or state</value>
         </member>
-        <member name="M:IO.Swagger.Models.ReturnCode.ToString">
+        <member name="M:DataServices.Models.ReturnCode.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.ReturnCode.ToJson">
+        <member name="M:DataServices.Models.ReturnCode.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.ReturnCode.Equals(System.Object)">
+        <member name="M:DataServices.Models.ReturnCode.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.ReturnCode.Equals(IO.Swagger.Models.ReturnCode)">
+        <member name="M:DataServices.Models.ReturnCode.Equals(DataServices.Models.ReturnCode)">
             <summary>
             Returns true if ReturnCode instances are equal
             </summary>
             <param name="other">Instance of ReturnCode to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.ReturnCode.GetHashCode">
+        <member name="M:DataServices.Models.ReturnCode.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Models.SdocId">
+        <member name="T:DataServices.Models.SdocId">
             <summary>
             The unique identifier for the SDRA assessment document i.e. the sdoc_id
             </summary>
         </member>
-        <member name="M:IO.Swagger.Models.SdocId.ToString">
+        <member name="M:DataServices.Models.SdocId.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.SdocId.ToJson">
+        <member name="M:DataServices.Models.SdocId.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:IO.Swagger.Models.SdocId.Equals(System.Object)">
+        <member name="M:DataServices.Models.SdocId.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.SdocId.Equals(IO.Swagger.Models.SdocId)">
+        <member name="M:DataServices.Models.SdocId.Equals(DataServices.Models.SdocId)">
             <summary>
             Returns true if SdocId instances are equal
             </summary>
             <param name="other">Instance of SdocId to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:IO.Swagger.Models.SdocId.GetHashCode">
+        <member name="M:DataServices.Models.SdocId.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:IO.Swagger.Program">
+        <member name="T:DataServices.Program">
             <summary>
             Program
             </summary>
         </member>
-        <member name="M:IO.Swagger.Program.Main(System.String[])">
+        <member name="M:DataServices.Program.Main(System.String[])">
             <summary>
             Main
             </summary>
             <param name="args"></param>
         </member>
-        <member name="M:IO.Swagger.Program.CreateWebHostBuilder(System.String[])">
+        <member name="M:DataServices.Program.CreateWebHostBuilder(System.String[])">
             <summary>
             Create the web host builder.
             </summary>
             <param name="args"></param>
             <returns>IWebHostBuilder</returns>
         </member>
-        <member name="T:IO.Swagger.Startup">
+        <member name="T:DataServices.Startup">
             <summary>
             Startup
             </summary>
         </member>
-        <member name="M:IO.Swagger.Startup.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:DataServices.Startup.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Constructor
             </summary>
             <param name="env"></param>
             <param name="configuration"></param>
         </member>
-        <member name="M:IO.Swagger.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:DataServices.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
             <param name="services"></param>
         </member>
-        <member name="M:IO.Swagger.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
+        <member name="M:DataServices.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>
             <param name="app"></param>
             <param name="env"></param>
             <param name="loggerFactory"></param>
+        </member>
+        <member name="T:SDRADataAccessWebService.Point">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Point.Latitude">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Point.Longitude">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.RecommendedActionType">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.RecommendedActionType.Id">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.RecommendedActionType.Name">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.DocumentType">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentType.Id">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentType.Name">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentType.Description">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.Link">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Link.DocId1">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Link.DocId2">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Link.LinkType">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.DocumentAction">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.Id">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.Name">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.DocumentId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.BranchId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.AssessActionType">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.VerifyActionType">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.AssessUser">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.AssessDate">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.AssessComments">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.VerifyUser">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.VerifyDate">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.VerifyComments">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.Snapshot">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.ProductDocumentId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.AssessUserName">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.DocumentAction.VerifyUserName">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.ProcessingStatus">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.ProcessingStatus.SdocId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.ProcessingStatus.ErrorCode">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.ProcessingStatus.StatusTime">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.ProcessingStatus.Message">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.CallOutcome">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.CallOutcome.ErrorCode">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.CallOutcome.Message">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.Polygon">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Polygon.NumPoints">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Polygon.Points">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.Line">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Line.NumPoints">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Line.Points">
+            <remarks/>
+        </member>
+        <member name="T:SDRADataAccessWebService.Document">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.Id">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.Name">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DocumentTypeId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.SourceName">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.SpatialExtentPolygon">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.CRSId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.CRSParams">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTId">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTName">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTFromDatum">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTMethod">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTDx">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTDy">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTDz">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTRx">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTRy">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTRz">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTScale">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTAccuracy">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTSourceFile">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.DTStatus">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.SepName">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.Scale">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.SpatialReferencingAccuracy">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.Status">
+            <remarks/>
+        </member>
+        <member name="P:SDRADataAccessWebService.Document.RegistrationDate">
+            <remarks/>
         </member>
     </members>
 </doc>
