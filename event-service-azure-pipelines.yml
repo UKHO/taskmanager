@@ -1,0 +1,61 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore eventservice'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+  displayName: 'dotnet build eventservice'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore eventservicetests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+  displayName: 'dotnet build eventservicetests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+  displayName: 'dotnet test eventservicetests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+    zipAfterPublish: false
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice'
+  displayName: 'Publish Solution'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\\eventservice'
+    ArtifactName: 'eventservice'
+    publishLocation: 'Container'
+  displayName: 'Publish eventservice Artifact'
+
