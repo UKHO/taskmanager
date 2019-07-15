@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataServicesTests", "DataSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventService", "EventService\EventService.csproj", "{80BE8052-7445-4A23-BB8A-198FB5C607EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventServiceTests", "EventServiceTests\EventServiceTests.csproj", "{D14AE93B-DC51-4BB9-811E-5791146E2410}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{80BE8052-7445-4A23-BB8A-198FB5C607EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80BE8052-7445-4A23-BB8A-198FB5C607EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80BE8052-7445-4A23-BB8A-198FB5C607EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D14AE93B-DC51-4BB9-811E-5791146E2410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D14AE93B-DC51-4BB9-811E-5791146E2410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D14AE93B-DC51-4BB9-811E-5791146E2410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D14AE93B-DC51-4BB9-811E-5791146E2410}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
