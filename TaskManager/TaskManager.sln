@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventServiceTests", "EventS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal", "Portal\Portal.csproj", "{1DF56C30-EC92-417A-A0F2-262D2D60E27C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalTests", "PortalTests\PortalTests.csproj", "{B2BF8E1F-9376-4979-9883-360755735D2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{1DF56C30-EC92-417A-A0F2-262D2D60E27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DF56C30-EC92-417A-A0F2-262D2D60E27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DF56C30-EC92-417A-A0F2-262D2D60E27C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2BF8E1F-9376-4979-9883-360755735D2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2BF8E1F-9376-4979-9883-360755735D2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2BF8E1F-9376-4979-9883-360755735D2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2BF8E1F-9376-4979-9883-360755735D2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
