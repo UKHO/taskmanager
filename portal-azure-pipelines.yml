@@ -1,0 +1,61 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portal\\portal.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore portal'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portal\\portal.csproj'
+  displayName: 'dotnet build portal'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portaltests\\portaltests.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore portaltests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portaltests\\portaltests.csproj'
+  displayName: 'dotnet build portaltests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portaltests\\portaltests.csproj'
+  displayName: 'dotnet test portaltests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    projects: '$(Build.SourcesDirectory)\\taskmanager\\portal\\portal.csproj'
+    zipAfterPublish: false
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
+  displayName: 'Publish Solution'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\\portal'
+    ArtifactName: 'portal'
+    publishLocation: 'Container'
+  displayName: 'Publish portal Artifact'
+
