@@ -46,7 +46,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    publishWebProjects: false
     projects: '$(Build.SourcesDirectory)\\taskmanager\\portal\\portal.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
