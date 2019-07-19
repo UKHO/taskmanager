@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
@@ -18,9 +19,11 @@ namespace Portal
                 .UseStartup<Startup>()
                 .ConfigureAppConfiguration(builder =>
                 {
+                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+
                     builder.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
                     {
-                        ConnectionString = ""
+                        ConnectionString = azureAppConfConnectionString
                     });
                 })
                 .ConfigureLogging((hostingContext, logging) =>
