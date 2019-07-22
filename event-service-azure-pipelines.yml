@@ -14,40 +14,40 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore eventservice'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
   displayName: 'dotnet build eventservice'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unitests\\eventservice.unittests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore eventservicetests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unitests\\eventservice.unittests.csproj'
   displayName: 'dotnet build eventservicetests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservicetests\\eventservicetests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
   displayName: 'dotnet test eventservicetests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\eventservice\\eventservice.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice'
   displayName: 'Publish Solution'
