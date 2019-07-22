@@ -60,10 +60,10 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
-  displayName: 'Publish Solution'
+  displayName: 'Publish portal-project'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -72,7 +72,7 @@ steps:
     projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
-  displayName: 'Publish Solution'
+  displayName: 'Publish specs-project'
 
 - task: PublishBuildArtifacts@1
   inputs:
