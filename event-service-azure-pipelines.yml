@@ -27,14 +27,14 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unitests\\eventservice.unittests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore eventservicetests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unitests\\eventservice.unittests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
   displayName: 'dotnet build eventservicetests'
 
 - task: DotNetCoreCLI@2
