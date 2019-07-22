@@ -14,40 +14,40 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore sourcedocumentcoordinator'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
   displayName: 'dotnet build sourcedocumentcoordinator'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator.unittests\\sourcedocumentcoordinator.unittests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore sourcedocumentcoordinatortests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator.unittests\\sourcedocumentcoordinator.unittests.csproj'
   displayName: 'dotnet build sourcedocumentcoordinatortests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinatortests\\sourcedocumentcoordinatortests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator.unittests\\sourcedocumentcoordinator.unittests.csproj'
   displayName: 'dotnet test sourcedocumentcoordinatortests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
   displayName: 'Publish Solution'
