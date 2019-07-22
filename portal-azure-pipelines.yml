@@ -46,14 +46,14 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\Portal.TestAutomation.Specs.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore portalspecs'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\Portal.TestAutomation.Specs.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
   displayName: 'dotnet build portalspecs'
 
 - task: DotNetCoreCLI@2
@@ -69,7 +69,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\Portal.TestAutomation.Specs.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
   displayName: 'Publish Solution'
