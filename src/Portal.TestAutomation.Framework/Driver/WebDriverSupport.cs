@@ -1,4 +1,5 @@
-﻿using BoDi;
+﻿using System;
+using BoDi;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using TechTalk.SpecFlow;
@@ -18,7 +19,7 @@ namespace Portal.TestAutomation.Framework.Driver
         [BeforeScenario(Order = 0)]
         public void InitializeWebDriver()
         {
-            var webDriver = new ChromeDriver();
+            var webDriver = new ChromeDriver(Environment.GetEnvironmentVariable("ChromeWebDriver"));
             _objectContainer.RegisterInstanceAs<IWebDriver>(webDriver);
         }
     }
