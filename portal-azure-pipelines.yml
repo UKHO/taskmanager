@@ -14,33 +14,33 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore portal'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
   displayName: 'dotnet build portal'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\portaltests\\portaltests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore portaltests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\portaltests\\portaltests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
   displayName: 'dotnet build portaltests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '$(Build.SourcesDirectory)\\src\\portaltests\\portaltests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
   displayName: 'dotnet test portaltests'
 
 - task: DotNetCoreCLI@2
