@@ -1,0 +1,17 @@
+﻿{
+  "bindingCulture": {
+    "language": "en-us"
+  },
+  "language": {
+    "feature": "en-us"
+  },
+  "plugins": [],
+  "stepAssemblies": [
+    {
+      "assembly": "Portal.TestAutomation.Steps"
+    },
+    {
+      "assembly": "Portal.TestAutomation.Framework"
+    }
+  ]
+}
