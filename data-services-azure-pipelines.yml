@@ -14,40 +14,40 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservices\\dataservices.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore dataservices'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservices\\dataservices.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
   displayName: 'dotnet build dataservices'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservicestests\\dataservicestests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
     feedsToUse: 'select'
   displayName: 'dotnet restore dataservicestests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservicestests\\dataservicestests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
   displayName: 'dotnet build dataservicestests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservicestests\\dataservicestests.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
   displayName: 'dotnet test dataservicestests'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\taskmanager\\dataservices\\dataservices.csproj'
+    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
     zipAfterPublish: false
     arguments: '--output $(Build.ArtifactStagingDirectory)\\dataservices'
   displayName: 'Publish Solution'
