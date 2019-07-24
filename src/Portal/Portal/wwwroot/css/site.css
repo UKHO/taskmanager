@@ -35,3 +35,14 @@ body {
         display: none;
     }
 }
+
+@media (min-width: 1400px) {
+    .container {
+         width: 1370px;
+    }
+}
+
+table.task-list thead tr th {
+    white-space: nowrap;
+    text-align: center;
+}
