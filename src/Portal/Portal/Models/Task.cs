@@ -2,7 +2,7 @@
 
 namespace Portal.Models
 {
-    public class LandingPage
+    public class Task
     {
         public string ProcessId { get; set; }
         public int DaysToDmEndDate { get; set; }

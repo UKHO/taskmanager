@@ -2,22 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Portal.Models;
 
 namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
+        public IList<Models.Task> Tasks { get; set; }
+
+        public IndexModel()
+        {
+            Tasks = new List<Task>();
+        }
         public void OnGet()
         {
             var rows = System.IO.File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "ExampleDataCSV.csv"));
 
-            var lst = new List<Models.LandingPage>();
+            Tasks = new List<Models.Task>();
 
             foreach (var row in rows.Split('\n'))
             {
                 if (!string.IsNullOrEmpty(row))
                 {
-                    lst.Add(new Models.LandingPage
+                    Tasks.Add(new Models.Task
                     {
                         ProcessId = row.Split(',')[0],
                         DaysToDmEndDate = Convert.ToInt32(row.Split(',')[1]),
@@ -34,8 +41,6 @@ namespace Portal.Pages
                     });
                 }
             }
-
-            var no = lst.Count;
         }
     }
 }
