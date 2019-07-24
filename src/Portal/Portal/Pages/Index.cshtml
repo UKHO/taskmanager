@@ -4,78 +4,199 @@
     ViewData["Title"] = "Home page";
 }
 
-<table id="example" class="task-list table-striped" style="width: 100%">
-    <thead>
-        <tr>
-            <th>Process ID</th>
-            <th><div>Days to DM</div><div>End Date</div></th>
-            <th>DM End Date</th>
-            <th>Days On Hold</th>
-            <th>RSDRA No.</th>
-            <th>Source Name</th>
-            <th>Workspace</th>
-            <th>Task Type</th>
-            <th>Task Stage</th>
-            <th>Assessor</th>
-            <th>Verifier</th>
-            <th>Team</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var task in Model.Tasks)
-        {
-            <tr>
-                <td>
-                    @task.ProcessId
-                </td>
-                <td>
-                    @task.DaysToDmEndDate
-                </td>
-                <td>
-                    @task.DmEndDate.ToShortDateString()
-                </td>
-                <td>
-                    @task.DaysOnHold
-                </td>
-                <td>
-                    @task.RsdraNo
-                </td>
-                <td>
-                    @task.SourceName
-                </td>
-                <td>
-                    @task.Workspace
-                </td>
-                <td>
-                    @task.TaskType
-                </td>
-                <td>
-                    @task.TaskStage
-                </td>
-                <td>
-                    @task.Assessor
-                </td>
-                <td>
-                    @task.Verifier
-                </td>
-                <td>
-                    @task.Team
-                </td>
-                <td>
-                    Cog
-                </td>
-            </tr>
-        }
+<div class="row" style="padding-top: 5px">
+    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+        <img src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+    </div>
+    <div class="col-lg-9 col-md-8 col-sm-8 col-xs-8">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <button class="btn btn-primary"><span style="padding-right: 5px;"></span>My Task List</button>
+                <button class="btn btn-primary"><span style="padding-right: 5px;"></span>Team Tasks</button>
+                <button class="btn btn-primary"><span style="padding-right: 5px;"></span>Statistics</button>
+                <button class="btn btn-primary"><span style="padding-right: 5px;"></span>Historical Tasks</button>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 5px">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                <div class="right-inner-addon">
+                    <i class="glyphicon glyphicon-search"></i>
+                    <input type="search" class="form-control" placeholder="Search" />
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 dropdown">
+                <button class="btn btn-primary" type="button" id="btnSelectStage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Stage</button>
+                <button class="btn btn-primary" type="button" id="btnSelectTeam" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Team</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    </tbody>
-</table>
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span>Unassigned Tasks</span>
+    </div>
+
+    <div class="panel-body">
+        <table id="example" class="task-list table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th><div>Days to DM</div><div>End Date</div></th>
+                    <th>DM End Date</th>
+                    <th>Days On Hold</th>
+                    <th>RSDRA No.</th>
+                    <th>Source Name</th>
+                    <th>Workspace</th>
+                    <th>Task Type</th>
+                    <th>Task Stage</th>
+                    <th>Assessor</th>
+                    <th>Verifier</th>
+                    <th>Team</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr>
+                        <td>
+                            @task.ProcessId
+                        </td>
+                        <td>
+                            @task.DaysToDmEndDate
+                        </td>
+                        <td>
+                            @task.DmEndDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.DaysOnHold
+                        </td>
+                        <td>
+                            @task.RsdraNo
+                        </td>
+                        <td>
+                            @task.SourceName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskType
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            Cog
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<br/>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span>In Flight Tasks</span>
+    </div>
+    <div class="panel-body">
+        <table id="examples" class="task-list table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th><div>Days to DM</div><div>End Date</div></th>
+                    <th>DM End Date</th>
+                    <th>Days On Hold</th>
+                    <th>RSDRA No.</th>
+                    <th>Source Name</th>
+                    <th>Workspace</th>
+                    <th>Task Type</th>
+                    <th>Task Stage</th>
+                    <th>Assessor</th>
+                    <th>Verifier</th>
+                    <th>Team</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr>
+                        <td>
+                            @task.ProcessId
+                        </td>
+                        <td>
+                            @task.DaysToDmEndDate
+                        </td>
+                        <td>
+                            @task.DmEndDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.DaysOnHold
+                        </td>
+                        <td>
+                            @task.RsdraNo
+                        </td>
+                        <td>
+                            @task.SourceName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskType
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            Cog
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @section Scripts {
 
     <script>
         $(document).ready(function () {
-            $('#example').DataTable();
+            $('#example').DataTable({
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50]
+            })
+            $('#examples').DataTable({
+                "lengthMenu": [10, 25, 50]
+            })
         });
     </script>
 }

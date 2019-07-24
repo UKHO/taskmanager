@@ -38,11 +38,37 @@ body {
 
 @media (min-width: 1400px) {
     .container {
-         width: 1370px;
+        width: 1370px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1570px;
     }
 }
 
 table.task-list thead tr th {
     white-space: nowrap;
     text-align: center;
+}
+
+.right-inner-addon {
+    position: relative;
+}
+
+.right-inner-addon input {
+        padding-right: 30px;
+}
+
+.right-inner-addon i {
+        position: absolute;
+        right: 0px;
+        padding: 10px 12px;
+        pointer-events: none;
+}
+
+.well.landingpagefooter {
+    background-color: #337ab7;
+    color: white;
 }
