@@ -4,6 +4,7 @@ namespace Portal.Models
 {
     public class Task
     {
+        public int Id { get; set; }
         public string ProcessId { get; set; }
         public int DaysToDmEndDate { get; set; }
         public DateTime DmEndDate { get; set; }
@@ -16,6 +17,5 @@ namespace Portal.Models
         public string Assessor { get; set; }
         public string Verifier { get; set; }
         public string Team { get; set; }
-
     }
 }

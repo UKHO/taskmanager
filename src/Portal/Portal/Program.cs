@@ -1,9 +1,10 @@
-﻿using System;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Portal.DataContext;
+using Portal.Models;
 
 namespace Portal
 {
@@ -11,7 +12,16 @@ namespace Portal
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var host = CreateWebHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<TasksDbContext>();
+
+                DataGenerator.Initialize(services);
+            }
+            host.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -19,12 +29,12 @@ namespace Portal
                 .UseStartup<Startup>()
                 .ConfigureAppConfiguration(builder =>
                 {
-                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+                    //var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                    builder.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
-                    {
-                        ConnectionString = azureAppConfConnectionString
-                    });
+                    //builder.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
+                    //{
+                    //    ConnectionString = azureAppConfConnectionString
+                    //});
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
