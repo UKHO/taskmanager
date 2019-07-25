@@ -87,7 +87,8 @@
     "taskStage": "Verify",
     "assessor": "SBarzey",
     "verifier": "MSlocombe",
-    "team": "PR"
+    "team": "PR",
+    "tasknote": "Contact Jim before Verifying #4324!"
   },
   {
     "id": 7,
@@ -103,6 +104,6 @@
     "assessor": "SBarzey",
     "verifier": "MSlocombe",
     "team": "PR",
-    "tasknote":  "This is a note to say 'I am a note!'" 
+    "tasknote":  "This is a note to say 'I am a note! #4325" 
   }
 ]
