@@ -152,6 +152,16 @@
                         </td>
                         <td>
                             @task.DaysOnHold
+                            @{
+                                if (task.DaysOnHold <= 5 && task.DaysOnHold >= 1)
+                                {
+                                    <i class="far fa-pause-circle"></i>
+                                }
+                                else if (task.DaysOnHold >= 6)
+                                {
+                                    <i class="far fa-pause-circle red"></i>
+                                }
+                            }
                         </td>
                         <td>
                             @task.RsdraNo

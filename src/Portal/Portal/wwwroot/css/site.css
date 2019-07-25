@@ -77,3 +77,7 @@ table.task-list thead tr th {
 .well.landingpagefooter p {
     margin: 0px;
 }
+
+.red {
+    color: red;
+}
