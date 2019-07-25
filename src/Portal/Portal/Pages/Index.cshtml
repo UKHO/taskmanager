@@ -58,6 +58,7 @@
                     <th>Verifier</th>
                     <th>Team</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -102,7 +103,10 @@
                             @task.Team
                         </td>
                         <td>
-                            Cog
+                            <i class="fas fa-cog black"></i>
+                        </td>
+                        <td>
+                            @task.TaskNote
                         </td>
                     </tr>
                 }
@@ -135,6 +139,7 @@
                     <th>Verifier</th>
                     <th>Team</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -152,7 +157,6 @@
                     }
 
                     <tr class="@rowColour">
-
                         <td>
                             @task.ProcessId
                         </td>
@@ -200,7 +204,10 @@
                             @task.Team
                         </td>
                         <td>
-                            Cog
+                            <i class="fas fa-cog black"></i>
+                        </td>
+                        <td>
+                            @task.TaskNote
                         </td>
                     </tr>
                 }
@@ -216,11 +223,44 @@
         $(document).ready(function () {
             $('#example').DataTable({
                 "pageLength": 5,
-                "lengthMenu": [5, 10, 25, 50]
-            })
-            $('#examples').DataTable({
-                "lengthMenu": [10, 25, 50]
-            })
+                "lengthMenu": [5, 10, 25, 50],
+                'columnDefs': [{
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }]
+            });
+            var table = $('#examples').DataTable({
+                "lengthMenu": [10, 25, 50],
+                'columnDefs': [{
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }]
+            });
+
+            $('#examples tbody tr').each(function (index, tr) {
+
+                var row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    $(tr).removeClass('shown');
+                } else {
+                    row.child(row.data()[13]).show();
+                    $(tr).addClass('shown');
+                }
+            });
         });
     </script>
 }

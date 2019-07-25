@@ -102,6 +102,7 @@
     "taskStage": "Verify",
     "assessor": "SBarzey",
     "verifier": "MSlocombe",
-    "team": "PR"
+    "team": "PR",
+    "tasknote":  "This is a note to say 'I am a note!'" 
   }
 ]
