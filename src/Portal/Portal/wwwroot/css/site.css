@@ -81,3 +81,11 @@ table.task-list thead tr th {
 .red {
     color: red;
 }
+
+.amber {
+    color: orange;
+}
+
+.black {
+    color: black;
+}

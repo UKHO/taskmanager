@@ -140,7 +140,19 @@
             <tbody>
                 @foreach (var task in Model.Tasks)
                 {
-                    <tr>
+                    string rowColour = "black";
+
+                    if (task.DaysToDmEndDate >= 1 && task.DaysToDmEndDate <= 2)
+                    {
+                        rowColour = "amber";
+                    }
+                    else if (task.DaysToDmEndDate <= 0)
+                    {
+                        rowColour = "red";
+                    }
+
+                    <tr class="@rowColour">
+
                         <td>
                             @task.ProcessId
                         </td>
@@ -155,7 +167,7 @@
                             @{
                                 if (task.DaysOnHold <= 5 && task.DaysOnHold >= 1)
                                 {
-                                    <i class="far fa-pause-circle"></i>
+                                    <i class="far fa-pause-circle black"></i>
                                 }
                                 else if (task.DaysOnHold >= 6)
                                 {
