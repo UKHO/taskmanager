@@ -252,14 +252,25 @@
             $('#examples tbody tr').each(function (index, tr) {
 
                 var row = table.row(tr);
+                var taskNote = row.data()[13];
 
-                if (row.child.isShown()) {
-                    row.child.hide();
-                    $(tr).removeClass('shown');
+                if (taskNote.length > 0) {
+                    row.child("<b>Note: </b>" + taskNote).show();
+                    row.child().children("td").addClass("note-formatting");
                 } else {
-                    row.child(row.data()[13]).show();
-                    $(tr).addClass('shown');
+                    row.child("").show();
                 }
+
+                $(tr).addClass('shown');
+
+                if ($(tr).hasClass('red')) {
+                    row.child().addClass('red');
+                } else if ($(tr).hasClass('amber')) {
+                    row.child().addClass('amber');
+                } else if ($(tr).hasClass('black')) {
+                    row.child().addClass('black');
+                }
+
             });
         });
     </script>

@@ -14,21 +14,22 @@
       "verifier": "WRigden",
       "team": "PR"
     },
-    {
-      "id": 2,
-      "processId": "1235",
-      "daysToDmEndDate": -4,
-      "dmEndDate": "2019-07-02T00:00:00",
-      "daysOnHold": 0,
-      "rsdraNo": "20190112346",
-      "sourceName": "18_5555_NM_ABP_IPS_5",
-      "workspace": "1235",
-      "taskType": "Simple",
-      "taskStage": "Verify",
-      "assessor": "SBarzey",
-      "verifier": "MSlocombe",
-      "team": "PR"
-    },
+  {
+    "id": 2,
+    "processId": "1235",
+    "daysToDmEndDate": -4,
+    "dmEndDate": "2019-07-02T00:00:00",
+    "daysOnHold": 0,
+    "rsdraNo": "20190112346",
+    "sourceName": "18_5555_NM_ABP_IPS_5",
+    "workspace": "1235",
+    "taskType": "Simple",
+    "taskStage": "Verify",
+    "assessor": "SBarzey",
+    "verifier": "MSlocombe",
+    "team": "PR",
+    "tasknote": "Waiting for Jim to get in touch."
+  },
   {
     "id": 3,
     "processId": "4321",
@@ -57,7 +58,8 @@
     "taskStage": "Verify",
     "assessor": "SBarzey",
     "verifier": "MSlocombe",
-    "team": "PR"
+    "team": "PR",
+    "tasknote": "Awaiting authorisation."
   },
   {
     "id": 5,

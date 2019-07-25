@@ -88,6 +88,10 @@ table.task-list thead tr th {
     background-color: #f9f9f9;
 }
 
+#examples.table-striped > tbody > tr > td.note-formatting {
+    padding: 5px 0px 10px 15px;
+}
+
 .red {
     color: red;
 }
