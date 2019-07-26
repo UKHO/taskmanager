@@ -103,3 +103,7 @@ table.task-list thead tr th {
 .black {
     color: black;
 }
+
+.panel {
+    overflow: auto;
+}
