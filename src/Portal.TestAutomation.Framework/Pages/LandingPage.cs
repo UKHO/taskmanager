@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Configuration;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 
@@ -13,7 +14,12 @@ namespace Portal.TestAutomation.Framework.Pages
         private IWebElement UkhoLogo => _driver.FindElement(LogoLocator);
 
         public LandingPage(IWebDriver driver, int seconds)
-        {                   
+        {
+            var configRoot = ConfigurationRoot.Instance;
+            var config = new LandingPageConfig();
+
+            configRoot.GetSection("urls").Bind(config);
+
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
         }
