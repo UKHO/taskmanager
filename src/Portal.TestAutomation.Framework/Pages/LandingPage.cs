@@ -10,8 +10,7 @@ namespace Portal.TestAutomation.Framework.Pages
         private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
 
-        private By LogoLocator => By.Id("ukhoLogo");
-        private IWebElement UkhoLogo => _driver.FindElement(LogoLocator);
+        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
         public LandingPage(IWebDriver driver, int seconds)
         {
