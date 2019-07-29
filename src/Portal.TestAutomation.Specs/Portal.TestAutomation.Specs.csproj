@@ -21,6 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="LandingPage.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LandingPage.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="specflow.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -36,6 +44,10 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>SecondTestExample.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="LandingPage.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>LandingPage.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 

@@ -4,93 +4,270 @@
     ViewData["Title"] = "Home page";
 }
 
-<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
-    <ol class="carousel-indicators">
-        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#myCarousel" data-slide-to="1"></li>
-        <li data-target="#myCarousel" data-slide-to="2"></li>
-    </ol>
-    <div class="carousel-inner" role="listbox">
-        <div class="item active">
-            <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Learn how to build ASP.NET apps that can run anywhere.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
+<div class="row" style="padding-top: 5px">
+    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+        <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+    </div>
+    <div class="col-lg-9 col-md-8 col-sm-8 col-xs-8">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <button id="btnMyTaskList" class="btn btn-primary"><span style="padding-right: 5px;"></span>My Task List</button>
+                <button id="btnTeamTasks" class="btn btn-primary"><span style="padding-right: 5px;"></span>Team Tasks</button>
+                <button id="btnStats" class="btn btn-primary"><span style="padding-right: 5px;"></span>Statistics</button>
+                <button id="btnHistorical" class="btn btn-primary"><span style="padding-right: 5px;"></span>Historical Tasks</button>
             </div>
         </div>
-        <div class="item">
-            <img src="~/images/banner2.svg" alt="Visual Studio" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    There are powerful new features in Visual Studio for building modern web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525030&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
+        <div class="row" style="padding-top: 5px">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <div class="right-inner-addon">
+                    <i class="glyphicon glyphicon-search"></i>
+                    <input id="txtGlobalSearch" type="search" class="form-control" placeholder="Search" />
+                </div>
             </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner3.svg" alt="Microsoft Azure" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Learn how Microsoft's Azure cloud platform allows you to build, deploy, and scale web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525027&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 dropdown">
+                <div class="pull-right">
+                    <button class="btn btn-primary" type="button" id="btnSelectStage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Stage</button>
+                    <button class="btn btn-primary" type="button" id="btnSelectTeam" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Team</button>
+                </div>
             </div>
         </div>
     </div>
-    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
 </div>
 
-<div class="row">
-    <div class="col-md-3">
-        <h2>Application uses</h2>
-        <ul>
-            <li>Sample pages using ASP.NET Core Razor Pages</li>
-            <li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
-        </ul>
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span>Unassigned Tasks</span>
     </div>
-    <div class="col-md-3">
-        <h2>How to</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?linkid=852130">Working with Razor Pages.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>Overview</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>Run &amp; Deploy</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure App Service</a></li>
-        </ul>
+
+    <div class="panel-body">
+        <table id="example" class="task-list table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th><div>Days to DM</div><div>End Date</div></th>
+                    <th>DM End Date</th>
+                    <th>Days On Hold</th>
+                    <th>RSDRA No.</th>
+                    <th>Source Name</th>
+                    <th>Workspace</th>
+                    <th>Task Type</th>
+                    <th>Task Stage</th>
+                    <th>Assessor</th>
+                    <th>Verifier</th>
+                    <th>Team</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr>
+                        <td>
+                            @task.ProcessId
+                        </td>
+                        <td>
+                            @task.DaysToDmEndDate
+                        </td>
+                        <td>
+                            @task.DmEndDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.DaysOnHold
+                        </td>
+                        <td>
+                            @task.RsdraNo
+                        </td>
+                        <td>
+                            @task.SourceName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskType
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            <i class="fas fa-cog black"></i>
+                        </td>
+                        <td>
+                            @task.TaskNote
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
     </div>
 </div>
+
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span>In Flight Tasks</span>
+    </div>
+    <div class="panel-body">
+        <table id="examples" class="task-list table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th><div>Days to DM</div><div>End Date</div></th>
+                    <th>DM End Date</th>
+                    <th>Days On Hold</th>
+                    <th>RSDRA No.</th>
+                    <th>Source Name</th>
+                    <th>Workspace</th>
+                    <th>Task Type</th>
+                    <th>Task Stage</th>
+                    <th>Assessor</th>
+                    <th>Verifier</th>
+                    <th>Team</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    string rowColour = "black";
+
+                    if (task.DaysToDmEndDate >= 1 && task.DaysToDmEndDate <= 2)
+                    {
+                        rowColour = "amber";
+                    }
+                    else if (task.DaysToDmEndDate <= 0)
+                    {
+                        rowColour = "red";
+                    }
+
+                    <tr class="@rowColour">
+                        <td>
+                            @task.ProcessId
+                        </td>
+                        <td>
+                            @task.DaysToDmEndDate
+                        </td>
+                        <td>
+                            @task.DmEndDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.DaysOnHold
+                            @{
+                                if (task.DaysOnHold <= 5 && task.DaysOnHold >= 1)
+                                {
+                                    <i class="far fa-pause-circle black"></i>
+                                }
+                                else if (task.DaysOnHold >= 6)
+                                {
+                                    <i class="far fa-pause-circle red"></i>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @task.RsdraNo
+                        </td>
+                        <td>
+                            @task.SourceName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskType
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            <i class="fas fa-cog black"></i>
+                        </td>
+                        <td>
+                            @task.TaskNote
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+                'columnDefs': [{
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }]
+            });
+            var table = $('#examples').DataTable({
+                "lengthMenu": [10, 25, 50],
+                'columnDefs': [{
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }]
+            });
+
+            $('#examples tbody tr').each(function (index, tr) {
+
+                var row = table.row(tr);
+                var taskNote = row.data()[13];
+
+                if (taskNote.length > 0) {
+                    row.child("<b>Note: </b>" + taskNote).show();
+                    row.child().children("td").addClass("note-formatting");
+                } else {
+                    row.child("").show();
+                }
+
+                $(tr).addClass('shown');
+
+                if ($(tr).hasClass('red')) {
+                    row.child().addClass('red');
+                } else if ($(tr).hasClass('amber')) {
+                    row.child().addClass('amber');
+                } else if ($(tr).hasClass('black')) {
+                    row.child().addClass('black');
+                }
+
+            });
+        });
+    </script>
+}

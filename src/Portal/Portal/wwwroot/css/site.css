@@ -1,7 +1,7 @@
 /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
 body {
-    padding-top: 50px;
+    padding-top: 20px;
     padding-bottom: 20px;
 }
 
@@ -34,4 +34,76 @@ body {
     .carousel-caption {
         display: none;
     }
+}
+
+@media (min-width: 1400px) {
+    .container {
+        width: 1370px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1570px;
+    }
+}
+
+table.task-list thead tr th {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.right-inner-addon {
+    position: relative;
+}
+
+.right-inner-addon input {
+        padding-right: 30px;
+}
+
+.right-inner-addon i {
+        position: absolute;
+        right: 0px;
+        padding: 10px 12px;
+        pointer-events: none;
+}
+
+.well.landingpagefooter {
+    background-color: #337ab7;
+    color: white;
+    padding: 5px 19px 5px 19px;
+}
+
+.well.landingpagefooter p {
+    margin: 0px;
+}
+
+#examples.table-striped > tbody > tr.even,
+#examples.table-striped > tbody > tr.even + tr {
+    background-color: #ffffff;
+}
+
+#examples.table-striped > tbody > tr.odd,
+#examples.table-striped > tbody > tr.odd + tr {
+    background-color: #f9f9f9;
+}
+
+#examples.table-striped > tbody > tr > td.note-formatting {
+    padding: 5px 0px 10px 15px;
+}
+
+.red {
+    color: red;
+}
+
+.amber {
+    color: orange;
+}
+
+.black {
+    color: black;
+}
+
+.panel {
+    overflow: auto;
 }
