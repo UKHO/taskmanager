@@ -9,7 +9,7 @@
       "sourceName": "18_5555_NM_ABP_IPS_4",
       "workspace": "1234",
       "taskType": "LTA",
-      "taskStage": "Assess",
+      "taskStage": "Review",
       "assessor": "SBarzey",
       "verifier": "WRigden",
       "team": "PR"
@@ -40,7 +40,7 @@
     "sourceName": "18_5555_NM_ABP_IPS_6",
     "workspace": "5554",
     "taskType": "LTA P/O",
-    "taskStage": "Approve",
+    "taskStage": "Review",
     "assessor": "SBarzey",
     "verifier": "PHocking",
     "team": "HW"
@@ -102,7 +102,7 @@
     "sourceName": "18_5555_NM_ABP_IPS_10",
     "workspace": "5558",
     "taskType": "Simple",
-    "taskStage": "Verify",
+    "taskStage": "Assess",
     "assessor": "SBarzey",
     "verifier": "MSlocombe",
     "team": "PR",
