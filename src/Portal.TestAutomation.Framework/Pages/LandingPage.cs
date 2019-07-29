@@ -9,15 +9,14 @@ namespace Portal.TestAutomation.Framework.Pages
     {
         private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
+        private readonly LandingPageConfig _config = new LandingPageConfig();
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
         public LandingPage(IWebDriver driver, int seconds)
         {
             var configRoot = ConfigurationRoot.Instance;
-            var config = new LandingPageConfig();
-
-            configRoot.GetSection("urls").Bind(config);
+            configRoot.GetSection("urls").Bind(_config);
 
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
@@ -39,8 +38,7 @@ namespace Portal.TestAutomation.Framework.Pages
 
         public void NavigateTo()
         {
-            // TODO - retrieve portal Url from Azure app configuration?
-            _driver.Navigate().GoToUrl("");
+            _driver.Navigate().GoToUrl(_config.LandingPageUrl);
         }
     }
 }
