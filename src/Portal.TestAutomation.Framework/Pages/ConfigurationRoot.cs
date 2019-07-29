@@ -4,9 +4,9 @@ using System;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public sealed class ConfigurationRoot
+    public static class ConfigurationRoot
     {
-        private static IConfigurationRoot _instance = null;
+        private static IConfigurationRoot _instance;
 
         public static IConfigurationRoot Instance
         {
