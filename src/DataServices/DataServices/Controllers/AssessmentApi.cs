@@ -86,27 +86,6 @@ namespace DataServices.Controllers
                 return StatusCode(500, e.Message);
             }
 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(DocumentObjects));
-
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-
             var documentObjects = new DocumentObjects();
             var documents = result.Body.GetDocumentsForAssessmentResult.Select<Document, DocumentObject>(
                 document => new DocumentObject
