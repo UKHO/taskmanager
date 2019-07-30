@@ -5,9 +5,11 @@
     "description" : "This API is for SDRA\n\nIt provides Source Document Assessment Data and Data Access\n",
     "version" : "1.0.0"
   },
-  "servers" : [ {
-    "url" : "http://ukho.gov.uk/DataServices/v1/"
-  } ],
+  "servers": [
+    {
+      "url": "/DataServices/v1/"
+    }
+  ],
   "paths" : {
     "/SourceDocument/Assessment/DocumentsForAssessment/{callerCode}" : {
       "get" : {
