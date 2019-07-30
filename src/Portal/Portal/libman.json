@@ -10,6 +10,106 @@
         "jquery.min.map",
         "jquery.js"
       ]
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.9",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/",
+      "files": [
+        "jquery.validate.unobtrusive.min.js",
+        "jquery.validate.unobtrusive.js"
+      ]
+    },
+    {
+      "library": "jquery-validate@1.17.0",
+      "destination": "wwwroot/lib/jquery-validate/",
+      "files": [
+        "jquery.validate.min.js",
+        "jquery.validate.js",
+        "additional-methods.js",
+        "additional-methods.min.js"
+      ]
+    },
+    {
+      "library": "datatables@1.10.19",
+      "destination": "wwwroot/lib/datatables/",
+      "files": [
+        "js/dataTables.bootstrap.js",
+        "js/dataTables.bootstrap.min.js",
+        "images/sort_asc.png",
+        "images/sort_asc_disabled.png",
+        "images/sort_both.png",
+        "images/sort_desc.png",
+        "images/sort_desc_disabled.png",
+        "js/dataTables.bootstrap4.js",
+        "js/dataTables.bootstrap4.min.js",
+        "js/dataTables.dataTables.js",
+        "js/dataTables.dataTables.min.js",
+        "js/dataTables.foundation.js",
+        "js/dataTables.foundation.min.js",
+        "js/dataTables.jqueryui.js",
+        "js/dataTables.jqueryui.min.js",
+        "css/dataTables.bootstrap4.min.css",
+        "css/dataTables.bootstrap4.css",
+        "js/dataTables.semanticui.js",
+        "js/dataTables.semanticui.min.js",
+        "css/dataTables.bootstrap.min.css",
+        "css/dataTables.bootstrap.css",
+        "js/jquery.dataTables.js",
+        "js/jquery.dataTables.min.js",
+        "css/dataTables.foundation.css",
+        "css/dataTables.foundation.min.css",
+        "css/dataTables.jqueryui.css",
+        "css/dataTables.jqueryui.min.css",
+        "css/dataTables.semanticui.css",
+        "css/dataTables.semanticui.min.css",
+        "css/jquery.dataTables.css",
+        "css/jquery.dataTables.min.css"
+      ]
+    },
+    {
+      "library": "twitter-bootstrap@3.4.1",
+      "destination": "wwwroot/lib/bootstrap/",
+      "files": [
+        "js/bootstrap.js",
+        "js/bootstrap.min.js",
+        "js/npm.js",
+        "fonts/glyphicons-halflings-regular.eot",
+        "fonts/glyphicons-halflings-regular.svg",
+        "fonts/glyphicons-halflings-regular.ttf",
+        "fonts/glyphicons-halflings-regular.woff",
+        "fonts/glyphicons-halflings-regular.woff2",
+        "css/bootstrap-theme.css",
+        "css/bootstrap-theme.css.map",
+        "css/bootstrap-theme.min.css",
+        "css/bootstrap-theme.min.css.map",
+        "css/bootstrap.css",
+        "css/bootstrap.css.map",
+        "css/bootstrap.min.css",
+        "css/bootstrap.min.css.map"
+      ]
+    },
+    {
+      "library": "font-awesome@5.9.0",
+      "destination": "wwwroot/lib/font-awesome/",
+      "files": [
+        "css/all.min.css",
+        "css/all.css",
+        "webfonts/fa-brands-400.eot",
+        "webfonts/fa-brands-400.svg",
+        "webfonts/fa-brands-400.ttf",
+        "webfonts/fa-brands-400.woff",
+        "webfonts/fa-brands-400.woff2",
+        "webfonts/fa-regular-400.eot",
+        "webfonts/fa-regular-400.svg",
+        "webfonts/fa-regular-400.ttf",
+        "webfonts/fa-regular-400.woff",
+        "webfonts/fa-regular-400.woff2",
+        "webfonts/fa-solid-900.eot",
+        "webfonts/fa-solid-900.svg",
+        "webfonts/fa-solid-900.ttf",
+        "webfonts/fa-solid-900.woff",
+        "webfonts/fa-solid-900.woff2"
+      ]
     }
   ]
 }
