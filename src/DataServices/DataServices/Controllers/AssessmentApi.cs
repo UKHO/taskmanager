@@ -10,20 +10,39 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using DataServices.Attributes;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SDRAAssessmentWebService;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace DataServices.Controllers
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
     [ApiController]
     public class AssessmentApiController : ControllerBase
-    { 
+    {
+        public readonly SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap _sdraAssessmentWebService;
+
+        public readonly SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap _sdraDataAccessWebService;
+
+        private readonly ILogger _logger;
+
+        public AssessmentApiController(SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap sdraAssessmentWebService,
+            SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap sdraDataAccessWebService,
+            ILogger<AssessmentApiController> logger)
+        {
+            _sdraAssessmentWebService = sdraAssessmentWebService;
+            _sdraDataAccessWebService = sdraDataAccessWebService;
+            _logger = logger;
+        }
+
         /// <summary>
         /// Get a list of open source document objects
         /// </summary>
@@ -47,7 +66,26 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult ListDocumentsForAssessment([FromRoute][Required]string callerCode)
-        { 
+        {
+            var task = _sdraAssessmentWebService.GetDocumentsForAssessmentAsync(
+                new GetDocumentsForAssessmentRequest(new GetDocumentsForAssessmentRequestBody(callerCode)));
+
+            GetDocumentsForAssessmentResponse result = null;
+            try
+            {
+                result = task.Result;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving documents for assessment");
+                return StatusCode(500, e.Message);
+            }
+
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(DocumentObjects));
 
@@ -68,13 +106,19 @@ namespace DataServices.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"name\" : \"NM_LAR_4_18, North Channel to the Firth of Lorne\",\n  \"id\" : 0,\n  \"sourceName\" : \"RSDRA2006000006072\"\n}, {\n  \"name\" : \"NM_LAR_4_18, North Channel to the Firth of Lorne\",\n  \"id\" : 0,\n  \"sourceName\" : \"RSDRA2006000006072\"\n} ]";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<DocumentObjects>(exampleJson)
-                        : default(DocumentObjects);            //TODO: Change the data returned
-            return new ObjectResult(example);
+
+            var documentObjects = new DocumentObjects();
+            var documents = result.Body.GetDocumentsForAssessmentResult.Select<Document, DocumentObject>(
+                document => new DocumentObject
+                {
+                    Id = document.Id,
+                    Name = document.Name,
+                    SourceName = document.SourceName
+                });
+
+            documentObjects.AddRange(documents);
+
+            return new ObjectResult(documentObjects);
         }
 
         /// <summary>
@@ -101,7 +145,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult PutAssessmentCompleted([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string comment)
-        { 
+        {
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200);
 
@@ -152,7 +196,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
-        { 
+        {
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200);
 
