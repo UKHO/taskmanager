@@ -7,14 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SDRAAssessmentWebService
+using System.Runtime.Serialization;
+
+namespace DataServices.Connected_Services.SDRAAssessmentWebService
 {
-    using System.Runtime.Serialization;
-    
-    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Document", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Name="Document", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class Document : object
     {
         
@@ -70,7 +69,7 @@ namespace SDRAAssessmentWebService
         
         private System.DateTime RegistrationDateField;
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        [DataMember(IsRequired=true)]
         public int Id
         {
             get
@@ -83,7 +82,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        [DataMember(EmitDefaultValue=false)]
         public string Name
         {
             get
@@ -96,7 +95,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        [DataMember(IsRequired=true, Order=2)]
         public int DocumentTypeId
         {
             get
@@ -109,7 +108,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        [DataMember(EmitDefaultValue=false, Order=3)]
         public string SourceName
         {
             get
@@ -122,7 +121,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        [DataMember(EmitDefaultValue=false, Order=4)]
         public string SpatialExtentPolygon
         {
             get
@@ -135,7 +134,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
+        [DataMember(IsRequired=true, Order=5)]
         public int CRSId
         {
             get
@@ -148,7 +147,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
+        [DataMember(EmitDefaultValue=false, Order=6)]
         public string CRSParams
         {
             get
@@ -161,7 +160,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=7)]
+        [DataMember(IsRequired=true, Order=7)]
         public int DTId
         {
             get
@@ -174,7 +173,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=8)]
+        [DataMember(EmitDefaultValue=false, Order=8)]
         public string DTName
         {
             get
@@ -187,7 +186,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=9)]
+        [DataMember(IsRequired=true, Order=9)]
         public int DTFromDatum
         {
             get
@@ -200,7 +199,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
+        [DataMember(EmitDefaultValue=false, Order=10)]
         public string DTMethod
         {
             get
@@ -213,7 +212,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=11)]
+        [DataMember(IsRequired=true, Order=11)]
         public double DTDx
         {
             get
@@ -226,7 +225,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=12)]
+        [DataMember(IsRequired=true, Order=12)]
         public double DTDy
         {
             get
@@ -239,7 +238,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=13)]
+        [DataMember(IsRequired=true, Order=13)]
         public double DTDz
         {
             get
@@ -252,7 +251,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=14)]
+        [DataMember(IsRequired=true, Order=14)]
         public double DTRx
         {
             get
@@ -265,7 +264,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=15)]
+        [DataMember(IsRequired=true, Order=15)]
         public double DTRy
         {
             get
@@ -278,7 +277,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=16)]
+        [DataMember(IsRequired=true, Order=16)]
         public double DTRz
         {
             get
@@ -291,7 +290,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=17)]
+        [DataMember(IsRequired=true, Order=17)]
         public double DTScale
         {
             get
@@ -304,7 +303,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=18)]
+        [DataMember(IsRequired=true, Order=18)]
         public double DTAccuracy
         {
             get
@@ -317,7 +316,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=19)]
+        [DataMember(EmitDefaultValue=false, Order=19)]
         public string DTSourceFile
         {
             get
@@ -330,7 +329,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=20)]
+        [DataMember(EmitDefaultValue=false, Order=20)]
         public string DTStatus
         {
             get
@@ -343,7 +342,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=21)]
+        [DataMember(EmitDefaultValue=false, Order=21)]
         public string SepName
         {
             get
@@ -356,7 +355,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=22)]
+        [DataMember(IsRequired=true, Order=22)]
         public int Scale
         {
             get
@@ -369,7 +368,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=23)]
+        [DataMember(IsRequired=true, Order=23)]
         public double SpatialReferencingAccuracy
         {
             get
@@ -382,7 +381,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=24)]
+        [DataMember(IsRequired=true, Order=24)]
         public int Status
         {
             get
@@ -395,7 +394,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=25)]
+        [DataMember(IsRequired=true, Order=25)]
         public System.DateTime RegistrationDate
         {
             get
@@ -411,7 +410,7 @@ namespace SDRAAssessmentWebService
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CallOutcome", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Name="CallOutcome", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class CallOutcome : object
     {
         
@@ -419,7 +418,7 @@ namespace SDRAAssessmentWebService
         
         private string MessageField;
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        [DataMember(IsRequired=true)]
         public int ErrorCode
         {
             get
@@ -432,7 +431,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        [DataMember(EmitDefaultValue=false)]
         public string Message
         {
             get
@@ -448,7 +447,7 @@ namespace SDRAAssessmentWebService
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ActionGroup", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Name="ActionGroup", Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class ActionGroup : object
     {
         
@@ -456,7 +455,7 @@ namespace SDRAAssessmentWebService
         
         private SDRAAssessmentWebService.ArrayOfInt ActionIDsField;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        [DataMember(EmitDefaultValue=false)]
         public string GroupId
         {
             get
@@ -469,7 +468,7 @@ namespace SDRAAssessmentWebService
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        [DataMember(EmitDefaultValue=false, Order=1)]
         public SDRAAssessmentWebService.ArrayOfInt ActionIDs
         {
             get
@@ -485,7 +484,7 @@ namespace SDRAAssessmentWebService
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfInt", Namespace="http://www.baesystems.com/schemas/sdra/assessment", ItemName="int")]
+    [CollectionDataContract(Name="ArrayOfInt", Namespace="http://www.baesystems.com/schemas/sdra/assessment", ItemName="int")]
     public class ArrayOfInt : System.Collections.Generic.List<int>
     {
     }
@@ -534,11 +533,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class GetDocumentsForAssessmentRequestBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public string callerCode;
         
         public GetDocumentsForAssessmentRequestBody()
@@ -574,11 +573,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class GetDocumentsForAssessmentResponseBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public SDRAAssessmentWebService.Document[] GetDocumentsForAssessmentResult;
         
         public GetDocumentsForAssessmentResponseBody()
@@ -614,14 +613,14 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class GetAssessmentDueDateRequestBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public string callerCode;
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [DataMember(Order=1)]
         public int sdocId;
         
         public GetAssessmentDueDateRequestBody()
@@ -658,11 +657,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class GetAssessmentDueDateResponseBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        [DataMember(Order=0)]
         public System.DateTime GetAssessmentDueDateResult;
         
         public GetAssessmentDueDateResponseBody()
@@ -698,29 +697,29 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class NotifyDocumentAssessedRequestBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public string callerCode;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        [DataMember(EmitDefaultValue=false, Order=1)]
         public string transactionId;
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        [DataMember(Order=2)]
         public int sdocId;
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        [DataMember(Order=3)]
         public int prodId;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        [DataMember(EmitDefaultValue=false, Order=4)]
         public byte[] snapshot;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        [DataMember(EmitDefaultValue=false, Order=5)]
         public string action;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
+        [DataMember(EmitDefaultValue=false, Order=6)]
         public string change;
         
         public NotifyDocumentAssessedRequestBody()
@@ -762,11 +761,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class NotifyDocumentAssessedResponseBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public SDRAAssessmentWebService.CallOutcome NotifyDocumentAssessedResult;
         
         public NotifyDocumentAssessedResponseBody()
@@ -802,17 +801,17 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class NotifyAssessmentCompletedRequestBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public string callerCode;
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [DataMember(Order=1)]
         public int sdocId;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        [DataMember(EmitDefaultValue=false, Order=2)]
         public string comment;
         
         public NotifyAssessmentCompletedRequestBody()
@@ -850,11 +849,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class NotifyAssessmentCompletedResponseBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public SDRAAssessmentWebService.CallOutcome NotifyAssessmentCompletedResult;
         
         public NotifyAssessmentCompletedResponseBody()
@@ -890,14 +889,14 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class SetActionGroupsRequestBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        [DataMember(Order=0)]
         public int sdocId;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        [DataMember(EmitDefaultValue=false, Order=1)]
         public SDRAAssessmentWebService.ActionGroup[] groups;
         
         public SetActionGroupsRequestBody()
@@ -934,11 +933,11 @@ namespace SDRAAssessmentWebService
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
+    [DataContract(Namespace="http://www.baesystems.com/schemas/sdra/assessment")]
     public partial class SetActionGroupsResponseBody
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        [DataMember(EmitDefaultValue=false, Order=0)]
         public SDRAAssessmentWebService.CallOutcome SetActionGroupsResult;
         
         public SetActionGroupsResponseBody()

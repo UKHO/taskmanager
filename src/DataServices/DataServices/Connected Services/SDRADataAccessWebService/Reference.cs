@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SDRADataAccessWebService
+namespace DataServices.Connected_Services.SDRADataAccessWebService
 {
     
     
