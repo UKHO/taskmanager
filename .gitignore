@@ -334,3 +334,9 @@ ASALocalRun/
 
 # Portal wwwroot lib
 **/Portal/wwwroot/lib/*
+
+# Java
+.idea
+*.iml
+*.log
+target/
