@@ -331,3 +331,6 @@ ASALocalRun/
 
 # Generated backing files for the features (Specflow)
 *feature.cs
+
+# Portal wwwroot lib
+**/Portal/wwwroot/lib/*
