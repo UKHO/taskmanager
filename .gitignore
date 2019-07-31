@@ -336,7 +336,10 @@ ASALocalRun/
 **/Portal/wwwroot/lib/*
 
 # Java
-.idea
-*.iml
-*.log
-target/
+**/DataServices.ApiTests/.idea
+**/DataServices.ApiTests/.classpath
+**/DataServices.ApiTests/.project
+**/DataServices.ApiTests/.settings
+**/DataServices.ApiTests/target/
+**/DataServices.ApiTests/**/*.iml
+**/DataServices.ApiTests/**/*.log
