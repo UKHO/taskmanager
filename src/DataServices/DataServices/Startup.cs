@@ -9,12 +9,14 @@
  */
 
 using System.IO;
+using DataServices.Config;
 using DataServices.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
@@ -60,6 +62,7 @@ namespace DataServices
                 })
                 .AddXmlSerializerFormatters();
 
+            services.AddOptions<Settings>().Bind(Configuration.GetSection("urls"));
 
             services
                 .AddSwaggerGen(c =>
@@ -91,15 +94,21 @@ namespace DataServices
             // DI our asmx service...
             services.AddScoped<SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoap>(provider =>
             {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
-                result.MaxBufferSize = int.MaxValue;
-                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
-                result.MaxReceivedMessageSize = int.MaxValue;
-                //result.AllowCookies = true;
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding
+                {
+                    MaxBufferSize = int.MaxValue,
+                    MaxReceivedMessageSize = int.MaxValue
+                };
+
+                Settings config;
+                using (var sp = services.BuildServiceProvider())
+                {
+                    config = sp.GetService<IOptions<Settings>>().Value;
+                }
 
                 var client = new SDRAAssessmentWebService.SDRAExternalInterfaceAssessmentWebServiceSoapClient(
                     result,
-                    new System.ServiceModel.EndpointAddress(Configuration["SDRAAssessmentWebService:BaseUrl"])
+                    new System.ServiceModel.EndpointAddress(config.AssessmentWebServiceUri)
                 );
                 return client;
             });
@@ -107,15 +116,21 @@ namespace DataServices
             // DI our asmx service...
             services.AddScoped<SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoap>(provider =>
             {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
-                result.MaxBufferSize = int.MaxValue;
-                // result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
-                result.MaxReceivedMessageSize = int.MaxValue;
-                //result.AllowCookies = true;
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding
+                {
+                    MaxBufferSize = int.MaxValue,
+                    MaxReceivedMessageSize = int.MaxValue
+                };
+
+                Settings config;
+                using (var sp = services.BuildServiceProvider())
+                {
+                    config = sp.GetService<IOptions<Settings>>().Value;
+                }
 
                 var client = new SDRADataAccessWebService.SDRAExternalInterfaceDataAccessWebServiceSoapClient(
                     result,
-                    new System.ServiceModel.EndpointAddress(Configuration["SDRADataAccessWebService:BaseUrl"])
+                    new System.ServiceModel.EndpointAddress(config.DataAccessWebServiceUri)
                 );
                 return client;
             });
