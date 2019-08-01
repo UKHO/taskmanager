@@ -3,8 +3,13 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
+schedules:
+- cron: "0 5 * * Mon,Tue,Wed,Thu,Fri"
+  displayName: Portal Nightly Test Run
+  branches:
+    include:
+    - master
+  always: true
 
 pool:
   vmImage: 'windows-2019'
