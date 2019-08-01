@@ -49,6 +49,10 @@ jobs:
 
 - job: Run_Zap_Full_Scan
   pool: UKHO Ubuntu 1804
+
+  workspace: 
+    clean: all
+
   steps:
     - task: CmdLine@2
       displayName: "Set chmod permissions (ArtifactStagingDirectory)"
@@ -58,7 +62,7 @@ jobs:
     - task: CmdLine@2
       displayName: "Create Zap Report Directory"
       inputs:
-        script: 'mkdir $(Build.ArtifactStagingDirectory)\\ZapReport'
+        script: 'mkdir $(Build.ArtifactStagingDirectory)/ZapReport'
 
     - task: CmdLine@2
       displayName: "Run Owasp Zap Full Scan"
