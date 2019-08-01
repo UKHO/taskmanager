@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+schedules:
+- cron: "0 5 * * Mon,Tue,Wed,Thu,Fri"
+  displayName: Portal Nightly Test Run
+  branches:
+    include:
+    - master
+  always: true
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore portalspecs'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+  displayName: 'dotnet build portalspecs'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+    zipAfterPublish: false
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
+  displayName: 'Publish specs-project'
+
+- task: VSTest@2
+  displayName: 'Run automated tests'
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: '**\*specs*.dll'
+    searchFolder: '$(Build.ArtifactStagingDirectory)\\Specs'
+    otherConsoleOptions: '/framework:FrameworkCore10'
