@@ -84,12 +84,12 @@ jobs:
       inputs:
         testResultsFormat: 'NUnit'
         testResultsFiles: 'Converted-OWASP-ZAP-Report.xml'
-        searchFolder: '$(Build.ArtifactStagingDirectory)\\ZapReport'
+        searchFolder: '$(Build.ArtifactStagingDirectory)/ZapReport'
 
     - task: PublishBuildArtifacts@1
       displayName: "Publish Owasp Zap Report"
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)\\ZapReport'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/ZapReport'
         ArtifactName: 'Owasp Zap HTML Report'
         publishLocation: 'Container'
 
