@@ -63,7 +63,7 @@ jobs:
     - task: CmdLine@2
       displayName: "Create Nunit Test Report"
       inputs:
-        script:  docker run --rm --mount type=bind,source=$(Build.SourcesDirectory)\\src\\SecurityTestFiles,target=/tmp/nunit/ --mount type=bind,source=$(Build.ArtifactStagingDirectory)\\ZapReport,target=/tmp/report/ mcr.microsoft.com/powershell:ubuntu-18.04 pwsh -File '/tmp/nunit/PowershellToConvertToNunit.ps1'
+        script:  docker run --rm --mount type=bind,source=$(Build.SourcesDirectory)/src/SecurityTestFiles/,target=/tmp/nunit/ --mount type=bind,source=$(Build.ArtifactStagingDirectory)/ZapReport,target=/tmp/report/ mcr.microsoft.com/powershell:ubuntu-18.04 pwsh -File '/tmp/nunit/PowershellToConvertToNunit.ps1'
 
     - task: PublishTestResults@2
       displayName: "Publish Owasp Zap Test Report"
