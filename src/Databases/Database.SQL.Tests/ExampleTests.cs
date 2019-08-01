@@ -14,6 +14,9 @@ namespace Database.SQL.Tests
         [SetUp]
         public void Setup()
         {
+
+            // Possibility to share this and switch providers
+
             _connection = new SqliteConnection("DataSource=:memory:");
 
             var dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
@@ -31,6 +34,8 @@ namespace Database.SQL.Tests
         [TearDown]
         public void Teardown()
         {
+            // Not managed to get context dispose to take connection with it yet
+            // Despite letting it open connection
             _dbContext.Database.EnsureDeleted();
             _connection.Dispose();
             _dbContext.Dispose();
