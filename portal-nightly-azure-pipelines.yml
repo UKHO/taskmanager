@@ -11,36 +11,75 @@ schedules:
     - master
   always: true
 
-pool:
-  vmImage: 'windows-2019'
+jobs:
+- job: Run_UI_Tests
+  pool:
+    vmImage: 'windows-2019'
+    
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+        feedsToUse: 'select'
+      displayName: 'dotnet restore portalspecs'
 
-steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore portalspecs'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+      displayName: 'dotnet build portalspecs'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-  displayName: 'dotnet build portalspecs'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+        zipAfterPublish: false
+        arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
+      displayName: 'Publish specs-project'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-    zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
-  displayName: 'Publish specs-project'
+    - task: VSTest@2
+      displayName: 'Run automated tests'
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: '**\*specs*.dll'
+        searchFolder: '$(Build.ArtifactStagingDirectory)\\Specs'
+        otherConsoleOptions: '/framework:FrameworkCore10'
 
-- task: VSTest@2
-  displayName: 'Run automated tests'
-  inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: '**\*specs*.dll'
-    searchFolder: '$(Build.ArtifactStagingDirectory)\\Specs'
-    otherConsoleOptions: '/framework:FrameworkCore10'
+- job: Run_Zap_Full_Scan
+  pool: UKHO Ubuntu 1804
+  steps:
+    - task: CmdLine@2
+      displayName: "Set chmod permissions (ArtifactStagingDirectory)"
+      inputs:
+        script: 'chmod 777 -R $(Build.ArtifactStagingDirectory)'
+
+    - task: CmdLine@2
+      displayName: "Run Owasp Zap Full Scan"
+      inputs:
+        script: 'docker run --rm --mount type=bind,source=$(Build.ArtifactStagingDirectory)\\ZapReport,target=/zap/wrk/ -t owasp/zap2docker-stable zap-full-scan.py -t $(ApplicationUrl) -g gen.conf -r report.html -w report.md -x report.xml -J report.json || true'
+
+    - task: CmdLine@2
+      displayName: "Create Nunit Test Report"
+      inputs:
+        script:  docker run --rm --mount type=bind,source=$(Build.SourcesDirectory),target=/tmp/nunit/ --mount type=bind,source=$(Build.ArtifactStagingDirectory)\\ZapReport,target=/tmp/report/ mcr.microsoft.com/powershell:ubuntu-18.04 pwsh -File '/tmp/nunit/PowershellToConvertToNunit.ps1'
+
+    - task: PublishTestResults@2
+      displayName: "Publish Owasp Zap Test Report"
+      inputs:
+        testResultsFormat: 'NUnit'
+        testResultsFiles: 'Converted-OWASP-ZAP-Report.xml'
+        searchFolder: '$(Build.ArtifactStagingDirectory)\\ZapReport'
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish Owasp Zap Report"
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)\\ZapReport'
+        ArtifactName: 'Owasp Zap HTML Report'
+        publishLocation: 'Container'
+
+    - task: CmdLine@2
+      displayName: "Revert chmod permissions (ArtifactStagingDirectory)"
+      inputs:
+        script: 'chmod 755 -R $(Build.ArtifactStagingDirectory)'
