@@ -12,12 +12,9 @@ namespace Database.SQL.Tests
         private TasksDbContext _dbContext;
         private SqliteConnection _connection;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
-
-            // Possibility to share this and switch providers
-
             _connection = new SqliteConnection("DataSource=:memory:");
 
             var dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
@@ -32,12 +29,9 @@ namespace Database.SQL.Tests
                           .SaveChanges();
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void Teardown()
         {
-            // Not managed to get context dispose to take connection with it yet
-            // Despite letting it open connection
-            _dbContext.Database.EnsureDeleted();
             _connection.Dispose();
             _dbContext.Dispose();
         }
@@ -55,22 +49,6 @@ namespace Database.SQL.Tests
             var tasks = _dbContext.Tasks.ToList();
             Assert.AreEqual(8, tasks.Count);
         }
-        [Test]
-        public void Example_test_with_reset_data()
-        {
-            var taskAddedPreviously = _dbContext.Tasks.Find(99);
-            Assert.IsNotNull(taskAddedPreviously);
-
-            TasksDbBuilder.UsingDbContext(_dbContext)
-                          .DeleteAllRowData()
-                          .PopulateTables()
-                          .SaveChanges();
-
-            var tasks = _dbContext.Tasks.ToList();
-
-            Assert.AreEqual("ben", taskAddedPreviously.Assessor);
-            Assert.AreEqual(7, tasks.Count);
-            Assert.IsNull(_dbContext.Tasks.Find(99));
-        }
     }
 }
+
