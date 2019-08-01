@@ -8,9 +8,12 @@ public class Tests {
 
     @Test
     public void ExampleTest() {
+
+        String envTest = System.getenv("TM_DATASERVICES_URL");
+
         given()
                 .when()
-                .get("https://jsonplaceholder.typicode.com/posts")
+                .get(envTest)
                 .then()
                 .statusCode(200);
     }
