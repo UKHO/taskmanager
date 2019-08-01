@@ -65,6 +65,11 @@ jobs:
         script: 'mkdir $(Build.ArtifactStagingDirectory)/ZapReport'
 
     - task: CmdLine@2
+      displayName: "Set chmod permissions (ArtifactStagingDirectory/ZapReport)"
+      inputs:
+        script: 'chmod 777 -R $(Build.ArtifactStagingDirectory)/ZapReport'
+
+    - task: CmdLine@2
       displayName: "Run Owasp Zap Full Scan"
       inputs:
         script: 'docker run --rm --mount type=bind,source=$(Build.ArtifactStagingDirectory)/ZapReport/,target=/zap/wrk/ -t owasp/zap2docker-stable zap-full-scan.py -t $(ApplicationUrl) -g gen.conf -r report.html -w report.md -x report.xml -J report.json || true'
