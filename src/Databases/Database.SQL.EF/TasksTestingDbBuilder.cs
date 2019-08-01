@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using Database.SQL.EF;
-using Database.SQL.EF.Models;
+﻿using Database.SQL.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 
-namespace Database.SQL.Tests
+namespace Database.SQL.EF
 {
     public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables, ICanSaveChanges
     {
