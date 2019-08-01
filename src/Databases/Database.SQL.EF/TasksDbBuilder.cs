@@ -2,28 +2,31 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.IO;
 
 namespace Database.SQL.EF
 {
-    public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables
+    public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables, ICanSaveChanges
     {
-        private readonly DbContextOptions<TasksDbContext> _dbContextOptions;
+        private readonly TasksDbContext _context;
 
-        private TasksDbBuilder(DbConnection dbConnection)
+        private TasksDbBuilder(TasksDbContext context)
         {
-            _dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
-                .UseSqlite(dbConnection)
-                .Options;
+            _context = context;
+
+            if (_context.Database.GetDbConnection().State == ConnectionState.Closed)
+            {
+                _context.Database.OpenConnection();
+            }
 
             // Schema hack to use generated SQL Server SQL with SQL Lite
             RunSql(new RawSqlString("ATTACH DATABASE ':memory:' AS dbo"));
         }
 
-        public static ICanCreateTables UsingConnection(DbConnection dbConnection)
+        public static ICanCreateTables UsingDbContext(TasksDbContext context)
         {
-            return new TasksDbBuilder(dbConnection);
+            return new TasksDbBuilder(context);
         }
 
         public ICanPopulateTables CreateTables()
@@ -37,33 +40,38 @@ namespace Database.SQL.EF
 
         private void RunSql(RawSqlString sqlString)
         {
-            using (var context = new TasksDbContext(_dbContextOptions))
-            {
-                context.Database.ExecuteSqlCommand(sqlString);
-                context.SaveChanges();
-            }
+            // Not ideal mixing SQL with EF
+            _context.Database.ExecuteSqlCommand(sqlString);
+            _context.SaveChanges();
         }
 
-        public DbContextOptions<TasksDbContext> PopulateTables()
+        public ICanSaveChanges PopulateTables()
         {
-            using (var context = new TasksDbContext(_dbContextOptions))
-            {
-                if (!File.Exists(@"Data\TasksSeedData.json")) return _dbContextOptions;
 
-                var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
-                var tasks = JsonConvert.DeserializeObject<IEnumerable<Task>>(jsonString);
+            if (!File.Exists(@"Data\TasksSeedData.json")) return this;
 
-                context.Tasks.AddRange(tasks);
-                context.SaveChanges();
-            }
+            var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
+            var tasks = JsonConvert.DeserializeObject<IEnumerable<Task>>(jsonString);
 
-            return _dbContextOptions;
+            _context.Tasks.AddRange(tasks);
+
+            return this;
         }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+
+    public interface ICanSaveChanges
+    {
+        void SaveChanges();
     }
 
     public interface ICanPopulateTables
     {
-        DbContextOptions<TasksDbContext> PopulateTables();
+        ICanSaveChanges PopulateTables();
     }
 
     public interface ICanCreateTables

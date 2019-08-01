@@ -8,35 +8,39 @@ namespace Database.SQL.Tests
 {
     public class ExampleTests
     {
+        private TasksDbContext _dbContext;
         private SqliteConnection _connection;
-        private DbContextOptions<TasksDbContext> _dbContextOptions;
 
         [SetUp]
         public void Setup()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
-            _connection.Open();
 
-            _dbContextOptions = TasksDbBuilder.UsingConnection(_connection)
-                                              .CreateTables()
-                                              .PopulateTables();
+            var dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
+                .UseSqlite(_connection)
+                .Options;
+
+            _dbContext = new TasksDbContext(dbContextOptions);
+
+            TasksDbBuilder.UsingDbContext(_dbContext)
+                          .CreateTables()
+                          .PopulateTables()
+                          .SaveChanges();
         }
 
         [TearDown]
         public void Teardown()
         {
-            _connection.Close();
+            _dbContext.Database.EnsureDeleted();
+            _connection.Dispose();
+            _dbContext.Dispose();
         }
 
         [Test]
         public void Example_test()
         {
-            using (var context = new TasksDbContext(_dbContextOptions))
-            {
-                var tasks = context.Tasks.ToList();
-                Assert.AreEqual(tasks.Count, 7);
-            }
-
+            var tasks = _dbContext.Tasks.ToList();
+            Assert.AreEqual(tasks.Count, 7);
         }
     }
 }
