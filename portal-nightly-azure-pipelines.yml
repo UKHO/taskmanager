@@ -7,13 +7,35 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-2019'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore portalspecs'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+  displayName: 'dotnet build portalspecs'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
+    zipAfterPublish: false
+    arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
+  displayName: 'Publish specs-project'
+
+- task: VSTest@2
+  displayName: 'Run automated tests'
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: '**\*specs*.dll'
+    searchFolder: '$(Build.ArtifactStagingDirectory)\\Specs'
+    otherConsoleOptions: '/framework:FrameworkCore10'
