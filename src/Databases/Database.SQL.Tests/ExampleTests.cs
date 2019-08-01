@@ -1,4 +1,5 @@
 using Database.SQL.EF;
+using Database.SQL.EF.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -11,7 +12,7 @@ namespace Database.SQL.Tests
         private TasksDbContext _dbContext;
         private SqliteConnection _connection;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
 
@@ -31,7 +32,7 @@ namespace Database.SQL.Tests
                           .SaveChanges();
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void Teardown()
         {
             // Not managed to get context dispose to take connection with it yet
@@ -44,8 +45,32 @@ namespace Database.SQL.Tests
         [Test]
         public void Example_test()
         {
+            _dbContext.Tasks.Add(new Task()
+            {
+                Id = 99,
+                Assessor = "ben"
+            });
+            _dbContext.SaveChanges();
+
             var tasks = _dbContext.Tasks.ToList();
-            Assert.AreEqual(tasks.Count, 7);
+            Assert.AreEqual(8, tasks.Count);
+        }
+        [Test]
+        public void Example_test_with_reset_data()
+        {
+            var taskAddedPreviously = _dbContext.Tasks.Find(99);
+            Assert.IsNotNull(taskAddedPreviously);
+
+            TasksDbBuilder.UsingDbContext(_dbContext)
+                          .DeleteAllRowData()
+                          .PopulateTables()
+                          .SaveChanges();
+
+            var tasks = _dbContext.Tasks.ToList();
+
+            Assert.AreEqual("ben", taskAddedPreviously.Assessor);
+            Assert.AreEqual(7, tasks.Count);
+            Assert.IsNull(_dbContext.Tasks.Find(99));
         }
     }
 }

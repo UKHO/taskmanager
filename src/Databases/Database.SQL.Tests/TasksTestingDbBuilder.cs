@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using Database.SQL.EF;
+﻿using Database.SQL.EF;
 using Database.SQL.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 
 namespace Database.SQL.Tests
 {
@@ -19,15 +21,27 @@ namespace Database.SQL.Tests
             if (_context.Database.GetDbConnection().State == ConnectionState.Closed)
             {
                 _context.Database.OpenConnection();
-            }
 
-            // Schema hack to use generated SQL Server SQL with SQL Lite
-            RunSql(new RawSqlString("ATTACH DATABASE ':memory:' AS dbo"));
+                // Schema hack to use generated SQL Server SQL with SQL Lite
+                RunSql(new RawSqlString("ATTACH DATABASE ':memory:' AS dbo"));
+            }
         }
 
         public static ICanCreateTables UsingDbContext(TasksDbContext context)
         {
             return new TasksDbBuilder(context);
+        }
+
+        public ICanPopulateTables DeleteAllRowData()
+        {
+
+            if (_context.Database.GetDbConnection().State != ConnectionState.Open)
+            {
+                throw new InvalidOperationException($"Database connection closed. Did you mean to call {nameof(CreateTables)}?");
+            }
+
+            _context.Tasks.RemoveRange(_context.Tasks.ToList());
+            return this;
         }
 
         public ICanPopulateTables CreateTables()
@@ -43,7 +57,7 @@ namespace Database.SQL.Tests
         {
             // Not ideal mixing SQL with EF
             _context.Database.ExecuteSqlCommand(sqlString);
-            _context.SaveChanges();
+            SaveChanges();
         }
 
         public ICanSaveChanges PopulateTables()
@@ -78,5 +92,6 @@ namespace Database.SQL.Tests
     public interface ICanCreateTables
     {
         ICanPopulateTables CreateTables();
+        ICanPopulateTables DeleteAllRowData();
     }
 }
