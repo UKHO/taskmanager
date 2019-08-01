@@ -3,6 +3,8 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+pr: none
+
 schedules:
 - cron: "0 5 * * Mon,Tue,Wed,Thu,Fri"
   displayName: Portal Nightly Test Run
