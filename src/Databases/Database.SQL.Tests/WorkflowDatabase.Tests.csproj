@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Database.SQL.EF\Database.SQL.EF.csproj" />
-    <ProjectReference Include="..\Database.SQL\Database.SQL.sqlproj" />
+    <ProjectReference Include="..\Database.SQL.EF\WorkflowDatabase.EF.csproj" />
+    <ProjectReference Include="..\Database.SQL\WorkflowDatabase.sqlproj" />
   </ItemGroup>
 
 </Project>
