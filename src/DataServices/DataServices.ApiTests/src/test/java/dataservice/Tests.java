@@ -4,17 +4,17 @@ import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 
-public class Tests {
+
+public class Tests extends TestData{
 
     @Test
     public void ExampleTest() {
 
-        String envTest = System.getenv("TM_DATASERVICES_URL");
-
         given()
                 .when()
-                .get(envTest)
+                .get(DataServices_BaseUrl)
                 .then()
                 .statusCode(200);
+
     }
 }
