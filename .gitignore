@@ -334,3 +334,12 @@ ASALocalRun/
 
 # Portal wwwroot lib
 **/Portal/wwwroot/lib/*
+
+# Java
+**/DataServices.ApiTests/.idea
+**/DataServices.ApiTests/.classpath
+**/DataServices.ApiTests/.project
+**/DataServices.ApiTests/.settings
+**/DataServices.ApiTests/target/
+**/DataServices.ApiTests/**/*.iml
+**/DataServices.ApiTests/**/*.log
