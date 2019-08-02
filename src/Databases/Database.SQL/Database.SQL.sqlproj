@@ -62,6 +62,10 @@
     <Build Include="Tables\Tasks.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
+    <Build Include="Tables\Processes.sql" />
+    <Build Include="Tables\AssessmentData.sql" />
+    <Build Include="Tables\Comments.sql" />
+    <Build Include="Tables\DbAssessmentReviewData.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
