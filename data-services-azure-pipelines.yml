@@ -71,3 +71,8 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish dataservices Artifact'
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.apitests\\'
+    ArtifactName: 'dataservices.apitests'
+    publishLocation: 'Container'
