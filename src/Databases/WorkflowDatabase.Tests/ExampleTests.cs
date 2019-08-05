@@ -1,15 +1,15 @@
-using Database.SQL.EF;
-using Database.SQL.EF.Models;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Linq;
+using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
-namespace Database.SQL.Tests
+namespace WorkflowDatabase.Tests
 {
     public class ExampleTests
     {
-        private TasksDbContext _dbContext;
+        private WorkflowDbContext _dbContext;
         private SqliteConnection _connection;
 
         [SetUp]
@@ -17,11 +17,11 @@ namespace Database.SQL.Tests
         {
             _connection = new SqliteConnection("DataSource=:memory:");
 
-            var dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
+            var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlite(_connection)
                 .Options;
 
-            _dbContext = new TasksDbContext(dbContextOptions);
+            _dbContext = new WorkflowDbContext(dbContextOptions);
 
             TasksDbBuilder.UsingDbContext(_dbContext)
                           .CreateTables()

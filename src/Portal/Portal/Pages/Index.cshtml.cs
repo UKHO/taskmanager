@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Database.SQL.EF;
-using Database.SQL.EF.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly TasksDbContext _dbContext;
+        private readonly WorkflowDbContext _dbContext;
         public IList<Task> Tasks { get; set; }
 
-        public IndexModel(TasksDbContext dbContext)
+        public IndexModel(WorkflowDbContext dbContext)
         {
             _dbContext = dbContext;
         }

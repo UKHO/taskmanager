@@ -41,11 +41,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.TestAutomation.Steps
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Databases", "Databases", "{1EAB5545-7539-44E4-8025-1580F2878997}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WorkflowDatabase", "Databases\Database.SQL\WorkflowDatabase.sqlproj", "{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WorkflowDatabase", "Databases\WorkflowDatabase\WorkflowDatabase.sqlproj", "{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.Tests", "Databases\Database.SQL.Tests\WorkflowDatabase.Tests.csproj", "{A6C8967B-207B-4037-B06D-E82363B47B55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.Tests", "Databases\WorkflowDatabase.Tests\WorkflowDatabase.Tests.csproj", "{A6C8967B-207B-4037-B06D-E82363B47B55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.EF", "Databases\Database.SQL.EF\WorkflowDatabase.EF.csproj", "{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.EF", "Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj", "{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

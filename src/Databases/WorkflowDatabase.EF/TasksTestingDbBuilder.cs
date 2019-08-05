@@ -1,19 +1,18 @@
 ﻿using System;
-using Database.SQL.EF.Models;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Net.Mime;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using WorkflowDatabase.EF.Models;
 
-namespace Database.SQL.EF
+namespace WorkflowDatabase.EF
 {
     public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables, ICanSaveChanges
     {
-        private readonly TasksDbContext _context;
+        private readonly WorkflowDbContext _context;
 
-        private TasksDbBuilder(TasksDbContext context)
+        private TasksDbBuilder(WorkflowDbContext context)
         {
             _context = context;
 
@@ -26,7 +25,7 @@ namespace Database.SQL.EF
             RunSql(new RawSqlString("ATTACH DATABASE ':memory:' AS dbo"));
         }
 
-        public static ICanCreateTables UsingDbContext(TasksDbContext context)
+        public static ICanCreateTables UsingDbContext(WorkflowDbContext context)
         {
             return new TasksDbBuilder(context);
         }
