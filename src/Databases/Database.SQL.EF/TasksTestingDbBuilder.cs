@@ -31,9 +31,9 @@ namespace Database.SQL.EF
 
         public ICanPopulateTables CreateTables()
         {
-            if (!File.Exists(@"Tables\Tasks.sql")) return this;
+            if (!File.Exists(@"..\..\Databases\Database.SQL\Tables\Tasks.sql")) return this;
 
-            RunSql(new RawSqlString(File.ReadAllText(@"Tables\Tasks.sql")));
+            RunSql(new RawSqlString(File.ReadAllText(@"..\..\Databases\Database.SQL\Tables\Tasks.sql")));
 
             return this;
         }
