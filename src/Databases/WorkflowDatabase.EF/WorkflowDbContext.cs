@@ -9,6 +9,7 @@ namespace WorkflowDatabase.EF
         {
         }
 
+        public DbSet<Models.AssessmentData> AssessmentData { get; set; }
         public DbSet<Models.Task> Tasks { get; set; }
     }
 }
