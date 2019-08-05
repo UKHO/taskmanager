@@ -1,9 +1,11 @@
-﻿using Database.SQL.EF.Models;
+﻿using System;
+using Database.SQL.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Net.Mime;
 
 namespace Database.SQL.EF
 {
@@ -31,10 +33,14 @@ namespace Database.SQL.EF
 
         public ICanPopulateTables CreateTables()
         {
-            if (!File.Exists(@"..\..\Databases\Database.SQL\Tables\Tasks.sql")) return this;
+            var sqlTablesRootPath = AppDomain.CurrentDomain.BaseDirectory;
+            var tables = Directory.GetFiles(Path.Combine(sqlTablesRootPath, @"SqlTables"));
 
-            RunSql(new RawSqlString(File.ReadAllText(@"..\..\Databases\Database.SQL\Tables\Tasks.sql")));
-
+            foreach (var table in tables)
+            {
+                RunSql(new RawSqlString(File.ReadAllText(table)));
+            }
+            
             return this;
         }
 
