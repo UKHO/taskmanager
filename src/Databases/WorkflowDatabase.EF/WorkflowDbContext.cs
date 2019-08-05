@@ -11,6 +11,7 @@ namespace WorkflowDatabase.EF
 
         public DbSet<Models.AssessmentData> AssessmentData { get; set; }
         public DbSet<Models.Comment> Comments { get; set; }
+        public DbSet<Models.Process> Processes { get; set; }
         public DbSet<Models.Task> Tasks { get; set; }
     }
 }
