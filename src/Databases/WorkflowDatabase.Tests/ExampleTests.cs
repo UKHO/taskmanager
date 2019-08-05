@@ -9,7 +9,7 @@ namespace WorkflowDatabase.Tests
 {
     public class ExampleTests
     {
-        private TasksDbContext _dbContext;
+        private WorkflowDbContext _dbContext;
         private SqliteConnection _connection;
 
         [SetUp]
@@ -17,11 +17,11 @@ namespace WorkflowDatabase.Tests
         {
             _connection = new SqliteConnection("DataSource=:memory:");
 
-            var dbContextOptions = new DbContextOptionsBuilder<TasksDbContext>()
+            var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlite(_connection)
                 .Options;
 
-            _dbContext = new TasksDbContext(dbContextOptions);
+            _dbContext = new WorkflowDbContext(dbContextOptions);
 
             TasksDbBuilder.UsingDbContext(_dbContext)
                           .CreateTables()

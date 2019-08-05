@@ -2,9 +2,9 @@
 
 namespace WorkflowDatabase.EF
 {
-    public class TasksDbContext : DbContext
+    public class WorkflowDbContext : DbContext
     {
-        public TasksDbContext(DbContextOptions<TasksDbContext> options)
+        public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
         }

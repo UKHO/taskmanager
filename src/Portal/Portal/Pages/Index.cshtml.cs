@@ -8,10 +8,10 @@ namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly TasksDbContext _dbContext;
+        private readonly WorkflowDbContext _dbContext;
         public IList<Task> Tasks { get; set; }
 
-        public IndexModel(TasksDbContext dbContext)
+        public IndexModel(WorkflowDbContext dbContext)
         {
             _dbContext = dbContext;
         }

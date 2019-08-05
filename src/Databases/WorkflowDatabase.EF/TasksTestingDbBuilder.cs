@@ -10,9 +10,9 @@ namespace WorkflowDatabase.EF
 {
     public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables, ICanSaveChanges
     {
-        private readonly TasksDbContext _context;
+        private readonly WorkflowDbContext _context;
 
-        private TasksDbBuilder(TasksDbContext context)
+        private TasksDbBuilder(WorkflowDbContext context)
         {
             _context = context;
 
@@ -25,7 +25,7 @@ namespace WorkflowDatabase.EF
             RunSql(new RawSqlString("ATTACH DATABASE ':memory:' AS dbo"));
         }
 
-        public static ICanCreateTables UsingDbContext(TasksDbContext context)
+        public static ICanCreateTables UsingDbContext(WorkflowDbContext context)
         {
             return new TasksDbBuilder(context);
         }

@@ -37,11 +37,11 @@ namespace Portal
             dbConnection.Open();
 
             services.AddEntityFrameworkSqlite()
-                    .AddDbContext<TasksDbContext>((serviceProvider, options) => options.UseSqlite(dbConnection)
+                    .AddDbContext<WorkflowDbContext>((serviceProvider, options) => options.UseSqlite(dbConnection)
                     .UseInternalServiceProvider(serviceProvider));
 
             using (var sp = services.BuildServiceProvider())
-            using (var context = sp.GetRequiredService<TasksDbContext>())
+            using (var context = sp.GetRequiredService<WorkflowDbContext>())
             {
                 TasksDbBuilder.UsingDbContext(context)
                     .CreateTables()
