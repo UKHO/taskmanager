@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Database.SQL.EF;
-using Database.SQL.EF.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {

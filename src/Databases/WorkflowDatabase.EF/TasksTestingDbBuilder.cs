@@ -1,13 +1,12 @@
 ﻿using System;
-using Database.SQL.EF.Models;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Net.Mime;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using WorkflowDatabase.EF.Models;
 
-namespace Database.SQL.EF
+namespace WorkflowDatabase.EF
 {
     public class TasksDbBuilder : ICanCreateTables, ICanPopulateTables, ICanSaveChanges
     {

@@ -1,11 +1,11 @@
-using Database.SQL.EF;
-using Database.SQL.EF.Models;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Linq;
+using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
-namespace Database.SQL.Tests
+namespace WorkflowDatabase.Tests
 {
     public class ExampleTests
     {

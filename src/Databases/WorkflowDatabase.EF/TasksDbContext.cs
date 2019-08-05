@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Database.SQL.EF
+namespace WorkflowDatabase.EF
 {
     public class TasksDbContext : DbContext
     {

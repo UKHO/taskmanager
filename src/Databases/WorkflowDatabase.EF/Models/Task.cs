@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Database.SQL.EF.Models
+namespace WorkflowDatabase.EF.Models
 {
     public class Task
     {
