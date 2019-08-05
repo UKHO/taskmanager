@@ -1,0 +1,24 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(Build.SourcesDirectory)\\src\\Databases\\Database.SQL\\WorkflowDatabase.sqlproj'
+  displayName: 'Build WorkflowDatabase'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\Database.SQL\\bin\\debug\\WorkflowDatabase.dacpac'
+    ArtifactName: 'workflowdatabase'
+    publishLocation: 'Container'
+  displayName: 'Publish WorkflowDatabase'
