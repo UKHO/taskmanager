@@ -20,19 +20,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Database.SQL\Tables\AssessmentData.sql" Link="SqlTables\AssessmentData.sql">
+    <None Include="..\WorkflowDatabase\Tables\AssessmentData.sql" Link="SqlTables\AssessmentData.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Database.SQL\Tables\Comments.sql" Link="SqlTables\Comments.sql">
+    <None Include="..\WorkflowDatabase\Tables\Comments.sql" Link="SqlTables\Comments.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Database.SQL\Tables\DbAssessmentReviewData.sql" Link="SqlTables\DbAssessmentReviewData.sql">
+    <None Include="..\WorkflowDatabase\Tables\DbAssessmentReviewData.sql" Link="SqlTables\DbAssessmentReviewData.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Database.SQL\Tables\Processes.sql" Link="SqlTables\Processes.sql">
+    <None Include="..\WorkflowDatabase\Tables\Processes.sql" Link="SqlTables\Processes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Database.SQL\Tables\Tasks.sql" Link="SqlTables\Tasks.sql">
+    <None Include="..\WorkflowDatabase\Tables\Tasks.sql" Link="SqlTables\Tasks.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
