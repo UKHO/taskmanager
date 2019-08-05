@@ -13,12 +13,12 @@ steps:
 
 - task: VSBuild@1
   inputs:
-    solution: '$(Build.SourcesDirectory)\\src\\Databases\\Database.SQL\\WorkflowDatabase.sqlproj'
+    solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
   displayName: 'Build WorkflowDatabase'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\Database.SQL\\bin\\debug\\WorkflowDatabase.dacpac'
+    PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\bin\\debug\\WorkflowDatabase.dacpac'
     ArtifactName: 'workflowdatabase'
     publishLocation: 'Container'
   displayName: 'Publish WorkflowDatabase'
