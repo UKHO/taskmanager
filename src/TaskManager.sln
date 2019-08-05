@@ -33,11 +33,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceDocumentCoordinator",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WorkflowCoordinator", "WorkflowCoordinator", "{AC6D37BD-D8E4-418F-B062-4B7CC6A8FD1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.TestAutomation.Specs", "Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.csproj", "{4082E4EB-A98A-4D0E-B32C-E9C4314A74B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.TestAutomation.Specs", "Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.csproj", "{4082E4EB-A98A-4D0E-B32C-E9C4314A74B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.TestAutomation.Framework", "Portal.TestAutomation.Framework\Portal.TestAutomation.Framework.csproj", "{3BBC0C16-552E-4DD0-9F08-7986AF9B9F44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.TestAutomation.Framework", "Portal.TestAutomation.Framework\Portal.TestAutomation.Framework.csproj", "{3BBC0C16-552E-4DD0-9F08-7986AF9B9F44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.TestAutomation.Steps", "Portal.TestAutomation.Steps\Portal.TestAutomation.Steps.csproj", "{C3690CF6-C041-4AAF-A065-AEC930DC3938}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.TestAutomation.Steps", "Portal.TestAutomation.Steps\Portal.TestAutomation.Steps.csproj", "{C3690CF6-C041-4AAF-A065-AEC930DC3938}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Databases", "Databases", "{1EAB5545-7539-44E4-8025-1580F2878997}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WorkflowDatabase", "Databases\Database.SQL\WorkflowDatabase.sqlproj", "{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.Tests", "Databases\Database.SQL.Tests\WorkflowDatabase.Tests.csproj", "{A6C8967B-207B-4037-B06D-E82363B47B55}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowDatabase.EF", "Databases\Database.SQL.EF\WorkflowDatabase.EF.csproj", "{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +105,20 @@ Global
 		{C3690CF6-C041-4AAF-A065-AEC930DC3938}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3690CF6-C041-4AAF-A065-AEC930DC3938}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3690CF6-C041-4AAF-A065-AEC930DC3938}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A6C8967B-207B-4037-B06D-E82363B47B55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6C8967B-207B-4037-B06D-E82363B47B55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6C8967B-207B-4037-B06D-E82363B47B55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6C8967B-207B-4037-B06D-E82363B47B55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +137,9 @@ Global
 		{4082E4EB-A98A-4D0E-B32C-E9C4314A74B8} = {1090BDD0-981C-477F-88CB-9C6EF85D568C}
 		{3BBC0C16-552E-4DD0-9F08-7986AF9B9F44} = {1090BDD0-981C-477F-88CB-9C6EF85D568C}
 		{C3690CF6-C041-4AAF-A065-AEC930DC3938} = {1090BDD0-981C-477F-88CB-9C6EF85D568C}
+		{B96CC0F6-E1F1-4967-8776-17FD0F00BE3B} = {1EAB5545-7539-44E4-8025-1580F2878997}
+		{A6C8967B-207B-4037-B06D-E82363B47B55} = {1EAB5545-7539-44E4-8025-1580F2878997}
+		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E} = {1EAB5545-7539-44E4-8025-1580F2878997}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}

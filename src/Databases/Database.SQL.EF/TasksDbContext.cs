@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Portal.DataContext
+namespace Database.SQL.EF
 {
     public class TasksDbContext : DbContext
     {

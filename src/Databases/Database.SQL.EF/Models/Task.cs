@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Portal.Models
+namespace Database.SQL.EF.Models
 {
     public class Task
     {

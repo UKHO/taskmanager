@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Portal.DataContext;
 using System.Collections.Generic;
 using System.Linq;
+using Database.SQL.EF;
+using Database.SQL.EF.Models;
 
 namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly TasksDbContext _dbContext;
-        public IList<Models.Task> Tasks { get; set; }
+        public IList<Task> Tasks { get; set; }
 
         public IndexModel(TasksDbContext dbContext)
         {
