@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Tasks]
 (
-	[ProcessId] INT NOT NULL PRIMARY KEY, 
+	[TaskId] INT NOT NULL PRIMARY KEY,
     [WorkflowProcessId] INT NOT NULL, 
     [DaysToDmEndDate] SMALLINT NULL, 
     [DmEndDate] DATETIME2 NULL, 
