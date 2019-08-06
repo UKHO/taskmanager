@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="TaskType" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1235c66b-9dd6-4bea-8d62-0b4db2d5e813" ChangeDateTime="08/06/2019 09:47:35">
+    <Property Name="ElementName" Value="[dbo].[Tasks].[ProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Tasks]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Process_Id" />
+  </Operation>
 </Operations>

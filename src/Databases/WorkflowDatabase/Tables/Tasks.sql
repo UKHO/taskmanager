@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Tasks]
 (
 	[Id] INT NOT NULL PRIMARY KEY, 
-    [ProcessId] VARCHAR(50) NULL, 
+    [Process_Id] INT NOT NULL, 
     [DaysToDmEndDate] SMALLINT NULL, 
     [DmEndDate] DATETIME2 NULL, 
     [DaysOnHold] SMALLINT NULL, 
@@ -13,5 +13,6 @@
     [Assessor] NCHAR(10) NULL, 
     [Verifier] NCHAR(10) NULL, 
     [Team] NCHAR(10) NULL, 
-    [TaskNote] NCHAR(100) NULL
+    [TaskNote] NCHAR(100) NULL, 
+    CONSTRAINT [FK_Tasks_ToProcesses] FOREIGN KEY ([Process_Id]) REFERENCES [Processes]([Id]) 
 )
