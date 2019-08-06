@@ -62,7 +62,7 @@
     <Build Include="Tables\Tasks.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
-    <Build Include="Tables\Processes.sql" />
+    <Build Include="Tables\Process.sql" />
     <Build Include="Tables\AssessmentData.sql" />
     <Build Include="Tables\Comment.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />

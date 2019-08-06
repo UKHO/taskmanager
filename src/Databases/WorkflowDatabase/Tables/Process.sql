@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Processes]
+﻿CREATE TABLE [dbo].[Process]
 (
 	[ProcessId] INT NOT NULL PRIMARY KEY, 
     [WorkflowProcessId] INT NOT NULL, 
