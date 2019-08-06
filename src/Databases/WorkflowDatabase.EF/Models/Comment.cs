@@ -2,9 +2,9 @@
 {
     public class Comment
     {
-        public int Id { get; set; }
+        public int CommentId { get; set; }
 
-        public int ProcessId { get; set; }
+        public int WorkflowProcessId { get; set; }
 
         public string Text { get; set; }
     }

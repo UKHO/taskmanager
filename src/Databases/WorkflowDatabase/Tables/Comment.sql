@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[Comments]
+﻿CREATE TABLE [dbo].[Comment]
 (
-	[CommentsId] INT NOT NULL PRIMARY KEY, 
+	[CommentId] INT NOT NULL PRIMARY KEY, 
     [WorkflowProcessId] INT NOT NULL, 
     [Text] NVARCHAR(50) NOT NULL
 )

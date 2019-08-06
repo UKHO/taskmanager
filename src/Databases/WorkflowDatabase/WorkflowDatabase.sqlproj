@@ -64,7 +64,7 @@
     </Build>
     <Build Include="Tables\Processes.sql" />
     <Build Include="Tables\AssessmentData.sql" />
-    <Build Include="Tables\Comments.sql" />
+    <Build Include="Tables\Comment.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />
   </ItemGroup>
   <ItemGroup>
