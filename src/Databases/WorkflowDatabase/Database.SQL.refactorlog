@@ -14,4 +14,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Process_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="98e3aeaa-789b-4ffa-ac91-8b2c2f99c167" ChangeDateTime="08/06/2019 14:49:22">
+    <Property Name="ElementName" Value="[dbo].[Processes].[ProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Processes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WorkflowProcessId" />
+  </Operation>
 </Operations>

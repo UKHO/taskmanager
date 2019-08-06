@@ -33,18 +33,13 @@ namespace Portal
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            var dbConnection = new SqliteConnection("DataSource=:memory:");
-            dbConnection.Open();
-
-            services.AddEntityFrameworkSqlite()
-                    .AddDbContext<WorkflowDbContext>((serviceProvider, options) => options.UseSqlite(dbConnection)
-                    .UseInternalServiceProvider(serviceProvider));
+            services.AddDbContext<WorkflowDbContext>((serviceProvider, options) => options
+                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False"));
 
             using (var sp = services.BuildServiceProvider())
             using (var context = sp.GetRequiredService<WorkflowDbContext>())
             {
                 TasksDbBuilder.UsingDbContext(context)
-                    .CreateTables()
                     .PopulateTables()
                     .SaveChanges();
             }

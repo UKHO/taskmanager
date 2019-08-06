@@ -70,4 +70,7 @@
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="WorkflowDatabase.LocalDb.publish.xml" />
+  </ItemGroup>
 </Project>

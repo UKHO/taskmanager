@@ -1,7 +1,7 @@
-using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using System.Linq;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -24,7 +24,6 @@ namespace WorkflowDatabase.Tests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             TasksDbBuilder.UsingDbContext(_dbContext)
-                          .CreateTables()
                           .PopulateTables()
                           .SaveChanges();
         }
@@ -41,7 +40,7 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.Tasks.Add(new Task()
             {
-                Id = 99,
+                //   Id = 99,
                 Assessor = "ben"
             });
             _dbContext.SaveChanges();
