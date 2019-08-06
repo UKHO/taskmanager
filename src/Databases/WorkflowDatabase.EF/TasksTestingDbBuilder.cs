@@ -29,15 +29,16 @@ namespace WorkflowDatabase.EF
 
         public ICanSaveChanges PopulateTables()
         {
-            if (!File.Exists(@"Data\ProcessesSeedData.json")) return this;
+            //if (!File.Exists(@"Data\ProcessesSeedData.json")) return this;
             if (!File.Exists(@"Data\TasksSeedData.json")) return this;
 
-            var jsonString = File.ReadAllText(@"Data\ProcessesSeedData.json");
-            var processes = JsonConvert.DeserializeObject<IEnumerable<Process>>(jsonString);
-            _context.Processes.AddRange(processes);
+            //var jsonString = File.ReadAllText(@"Data\ProcessesSeedData.json");
+            //var processes = JsonConvert.DeserializeObject<IEnumerable<Process>>(jsonString);
+            //_context.Processes.AddRange(processes);
 
-            jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
+            var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
             var tasks = JsonConvert.DeserializeObject<IEnumerable<Task>>(jsonString);
+            _context.Database.ExecuteSqlCommand("TRUNCATE TABLE [Tasks]");
 
             _context.Tasks.AddRange(tasks);
 
