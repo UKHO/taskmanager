@@ -1,7 +1,7 @@
 [
     {
       "id": 1,
-      "processId": "1234",
+      "Process_Id": 1,
       "daysToDmEndDate": -5,
       "dmEndDate": "2019-07-01T00:00:00",
       "daysOnHold": 0,
@@ -16,7 +16,7 @@
     },
   {
     "id": 2,
-    "processId": "1235",
+    "Process_Id": 2,
     "daysToDmEndDate": -4,
     "dmEndDate": "2019-07-02T00:00:00",
     "daysOnHold": 0,
@@ -32,7 +32,7 @@
   },
   {
     "id": 3,
-    "processId": "4321",
+    "Process_Id": 3,
     "daysToDmEndDate": 0,
     "dmEndDate": "2019-07-06T00:00:00",
     "daysOnHold": 3,
@@ -47,7 +47,7 @@
   },
   {
     "id": 4,
-    "processId": "4322",
+    "Process_Id": 4,
     "daysToDmEndDate": 1,
     "dmEndDate": "2019-07-07T00:00:00",
     "daysOnHold": 2,
@@ -63,7 +63,7 @@
   },
   {
     "id": 5,
-    "processId": "4323",
+    "Process_Id": 5,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 0,
@@ -78,7 +78,7 @@
   },
   {
     "id": 6,
-    "processId": "4324",
+    "Process_Id": 6,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 2,
@@ -94,7 +94,7 @@
   },
   {
     "id": 7,
-    "processId": "4325",
+    "Process_Id": 7,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 6,
