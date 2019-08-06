@@ -1,7 +1,7 @@
 [
     {
       "id": 1,
-      "Process_Id": 1,
+      "WorkflowProcessId": 1111,
       "daysToDmEndDate": -5,
       "dmEndDate": "2019-07-01T00:00:00",
       "daysOnHold": 0,
@@ -16,7 +16,7 @@
     },
   {
     "id": 2,
-    "Process_Id": 2,
+    "WorkflowProcessId": 2222,
     "daysToDmEndDate": -4,
     "dmEndDate": "2019-07-02T00:00:00",
     "daysOnHold": 0,
@@ -32,7 +32,7 @@
   },
   {
     "id": 3,
-    "Process_Id": 3,
+    "WorkflowProcessId": 3333,
     "daysToDmEndDate": 0,
     "dmEndDate": "2019-07-06T00:00:00",
     "daysOnHold": 3,
@@ -47,7 +47,7 @@
   },
   {
     "id": 4,
-    "Process_Id": 4,
+    "WorkflowProcessId": 4444,
     "daysToDmEndDate": 1,
     "dmEndDate": "2019-07-07T00:00:00",
     "daysOnHold": 2,
@@ -63,7 +63,7 @@
   },
   {
     "id": 5,
-    "Process_Id": 5,
+    "WorkflowProcessId": 5555,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 0,
@@ -78,7 +78,7 @@
   },
   {
     "id": 6,
-    "Process_Id": 6,
+    "WorkflowProcessId": 6666,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 2,
@@ -94,7 +94,7 @@
   },
   {
     "id": 7,
-    "Process_Id": 7,
+    "WorkflowProcessId": 7777,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 6,
