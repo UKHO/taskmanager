@@ -14,7 +14,14 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
+    msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=WorkflowDatabase.LocalDb.publish.xml
   displayName: 'Build WorkflowDatabase'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
+  displayName: 'dotnet test'
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -22,3 +29,4 @@ steps:
     ArtifactName: 'workflowdatabase'
     publishLocation: 'Container'
   displayName: 'Publish WorkflowDatabase'
+

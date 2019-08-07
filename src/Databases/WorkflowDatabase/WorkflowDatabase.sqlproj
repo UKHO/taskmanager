@@ -71,6 +71,8 @@
     <RefactorLog Include="Database.SQL.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="WorkflowDatabase.LocalDb.publish.xml" />
+    <None Include="WorkflowDatabase.LocalDb.publish.xml">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
