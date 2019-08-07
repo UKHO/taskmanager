@@ -35,17 +35,19 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish WorkflowDatabase'
 
-environment: 'tm2dev.workflowdatabase'
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - task: SqlAzureDacpacDeployment@1
-          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-          inputs:
-            azureSubscription: 'TM2 Dev/Test Sub Dev RG'
-            ServerName: 'taskmanager-dev-sqlserver.database.windows.net'
-            DatabaseName: 'taskmanager-dev-workflowdatabase'
-            SqlUsername: '$(SQLUsername)'
-            SqlPassword: '$(SQLPassword)'
-            DacpacFile: '$(System.DefaultWorkingDirectory)/WorkflowDatabase/workflowdatabase/WorkflowDatabase.dacpac'
+# Keep this for when Azure DevOps feature is released shortly
+#
+#environment: 'tm2dev.workflowdatabase'
+#  strategy:
+#    runOnce:
+#      deploy:
+#        steps:
+#        - task: SqlAzureDacpacDeployment@1
+#          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#          inputs:
+#            azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+#            ServerName: 'taskmanager-dev-sqlserver.database.windows.net'
+#            DatabaseName: 'taskmanager-dev-workflowdatabase'
+#            SqlUsername: '$(SQLUsername)'
+#            SqlPassword: '$(SQLPassword)'
+#            DacpacFile: '$(System.DefaultWorkingDirectory)/WorkflowDatabase/workflowdatabase/WorkflowDatabase.dacpac'
