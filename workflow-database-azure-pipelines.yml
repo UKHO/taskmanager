@@ -35,7 +35,7 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish WorkflowDatabase'
 
-environment: tm2dev.workflowdatabase
+environment: 'tm2dev.workflowdatabase'
   strategy:               
     runOnce:             
       deploy:
