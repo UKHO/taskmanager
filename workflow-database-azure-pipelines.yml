@@ -21,7 +21,7 @@ steps:
   inputs:
     command: 'test'
     projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
-  displayName: 'dotnet test'
+  displayName: 'dotnet test LocalDb instance of database'
 
 - task: VSBuild@1
   inputs:
