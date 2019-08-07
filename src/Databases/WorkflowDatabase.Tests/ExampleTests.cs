@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Linq;
@@ -10,15 +9,12 @@ namespace WorkflowDatabase.Tests
     public class ExampleTests
     {
         private WorkflowDbContext _dbContext;
-        private SqliteConnection _connection;
 
         [SetUp]
         public void Setup()
         {
-            _connection = new SqliteConnection("DataSource=:memory:");
-
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
-                .UseSqlite(_connection)
+                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
@@ -31,7 +27,6 @@ namespace WorkflowDatabase.Tests
         [TearDown]
         public void Teardown()
         {
-            _connection.Dispose();
             _dbContext.Dispose();
         }
 
@@ -40,8 +35,10 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.Tasks.Add(new Task()
             {
-                //   Id = 99,
+                TaskId = 99,
+                WorkflowProcessId = 9999,
                 Assessor = "ben"
+
             });
             _dbContext.SaveChanges();
 
