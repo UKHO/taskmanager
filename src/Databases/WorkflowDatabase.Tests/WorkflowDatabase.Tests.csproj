@@ -30,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WorkflowDatabase\WorkflowDatabase.sqlproj" />
     <ProjectReference Include="..\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
   </ItemGroup>
 
