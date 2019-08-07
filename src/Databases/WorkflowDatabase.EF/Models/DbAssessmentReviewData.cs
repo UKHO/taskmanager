@@ -2,8 +2,8 @@
 {
     public class DbAssessmentReviewData
     {
-        public int Id { get; set; }
-        public int ProcessId { get; set; }
+        public int DbAssessmentReviewDataId { get; set; }
+        public int WorkflowProcessId { get; set; }
         public string Ion { get; set; }
         public string ActivityCode { get; set; }
         public string Assessor { get; set; }

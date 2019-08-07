@@ -1,17 +1,17 @@
 ﻿CREATE TABLE [dbo].[Tasks]
 (
-	[Id] INT NOT NULL PRIMARY KEY, 
-    [ProcessId] VARCHAR(50) NULL, 
+	[TaskId] INT NOT NULL PRIMARY KEY,
+    [WorkflowProcessId] INT NOT NULL, 
     [DaysToDmEndDate] SMALLINT NULL, 
     [DmEndDate] DATETIME2 NULL, 
     [DaysOnHold] SMALLINT NULL, 
-    [RsdraNo] NCHAR(10) NULL, 
-    [SourceName] NCHAR(10) NULL, 
-    [Workspace] NCHAR(10) NULL, 
-    [TaskType] NCHAR(10) NULL, 
-    [TaskStage] NCHAR(10) NULL, 
-    [Assessor] NCHAR(10) NULL, 
-    [Verifier] NCHAR(10) NULL, 
-    [Team] NCHAR(10) NULL, 
-    [TaskNote] NCHAR(100) NULL
+    [RsdraNo] NVARCHAR(50) NULL, 
+    [SourceName] NVARCHAR(50) NULL, 
+    [Workspace] NVARCHAR(10) NULL, 
+    [TaskType] NVARCHAR(10) NULL, 
+    [TaskStage] NVARCHAR(10) NULL, 
+    [Assessor] NVARCHAR(10) NULL, 
+    [Verifier] NVARCHAR(10) NULL, 
+    [Team] NVARCHAR(10) NULL, 
+    [TaskNote] NVARCHAR(100) NULL, 
 )

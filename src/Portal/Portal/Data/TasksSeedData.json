@@ -1,7 +1,7 @@
 [
     {
-      "id": 1,
-      "processId": "1234",
+      "TaskId": 1,
+      "WorkflowProcessId": 1111,
       "daysToDmEndDate": -5,
       "dmEndDate": "2019-07-01T00:00:00",
       "daysOnHold": 0,
@@ -15,8 +15,8 @@
       "team": "PR"
     },
   {
-    "id": 2,
-    "processId": "1235",
+    "TaskId": 2,
+    "WorkflowProcessId": 2222,
     "daysToDmEndDate": -4,
     "dmEndDate": "2019-07-02T00:00:00",
     "daysOnHold": 0,
@@ -31,8 +31,8 @@
     "tasknote": "Waiting for Jim to get in touch."
   },
   {
-    "id": 3,
-    "processId": "4321",
+    "TaskId": 3,
+    "WorkflowProcessId": 3333,
     "daysToDmEndDate": 0,
     "dmEndDate": "2019-07-06T00:00:00",
     "daysOnHold": 3,
@@ -46,8 +46,8 @@
     "team": "HW"
   },
   {
-    "id": 4,
-    "processId": "4322",
+    "TaskId": 4,
+    "WorkflowProcessId": 4444,
     "daysToDmEndDate": 1,
     "dmEndDate": "2019-07-07T00:00:00",
     "daysOnHold": 2,
@@ -62,8 +62,8 @@
     "tasknote": "Awaiting authorisation."
   },
   {
-    "id": 5,
-    "processId": "4323",
+    "TaskId": 5,
+    "WorkflowProcessId": 5555,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 0,
@@ -77,8 +77,8 @@
     "team": "PR"
   },
   {
-    "id": 6,
-    "processId": "4324",
+    "TaskId": 6,
+    "WorkflowProcessId": 6666,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 2,
@@ -93,8 +93,8 @@
     "tasknote": "Contact Jim before Verifying #4324!"
   },
   {
-    "id": 7,
-    "processId": "4325",
+    "TaskId": 7,
+    "WorkflowProcessId": 7777,
     "daysToDmEndDate": 11,
     "dmEndDate": "2019-07-17T00:00:00",
     "daysOnHold": 6,

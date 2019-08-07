@@ -4,11 +4,11 @@ namespace WorkflowDatabase.EF.Models
 {
     public class Task
     {
-        public int Id { get; set; }
-        public string ProcessId { get; set; }
-        public int DaysToDmEndDate { get; set; }
+        public int TaskId { get; set; }
+        public int WorkflowProcessId { get; set; }
+        public short DaysToDmEndDate { get; set; }
         public DateTime DmEndDate { get; set; }
-        public int DaysOnHold { get; set; }
+        public short DaysOnHold { get; set; }
         public string RsdraNo { get; set; }
         public string SourceName { get; set; }
         public string Workspace { get; set; }

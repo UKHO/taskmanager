@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[AssessmentData]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[AssessmentDataId] INT NOT NULL PRIMARY KEY,
 	[SdocId] INT NOT NULL,
 	[RsdraNumber] NVARCHAR(50) NOT NULL,
 	[SourceDocumentName] NVARCHAR(255) NOT NULL,

@@ -62,12 +62,17 @@
     <Build Include="Tables\Tasks.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
-    <Build Include="Tables\Processes.sql" />
+    <Build Include="Tables\Process.sql" />
     <Build Include="Tables\AssessmentData.sql" />
-    <Build Include="Tables\Comments.sql" />
+    <Build Include="Tables\Comment.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WorkflowDatabase.LocalDb.publish.xml">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

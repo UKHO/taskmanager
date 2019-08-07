@@ -343,3 +343,5 @@ ASALocalRun/
 **/DataServices.ApiTests/target/
 **/DataServices.ApiTests/**/*.iml
 **/DataServices.ApiTests/**/*.log
+
+*.refactorlog

@@ -15,26 +15,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SqlTables\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\WorkflowDatabase\Tables\AssessmentData.sql" Link="SqlTables\AssessmentData.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\WorkflowDatabase\Tables\Comments.sql" Link="SqlTables\Comments.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\WorkflowDatabase\Tables\DbAssessmentReviewData.sql" Link="SqlTables\DbAssessmentReviewData.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\WorkflowDatabase\Tables\Processes.sql" Link="SqlTables\Processes.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\WorkflowDatabase\Tables\Tasks.sql" Link="SqlTables\Tasks.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
