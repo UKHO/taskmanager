@@ -2,7 +2,7 @@
 
 namespace Common.Messages
 {
-    public class AnnounceOpenedAssessmentMessage
+    public class AnnounceOpenedAssessmentMessage : ICorrelation
     {
         public Guid CorrelationId { get; set; }
     }
