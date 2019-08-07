@@ -36,8 +36,8 @@ steps:
   displayName: 'Publish WorkflowDatabase'
 
 environment: 'tm2dev.workflowdatabase'
-  strategy:               
-    runOnce:             
+  strategy:
+    runOnce:
       deploy:
         steps:
         - task: SqlAzureDacpacDeployment@1
