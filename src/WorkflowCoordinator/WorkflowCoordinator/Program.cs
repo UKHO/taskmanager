@@ -58,6 +58,17 @@ namespace WorkflowCoordinator
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
+                    // if local
+                    services.AddOptions<UrlsConfig>()
+                        .Configure(o => o.BaseUrl = "http://localhost:27720/");
+                // else
+                //services.AddOptions<UrlsConfig>()
+                //    .Configure(o => o.BaseUrl = "http://localhost:27720/");
+
+                
+                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5)); 
+
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })
             .UseConsoleLifetime();
@@ -69,5 +80,10 @@ namespace WorkflowCoordinator
                 await host.RunAsync();
             }
         }
+    }
+
+    public class UrlsConfig
+    {
+        public string  BaseUrl { get; set; }
     }
 }

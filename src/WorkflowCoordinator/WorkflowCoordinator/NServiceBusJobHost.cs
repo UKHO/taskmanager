@@ -1,5 +1,4 @@
-﻿using Common.Messages;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -14,6 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkflowCoordinator.Config;
+using WorkflowCoordinator.Messages;
 
 namespace WorkflowCoordinator
 {
@@ -23,7 +23,7 @@ namespace WorkflowCoordinator
         private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        private readonly bool _isLocalDebugging = false;
+        private readonly bool _isLocalDebugging;
         private readonly string _connectionString;
         private readonly string _azureAccessToken;
 
@@ -168,7 +168,9 @@ namespace WorkflowCoordinator
                      .DefiningEventsAs(
                         type => type.Namespace == "Common.Messages.Events")
                      .DefiningMessagesAs(
-                        type => type.Namespace == "Common.Messages");
+                        type => type.Namespace == "Common.Messages")
+                     .DefiningMessagesAs(
+                         type => type.Namespace == "WorkflowCoordinator.Messages"); ;
 
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
@@ -178,7 +180,7 @@ namespace WorkflowCoordinator
                 var options = new SendOptions();
                 options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
                 options.RouteToThisEndpoint();
-                await _endpoint.Send(new AnnounceOpenedAssessmentMessage() { CorrelationId = Guid.NewGuid() }, options)
+                await _endpoint.Send(new SdraPollingMessage(), options)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
