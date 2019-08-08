@@ -1,7 +1,6 @@
 ﻿using NServiceBus;
 using NServiceBus.Logging;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using WorkflowCoordinator.Messages;
 
@@ -12,8 +11,6 @@ namespace WorkflowCoordinator
         private readonly IDataServiceApiClient _dataServiceApiClient;
         ILog log = LogManager.GetLogger<SdraPollingMessage>();
 
-      //  public SdraPollingMessageHandler(){}
-        
         public SdraPollingMessageHandler(IDataServiceApiClient dataServiceApiClient)
         {
             _dataServiceApiClient = dataServiceApiClient;

@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NServiceBus;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,8 +21,26 @@ namespace WorkflowCoordinator
         {
             var builder = new HostBuilder()
             .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
-            .ConfigureWebJobs(b =>
+            .ConfigureWebJobs((context, b) =>
             {
+                var endpointConfiguration = new EndpointConfiguration("WorkflowCoordinator");
+                b.Services.AddOptions<UrlsConfig>()
+                    .Configure(o => o.BaseUrl = "http://localhost:27720/ **rest of base url**");
+                b.Services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+                b.Services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+                UpdateableServiceProvider container = null;
+
+                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+                {
+                    customizations.ExistingServices(b.Services);
+                    customizations.ServiceProviderFactory(sc =>
+                    {
+                        container = new UpdateableServiceProvider(sc);
+                        return container;
+                    });
+                });
                 b.AddAzureStorageCoreServices();
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
@@ -44,30 +64,9 @@ namespace WorkflowCoordinator
             {
                 services.AddOptions<ExampleConfig>()
                     .Bind(hostingContext.Configuration.GetSection("ExampleConfig"));
-                //.PostConfigure(o =>
-                //{
-                //    var errors = string.Join(",", o.ValidateDataAnnotations().Concat(o.Validate()));
-                //    if (errors.Any())
-                //    {
-                //        var message = $"Found configuration error(s) in {o.GetType().Name}: {errors}";
-                //        _logger.LogError(message);
-                //        throw new ApplicationException(message);
-                //    }
-                //});
 
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
-
-                    // if local
-                    services.AddOptions<UrlsConfig>()
-                        .Configure(o => o.BaseUrl = "http://localhost:27720/");
-                // else
-                //services.AddOptions<UrlsConfig>()
-                //    .Configure(o => o.BaseUrl = "http://localhost:27720/");
-
-                
-                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
-                    .SetHandlerLifetime(TimeSpan.FromMinutes(5)); 
 
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })
@@ -84,6 +83,6 @@ namespace WorkflowCoordinator
 
     public class UrlsConfig
     {
-        public string  BaseUrl { get; set; }
+        public string BaseUrl { get; set; }
     }
 }

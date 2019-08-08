@@ -8,10 +8,10 @@ namespace WorkflowCoordinator
 {
     public class DataServiceApiClient : IDataServiceApiClient
     {
-        public IOptionsSnapshot<UrlsConfig> _urlsConfig;
+        public IOptions<UrlsConfig> _urlsConfig;
         private readonly HttpClient _httpClient;
 
-        public DataServiceApiClient(HttpClient httpClient, IOptionsSnapshot<UrlsConfig> urlsConfig)
+        public DataServiceApiClient(HttpClient httpClient, IOptions<UrlsConfig> urlsConfig)
         {
             _urlsConfig = urlsConfig;
             _httpClient = httpClient;
@@ -19,7 +19,7 @@ namespace WorkflowCoordinator
 
         public async Task<IEnumerable<Assessment>> GetAssessments(string callerCode)
         {
-            var response = await _httpClient.GetAsync($@"{_urlsConfig.Value.BaseUrl}**HIDDEN**");
+            var response = await _httpClient.GetAsync($@"{_urlsConfig.Value.BaseUrl}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
 
             var assessments = JsonConvert.DeserializeObject<IEnumerable<Assessment>>(await response.Content.ReadAsStringAsync());
             return assessments;

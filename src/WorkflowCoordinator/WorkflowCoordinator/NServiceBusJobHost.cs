@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Messages;
 
@@ -22,6 +23,7 @@ namespace WorkflowCoordinator
         private readonly IOptions<ExampleConfig> _generalConfig;
         private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly EndpointConfiguration _endpointConfig;
 
         private readonly bool _isLocalDebugging;
         private readonly string _connectionString;
@@ -31,11 +33,15 @@ namespace WorkflowCoordinator
 
         private IEndpointInstance _endpoint;
 
-        public NServiceBusJobHost(IOptions<ExampleConfig> generalConfig, IOptions<SecretsConfig> secretsConfig, IHostingEnvironment hostingEnvironment)
+        public NServiceBusJobHost(IOptionsSnapshot<ExampleConfig> generalConfig, 
+            IOptionsSnapshot<SecretsConfig> secretsConfig, 
+            IHostingEnvironment hostingEnvironment, 
+            EndpointConfiguration endpointConfig)
         {
             _generalConfig = generalConfig;
             _secretsConfig = secretsConfig;
             _hostingEnvironment = hostingEnvironment;
+            _endpointConfig = endpointConfig;
             _isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
 
             if (_isLocalDebugging)
@@ -45,7 +51,7 @@ namespace WorkflowCoordinator
             }
             else
             {
-                _connectionString = BuildSqlConnectionString(_secretsConfig.Value.NsbDataSource, "_secretsConfig.Value.NsbInitialCatalog");
+                _connectionString = BuildSqlConnectionString(_secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
 
                 try
                 {
@@ -63,7 +69,7 @@ namespace WorkflowCoordinator
 
         private static void ReCreateDb(string dbName, string connectionString)
         {
-            // TODO Switch over to SQL parameters
+            // TODO Switch over to SQL parameters (SHa has this covered)
             var safeDbName = dbName.Replace("'", "''");
 
             string commandText = "USE master " +
@@ -118,7 +124,7 @@ namespace WorkflowCoordinator
         {
             try
             {
-                var endpointConfiguration = new EndpointConfiguration(_generalConfig.Value.NsbEndpointName);
+                var endpointConfiguration = _endpointConfig;
 
                 endpointConfiguration.UseTransport<SqlServerTransport>()
                                      .Transactions(TransportTransactionMode.SendsAtomicWithReceive)
