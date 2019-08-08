@@ -17,8 +17,7 @@ schedules:
 
 jobs:
 - job: Run_UI_Tests
-  pool:
-    vmImage: 'windows-2019'
+  pool: UKHO Windows 2019
     
   steps:
     - task: DotNetCoreCLI@2
