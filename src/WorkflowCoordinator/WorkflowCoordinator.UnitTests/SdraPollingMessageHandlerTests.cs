@@ -59,9 +59,7 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             Assert.AreEqual(1, _handlerContext.SentMessages.Length);
-
-            object o = _handlerContext.SentMessages[0].Message;
-            Assert.IsInstanceOf<SdraPollingMessage>(o);
+            Assert.IsInstanceOf<SdraPollingMessage>(_handlerContext.SentMessages[0].Message);
 
             var processMessage = _handlerContext.SentMessages[0];
 
