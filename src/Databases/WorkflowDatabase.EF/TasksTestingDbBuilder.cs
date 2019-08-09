@@ -20,12 +20,6 @@ namespace WorkflowDatabase.EF
             return new TasksDbBuilder(context);
         }
 
-        private void RunSql(RawSqlString sqlString)
-        {
-            _context.Database.ExecuteSqlCommand(sqlString);
-            _context.SaveChanges();
-        }
-
         public ICanSaveChanges PopulateTables()
         {
             if (!File.Exists(@"Data\TasksSeedData.json")) return this;
