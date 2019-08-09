@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
-namespace WorkflowCoordinator
+namespace WorkflowCoordinator.HttpClients
 {
     public class DataServiceApiClient : IDataServiceApiClient
     {

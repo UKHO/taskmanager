@@ -12,7 +12,6 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Messages;
 
@@ -20,8 +19,8 @@ namespace WorkflowCoordinator
 {
     public class NServiceBusJobHost : IJobHost
     {
-        private readonly IOptions<ExampleConfig> _generalConfig;
         private readonly IOptions<SecretsConfig> _secretsConfig;
+        private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointConfiguration _endpointConfig;
 
@@ -33,9 +32,9 @@ namespace WorkflowCoordinator
 
         private IEndpointInstance _endpoint;
 
-        public NServiceBusJobHost(IOptionsSnapshot<ExampleConfig> generalConfig, 
-            IOptionsSnapshot<SecretsConfig> secretsConfig, 
-            IHostingEnvironment hostingEnvironment, 
+        public NServiceBusJobHost(IOptionsSnapshot<GeneralConfig> generalConfig,
+            IOptionsSnapshot<SecretsConfig> secretsConfig,
+            IHostingEnvironment hostingEnvironment,
             EndpointConfiguration endpointConfig)
         {
             _generalConfig = generalConfig;
@@ -56,10 +55,10 @@ namespace WorkflowCoordinator
                 try
                 {
                     var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                    var azureDbTokenUrl = _generalConfig.Value.ConnectionStrings.AzureDbTokenUrl;
+                    var azureDbTokenUrl = _generalConfig.Value.AzureDbTokenUrl;
                     _azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // log
                     throw;
@@ -95,7 +94,7 @@ namespace WorkflowCoordinator
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // log
                     throw;

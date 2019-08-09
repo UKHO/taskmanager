@@ -1,10 +1,11 @@
-﻿using NServiceBus;
-using NServiceBus.Logging;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Logging;
+using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 
-namespace WorkflowCoordinator
+namespace WorkflowCoordinator.Handlers
 {
     public class SdraPollingMessageHandler : IHandleMessages<SdraPollingMessage>
     {
