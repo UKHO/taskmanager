@@ -1,6 +1,9 @@
-﻿using Microsoft.Azure.KeyVault;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
@@ -9,10 +12,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-using System;
-using System.Threading.Tasks;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
+using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator
 {
@@ -58,6 +60,17 @@ namespace WorkflowCoordinator
 
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+
+                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) => options
+                    .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False"));
+
+                using (var sp = services.BuildServiceProvider())
+                using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                {
+                    TasksDbBuilder.UsingDbContext(context)
+                        .PopulateTables()
+                        .SaveChanges();
+                }
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));

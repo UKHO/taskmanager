@@ -5,10 +5,12 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
+using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.UnitTests
 {
@@ -21,8 +23,16 @@ namespace WorkflowCoordinator.UnitTests
         [SetUp]
         public void Setup()
         {
+            var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
+                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
+                .Options;
+            var dbContext = new WorkflowDbContext(dbContextOptions);
+            TasksDbBuilder.UsingDbContext(dbContext)
+                .PopulateTables()
+                .SaveChanges();
+
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
-            _handler = new SdraPollingMessageHandler(_fakeDataServiceApiClient);
+            _handler = new SdraPollingMessageHandler(_fakeDataServiceApiClient, dbContext);
             _handlerContext = new TestableMessageHandlerContext();
         }
 

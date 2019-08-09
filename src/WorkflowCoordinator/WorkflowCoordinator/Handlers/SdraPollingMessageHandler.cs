@@ -1,20 +1,23 @@
-﻿using NServiceBus;
-using NServiceBus.Logging;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Logging;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
+using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.Handlers
 {
     public class SdraPollingMessageHandler : IHandleMessages<SdraPollingMessage>
     {
         private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly WorkflowDbContext _dbContext;
         ILog log = LogManager.GetLogger<SdraPollingMessage>();
 
-        public SdraPollingMessageHandler(IDataServiceApiClient dataServiceApiClient)
+        public SdraPollingMessageHandler(IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
         {
             _dataServiceApiClient = dataServiceApiClient;
+            _dbContext = dbContext;
         }
 
         public async Task Handle(SdraPollingMessage message, IMessageHandlerContext context)

@@ -24,6 +24,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
+    <ProjectReference Include="..\..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Settings.job">
