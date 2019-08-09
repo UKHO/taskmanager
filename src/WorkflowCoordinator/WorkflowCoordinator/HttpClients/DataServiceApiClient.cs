@@ -1,41 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using WorkflowCoordinator.Config;
+using WorkflowCoordinator.Models;
 
 namespace WorkflowCoordinator.HttpClients
 {
     public class DataServiceApiClient : IDataServiceApiClient
     {
-        public IOptions<UrlsConfig> _urlsConfig;
+        private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly HttpClient _httpClient;
 
-        public DataServiceApiClient(HttpClient httpClient, IOptions<UrlsConfig> urlsConfig)
+        public DataServiceApiClient(HttpClient httpClient, IOptions<GeneralConfig> generalConfig)
         {
-            _urlsConfig = urlsConfig;
+            _generalConfig = generalConfig;
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Assessment>> GetAssessments(string callerCode)
+        public async Task<IEnumerable<AssessmentModel>> GetAssessments(string callerCode)
         {
-            var response = await _httpClient.GetAsync($@"{_urlsConfig.Value.BaseUrl}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
+            // TODO look at what should move to config
 
-            var assessments = JsonConvert.DeserializeObject<IEnumerable<Assessment>>(await response.Content.ReadAsStringAsync());
+            var response = await _httpClient.GetAsync($@"{_generalConfig.Value.DataAccessLocalhostBaseUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
+
+            var assessments = JsonConvert.DeserializeObject<IEnumerable<AssessmentModel>>(await response.Content.ReadAsStringAsync());
             return assessments;
         }
-
-        public class Assessment
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public string SourceName { get; set; }
-        }
-
-    }
-
-    public interface IDataServiceApiClient
-    {
-        Task<IEnumerable<DataServiceApiClient.Assessment>> GetAssessments(string callerCode);
     }
 }

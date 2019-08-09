@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Logging;
+using System;
+using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 
@@ -19,7 +19,7 @@ namespace WorkflowCoordinator.Handlers
 
         public async Task Handle(SdraPollingMessage message, IMessageHandlerContext context)
         {
-
+            // TODO does HDB caller code need to be in config or is it never changing?
             var assessments = await _dataServiceApiClient.GetAssessments("HDB");
 
             log.Debug($"[Defer Message Delivery] for {nameof(SdraPollingMessage)}");

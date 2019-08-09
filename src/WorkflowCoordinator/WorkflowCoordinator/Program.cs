@@ -29,23 +29,17 @@ namespace WorkflowCoordinator
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
+                var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
                 var tokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
-
-                var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
                 config.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
                 {
                     ConnectionString = azureAppConfConnectionString
                 });
 
-                config
-                    //.SetBasePath(Directory.GetCurrentDirectory())
-                    //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    //.AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    //.AddEnvironmentVariables()
-                    .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
+                config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
             })
             .ConfigureLogging((hostingContext, b) =>
             {
@@ -54,13 +48,17 @@ namespace WorkflowCoordinator
             .ConfigureServices((hostingContext, services) =>
             {
                 var startupConfig = new StartupConfig();
-                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
                 hostingContext.Configuration.GetSection("workflowcoordinator").Bind(startupConfig);
 
                 var endpointConfiguration = new EndpointConfiguration(startupConfig.EndpointName);
-                services.AddOptions<UrlsConfig>()
-                    .Configure(o => o.BaseUrl = startupConfig.DataAccessWebServiceLocalhostBaseUri.ToString());
                 services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+                services.AddOptions<GeneralConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("workflowcoordinator"))
+                    .Bind(hostingContext.Configuration.GetSection("urls"));
+
+                services.AddOptions<SecretsConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
@@ -76,12 +74,6 @@ namespace WorkflowCoordinator
                     });
                 });
 
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("workflowcoordinator"));
-
-                services.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
-
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })
             .UseConsoleLifetime();
@@ -93,10 +85,5 @@ namespace WorkflowCoordinator
                 await host.RunAsync();
             }
         }
-    }
-
-    public class UrlsConfig
-    {
-        public string BaseUrl { get; set; }
     }
 }
