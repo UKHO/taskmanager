@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NServiceBus;
 using NServiceBus.Logging;
 using WorkflowCoordinator.HttpClients;
@@ -27,11 +28,33 @@ namespace WorkflowCoordinator.Handlers
 
             log.Debug($"[Defer Message Delivery] for {nameof(SdraPollingMessage)}");
 
-            var options = new SendOptions();
-            options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
-            options.RouteToThisEndpoint();
+            foreach (var assessment in assessments)
+            {
+                var assessmentRecord = await
+                    _dbContext.AssessmentData.SingleOrDefaultAsync(a => a.RsdraNumber == assessment.RsdraNumber);
 
-            await context.Send(new SdraPollingMessage(), options)
+                if (assessmentRecord == null)
+                {
+                    // TODO Put bits to get rest of SDRA data and add row to our Db here
+
+                    var startDbAssessmentCommand = new StartDbAssessmentCommand()
+                    {
+                        CorrelationId = Guid.NewGuid()
+                    };
+
+                    var startDbAssessmentCommandOptions = new SendOptions();
+                    startDbAssessmentCommandOptions.RouteToThisEndpoint();
+                    await context.Send(startDbAssessmentCommand, startDbAssessmentCommandOptions).ConfigureAwait(false);
+                }
+
+                // TODO fire message sent to initiate source document retrieval from SDRA
+
+            }
+
+            var sdraPollingMessageOptions = new SendOptions();
+            sdraPollingMessageOptions.DelayDeliveryWith(TimeSpan.FromSeconds(5));
+            sdraPollingMessageOptions.RouteToThisEndpoint();
+            await context.Send(new SdraPollingMessage(), sdraPollingMessageOptions)
                  .ConfigureAwait(false);
         }
     }

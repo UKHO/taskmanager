@@ -1,11 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.EntityFrameworkCore;
 using NServiceBus;
 using NServiceBus.Testing;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -54,12 +55,71 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_sends_new_sdrapollingmessage_with_delayed_send_five_seconds()
         {
             //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                {
+                    new AssessmentModel()
+                    {
+                        SdocId = 1,
+                        RsdraNumber = "sourcename",
+                        Name = "name"
+                    }
+                }));
+
+            //When
+            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+
+            //Then
+            Assert.IsNotNull(_handlerContext.SentMessages);
+
+            var sdraPollingMessage = _handlerContext.SentMessages.SingleOrDefault(t =>
+                     t.Message is SdraPollingMessage);
+            Assert.IsNotNull(sdraPollingMessage, $"No message of type {nameof(SdraPollingMessage)} seen.");
+
+            Assert.IsTrue(sdraPollingMessage.Options.IsRoutingToThisEndpoint());
+            Assert.AreEqual(TimeSpan.FromSeconds(5), sdraPollingMessage.Options.GetDeliveryDelay());
+        }
+
+        [Test]
+        public async Task Test_sends_new_StartDbAssessmentCommand()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(
+                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    {
+                        new AssessmentModel()
+                        {
+                            SdocId = 1,
+                            RsdraNumber = "sourcename",
+                            Name = "name"
+                        }
+                    }));
+
+            //When
+            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+
+            //Then
+            Assert.IsNotNull(_handlerContext.SentMessages);
+
+            var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                     t.Message is StartDbAssessmentCommand);
+            Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
+
+            Assert.IsTrue(startDbAssessmentCommand.Options.IsRoutingToThisEndpoint());
+        }
+
+
+        [Test]
+        public async Task Test_sends_two_messages()
+        {
+            //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
             {
                 new AssessmentModel()
                 {
-                    Id = 1,
-                    SourceName = "sourcename",
+                    SdocId = 1,
+                    RsdraNumber = "sourcename",
                     Name = "name"
                 }
             }));
@@ -68,13 +128,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
-            Assert.IsInstanceOf<SdraPollingMessage>(_handlerContext.SentMessages[0].Message);
-
-            var processMessage = _handlerContext.SentMessages[0];
-
-            Assert.IsTrue(processMessage.Options.IsRoutingToThisEndpoint());
-            Assert.AreEqual(TimeSpan.FromSeconds(5), processMessage.Options.GetDeliveryDelay());
+            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
         }
     }
 }

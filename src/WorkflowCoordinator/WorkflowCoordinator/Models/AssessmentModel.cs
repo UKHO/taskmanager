@@ -1,9 +1,13 @@
-﻿namespace WorkflowCoordinator.Models
+﻿using Newtonsoft.Json;
+
+namespace WorkflowCoordinator.Models
 {
     public class AssessmentModel
     {
-        public int Id { get; set; }
+        [JsonProperty("id")]
+        public int SdocId { get; set; }
         public string Name { get; set; }
-        public string SourceName { get; set; }
+        [JsonProperty("sourceName")]
+        public string RsdraNumber { get; set; }
     }
 }

@@ -50,12 +50,12 @@ namespace WorkflowCoordinator
             .ConfigureServices((hostingContext, services) =>
             {
                 var startupConfig = new StartupConfig();
-                hostingContext.Configuration.GetSection("workflowcoordinator").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
 
-                var endpointConfiguration = new EndpointConfiguration(startupConfig.EndpointName);
+                var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
                 services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
                 services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("workflowcoordinator"))
+                    .Bind(hostingContext.Configuration.GetSection("nsb"))
                     .Bind(hostingContext.Configuration.GetSection("urls"));
 
                 services.AddOptions<SecretsConfig>()
