@@ -1,4 +1,10 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -6,12 +12,6 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Messages;
 
@@ -66,6 +66,8 @@ namespace WorkflowCoordinator
             }
         }
 
+
+        //TODO move to common and consider protection over localdb only
         private static void ReCreateDb(string dbName, string connectionString)
         {
             // TODO Switch over to SQL parameters (SHa has this covered)
