@@ -54,9 +54,7 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     // TODO prefer routing centralised
-                    var options = new SendOptions();
-                    options.SetDestination("SourceDocumentCoordinator");
-                    await context.Send(initiateRetrievalCommand, options).ConfigureAwait(false);
+                    await context.Send("SourceDocumentCoordinator", initiateRetrievalCommand).ConfigureAwait(false);
                 }
             }
 
