@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages;
+using Common.Messages.Commands;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NServiceBus;

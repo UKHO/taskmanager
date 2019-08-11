@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Messages
+namespace Common.Messages.Commands
 {
     public class InitiateSourceDocumentRetrievalCommand : ICorrelate
     {

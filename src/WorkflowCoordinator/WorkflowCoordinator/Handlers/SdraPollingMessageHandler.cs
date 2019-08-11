@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Messages;
+using Common.Messages.Commands;
 using Microsoft.EntityFrameworkCore;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -54,7 +54,8 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     // TODO prefer routing centralised
-                    await context.Send("SourceDocumentCoordinator", initiateRetrievalCommand).ConfigureAwait(false);
+                    await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
+                    //await context.Send("SourceDocumentCoordinator", initiateRetrievalCommand).ConfigureAwait(false);
                 }
             }
 
