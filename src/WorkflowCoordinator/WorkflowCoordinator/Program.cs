@@ -53,6 +53,7 @@ namespace WorkflowCoordinator
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
 
                 var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
+
                 services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))

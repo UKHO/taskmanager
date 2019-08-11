@@ -2,7 +2,7 @@
 
 namespace Common.Messages
 {
-    public interface ICorrelation
+    public interface ICorrelate
     {
         Guid CorrelationId { get; set; }
     }

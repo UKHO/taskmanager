@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NServiceBus;
@@ -109,9 +110,38 @@ namespace WorkflowCoordinator.UnitTests
             Assert.IsTrue(startDbAssessmentCommand.Options.IsRoutingToThisEndpoint());
         }
 
+        [Test]
+        public async Task Test_sends_new_InitiateSourceDocumentRetrievalCommand_to_SourceDocumentCoordinator()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(
+                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    {
+                        new AssessmentModel()
+                        {
+                            SdocId = 1,
+                            RsdraNumber = "sourcename",
+                            Name = "name"
+                        }
+                    }));
+
+            //When
+            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+
+            //Then
+            Assert.IsNotNull(_handlerContext.SentMessages);
+
+            var initiateRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                     t.Message is InitiateSourceDocumentRetrievalCommand);
+            Assert.IsNotNull(initiateRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+
+            Assert.AreEqual("SourceDocumentCoordinator",
+                initiateRetrievalCommand.Options.GetDestination());
+        }
 
         [Test]
-        public async Task Test_sends_two_messages()
+        public async Task Test_sends_three_messages()
         {
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
@@ -128,7 +158,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
+            Assert.AreEqual(3, _handlerContext.SentMessages.Length);
         }
     }
 }

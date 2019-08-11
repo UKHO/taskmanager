@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common.Messages;
 using Microsoft.EntityFrameworkCore;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -45,10 +46,18 @@ namespace WorkflowCoordinator.Handlers
                     var startDbAssessmentCommandOptions = new SendOptions();
                     startDbAssessmentCommandOptions.RouteToThisEndpoint();
                     await context.Send(startDbAssessmentCommand, startDbAssessmentCommandOptions).ConfigureAwait(false);
+
+                    var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
+                    {
+                        SourceDocumentId = assessment.SdocId,
+                        CorrelationId = Guid.NewGuid()
+                    };
+
+                    // TODO prefer routing centralised
+                    var options = new SendOptions();
+                    options.SetDestination("SourceDocumentCoordinator");
+                    await context.Send(initiateRetrievalCommand, options).ConfigureAwait(false);
                 }
-
-                // TODO fire message sent to initiate source document retrieval from SDRA
-
             }
 
             var sdraPollingMessageOptions = new SendOptions();

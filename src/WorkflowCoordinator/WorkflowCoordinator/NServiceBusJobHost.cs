@@ -126,59 +126,55 @@ namespace WorkflowCoordinator
             try
             {
                 var endpointConfiguration = _endpointConfig;
-
-                endpointConfiguration.UseTransport<SqlServerTransport>()
-                                     .Transactions(TransportTransactionMode.SendsAtomicWithReceive)
-                                     .UseCustomSqlConnectionFactory(async () =>
-                    {
-                        var con = new SqlConnection();
-
-                        try
+                var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
+                    .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
+                        async () =>
                         {
-                            con.ConnectionString = _connectionString;
-                            if (!_isLocalDebugging) con.AccessToken = _azureAccessToken;
-                            await con.OpenAsync().ConfigureAwait(false);
-                            return con;
-                        }
-                        catch
-                        {
-                            con.Dispose();
-                            throw;
-                        }
-                    });
+                            var con = new SqlConnection();
+                            try
+                            {
+                                con.ConnectionString = _connectionString;
+                                if (!_isLocalDebugging) con.AccessToken = _azureAccessToken;
+                                await con.OpenAsync().ConfigureAwait(false);
+                                return con;
+                            }
+                            catch
+                            {
+                                con.Dispose();
+                                throw;
+                            }
+                        });
 
+                // Not working...
+                //transport.Routing().RouteToEndpoint(
+                //    messageType: typeof(InitiateSourceDocumentRetrievalCommand),
+                //    destination: "SourceDocumentCoordinator");
 
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
-                persistence.ConnectionBuilder(
-                    connectionBuilder: () =>
+                persistence.ConnectionBuilder(connectionBuilder: () =>
+                {
+                    var con = new SqlConnection();
+                    try
                     {
-                        var con = new SqlConnection();
-                        try
-                        {
-                            con.ConnectionString = _connectionString;
-                            if (!_isLocalDebugging) con.AccessToken = _azureAccessToken;
-                            return con; ;
-                        }
-                        catch
-                        {
-                            con.Dispose();
-                            throw;
-                        }
-                    });
-
+                        con.ConnectionString = _connectionString;
+                        if (!_isLocalDebugging) con.AccessToken = _azureAccessToken;
+                        return con;
+                        ;
+                    }
+                    catch
+                    {
+                        con.Dispose();
+                        throw;
+                    }
+                });
                 persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
-
                 endpointConfiguration.Conventions()
-                     .DefiningCommandsAs(
-                        type => type.Namespace == "Common.Messages.Commands")
-                     .DefiningEventsAs(
-                        type => type.Namespace == "Common.Messages.Events")
-                     .DefiningMessagesAs(
-                        type => type.Namespace == "Common.Messages")
-                     .DefiningMessagesAs(
-                         type => type.Namespace == "WorkflowCoordinator.Messages"); ;
-
+                    .DefiningCommandsAs(type => type.Namespace == "Common.Messages.Commands")
+                    .DefiningEventsAs(type => type.Namespace == "Common.Messages.Events")
+                    .DefiningMessagesAs(type => type.Namespace == "Common.Messages")
+                    .DefiningMessagesAs(type => type.Namespace == "WorkflowCoordinator.Messages");
+                ;
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
@@ -187,8 +183,7 @@ namespace WorkflowCoordinator
                 var options = new SendOptions();
                 options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
                 options.RouteToThisEndpoint();
-                await _endpoint.Send(new SdraPollingMessage(), options)
-                    .ConfigureAwait(false);
+                await _endpoint.Send(new SdraPollingMessage(), options).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
