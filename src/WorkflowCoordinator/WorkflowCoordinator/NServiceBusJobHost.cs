@@ -23,6 +23,7 @@ namespace WorkflowCoordinator
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointConfiguration _endpointConfig;
+        private readonly string _localDbServer;
 
         private readonly bool _isLocalDebugging;
         private readonly string _connectionString;
@@ -42,11 +43,12 @@ namespace WorkflowCoordinator
             _hostingEnvironment = hostingEnvironment;
             _endpointConfig = endpointConfig;
             _isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+            _localDbServer = @"(localdb)\MSSQLLocalDB";
 
             if (_isLocalDebugging)
             {
-                _connectionString = BuildSqlConnectionString(@"(localdb)\MSSQLLocalDB", _secretsConfig.Value.NsbInitialCatalog);
-                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, BuildSqlConnectionString(@"(localdb)\MSSQLLocalDB"));
+                _connectionString = BuildSqlConnectionString(_localDbServer, _secretsConfig.Value.NsbInitialCatalog);
+                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, BuildSqlConnectionString(_localDbServer));
             }
             else
             {
@@ -65,17 +67,17 @@ namespace WorkflowCoordinator
                 }
             }
         }
-        
+
         private void ReCreateLocalDb(string dbName, string connectionString)
         {
             var connectionStringObject = new SqlConnectionStringBuilder(connectionString);
-            if (!_isLocalDebugging || !connectionStringObject.DataSource.Equals(@"(localdb)\MSSQLLocalDB"))
+            if (!_isLocalDebugging || !connectionStringObject.DataSource.Equals(_localDbServer))
             {
                 throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
             }
 
             var sanitisedDbName = dbName.Replace("'", "''");
-            
+
             var commandText = "USE master " +
                         $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
                         "BEGIN " +
