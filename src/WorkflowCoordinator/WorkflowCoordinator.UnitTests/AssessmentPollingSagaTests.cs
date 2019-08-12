@@ -28,6 +28,7 @@ namespace WorkflowCoordinator.UnitTests
         [SetUp]
         public void Setup()
         {
+            //DBContext
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
                 .Options;
@@ -35,6 +36,8 @@ namespace WorkflowCoordinator.UnitTests
             TasksDbBuilder.UsingDbContext(dbContext)
                 .PopulateTables()
                 .SaveChanges();
+
+            //GeneralConfig
             var generalConfigOptionsSnapshot =  A.Fake<IOptionsSnapshot<GeneralConfig>>();
             var generalConfig = new GeneralConfig {WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5};
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
@@ -85,84 +88,81 @@ namespace WorkflowCoordinator.UnitTests
             Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
         }
 
-        //[Test]
-        //public async Task Test_sends_new_StartDbAssessmentCommand()
-        //{
-        //    //Given
-        //    A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-        //        .Returns(
-        //            Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
-        //            {
-        //                new AssessmentModel()
-        //                {
-        //                    SdocId = 1,
-        //                    RsdraNumber = "sourcename",
-        //                    Name = "name"
-        //                }
-        //            }));
+        [Test]
+        public async Task Test_sends_new_StartDbAssessmentCommand()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(
+                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    {
+                        new AssessmentModel()
+                        {
+                            SdocId = 1,
+                            RsdraNumber = "sourcename",
+                            Name = "name"
+                        }
+                    }));
 
-        //    //When
-        //    await _saga.Timeout(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
+            //When
+            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
-        //    //Then
-        //    Assert.IsNotNull(_handlerContext.SentMessages);
+            //Then
+            Assert.IsNotNull(_handlerContext.SentMessages);
 
-        //    var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-        //             t.Message is StartDbAssessmentCommand);
-        //    Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
+            var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                     t.Message is StartDbAssessmentCommand);
+            Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
 
-        //    Assert.IsTrue(startDbAssessmentCommand.Options.IsRoutingToThisEndpoint());
-        //}
+            Assert.IsTrue(startDbAssessmentCommand.Options.IsRoutingToThisEndpoint());
+        }
 
-        //[Test]
-        //public async Task Test_sends_new_InitiateSourceDocumentRetrievalCommand_to_SourceDocumentCoordinator()
-        //{
-        //    //Given
-        //    A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-        //        .Returns(
-        //            Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
-        //            {
-        //                new AssessmentModel()
-        //                {
-        //                    SdocId = 1,
-        //                    RsdraNumber = "sourcename",
-        //                    Name = "name"
-        //                }
-        //            }));
+        [Test]
+        public async Task Test_sends_new_InitiateSourceDocumentRetrievalCommand_to_SourceDocumentCoordinator()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(
+                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    {
+                        new AssessmentModel()
+                        {
+                            SdocId = 1,
+                            RsdraNumber = "sourcename",
+                            Name = "name"
+                        }
+                    }));
 
-        //    //When
-        //    await _saga.Timeout(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
+            //When
+            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
-        //    //Then
-        //    Assert.IsNotNull(_handlerContext.SentMessages);
+            //Then
+            Assert.IsNotNull(_handlerContext.SentMessages);
 
-        //    var initiateRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-        //             t.Message is InitiateSourceDocumentRetrievalCommand);
-        //    Assert.IsNotNull(initiateRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+            var initiateRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                     t.Message is InitiateSourceDocumentRetrievalCommand);
+            Assert.IsNotNull(initiateRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+        }
 
-        //    Assert.AreEqual("SourceDocumentCoordinator",
-        //        initiateRetrievalCommand.Options.GetDestination());
-        //}
+        [Test]
+        public async Task Test_sends_three_messages()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+            {
+                new AssessmentModel()
+                {
+                    SdocId = 1,
+                    RsdraNumber = "sourcename",
+                    Name = "name"
+                }
+            }));
 
-        //[Test]
-        //public async Task Test_sends_three_messages()
-        //{
-        //    //Given
-        //    A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
-        //    {
-        //        new AssessmentModel()
-        //        {
-        //            SdocId = 1,
-        //            RsdraNumber = "sourcename",
-        //            Name = "name"
-        //        }
-        //    }));
+            //When
+            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
-        //    //When
-        //    await _saga.Timeout(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
-
-        //    //Then
-        //    Assert.AreEqual(3, _handlerContext.SentMessages.Length);
-        //}
+            //Then
+            Assert.AreEqual(3, _handlerContext.SentMessages.Length);
+        }
     }
 }
