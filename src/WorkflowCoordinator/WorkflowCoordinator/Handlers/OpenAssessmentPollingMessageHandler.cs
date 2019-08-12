@@ -10,24 +10,24 @@ using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class SdraPollingMessageHandler : IHandleMessages<SdraPollingMessage>
+    public class OpenAssessmentPollingMessageHandler : IHandleMessages<OpenAssessmentPollingMessage>
     {
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
-        ILog log = LogManager.GetLogger<SdraPollingMessage>();
+        ILog log = LogManager.GetLogger<OpenAssessmentPollingMessage>();
 
-        public SdraPollingMessageHandler(IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
+        public OpenAssessmentPollingMessageHandler(IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _dbContext = dbContext;
         }
 
-        public async Task Handle(SdraPollingMessage message, IMessageHandlerContext context)
+        public async Task Handle(OpenAssessmentPollingMessage message, IMessageHandlerContext context)
         {
             // TODO does HDB caller code need to be in config or is it never changing?
             var assessments = await _dataServiceApiClient.GetAssessments("HDB");
 
-            log.Debug($"[Defer Message Delivery] for {nameof(SdraPollingMessage)}");
+            log.Debug($"[Defer Message Delivery] for {nameof(OpenAssessmentPollingMessage)}");
 
             foreach (var assessment in assessments)
             {
@@ -54,15 +54,15 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     // TODO prefer routing centralised
-                    await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
-                    //await context.Send("SourceDocumentCoordinator", initiateRetrievalCommand).ConfigureAwait(false);
+                  //  await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
+                    await context.Send("SourceDocumentCoordinator", initiateRetrievalCommand).ConfigureAwait(false);
                 }
             }
 
             var sdraPollingMessageOptions = new SendOptions();
             sdraPollingMessageOptions.DelayDeliveryWith(TimeSpan.FromSeconds(5));
             sdraPollingMessageOptions.RouteToThisEndpoint();
-            await context.Send(new SdraPollingMessage(), sdraPollingMessageOptions)
+            await context.Send(new OpenAssessmentPollingMessage(), sdraPollingMessageOptions)
                  .ConfigureAwait(false);
         }
     }

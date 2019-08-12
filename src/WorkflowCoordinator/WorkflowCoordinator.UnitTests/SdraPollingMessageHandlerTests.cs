@@ -18,7 +18,7 @@ namespace WorkflowCoordinator.UnitTests
 {
     public class SdraPollingMessageHandlerTests
     {
-        private SdraPollingMessageHandler _handler;
+        private OpenAssessmentPollingMessageHandler _handler;
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private TestableMessageHandlerContext _handlerContext;
 
@@ -34,7 +34,7 @@ namespace WorkflowCoordinator.UnitTests
                 .SaveChanges();
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
-            _handler = new SdraPollingMessageHandler(_fakeDataServiceApiClient, dbContext);
+            _handler = new OpenAssessmentPollingMessageHandler(_fakeDataServiceApiClient, dbContext);
             _handlerContext = new TestableMessageHandlerContext();
         }
 
@@ -46,7 +46,7 @@ namespace WorkflowCoordinator.UnitTests
                                                     .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
 
             //When
-            await _handler.Handle(new SdraPollingMessage(), _handlerContext);
+            await _handler.Handle(new OpenAssessmentPollingMessage(), _handlerContext);
 
             //Then
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments(A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -68,14 +68,14 @@ namespace WorkflowCoordinator.UnitTests
                 }));
 
             //When
-            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+            await _handler.Handle(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
             Assert.IsNotNull(_handlerContext.SentMessages);
 
             var sdraPollingMessage = _handlerContext.SentMessages.SingleOrDefault(t =>
-                     t.Message is SdraPollingMessage);
-            Assert.IsNotNull(sdraPollingMessage, $"No message of type {nameof(SdraPollingMessage)} seen.");
+                     t.Message is OpenAssessmentPollingMessage);
+            Assert.IsNotNull(sdraPollingMessage, $"No message of type {nameof(OpenAssessmentPollingMessage)} seen.");
 
             Assert.IsTrue(sdraPollingMessage.Options.IsRoutingToThisEndpoint());
             Assert.AreEqual(TimeSpan.FromSeconds(5), sdraPollingMessage.Options.GetDeliveryDelay());
@@ -98,7 +98,7 @@ namespace WorkflowCoordinator.UnitTests
                     }));
 
             //When
-            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+            await _handler.Handle(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
             Assert.IsNotNull(_handlerContext.SentMessages);
@@ -127,7 +127,7 @@ namespace WorkflowCoordinator.UnitTests
                     }));
 
             //When
-            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+            await _handler.Handle(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
             Assert.IsNotNull(_handlerContext.SentMessages);
@@ -155,7 +155,7 @@ namespace WorkflowCoordinator.UnitTests
             }));
 
             //When
-            await _handler.Handle(new SdraPollingMessage(), _handlerContext).ConfigureAwait(false);
+            await _handler.Handle(new OpenAssessmentPollingMessage(), _handlerContext).ConfigureAwait(false);
 
             //Then
             Assert.AreEqual(3, _handlerContext.SentMessages.Length);

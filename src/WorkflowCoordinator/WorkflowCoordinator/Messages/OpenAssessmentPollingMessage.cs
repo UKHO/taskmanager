@@ -1,6 +1,6 @@
 ﻿namespace WorkflowCoordinator.Messages
 {
-    public class SdraPollingMessage
+    public class OpenAssessmentPollingMessage
     {
     }
 }

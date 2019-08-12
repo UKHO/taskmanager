@@ -42,6 +42,7 @@ namespace WorkflowCoordinator
             _secretsConfig = secretsConfig;
             _hostingEnvironment = hostingEnvironment;
             _endpointConfig = endpointConfig;
+
             _isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
             _localDbServer = @"(localdb)\MSSQLLocalDB";
 
@@ -54,17 +55,9 @@ namespace WorkflowCoordinator
             {
                 _connectionString = BuildSqlConnectionString(_secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
 
-                try
-                {
-                    var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                    var azureDbTokenUrl = _generalConfig.Value.AzureDbTokenUrl;
-                    _azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
-                }
-                catch (Exception)
-                {
-                    // log
-                    throw;
-                }
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var azureDbTokenUrl = _generalConfig.Value.AzureDbTokenUrl;
+                _azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
             }
         }
 
@@ -100,11 +93,6 @@ namespace WorkflowCoordinator
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    // log
-                    throw;
                 }
                 finally
                 {
@@ -165,7 +153,6 @@ namespace WorkflowCoordinator
                         con.ConnectionString = _connectionString;
                         if (!_isLocalDebugging) con.AccessToken = _azureAccessToken;
                         return con;
-                        ;
                     }
                     catch
                     {
@@ -174,6 +161,7 @@ namespace WorkflowCoordinator
                     }
                 });
                 persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
+
                 endpointConfiguration.Conventions()
                     .DefiningCommandsAs(type => type.Namespace == "Common.Messages.Commands")
                     .DefiningEventsAs(type => type.Namespace == "Common.Messages.Events")
@@ -184,11 +172,13 @@ namespace WorkflowCoordinator
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
+
+                // TODO concerns over restarting endpoint
                 // Send the initial delayed message for polling
                 var options = new SendOptions();
                 options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
                 options.RouteToThisEndpoint();
-                await _endpoint.Send(new SdraPollingMessage(), options).ConfigureAwait(false);
+                await _endpoint.Send(new OpenAssessmentPollingMessage(), options).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
