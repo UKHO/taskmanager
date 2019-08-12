@@ -7,7 +7,7 @@ namespace WorkflowCoordinator.Handlers
 {
     public class StartDbAssessmentCommandHandler : IHandleMessages<StartDbAssessmentCommand>
     {
-        ILog log = LogManager.GetLogger<OpenAssessmentPollingMessage>();
+        ILog log = LogManager.GetLogger<StartDbAssessmentCommandHandler>();
 
         public async Task Handle(StartDbAssessmentCommand command, IMessageHandlerContext context)
         {

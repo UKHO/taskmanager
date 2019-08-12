@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Messages.Commands;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
@@ -138,10 +139,13 @@ namespace WorkflowCoordinator
                             }
                         });
 
-                // Works but is not testable via unit tests
-                //transport.Routing().RouteToEndpoint(
-                //    messageType: typeof(InitiateSourceDocumentRetrievalCommand),
-                //    destination: "SourceDocumentCoordinator");
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(StartAssessmentPollingCommand),
+                    destination: _generalConfig.Value.WorkflowCoordinatorName);
+
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(InitiateSourceDocumentRetrievalCommand),
+                    destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
@@ -172,13 +176,8 @@ namespace WorkflowCoordinator
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
-
-                // TODO concerns over restarting endpoint
-                // Send the initial delayed message for polling
-                var options = new SendOptions();
-                options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
-                options.RouteToThisEndpoint();
-                await _endpoint.Send(new OpenAssessmentPollingMessage(), options).ConfigureAwait(false);
+                Guid pollingSagaGuid = new Guid("ef3932c3-4232-41be-a0e7-05cf8a052017");
+                await _endpoint.Send(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
