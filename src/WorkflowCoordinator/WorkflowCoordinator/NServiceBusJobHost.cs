@@ -46,7 +46,7 @@ namespace WorkflowCoordinator
             if (_isLocalDebugging)
             {
                 _connectionString = BuildSqlConnectionString(@"(localdb)\MSSQLLocalDB", _secretsConfig.Value.NsbInitialCatalog);
-                ReCreateDb(_secretsConfig.Value.NsbInitialCatalog, BuildSqlConnectionString(@"(localdb)\MSSQLLocalDB"));
+                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, BuildSqlConnectionString(@"(localdb)\MSSQLLocalDB"));
             }
             else
             {
@@ -65,26 +65,29 @@ namespace WorkflowCoordinator
                 }
             }
         }
-
-
-        //TODO move to common and consider protection over localdb only
-        private static void ReCreateDb(string dbName, string connectionString)
+        
+        private void ReCreateLocalDb(string dbName, string connectionString)
         {
-            // TODO Switch over to SQL parameters (SHa has this covered)
-            var safeDbName = dbName.Replace("'", "''");
+            var connectionStringObject = new SqlConnectionStringBuilder(connectionString);
+            if (!_isLocalDebugging || !connectionStringObject.DataSource.Equals(@"(localdb)\MSSQLLocalDB"))
+            {
+                throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
+            }
 
-            string commandText = "USE master " +
-                        $"IF EXISTS(select * from sys.databases where name='{safeDbName}') " +
+            var sanitisedDbName = dbName.Replace("'", "''");
+            
+            var commandText = "USE master " +
+                        $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
                         "BEGIN " +
-                       $"ALTER DATABASE [{safeDbName}] " +
+                       $"ALTER DATABASE [{sanitisedDbName}] " +
                         "SET SINGLE_USER " +
                         "WITH ROLLBACK IMMEDIATE; " +
-                        $"DROP DATABASE [{safeDbName}] " +
-                        $"CREATE DATABASE [{safeDbName}] " +
+                        $"DROP DATABASE [{sanitisedDbName}] " +
+                        $"CREATE DATABASE [{sanitisedDbName}] " +
                         "END " +
                         "ELSE " +
                         "BEGIN " +
-                        $"CREATE DATABASE [{safeDbName}] " +
+                        $"CREATE DATABASE [{sanitisedDbName}] " +
                         "END";
 
             using (var connection = new SqlConnection(connectionString))
@@ -145,7 +148,7 @@ namespace WorkflowCoordinator
                             }
                         });
 
-                // Not working...
+                // Works but is not testable via unit tests
                 //transport.Routing().RouteToEndpoint(
                 //    messageType: typeof(InitiateSourceDocumentRetrievalCommand),
                 //    destination: "SourceDocumentCoordinator");
