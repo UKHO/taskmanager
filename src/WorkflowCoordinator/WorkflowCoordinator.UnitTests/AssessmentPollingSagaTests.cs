@@ -10,7 +10,6 @@ using NServiceBus;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Config;
-using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
@@ -47,6 +46,42 @@ namespace WorkflowCoordinator.UnitTests
                 _fakeDataServiceApiClient, dbContext) {Data = new AssessmentPollingSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
         }
+
+
+        [Test]
+        public async Task Test_startassessmentpolling_requests_timeout()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
+
+            //When
+            await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
+
+            //Then
+            Assert.IsNotNull(_handlerContext.TimeoutMessages);
+
+            var executeAssessmentPollingTask = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
+                t.Message is ExecuteAssessmentPollingTask);
+            Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
+        }
+
+        [Test]
+        public async Task Test_startassessmentpolling_does_not_request_timeout()
+        {
+            //Given
+            _saga.Data = new AssessmentPollingSagaData { IsTaskAlreadyScheduled = true};
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
+
+            //When
+            await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
+
+            //Then
+            Assert.IsNotNull(_handlerContext.TimeoutMessages);
+            Assert.IsEmpty(_handlerContext.TimeoutMessages);
+        }
+
 
         [Test]
         public async Task Test_call_getassessments_exactly_once()
