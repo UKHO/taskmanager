@@ -173,7 +173,7 @@ namespace WorkflowCoordinator
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
-                Guid pollingSagaGuid = new Guid("ef3932c3-4232-41be-a0e7-05cf8a052017");
+                Guid pollingSagaGuid = _generalConfig.Value.AssessmentPollingSagaCorrelationGuid;
                 await _endpoint.Send(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
             }
             catch (Exception ex)
