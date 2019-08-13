@@ -63,7 +63,8 @@ namespace WorkflowCoordinator
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))
                     .Bind(hostingContext.Configuration.GetSection("apis"))
-                    .Bind(hostingContext.Configuration.GetSection("urls"));
+                    .Bind(hostingContext.Configuration.GetSection("urls"))
+                    .Bind(hostingContext.Configuration.GetSection("databases"));
 
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
