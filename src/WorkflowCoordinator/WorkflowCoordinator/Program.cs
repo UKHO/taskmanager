@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Azure.KeyVault;
@@ -50,28 +51,37 @@ namespace WorkflowCoordinator
             })
             .ConfigureServices((hostingContext, services) =>
             {
+                var isLocalDebugging = hostingContext.HostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+
                 var startupConfig = new StartupConfig();
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
 
                 var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
 
                 services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))
+                    .Bind(hostingContext.Configuration.GetSection("apis"))
                     .Bind(hostingContext.Configuration.GetSection("urls"));
 
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) => options
-                    .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False"));
 
-                using (var sp = services.BuildServiceProvider())
-                using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                    options.UseSqlServer(workflowDbConnectionString));
+
+                if (isLocalDebugging)
                 {
-                    TasksDbBuilder.UsingDbContext(context)
-                        .PopulateTables()
-                        .SaveChanges();
+                    using (var sp = services.BuildServiceProvider())
+                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                    {
+                        TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    }
                 }
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()

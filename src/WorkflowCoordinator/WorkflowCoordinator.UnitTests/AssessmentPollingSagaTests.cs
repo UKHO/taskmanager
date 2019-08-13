@@ -6,7 +6,6 @@ using Common.Messages.Commands;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using NServiceBus;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Config;
@@ -35,7 +34,7 @@ namespace WorkflowCoordinator.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            var generalConfig = new GeneralConfig { WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5 };
+            var generalConfig = new GeneralConfig { WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5, CallerCode = "HDB" };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
@@ -139,8 +138,6 @@ namespace WorkflowCoordinator.UnitTests
             var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
                      t.Message is StartDbAssessmentCommand);
             Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
-
-            Assert.IsTrue(startDbAssessmentCommand.Options.IsRoutingToThisEndpoint());
         }
 
         [Test]

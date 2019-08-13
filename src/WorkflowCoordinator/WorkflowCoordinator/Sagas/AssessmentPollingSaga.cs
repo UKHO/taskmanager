@@ -50,8 +50,7 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Timeout(ExecuteAssessmentPollingTask state, IMessageHandlerContext context)
         {
-            // TODO does HDB caller code need to be in config or is it never changing?
-            var assessments = await _dataServiceApiClient.GetAssessments("HDB");
+            var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
 
             log.Debug($"[Defer Message Delivery] for {nameof(ExecuteAssessmentPollingTask)}");
 
@@ -62,16 +61,14 @@ namespace WorkflowCoordinator.Sagas
 
                 if (assessmentRecord == null)
                 {
-                    // TODO Put bits to get rest of SDRA data and add row to our Db here
+                    // Put bits to get rest of SDRA data and add row to our Db here
 
                     var startDbAssessmentCommand = new StartDbAssessmentCommand()
                     {
                         CorrelationId = Guid.NewGuid()
                     };
 
-                    var startDbAssessmentCommandOptions = new SendOptions();
-                    startDbAssessmentCommandOptions.RouteToThisEndpoint();
-                    await context.Send(startDbAssessmentCommand, startDbAssessmentCommandOptions).ConfigureAwait(false);
+                    await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
 
                     var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
                     {

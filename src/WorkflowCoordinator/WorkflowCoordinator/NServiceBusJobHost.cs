@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages.Commands;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
@@ -49,12 +50,12 @@ namespace WorkflowCoordinator
 
             if (_isLocalDebugging)
             {
-                _connectionString = BuildSqlConnectionString(_localDbServer, _secretsConfig.Value.NsbInitialCatalog);
-                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, BuildSqlConnectionString(_localDbServer));
+                _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
+                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer));
             }
             else
             {
-                _connectionString = BuildSqlConnectionString(_secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
+                _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
 
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 var azureDbTokenUrl = _generalConfig.Value.AzureDbTokenUrl;
@@ -103,15 +104,7 @@ namespace WorkflowCoordinator
             }
         }
 
-        private string BuildSqlConnectionString(string dataSource, string initialCatalog = "") =>
-            new SqlConnectionStringBuilder
-            {
-                DataSource = dataSource,
-                InitialCatalog = initialCatalog,
-                IntegratedSecurity = _isLocalDebugging,
-                Encrypt = _isLocalDebugging ? false : true,
-                ConnectTimeout = 20
-            }.ToString();
+
 
         [FunctionName("StartAsync")]
         [NoAutomaticTrigger]
@@ -141,6 +134,10 @@ namespace WorkflowCoordinator
 
                 transport.Routing().RouteToEndpoint(
                     messageType: typeof(StartAssessmentPollingCommand),
+                    destination: _generalConfig.Value.WorkflowCoordinatorName);
+
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(StartDbAssessmentCommand),
                     destination: _generalConfig.Value.WorkflowCoordinatorName);
 
                 transport.Routing().RouteToEndpoint(
