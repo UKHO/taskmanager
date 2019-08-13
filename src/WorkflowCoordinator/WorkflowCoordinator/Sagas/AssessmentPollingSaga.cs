@@ -38,6 +38,8 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartAssessmentPollingCommand message, IMessageHandlerContext context)
         {
+            log.Debug($"Handling {nameof(StartAssessmentPollingCommand)}");
+
             Data.CorrelationId = message.CorrelationId;
             if (!Data.IsTaskAlreadyScheduled)
             {
