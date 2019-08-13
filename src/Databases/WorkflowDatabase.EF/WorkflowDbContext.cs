@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data.SqlClient;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace WorkflowDatabase.EF
 {
@@ -7,6 +9,8 @@ namespace WorkflowDatabase.EF
         public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
+            var conn = Database.GetDbConnection() as SqlConnection;
+            conn.AccessToken = (new AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
         }
 
         public DbSet<Models.AssessmentData> AssessmentData { get; set; }
