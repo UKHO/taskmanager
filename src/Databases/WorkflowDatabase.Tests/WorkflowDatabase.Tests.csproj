@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
     <ProjectReference Include="..\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
   </ItemGroup>
 

@@ -23,27 +23,25 @@ namespace WorkflowCoordinator.UnitTests
         private AssessmentPollingSaga _saga;
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private TestableMessageHandlerContext _handlerContext;
+        private WorkflowDbContext _dbContext;
 
         [SetUp]
         public void Setup()
         {
-            //DBContext
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
-                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
+                .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
-            var dbContext = new WorkflowDbContext(dbContextOptions);
-            TasksDbBuilder.UsingDbContext(dbContext)
-                .PopulateTables()
-                .SaveChanges();
 
-            //GeneralConfig
-            var generalConfigOptionsSnapshot =  A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            var generalConfig = new GeneralConfig {WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5};
+            _dbContext = new WorkflowDbContext(dbContextOptions);
+
+            var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            var generalConfig = new GeneralConfig { WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5 };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _saga = new AssessmentPollingSaga(generalConfigOptionsSnapshot,
-                _fakeDataServiceApiClient, dbContext) {Data = new AssessmentPollingSagaData() };
+                _fakeDataServiceApiClient, _dbContext)
+            { Data = new AssessmentPollingSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
         }
 
@@ -59,8 +57,6 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
 
             //Then
-            Assert.IsNotNull(_handlerContext.TimeoutMessages);
-
             var executeAssessmentPollingTask = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
                 t.Message is ExecuteAssessmentPollingTask);
             Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
@@ -70,7 +66,7 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_startassessmentpolling_does_not_request_timeout()
         {
             //Given
-            _saga.Data = new AssessmentPollingSagaData { IsTaskAlreadyScheduled = true};
+            _saga.Data = new AssessmentPollingSagaData { IsTaskAlreadyScheduled = true };
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
                 .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
 
@@ -78,7 +74,6 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
 
             //Then
-            Assert.IsNotNull(_handlerContext.TimeoutMessages);
             Assert.IsEmpty(_handlerContext.TimeoutMessages);
         }
 
@@ -116,8 +111,6 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.IsNotNull(_handlerContext.TimeoutMessages);
-
             var executeAssessmentPollingTask = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
                      t.Message is ExecuteAssessmentPollingTask);
             Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
@@ -143,8 +136,6 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.IsNotNull(_handlerContext.SentMessages);
-
             var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
                      t.Message is StartDbAssessmentCommand);
             Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
@@ -172,8 +163,6 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.IsNotNull(_handlerContext.SentMessages);
-
             var initiateRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
                      t.Message is InitiateSourceDocumentRetrievalCommand);
             Assert.IsNotNull(initiateRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
@@ -198,6 +187,36 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             Assert.AreEqual(3, _handlerContext.SentMessages.Length);
+        }
+
+        [Test]
+        public async Task Test_if_all_assessment_match_database_rows_then_only_timeout_fired()
+        {
+            //Given
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+            {
+                new AssessmentModel()
+                {
+                    SdocId = 1,
+                    RsdraNumber = "1234",
+                    Name = "name"
+                }
+            }));
+
+            await _dbContext.AssessmentData.AddAsync(new WorkflowDatabase.EF.Models.AssessmentData()
+            {
+                RsdraNumber = "1234"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            //When
+            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
+
+            //Then
+            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+            var executeAssessmentPollingTask = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is ExecuteAssessmentPollingTask);
+            Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
         }
     }
 }

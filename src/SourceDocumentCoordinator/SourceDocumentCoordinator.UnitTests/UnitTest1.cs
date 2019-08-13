@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Tests
+namespace SourceDocumentCoordinator.UnitTests
 {
     public class Tests
     {

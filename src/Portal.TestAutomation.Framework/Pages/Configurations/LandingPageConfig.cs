@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Portal.TestAutomation.Framework
+namespace Portal.TestAutomation.Framework.Pages.Configurations
 {
     public class LandingPageConfig
     {

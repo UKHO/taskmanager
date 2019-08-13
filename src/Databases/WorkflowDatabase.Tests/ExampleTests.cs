@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Linq;
+using Common.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 

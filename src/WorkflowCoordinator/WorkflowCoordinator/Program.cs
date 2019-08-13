@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
