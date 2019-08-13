@@ -50,9 +50,9 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Timeout(ExecuteAssessmentPollingTask state, IMessageHandlerContext context)
         {
-            var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
+            log.Debug($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
 
-            log.Debug($"[Defer Message Delivery] for {nameof(ExecuteAssessmentPollingTask)}");
+            var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
 
             foreach (var assessment in assessments)
             {
