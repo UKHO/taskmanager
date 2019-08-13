@@ -50,7 +50,7 @@ namespace WorkflowCoordinator
 
             if (_isLocalDebugging)
             {
-                _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _secretsConfig.Value.NsbInitialCatalog);
+                _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
                 ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer));
             }
             else
