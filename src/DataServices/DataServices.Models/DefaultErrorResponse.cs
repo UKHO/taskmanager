@@ -11,7 +11,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
+using System.Xml;
 
 namespace DataServices.Models
 { 
@@ -38,15 +38,6 @@ namespace DataServices.Models
             sb.Append("  Detail: ").Append(Detail).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
+using System.Xml;
 
 namespace DataServices.Models
 { 
@@ -20,23 +20,34 @@ namespace DataServices.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class ReturnCode : IEquatable<ReturnCode>
+    public partial class QueuedDocumentObject : IEquatable<QueuedDocumentObject>
     { 
+        /// <summary>
+        /// Gets or Sets SodcId
+        /// </summary>
+        [DataMember(Name="sodcId")]
+        public SdocId SodcId { get; set; }
+
         /// <summary>
         /// The &#x27;error&#x27; code number returned by SDRA webservice
         /// </summary>
         /// <value>The &#x27;error&#x27; code number returned by SDRA webservice</value>
-        [Required]
         [DataMember(Name="code")]
         public int? Code { get; set; }
 
         /// <summary>
-        /// The description of the &#x27;error&#x27; or state
+        /// Gets or Sets Message
         /// </summary>
-        /// <value>The description of the &#x27;error&#x27; or state</value>
         [Required]
         [DataMember(Name="message")]
         public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or Sets StatusTime
+        /// </summary>
+        [Required]
+        [DataMember(Name="statusTime")]
+        public DateTime? StatusTime { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -45,20 +56,13 @@ namespace DataServices.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class ReturnCode {\n");
+            sb.Append("class QueuedDocumentObject {\n");
+            sb.Append("  SodcId: ").Append(SodcId).Append("\n");
             sb.Append("  Code: ").Append(Code).Append("\n");
             sb.Append("  Message: ").Append(Message).Append("\n");
+            sb.Append("  StatusTime: ").Append(StatusTime).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>
@@ -70,20 +74,25 @@ namespace DataServices.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((ReturnCode)obj);
+            return obj.GetType() == GetType() && Equals((QueuedDocumentObject)obj);
         }
 
         /// <summary>
-        /// Returns true if ReturnCode instances are equal
+        /// Returns true if QueuedDocumentObject instances are equal
         /// </summary>
-        /// <param name="other">Instance of ReturnCode to be compared</param>
+        /// <param name="other">Instance of QueuedDocumentObject to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReturnCode other)
+        public bool Equals(QueuedDocumentObject other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
+                (
+                    SodcId == other.SodcId ||
+                    SodcId != null &&
+                    SodcId.Equals(other.SodcId)
+                ) && 
                 (
                     Code == other.Code ||
                     Code != null &&
@@ -93,6 +102,11 @@ namespace DataServices.Models
                     Message == other.Message ||
                     Message != null &&
                     Message.Equals(other.Message)
+                ) && 
+                (
+                    StatusTime == other.StatusTime ||
+                    StatusTime != null &&
+                    StatusTime.Equals(other.StatusTime)
                 );
         }
 
@@ -106,10 +120,14 @@ namespace DataServices.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
+                    if (SodcId != null)
+                    hashCode = hashCode * 59 + SodcId.GetHashCode();
                     if (Code != null)
                     hashCode = hashCode * 59 + Code.GetHashCode();
                     if (Message != null)
                     hashCode = hashCode * 59 + Message.GetHashCode();
+                    if (StatusTime != null)
+                    hashCode = hashCode * 59 + StatusTime.GetHashCode();
                 return hashCode;
             }
         }
@@ -117,12 +135,12 @@ namespace DataServices.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(ReturnCode left, ReturnCode right)
+        public static bool operator ==(QueuedDocumentObject left, QueuedDocumentObject right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(ReturnCode left, ReturnCode right)
+        public static bool operator !=(QueuedDocumentObject left, QueuedDocumentObject right)
         {
             return !Equals(left, right);
         }

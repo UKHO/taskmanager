@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
+using System.Xml;
 
 namespace DataServices.Models
 { 
@@ -32,15 +32,6 @@ namespace DataServices.Models
             sb.Append("class LinkedDocuments {\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public  new string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>
