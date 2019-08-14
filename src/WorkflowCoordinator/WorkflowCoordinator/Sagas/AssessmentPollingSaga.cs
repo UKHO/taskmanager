@@ -59,7 +59,7 @@ namespace WorkflowCoordinator.Sagas
             foreach (var assessment in assessments)
             {
                 var assessmentRecord = await
-                    _dbContext.AssessmentData.SingleOrDefaultAsync(a => a.RsdraNumber == assessment.RsdraNumber);
+                    _dbContext.AssessmentData.SingleOrDefaultAsync(a => a.RsdraNumber == assessment.SourceName);
 
                 if (assessmentRecord == null)
                 {
@@ -74,7 +74,7 @@ namespace WorkflowCoordinator.Sagas
 
                     var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
                     {
-                        SourceDocumentId = assessment.SdocId,
+                        SourceDocumentId = assessment.Id, //TODO: ?!?!?!??!
                         CorrelationId = Guid.NewGuid()
                     };
 

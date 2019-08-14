@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\..\DataServices\DataServices.Models\DataServices.Models.csproj" />
     <ProjectReference Include="..\WorkflowCoordinator\WorkflowCoordinator.csproj" />
   </ItemGroup>
 

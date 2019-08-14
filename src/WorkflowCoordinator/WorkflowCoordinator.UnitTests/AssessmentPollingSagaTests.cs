@@ -11,7 +11,7 @@ using NUnit.Framework;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
-using WorkflowCoordinator.Models;
+using DataServices.Models;
 using WorkflowCoordinator.Sagas;
 using WorkflowDatabase.EF;
 
@@ -50,7 +50,7 @@ namespace WorkflowCoordinator.UnitTests
         {
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
+                .Returns(Task.FromResult<IEnumerable<DocumentObject>>(A.Dummy<IEnumerable<DocumentObject>>()));
 
             //When
             await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
@@ -67,7 +67,7 @@ namespace WorkflowCoordinator.UnitTests
             //Given
             _saga.Data = new AssessmentPollingSagaData { IsTaskAlreadyScheduled = true };
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
+                .Returns(Task.FromResult<IEnumerable<DocumentObject>>(A.Dummy<IEnumerable<DocumentObject>>()));
 
             //When
             await _saga.Handle(new StartAssessmentPollingCommand(Guid.NewGuid()), _handlerContext);
@@ -82,7 +82,7 @@ namespace WorkflowCoordinator.UnitTests
         {
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-                                                    .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(A.Dummy<IEnumerable<AssessmentModel>>()));
+                                                    .Returns(Task.FromResult<IEnumerable<DocumentObject>>(A.Dummy<IEnumerable<DocumentObject>>()));
 
             //When
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext);
@@ -96,12 +96,12 @@ namespace WorkflowCoordinator.UnitTests
         {
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-                .Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                .Returns(Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
                 {
-                    new AssessmentModel()
+                    new DocumentObject()
                     {
-                        SdocId = 1,
-                        RsdraNumber = "sourcename",
+                        Id = 1,
+                        SourceName = "sourcename",
                         Name = "name"
                     }
                 }));
@@ -121,12 +121,12 @@ namespace WorkflowCoordinator.UnitTests
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
                 .Returns(
-                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
                     {
-                        new AssessmentModel()
+                        new DocumentObject()
                         {
-                            SdocId = 1,
-                            RsdraNumber = "sourcename",
+                            Id = 1,
+                            SourceName = "sourcename",
                             Name = "name"
                         }
                     }));
@@ -146,12 +146,12 @@ namespace WorkflowCoordinator.UnitTests
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
                 .Returns(
-                    Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+                    Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
                     {
-                        new AssessmentModel()
+                        new DocumentObject()
                         {
-                            SdocId = 1,
-                            RsdraNumber = "sourcename",
+                            Id = 1,
+                            SourceName = "sourcename",
                             Name = "name"
                         }
                     }));
@@ -169,12 +169,12 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_sends_three_messages()
         {
             //Given
-            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
             {
-                new AssessmentModel()
+                new DocumentObject()
                 {
-                    SdocId = 1,
-                    RsdraNumber = "sourcename",
+                    Id = 1,
+                    SourceName = "sourcename",
                     Name = "name"
                 }
             }));
@@ -190,12 +190,12 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_if_all_assessment_match_database_rows_then_only_timeout_fired()
         {
             //Given
-            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<AssessmentModel>>(new List<AssessmentModel>()
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
             {
-                new AssessmentModel()
+                new DocumentObject()
                 {
-                    SdocId = 1,
-                    RsdraNumber = "1234",
+                    Id = 1,
+                    SourceName = "1234",
                     Name = "name"
                 }
             }));

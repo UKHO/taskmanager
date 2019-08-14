@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WorkflowCoordinator.Models;
+using DataServices.Models;
 
 namespace WorkflowCoordinator.HttpClients
 {
     public interface IDataServiceApiClient
     {
-        Task<IEnumerable<AssessmentModel>> GetAssessments(string callerCode);
+        Task<IEnumerable<DocumentObject>> GetAssessments(string callerCode);
     }
 }
