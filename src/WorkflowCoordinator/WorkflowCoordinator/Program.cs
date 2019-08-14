@@ -77,7 +77,9 @@ namespace WorkflowCoordinator
                // TODO Disposed by DbContext? Fairly confident but could do with checking
                var connection = new SqlConnection(workflowDbConnectionString)
                {
-                   AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+                   AccessToken = isLocalDebugging ? 
+                       null :
+                       new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
                };
                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                    options.UseSqlServer(connection));
