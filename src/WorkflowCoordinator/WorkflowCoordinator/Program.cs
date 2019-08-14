@@ -51,16 +51,16 @@ namespace WorkflowCoordinator
                 b.SetMinimumLevel(LogLevel.Debug);
             })
             .ConfigureServices((hostingContext, services) =>
-            {
-                var isLocalDebugging = hostingContext.HostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+           {
+               var isLocalDebugging = hostingContext.HostingEnvironment.IsDevelopment() && Debugger.IsAttached;
 
-                var startupConfig = new StartupConfig();
-                hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
-                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
-                hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
+               var startupConfig = new StartupConfig();
+               hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+               hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
+               hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
 
-                var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
-                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+               var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
+               services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
 
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))
@@ -68,45 +68,46 @@ namespace WorkflowCoordinator
                     .Bind(hostingContext.Configuration.GetSection("urls"))
                     .Bind(hostingContext.Configuration.GetSection("databases"));
 
-                services.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+               services.AddOptions<SecretsConfig>()
+                   .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
-                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+               var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                   isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
-                var connection = new SqlConnection(workflowDbConnectionString)
-                {
-                    AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-                };
-                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                    options.UseSqlServer(connection));
+               // TODO Disposed by DbContext? Fairly confident but could do with checking
+               var connection = new SqlConnection(workflowDbConnectionString)
+               {
+                   AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+               };
+               services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                   options.UseSqlServer(connection));
 
-                if (isLocalDebugging)
-                {
-                    using (var sp = services.BuildServiceProvider())
-                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
-                    {
-                        TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
-                    }
-                }
+               if (isLocalDebugging)
+               {
+                   using (var sp = services.BuildServiceProvider())
+                   using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                   {
+                       TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
+                   }
+               }
 
-                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
-                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+               services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
-                UpdateableServiceProvider container = null;
+               UpdateableServiceProvider container = null;
 
-                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
-                {
-                    customizations.ExistingServices(services);
-                    customizations.ServiceProviderFactory(sc =>
-                    {
-                        container = new UpdateableServiceProvider(sc);
-                        return container;
-                    });
-                });
+               endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+               {
+                   customizations.ExistingServices(services);
+                   customizations.ServiceProviderFactory(sc =>
+                   {
+                       container = new UpdateableServiceProvider(sc);
+                       return container;
+                   });
+               });
 
-                services.AddScoped<IJobHost, NServiceBusJobHost>();
-            })
+               services.AddScoped<IJobHost, NServiceBusJobHost>();
+           })
             .UseConsoleLifetime();
 
             var host = builder.Build();
