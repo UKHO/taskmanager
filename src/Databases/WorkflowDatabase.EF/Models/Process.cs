@@ -1,5 +1,8 @@
-﻿namespace WorkflowDatabase.EF.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WorkflowDatabase.EF.Models
 {
+    [Table("Process")]
     public class Process
     {
         public int ProcessId { get; set; }

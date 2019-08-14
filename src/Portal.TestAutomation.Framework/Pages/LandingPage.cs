@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
+using Portal.TestAutomation.Framework.Pages.Configurations;
 
 namespace Portal.TestAutomation.Framework.Pages
 {

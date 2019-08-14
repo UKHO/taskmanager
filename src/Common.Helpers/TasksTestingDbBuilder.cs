@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
-namespace WorkflowDatabase.EF
+namespace Common.Helpers
 {
     public class TasksDbBuilder : ICanPopulateTables, ICanSaveChanges
     {
@@ -20,20 +21,14 @@ namespace WorkflowDatabase.EF
             return new TasksDbBuilder(context);
         }
 
-        private void RunSql(RawSqlString sqlString)
-        {
-            _context.Database.ExecuteSqlCommand(sqlString);
-            _context.SaveChanges();
-        }
-
         public ICanSaveChanges PopulateTables()
         {
-            if (!File.Exists(@"Data\TasksSeedData.json")) return this;
+            if (!File.Exists(@"Data\TasksSeedData.json")) throw new FileNotFoundException(@"Data\TasksSeedData.json");
 
             var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
             var tasks = JsonConvert.DeserializeObject<IEnumerable<Task>>(jsonString);
 
-            _context.Database.ExecuteSqlCommand("TRUNCATE TABLE [Tasks]");
+            if (!_context.Database.IsInMemory()) _context.Database.ExecuteSqlCommand("TRUNCATE TABLE [Tasks]");
 
             _context.Tasks.AddRange(tasks);
 

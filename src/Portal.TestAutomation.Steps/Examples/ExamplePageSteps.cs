@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 using OpenQA.Selenium;
+using Portal.TestAutomation.Framework.Pages.Examples;
 using TechTalk.SpecFlow;
-using Portal.TestAutomation.Framework.Pages;
 
-namespace Portal.TestAutomation.Steps
+namespace Portal.TestAutomation.Steps.Examples
 {
     [Binding]
     public sealed class ExamplePageSteps

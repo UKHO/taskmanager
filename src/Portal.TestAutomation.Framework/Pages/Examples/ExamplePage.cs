@@ -2,7 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace Portal.TestAutomation.Framework.Pages
+namespace Portal.TestAutomation.Framework.Pages.Examples
 {
     public class ExamplePage : BasePage
     {
