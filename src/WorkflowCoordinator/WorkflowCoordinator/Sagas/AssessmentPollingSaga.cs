@@ -63,7 +63,7 @@ namespace WorkflowCoordinator.Sagas
 
                 if (assessmentRecord == null)
                 {
-                    // Put bits to get rest of SDRA data and add row to our Db here
+                    // Put bits to get rest of SDRA data and add row to our Db here when we hit those stories
 
                     var startDbAssessmentCommand = new StartDbAssessmentCommand()
                     {
