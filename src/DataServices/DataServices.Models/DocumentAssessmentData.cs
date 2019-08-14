@@ -12,10 +12,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Xml;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// 
     /// </summary>

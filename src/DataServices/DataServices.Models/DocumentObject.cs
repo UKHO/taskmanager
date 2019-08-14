@@ -12,10 +12,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Xml;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
@@ -28,7 +27,7 @@ namespace DataServices.Models
         /// <value>The unique identifier for the SDRA assessment doucument i.e. the sdoc_id</value>
         [Required]
         [DataMember(Name="id")]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The name of the SDRA document

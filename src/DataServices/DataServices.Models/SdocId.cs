@@ -11,10 +11,9 @@
 using System;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Xml;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// The unique identifier for the SDRA assessment document i.e. the sdoc_id
     /// </summary>
