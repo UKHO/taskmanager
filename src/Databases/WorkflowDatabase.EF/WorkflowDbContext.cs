@@ -1,19 +1,12 @@
-﻿using System.Data.SqlClient;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WorkflowDatabase.EF
 {
     public class WorkflowDbContext : DbContext
     {
-        public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options, string azureAccessToken = "")
+        public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
-            if (!string.IsNullOrEmpty(azureAccessToken))
-            {
-                var conn = Database.GetDbConnection() as SqlConnection;
-                conn.AccessToken = (new AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
-            }
         }
 
         public DbSet<Models.AssessmentData> AssessmentData { get; set; }
