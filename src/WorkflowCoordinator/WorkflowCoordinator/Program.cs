@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -55,11 +56,12 @@ namespace WorkflowCoordinator
 
                 var startupConfig = new StartupConfig();
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
                 hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
 
                 var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
-
                 services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))
                     .Bind(hostingContext.Configuration.GetSection("apis"))
@@ -69,12 +71,15 @@ namespace WorkflowCoordinator
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-
                 var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
                     isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
+                var connection = new SqlConnection(workflowDbConnectionString)
+                {
+                    AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+                };
                 services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                    options.UseSqlServer(workflowDbConnectionString));
+                    options.UseSqlServer(connection));
 
                 if (isLocalDebugging)
                 {

@@ -104,8 +104,6 @@ namespace WorkflowCoordinator
             }
         }
 
-
-
         [FunctionName("StartAsync")]
         [NoAutomaticTrigger]
         public async Task StartAsync(CancellationToken cancellationToken)

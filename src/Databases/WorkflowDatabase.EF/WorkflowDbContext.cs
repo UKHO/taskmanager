@@ -6,11 +6,14 @@ namespace WorkflowDatabase.EF
 {
     public class WorkflowDbContext : DbContext
     {
-        public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
+        public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options, string azureAccessToken = "")
             : base(options)
         {
-            var conn = Database.GetDbConnection() as SqlConnection;
-            conn.AccessToken = (new AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
+            if (!string.IsNullOrEmpty(azureAccessToken))
+            {
+                var conn = Database.GetDbConnection() as SqlConnection;
+                conn.AccessToken = (new AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
         }
 
         public DbSet<Models.AssessmentData> AssessmentData { get; set; }
