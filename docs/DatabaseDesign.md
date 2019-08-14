@@ -4,6 +4,8 @@
 
 ### AssessmentData
 
+The AssessmentData table is responsible for holding the data that comes back from the SDRA view when we need to start a new
+database assessment workflow for an open assessment.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
@@ -25,6 +27,8 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 
 ### Comment
 
+The Comment table holds user entered comments for each workflow.
+
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
 |CommentId          |INT            |No           |The primary key of this table                                                                    |
@@ -35,6 +39,8 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
 ### DbAssessmentReviewData
+
+The DbAssessmentReviewData table holds the data that may change on the Review step of a Database Assessment workflow instance.
 
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------        |---------------|-------------|-------------------------------------------------------------------------------------------------|
@@ -51,6 +57,9 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 
 ### WorkflowInstance
 
+The WorkflowInstance table will hold the instances of a Database Assessment workflow. The ParentProcessId column will be used when an instance is a 
+sub workflow, and will hold the ProcessId of the parent workflow that the sub was generated from.
+
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------        |---------------|-------------|-------------------------------------------------------------------------------------------------|
 |WorkflowInstanceId         |INT            |No           |The primary key of this table                                                                    |
@@ -59,4 +68,3 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 |ParentProcessId            |INT            |Yes          |If a sub workflow, the parent workflow that was used to generate the new instance.               |
 |WorkflowType               |NVARCHAR(50)   |Yes          |                                                                                                 |
 |ActivityName               |NVARCHAR(50)   |Yes          |                                                                                                 |
-
