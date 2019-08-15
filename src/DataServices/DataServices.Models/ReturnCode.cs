@@ -9,19 +9,34 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public partial class DocumentObjects : List<DocumentObject>, IEquatable<DocumentObjects>
+    public partial class ReturnCode : IEquatable<ReturnCode>
     { 
+        /// <summary>
+        /// The &#x27;error&#x27; code number returned by SDRA webservice
+        /// </summary>
+        /// <value>The &#x27;error&#x27; code number returned by SDRA webservice</value>
+        [Required]
+        [DataMember(Name="code")]
+        public int? Code { get; set; }
+
+        /// <summary>
+        /// The description of the &#x27;error&#x27; or state
+        /// </summary>
+        /// <value>The description of the &#x27;error&#x27; or state</value>
+        [Required]
+        [DataMember(Name="message")]
+        public string Message { get; set; }
+
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
@@ -29,18 +44,11 @@ namespace DataServices.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class DocumentObjects {\n");
+            sb.Append("class ReturnCode {\n");
+            sb.Append("  Code: ").Append(Code).Append("\n");
+            sb.Append("  Message: ").Append(Message).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public  new string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>
@@ -52,20 +60,30 @@ namespace DataServices.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((DocumentObjects)obj);
+            return obj.GetType() == GetType() && Equals((ReturnCode)obj);
         }
 
         /// <summary>
-        /// Returns true if DocumentObjects instances are equal
+        /// Returns true if ReturnCode instances are equal
         /// </summary>
-        /// <param name="other">Instance of DocumentObjects to be compared</param>
+        /// <param name="other">Instance of ReturnCode to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(DocumentObjects other)
+        public bool Equals(ReturnCode other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return false;
+            return 
+                (
+                    Code == other.Code ||
+                    Code != null &&
+                    Code.Equals(other.Code)
+                ) && 
+                (
+                    Message == other.Message ||
+                    Message != null &&
+                    Message.Equals(other.Message)
+                );
         }
 
         /// <summary>
@@ -78,6 +96,10 @@ namespace DataServices.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
+                    if (Code != null)
+                    hashCode = hashCode * 59 + Code.GetHashCode();
+                    if (Message != null)
+                    hashCode = hashCode * 59 + Message.GetHashCode();
                 return hashCode;
             }
         }
@@ -85,12 +107,12 @@ namespace DataServices.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(DocumentObjects left, DocumentObjects right)
+        public static bool operator ==(ReturnCode left, ReturnCode right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(DocumentObjects left, DocumentObjects right)
+        public static bool operator !=(ReturnCode left, ReturnCode right)
         {
             return !Equals(left, right);
         }

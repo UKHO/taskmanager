@@ -9,18 +9,16 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
-    /// 
+    /// The unique identifier for the SDRA assessment document i.e. the sdoc_id
     /// </summary>
     [DataContract]
-    public partial class QueuedDocumentObjects : List<QueuedDocumentObject>, IEquatable<QueuedDocumentObjects>
+    public partial class SdocId : IEquatable<SdocId>
     { 
         /// <summary>
         /// Returns the string presentation of the object
@@ -29,18 +27,9 @@ namespace DataServices.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class QueuedDocumentObjects {\n");
+            sb.Append("class SdocId {\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public  new string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>
@@ -52,15 +41,15 @@ namespace DataServices.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((QueuedDocumentObjects)obj);
+            return obj.GetType() == GetType() && Equals((SdocId)obj);
         }
 
         /// <summary>
-        /// Returns true if QueuedDocumentObjects instances are equal
+        /// Returns true if SdocId instances are equal
         /// </summary>
-        /// <param name="other">Instance of QueuedDocumentObjects to be compared</param>
+        /// <param name="other">Instance of SdocId to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(QueuedDocumentObjects other)
+        public bool Equals(SdocId other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -85,12 +74,12 @@ namespace DataServices.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(QueuedDocumentObjects left, QueuedDocumentObjects right)
+        public static bool operator ==(SdocId left, SdocId right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(QueuedDocumentObjects left, QueuedDocumentObjects right)
+        public static bool operator !=(SdocId left, SdocId right)
         {
             return !Equals(left, right);
         }

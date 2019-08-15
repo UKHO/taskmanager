@@ -12,10 +12,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
@@ -129,15 +128,6 @@ namespace DataServices.Models
             sb.Append("  Datum: ").Append(Datum).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>

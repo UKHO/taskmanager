@@ -51,7 +51,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{DB5D8B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Messages", "Common\Common.Messages\Common.Messages.csproj", "{2F6F8E7E-CB8F-4E3A-AE1B-6FA25BF99BC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Helpers", "Common.Helpers\Common.Helpers.csproj", "{C7BC619D-7B09-417F-BC2A-43B79FF28541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Helpers", "Common.Helpers\Common.Helpers.csproj", "{C7BC619D-7B09-417F-BC2A-43B79FF28541}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataServices.Models", "DataServices\DataServices.Models\DataServices.Models.csproj", "{6B6269AD-C400-4A5E-B6F8-19E5036BF127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +135,10 @@ Global
 		{C7BC619D-7B09-417F-BC2A-43B79FF28541}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7BC619D-7B09-417F-BC2A-43B79FF28541}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7BC619D-7B09-417F-BC2A-43B79FF28541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B6269AD-C400-4A5E-B6F8-19E5036BF127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B6269AD-C400-4A5E-B6F8-19E5036BF127}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B6269AD-C400-4A5E-B6F8-19E5036BF127}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B6269AD-C400-4A5E-B6F8-19E5036BF127}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,6 +162,7 @@ Global
 		{CF1A9C9D-81C2-4F71-A634-FA0F8FCE154E} = {1EAB5545-7539-44E4-8025-1580F2878997}
 		{2F6F8E7E-CB8F-4E3A-AE1B-6FA25BF99BC8} = {DB5D8B0D-04B0-4929-A5B8-BE892037D846}
 		{C7BC619D-7B09-417F-BC2A-43B79FF28541} = {DB5D8B0D-04B0-4929-A5B8-BE892037D846}
+		{6B6269AD-C400-4A5E-B6F8-19E5036BF127} = {9C5DE816-B215-42DD-8ED2-A00895B4CDF6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}

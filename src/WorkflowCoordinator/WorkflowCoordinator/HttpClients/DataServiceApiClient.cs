@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DataServices.Models;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using WorkflowCoordinator.Config;
-using WorkflowCoordinator.Models;
 
 namespace WorkflowCoordinator.HttpClients
 {
@@ -19,13 +19,13 @@ namespace WorkflowCoordinator.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<AssessmentModel>> GetAssessments(string callerCode)
+        public async Task<IEnumerable<DocumentObject>> GetAssessments(string callerCode)
         {
             // TODO look at what should move to config
 
             var response = await _httpClient.GetAsync($@"{_generalConfig.Value.DataAccessLocalhostBaseUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
 
-            var assessments = JsonConvert.DeserializeObject<IEnumerable<AssessmentModel>>(await response.Content.ReadAsStringAsync());
+            var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(await response.Content.ReadAsStringAsync());
             return assessments;
         }
     }

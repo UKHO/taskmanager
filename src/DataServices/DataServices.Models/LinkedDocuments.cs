@@ -9,24 +9,18 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace DataServices.Models
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public partial class DefaultErrorResponse : IEquatable<DefaultErrorResponse>
+    public partial class LinkedDocuments : List<LinkedDocument>, IEquatable<LinkedDocuments>
     { 
-        /// <summary>
-        /// Gets or Sets Detail
-        /// </summary>
-        [DataMember(Name="detail")]
-        public string Detail { get; set; }
-
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
@@ -34,19 +28,9 @@ namespace DataServices.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class DefaultErrorResponse {\n");
-            sb.Append("  Detail: ").Append(Detail).Append("\n");
+            sb.Append("class LinkedDocuments {\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /// <summary>
@@ -58,25 +42,20 @@ namespace DataServices.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((DefaultErrorResponse)obj);
+            return obj.GetType() == GetType() && Equals((LinkedDocuments)obj);
         }
 
         /// <summary>
-        /// Returns true if DefaultErrorResponse instances are equal
+        /// Returns true if LinkedDocuments instances are equal
         /// </summary>
-        /// <param name="other">Instance of DefaultErrorResponse to be compared</param>
+        /// <param name="other">Instance of LinkedDocuments to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(DefaultErrorResponse other)
+        public bool Equals(LinkedDocuments other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return 
-                (
-                    Detail == other.Detail ||
-                    Detail != null &&
-                    Detail.Equals(other.Detail)
-                );
+            return false;
         }
 
         /// <summary>
@@ -89,8 +68,6 @@ namespace DataServices.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (Detail != null)
-                    hashCode = hashCode * 59 + Detail.GetHashCode();
                 return hashCode;
             }
         }
@@ -98,12 +75,12 @@ namespace DataServices.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(DefaultErrorResponse left, DefaultErrorResponse right)
+        public static bool operator ==(LinkedDocuments left, LinkedDocuments right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(DefaultErrorResponse left, DefaultErrorResponse right)
+        public static bool operator !=(LinkedDocuments left, LinkedDocuments right)
         {
             return !Equals(left, right);
         }
