@@ -74,7 +74,7 @@ namespace WorkflowCoordinator.Sagas
 
                     var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
                     {
-                        SourceDocumentId = assessment.Id, //TODO: ?!?!?!??!
+                        SourceDocumentId = assessment.Id,
                         CorrelationId = Guid.NewGuid()
                     };
 
