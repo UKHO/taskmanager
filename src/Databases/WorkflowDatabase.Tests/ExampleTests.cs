@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Linq;
@@ -46,6 +47,33 @@ namespace WorkflowDatabase.Tests
             var tasks = _dbContext.Tasks.ToList();
             Assert.AreEqual(8, tasks.Count);
         }
+
+        [Test]
+        public void Ensure_workflowinstance_table_prevents_duplicate_processid()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review"
+            });
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "2_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review"
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"));
+        }
+
     }
+
 }
 
