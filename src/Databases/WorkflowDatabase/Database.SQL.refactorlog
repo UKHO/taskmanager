@@ -21,4 +21,53 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="WorkflowProcessId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="8081ac55-f453-46a0-85f3-65139e23db18" ChangeDateTime="08/13/2019 09:17:05">
+    <Property Name="ElementName" Value="[dbo].[Process].[ProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Process]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WorkflowInstanceId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c9d332e7-da5d-4af9-be37-b7c07eb35df4" ChangeDateTime="08/13/2019 09:17:08">
+    <Property Name="ElementName" Value="[dbo].[Process].[WorkflowProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Process]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProcessId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d04f14f6-016b-4d3c-ba2a-e47760aa9af3" ChangeDateTime="08/13/2019 09:17:12">
+    <Property Name="ElementName" Value="[dbo].[Process].[ParentWorkflowProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Process]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentProcessId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="50d945ff-e346-4f9d-84d9-12076c1c023c" ChangeDateTime="08/13/2019 09:17:22">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentReviewData].[WorkflowProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentReviewData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProcessId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="83859397-acb8-4d3a-bbed-012b35836974" ChangeDateTime="08/13/2019 09:17:32">
+    <Property Name="ElementName" Value="[dbo].[Comment].[WorkflowProcessId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Comment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProcessId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e9e4c4bf-0d7d-489c-a206-a567791d32ef" ChangeDateTime="08/13/2019 09:26:02">
+    <Property Name="ElementName" Value="[dbo].[FK_WorkflowInstance_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[WorkflowInstance]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_WorkflowInstance_AssessmentData]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="aa6a9338-9e97-4fcb-b815-6956f02d82d0" ChangeDateTime="08/14/2019 07:58:19">
+    <Property Name="ElementName" Value="[dbo].[Comment].[Text]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Comment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Comment" />
+  </Operation>
 </Operations>

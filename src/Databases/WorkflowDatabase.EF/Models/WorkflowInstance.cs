@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("Process")]
-    public class Process
+    public class WorkflowInstance
     {
+        public int WorkflowInstanceId { get; set; }
         public int ProcessId { get; set; }
-        public int WorkflowProcessId { get; set; }
         public string SerialNumber { get; set; }
-        public int? ParentWorkflowProcessId { get; set; }
+        public int? ParentProcessId { get; set; }
         public string WorkflowType { get; set; }
         public string ActivityName { get; set; }
     }
