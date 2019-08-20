@@ -26,11 +26,12 @@ namespace Common.Helpers
             if (!File.Exists(@"Data\TasksSeedData.json")) throw new FileNotFoundException(@"Data\TasksSeedData.json");
 
             var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
-            var tasks = JsonConvert.DeserializeObject<IEnumerable<Task>>(jsonString);
+            var tasks = JsonConvert.DeserializeObject<IEnumerable<WorkflowInstance>>(jsonString);
 
-            if (!_context.Database.IsInMemory()) _context.Database.ExecuteSqlCommand("TRUNCATE TABLE [Tasks]");
+            _context.Database.ExecuteSqlCommand("delete from [Comment]");
+            _context.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
 
-            _context.Tasks.AddRange(tasks);
+            _context.WorkflowInstance.AddRange(tasks);
 
             return this;
         }

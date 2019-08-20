@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WorkflowDatabase.EF.Models;
 
 namespace WorkflowDatabase.EF
 {
@@ -10,9 +11,16 @@ namespace WorkflowDatabase.EF
         }
 
         public DbSet<Models.AssessmentData> AssessmentData { get; set; }
-        public DbSet<Models.Comment> Comments { get; set; }
+        public DbSet<Models.Comment> Comment { get; set; }
         public DbSet<Models.DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
-        public DbSet<Models.Task> Tasks { get; set; }
         public DbSet<Models.WorkflowInstance> WorkflowInstance { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.Comment);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

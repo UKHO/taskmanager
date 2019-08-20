@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace WorkflowDatabase.EF.Models
+namespace Portal.ViewModels
 {
-    public class Task
+    public class TaskViewModel
     {
         public int TaskId { get; set; }
         public int WorkflowProcessId { get; set; }

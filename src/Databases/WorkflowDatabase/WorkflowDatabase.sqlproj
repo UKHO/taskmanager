@@ -59,9 +59,6 @@
     <Folder Include="Tables" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\Tasks.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Build>
     <Build Include="Tables\WorkflowInstance.sql" />
     <Build Include="Tables\AssessmentData.sql" />
     <Build Include="Tables\Comment.sql" />

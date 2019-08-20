@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Portal.ViewModels;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        public IList<Task> Tasks { get; set; }
+        public IList<TaskViewModel> Tasks { get; set; }
 
         public IndexModel(WorkflowDbContext dbContext)
         {
@@ -17,7 +17,7 @@ namespace Portal.Pages
         }
         public void OnGet()
         {
-            Tasks = _dbContext.Tasks.ToList();
+            Tasks = _dbContext.WorkflowInstance.ToList();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@page
-@model IndexModel
+@model TaskViewModel
 @{
     ViewData["Title"] = "Home page";
 }
@@ -63,11 +63,11 @@
             </thead>
             <tbody>
 
-                @foreach (var task in Model.Tasks)
+                @foreach (var task in Model.TaskViewModel)
                 {
                     <tr>
                         <td>
-                            @task.WorkflowProcessId
+                            @task.ProcessId
                         </td>
                         <td>
                             @task.DaysToDmEndDate

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -24,6 +25,22 @@ namespace WorkflowDatabase.Tests
             TasksDbBuilder.UsingDbContext(_dbContext)
                           .PopulateTables()
                           .SaveChanges();
+
+            var wfi = new WorkflowInstance
+            {
+                ActivityName = "Review",
+                WorkflowType = "DbAss",
+                ParentProcessId = null,
+                SerialNumber = "123_sn",
+                ProcessId = 123,
+                Comment = new List<Comment>
+                {
+                    new Comment {Text = "my first comment", ProcessId = 123}
+                }
+            };
+
+            _dbContext.WorkflowInstance.Add(wfi);
+            _dbContext.SaveChanges();
         }
 
         [TearDown]
@@ -32,21 +49,21 @@ namespace WorkflowDatabase.Tests
             _dbContext.Dispose();
         }
 
-        [Test]
-        public void Example_test()
-        {
-            _dbContext.Tasks.Add(new Task()
-            {
-                TaskId = 99,
-                WorkflowProcessId = 9999,
-                Assessor = "ben"
+        //[Test]
+        //public void Example_test()
+        //{
+        //    _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+        //    {
+        //        TaskId = 99,
+        //        WorkflowProcessId = 9999,
+        //        Assessor = "ben"
 
-            });
-            _dbContext.SaveChanges();
+        //    });
+        //    _dbContext.SaveChanges();
 
-            var tasks = _dbContext.Tasks.ToList();
-            Assert.AreEqual(8, tasks.Count);
-        }
+        //    var tasks = _dbContext.WorkflowInstance.ToList();
+        //    Assert.AreEqual(8, tasks.Count);
+        //}
 
         [Test]
         public void Ensure_workflowinstance_table_prevents_duplicate_processid()
