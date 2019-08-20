@@ -42,7 +42,7 @@
     </div>
 
     <div class="panel-body table-responsive">
-        <table id="example" class="task-list table-striped" style="width: 100%">
+        <table id="unassignedTasks" class="task-list table-striped" style="width: 100%">
             <thead>
                 <tr>
                     <th>Process ID</th>
@@ -119,7 +119,7 @@
         <span>In Flight Tasks</span>
     </div>
     <div class="panel-body table-responsive">
-        <table id="examples" class="task-list table-striped" style="width: 100%">
+        <table id="inFlightTasks" class="task-list table-striped" style="width: 100%">
             <thead>
                 <tr>
                     <th>Process ID</th>
@@ -220,8 +220,9 @@
 
     <script>
         $(document).ready(function () {
-            $('#example').DataTable({
+            var unassignedTasksTable = $('#unassignedTasks').DataTable({
                 "pageLength": 5,
+                'sDom': 'ltipr',
                 "lengthMenu": [5, 10, 25, 50],
                 'columnDefs': [{
                     'targets': [12],
@@ -234,8 +235,9 @@
                     'searchable': false
                 }]
             });
-            var table = $('#examples').DataTable({
+            var inFlightTasksTable = $('#inFlightTasks').DataTable({
                 "lengthMenu": [10, 25, 50],
+                'sDom': 'ltipr',
                 'columnDefs': [{
                     'targets': [12],
                     'orderable': false,
@@ -248,9 +250,9 @@
                 }]
             });
 
-            $('#examples tbody tr').each(function (index, tr) {
+            $('#inFlightTasks tbody tr').each(function (index, tr) {
 
-                var row = table.row(tr);
+                var row = inFlightTasksTable.row(tr);
                 var taskNote = row.data()[13];
 
                 if (taskNote.length > 0) {
@@ -269,7 +271,11 @@
                 } else if ($(tr).hasClass('black')) {
                     row.child().addClass('black');
                 }
+            });
 
+            $('#txtGlobalSearch').keyup(function () {
+                unassignedTasksTable.search($(this).val()).draw();
+                inFlightTasksTable.search($(this).val()).draw();
             });
         });
     </script>
