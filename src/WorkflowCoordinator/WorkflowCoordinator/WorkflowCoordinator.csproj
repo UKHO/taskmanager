@@ -5,13 +5,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
  <ItemGroup>
-   <None Remove="Data\ProcessesSeedData.json" />
    <None Remove="Data\TasksSeedData.json" />
  </ItemGroup>
  <ItemGroup>
-   <Content Include="Data\ProcessesSeedData.json">
-     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-   </Content>
    <Content Include="Data\TasksSeedData.json">
      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

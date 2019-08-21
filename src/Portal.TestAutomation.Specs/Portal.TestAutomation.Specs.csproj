@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\Portal.TestAutomation.Steps\Portal.TestAutomation.Steps.csproj" />
   </ItemGroup>
 
