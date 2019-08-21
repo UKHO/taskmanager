@@ -62,11 +62,11 @@ namespace WorkflowCoordinator
                var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
 
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("nsb"))
-                    .Bind(hostingContext.Configuration.GetSection("apis"))
-                    .Bind(hostingContext.Configuration.GetSection("urls"))
-                    .Bind(hostingContext.Configuration.GetSection("databases"));
+               services.AddOptions<GeneralConfig>()
+                   .Bind(hostingContext.Configuration.GetSection("nsb"))
+                   .Bind(hostingContext.Configuration.GetSection("apis"))
+                   .Bind(hostingContext.Configuration.GetSection("urls"))
+                   .Bind(hostingContext.Configuration.GetSection("databases"));
 
                services.AddOptions<SecretsConfig>()
                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
@@ -74,10 +74,9 @@ namespace WorkflowCoordinator
                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
-               // TODO Disposed by DbContext? Fairly confident but could do with checking
                var connection = new SqlConnection(workflowDbConnectionString)
                {
-                   AccessToken = isLocalDebugging ? 
+                   AccessToken = isLocalDebugging ?
                        null :
                        new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
                };

@@ -1,12 +1,16 @@
+using System.Data.SqlClient;
+using System.Diagnostics;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Portal.Configuration;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
 
@@ -14,8 +18,11 @@ namespace Portal
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
+            _hostingEnvironment = env;
             Configuration = configuration;
         }
 
@@ -35,17 +42,32 @@ namespace Portal
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<WorkflowDbContext>((serviceProvider, options) => options
-                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=taskmanager-dev-WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False"));
+            var isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
 
-            using (var sp = services.BuildServiceProvider())
-            using (var context = sp.GetRequiredService<WorkflowDbContext>())
+            var startupConfig = new StartupConfig();
+            Configuration.GetSection("urls").Bind(startupConfig);
+            Configuration.GetSection("databases").Bind(startupConfig);
+
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+            var connection = new SqlConnection(workflowDbConnectionString)
             {
-                TasksDbBuilder.UsingDbContext(context)
-                    .PopulateTables()
-                    .SaveChanges();
-            }
+                AccessToken = isLocalDebugging ? 
+                    null :
+                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+            };
+            services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                options.UseSqlServer(connection));
 
+            if (isLocalDebugging)
+            {
+                using (var sp = services.BuildServiceProvider())
+                using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                {
+                    TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
+                }
+            }
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             var mapper = mappingConfig.CreateMapper();
