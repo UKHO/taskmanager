@@ -58,9 +58,14 @@ namespace WorkflowCoordinator.Sagas
 
             //TODO: Save WorkflowInstanceID to SagaData
 
-            //TODO: Send message to get rest of SDRA data
+            log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
+            await context.Send(new RetrieveAssessmentDataCommand
+            {
+                CorrelationId = Data.CorrelationId,
+                SourceDocumentId = Data.SourceDocumentId
+            });
 
-            await Task.CompletedTask;
+            log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
         }
     }
 }
