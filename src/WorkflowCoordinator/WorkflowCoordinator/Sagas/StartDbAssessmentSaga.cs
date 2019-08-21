@@ -17,15 +17,19 @@ namespace WorkflowCoordinator.Sagas
     {
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
 
         ILog log = LogManager.GetLogger<StartDbAssessmentSaga>();
 
         public StartDbAssessmentSaga(IOptionsSnapshot<GeneralConfig> generalConfig,
-            IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
+            IDataServiceApiClient dataServiceApiClient,
+            IWorkflowServiceApiClient workflowServiceApiClient,
+            WorkflowDbContext dbContext)
         {
             _generalConfig = generalConfig;
             _dataServiceApiClient = dataServiceApiClient;
+            _workflowServiceApiClient = workflowServiceApiClient;
             _dbContext = dbContext;
         }
 

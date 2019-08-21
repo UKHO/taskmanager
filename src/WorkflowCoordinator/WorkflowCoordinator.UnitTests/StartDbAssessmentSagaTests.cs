@@ -18,6 +18,7 @@ namespace WorkflowCoordinator.UnitTests
     {
         private StartDbAssessmentSaga _saga;
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
 
@@ -35,8 +36,11 @@ namespace WorkflowCoordinator.UnitTests
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _saga = new StartDbAssessmentSaga(generalConfigOptionsSnapshot,
-                _fakeDataServiceApiClient, _dbContext)
+                _fakeDataServiceApiClient,
+                _fakeWorkflowServiceApiClient,
+                _dbContext)
             { Data = new StartDbAssessmentSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
         }
