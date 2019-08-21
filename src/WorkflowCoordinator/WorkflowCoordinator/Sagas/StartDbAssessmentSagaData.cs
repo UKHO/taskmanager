@@ -8,6 +8,6 @@ namespace WorkflowCoordinator.Sagas
     {
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
-        public int WorkflowInstanceId { get; set; }
+        public int ProcessId { get; set; }
     }
 }
