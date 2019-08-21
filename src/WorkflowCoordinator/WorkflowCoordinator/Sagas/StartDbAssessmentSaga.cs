@@ -42,9 +42,19 @@ namespace WorkflowCoordinator.Sagas
             if (Completed)
             {
                 //TODO: Is this the behaviour we want?
-                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} is already complete for " +
-                                            $"{nameof(message.CorrelationId)}: {message.CorrelationId}" +
-                                            $"{nameof(message.SourceDocumentId)}: {message.SourceDocumentId}");
+                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} is already complete with saga data: " +
+                                            $"{nameof(Data.CorrelationId)}: {Data.CorrelationId}; " +
+                                            $"{nameof(Data.SourceDocumentId)}: {Data.SourceDocumentId}; " +
+                                            $"{nameof(Data.ProcessId)}: {Data.ProcessId}");
+            }
+
+            if (!Data.ProcessId.Equals(0))
+            {
+                //TODO: Is this the behaviour we want?
+                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} already handled {nameof(StartDbAssessmentCommand)} with saga data: " +
+                                            $"{nameof(Data.CorrelationId)}: {Data.CorrelationId}; " +
+                                            $"{nameof(Data.SourceDocumentId)}: {Data.SourceDocumentId}; " +
+                                            $"{nameof(Data.ProcessId)}: {Data.ProcessId}");
             }
 
             Data.CorrelationId = message.CorrelationId;
@@ -54,9 +64,12 @@ namespace WorkflowCoordinator.Sagas
                       $"{nameof(Data.SourceDocumentId)}:{Data.SourceDocumentId}; " +
                       $"to {nameof(StartDbAssessmentSagaData)}");
 
+
             //TODO: Start Workflow
 
-            //TODO: Save WorkflowInstanceID to SagaData
+            //TODO: Save K2 ProcessId to SagaData
+
+            //TODO: Save WorkflowInstance in WorkflowDatabase
 
             log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.Send(new RetrieveAssessmentDataCommand
