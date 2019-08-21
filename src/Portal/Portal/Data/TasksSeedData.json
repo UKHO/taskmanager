@@ -9,7 +9,31 @@
       {
         "processId": 123,
         "text": "A comment"
+      },
+      {
+        "processId": 123,
+        "text": "A 2nd comment"
       }
-    ]
+    ],
+    "assessmentData": {
+      "sdocId": 12345,
+      "rsdraNumber": "RSDRA123354545",
+      "sourceDocumentName": "Document1",
+      "receiptDate": "2019-01-01T00:00:00",
+      "toSdoDate": "2019-01-01T00:00:00",
+      "effectiveStartDate": "2019-01-01T00:00:00",
+      "teamDistributedTo": "HW",
+      "sourceDocumentType": "PDF",
+      "sourceNature": "It is au naturale",
+      "datum": null,
+      "processId": 123
+    },
+    "dbAssessmentReviewData": {
+      "processId": 123,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "assessor": "BarzeyS",
+      "verifier":  "StensonB"
+    }
   }
 ]

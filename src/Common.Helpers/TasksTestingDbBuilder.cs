@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
@@ -29,6 +30,8 @@ namespace Common.Helpers
             var tasks = JsonConvert.DeserializeObject<IEnumerable<WorkflowInstance>>(jsonString);
 
             _context.Database.ExecuteSqlCommand("delete from [Comment]");
+            _context.Database.ExecuteSqlCommand("delete from [AssessmentData]");
+            _context.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
             _context.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
 
             _context.WorkflowInstance.AddRange(tasks);

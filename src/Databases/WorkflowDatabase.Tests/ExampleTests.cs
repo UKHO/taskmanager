@@ -33,9 +33,9 @@ namespace WorkflowDatabase.Tests
                 ParentProcessId = null,
                 SerialNumber = "123_sn",
                 ProcessId = 123,
-                Comment = new List<Comment>
+                Comment = new List<Comments>
                 {
-                    new Comment {Text = "my first comment", ProcessId = 123}
+                    new Comments {Text = "my first comment", ProcessId = 123}
                 }
             };
 
@@ -48,22 +48,6 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.Dispose();
         }
-
-        //[Test]
-        //public void Example_test()
-        //{
-        //    _dbContext.WorkflowInstance.Add(new WorkflowInstance()
-        //    {
-        //        TaskId = 99,
-        //        WorkflowProcessId = 9999,
-        //        Assessor = "ben"
-
-        //    });
-        //    _dbContext.SaveChanges();
-
-        //    var tasks = _dbContext.WorkflowInstance.ToList();
-        //    Assert.AreEqual(8, tasks.Count);
-        //}
 
         [Test]
         public void Ensure_workflowinstance_table_prevents_duplicate_processid()

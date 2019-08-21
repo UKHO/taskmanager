@@ -1,5 +1,5 @@
 ﻿@page
-@model TaskViewModel
+@model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
@@ -62,8 +62,8 @@
                 </tr>
             </thead>
             <tbody>
-
-                @foreach (var task in Model.TaskViewModel)
+                
+            @foreach (var task in Model.Tasks)
                 {
                     <tr>
                         <td>
@@ -79,10 +79,10 @@
                             @task.DaysOnHold
                         </td>
                         <td>
-                            @task.RsdraNo
+                            @task.AssessmentDataRsdraNumber
                         </td>
                         <td>
-                            @task.SourceName
+                            @task.AssessmentDataSourceDocumentName
                         </td>
                         <td>
                             @task.Workspace
@@ -157,7 +157,7 @@
 
                     <tr class="@rowColour">
                         <td>
-                            @task.WorkflowProcessId
+                            @task.ProcessId
                         </td>
                         <td>
                             @task.DaysToDmEndDate
@@ -179,10 +179,10 @@
                             }
                         </td>
                         <td>
-                            @task.RsdraNo
+                            @task.AssessmentDataRsdraNumber
                         </td>
                         <td>
-                            @task.SourceName
+                            @task.AssessmentDataSourceDocumentName
                         </td>
                         <td>
                             @task.Workspace
@@ -194,10 +194,10 @@
                             @task.TaskStage
                         </td>
                         <td>
-                            @task.Assessor
+                            @task.DbAssessmentReviewDataAssessor
                         </td>
                         <td>
-                            @task.Verifier
+                            @task.DbAssessmentReviewDataVerifier
                         </td>
                         <td>
                             @task.Team

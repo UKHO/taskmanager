@@ -1,9 +1,13 @@
-﻿namespace WorkflowDatabase.EF.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WorkflowDatabase.EF.Models
 {
-    public class Comment
+    [Table("Comment")]
+    public class Comments
     {
         public int CommentId { get; set; }
         public int ProcessId { get; set; }
         public string Text { get; set; }
+        public int WorkflowInstanceId { get; set; }
     }
 }

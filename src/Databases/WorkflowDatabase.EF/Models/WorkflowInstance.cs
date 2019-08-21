@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using System.Collections.Generic;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -15,6 +11,8 @@ namespace WorkflowDatabase.EF.Models
         public string WorkflowType { get; set; }
         public string ActivityName { get; set; }
 
-        public virtual List<Comment> Comment { get; set; }
+        public virtual List<Comments> Comment { get; set; }
+        public virtual AssessmentData AssessmentData { get; set; }
+        public virtual DbAssessmentReviewData DbAssessmentReviewData { get; set; }
     }
 }

@@ -1,23 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
+
+        private readonly IMapper _mapper;
+
         public IList<TaskViewModel> Tasks { get; set; }
 
-        public IndexModel(WorkflowDbContext dbContext)
+        public IndexModel(WorkflowDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
         public void OnGet()
         {
-            Tasks = _dbContext.WorkflowInstance.ToList();
+            var workflows = _dbContext.WorkflowInstance
+                .Include(c => c.Comment)
+                .Include(a => a.AssessmentData)
+                .Include(d => d.DbAssessmentReviewData)
+                .ToList();
+
+            this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
+
         }
     }
 }

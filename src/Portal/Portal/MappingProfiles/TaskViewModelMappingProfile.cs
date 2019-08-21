@@ -1,0 +1,21 @@
+﻿using AutoMapper;
+using Portal.ViewModels;
+using WorkflowDatabase.EF.Models;
+
+namespace Portal.MappingProfiles
+{
+    public class TaskViewModelMappingProfile : Profile
+    {
+        public TaskViewModelMappingProfile()
+        {
+            CreateMap<WorkflowInstance, TaskViewModel>()
+                .ForMember(destination => destination.TaskType,
+                    opts => opts.MapFrom(source => source.WorkflowType))
+                .ForMember(destination => destination.TaskStage,
+                    opts => opts.MapFrom(source => source.ActivityName));
+
+            CreateMap<AssessmentData, TaskViewModel>();
+            CreateMap<DbAssessmentReviewData, TaskViewModel>();
+        }
+    }
+}
