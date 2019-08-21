@@ -1,16 +1,23 @@
-﻿using OpenQA.Selenium;
+﻿using Common.Helpers;
+using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
+using WorkflowDatabase.EF;
 
 namespace Portal.TestAutomation.Steps
 {
     [Binding]
     public class LandingPageSteps
     {
+        private readonly WorkflowDbContext _workflowDbContext;
         private readonly LandingPage _landingPage;
 
-        public LandingPageSteps(IWebDriver driver)
+        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
         {
+            _workflowDbContext = workflowDbContext;
+
+            TasksDbBuilder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
+
             _landingPage = new LandingPage(driver, 5);
         }
 
@@ -24,6 +31,11 @@ namespace Portal.TestAutomation.Steps
         public void ThenTheLandingPageHasLoaded()
         {
             _landingPage.HasLoaded();
+        }
+
+        [Then(@"Task with process id (.*) appears")]
+        public void ThenTaskWithProcessIdAppears(int p0)
+        {
         }
 
 
