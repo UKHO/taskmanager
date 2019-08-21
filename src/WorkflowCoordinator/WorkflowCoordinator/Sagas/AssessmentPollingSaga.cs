@@ -67,15 +67,16 @@ namespace WorkflowCoordinator.Sagas
 
                     var startDbAssessmentCommand = new StartDbAssessmentCommand()
                     {
-                        CorrelationId = Guid.NewGuid()
+                        CorrelationId = Guid.NewGuid(),
+                        SourceDocumentId = assessment.Id
                     };
 
                     await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
 
                     var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
                     {
-                        SourceDocumentId = assessment.Id,
-                        CorrelationId = Guid.NewGuid()
+                        CorrelationId = Guid.NewGuid(),
+                        SourceDocumentId = assessment.Id
                     };
 
                     await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
