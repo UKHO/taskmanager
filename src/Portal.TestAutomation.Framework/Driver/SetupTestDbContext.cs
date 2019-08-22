@@ -1,5 +1,4 @@
-﻿using System;
-using BoDi;
+﻿using BoDi;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,13 +22,13 @@ namespace Portal.TestAutomation.Framework.Driver
         public void InitializeDbContext()
         {
             var config = new DbConfig();
-     
+
             var configRoot = AzureAppConfigConfigurationRoot.Instance;
             configRoot.GetSection("databases").Bind(config);
             configRoot.GetSection("urls").Bind(config);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
-                ConfigHelpers.IsLocalDevelopment ? config.LocalDbServer : config.WorkflowDbServer, config.WorkflowDbName);
+                ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)
