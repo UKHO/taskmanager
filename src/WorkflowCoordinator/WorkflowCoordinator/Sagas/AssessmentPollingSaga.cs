@@ -65,9 +65,11 @@ namespace WorkflowCoordinator.Sagas
                 {
                     // Put bits to get rest of SDRA data and add row to our Db here when we hit those stories
 
+                    var correlationId = Guid.NewGuid();
+
                     var startDbAssessmentCommand = new StartDbAssessmentCommand()
                     {
-                        CorrelationId = Guid.NewGuid(),
+                        CorrelationId = correlationId,
                         SourceDocumentId = assessment.Id
                     };
 
@@ -75,7 +77,7 @@ namespace WorkflowCoordinator.Sagas
 
                     var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
                     {
-                        CorrelationId = Guid.NewGuid(),
+                        CorrelationId = correlationId,
                         SourceDocumentId = assessment.Id
                     };
 
