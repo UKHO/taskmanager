@@ -42,23 +42,30 @@ namespace WorkflowCoordinator.Sagas
         {
             log.Debug($"Handling {nameof(StartDbAssessmentCommand)}: {message.ToJSONSerializedString()}");
 
-            if (!Data.ProcessId.Equals(0))
+            if (!Data.IsStarted)
             {
-                //TODO: Is this the behaviour we want?
-                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} already handled {nameof(StartDbAssessmentCommand)} " +
-                                            $"with saga data: {Data.ToJSONSerializedString()}");
+                Data.IsStarted = true;
+                Data.CorrelationId = message.CorrelationId;
+                Data.SourceDocumentId = message.SourceDocumentId;
+
+                log.Debug($"Saved {Data.ToJSONSerializedString()} " +
+                          $"to {nameof(StartDbAssessmentSagaData)}");
             }
 
-            Data.CorrelationId = message.CorrelationId;
-            Data.SourceDocumentId = message.SourceDocumentId;
+            if (Data.ProcessId.Equals(0))
+            {
+                //TODO: Start Workflow
 
-            log.Debug($"Saved {Data.ToJSONSerializedString()} " +
-                      $"to {nameof(StartDbAssessmentSagaData)}");
+                //TODO: Save K2 ProcessId to SagaData
+
+            }
+
+            //TODO: Get Serial Number and relevant WorkflowInstance data from K2
 
 
-            //TODO: Start Workflow
 
-            //TODO: Save K2 ProcessId to SagaData
+
+
 
             //TODO: Save WorkflowInstance in WorkflowDatabase
 

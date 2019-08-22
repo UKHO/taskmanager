@@ -9,5 +9,6 @@ namespace WorkflowCoordinator.Sagas
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
         public int ProcessId { get; set; }
+        public bool IsStarted { get; set; }
     }
 }
