@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
-using Microsoft.EntityFrameworkCore;
+using Common.Helpers;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -41,31 +40,19 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartDbAssessmentCommand message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(StartDbAssessmentCommand)}");
-
-            if (Completed)
-            {
-                //TODO: Is this the behaviour we want?
-                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} is already complete with saga data: " +
-                                            $"{nameof(Data.CorrelationId)}: {Data.CorrelationId}; " +
-                                            $"{nameof(Data.SourceDocumentId)}: {Data.SourceDocumentId}; " +
-                                            $"{nameof(Data.ProcessId)}: {Data.ProcessId}");
-            }
+            log.Debug($"Handling {nameof(StartDbAssessmentCommand)}: {message.ToJSONSerializedString()}");
 
             if (!Data.ProcessId.Equals(0))
             {
                 //TODO: Is this the behaviour we want?
-                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} already handled {nameof(StartDbAssessmentCommand)} with saga data: " +
-                                            $"{nameof(Data.CorrelationId)}: {Data.CorrelationId}; " +
-                                            $"{nameof(Data.SourceDocumentId)}: {Data.SourceDocumentId}; " +
-                                            $"{nameof(Data.ProcessId)}: {Data.ProcessId}");
+                throw new ArgumentException($"{nameof(StartDbAssessmentSaga)} already handled {nameof(StartDbAssessmentCommand)} " +
+                                            $"with saga data: {Data.ToJSONSerializedString()}");
             }
 
             Data.CorrelationId = message.CorrelationId;
             Data.SourceDocumentId = message.SourceDocumentId;
 
-            log.Debug($"Saved {nameof(Data.CorrelationId)}:{Data.CorrelationId}; " +
-                      $"{nameof(Data.SourceDocumentId)}:{Data.SourceDocumentId}; " +
+            log.Debug($"Saved {Data.ToJSONSerializedString()} " +
                       $"to {nameof(StartDbAssessmentSagaData)}");
 
 
