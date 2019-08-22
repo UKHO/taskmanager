@@ -88,7 +88,7 @@ namespace WorkflowCoordinator
                    using (var sp = services.BuildServiceProvider())
                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
                    {
-                       TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
+                       TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                    }
                }
 

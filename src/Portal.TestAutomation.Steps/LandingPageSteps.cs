@@ -17,7 +17,7 @@ namespace Portal.TestAutomation.Steps
         {
             _workflowDbContext = workflowDbContext;
 
-            TasksDbBuilder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
+            TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
 
             _landingPage = new LandingPage(driver, 5);
         }

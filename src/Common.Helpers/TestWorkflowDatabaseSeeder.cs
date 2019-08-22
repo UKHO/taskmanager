@@ -1,25 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Common.Helpers
 {
-    public class TasksDbBuilder : ICanPopulateTables, ICanSaveChanges
+    public class TestWorkflowDatabaseSeeder : ICanPopulateTables, ICanSaveChanges
     {
         private readonly WorkflowDbContext _context;
 
-        private TasksDbBuilder(WorkflowDbContext context)
+        private TestWorkflowDatabaseSeeder(WorkflowDbContext context)
         {
             _context = context;
         }
 
         public static ICanPopulateTables UsingDbContext(WorkflowDbContext context)
         {
-            return new TasksDbBuilder(context);
+            return new TestWorkflowDatabaseSeeder(context);
         }
 
         public ICanSaveChanges PopulateTables()

@@ -6,8 +6,7 @@ namespace Common.Helpers
     {
         private static string EnvironmentName => Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
 
-        public static bool IsLocalDevelopment => false;
-           // EnvironmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
+        public static bool IsLocalDevelopment => EnvironmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
 
         public static bool IsAzureDevOpsBuild => EnvironmentName.Equals("AzureDevOpsBuild", StringComparison.OrdinalIgnoreCase);
 

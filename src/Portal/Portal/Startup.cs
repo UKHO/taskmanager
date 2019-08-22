@@ -64,7 +64,7 @@ namespace Portal
                 using (var sp = services.BuildServiceProvider())
                 using (var context = sp.GetRequiredService<WorkflowDbContext>())
                 {
-                    TasksDbBuilder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
             // Auto mapper config
