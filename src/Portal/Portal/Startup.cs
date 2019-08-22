@@ -1,5 +1,4 @@
 using System.Data.SqlClient;
-using System.Diagnostics;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
@@ -42,25 +41,25 @@ namespace Portal
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            var isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
 
-            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
-                isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
+                isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
             var connection = new SqlConnection(workflowDbConnectionString)
             {
-                AccessToken = isLocalDebugging ? 
+                AccessToken = isLocalDevelopment ?
                     null :
                     new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
             };
             services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                 options.UseSqlServer(connection));
 
-            if (isLocalDebugging)
+            if (isLocalDevelopment)
             {
                 using (var sp = services.BuildServiceProvider())
                 using (var context = sp.GetRequiredService<WorkflowDbContext>())

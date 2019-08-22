@@ -29,10 +29,7 @@ namespace Common.Helpers
             var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
             var tasks = JsonConvert.DeserializeObject<IEnumerable<WorkflowInstance>>(jsonString);
 
-            _context.Database.ExecuteSqlCommand("delete from [Comment]");
-            _context.Database.ExecuteSqlCommand("delete from [AssessmentData]");
-            _context.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
-            _context.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
+            DatabasesHelpers.ClearWorkflowDbTables(_context);
 
             _context.WorkflowInstance.AddRange(tasks);
 

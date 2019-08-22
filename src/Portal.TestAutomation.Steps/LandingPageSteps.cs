@@ -1,4 +1,5 @@
 ﻿using Common.Helpers;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
@@ -36,6 +37,10 @@ namespace Portal.TestAutomation.Steps
         [Then(@"Task with process id (.*) appears")]
         public void ThenTaskWithProcessIdAppears(int p0)
         {
+            var row = _landingPage.FindTaskByProcessId(p0);
+
+            if (row == null) Assert.Fail();
+            else Assert.Pass();
         }
 
 

@@ -1,5 +1,9 @@
-﻿using BoDi;
+﻿using System;
+using BoDi;
+using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Portal.TestAutomation.Framework.Configuration;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
 
@@ -18,14 +22,23 @@ namespace Portal.TestAutomation.Framework.Driver
         [BeforeScenario(Order = 1)]
         public void InitializeDbContext()
         {
+            var config = new DbConfig();
+     
+            var configRoot = AzureAppConfigConfigurationRoot.Instance;
+            configRoot.GetSection("databases").Bind(config);
+            configRoot.GetSection("urls").Bind(config);
+
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
+                ConfigHelpers.IsLocalDevelopment ? config.LocalDbServer : config.WorkflowDbServer, config.WorkflowDbName);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
-                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=taskmanager-dev-workflowdatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
+                .UseSqlServer(workflowDbConnectionString)
                 .Options;
 
             var dbContext = new WorkflowDbContext(dbContextOptions);
 
             _objectContainer.RegisterInstanceAs<WorkflowDbContext>(dbContext);
         }
+
     }
 }
