@@ -9,6 +9,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Portal.Configuration;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
@@ -18,10 +19,12 @@ namespace Portal
     public class Startup
     {
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILogger<Startup> _logger;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment env, ILogger<Startup> logger)
         {
             _hostingEnvironment = env;
+            _logger = logger;
             Configuration = configuration;
         }
 
@@ -37,7 +40,7 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("General"));
+            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("portal"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -90,6 +93,7 @@ namespace Portal
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseAzureAppConfiguration();
             app.UseMvc();
         }
     }
