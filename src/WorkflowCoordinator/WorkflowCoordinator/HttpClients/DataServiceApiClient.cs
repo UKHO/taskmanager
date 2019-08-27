@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DataServices.Models;
@@ -22,10 +23,18 @@ namespace WorkflowCoordinator.HttpClients
         public async Task<IEnumerable<DocumentObject>> GetAssessments(string callerCode)
         {
             // TODO look at what should move to config
+            // TODO: wrap with try-catch to retrun a meaningfull response
 
-            var response = await _httpClient.GetAsync($@"{_generalConfig.Value.DataAccessLocalhostBaseUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
+            var data = "";
+            var fullUri = new Uri($@"{_generalConfig.Value.DataServicesWebServiceUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
 
-            var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(await response.Content.ReadAsStringAsync());
+            using (var response = await _httpClient.GetAsync(fullUri))
+            {
+                data = await response.Content.ReadAsStringAsync();
+            }
+
+            var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(data);
+
             return assessments;
         }
     }
