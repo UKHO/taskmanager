@@ -5,6 +5,7 @@ namespace WorkflowCoordinator.Config
     public class GeneralConfig
     {
         public Uri DataAccessLocalhostBaseUri { get; set; }
+        public Uri DataServicesWebServiceUri { get; set; }
         public string SourceDocumentCoordinatorName { get; set; }
         public string WorkflowCoordinatorName { get; set; }
         public string CallerCode { get; set; }
@@ -12,5 +13,6 @@ namespace WorkflowCoordinator.Config
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
         public Guid AssessmentPollingSagaCorrelationGuid { get; set; }
+        public Uri K2WebServiceUri { get; set; }
     }
 }
