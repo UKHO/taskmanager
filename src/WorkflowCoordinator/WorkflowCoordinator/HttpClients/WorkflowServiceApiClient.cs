@@ -16,9 +16,10 @@ namespace WorkflowCoordinator.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<int> CreateWorkflowInstance(int workflowId)
+        public async Task<int> CreateWorkflowInstance()
         {
-            //TODO: Get Workflows to get WorkflowID
+            //TODO: Get Workflows to get WorkflowID for "DB Assessment"; this is the main workflow id and not the instance id
+
             //TODO: Create Workflow Instance
             //TODO: Get SerialNumber
             return 0;
