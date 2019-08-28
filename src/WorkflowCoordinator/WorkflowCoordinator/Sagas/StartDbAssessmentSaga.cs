@@ -16,8 +16,8 @@ using WorkflowDatabase.EF;
 namespace WorkflowCoordinator.Sagas
 {
     public class StartDbAssessmentSaga : Saga<StartDbAssessmentSagaData>,
-            IAmStartedByMessages<StartDbAssessmentCommand>,
-            IHandleMessages<RetrieveAssessmentDataCommand>
+                                            IAmStartedByMessages<StartDbAssessmentCommand>,
+                                            IHandleMessages<RetrieveAssessmentDataCommand>
     {
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
@@ -60,12 +60,13 @@ namespace WorkflowCoordinator.Sagas
                           $"to {nameof(StartDbAssessmentSagaData)}");
             }
 
-            if (Data.ProcessId.Equals(0))
+            if (Data.ProcessId == 0)
             {
-                //TODO: Start Workflow
+                // "DB Assessment" workflow instance is not yet created
 
-                //TODO: Save K2 ProcessId to SagaData
-
+                // Create and start new "DB Assessment" Workflow instance
+                // and Save K2-workflow-instance-Id ProcessId to SagaData
+                Data.ProcessId = await _workflowServiceApiClient.CreateWorkflowInstance();
             }
 
             //TODO: Get Serial Number and relevant WorkflowInstance data from K2
