@@ -1,10 +1,14 @@
-﻿using System;
+﻿using DataServices.Models;
+
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DataServices.Models;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+
 using WorkflowCoordinator.Config;
 
 namespace WorkflowCoordinator.HttpClients
@@ -22,11 +26,8 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task<IEnumerable<DocumentObject>> GetAssessments(string callerCode)
         {
-            // TODO look at what should move to config
-            // TODO: wrap with try-catch to retrun a meaningfull response
-
             var data = "";
-            var fullUri = new Uri($@"{_generalConfig.Value.DataServicesWebServiceUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
+            var fullUri = new Uri(_generalConfig.Value.DataServicesWebServiceBaseUri, $@"{_generalConfig.Value.DataServicesWebServiceDocumentsForAssessmentUri}{callerCode}");
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {

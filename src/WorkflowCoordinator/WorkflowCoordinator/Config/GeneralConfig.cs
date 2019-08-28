@@ -5,7 +5,8 @@ namespace WorkflowCoordinator.Config
     public class GeneralConfig
     {
         public Uri DataAccessLocalhostBaseUri { get; set; }
-        public Uri DataServicesWebServiceUri { get; set; }
+        public Uri DataServicesWebServiceBaseUri { get; set; }
+        public Uri DataServicesWebServiceDocumentsForAssessmentUri { get; set; }
         public string SourceDocumentCoordinatorName { get; set; }
         public string WorkflowCoordinatorName { get; set; }
         public string CallerCode { get; set; }
