@@ -1,18 +1,23 @@
-﻿using System;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
+
 using Microsoft.Extensions.Options;
+
 using NServiceBus;
 using NServiceBus.Logging;
+
+using System.Threading.Tasks;
+
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
+
 using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.Sagas
 {
     public class StartDbAssessmentSaga : Saga<StartDbAssessmentSagaData>,
-            IAmStartedByMessages<StartDbAssessmentCommand>
+            IAmStartedByMessages<StartDbAssessmentCommand>,
+            IHandleMessages<RetrieveAssessmentDataCommand>
     {
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
@@ -36,6 +41,9 @@ namespace WorkflowCoordinator.Sagas
         {
             mapper.ConfigureMapping<StartDbAssessmentCommand>(message => message.SourceDocumentId)
                   .ToSaga(sagaData => sagaData.SourceDocumentId);
+
+            mapper.ConfigureMapping<RetrieveAssessmentDataCommand>(message => message.SourceDocumentId)
+                .ToSaga(sagaData => sagaData.SourceDocumentId);
         }
 
         public async Task Handle(StartDbAssessmentCommand message, IMessageHandlerContext context)
@@ -64,11 +72,11 @@ namespace WorkflowCoordinator.Sagas
 
 
 
-
-
-
             //TODO: Save WorkflowInstance in WorkflowDatabase
 
+
+
+            // TODO: Fire message to get SDRA data from SDRA-DB and store it in WorkflowDatabase
             log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.Send(new RetrieveAssessmentDataCommand
             {
@@ -77,6 +85,14 @@ namespace WorkflowCoordinator.Sagas
             });
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
+        }
+
+        public async Task Handle(RetrieveAssessmentDataCommand message, IMessageHandlerContext context)
+        {
+            // TODO: Get SDRA data from SDRA-DB and store it in WorkflowDatabase; and then mark Saga Complete
+            log.Debug($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
+
+            MarkAsComplete();
         }
     }
 }
