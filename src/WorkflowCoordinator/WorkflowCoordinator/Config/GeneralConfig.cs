@@ -16,6 +16,6 @@ namespace WorkflowCoordinator.Config
         public Guid AssessmentPollingSagaCorrelationGuid { get; set; }
         public Uri K2WebServiceBaseUri { get; set; }
         public Uri K2WebServiceGetWorkflowsUri { get; set; }
-        public string DBAssessmentWorkflowName { get; set; }
+        public string K2DBAssessmentWorkflowName { get; set; }
     }
 }
