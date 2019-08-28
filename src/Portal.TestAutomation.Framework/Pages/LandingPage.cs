@@ -19,7 +19,10 @@ namespace Portal.TestAutomation.Framework.Pages
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
         private IWebElement UnassignedTaskTable => _driver.FindElement(By.Id("unassignedTasks"));
+        private IWebElement AssignedTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
+        private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
         private List<IWebElement> UnassignedTaskTableRows => UnassignedTaskTable.FindElements(By.TagName("tr")).ToList();
+        private List<IWebElement> AssignedTaskTableRows => AssignedTaskTable.FindElements(By.TagName("tr")).ToList();
 
 
         public LandingPage(IWebDriver driver, int seconds)
@@ -52,23 +55,22 @@ namespace Portal.TestAutomation.Framework.Pages
             _driver.Navigate().GoToUrl(LandingPageUrl);
         }
 
-        public IWebElement FindTaskByProcessId(int processId)
+        public void FilterRowsByProcessIdInGlobalSearch(int processId)
         {
-            var moo = UnassignedTaskTableRows;
+            GlobalSearchField.SendKeys(processId.ToString());
+        }
 
-            foreach (var row in UnassignedTaskTableRows)
+        public bool FindTaskByProcessId(int processId)
+        {
+            // Ensure we only have the one row (including the header row) for each filtered table
+            if (UnassignedTaskTableRows.Count > 2 || AssignedTaskTableRows.Count > 3)
             {
-                var cells = row.FindElements(By.TagName("td"));
-
-                if (!cells.Any()) continue;
-
-                if (int.Parse(cells[0].Text) == processId)
-                {
-                    return row;
-                }
+                return false;
             }
 
-            return null;
+            // Checks both unassigned and assigned tables for correct process id
+            return UnassignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(UnassignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId
+                   && AssignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(AssignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId;
         }
     }
 }
