@@ -95,6 +95,9 @@ namespace WorkflowCoordinator
                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+               services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
                UpdateableServiceProvider container = null;
 
                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
