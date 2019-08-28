@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\Portal.TestAutomation.Steps\Portal.TestAutomation.Steps.csproj" />
   </ItemGroup>
 
@@ -60,6 +59,7 @@
     <SpecFlowFeatureFiles Update="LandingPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
+      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
