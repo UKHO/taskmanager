@@ -12,4 +12,9 @@
     <PackageReference Include="SpecFlow" Version="3.0.225" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
+  </ItemGroup>
+
 </Project>

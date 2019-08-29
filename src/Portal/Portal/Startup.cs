@@ -1,19 +1,30 @@
+using System.Data.SqlClient;
+using AutoMapper;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Portal.Configuration;
+using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
 
 namespace Portal
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILogger<Startup> _logger;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env, ILogger<Startup> logger)
         {
+            _hostingEnvironment = env;
+            _logger = logger;
             Configuration = configuration;
         }
 
@@ -29,20 +40,40 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("General"));
+            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("portal"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<WorkflowDbContext>((serviceProvider, options) => options
-                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=WorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False"));
+            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
-            using (var sp = services.BuildServiceProvider())
-            using (var context = sp.GetRequiredService<WorkflowDbContext>())
+            var startupConfig = new StartupConfig();
+            Configuration.GetSection("urls").Bind(startupConfig);
+            Configuration.GetSection("databases").Bind(startupConfig);
+
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
+                isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+            var connection = new SqlConnection(workflowDbConnectionString)
             {
-                TasksDbBuilder.UsingDbContext(context)
-                    .PopulateTables()
-                    .SaveChanges();
+                AccessToken = isLocalDevelopment ?
+                    null :
+                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+            };
+            services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                options.UseSqlServer(connection));
+
+            if (isLocalDevelopment)
+            {
+                using (var sp = services.BuildServiceProvider())
+                using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                {
+                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                }
             }
+            // Auto mapper config
+            var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
+            var mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +93,7 @@ namespace Portal
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseAzureAppConfiguration();
             app.UseMvc();
         }
     }

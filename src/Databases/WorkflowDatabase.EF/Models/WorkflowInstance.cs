@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -12,5 +10,9 @@ namespace WorkflowDatabase.EF.Models
         public int? ParentProcessId { get; set; }
         public string WorkflowType { get; set; }
         public string ActivityName { get; set; }
+
+        public virtual List<Comments> Comment { get; set; }
+        public virtual AssessmentData AssessmentData { get; set; }
+        public virtual DbAssessmentReviewData DbAssessmentReviewData { get; set; }
     }
 }

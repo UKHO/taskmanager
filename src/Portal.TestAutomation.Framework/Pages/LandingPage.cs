@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Common.Helpers;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using System;
-using Portal.TestAutomation.Framework.Pages.Configurations;
+using Portal.TestAutomation.Framework.Configuration;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
@@ -12,12 +15,22 @@ namespace Portal.TestAutomation.Framework.Pages
         private readonly WebDriverWait _wait;
         private readonly LandingPageConfig _config = new LandingPageConfig();
 
+        private Uri LandingPageUrl;
+
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
+        private IWebElement UnassignedTaskTable => _driver.FindElement(By.Id("unassignedTasks"));
+        private IWebElement AssignedTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
+        private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
+        private List<IWebElement> UnassignedTaskTableRows => UnassignedTaskTable.FindElements(By.TagName("tr")).ToList();
+        private List<IWebElement> AssignedTaskTableRows => AssignedTaskTable.FindElements(By.TagName("tr")).ToList();
+
 
         public LandingPage(IWebDriver driver, int seconds)
         {
-            var configRoot = ConfigurationRoot.Instance;
+            var configRoot = AzureAppConfigConfigurationRoot.Instance;
             configRoot.GetSection("urls").Bind(_config);
+
+            LandingPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.LandingPageUrl : _config.LocalDevLandingPageUrl;
 
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
@@ -39,7 +52,25 @@ namespace Portal.TestAutomation.Framework.Pages
 
         public void NavigateTo()
         {
-            _driver.Navigate().GoToUrl(_config.LandingPageUrl);
+            _driver.Navigate().GoToUrl(LandingPageUrl);
+        }
+
+        public void FilterRowsByProcessIdInGlobalSearch(int processId)
+        {
+            GlobalSearchField.SendKeys(processId.ToString());
+        }
+
+        public bool FindTaskByProcessId(int processId)
+        {
+            // Ensure we only have the one row (including the header row) for each filtered table
+            if (UnassignedTaskTableRows.Count > 2 || AssignedTaskTableRows.Count > 3)
+            {
+                return false;
+            }
+
+            // Checks both unassigned and assigned tables for correct process id
+            return UnassignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(UnassignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId
+                   && AssignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(AssignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId;
         }
     }
 }

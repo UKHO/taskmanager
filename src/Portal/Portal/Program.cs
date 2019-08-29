@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Logging;
-using System;
 
 
 namespace Portal
@@ -22,14 +21,15 @@ namespace Portal
                 {
                     var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                    builder.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
+                    builder.AddAzureAppConfiguration(options =>
                     {
-                        ConnectionString = azureAppConfConnectionString
+                        options.Connect(azureAppConfConnectionString)
+                            .ConfigureRefresh(o => o.Register("logging:portal:loglevel:default", true));
                     });
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("logging:portal"));
                     logging.AddConsole();
                     logging.AddDebug();
                     logging.AddAzureWebAppDiagnostics();

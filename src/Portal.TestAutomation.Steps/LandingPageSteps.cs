@@ -1,6 +1,11 @@
-﻿using OpenQA.Selenium;
+﻿using System.Collections.Generic;
+using Common.Helpers;
+using Microsoft.Azure.Services.AppAuthentication;
+using NUnit.Framework;
+using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
+using WorkflowDatabase.EF;
 
 namespace Portal.TestAutomation.Steps
 {
@@ -9,8 +14,10 @@ namespace Portal.TestAutomation.Steps
     {
         private readonly LandingPage _landingPage;
 
-        public LandingPageSteps(IWebDriver driver)
+        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
         {
+            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
+
             _landingPage = new LandingPage(driver, 5);
         }
 
@@ -26,6 +33,16 @@ namespace Portal.TestAutomation.Steps
             _landingPage.HasLoaded();
         }
 
+        [When(@"I enter Process Id of ""(.*)""")]
+        public void WhenIEnterProcessIdOf(int processId)
+        {
+            _landingPage.FilterRowsByProcessIdInGlobalSearch(processId);
+        }
 
+        [Then(@"Task with process id (.*) appears in both the assigned and unassigned tasks tables")]
+        public void ThenTaskWithProcessIdAppearsInBothTheAssignedAndUnassignedTasksTables(int p0)
+        {
+            Assert.IsTrue(_landingPage.FindTaskByProcessId(p0));
+        }
     }
 }

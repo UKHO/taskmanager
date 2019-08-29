@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using System;
 
-namespace Portal.TestAutomation.Framework.Pages
+namespace Common.Helpers
 {
-    public static class ConfigurationRoot
+    public static class AzureAppConfigConfigurationRoot
     {
         private static IConfigurationRoot _instance;
 

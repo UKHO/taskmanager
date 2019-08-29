@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\TasksSeedData.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\TasksSeedData.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="nunit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
@@ -21,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="LandingPage.feature.cs">
+    <Compile Update="LandingPageTasks.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>LandingPage.feature</DependentUpon>
+      <DependentUpon>LandingPageTasks.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -45,9 +56,10 @@
       <LastGenOutput>SecondTestExample.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="LandingPage.feature">
+    <SpecFlowFeatureFiles Update="LandingPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>LandingPage.feature.cs</LastGenOutput>
+      <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
+      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 

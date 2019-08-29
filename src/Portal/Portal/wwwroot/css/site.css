@@ -78,17 +78,17 @@ table.task-list thead tr th {
     margin: 0px;
 }
 
-#examples.table-striped > tbody > tr.even,
-#examples.table-striped > tbody > tr.even + tr {
+#inFlightTasks.table-striped > tbody > tr.even,
+#inFlightTasks.table-striped > tbody > tr.even + tr {
     background-color: #ffffff;
 }
 
-#examples.table-striped > tbody > tr.odd,
-#examples.table-striped > tbody > tr.odd + tr {
+#inFlightTasks.table-striped > tbody > tr.odd,
+#inFlightTasks.table-striped > tbody > tr.odd + tr {
     background-color: #f9f9f9;
 }
 
-#examples.table-striped > tbody > tr > td.note-formatting {
+#inFlightTasks.table-striped > tbody > tr > td.note-formatting {
     padding: 5px 0px 10px 15px;
 }
 

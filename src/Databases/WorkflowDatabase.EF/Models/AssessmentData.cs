@@ -15,5 +15,6 @@ namespace WorkflowDatabase.EF.Models
         public string SourceDocumentType { get; set; }
         public string SourceNature { get; set; }
         public string Datum { get; set; }
+        public int ProcessId { get; set; }
     }
 }
