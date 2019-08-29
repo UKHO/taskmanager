@@ -64,9 +64,12 @@ namespace WorkflowCoordinator.Sagas
             {
                 // "DB Assessment" workflow instance is not yet created
 
+                // DB assessment workflow id is required when creating instance
+                var workflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
+
                 // Create and start new "DB Assessment" Workflow instance
                 // and Save K2-workflow-instance-Id ProcessId to SagaData
-                Data.ProcessId = await _workflowServiceApiClient.CreateWorkflowInstance();
+                Data.ProcessId = await _workflowServiceApiClient.CreateWorkflowInstance(workflowId);
             }
 
             //TODO: Get Serial Number and relevant WorkflowInstance data from K2
