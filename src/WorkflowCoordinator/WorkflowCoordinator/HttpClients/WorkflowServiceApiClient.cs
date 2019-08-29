@@ -25,41 +25,41 @@ namespace WorkflowCoordinator.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<int> CreateWorkflowInstance()
+        public async Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId)
         {
-            //TODO: Get Workflows to get WorkflowID for "DB Assessment"; this is the main workflow id and not the instance id
-            var dbAssessmentId = await GetDBAssessmentWorkflowId();
-
-            if (dbAssessmentId ==0)
-                throw new ApplicationException($"Failed to find {_generalConfig.Value.K2DBAssessmentWorkflowName} K2 workflow in {_generalConfig.Value.K2WebServiceBaseUri}");
+            //if (dbAssessmentId ==0)
+            //    throw new ApplicationException($"Failed to find {_generalConfig.Value.K2DBAssessmentWorkflowName} K2 workflow in {_generalConfig.Value.K2WebServiceBaseUri}");
 
             //TODO: Create Workflow Instance
             //TODO: Get SerialNumber
             return 0;
         }
 
-        private async Task<int> GetDBAssessmentWorkflowId()
+        public async Task<int> GetDBAssessmentWorkflowId()
         {
             // TODO: Getting 401 Unauthorised even when using localhost; enabling Windows Auth in IIS; Diabling Anonymous in IIS
             //var localK2BaseUrl = new Uri("http://localhost:81/Api/");
             //Uri fullUri = new Uri(localK2BaseUrl, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
 
             // TODO: Getting Certificate error when using https; 
-            Uri fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
-           
+            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
+            var data = "";
 
-            var response = await _httpClient.GetAsync(fullUri);
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            using (var response = await _httpClient.GetAsync(fullUri))
             {
-                var data = await response.Content.ReadAsStringAsync();
+                data = await response.Content.ReadAsStringAsync();
 
-                var workflows = JsonConvert.DeserializeObject<IEnumerable<K2WorkflowData>>(data);
-                var dbAssesmentWorkflow = workflows.FirstOrDefault(w => w.Name.Equals(_generalConfig.Value.K2DBAssessmentWorkflowName, StringComparison.OrdinalIgnoreCase));
-                return dbAssesmentWorkflow?.Id ?? 0;
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+
             }
 
-            return 0;
+            var workflows = JsonConvert.DeserializeObject<IEnumerable<K2WorkflowData>>(data);
+            var dbAssesmentWorkflow = workflows.FirstOrDefault(w => w.Name.Equals(_generalConfig.Value.K2DBAssessmentWorkflowName, StringComparison.OrdinalIgnoreCase));
+            return dbAssesmentWorkflow?.Id ?? 0;
+
         }
     }
 }

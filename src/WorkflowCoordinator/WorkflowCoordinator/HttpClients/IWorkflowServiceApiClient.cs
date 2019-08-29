@@ -4,6 +4,7 @@ namespace WorkflowCoordinator.HttpClients
 {
     public interface IWorkflowServiceApiClient
     {
-        Task<int> CreateWorkflowInstance();
+        Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId);
+        Task<int> GetDBAssessmentWorkflowId();
     }
 }
