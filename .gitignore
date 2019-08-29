@@ -344,4 +344,15 @@ ASALocalRun/
 **/DataServices.ApiTests/**/*.iml
 **/DataServices.ApiTests/**/*.log
 
+# Java
+**/EventServices.ApiTests/.idea
+**/EventServices.ApiTests/.classpath
+**/EventServices.ApiTests/.project
+**/EventServices.ApiTests/.settings
+**/EventServices.ApiTests/target/
+**/EventServices.ApiTests/**/*.iml
+**/EventServices.ApiTests/**/*.log
+
 *.refactorlog
+# ignoring maven files?
+*.lst
