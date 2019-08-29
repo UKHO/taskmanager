@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -31,7 +32,14 @@ namespace WorkflowCoordinator.HttpClients
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {
+
                 data = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{_generalConfig.Value.DataServicesWebServiceBaseUri}'");
+
             }
 
             var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(data);
