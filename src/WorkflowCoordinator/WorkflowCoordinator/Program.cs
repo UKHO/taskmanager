@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Azure.KeyVault;
@@ -70,7 +72,8 @@ namespace WorkflowCoordinator
                     .Bind(hostingContext.Configuration.GetSection("k2"));
 
                services.AddOptions<SecretsConfig>()
-                   .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+                   .Bind(hostingContext.Configuration.GetSection("NsbDbSection"))
+                   .Bind(hostingContext.Configuration.GetSection("K2RestApi"));
 
                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
@@ -96,8 +99,17 @@ namespace WorkflowCoordinator
                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+               var secretConfig = new SecretsConfig();
+               hostingContext.Configuration.GetSection("NsbDbSection").Bind(secretConfig);
+               hostingContext.Configuration.GetSection("K2RestApi").Bind(secretConfig);
+
                services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
-                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                   .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                   {
+                       ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                       Credentials = new NetworkCredential($"engineering\\{secretConfig.NsbToK2ApiUsername}", secretConfig.NsbToK2ApiPassword)
+                    });
 
                UpdateableServiceProvider container = null;
 
