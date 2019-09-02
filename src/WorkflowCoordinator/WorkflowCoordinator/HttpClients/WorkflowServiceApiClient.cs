@@ -27,21 +27,33 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId)
         {
-            //if (dbAssessmentId ==0)
-            //    throw new ApplicationException($"Failed to find {_generalConfig.Value.K2DBAssessmentWorkflowName} K2 workflow in {_generalConfig.Value.K2WebServiceBaseUri}");
+            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceStartWorkflowInstanceUri + $"/{dbAssessmentWorkflowId}");
+            var data = "";
 
-            //TODO: Create Workflow Instance
-            //TODO: Get SerialNumber
-            return 0;
+            using (var response = await _httpClient.PostAsync(fullUri, null))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+
+            }
+
+            if (!int.TryParse(data, out var workflowInstanceId))
+            {
+                throw new ApplicationException($"Failed to get WorkflowInstanceId" +
+                                               $"\nData= '{data}'," +
+                                               $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+
+            }
+
+            return workflowInstanceId;
         }
 
         public async Task<int> GetDBAssessmentWorkflowId()
         {
-            // TODO: Getting 401 Unauthorised even when using localhost; enabling Windows Auth in IIS; Diabling Anonymous in IIS
-            //var localK2BaseUrl = new Uri("http://localhost:81/Api/");
-            //Uri fullUri = new Uri(localK2BaseUrl, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
-
-            // TODO: Getting Certificate error when using https; 
             var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
             var data = "";
 

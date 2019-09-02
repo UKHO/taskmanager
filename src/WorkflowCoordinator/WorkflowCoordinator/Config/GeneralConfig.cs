@@ -17,5 +17,6 @@ namespace WorkflowCoordinator.Config
         public Uri K2WebServiceBaseUri { get; set; }
         public Uri K2WebServiceGetWorkflowsUri { get; set; }
         public string K2DBAssessmentWorkflowName { get; set; }
+        public Uri K2WebServiceStartWorkflowInstanceUri { get; set; }
     }
 }
