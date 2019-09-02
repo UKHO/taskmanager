@@ -3,6 +3,7 @@ using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Portal.TestAutomation.Framework.Configuration;
+using Portal.TestAutomation.Framework.Setup;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
 
@@ -21,14 +22,17 @@ namespace Portal.TestAutomation.Framework.Driver
         [BeforeScenario(Order = 1)]
         public void InitializeDbContext()
         {
-            var config = new DbConfig();
+            var config = SetupConfig.GetAndBindDbConfig();
 
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("databases").Bind(config);
-            configRoot.GetSection("urls").Bind(config);
+            // Get a ready-to-use Key Vault client
+            var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+
+            // Populate SecretsConfig using the setup class
+            var secrets = SetupConfig.GetAndBindSecretsConfig(keyVaultAddress, keyVaultClient);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
-                ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName);
+                ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName,
+                config.WorkflowDbUITestAcct, secrets.Result.WorkflowDbPassword);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)

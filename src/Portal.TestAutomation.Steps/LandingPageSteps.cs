@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Common.Helpers;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;

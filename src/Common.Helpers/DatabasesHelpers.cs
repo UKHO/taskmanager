@@ -7,14 +7,16 @@ namespace Common.Helpers
     public static class DatabasesHelpers
     {
         public static string
-            BuildSqlConnectionString(bool isLocalDb, string dataSource, string initialCatalog = "") =>
+            BuildSqlConnectionString(bool isLocalDb, string dataSource, string initialCatalog = "", string userId = "", string password = "") =>
             new SqlConnectionStringBuilder
             {
                 DataSource = dataSource,
                 InitialCatalog = initialCatalog,
                 IntegratedSecurity = isLocalDb,
                 Encrypt = isLocalDb ? false : true,
-                ConnectTimeout = 20
+                ConnectTimeout = 20,
+                UserID = userId,
+                Password = password
             }.ToString();
 
         public static void ClearWorkflowDbTables(WorkflowDbContext workflowDbContext)
