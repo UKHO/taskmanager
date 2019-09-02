@@ -73,6 +73,7 @@ namespace WorkflowCoordinator.Sagas
             }
 
             //TODO: Get Serial Number and relevant WorkflowInstance data from K2
+            var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(Data.ProcessId);
 
 
 

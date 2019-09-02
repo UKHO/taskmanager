@@ -73,5 +73,27 @@ namespace WorkflowCoordinator.HttpClients
             return dbAssesmentWorkflow?.Id ?? 0;
 
         }
+
+        public async Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId)
+        {
+            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetTasksUri);
+            var data = "";
+
+            using (var response = await _httpClient.GetAsync(fullUri))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+
+            }
+
+            var tasks = JsonConvert.DeserializeObject<K2Tasks>(data);
+            var task = tasks.Tasks.FirstOrDefault(w => w.WorkflowInstanceID == workflowInstanceId);
+
+            return task.SerialNumber;
+        }
     }
 }

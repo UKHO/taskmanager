@@ -6,5 +6,6 @@ namespace WorkflowCoordinator.HttpClients
     {
         Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId);
         Task<int> GetDBAssessmentWorkflowId();
+        Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId);
     }
 }
