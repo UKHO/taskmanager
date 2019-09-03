@@ -3,7 +3,7 @@ resources:
     - repository: owaspzapui
       type: github
       endpoint: UKHO
-      name: UKHO/owasp-zap-ui-scan
+      name: UKHO/owasp-zap-scan
       ref: refs/heads/master
 
 jobs:
