@@ -91,9 +91,9 @@ steps:
   displayName: 'Download Build Artifacts'
   inputs:
     buildType: 'current'
-    downloadType: 'single'
+    #downloadType: 'single'
     # BuildVersionToDownload: 'latest'
-    artifactName: 'portal'
+    #artifactName: 'portal'
     downloadPath: '$(System.ArtifactsDirectory)' 
 
 - task: AzureRmWebAppDeployment@4
@@ -101,7 +101,7 @@ steps:
   inputs:
     azureSubscription: 'TM2-Dev'
     WebAppName: 'taskmanager-dev-web-portal'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/Portal/portal/portal'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/Portal/portal'
 
 - task: VSTest@2
   displayName: 'Run automated tests'
