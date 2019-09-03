@@ -87,6 +87,13 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish specs Artifact'
 
+ - task: DownloadBuildArtifacts@0
+   inputs:
+    buildType: 'current'
+    # downloadType: 'single'
+    # artifactName: 'portal'
+    downloadPath: '$(System.ArtifactsDirectory)' 
+
 - task: AzureRmWebAppDeployment@4
   displayName: 'Azure App Service Deploy'
   inputs:
