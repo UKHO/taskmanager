@@ -91,6 +91,7 @@ steps:
    inputs:
     buildType: 'current'
     downloadType: 'specific'
+    BuildVersionToDownload: 'latest'
     # artifactName: 'portal'
     downloadPath: '$(System.ArtifactsDirectory)' 
 
