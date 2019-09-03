@@ -68,5 +68,7 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 |ParentProcessId            |INT            |Yes          |If a sub workflow, the parent workflow that was used to generate the new instance.               |
 |WorkflowType               |NVARCHAR(50)   |Yes          |                                                                                                 |
 |ActivityName               |NVARCHAR(50)   |Yes          |                                                                                                 |
+|StartedAt                  |DATETIME       |No           |                                                                                                 |
+|Status                     |NVARCHAR(25)   |No           |                                                                                                 |
 
 The ProcessId column has a unique constraint, to facilitate the foreign key from the AssessmentData table.

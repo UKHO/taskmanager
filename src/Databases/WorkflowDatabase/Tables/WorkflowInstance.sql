@@ -6,5 +6,7 @@
     [ParentProcessId] INT NULL, 
     [WorkflowType] NVARCHAR(50) NOT NULL, 
     [ActivityName] NVARCHAR(50) NOT NULL,
-	CONSTRAINT [AK_WorkflowInstance_ProcessId] UNIQUE ([ProcessId])
+	[StartedAt] DATETIME NOT NULL, 
+    [Status] NVARCHAR(25) NOT NULL, 
+    CONSTRAINT [AK_WorkflowInstance_ProcessId] UNIQUE ([ProcessId])
 )
