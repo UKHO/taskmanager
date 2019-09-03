@@ -22,7 +22,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
-    <PackageReference Include="SpecFlow" Version="3.1.26-beta" />
+    <PackageReference Include="SpecFlow" Version="3.0.225" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.0.225" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
   </ItemGroup>
@@ -46,16 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Examples\FirstTestExample.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>FirstTestExample.feature.cs</LastGenOutput>
-      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Examples\SecondTestExample.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>SecondTestExample.feature.cs</LastGenOutput>
-      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
-    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="LandingPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
