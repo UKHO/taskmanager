@@ -87,10 +87,8 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish specs Artifact'
 
-  - task: AzureRmWebAppDeployment@4
-
+- task: AzureRmWebAppDeployment@4
   displayName: 'Azure App Service Deploy'
-
   inputs:
 
     azureSubscription: 'TM2-Dev'
