@@ -1,0 +1,12 @@
+resources:
+  repositories:
+    - repository: owaspzapapi
+      type: github
+      endpoint: UKHO
+      name: UKHO/owasp-zap-scan
+      ref: refs/heads/master
+
+jobs:
+- template: owasp-zap-api-scan-template.yml@owaspzapapi
+  parameters:
+    swaggerDefUrl: $(SwaggerDefUrl)
