@@ -89,10 +89,10 @@ steps:
 
  - task: DownloadBuildArtifacts@0
    inputs:
-    buildType: 'current'
-    downloadType: 'specific'
-    BuildVersionToDownload: 'latest'
-    # artifactName: 'portal'
+    # buildType: 'current'
+    # downloadType: 'specific'
+    # BuildVersionToDownload: 'latest'
+    artifactName: 'portal'
     downloadPath: '$(System.ArtifactsDirectory)' 
 
 - task: AzureRmWebAppDeployment@4
