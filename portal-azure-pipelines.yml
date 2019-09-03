@@ -88,6 +88,7 @@ steps:
   displayName: 'Publish specs Artifact'
 
  - task: DownloadBuildArtifacts@0
+   displayName: 'Download Build Artifacts'
    inputs:
     # buildType: 'current'
     # downloadType: 'specific'
