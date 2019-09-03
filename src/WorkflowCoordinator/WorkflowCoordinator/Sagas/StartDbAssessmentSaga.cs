@@ -1,17 +1,21 @@
 ﻿using Common.Helpers;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 using NServiceBus;
 using NServiceBus.Logging;
 
-using System.Threading.Tasks;
+using System;
 
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
+
+using Task = System.Threading.Tasks.Task;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -62,24 +66,13 @@ namespace WorkflowCoordinator.Sagas
 
             if (Data.ProcessId == 0)
             {
-                // "DB Assessment" workflow instance is not yet created
-
-                // DB assessment workflow id is required when creating instance
                 var workflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
-
-                // Create and start new "DB Assessment" Workflow instance
-                // and Save K2-workflow-instance-Id ProcessId to SagaData
                 Data.ProcessId = await _workflowServiceApiClient.CreateWorkflowInstance(workflowId);
             }
 
-            //TODO: Get Serial Number and relevant WorkflowInstance data from K2
             var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(Data.ProcessId);
 
-
-
-            //TODO: Save WorkflowInstance in WorkflowDatabase
-
-
+            await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
 
             // TODO: Fire message to get SDRA data from SDRA-DB and store it in WorkflowDatabase
             log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
@@ -95,9 +88,33 @@ namespace WorkflowCoordinator.Sagas
         public async Task Handle(RetrieveAssessmentDataCommand message, IMessageHandlerContext context)
         {
             // TODO: Get SDRA data from SDRA-DB and store it in WorkflowDatabase; and then mark Saga Complete
+            // Use Saga data to get Sdocid and processId
             log.Debug($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
 
             MarkAsComplete();
+        }
+
+        private async Task UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
+        {
+            var isExist= await _dbContext.WorkflowInstance.AnyAsync(w => w.ProcessId == processId);
+
+            if (!isExist)
+            {
+
+                var workflowInstance = new WorkflowInstance()
+                {
+                    ProcessId = processId,
+                    SerialNumber = serialNumber,
+                    WorkflowType = WorkflowConstants.WorkflowType,
+                    ActivityName = WorkflowConstants.ActivityName,
+                    Status = status.ToString(),
+                    StartedAt = DateTime.Now
+                };
+
+                await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
+                await _dbContext.SaveChangesAsync();
+            }
+
         }
     }
 }
