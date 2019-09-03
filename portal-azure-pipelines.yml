@@ -117,4 +117,4 @@ steps:
   inputs:
     azureSubscription: 'TM2-Dev'
     scriptLocation: 'inlineScript'
-    inlineScript: 'call dotnet test $(Build.SourcesDirectory)\Portal.TestAutomation.Specs.csproj --logger "trx;LogFileName=$(Build.SourcesDirectory)\Portal.TestAutomation.Specs-results.trx"'
+    inlineScript: 'call dotnet test $(Build.SourcesDirectory)\Portal.TestAutomation.Specs.dll --logger "trx;LogFileName=$(Build.SourcesDirectory)\Portal.TestAutomation.Specs-results.trx"'
