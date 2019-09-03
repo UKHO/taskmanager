@@ -101,7 +101,7 @@ steps:
   inputs:
     azureSubscription: 'TM2-Dev'
     WebAppName: 'taskmanager-dev-web-portal'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/Portal/portal'
+    packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
 
 - task: VSTest@2
   displayName: 'Run automated tests'
