@@ -87,9 +87,9 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish specs Artifact'
 
- - task: DownloadBuildArtifacts@0
-   displayName: 'Download Build Artifacts'
-   inputs:
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts'
+  inputs:
     buildType: 'current'
     downloadType: 'single'
     # BuildVersionToDownload: 'latest'
@@ -99,15 +99,12 @@ steps:
 - task: AzureRmWebAppDeployment@4
   displayName: 'Azure App Service Deploy'
   inputs:
-
     azureSubscription: 'TM2-Dev'
     WebAppName: 'taskmanager-dev-web-portal'
     packageForLinux: '$(System.DefaultWorkingDirectory)/Portal/portal/portal'
 
 - task: VSTest@2
-
   displayName: 'Run automated tests'
-
   inputs:
     azureSubscription: 'TM2-Dev'
     testAssemblyVer2: '**\*specs*.dll'
