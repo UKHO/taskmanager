@@ -27,7 +27,7 @@ namespace Portal.TestAutomation.Framework.Driver
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
                 ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName,
-                config.WorkflowDbUITestAcct, secrets.Result.WorkflowDbPassword);
+                config.WorkflowDbUITestAcct, secrets.WorkflowDbPassword);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)
