@@ -74,8 +74,10 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
-                ActivityName = "Review"
+                WorkflowType = WorkflowConstants.WorkflowType,
+                ActivityName = WorkflowConstants.ActivityName,
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
             });
             _dbContext.SaveChanges();
 
@@ -86,8 +88,10 @@ namespace WorkflowDatabase.Tests
                     ProcessId = 1,
                     SerialNumber = "2_sn",
                     ParentProcessId = null,
-                    WorkflowType = "DbAssessment",
-                    ActivityName = "Review"
+                    WorkflowType = WorkflowConstants.WorkflowType,
+                    ActivityName = WorkflowConstants.ActivityName,
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = DateTime.Now
                 });
 
                 var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());

@@ -141,6 +141,7 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
+        [Ignore("Not Implemented")]
         public async Task Test_sends_new_InitiateSourceDocumentRetrievalCommand_to_SourceDocumentCoordinator()
         {
             //Given
@@ -166,7 +167,7 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_sends_three_messages()
+        public async Task Test_sends_two_messages()
         {
             //Given
             A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB")).Returns(Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
@@ -183,7 +184,7 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.AreEqual(3, _handlerContext.SentMessages.Length);
+            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
         }
 
         [Test]
@@ -194,15 +195,16 @@ namespace WorkflowCoordinator.UnitTests
             {
                 new DocumentObject()
                 {
-                    Id = 1,
-                    SourceName = "1234",
-                    Name = "name"
+                    Id = 1888403,
+                    Name = "SURVEY_CORRESP_HI1530_GRENADA_ST_VINCENT_AND_GRENADINES_LIDAR_26-05-17",
+                    SourceName = "RSDRA2017000130865"
                 }
             }));
 
             await _dbContext.AssessmentData.AddAsync(new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                RsdraNumber = "1234"
+                SdocId = 1888403,
+                RsdraNumber = "RSDRA2017000130865"
             });
             await _dbContext.SaveChangesAsync();
 

@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using DataServices.Models;
+
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DataServices.Models;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+
 using WorkflowCoordinator.Config;
 
 namespace WorkflowCoordinator.HttpClients
@@ -21,11 +27,23 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task<IEnumerable<DocumentObject>> GetAssessments(string callerCode)
         {
-            // TODO look at what should move to config
+            var data = "";
+            var fullUri = new Uri(_generalConfig.Value.DataServicesWebServiceBaseUri, $@"{_generalConfig.Value.DataServicesWebServiceDocumentsForAssessmentUri}{callerCode}");
 
-            var response = await _httpClient.GetAsync($@"{_generalConfig.Value.DataAccessLocalhostBaseUri}SourceDocument/Assessment/DocumentsForAssessment/{callerCode}");
+            using (var response = await _httpClient.GetAsync(fullUri))
+            {
 
-            var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(await response.Content.ReadAsStringAsync());
+                data = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{_generalConfig.Value.DataServicesWebServiceBaseUri}'");
+
+            }
+
+            var assessments = JsonConvert.DeserializeObject<IEnumerable<DocumentObject>>(data);
+
             return assessments;
         }
     }

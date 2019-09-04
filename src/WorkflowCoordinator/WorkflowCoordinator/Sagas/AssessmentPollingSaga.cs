@@ -1,14 +1,21 @@
-﻿using System;
-using System.Threading.Tasks;
-using Common.Messages.Commands;
+﻿using DataServices.Models;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+
 using NServiceBus;
 using NServiceBus.Logging;
+
+using System;
+using System.Threading.Tasks;
+
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
+
 using WorkflowDatabase.EF;
+
+using Task = System.Threading.Tasks.Task;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -54,37 +61,51 @@ namespace WorkflowCoordinator.Sagas
         {
             log.Debug($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
 
-            var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
+            var assessment = await GetAssessmentNotInWorkflowDatabase();
 
-            foreach (var assessment in assessments)
+            if (assessment != null)
             {
-                var assessmentRecord = await
-                    _dbContext.AssessmentData.SingleOrDefaultAsync(a => a.RsdraNumber == assessment.SourceName);
+                var correlationId = Guid.NewGuid();
 
-                if (assessmentRecord == null)
+                // Start new DB Assessment K2 workflow instance
+                // Then Get SDRA data from SDRA-DB and store it in WorkflowDatabase
+                var startDbAssessmentCommand = new StartDbAssessmentCommand()
                 {
-                    // Put bits to get rest of SDRA data and add row to our Db here when we hit those stories
+                    CorrelationId = correlationId,
+                    SourceDocumentId = assessment.Id
+                };
 
-                    var startDbAssessmentCommand = new StartDbAssessmentCommand()
-                    {
-                        CorrelationId = Guid.NewGuid()
-                    };
+                await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
 
-                    await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
+                // TODO: Fire message to SourceDocumentCoordinator to retrieve the Document
+                //var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
+                //{
+                //    CorrelationId = correlationId,
+                //    SourceDocumentId = assessment.Id
+                //};
 
-                    var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
-                    {
-                        SourceDocumentId = assessment.Id,
-                        CorrelationId = Guid.NewGuid()
-                    };
-
-                    await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
-                }
+                //await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
             }
 
             await RequestTimeout<ExecuteAssessmentPollingTask>(context,
                     TimeSpan.FromSeconds(_generalConfig.Value.WorkflowCoordinatorAssessmentPollingIntervalSeconds))
                 .ConfigureAwait(false);
+        }
+
+        private async Task<DocumentObject> GetAssessmentNotInWorkflowDatabase()
+        {
+            var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
+
+            // Get first Open Assessment that does not exists in WorkflowDatabase
+            foreach (var assessment in assessments)
+            {
+                var isExists = await
+                    _dbContext.AssessmentData.AnyAsync(a => a.SdocId == assessment.Id);
+
+                if (!isExists) return assessment;
+            }
+
+            return null;
         }
     }
 }

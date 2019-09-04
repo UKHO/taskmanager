@@ -3,7 +3,7 @@ using Common.Messages;
 
 namespace WorkflowCoordinator.Messages
 {
-    public class StartDbAssessmentCommand : ICorrelate
+    public class RetrieveAssessmentDataCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }

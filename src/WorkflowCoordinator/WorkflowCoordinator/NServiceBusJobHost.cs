@@ -139,6 +139,10 @@ namespace WorkflowCoordinator
                     destination: _generalConfig.Value.WorkflowCoordinatorName);
 
                 transport.Routing().RouteToEndpoint(
+                    messageType: typeof(RetrieveAssessmentDataCommand),
+                    destination: _generalConfig.Value.WorkflowCoordinatorName);
+
+                transport.Routing().RouteToEndpoint(
                     messageType: typeof(InitiateSourceDocumentRetrievalCommand),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 

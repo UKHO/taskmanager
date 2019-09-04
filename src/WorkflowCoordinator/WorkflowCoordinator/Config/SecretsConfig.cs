@@ -1,4 +1,6 @@
-﻿namespace WorkflowCoordinator.Config
+﻿using NServiceBus;
+
+namespace WorkflowCoordinator.Config
 {
     public class SecretsConfig
     {
