@@ -1,21 +1,16 @@
-using Common.Helpers;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-
-using NServiceBus.Testing;
-
-using NUnit.Framework;
-
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Common.Helpers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using NServiceBus.Testing;
+using NUnit.Framework;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Sagas;
-
 using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.IntegrationTests
@@ -29,12 +24,17 @@ namespace WorkflowCoordinator.IntegrationTests
 
         [SetUp]
         public void Setup()
-        { 
-            var configurationRoot = AzureAppConfigConfigurationRoot.Instance;
-
+        {
             _generalConfig = new GeneralConfig();
-            configurationRoot.GetSection("k2").Bind(_generalConfig);
-            configurationRoot.GetSection("apis").Bind(_generalConfig);
+            var startupSecretsConfig = new StartupSecretsConfig();
+
+            var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
+            appConfigurationConfigRoot.GetSection("k2").Bind(_generalConfig);
+            appConfigurationConfigRoot.GetSection("apis").Bind(_generalConfig);
+            appConfigurationConfigRoot.GetSection("urls").Bind(_generalConfig);
+
+            var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
+            keyVaultConfigRoot.GetSection("K2RestApi").Bind(startupSecretsConfig);
 
 
             IOptionsSnapshot<GeneralConfig> generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(_generalConfig);
@@ -42,7 +42,16 @@ namespace WorkflowCoordinator.IntegrationTests
             _handlerContext = new TestableMessageHandlerContext();
 
             var dataServiceApiClient = new DataServiceApiClient(new HttpClient(), generalConfigOptions);
-            var workflowServiceApiClient = new WorkflowServiceApiClient(new HttpClient(), generalConfigOptions);
+            var workflowServiceApiClient = new WorkflowServiceApiClient(
+                new HttpClient(
+                    new HttpClientHandler()
+                    {
+                        ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                        Credentials = new NetworkCredential(startupSecretsConfig.NsbToK2ApiUsername, startupSecretsConfig.NsbToK2ApiPassword)
+                    }
+                ), generalConfigOptions);
+
+            //TODO: Setup dbcontext
 
             _startDbAssessmentSaga = new StartDbAssessmentSaga(generalConfigOptions, dataServiceApiClient, workflowServiceApiClient, _dbContext);
         }
@@ -58,6 +67,10 @@ namespace WorkflowCoordinator.IntegrationTests
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sourceDocumentId
+            };
+            _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData()
+            {
+
             };
 
             //When
