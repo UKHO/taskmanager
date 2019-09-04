@@ -17,6 +17,10 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.1" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

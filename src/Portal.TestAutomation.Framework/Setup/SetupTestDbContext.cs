@@ -1,8 +1,7 @@
 ﻿using BoDi;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Portal.TestAutomation.Framework.Configuration;
+using Portal.TestAutomation.Framework.Setup;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
 
@@ -21,14 +20,14 @@ namespace Portal.TestAutomation.Framework.Driver
         [BeforeScenario(Order = 1)]
         public void InitializeDbContext()
         {
-            var config = new DbConfig();
+            var config = SetupConfig.GetAndBindDbConfig();
 
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("databases").Bind(config);
-            configRoot.GetSection("urls").Bind(config);
+            // Populate SecretsConfig using the setup class
+            var secrets = SetupConfig.GetAndBindSecretsConfig();
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
-                ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName);
+                ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName,
+                config.WorkflowDbUITestAcct, secrets.WorkflowDbPassword);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)

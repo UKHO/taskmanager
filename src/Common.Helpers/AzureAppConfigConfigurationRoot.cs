@@ -12,14 +12,16 @@ namespace Common.Helpers
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new ConfigurationBuilder()
-                        .AddAzureAppConfiguration(Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING")).Build();
-                }
+                if (_instance != null) return _instance;
+
+                var appConfigConnection = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+                if (string.IsNullOrEmpty(appConfigConnection)) throw new ApplicationException("Missing environment variable: AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+
+                _instance = new ConfigurationBuilder().AddAzureAppConfiguration(appConfigConnection).Build();
 
                 return _instance;
             }
         }
     }
+
 }

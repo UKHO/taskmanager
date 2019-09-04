@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Common.Helpers;
 using SourceDocumentCoordinator.Config;
 
 namespace SourceDocumentCoordinator
@@ -25,10 +26,7 @@ namespace SourceDocumentCoordinator
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
-
-                var tokenProvider = new AzureServiceTokenProvider();
-                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
+                var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
 
                 config.SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

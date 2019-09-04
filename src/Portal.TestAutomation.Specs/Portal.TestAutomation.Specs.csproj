@@ -46,16 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Examples\FirstTestExample.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>FirstTestExample.feature.cs</LastGenOutput>
-      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Examples\SecondTestExample.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>SecondTestExample.feature.cs</LastGenOutput>
-      <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
-    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="LandingPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
