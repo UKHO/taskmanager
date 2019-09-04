@@ -1,8 +1,6 @@
 ﻿using BoDi;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Portal.TestAutomation.Framework.Configuration;
 using Portal.TestAutomation.Framework.Setup;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
@@ -24,11 +22,8 @@ namespace Portal.TestAutomation.Framework.Driver
         {
             var config = SetupConfig.GetAndBindDbConfig();
 
-            // Get a ready-to-use Key Vault client
-            var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
-
             // Populate SecretsConfig using the setup class
-            var secrets = SetupConfig.GetAndBindSecretsConfig(keyVaultAddress, keyVaultClient);
+            var secrets = SetupConfig.GetAndBindSecretsConfig();
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
                 ConfigHelpers.IsAzureDevOpsBuild ? config.WorkflowDbServer : config.LocalDbServer, config.WorkflowDbName,

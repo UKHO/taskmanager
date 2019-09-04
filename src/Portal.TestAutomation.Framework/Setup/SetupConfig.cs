@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Helpers;
-using Microsoft.Azure.KeyVault;
+﻿using Common.Helpers;
 using Microsoft.Extensions.Configuration;
 using Portal.TestAutomation.Framework.Configuration;
 
@@ -22,13 +17,13 @@ namespace Portal.TestAutomation.Framework.Setup
             return config;
         }
 
-        public static async Task<SecretsConfig> GetAndBindSecretsConfig(string address, KeyVaultClient kvClient)
+        public static SecretsConfig GetAndBindSecretsConfig()
         {
             var config = new SecretsConfig();
 
-            // Get the sql acct pwd from Key Vault
-            var pwd = await kvClient.GetSecretAsync(address + "secrets/WorkflowDbSection--SqlAcctPwd").ConfigureAwait(false);
-            config.WorkflowDbPassword = pwd.Value;
+            var configRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
+            configRoot.GetSection("WorkflowDbSection").Bind(config);
+
             return config;
         }
     }
