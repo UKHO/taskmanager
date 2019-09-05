@@ -1,19 +1,27 @@
+using Common.Helpers;
+
+using FakeItEasy;
+
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+
+using NServiceBus.Testing;
+
+using NUnit.Framework;
+
 using System;
 using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using NServiceBus.Testing;
-using NUnit.Framework;
+
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Sagas;
+
 using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.IntegrationTests
@@ -22,35 +30,93 @@ namespace WorkflowCoordinator.IntegrationTests
     {
         private StartDbAssessmentSaga _startDbAssessmentSaga;
         private TestableMessageHandlerContext _handlerContext;
-        private WorkflowDbContext _dbContext;
-        private GeneralConfig _generalConfig;
+        private IDataServiceApiClient _fakeDataServiceApiClient;
+        private int _processId;
+        private int _sdocId;
 
         [SetUp]
         public void Setup()
         {
-            _generalConfig = new GeneralConfig();
-            var startupConfig = new StartupConfig();
-            var startupSecretsConfig = new StartupSecretsConfig();
-
-            var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
-            appConfigurationConfigRoot.GetSection("k2").Bind(_generalConfig);
-            appConfigurationConfigRoot.GetSection("apis").Bind(_generalConfig);
-            appConfigurationConfigRoot.GetSection("urls").Bind(_generalConfig);
-
-            appConfigurationConfigRoot.GetSection("databases").Bind(startupConfig);
-            appConfigurationConfigRoot.GetSection("nsb").Bind(startupConfig);
-            appConfigurationConfigRoot.GetSection("urls").Bind(startupConfig);
-
-            var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
-            keyVaultConfigRoot.GetSection("K2RestApi").Bind(startupSecretsConfig);
-
-
-            IOptionsSnapshot<GeneralConfig> generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(_generalConfig);
-
+            _processId = 0;
+            _sdocId = 0;
             _handlerContext = new TestableMessageHandlerContext();
 
-            var dataServiceApiClient = new DataServiceApiClient(new HttpClient(), generalConfigOptions);
-            var workflowServiceApiClient = new WorkflowServiceApiClient(
+            var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
+            var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
+
+            var generalConfig = GetGeneralConfigs(appConfigurationConfigRoot);
+            var startupConfig = GetStartupConfigs(appConfigurationConfigRoot);
+            var startupSecretsConfig = GetSecretsConfigs(keyVaultConfigRoot);
+            
+            IOptionsSnapshot<GeneralConfig> generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
+
+            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+
+            var workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions);
+
+            var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+            var connection = SetupWorkflowDatabaseConnection(workflowDbConnectionString, isLocalDebugging, startupConfig);
+
+            var dbContext = WorkflowDbContext(connection);
+            _startDbAssessmentSaga = new StartDbAssessmentSaga(generalConfigOptions, _fakeDataServiceApiClient, workflowServiceApiClient, dbContext);
+        }
+
+        [Test]
+        public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
+        {
+            // Given
+            _sdocId = RandomiseSdcoId();
+            var correlationId = Guid.NewGuid();
+            var startDbAssessmentCommand = new StartDbAssessmentCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = _sdocId
+            };
+            _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData();
+
+            //When
+            await _startDbAssessmentSaga.Handle(startDbAssessmentCommand, _handlerContext);
+            _processId = _startDbAssessmentSaga.Data.ProcessId;
+
+            //Then
+            Assert.AreEqual(correlationId, _startDbAssessmentSaga.Data.CorrelationId);
+            Assert.AreEqual(_sdocId, _startDbAssessmentSaga.Data.SourceDocumentId);
+            Assert.AreEqual(_processId, _startDbAssessmentSaga.Data.ProcessId);
+        }
+
+        private int RandomiseSdcoId()
+        {
+            var sdocIdRandomiser = new Random(DateTime.Now.Millisecond);
+            return sdocIdRandomiser.Next(1000, Int32.MaxValue);
+        }
+
+        private WorkflowDbContext WorkflowDbContext(SqlConnection connection)
+        {
+            var dbContextOptionsBuilder = new DbContextOptionsBuilder<WorkflowDbContext>();
+
+            dbContextOptionsBuilder.UseSqlServer(connection);
+            var dbContext = new WorkflowDbContext(dbContextOptionsBuilder.Options);
+
+            return dbContext;
+        }
+
+        private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)
+        {
+            return new SqlConnection(workflowDbConnectionString)
+            {
+                AccessToken = isLocalDebugging ?
+                    null :
+                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+            };
+        }
+
+        private WorkflowServiceApiClient SetupWorkflowServiceApiClient(StartupSecretsConfig startupSecretsConfig, IOptions<GeneralConfig> generalConfigOptions)
+        {
+            return new WorkflowServiceApiClient(
                 new HttpClient(
                     new HttpClientHandler()
                     {
@@ -58,45 +124,38 @@ namespace WorkflowCoordinator.IntegrationTests
                         Credentials = new NetworkCredential(startupSecretsConfig.NsbToK2ApiUsername, startupSecretsConfig.NsbToK2ApiPassword)
                     }
                 ), generalConfigOptions);
-
-            var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
-
-            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
-                isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
-
-            var connection = new SqlConnection(workflowDbConnectionString)
-            {
-                AccessToken = isLocalDebugging ?
-                    null :
-                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-            };
-
-            var dbContextOptionsBuilder = new DbContextOptionsBuilder<WorkflowDbContext>();
-            dbContextOptionsBuilder.UseSqlServer(connection);
-            _dbContext = new WorkflowDbContext(dbContextOptionsBuilder.Options);
-            _startDbAssessmentSaga = new StartDbAssessmentSaga(generalConfigOptions, dataServiceApiClient, workflowServiceApiClient, _dbContext);
         }
 
-        [Test]
-        public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
+        private StartupSecretsConfig GetSecretsConfigs(IConfigurationRoot keyVaultConfigRoot)
         {
-            // Given
+            var startupSecretsConfig = new StartupSecretsConfig();
 
-            var correlationId = Guid.NewGuid();
-            var sourceDocumentId = 12345678;
-            var startDbAssessmentCommand = new StartDbAssessmentCommand
-            {
-                CorrelationId = correlationId,
-                SourceDocumentId = sourceDocumentId
-            };
-            _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData();
+            keyVaultConfigRoot.GetSection("K2RestApi").Bind(startupSecretsConfig);
 
-            //When
-            await _startDbAssessmentSaga.Handle(startDbAssessmentCommand, _handlerContext);
+            return startupSecretsConfig;
+        }
 
-            //Then
-            Assert.AreEqual(correlationId, _startDbAssessmentSaga.Data.CorrelationId);
-            Assert.AreEqual(sourceDocumentId, _startDbAssessmentSaga.Data.SourceDocumentId);
+        private GeneralConfig GetGeneralConfigs(IConfigurationRoot appConfigurationConfigRoot)
+        {
+            var generalConfig = new GeneralConfig();
+
+            appConfigurationConfigRoot.GetSection("k2").Bind(generalConfig);
+            appConfigurationConfigRoot.GetSection("apis").Bind(generalConfig);
+            appConfigurationConfigRoot.GetSection("urls").Bind(generalConfig);
+
+            return generalConfig;
+
+        }
+
+        private StartupConfig GetStartupConfigs(IConfigurationRoot appConfigurationConfigRoot)
+        {
+            var startupConfig = new StartupConfig();
+
+            appConfigurationConfigRoot.GetSection("databases").Bind(startupConfig);
+            appConfigurationConfigRoot.GetSection("nsb").Bind(startupConfig);
+            appConfigurationConfigRoot.GetSection("urls").Bind(startupConfig);
+
+            return startupConfig;
         }
     }
 }
