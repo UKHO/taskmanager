@@ -1,8 +1,11 @@
 using System;
+using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NServiceBus.Testing;
@@ -26,12 +29,17 @@ namespace WorkflowCoordinator.IntegrationTests
         public void Setup()
         {
             _generalConfig = new GeneralConfig();
+            var startupConfig = new StartupConfig();
             var startupSecretsConfig = new StartupSecretsConfig();
 
             var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
             appConfigurationConfigRoot.GetSection("k2").Bind(_generalConfig);
             appConfigurationConfigRoot.GetSection("apis").Bind(_generalConfig);
             appConfigurationConfigRoot.GetSection("urls").Bind(_generalConfig);
+
+            appConfigurationConfigRoot.GetSection("databases").Bind(startupConfig);
+            appConfigurationConfigRoot.GetSection("nsb").Bind(startupConfig);
+            appConfigurationConfigRoot.GetSection("urls").Bind(startupConfig);
 
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
             keyVaultConfigRoot.GetSection("K2RestApi").Bind(startupSecretsConfig);
@@ -51,13 +59,26 @@ namespace WorkflowCoordinator.IntegrationTests
                     }
                 ), generalConfigOptions);
 
-            //TODO: Setup dbcontext
+            var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+            var connection = new SqlConnection(workflowDbConnectionString)
+            {
+                AccessToken = isLocalDebugging ?
+                    null :
+                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+            };
+
+            var dbContextOptionsBuilder = new DbContextOptionsBuilder<WorkflowDbContext>();
+            dbContextOptionsBuilder.UseSqlServer(connection);
+            _dbContext = new WorkflowDbContext(dbContextOptionsBuilder.Options);
             _startDbAssessmentSaga = new StartDbAssessmentSaga(generalConfigOptions, dataServiceApiClient, workflowServiceApiClient, _dbContext);
         }
 
         [Test]
-        public async Task Test1()
+        public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
         {
             // Given
 
@@ -68,10 +89,7 @@ namespace WorkflowCoordinator.IntegrationTests
                 CorrelationId = correlationId,
                 SourceDocumentId = sourceDocumentId
             };
-            _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData()
-            {
-
-            };
+            _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData();
 
             //When
             await _startDbAssessmentSaga.Handle(startDbAssessmentCommand, _handlerContext);
