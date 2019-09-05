@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.Logging;
 using System;
+using System.Linq;
 using AutoMapper;
 using DataServices.Models;
 using WorkflowCoordinator.Config;
@@ -79,7 +80,7 @@ namespace WorkflowCoordinator.Sagas
                 CorrelationId = Data.CorrelationId,
                 ProcessId = Data.ProcessId,
                 SourceDocumentId = Data.SourceDocumentId,
-                WorkflowInstanceId = workflowInstanceId
+                WorkflowInstanceId = workflowInstanceId.Value
             });
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
@@ -104,6 +105,7 @@ namespace WorkflowCoordinator.Sagas
 
             mappedAssessmentData.ProcessId = message.ProcessId;
             mappedComments.WorkflowInstanceId = message.WorkflowInstanceId;
+            mappedComments.ProcessId = message.ProcessId;
 
             _dbContext.AssessmentData.Add(mappedAssessmentData);
             _dbContext.Comment.Add(mappedComments);
@@ -113,27 +115,26 @@ namespace WorkflowCoordinator.Sagas
             MarkAsComplete();
         }
 
-        private async Task<int> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
+        private async Task<int?> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
         {
-            var newId = 0;
-            var isExist = await _dbContext.WorkflowInstance.AnyAsync(w => w.ProcessId == processId);
+            var existingInstance = await _dbContext.WorkflowInstance.FirstOrDefaultAsync(w => w.ProcessId == processId);
 
-            if (!isExist)
+            if (existingInstance != null) return existingInstance.WorkflowInstanceId;
+
+            var workflowInstance = new WorkflowInstance()
             {
-                var workflowInstance = new WorkflowInstance()
-                {
-                    ProcessId = processId,
-                    SerialNumber = serialNumber,
-                    WorkflowType = WorkflowConstants.WorkflowType,
-                    ActivityName = WorkflowConstants.ActivityName,
-                    Status = status.ToString(),
-                    StartedAt = DateTime.Now
-                };
+                ProcessId = processId,
+                SerialNumber = serialNumber,
+                WorkflowType = WorkflowConstants.WorkflowType,
+                ActivityName = WorkflowConstants.ActivityName,
+                Status = status.ToString(),
+                StartedAt = DateTime.Now
+            };
 
-                await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
-                await _dbContext.SaveChangesAsync();
-                newId = workflowInstance.WorkflowInstanceId;
-            }
+            await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            var newId = workflowInstance.WorkflowInstanceId;
             return newId;
         }
     }

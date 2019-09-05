@@ -56,7 +56,7 @@ namespace WorkflowCoordinator.HttpClients
         public async Task<int> GetDBAssessmentWorkflowId()
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetWorkflowsUri);
-            var data = "";
+            string data;
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {
@@ -70,15 +70,15 @@ namespace WorkflowCoordinator.HttpClients
             }
 
             var workflows = JsonConvert.DeserializeObject<K2Workflows>(data);
-            var dbAssesmentWorkflow = workflows.Workflows.FirstOrDefault(w => w.Name.Equals(_generalConfig.Value.K2DBAssessmentWorkflowName, StringComparison.OrdinalIgnoreCase));
-            return dbAssesmentWorkflow?.Id ?? 0;
+            var dbAssesmentWorkflow = workflows.Workflows.First(w => w.Name.Equals(_generalConfig.Value.K2DBAssessmentWorkflowName, StringComparison.OrdinalIgnoreCase));
+            return dbAssesmentWorkflow.Id;
 
         }
 
         public async Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId)
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri);
-            var data = "";
+            string data;
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {
@@ -92,7 +92,7 @@ namespace WorkflowCoordinator.HttpClients
             }
 
             var tasks = JsonConvert.DeserializeObject<K2Tasks>(data);
-            var task = tasks.Tasks.FirstOrDefault(w => w.WorkflowInstanceID == workflowInstanceId);
+            var task = tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
 
             return task.SerialNumber;
         }
