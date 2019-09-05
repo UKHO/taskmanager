@@ -20,10 +20,10 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using AutoMapper;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
-
+using WorkflowCoordinator.MappingProfiles;
 using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator
@@ -58,77 +58,83 @@ namespace WorkflowCoordinator
                 b.SetMinimumLevel(LogLevel.Debug);
             })
             .ConfigureServices((hostingContext, services) =>
-           {
-               var isLocalDebugging = hostingContext.HostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+            {
+                var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
-               var startupConfig = new StartupConfig();
-               hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
-               hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
-               hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
+                var startupConfig = new StartupConfig();
+                hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
 
-               var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
-               services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+                var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
+                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
 
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"))
                     .Bind(hostingContext.Configuration.GetSection("apis"))
-                    .Bind(hostingContext.Configuration.GetSection("urls"))
                     .Bind(hostingContext.Configuration.GetSection("databases"))
                     .Bind(hostingContext.Configuration.GetSection("k2"));
 
-               var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
-                   isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+                services.AddOptions<UriConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("urls"));
 
-               var connection = new SqlConnection(workflowDbConnectionString)
-               {
-                   AccessToken = isLocalDebugging ?
-                       null :
-                       new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-               };
-               services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                   options.UseSqlServer(connection));
+                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
-               if (isLocalDebugging)
-               {
-                   using (var sp = services.BuildServiceProvider())
-                   using (var context = sp.GetRequiredService<WorkflowDbContext>())
-                   {
-                       TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                   }
-               }
+                var connection = new SqlConnection(workflowDbConnectionString)
+                {
+                    AccessToken = isLocalDebugging ?
+                        null :
+                        new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+                };
+                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                    options.UseSqlServer(connection));
 
-               services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
-                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                if (isLocalDebugging)
+                {
+                    using (var sp = services.BuildServiceProvider())
+                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                    {
+                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    }
+                }
 
-               services.AddOptions<SecretsConfig>()
-                   .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+                services.AddOptions<SecretsConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-               var startupSecretConfig = new StartupSecretsConfig();
-               hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+                // Auto mapper config
+                var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new AssessmentDataMappingProfile()); });
+                var mapper = mappingConfig.CreateMapper();
+                services.AddSingleton(mapper);
 
-               services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
-                   .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                   .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                   {
-                       ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                       Credentials = new NetworkCredential(startupSecretConfig.NsbToK2ApiUsername, startupSecretConfig.NsbToK2ApiPassword)
+                var startupSecretConfig = new StartupSecretsConfig();
+                hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+
+                services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                    {
+                        ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                        Credentials = new NetworkCredential(startupSecretConfig.NsbToK2ApiUsername, startupSecretConfig.NsbToK2ApiPassword)
                     });
 
-               UpdateableServiceProvider container = null;
+                UpdateableServiceProvider container = null;
 
-               endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
-               {
-                   customizations.ExistingServices(services);
-                   customizations.ServiceProviderFactory(sc =>
-                   {
-                       container = new UpdateableServiceProvider(sc);
-                       return container;
-                   });
-               });
+                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+                {
+                    customizations.ExistingServices(services);
+                    customizations.ServiceProviderFactory(sc =>
+                    {
+                        container = new UpdateableServiceProvider(sc);
+                        return container;
+                    });
+                });
 
-               services.AddScoped<IJobHost, NServiceBusJobHost>();
-           })
+                services.AddScoped<IJobHost, NServiceBusJobHost>();
+            })
             .UseConsoleLifetime();
 
             var host = builder.Build();

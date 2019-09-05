@@ -17,17 +17,19 @@ namespace WorkflowCoordinator.HttpClients
     public class WorkflowServiceApiClient : IWorkflowServiceApiClient
     {
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IOptions<UriConfig> _uriConfig;
         private readonly HttpClient _httpClient;
 
-        public WorkflowServiceApiClient(HttpClient httpClient, IOptions<GeneralConfig> generalConfig)
+        public WorkflowServiceApiClient(HttpClient httpClient, IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig)
         {
             _generalConfig = generalConfig;
+            _uriConfig = uriConfig;
             _httpClient = httpClient;
         }
 
         public async Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId)
         {
-            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceStartWorkflowInstanceUri + $"/{dbAssessmentWorkflowId}");
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceStartWorkflowInstanceUri + $"/{dbAssessmentWorkflowId}");
             var data = "";
 
             using (var response = await _httpClient.PostAsync(fullUri, null))
@@ -37,15 +39,14 @@ namespace WorkflowCoordinator.HttpClients
                 if (response.StatusCode != HttpStatusCode.OK)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
-                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
-
+                                                   $"\n Url='{fullUri}'");
             }
 
             if (!int.TryParse(data, out var workflowInstanceId))
             {
                 throw new ApplicationException($"Failed to get WorkflowInstanceId" +
                                                $"\nData= '{data}'," +
-                                               $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+                                               $"\n Url='{fullUri}'");
 
             }
 
@@ -54,7 +55,7 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task<int> GetDBAssessmentWorkflowId()
         {
-            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetWorkflowsUri);
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetWorkflowsUri);
             var data = "";
 
             using (var response = await _httpClient.GetAsync(fullUri))
@@ -64,7 +65,7 @@ namespace WorkflowCoordinator.HttpClients
                 if (response.StatusCode != HttpStatusCode.OK)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
-                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+                                                   $"\n Url='{fullUri}'");
 
             }
 
@@ -76,7 +77,7 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId)
         {
-            var fullUri = new Uri(_generalConfig.Value.K2WebServiceBaseUri, _generalConfig.Value.K2WebServiceGetTasksUri);
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri);
             var data = "";
 
             using (var response = await _httpClient.GetAsync(fullUri))
@@ -86,7 +87,7 @@ namespace WorkflowCoordinator.HttpClients
                 if (response.StatusCode != HttpStatusCode.OK)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
-                                                   $"\n Url='{_generalConfig.Value.K2WebServiceBaseUri}'");
+                                                   $"\n Url='{fullUri}'");
 
             }
 
