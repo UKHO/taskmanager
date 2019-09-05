@@ -69,7 +69,7 @@ namespace WorkflowCoordinator.IntegrationTests
         public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
         {
             // Given
-            _sdocId = RandomiseSdcoId();
+            _sdocId = 1111; // RandomiseSdcoId();
             var correlationId = Guid.NewGuid();
             var startDbAssessmentCommand = new StartDbAssessmentCommand
             {
@@ -86,6 +86,13 @@ namespace WorkflowCoordinator.IntegrationTests
             Assert.AreEqual(correlationId, _startDbAssessmentSaga.Data.CorrelationId);
             Assert.AreEqual(_sdocId, _startDbAssessmentSaga.Data.SourceDocumentId);
             Assert.AreEqual(_processId, _startDbAssessmentSaga.Data.ProcessId);
+        }
+
+        [TearDown]
+        public void CleanupTests()
+        {
+            //TODO: Remove K2 workflow instance using _processId
+            //TODO: Remove WorkflowInstance record from WorkflowInstance table using _processId
         }
 
         private int RandomiseSdcoId()
