@@ -26,7 +26,7 @@ namespace DataServices.Models
         /// </summary>
         [Required]
         [DataMember(Name="sdocId")]
-        public SdocId SdocId { get; set; }
+        public int SdocId { get; set; }
 
         /// <summary>
         /// SOURCE_DOCUMENT_NAME

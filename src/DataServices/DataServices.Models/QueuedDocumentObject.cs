@@ -25,7 +25,7 @@ namespace DataServices.Models
         /// Gets or Sets SodcId
         /// </summary>
         [DataMember(Name="sodcId")]
-        public SdocId SodcId { get; set; }
+        public int SodcId { get; set; }
 
         /// <summary>
         /// The &#x27;error&#x27; code number returned by SDRA webservice

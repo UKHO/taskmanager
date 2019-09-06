@@ -1,21 +1,19 @@
 ﻿using Common.Helpers;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-
 using NServiceBus;
 using NServiceBus.Logging;
-
 using System;
-
+using System.Linq;
+using AutoMapper;
+using DataServices.Models;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
-
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
-
 using Task = System.Threading.Tasks.Task;
+using System.Threading.Tasks;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -27,18 +25,20 @@ namespace WorkflowCoordinator.Sagas
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         ILog log = LogManager.GetLogger<StartDbAssessmentSaga>();
 
         public StartDbAssessmentSaga(IOptionsSnapshot<GeneralConfig> generalConfig,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            WorkflowDbContext dbContext)
+            WorkflowDbContext dbContext, IMapper mapper)
         {
             _generalConfig = generalConfig;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<StartDbAssessmentSagaData> mapper)
@@ -72,49 +72,70 @@ namespace WorkflowCoordinator.Sagas
 
             var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(Data.ProcessId);
 
-            await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
+            var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
 
-            // TODO: Fire message to get SDRA data from SDRA-DB and store it in WorkflowDatabase
             log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.Send(new RetrieveAssessmentDataCommand
             {
                 CorrelationId = Data.CorrelationId,
-                SourceDocumentId = Data.SourceDocumentId
+                ProcessId = Data.ProcessId,
+                SourceDocumentId = Data.SourceDocumentId,
+                WorkflowInstanceId = workflowInstanceId.Value
             });
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
         }
 
+        /// <summary>
+        /// Get assessment data from SDRA and store it in the AssessmentData table and then mark Saga Complete
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Handle(RetrieveAssessmentDataCommand message, IMessageHandlerContext context)
         {
-            // TODO: Get SDRA data from SDRA-DB and store it in WorkflowDatabase; and then mark Saga Complete
-            // Use Saga data to get Sdocid and processId
             log.Debug($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
+
+            // Call DataServices to get the assessment data for the given sdoc Id
+            var assessmentData = await _dataServiceApiClient.GetAssessmentData(_generalConfig.Value.CallerCode, message.SourceDocumentId);
+
+            // Add assessment data and any comments to DB, after auto mapping it
+            var mappedAssessmentData = _mapper.Map<DocumentAssessmentData, AssessmentData>(assessmentData);
+            var mappedComments = _mapper.Map<DocumentAssessmentData, Comments>(assessmentData);
+
+            mappedAssessmentData.ProcessId = message.ProcessId;
+            mappedComments.WorkflowInstanceId = message.WorkflowInstanceId;
+            mappedComments.ProcessId = message.ProcessId;
+
+            _dbContext.AssessmentData.Add(mappedAssessmentData);
+            _dbContext.Comment.Add(mappedComments);
+
+            await _dbContext.SaveChangesAsync();
 
             MarkAsComplete();
         }
 
-        private async Task UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
+        private async Task<int?> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
         {
-            var isExist= await _dbContext.WorkflowInstance.AnyAsync(w => w.ProcessId == processId);
+            var existingInstance = await _dbContext.WorkflowInstance.FirstOrDefaultAsync(w => w.ProcessId == processId);
 
-            if (!isExist)
+            if (existingInstance != null) return existingInstance.WorkflowInstanceId;
+
+            var workflowInstance = new WorkflowInstance()
             {
+                ProcessId = processId,
+                SerialNumber = serialNumber,
+                WorkflowType = WorkflowConstants.WorkflowType,
+                ActivityName = WorkflowConstants.ActivityName,
+                Status = status.ToString(),
+                StartedAt = DateTime.Now
+            };
 
-                var workflowInstance = new WorkflowInstance()
-                {
-                    ProcessId = processId,
-                    SerialNumber = serialNumber,
-                    WorkflowType = WorkflowConstants.WorkflowType,
-                    ActivityName = WorkflowConstants.ActivityName,
-                    Status = status.ToString(),
-                    StartedAt = DateTime.Now
-                };
+            await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
+            await _dbContext.SaveChangesAsync();
 
-                await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
-                await _dbContext.SaveChangesAsync();
-            }
-
+            var newId = workflowInstance.WorkflowInstanceId;
+            return newId;
         }
     }
 }

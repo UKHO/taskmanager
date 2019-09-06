@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ namespace WorkflowCoordinator.UnitTests
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
+        private IMapper _mapper;
 
         [SetUp]
         public void Setup()
@@ -40,9 +42,11 @@ namespace WorkflowCoordinator.UnitTests
             _saga = new StartDbAssessmentSaga(generalConfigOptionsSnapshot,
                 _fakeDataServiceApiClient,
                 _fakeWorkflowServiceApiClient,
-                _dbContext)
+                _dbContext,
+                _mapper)
             { Data = new StartDbAssessmentSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
+            _mapper = A.Fake<IMapper>();
         }
 
         [Test]

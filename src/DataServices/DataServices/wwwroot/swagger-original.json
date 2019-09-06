@@ -1252,18 +1252,6 @@
           "type" : "string"
         }
       },
-      "sdocId" : {
-        "name" : "sdocId",
-        "in" : "path",
-        "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : "integer",
-          "format" : "int32"
-        }
-      },
       "action" : {
         "name" : "action",
         "in" : "path",

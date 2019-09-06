@@ -177,7 +177,7 @@ namespace DataServices.Controllers
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
-            exampleJson = "{\n  \"datum\" : \"WGS84, Non-WGS84, WGS84 Equivalent, null\",\n  \"sdocId\" : 0,\n  \"notes\" : \"notes\",\n  \"documentNature:\" : \"Textual, Graphical\",\n  \"SDODate\" : \"2000-01-23\",\n  \"documentType\" : \"Source NM, Survey - Correspondence, Survey - Sheet, Notices to Mariners - FG Bulletin\",\n  \"name\" : \"name\",\n  \"receiptDate\" : \"2000-01-23\",\n  \"effectiveStartDate\" : \"2000-01-23\",\n  \"sourceName\" : \"sourceName\",\n  \"team\" : \"HW, PR\"\n}";
+            exampleJson = "{\n  \"datum\" : \"WGS84, Non-WGS84, WGS84 Equivalent, null\",\n  \"sdocId\" : 12345,\n  \"notes\" : \"notes\",\n  \"documentNature:\" : \"Textual, Graphical\",\n  \"SDODate\" : \"2000-01-23\",\n  \"documentType\" : \"Source NM, Survey - Correspondence, Survey - Sheet, Notices to Mariners - FG Bulletin\",\n  \"name\" : \"name\",\n  \"receiptDate\" : \"2000-01-23\",\n  \"effectiveStartDate\" : \"2000-01-23\",\n  \"sourceName\" : \"RSDRA5656090998\",\n  \"team\" : \"HW, PR\"\n}";
             
                         var example = exampleJson != null
                         ? JsonConvert.DeserializeObject<DocumentAssessmentData>(exampleJson)

@@ -23,6 +23,7 @@ namespace WorkflowCoordinator
     {
         private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IOptions<UriConfig> _uriConfig;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointConfiguration _endpointConfig;
         private readonly string _localDbServer;
@@ -38,14 +39,15 @@ namespace WorkflowCoordinator
         public NServiceBusJobHost(IOptionsSnapshot<GeneralConfig> generalConfig,
             IOptionsSnapshot<SecretsConfig> secretsConfig,
             IHostingEnvironment hostingEnvironment,
-            EndpointConfiguration endpointConfig)
+            EndpointConfiguration endpointConfig, IOptions<UriConfig> uriConfig)
         {
             _generalConfig = generalConfig;
             _secretsConfig = secretsConfig;
             _hostingEnvironment = hostingEnvironment;
             _endpointConfig = endpointConfig;
+            _uriConfig = uriConfig;
 
-            _isLocalDebugging = _hostingEnvironment.IsDevelopment() && Debugger.IsAttached;
+            _isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
             _localDbServer = _generalConfig.Value.LocalDbServer;
 
             if (_isLocalDebugging)
@@ -58,7 +60,7 @@ namespace WorkflowCoordinator
                 _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
 
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                var azureDbTokenUrl = _generalConfig.Value.AzureDbTokenUrl;
+                var azureDbTokenUrl = _uriConfig.Value.AzureDbTokenUrl;
                 _azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
             }
         }
