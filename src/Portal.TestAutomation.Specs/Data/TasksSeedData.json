@@ -5,6 +5,8 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Review",
+    "startedAt": "2019-01-01T00:00:00",
+    "status": "Started",
     "comment": [
       {
         "processId": 123,
@@ -42,6 +44,8 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Review",
+    "startedAt": "2019-01-01T00:00:00",
+    "status": "Started",
     "comment": [
       {
         "processId": 321,
