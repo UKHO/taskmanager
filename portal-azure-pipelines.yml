@@ -97,12 +97,12 @@ steps:
     downloadType: 'specific'
     downloadPath: '$(System.ArtifactsDirectory)' 
 
-- task: AzureRmWebAppDeployment@4
-  displayName: 'Azure App Service Deploy'
-  inputs:
-    azureSubscription: 'TM2-Dev'
-    WebAppName: 'taskmanager-dev-web-portal'
-    packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
+# - task: AzureRmWebAppDeployment@4
+#   displayName: 'Azure App Service Deploy'
+#   inputs:
+#     azureSubscription: 'TM2-Dev'
+#     WebAppName: 'taskmanager-dev-web-portal'
+#     packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
 
 - task: AzureCLI@1
   inputs:
