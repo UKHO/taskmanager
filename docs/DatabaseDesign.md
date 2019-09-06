@@ -16,10 +16,10 @@ database assessment workflow for an open assessment.
 |ReceiptDate        |DATETIME       |No           |                                                                                                 |
 |ToSdoDate          |DATETIME       |Yes          |                                                                                                 |
 |EffectiveStartDate |DATETIME       |Yes          |                                                                                                 |
-|TeamDistributedTo  |NVARCHAR(10)   |Yes          |                                                                                                 |
-|SourceDocumentType |NVARCHAR(255)  |Yes          |                                                                                                 |
-|SourceNature       |NVARCHAR(20)   |Yes          |                                                                                                 |
-|Datum              |NVARCHAR(20)   |Yes          |                                                                                                 |
+|TeamDistributedTo  |NVARCHAR(20)   |Yes          |                                                                                                 |
+|SourceDocumentType |NVARCHAR(4000)  |Yes          |                                                                                                 |
+|SourceNature       |NVARCHAR(255)   |Yes          |                                                                                                 |
+|Datum              |NVARCHAR(2000)   |Yes          |                                                                                                 |
 |ProcessId          |INT            |No           |The K2 process instance Id (FK)                                                                  |
 
 The ProcessId column has a unique constraint.
