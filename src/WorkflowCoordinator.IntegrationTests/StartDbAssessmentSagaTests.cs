@@ -1,3 +1,5 @@
+using AutoMapper;
+
 using Common.Helpers;
 
 using FakeItEasy;
@@ -31,6 +33,7 @@ namespace WorkflowCoordinator.IntegrationTests
         private StartDbAssessmentSaga _startDbAssessmentSaga;
         private TestableMessageHandlerContext _handlerContext;
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private IMapper _fakeMapper;
         private int _processId;
         private int _sdocId;
 
@@ -45,14 +48,16 @@ namespace WorkflowCoordinator.IntegrationTests
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
 
             var generalConfig = GetGeneralConfigs(appConfigurationConfigRoot);
+            var uriConfig = GetUriConfigs(appConfigurationConfigRoot);
             var startupConfig = GetStartupConfigs(appConfigurationConfigRoot);
             var startupSecretsConfig = GetSecretsConfigs(keyVaultConfigRoot);
             
             IOptionsSnapshot<GeneralConfig> generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
+            IOptionsSnapshot<UriConfig> uriConfigOptions = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
-            var workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions);
+            var workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
 
             var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
@@ -62,14 +67,21 @@ namespace WorkflowCoordinator.IntegrationTests
             var connection = SetupWorkflowDatabaseConnection(workflowDbConnectionString, isLocalDebugging, startupConfig);
 
             var dbContext = WorkflowDbContext(connection);
-            _startDbAssessmentSaga = new StartDbAssessmentSaga(generalConfigOptions, _fakeDataServiceApiClient, workflowServiceApiClient, dbContext);
+            _fakeMapper = A.Fake<IMapper>();
+
+            _startDbAssessmentSaga = new StartDbAssessmentSaga(
+                                                                generalConfigOptions, 
+                                                                _fakeDataServiceApiClient, 
+                                                                workflowServiceApiClient, 
+                                                                dbContext,
+                                                                _fakeMapper);
         }
 
         [Test]
         public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
         {
             // Given
-            _sdocId = 1111; // RandomiseSdcoId();
+            _sdocId = 1111;
             var correlationId = Guid.NewGuid();
             var startDbAssessmentCommand = new StartDbAssessmentCommand
             {
@@ -85,7 +97,7 @@ namespace WorkflowCoordinator.IntegrationTests
             //Then
             Assert.AreEqual(correlationId, _startDbAssessmentSaga.Data.CorrelationId);
             Assert.AreEqual(_sdocId, _startDbAssessmentSaga.Data.SourceDocumentId);
-            Assert.AreEqual(_processId, _startDbAssessmentSaga.Data.ProcessId);
+            Assert.IsTrue(_processId > 0);
         }
 
         [TearDown]
@@ -93,12 +105,6 @@ namespace WorkflowCoordinator.IntegrationTests
         {
             //TODO: Remove K2 workflow instance using _processId
             //TODO: Remove WorkflowInstance record from WorkflowInstance table using _processId
-        }
-
-        private int RandomiseSdcoId()
-        {
-            var sdocIdRandomiser = new Random(DateTime.Now.Millisecond);
-            return sdocIdRandomiser.Next(1000, Int32.MaxValue);
         }
 
         private WorkflowDbContext WorkflowDbContext(SqlConnection connection)
@@ -121,7 +127,8 @@ namespace WorkflowCoordinator.IntegrationTests
             };
         }
 
-        private WorkflowServiceApiClient SetupWorkflowServiceApiClient(StartupSecretsConfig startupSecretsConfig, IOptions<GeneralConfig> generalConfigOptions)
+        private WorkflowServiceApiClient SetupWorkflowServiceApiClient(StartupSecretsConfig startupSecretsConfig,
+            IOptions<GeneralConfig> generalConfigOptions, IOptions<UriConfig> uriConfig)
         {
             return new WorkflowServiceApiClient(
                 new HttpClient(
@@ -130,7 +137,7 @@ namespace WorkflowCoordinator.IntegrationTests
                         ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
                         Credentials = new NetworkCredential(startupSecretsConfig.NsbToK2ApiUsername, startupSecretsConfig.NsbToK2ApiPassword)
                     }
-                ), generalConfigOptions);
+                ), generalConfigOptions, uriConfig);
         }
 
         private StartupSecretsConfig GetSecretsConfigs(IConfigurationRoot keyVaultConfigRoot)
@@ -148,9 +155,18 @@ namespace WorkflowCoordinator.IntegrationTests
 
             appConfigurationConfigRoot.GetSection("k2").Bind(generalConfig);
             appConfigurationConfigRoot.GetSection("apis").Bind(generalConfig);
-            appConfigurationConfigRoot.GetSection("urls").Bind(generalConfig);
 
             return generalConfig;
+
+        }
+
+        private UriConfig GetUriConfigs(IConfigurationRoot appConfigurationConfigRoot)
+        {
+            var uriConfig = new UriConfig();
+
+            appConfigurationConfigRoot.GetSection("urls").Bind(uriConfig);
+
+            return uriConfig;
 
         }
 
