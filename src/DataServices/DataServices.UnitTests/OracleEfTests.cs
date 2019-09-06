@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace DataServices.UnitTests
 {
-    public class Tests
+    public class OracleEfTests
     {
         [SetUp]
         public void Setup()
@@ -12,6 +12,7 @@ namespace DataServices.UnitTests
         [Test]
         public void Test1()
         {
+
             Assert.Pass();
         }
     }
