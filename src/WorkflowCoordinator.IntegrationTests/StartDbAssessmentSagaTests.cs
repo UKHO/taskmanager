@@ -34,15 +34,14 @@ namespace WorkflowCoordinator.IntegrationTests
         private TestableMessageHandlerContext _handlerContext;
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private WorkflowServiceApiClient _workflowServiceApiClient;
+        private WorkflowDbContext _dbContext;
         private IMapper _fakeMapper;
         private int _processId;
-        private int _sdocId;
 
         [SetUp]
         public void Setup()
         {
             _processId = 0;
-            _sdocId = 0;
             _handlerContext = new TestableMessageHandlerContext();
 
             var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
@@ -67,14 +66,14 @@ namespace WorkflowCoordinator.IntegrationTests
 
             var connection = SetupWorkflowDatabaseConnection(workflowDbConnectionString, isLocalDebugging, startupConfig);
 
-            var dbContext = WorkflowDbContext(connection);
+            _dbContext = WorkflowDbContext(connection);
             _fakeMapper = A.Fake<IMapper>();
 
             _startDbAssessmentSaga = new StartDbAssessmentSaga(
                                                                 generalConfigOptions, 
                                                                 _fakeDataServiceApiClient, 
                                                                 _workflowServiceApiClient, 
-                                                                dbContext,
+                                                                _dbContext,
                                                                 _fakeMapper);
         }
 
@@ -82,12 +81,12 @@ namespace WorkflowCoordinator.IntegrationTests
         public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
         {
             // Given
-            _sdocId = 1111;
+            var sdocId = 1111;
             var correlationId = Guid.NewGuid();
             var startDbAssessmentCommand = new StartDbAssessmentCommand
             {
                 CorrelationId = correlationId,
-                SourceDocumentId = _sdocId
+                SourceDocumentId = sdocId
             };
             _startDbAssessmentSaga.Data = new StartDbAssessmentSagaData();
 
@@ -97,7 +96,7 @@ namespace WorkflowCoordinator.IntegrationTests
 
             //Then
             Assert.AreEqual(correlationId, _startDbAssessmentSaga.Data.CorrelationId);
-            Assert.AreEqual(_sdocId, _startDbAssessmentSaga.Data.SourceDocumentId);
+            Assert.AreEqual(sdocId, _startDbAssessmentSaga.Data.SourceDocumentId);
             Assert.IsTrue(_processId > 0);
         }
 
@@ -106,12 +105,25 @@ namespace WorkflowCoordinator.IntegrationTests
         {
             if (_processId > 0)
             {
-                var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(_processId);
-                await _workflowServiceApiClient.TerminateWorkflowInstance(serialNumber);
-
-
-                //TODO: Remove WorkflowInstance record from WorkflowInstance table using _processId
+                await TerminateWorkflowInstance();
+                await CleanWorkflowInstanceTable();
             }
+        }
+
+        private async Task CleanWorkflowInstanceTable()
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance.FirstOrDefaultAsync(w => w.ProcessId == _processId);
+            if (workflowInstance != null)
+            {
+                _dbContext.WorkflowInstance.Remove(workflowInstance);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task TerminateWorkflowInstance()
+        {
+            var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(_processId);
+            await _workflowServiceApiClient.TerminateWorkflowInstance(serialNumber);
         }
 
         private WorkflowDbContext WorkflowDbContext(SqlConnection connection)
