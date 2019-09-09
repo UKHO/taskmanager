@@ -36,7 +36,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
@@ -62,7 +62,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
@@ -84,7 +84,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
