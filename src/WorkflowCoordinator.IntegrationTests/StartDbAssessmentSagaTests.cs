@@ -135,7 +135,7 @@ namespace WorkflowCoordinator.IntegrationTests
                     new HttpClientHandler()
                     {
                         ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                        Credentials = new NetworkCredential(startupSecretsConfig.NsbToK2ApiUsername, startupSecretsConfig.NsbToK2ApiPassword)
+                        Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername, startupSecretsConfig.K2RestApiPassword)
                     }
                 ), generalConfigOptions, uriConfig);
         }
