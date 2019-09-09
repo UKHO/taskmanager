@@ -33,6 +33,7 @@ namespace WorkflowCoordinator.IntegrationTests
         private StartDbAssessmentSaga _startDbAssessmentSaga;
         private TestableMessageHandlerContext _handlerContext;
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private WorkflowServiceApiClient _workflowServiceApiClient;
         private IMapper _fakeMapper;
         private int _processId;
         private int _sdocId;
@@ -57,7 +58,7 @@ namespace WorkflowCoordinator.IntegrationTests
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
-            var workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
+            _workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
 
             var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
@@ -72,7 +73,7 @@ namespace WorkflowCoordinator.IntegrationTests
             _startDbAssessmentSaga = new StartDbAssessmentSaga(
                                                                 generalConfigOptions, 
                                                                 _fakeDataServiceApiClient, 
-                                                                workflowServiceApiClient, 
+                                                                _workflowServiceApiClient, 
                                                                 dbContext,
                                                                 _fakeMapper);
         }
@@ -101,10 +102,16 @@ namespace WorkflowCoordinator.IntegrationTests
         }
 
         [TearDown]
-        public void CleanupTests()
+        public async Task CleanupTests()
         {
-            //TODO: Remove K2 workflow instance using _processId
-            //TODO: Remove WorkflowInstance record from WorkflowInstance table using _processId
+            if (_processId > 0)
+            {
+                var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(_processId);
+                await _workflowServiceApiClient.TerminateWorkflowInstance(serialNumber);
+
+
+                //TODO: Remove WorkflowInstance record from WorkflowInstance table using _processId
+            }
         }
 
         private WorkflowDbContext WorkflowDbContext(SqlConnection connection)
