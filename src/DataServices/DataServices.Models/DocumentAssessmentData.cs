@@ -20,7 +20,7 @@ namespace DataServices.Models
     /// 
     /// </summary>
     [DataContract]
-    [Table("SEL_HPD_TASK")]
+    [Table("SEL_HPD_TASK", Schema = "CPSRB")]
     public partial class DocumentAssessmentData : IEquatable<DocumentAssessmentData>
     { 
         /// <summary>
