@@ -67,7 +67,6 @@ namespace DataServices
 
             services.AddOptions<Settings>().Bind(Configuration.GetSection("urls"));
 
-
             var startupSecrets = new StartupSecretsConfig();
             Configuration.GetSection("SdraDbSection").Bind(startupSecrets);
 

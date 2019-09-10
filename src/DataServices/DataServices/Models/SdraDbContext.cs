@@ -8,7 +8,7 @@ namespace DataServices.Models
             : base(options)
         {
         }
-        
+
         public DbSet<DocumentAssessmentData> AssessmentData { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
