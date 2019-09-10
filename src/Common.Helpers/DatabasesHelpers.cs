@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -18,6 +19,16 @@ namespace Common.Helpers
                 UserID = userId,
                 Password = password
             }.ToString();
+
+        public static string BuildOracleConnectionString(string dataSource, string userId = "", string password = "") =>
+            new OracleConnectionStringBuilder
+            {
+                DataSource = dataSource,
+                UserID = userId,
+                Password = password
+            }.ToString();
+
+
 
         public static void ClearWorkflowDbTables(WorkflowDbContext workflowDbContext)
         {

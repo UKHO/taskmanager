@@ -10,6 +10,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -19,12 +20,14 @@ namespace DataServices.Models
     /// 
     /// </summary>
     [DataContract]
+    [Table("SEL_HPD_TASK")]
     public partial class DocumentAssessmentData : IEquatable<DocumentAssessmentData>
     { 
         /// <summary>
         /// Gets or Sets SdocId
         /// </summary>
         [Required]
+        [Column("SDOC_ID")]
         [DataMember(Name="sdocId")]
         public int SdocId { get; set; }
 
@@ -33,6 +36,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>SOURCE_DOCUMENT_NAME</value>
         [Required]
+        [Column("SOURCE_DOCUMENT_NAME")]
         [DataMember(Name="name")]
         public string Name { get; set; }
 
@@ -41,6 +45,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>name of source</value>
         [Required]
+        [Column("RSDRA_NUMBER")]
         [DataMember(Name="sourceName")]
         public string SourceName { get; set; }
 
@@ -49,6 +54,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>RECEIPT_DATE</value>
         [Required]
+        [Column("RECEIPT_DATE")]
         [DataMember(Name="receiptDate")]
         public DateTime? ReceiptDate { get; set; }
 
@@ -57,6 +63,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>TO_SDO_DATE</value>
         [Required]
+        [Column("TO_SDO_DATE")]
         [DataMember(Name="SDODate")]
         public DateTime? SDODate { get; set; }
 
@@ -65,6 +72,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>The Effective start date, based on either the Receipt Date or To_SDO_Date</value>
         [Required]
+        [Column("EFFECTIVE_START_DATE")]
         [DataMember(Name="effectiveStartDate")]
         public DateTime? EffectiveStartDate { get; set; }
 
@@ -72,7 +80,7 @@ namespace DataServices.Models
         /// Notes about the source document assessment.
         /// </summary>
         /// <value>Notes about the source document assessment.</value>
-        [Required]
+        [Column("NOTES")]
         [DataMember(Name="notes")]
         public string Notes { get; set; }
 
@@ -81,6 +89,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>The team to which the source document assessment has been assigned</value>
         [Required]
+        [Column("TEAM")]
         [DataMember(Name="team")]
         public string Team { get; set; }
 
@@ -89,6 +98,7 @@ namespace DataServices.Models
         /// </summary>
         /// <value>The type of source document from SDRA SOURCE_DOCUMENT_TYPE</value>
         [Required]
+        [Column("SOURCE_DOCUMENT_TYPE")]
         [DataMember(Name="documentType")]
         public string DocumentType { get; set; }
 
@@ -96,6 +106,7 @@ namespace DataServices.Models
         /// SOURCE_NATURE
         /// </summary>
         /// <value>SOURCE_NATURE</value>
+        [Column("SOURCE_NATURE")]
         [DataMember(Name="documentNature:")]
         public string DocumentNature { get; set; }
 
@@ -103,7 +114,7 @@ namespace DataServices.Models
         /// Datum
         /// </summary>
         /// <value>Datum</value>
-        [Required]
+        [Column("DATUM")]
         [DataMember(Name="datum")]
         public string Datum { get; set; }
 

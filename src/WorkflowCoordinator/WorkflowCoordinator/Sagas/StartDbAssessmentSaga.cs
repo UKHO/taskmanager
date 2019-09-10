@@ -108,7 +108,11 @@ namespace WorkflowCoordinator.Sagas
             mappedComments.ProcessId = message.ProcessId;
 
             _dbContext.AssessmentData.Add(mappedAssessmentData);
-            _dbContext.Comment.Add(mappedComments);
+
+            if (mappedComments.Text != null)
+            {
+                _dbContext.Comment.Add(mappedComments);
+            }
 
             await _dbContext.SaveChangesAsync();
 
