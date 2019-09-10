@@ -36,7 +36,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
@@ -62,7 +62,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
@@ -84,7 +84,7 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
@@ -95,6 +95,22 @@ namespace WorkflowCoordinator.HttpClients
             var task = tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
 
             return task.SerialNumber;
+        }
+
+        public async Task TerminateWorkflowInstance(string serialNumber)
+        {
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri,
+                $"{_uriConfig.Value.K2WebServiceGetTasksUri}{serialNumber}/{_uriConfig.Value.K2WebServiceTerminateWorkflowInstanceUri}");
+            var data = "";
+
+            using (var response = await _httpClient.PostAsync(fullUri, null))
+            {
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
         }
     }
 }

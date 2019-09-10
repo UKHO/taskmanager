@@ -118,7 +118,7 @@ namespace WorkflowCoordinator
                     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                     {
                         ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                        Credentials = new NetworkCredential(startupSecretConfig.NsbToK2ApiUsername, startupSecretConfig.NsbToK2ApiPassword)
+                        Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
                     });
 
                 UpdateableServiceProvider container = null;
