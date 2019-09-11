@@ -76,15 +76,6 @@ namespace WorkflowCoordinator.Sagas
                 };
 
                 await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
-
-                // TODO: Fire message to SourceDocumentCoordinator to retrieve the Document
-                //var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
-                //{
-                //    CorrelationId = correlationId,
-                //    SourceDocumentId = assessment.Id
-                //};
-
-                //await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
             }
 
             await RequestTimeout<ExecuteAssessmentPollingTask>(context,
