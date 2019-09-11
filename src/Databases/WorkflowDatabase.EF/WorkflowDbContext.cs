@@ -10,10 +10,11 @@ namespace WorkflowDatabase.EF
         {
         }
 
-        public DbSet<Models.AssessmentData> AssessmentData { get; set; }
-        public DbSet<Models.Comments> Comment { get; set; }
-        public DbSet<Models.DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
-        public DbSet<Models.WorkflowInstance> WorkflowInstance { get; set; }
+        public DbSet<AssessmentData> AssessmentData { get; set; }
+        public DbSet<Comments> Comment { get; set; }
+        public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
+        public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
+        public DbSet<SourceDocumentStatus> SourceDocumentStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

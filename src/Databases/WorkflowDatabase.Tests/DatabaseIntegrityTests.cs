@@ -97,7 +97,81 @@ namespace WorkflowDatabase.Tests
                 var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
+        }
 
+        [Test]
+        public void Ensure_sourcedocumentstatus_table_prevents_duplicate_processId_due_to_FK()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review"
+            });
+
+            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            {
+                ProcessId = 1,
+                SdocId = 12345,
+                ContentServiceId = Guid.NewGuid(),
+                StartedAt = DateTime.Now,
+                Status = "Started"
+            });
+
+            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            {
+                ProcessId = 1,
+                SdocId = 12346,
+                ContentServiceId = Guid.NewGuid(),
+                StartedAt = DateTime.Now,
+                Status = "Started"
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Test]
+        public void Ensure_sourcedocumentstatus_table_prevents_duplicate_processid_due_to_UQ()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "2_sn",
+                ParentProcessId = null,
+                WorkflowType = WorkflowConstants.WorkflowType,
+                ActivityName = WorkflowConstants.ActivityName,
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            });
+            _dbContext.SaveChanges();
+
+            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            {
+                ProcessId = 1,
+                SdocId = 12345,
+                ContentServiceId = Guid.NewGuid(),
+                StartedAt = DateTime.Now,
+                Status = "Started"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+                {
+                    ProcessId = 1,
+                    SdocId = 12345,
+                    ContentServiceId = Guid.NewGuid(),
+                    StartedAt = DateTime.Now,
+                    Status = "Started"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
         }
     }
 }
