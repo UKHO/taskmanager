@@ -154,5 +154,42 @@
       "assessor": "BatesP",
       "verifier": "BarzeyS"
     }
+  },
+  {
+    "processId": 127,
+    "serialNumber": "126_sn",
+    "parentProcessId": null,
+    "workflowType": "DbAssessment",
+    "activityName": "Assess",
+    "startedAt": "2019-01-01T00:00:00",
+    "status": "Started",
+    "comment": [
+      {
+        "processId": 127,
+        "text": "A comment"
+      },
+      {
+        "processId": 127,
+        "text": "A 2nd comment"
+      }
+    ],
+    "assessmentData": {
+      "sdocId": 65533,
+      "rsdraNumber": "RSDRA342130002",
+      "sourceDocumentName": "4532ss.pdf",
+      "receiptDate": "2019-07-11T00:00:00",
+      "toSdoDate": "2019-07-03T00:00:00",
+      "effectiveStartDate": "2019-07-10T00:00:00",
+      "teamDistributedTo": "HW",
+      "sourceDocumentType": "Email",
+      "sourceNature": "Aggressive",
+      "datum": null,
+      "processId": 127
+    },
+    "dbAssessmentReviewData": {
+      "processId": 127,
+      "ion": "I8766",
+      "activityCode": "4881"
+    }
   }
 ]
