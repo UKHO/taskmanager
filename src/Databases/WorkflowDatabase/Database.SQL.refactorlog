@@ -84,4 +84,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Text" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="f5cd3939-4803-4dd3-92b8-63dd86ad291f" ChangeDateTime="09/11/2019 12:14:23">
+    <Property Name="ElementName" Value="[dbo].[SourceDocumentStatus].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SourceDocumentStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SourceDocumentStatusId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5d28cce2-a797-4c1e-b736-8cdc50a79d25" ChangeDateTime="09/11/2019 12:17:11">
+    <Property Name="ElementName" Value="[dbo].[SourceDocumentStatus].[SDocId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SourceDocumentStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SdocId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="74da2cef-785c-4fd8-b669-17a4388c0ac4" ChangeDateTime="09/11/2019 12:21:01">
+    <Property Name="ElementName" Value="[dbo].[FK_SourceDocumentStatus_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[SourceDocumentStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_SourceDocumentStatus_WorkflowInstance]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0e9c44ec-7849-4b63-b6bb-66d26cd58c6b" ChangeDateTime="09/11/2019 12:23:22">
+    <Property Name="ElementName" Value="[dbo].[AK_SourceDocumentStatus_Column]" />
+    <Property Name="ElementType" Value="SqlUniqueConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[SourceDocumentStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[AK_SourceDocumentStatus_ProcessId]" />
+  </Operation>
 </Operations>

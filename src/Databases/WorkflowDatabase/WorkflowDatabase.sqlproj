@@ -63,6 +63,7 @@
     <Build Include="Tables\AssessmentData.sql" />
     <Build Include="Tables\Comment.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />
+    <Build Include="Tables\SourceDocumentStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
