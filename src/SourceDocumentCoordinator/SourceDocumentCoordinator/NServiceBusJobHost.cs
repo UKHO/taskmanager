@@ -16,13 +16,13 @@ namespace SourceDocumentCoordinator
 {
     public class NServiceBusJobHost : IJobHost
     {
-        private readonly IOptions<ExampleConfig> _generalConfig;
+        private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IOptions<SecretsConfig> _secretsConfig;
         static readonly ILog Log = LogManager.GetLogger<NServiceBusJobHost>();
 
         private IEndpointInstance _endpoint;
 
-        public NServiceBusJobHost(IOptions<ExampleConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
+        public NServiceBusJobHost(IOptions<GeneralConfig> generalConfig, IOptions<SecretsConfig> secretsConfig)
         {
             _generalConfig = generalConfig;
             _secretsConfig = secretsConfig;
@@ -34,7 +34,7 @@ namespace SourceDocumentCoordinator
         {
             try
             {
-                var endpointConfiguration = new EndpointConfiguration(_generalConfig.Value.NsbEndpointName);
+                var endpointConfiguration = new EndpointConfiguration(_generalConfig.Value.SourceDocumentCoordinatorName);
 
                 var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
                 transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);

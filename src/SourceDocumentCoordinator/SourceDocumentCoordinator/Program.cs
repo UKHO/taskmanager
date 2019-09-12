@@ -10,6 +10,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using NServiceBus;
 using SourceDocumentCoordinator.Config;
 
 namespace SourceDocumentCoordinator
@@ -18,6 +20,8 @@ namespace SourceDocumentCoordinator
     {
         private static async Task Main(string[] args)
         {
+            var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+
             var builder = new HostBuilder()
             .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
             .ConfigureWebJobs(b =>
@@ -26,13 +30,15 @@ namespace SourceDocumentCoordinator
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
-
                 config.SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                     .AddEnvironmentVariables()
                     .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
+
+                var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+
+                config.AddAzureAppConfiguration(azureAppConfConnectionString);
             })
             .ConfigureLogging((hostingContext, b) =>
             {
@@ -40,19 +46,20 @@ namespace SourceDocumentCoordinator
             })
             .ConfigureServices((hostingContext, services) =>
             {
-                services.AddOptions<ExampleConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("ExampleConfig"));
-                //.PostConfigure(o =>
-                //{
-                //    var errors = string.Join(",", o.ValidateDataAnnotations().Concat(o.Validate()));
-                //    if (errors.Any())
-                //    {
-                //        var message = $"Found configuration error(s) in {o.GetType().Name}: {errors}";
-                //        _logger.LogError(message);
-                //        throw new ApplicationException(message);
-                //    }
-                //});
+                var startupConfig = new StartupConfig();
+                hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
+                hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
 
+                var endpointConfiguration = new EndpointConfiguration(startupConfig.SourceDocumentCoordinatorName);
+                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
+
+                services.AddOptions<UriConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("urls"));
+                services.AddOptions<GeneralConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("apis"));
+                services.AddOptions<GeneralConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("nsb"));
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 

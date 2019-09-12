@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
     <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
+    <ProjectReference Include="..\..\DataServices\DataServices.Models\DataServices.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
