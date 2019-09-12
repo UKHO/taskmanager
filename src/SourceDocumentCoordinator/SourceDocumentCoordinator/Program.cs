@@ -60,6 +60,8 @@ namespace SourceDocumentCoordinator
                     .Bind(hostingContext.Configuration.GetSection("apis"));
                 services.AddOptions<GeneralConfig>()
                     .Bind(hostingContext.Configuration.GetSection("nsb"));
+                services.AddOptions<GeneralConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("databases"));
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
