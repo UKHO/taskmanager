@@ -20,6 +20,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
