@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -28,17 +27,14 @@ namespace SourceDocumentCoordinator.HttpClients
             var data = "";
             var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
 
-            var fullUri = new UriBuilder(baseUri)
-            {
-                Path =
-                    $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{writableFolderName}/{imageAsGeotiff}"
-            };
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{writableFolderName}/{imageAsGeotiff}");
 
             using (var response = await _httpClient.GetAsync(fullUri.ToString()))
             {
                 data = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");

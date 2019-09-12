@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
-using Common.Messages.Commands;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
@@ -71,37 +70,37 @@ namespace SourceDocumentCoordinator
                 throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
             }
 
-            var sanitisedDbName = dbName.Replace("'", "''");
+            //var sanitisedDbName = dbName.Replace("'", "''");
 
-            var commandText = "USE master " +
-                        $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
-                        "BEGIN " +
-                       $"ALTER DATABASE [{sanitisedDbName}] " +
-                        "SET SINGLE_USER " +
-                        "WITH ROLLBACK IMMEDIATE; " +
-                        $"DROP DATABASE [{sanitisedDbName}] " +
-                        $"CREATE DATABASE [{sanitisedDbName}] " +
-                        "END " +
-                        "ELSE " +
-                        "BEGIN " +
-                        $"CREATE DATABASE [{sanitisedDbName}] " +
-                        "END";
+            //var commandText = "USE master " +
+            //            $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
+            //            "BEGIN " +
+            //           $"ALTER DATABASE [{sanitisedDbName}] " +
+            //            "SET MULTI_USER " +
+            //            "WITH ROLLBACK IMMEDIATE; " +
+            //            $"DROP DATABASE [{sanitisedDbName}] " +
+            //            $"CREATE DATABASE [{sanitisedDbName}] " +
+            //            "END " +
+            //            "ELSE " +
+            //            "BEGIN " +
+            //            $"CREATE DATABASE [{sanitisedDbName}] " +
+            //            "END";
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                var command = new SqlCommand(commandText, connection);
+            //using (var connection = new SqlConnection(connectionString))
+            //{
+            //    var command = new SqlCommand(commandText, connection);
 
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                finally
-                {
-                    connection.Close();
-                }
+            //    try
+            //    {
+            //        connection.Open();
+            //        command.ExecuteNonQuery();
+            //    }
+            //    finally
+            //    {
+            //        connection.Close();
+            //    }
 
-            }
+            //}
         }
 
         [FunctionName("StartAsync")]

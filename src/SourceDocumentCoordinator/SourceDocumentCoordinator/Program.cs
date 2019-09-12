@@ -1,18 +1,22 @@
-﻿using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using NServiceBus;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SourceDocumentCoordinator.Config;
+using SourceDocumentCoordinator.HttpClients;
+using WorkflowDatabase.EF;
 
 namespace SourceDocumentCoordinator
 {
@@ -46,6 +50,8 @@ namespace SourceDocumentCoordinator
             })
             .ConfigureServices((hostingContext, services) =>
             {
+                var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+
                 var startupConfig = new StartupConfig();
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
                 hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
@@ -64,6 +70,42 @@ namespace SourceDocumentCoordinator
                     .Bind(hostingContext.Configuration.GetSection("databases"));
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+
+                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+
+                var connection = new SqlConnection(workflowDbConnectionString)
+                {
+                    AccessToken = isLocalDebugging ?
+                        null :
+                        new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+                };
+                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                    options.UseSqlServer(connection));
+
+                if (isLocalDebugging)
+                {
+                    using (var sp = services.BuildServiceProvider())
+                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                    {
+                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    }
+                }
+
+                UpdateableServiceProvider container = null;
+
+                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+                {
+                    customizations.ExistingServices(services);
+                    customizations.ServiceProviderFactory(sc =>
+                    {
+                        container = new UpdateableServiceProvider(sc);
+                        return container;
+                    });
+                });
 
                 services.AddScoped<IJobHost, NServiceBusJobHost>();
             })

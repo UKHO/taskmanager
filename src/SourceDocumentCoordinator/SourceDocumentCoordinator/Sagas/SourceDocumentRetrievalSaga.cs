@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
@@ -10,6 +8,7 @@ using NServiceBus.Logging;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Sagas
 {
@@ -34,19 +33,32 @@ namespace SourceDocumentCoordinator.Sagas
                 .ToSaga(sagaData => sagaData.SourceDocumentId);
         }
 
-        public Task Handle(InitiateSourceDocumentRetrievalCommand message, IMessageHandlerContext context)
+        public async Task Handle(InitiateSourceDocumentRetrievalCommand message, IMessageHandlerContext context)
         {
             log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalCommand)}: {message.ToJSONSerializedString()}");
 
             // Call GetDocumentForViewing method on DataServices API
-           var something =  _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "",
+           var returnCode =  await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "d",
                 true);
 
-            // Subsequent stories:
-            // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
-            // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+           // TODO: Think about different return code scenarios
+           if (returnCode.Code.HasValue && returnCode.Code.Value == 0)
+           {
+               _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus
+               {
+                   ProcessId = message.ProcessId,
+                   SdocId = message.SourceDocumentId,
+                   Status = "Started",
+                   StartedAt = DateTime.Now
+               });
 
-            return null;
+               _dbContext.SaveChanges();
+           }
+
+           // Subsequent stories:
+           // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
+           // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+
         }
     }
 }

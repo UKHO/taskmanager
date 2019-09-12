@@ -79,7 +79,7 @@ namespace WorkflowCoordinator
                         $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
                         "BEGIN " +
                        $"ALTER DATABASE [{sanitisedDbName}] " +
-                        "SET SINGLE_USER " +
+                        "SET MULTI_USER " +
                         "WITH ROLLBACK IMMEDIATE; " +
                         $"DROP DATABASE [{sanitisedDbName}] " +
                         $"CREATE DATABASE [{sanitisedDbName}] " +
