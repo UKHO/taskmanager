@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
+using FakeItEasy;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,7 +21,7 @@ namespace SourceDocumentCoordinator.IntegrationTests
     public class SourceDocumentRetrievalSagaTests
     {
         private TestableMessageHandlerContext _handlerContext;
-        private IDataServiceApiClient _dataServiceApiClient;
+        private IDataServiceApiClient _fakeDataServiceApiClient;
         private WorkflowDbContext _dbContext;
         private SourceDocumentRetrievalSaga _sourceDocumentRetrievalSaga;
         private IOptionsSnapshot<GeneralConfig> _generalConfigOptions;
@@ -27,14 +29,21 @@ namespace SourceDocumentCoordinator.IntegrationTests
         [SetUp]
         public void SetUp()
         {
+            var httpClient = new HttpClient();
+
             _handlerContext = new TestableMessageHandlerContext();
             var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
 
             var startupConfig = GetStartupConfigs(appConfigurationConfigRoot);
             var generalConfig = GetGeneralConfigs(appConfigurationConfigRoot);
+            var uriConfig = GetUriConfigs(appConfigurationConfigRoot);
 
             _generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
+
+            var uriOptions = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
+
+            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
@@ -46,7 +55,7 @@ namespace SourceDocumentCoordinator.IntegrationTests
             _dbContext = WorkflowDbContext(connection);
 
             _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
-                _dataServiceApiClient,
+                _fakeDataServiceApiClient,
                 _generalConfigOptions);
         }
 
@@ -110,6 +119,16 @@ namespace SourceDocumentCoordinator.IntegrationTests
             appConfigurationConfigRoot.GetSection("apis").Bind(generalConfig);
 
             return generalConfig;
+        }
+        
+        private UriConfig GetUriConfigs(IConfigurationRoot appConfigurationConfigRoot)
+        {
+            var uriConfig = new UriConfig();
+
+            appConfigurationConfigRoot.GetSection("urls").Bind(uriConfig);
+
+            return uriConfig;
+
         }
     }
 }
