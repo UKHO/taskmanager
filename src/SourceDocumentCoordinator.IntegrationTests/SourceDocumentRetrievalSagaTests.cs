@@ -45,12 +45,12 @@ namespace SourceDocumentCoordinator.IntegrationTests
 
             _dbContext = WorkflowDbContext(connection);
 
-            _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext, 
-                _dataServiceApiClient, 
+            _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
+                _dataServiceApiClient,
                 _generalConfigOptions);
         }
 
-    [Test]
+        [Test]
         public async Task Test_SourceDocumentRetrievalSaga_Saves_Saga_Data()
         {
             // Given
@@ -66,7 +66,6 @@ namespace SourceDocumentCoordinator.IntegrationTests
 
             //When
             await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
-            _sourceDocumentId = _sourceDocumentRetrievalSaga.Data.SourceDocumentId;
 
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
