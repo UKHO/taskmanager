@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
@@ -25,11 +23,11 @@ namespace SourceDocumentCoordinator.IntegrationTests
         private WorkflowDbContext _dbContext;
         private SourceDocumentRetrievalSaga _sourceDocumentRetrievalSaga;
         private IOptionsSnapshot<GeneralConfig> _generalConfigOptions;
-        private int _sourceDocumentId;
 
         [SetUp]
         public void SetUp()
         {
+            _handlerContext = new TestableMessageHandlerContext();
             var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
 
@@ -46,6 +44,10 @@ namespace SourceDocumentCoordinator.IntegrationTests
             var connection = SetupWorkflowDatabaseConnection(workflowDbConnectionString, isLocalDebugging, startupConfig);
 
             _dbContext = WorkflowDbContext(connection);
+
+            _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
+                _dataServiceApiClient,
+                _generalConfigOptions);
         }
 
         [Test]
@@ -64,7 +66,6 @@ namespace SourceDocumentCoordinator.IntegrationTests
 
             //When
             await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
-            _sourceDocumentId = _sourceDocumentRetrievalSaga.Data.SourceDocumentId;
 
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
