@@ -59,6 +59,7 @@ namespace SourceDocumentCoordinator.Sagas
            // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
            // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
 
+           MarkAsComplete();
         }
     }
 }
