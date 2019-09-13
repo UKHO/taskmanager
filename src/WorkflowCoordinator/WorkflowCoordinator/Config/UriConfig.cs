@@ -15,6 +15,8 @@ namespace WorkflowCoordinator.Config
         public Uri K2WebServiceStartWorkflowInstanceUri { get; set; }
         public Uri K2WebServiceTerminateWorkflowInstanceUri { get; set; }
         public Uri K2WebServiceGetTasksUri { get; set; }
+        public Uri DataServicesLocalhostHealthcheckUrl { get; set; }
+        public Uri DataServicesHealthcheckUrl { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId)
         {

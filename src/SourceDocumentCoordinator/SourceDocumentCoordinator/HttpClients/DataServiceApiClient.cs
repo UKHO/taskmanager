@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Common.Helpers;
 using DataServices.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -44,6 +44,24 @@ namespace SourceDocumentCoordinator.HttpClients
             var returnCode = JsonConvert.DeserializeObject<ReturnCode>(data);
 
             return returnCode;
+        }
+
+        public async Task<bool> CheckDataServicesConnection()
+        {
+            var fullUri = new Uri(ConfigHelpers.IsLocalDevelopment ? $"{_uriConfig.Value.DataServicesLocalhostHealthcheckUrl}" :
+                $"{_uriConfig.Value.DataServicesHealthcheckUrl}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            return true;
         }
     }
 }
