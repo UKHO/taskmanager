@@ -37,29 +37,43 @@ namespace SourceDocumentCoordinator.Sagas
         {
             log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalCommand)}: {message.ToJSONSerializedString()}");
 
+            if (!Data.IsStarted)
+            {
+                Data.IsStarted = true;
+                Data.CorrelationId = message.CorrelationId;
+                Data.SourceDocumentId = message.SourceDocumentId;
+                Data.SourceDocumentStatusId = 0;
+            }
+
             // Call GetDocumentForViewing method on DataServices API
-           var returnCode =  await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "d",
+            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "d",
                 true);
 
-           // TODO: Think about different return code scenarios
-           if (returnCode.Code.HasValue && returnCode.Code.Value == 0)
-           {
-               _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus
-               {
-                   ProcessId = message.ProcessId,
-                   SdocId = message.SourceDocumentId,
-                   Status = "Started",
-                   StartedAt = DateTime.Now
-               });
+            // TODO: Think about different return code scenarios
+            if (returnCode.Code.HasValue 
+                && (returnCode.Code.Value == 0)
+                || (returnCode.Code.Value == 1 && Data.SourceDocumentStatusId == 0))
+            {
+                var sourceDocumentStatus = new SourceDocumentStatus
+                {
+                    ProcessId = message.ProcessId,
+                    SdocId = message.SourceDocumentId,
+                    Status = "Started",
+                    StartedAt = DateTime.Now
+                };
 
-               _dbContext.SaveChanges();
-           }
+                _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
 
-           // TODO: Subsequent stories:
-           // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
-           // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+                _dbContext.SaveChanges();
 
-           MarkAsComplete();
+                Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
+            }
+
+            // TODO: Subsequent stories:
+            // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
+            // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+
+            MarkAsComplete();
         }
     }
 }
