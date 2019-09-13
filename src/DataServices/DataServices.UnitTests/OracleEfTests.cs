@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
+using DataServices.Adapters;
 using DataServices.Controllers;
 using DataServices.Models;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace DataServices.UnitTests
@@ -16,6 +14,7 @@ namespace DataServices.UnitTests
     {
         private SdraDbContext _dbContext;
         private ILogger<DataAccessApiController> _fakeLogger;
+        private IDataAccessWebServiceSoapClientAdapter _fakeDataAccessWebServiceSoapClientAdapter;
 
         [SetUp]
         public void Setup()
@@ -27,12 +26,13 @@ namespace DataServices.UnitTests
             _dbContext = new SdraDbContext(dbContextOptions);
 
             _fakeLogger = A.Fake<ILogger<DataAccessApiController>>();
+            _fakeDataAccessWebServiceSoapClientAdapter = A.Fake<DataAccessWebServiceSoapClientAdapter>();
         }
 
         [Test]
         public void Test_GetDocumentAssessmentData_returns_assessment_data_for_given_sdoc_Id()
         {
-            var controller = new DataAccessApiController(_dbContext, _fakeLogger);
+            var controller = new DataAccessApiController(_dbContext, _fakeLogger, _fakeDataAccessWebServiceSoapClientAdapter);
 
             _dbContext.AssessmentData.AddAsync(new DocumentAssessmentData()
             {
