@@ -62,7 +62,7 @@ namespace SourceDocumentCoordinator.Sagas
                 {
                     ProcessId = message.ProcessId,
                     SdocId = message.SourceDocumentId,
-                    Status = "Started",
+                    Status = SourceDocumentRetrievalStatus.Started.ToString(),
                     StartedAt = DateTime.Now
                 };
 
@@ -84,8 +84,7 @@ namespace SourceDocumentCoordinator.Sagas
                 requestStatus);
 
             // TODO: Subsequent stories:
-            // Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
-
+            // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
             //MarkAsComplete();
         }
 
@@ -94,14 +93,37 @@ namespace SourceDocumentCoordinator.Sagas
             var queuedDocs = _dataServiceApiClient.GetDocumentRequestQueueStatus(_generalConfig.Value.CallerCode);
 
             // TODO: Potentially deal with a list of queued requests...
-            var ours = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
+            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
 
-            // TODO: if code != 1 etc...
-            if (ours.Code == 1)
+            switch (sourceDocument.Code)
             {
-                await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
-                    TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds), 
-                    message);
+                case 0:
+                    // Doc Ready; update DB;
+                    UpdateSourceDocumentStatus(message);
+
+                    // TODO: fire new Command to retrieve the doc and save it in Content service
+
+                    break;
+                case 1:
+                    // Still queued; fire another timer
+                    await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
+                        TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                        message);
+                    break;
+                default:
+                    throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
+            }
+
+        }
+
+        private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
+        {
+            var sourceDocumentStatus =
+                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SdocId);
+            if (sourceDocumentStatus != null)
+            {
+                sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
+                _dbContext.SaveChanges();
             }
         }
     }
