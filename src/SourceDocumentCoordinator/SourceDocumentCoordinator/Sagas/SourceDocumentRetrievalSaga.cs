@@ -73,19 +73,18 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
             }
 
-            var requestStatus = new GetDocumentRequestQueueStatusCommand
+            if (Data.SourceDocumentStatusId > 0)
             {
-                SdocId = message.SourceDocumentId,
-                CorrelationId = message.CorrelationId
-            };
+                var requestStatus = new GetDocumentRequestQueueStatusCommand
+                {
+                    SdocId = message.SourceDocumentId,
+                    CorrelationId = message.CorrelationId
+                };
 
-            await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
-                TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
-                requestStatus);
-
-            // TODO: Subsequent stories:
-            // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
-            //MarkAsComplete();
+                await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
+                    TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                    requestStatus);
+            }
         }
 
         public async Task Timeout(GetDocumentRequestQueueStatusCommand message, IMessageHandlerContext context)
@@ -101,7 +100,10 @@ namespace SourceDocumentCoordinator.Sagas
                     // Doc Ready; update DB;
                     UpdateSourceDocumentStatus(message);
 
+                    // TODO: Subsequent stories:
                     // TODO: fire new Command to retrieve the doc and save it in Content service
+                    // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+                    //MarkAsComplete();
 
                     break;
                 case 1:
@@ -113,7 +115,6 @@ namespace SourceDocumentCoordinator.Sagas
                 default:
                     throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
             }
-
         }
 
         private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
