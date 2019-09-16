@@ -14,7 +14,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Sagas
 {
-    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>, 
+    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>,
         IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>,
         IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
@@ -54,7 +54,7 @@ namespace SourceDocumentCoordinator.Sagas
                 true);
 
             // TODO: Think about different return code scenarios
-            if (returnCode.Code.HasValue 
+            if (returnCode.Code.HasValue
                 && (returnCode.Code.Value == 0)
                 || (returnCode.Code.Value == 1 && Data.SourceDocumentStatusId == 0))
             {
@@ -94,7 +94,11 @@ namespace SourceDocumentCoordinator.Sagas
             // TODO: Potentially deal with a list of queued requests...
             var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
 
-            switch (sourceDocument.Code)
+            if (sourceDocument.Code == null)
+                throw new ApplicationException(
+                    $"Source Document Retrieval Status Code is null {Environment.NewLine}{sourceDocument.ToJSONSerializedString()}");
+
+            switch (sourceDocument.Code.Value)
             {
                 case 0:
                     // Doc Ready; update DB;
@@ -109,7 +113,8 @@ namespace SourceDocumentCoordinator.Sagas
                 case 1:
                     // Still queued; fire another timer
                     await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
-                        TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                        TimeSpan.FromSeconds(_generalConfig.Value
+                            .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                         message);
                     break;
                 default:
