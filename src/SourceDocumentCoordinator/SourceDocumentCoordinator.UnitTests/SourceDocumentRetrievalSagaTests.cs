@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -35,7 +36,6 @@ namespace SourceDocumentCoordinator.UnitTests
                 .Options;
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
-
             _handlerContext = new TestableMessageHandlerContext();
 
             var generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
@@ -49,7 +49,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_Saves_Saga_Data()
+        public async Task Test_SourceDocumentRetrievalSaga_saves_saga_data_when_return_code_is_0()
         {
             // Given
             var sdocId = 1111;
@@ -61,7 +61,7 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 1
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
-            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored,A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
 
             //When
             await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
@@ -69,6 +69,58 @@ namespace SourceDocumentCoordinator.UnitTests
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
             Assert.AreEqual(sdocId, _sourceDocumentRetrievalSaga.Data.SourceDocumentId);
+        }
+
+        [Test]
+        public async Task Test_SourceDocumentRetrievalSaga_saves_saga_data_and_source_doc_status_when_return_code_is_1_and_source_document_status_is_0()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId,
+                ProcessId = 1
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+
+            //Then
+            Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
+            Assert.AreEqual(sdocId, _sourceDocumentRetrievalSaga.Data.SourceDocumentId);
+            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), true);
+        }
+
+        [Test]
+        public async Task Test_SourceDocumentRetrievalSaga_does_not_save_source_doc_status_when_return_code_is_1_and_source_document_status_is_1()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId,
+                ProcessId = 1
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData
+            {
+                CorrelationId = correlationId,
+                SourceDocumentStatusId = 1,
+                IsStarted = true
+            };
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+
+            //Then
+            Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
+            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), false);
         }
 
         private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)
