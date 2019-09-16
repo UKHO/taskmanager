@@ -141,32 +141,6 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        [Ignore("Not Implemented")]
-        public async Task Test_sends_new_InitiateSourceDocumentRetrievalCommand_to_SourceDocumentCoordinator()
-        {
-            //Given
-            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
-                .Returns(
-                    Task.FromResult<IEnumerable<DocumentObject>>(new List<DocumentObject>()
-                    {
-                        new DocumentObject()
-                        {
-                            Id = 1,
-                            SourceName = "sourcename",
-                            Name = "name"
-                        }
-                    }));
-
-            //When
-            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
-
-            //Then
-            var initiateRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-                     t.Message is InitiateSourceDocumentRetrievalCommand);
-            Assert.IsNotNull(initiateRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
-        }
-
-        [Test]
         public async Task Test_sends_two_messages()
         {
             //Given

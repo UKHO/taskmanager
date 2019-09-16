@@ -9,12 +9,16 @@
  */
 
 using System;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
+using DataServices.Adapters;
 using DataServices.Attributes;
+using DataServices.Connected_Services.SDRADataAccessWebService;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -29,11 +33,14 @@ namespace DataServices.Controllers
     {
         private readonly SdraDbContext _dbContext;
         private readonly ILogger<DataAccessApiController> _logger;
+        private readonly IDataAccessWebServiceSoapClientAdapter _dataAccessWebServiceSoapClientAdapter;
 
-        public DataAccessApiController(SdraDbContext dbContext, ILogger<DataAccessApiController> logger)
+        public DataAccessApiController(SdraDbContext dbContext, ILogger<DataAccessApiController> logger,
+            IDataAccessWebServiceSoapClientAdapter dataAccessWebServiceSoapClientAdapter)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _dataAccessWebServiceSoapClientAdapter = dataAccessWebServiceSoapClientAdapter;
         }
 
         /// <summary>
@@ -119,23 +126,9 @@ namespace DataServices.Controllers
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(LinkedDocument));
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
             exampleJson = "{\n  \"docId1\" : 0,\n  \"docId2\" : 6,\n  \"linkType\" : \"PARENTCHILD, CHARTPANELAFFECTED, CROSSREFERENCE\"\n}";
 
@@ -226,33 +219,29 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string writeableFolderName, [FromRoute][Required]bool? imageAsGeoTIFF)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(ReturnCode));
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value,
+                writeableFolderName, imageAsGeoTIFF.Value);
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "{\n  \"code\" : 0,\n  \"message\" : \"The requested document has been added to the queue., The requested document is already in the queue.\"\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<ReturnCode>(exampleJson)
-            : default(ReturnCode);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            ReturnCode returnCode = null;
+            try
+            {
+                returnCode = new ReturnCode
+                {
+                    Code = task.Result.ErrorCode,
+                    Message = task.Result.Message
+                };
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error initiating document retrieval");
+                return StatusCode(500, e.Message);
+            }
+            return new ObjectResult(returnCode);
         }
 
         /// <summary>
@@ -279,33 +268,45 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(QueuedDocumentObjects));
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync(callerCode);
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            ProcessingStatus[] docStatus = null;
+            try
+            {
+                docStatus = task.Result;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving document status");
+                return StatusCode(500, e.Message);
+            }
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            var queuedDocumentObjects = new QueuedDocumentObjects();
+            var documents = docStatus.Select<ProcessingStatus, QueuedDocumentObject>(
+                document => new QueuedDocumentObject
+                {
+                    Code = document.ErrorCode,
+                    Message = document.Message,
+                    SodcId = document.SdocId,
+                    StatusTime = document.StatusTime
+                });
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+            queuedDocumentObjects.AddRange(documents);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+            return new ObjectResult(queuedDocumentObjects);
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
+            //string exampleJson = null;
+            //exampleJson = "[ {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\server\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n}, {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\servername\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n} ]";
 
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\server\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n}, {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\servername\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n} ]";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<QueuedDocumentObjects>(exampleJson)
-            : default(QueuedDocumentObjects);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            //var example = exampleJson != null
+            //? JsonConvert.DeserializeObject<QueuedDocumentObjects>(exampleJson)
+            //: default(QueuedDocumentObjects);            //TODO: Change the data returned
+            //return new ObjectResult(example);
         }
 
         /// <summary>

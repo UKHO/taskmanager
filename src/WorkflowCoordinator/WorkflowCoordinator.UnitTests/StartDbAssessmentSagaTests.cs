@@ -12,7 +12,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Common.Messages.Commands;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -91,7 +91,21 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_StartDbAssessmentCommand_Sends_1_Message()
+        public async Task Test_StartDbAssessmentCommand_Sends_InitiateSourceDocumentRetrievalCommand()
+        {
+            //Given
+
+            //When
+            await _saga.Handle(A.Dummy<StartDbAssessmentCommand>(), _handlerContext);
+
+            //Then
+            var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is InitiateSourceDocumentRetrievalCommand);
+            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+        }
+
+        [Test]
+        public async Task Test_StartDbAssessmentCommand_Sends_2_Messages()
         {
             //Given
             
@@ -99,7 +113,7 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Handle(A.Dummy<StartDbAssessmentCommand>(), _handlerContext);
 
             //Then
-            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
         }
     }
 }

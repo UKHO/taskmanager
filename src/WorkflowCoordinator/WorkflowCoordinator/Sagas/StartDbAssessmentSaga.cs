@@ -14,6 +14,7 @@ using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using Task = System.Threading.Tasks.Task;
 using System.Threading.Tasks;
+using Common.Messages.Commands;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -82,6 +83,20 @@ namespace WorkflowCoordinator.Sagas
                 SourceDocumentId = Data.SourceDocumentId,
                 WorkflowInstanceId = workflowInstanceId.Value
             });
+
+            // TODO: Fire InitiateSourceDocumentRetrievalCommand to SourceDocumentCoordinator to retrieve the Document
+            // TODO: Add InitiateSourceDocumentRetrievalCommand handler in SourceDocumentCoordinator to start document retrieval process
+            log.Debug($"Sending {nameof(InitiateSourceDocumentRetrievalCommand)}");
+
+            var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
+            {
+                CorrelationId = Data.CorrelationId,
+                ProcessId = Data.ProcessId,
+                SourceDocumentId = Data.SourceDocumentId
+            };
+
+            await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
+
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
         }
