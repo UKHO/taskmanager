@@ -46,7 +46,7 @@ namespace SourceDocumentCoordinator.Sagas
             }
 
             // Call GetDocumentForViewing method on DataServices API
-            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "d",
+            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "tbc",
                 true);
 
             // TODO: Think about different return code scenarios
