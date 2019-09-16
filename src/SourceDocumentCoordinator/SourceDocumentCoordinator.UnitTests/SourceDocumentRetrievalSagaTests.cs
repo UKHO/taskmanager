@@ -1,9 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Helpers;
 using Common.Messages.Commands;
 using DataServices.Models;
 using FakeItEasy;
@@ -15,6 +13,7 @@ using NServiceBus.Testing;
 using NUnit.Framework;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
+using SourceDocumentCoordinator.Messages;
 using SourceDocumentCoordinator.Sagas;
 using WorkflowDatabase.EF;
 
@@ -122,6 +121,32 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
             Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), false);
         }
+
+        [Test]
+        public async Task Test_SourceDocumentRetrievalSaga_requests_timeout()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId,
+                ProcessId = 1
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+
+            //Then
+            var getDocumentRequestQueueStatusCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
+                t.Message is GetDocumentRequestQueueStatusCommand);
+            Assert.IsNotNull(getDocumentRequestQueueStatusCommand, $"No timeout of type {nameof(GetDocumentRequestQueueStatusCommand)}");
+        }
+
+        //TODO: Timeout tests here...
 
         private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)
         {
