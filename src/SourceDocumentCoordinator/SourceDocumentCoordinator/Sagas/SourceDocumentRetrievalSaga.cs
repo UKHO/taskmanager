@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
@@ -7,12 +8,15 @@ using NServiceBus;
 using NServiceBus.Logging;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
+using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Sagas
 {
-    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>, IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>
+    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>, 
+        IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>,
+        IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
@@ -69,11 +73,36 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
             }
 
-            // TODO: Subsequent stories:
-            // 1). Send command to check GetDocumentRequestQueueStatus on DataServices API
-            // 2). Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+            var requestStatus = new GetDocumentRequestQueueStatusCommand
+            {
+                SdocId = message.SourceDocumentId,
+                CorrelationId = message.CorrelationId
+            };
 
-            MarkAsComplete();
+            await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
+                TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                requestStatus);
+
+            // TODO: Subsequent stories:
+            // Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+
+            //MarkAsComplete();
+        }
+
+        public async Task Timeout(GetDocumentRequestQueueStatusCommand message, IMessageHandlerContext context)
+        {
+            var queuedDocs = _dataServiceApiClient.GetDocumentRequestQueueStatus(_generalConfig.Value.CallerCode);
+
+            // TODO: Potentially deal with a list of queued requests...
+            var ours = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
+
+            // TODO: if code != 1 etc...
+            if (ours.Code == 1)
+            {
+                await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
+                    TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds), 
+                    message);
+            }
         }
     }
 }

@@ -63,5 +63,29 @@ namespace SourceDocumentCoordinator.HttpClients
 
             return true;
         }
+
+        public async Task<QueuedDocumentObjects> GetDocumentRequestQueueStatus(string callerCode)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceDocumentRequestQueueStatusUri}{callerCode}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+
+            }
+
+            var returnCode = JsonConvert.DeserializeObject<QueuedDocumentObjects>(data);
+
+            return returnCode;
+        }
     }
 }
