@@ -105,9 +105,23 @@ namespace SourceDocumentCoordinator.Sagas
                     UpdateSourceDocumentStatus(message);
 
                     // TODO: Subsequent stories:
-                    // TODO: fire new Command to retrieve the doc and save it in Content service
                     // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
-                    //MarkAsComplete();
+                    var removeFromQueue = new ClearDocumentRequestFromQueueCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        SdocId = message.SdocId
+                    };
+                    await context.SendLocal(removeFromQueue).ConfigureAwait(false);
+
+                    // TODO: fire new Command to retrieve the doc and save it in Content service
+                    var persistCommand = new PersistDocumentInStoreCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        SdocId = message.SdocId
+                    };
+                    await context.SendLocal(persistCommand).ConfigureAwait(false);
+
+                    MarkAsComplete();
 
                     break;
                 case 1:
@@ -116,7 +130,7 @@ namespace SourceDocumentCoordinator.Sagas
                         TimeSpan.FromSeconds(_generalConfig.Value
                             .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                         message);
-                    break;
+                    break;;
                 default:
                     throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
             }

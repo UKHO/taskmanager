@@ -75,12 +75,12 @@ namespace WorkflowCoordinator.Sagas
                     SourceDocumentId = assessment.Id
                 };
 
-                await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
+                await context.SendLocal(startDbAssessmentCommand).ConfigureAwait(false);
             }
 
-            await RequestTimeout<ExecuteAssessmentPollingTask>(context,
-                    TimeSpan.FromSeconds(_generalConfig.Value.WorkflowCoordinatorAssessmentPollingIntervalSeconds))
-                .ConfigureAwait(false);
+            //await RequestTimeout<ExecuteAssessmentPollingTask>(context,
+            //        TimeSpan.FromSeconds(_generalConfig.Value.WorkflowCoordinatorAssessmentPollingIntervalSeconds))
+            //    .ConfigureAwait(false);
         }
 
         private async Task<DocumentObject> GetAssessmentNotInWorkflowDatabase()

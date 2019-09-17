@@ -87,5 +87,29 @@ namespace SourceDocumentCoordinator.HttpClients
 
             return returnCode;
         }
+
+        public async Task<ReturnCode> DeleteDocumentRequestJobFromQueue(string callerCode, int sdocId, string writeableFolderName)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceDeleteDocumentRequestJobFromQueueUri}{callerCode}/{sdocId}/{writeableFolderName}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+
+            }
+
+            var returnCode = JsonConvert.DeserializeObject<ReturnCode>(data);
+
+            return returnCode;
+        }
     }
 }

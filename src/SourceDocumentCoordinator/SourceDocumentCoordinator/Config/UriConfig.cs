@@ -11,6 +11,7 @@ namespace SourceDocumentCoordinator.Config
         public Uri DataServicesWebServiceBaseUri { get; set; }
         public Uri DataServicesWebServiceGetDocumentForViewingUri { get; set; }
         public Uri DataServicesWebServiceDocumentRequestQueueStatusUri { get; set; }
+        public Uri DataServicesWebServiceDeleteDocumentRequestJobFromQueueUri { get; set; }
         public Uri DataServicesWebServiceHealthcheckUri { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
 
