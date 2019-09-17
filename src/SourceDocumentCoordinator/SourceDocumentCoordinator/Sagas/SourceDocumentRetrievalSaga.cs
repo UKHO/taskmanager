@@ -14,7 +14,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Sagas
 {
-    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>, 
+    public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>,
         IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>,
         IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
@@ -54,7 +54,7 @@ namespace SourceDocumentCoordinator.Sagas
                 true);
 
             // TODO: Think about different return code scenarios
-            if (returnCode.Code.HasValue 
+            if (returnCode.Code.HasValue
                 && (returnCode.Code.Value == 0)
                 || (returnCode.Code.Value == 1 && Data.SourceDocumentStatusId == 0))
             {
@@ -62,7 +62,7 @@ namespace SourceDocumentCoordinator.Sagas
                 {
                     ProcessId = message.ProcessId,
                     SdocId = message.SourceDocumentId,
-                    Status = "Started",
+                    Status = SourceDocumentRetrievalStatus.Started.ToString(),
                     StartedAt = DateTime.Now
                 };
 
@@ -73,20 +73,18 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
             }
 
-            var requestStatus = new GetDocumentRequestQueueStatusCommand
+            if (Data.SourceDocumentStatusId > 0)
             {
-                SdocId = message.SourceDocumentId,
-                CorrelationId = message.CorrelationId
-            };
+                var requestStatus = new GetDocumentRequestQueueStatusCommand
+                {
+                    SdocId = message.SourceDocumentId,
+                    CorrelationId = message.CorrelationId
+                };
 
-            await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
-                TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
-                requestStatus);
-
-            // TODO: Subsequent stories:
-            // Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
-
-            //MarkAsComplete();
+                await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
+                    TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                    requestStatus);
+            }
         }
 
         public async Task Timeout(GetDocumentRequestQueueStatusCommand message, IMessageHandlerContext context)
@@ -94,14 +92,44 @@ namespace SourceDocumentCoordinator.Sagas
             var queuedDocs = _dataServiceApiClient.GetDocumentRequestQueueStatus(_generalConfig.Value.CallerCode);
 
             // TODO: Potentially deal with a list of queued requests...
-            var ours = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
+            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
 
-            // TODO: if code != 1 etc...
-            if (ours.Code == 1)
+            if (sourceDocument.Code == null)
+                throw new ApplicationException(
+                    $"Source Document Retrieval Status Code is null {Environment.NewLine}{sourceDocument.ToJSONSerializedString()}");
+
+            switch (sourceDocument.Code.Value)
             {
-                await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context, 
-                    TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds), 
-                    message);
+                case 0:
+                    // Doc Ready; update DB;
+                    UpdateSourceDocumentStatus(message);
+
+                    // TODO: Subsequent stories:
+                    // TODO: fire new Command to retrieve the doc and save it in Content service
+                    // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
+                    //MarkAsComplete();
+
+                    break;
+                case 1:
+                    // Still queued; fire another timer
+                    await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
+                        TimeSpan.FromSeconds(_generalConfig.Value
+                            .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
+                        message);
+                    break;
+                default:
+                    throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
+            }
+        }
+
+        private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
+        {
+            var sourceDocumentStatus =
+                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SdocId);
+            if (sourceDocumentStatus != null)
+            {
+                sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
+                _dbContext.SaveChanges();
             }
         }
     }
