@@ -27,12 +27,12 @@ namespace SourceDocumentCoordinator.Handlers
 
         public async Task Handle(ClearDocumentRequestFromQueueCommand message, IMessageHandlerContext context)
         {
-            var returnCode = _dataServiceApiClient
-                .DeleteDocumentRequestJobFromQueue(_generalConfig.Value.CallerCode, message.SdocId, ConstructWriteableFolderName(message.SdocId));
+            var returnCode = await _dataServiceApiClient
+                .DeleteDocumentRequestJobFromQueue(_generalConfig.Value.CallerCode, message.SdocId, ConstructWriteableFolderName(message.SdocId)).ConfigureAwait(false);
 
-            if (returnCode.Result.Code.HasValue)
+            if (returnCode.Code.HasValue)
             {
-                switch (returnCode.Result.Code.Value)
+                switch (returnCode.Code.Value)
                 {
                     case (int)ClearDocumentFromQueueReturnCodeEnum.Success:
                         break;
