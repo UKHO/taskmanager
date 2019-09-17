@@ -95,7 +95,7 @@ namespace WorkflowCoordinator.Sagas
                 SourceDocumentId = Data.SourceDocumentId
             };
 
-            await context.SendLocal(initiateRetrievalCommand).ConfigureAwait(false);
+            await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
 
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");

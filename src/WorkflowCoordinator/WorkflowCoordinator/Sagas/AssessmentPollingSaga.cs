@@ -78,9 +78,9 @@ namespace WorkflowCoordinator.Sagas
                 await context.SendLocal(startDbAssessmentCommand).ConfigureAwait(false);
             }
 
-            //await RequestTimeout<ExecuteAssessmentPollingTask>(context,
-            //        TimeSpan.FromSeconds(_generalConfig.Value.WorkflowCoordinatorAssessmentPollingIntervalSeconds))
-            //    .ConfigureAwait(false);
+            await RequestTimeout<ExecuteAssessmentPollingTask>(context,
+                    TimeSpan.FromSeconds(_generalConfig.Value.WorkflowCoordinatorAssessmentPollingIntervalSeconds))
+                .ConfigureAwait(false);
         }
 
         private async Task<DocumentObject> GetAssessmentNotInWorkflowDatabase()
