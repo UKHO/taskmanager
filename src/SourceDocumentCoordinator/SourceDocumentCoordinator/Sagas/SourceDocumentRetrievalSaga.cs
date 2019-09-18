@@ -1,14 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Messages.Commands;
+
 using Microsoft.Extensions.Options;
+
 using NServiceBus;
 using NServiceBus.Logging;
+
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -52,7 +57,7 @@ namespace SourceDocumentCoordinator.Sagas
             // Call GetDocumentForViewing method on DataServices API
             var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode,
                 message.SourceDocumentId,
-                "TBC",
+                _generalConfig.Value.SourceDoumentWriteableFolderName,
                 true);
 
             // TODO: Think about different return code scenarios
@@ -79,7 +84,7 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 var requestStatus = new GetDocumentRequestQueueStatusCommand
                 {
-                    SdocId = message.SourceDocumentId,
+                    SourceDocumentId = message.SourceDocumentId,
                     CorrelationId = message.CorrelationId
                 };
 
@@ -94,7 +99,7 @@ namespace SourceDocumentCoordinator.Sagas
             var queuedDocs = _dataServiceApiClient.GetDocumentRequestQueueStatus(_generalConfig.Value.CallerCode);
 
             // TODO: Potentially deal with a list of queued requests...
-            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
+            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SourceDocumentId);
 
             if (sourceDocument.Code == null)
                 throw new ApplicationException(
@@ -111,7 +116,7 @@ namespace SourceDocumentCoordinator.Sagas
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
                         CorrelationId = message.CorrelationId,
-                        SdocId = message.SdocId
+                        SourceDocumentId = message.SourceDocumentId
                     };
                     await context.SendLocal(removeFromQueue).ConfigureAwait(false);
 
@@ -119,7 +124,7 @@ namespace SourceDocumentCoordinator.Sagas
                     var persistCommand = new PersistDocumentInStoreCommand
                     {
                         CorrelationId = message.CorrelationId,
-                        SdocId = message.SdocId
+                        SourceDocumentId = message.SourceDocumentId
                     };
                     await context.SendLocal(persistCommand).ConfigureAwait(false);
 
@@ -141,7 +146,7 @@ namespace SourceDocumentCoordinator.Sagas
         private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
         {
             var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SdocId);
+                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
             if (sourceDocumentStatus != null)
             {
                 sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();

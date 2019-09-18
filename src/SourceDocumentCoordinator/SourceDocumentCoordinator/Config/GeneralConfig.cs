@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace SourceDocumentCoordinator.Config
 {
@@ -9,6 +10,13 @@ namespace SourceDocumentCoordinator.Config
         public string LocalDbServer { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
         public int SourceDocumentCoordinatorQueueStatusIntervalSeconds { get; set; }
+        public string SourceDoumentWriteableFolderName { get; set; }
+
+        public string GetSourceDoumentWriteableFolderFullPath(int sdocId)
+        {
+            return Path.Combine(this.SourceDoumentWriteableFolderName,sdocId.ToString());
+        }
+
     }
 
     public class ConnectionStrings

@@ -191,7 +191,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
             {
                 CorrelationId = correlationId,
-                SdocId = sdocId
+                SourceDocumentId = sdocId
             };
 
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
@@ -229,7 +229,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
             {
                 CorrelationId = correlationId,
-                SdocId = sdocId
+                SourceDocumentId = sdocId
             };
 
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
@@ -270,7 +270,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
             {
                 CorrelationId = correlationId,
-                SdocId = sdocId
+                SourceDocumentId = sdocId
             };
 
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();

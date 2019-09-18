@@ -28,7 +28,11 @@ namespace SourceDocumentCoordinator.Handlers
         public async Task Handle(ClearDocumentRequestFromQueueCommand message, IMessageHandlerContext context)
         {
             var returnCode = await _dataServiceApiClient
-                .DeleteDocumentRequestJobFromQueue(_generalConfig.Value.CallerCode, message.SdocId, ConstructWriteableFolderName(message.SdocId)).ConfigureAwait(false);
+                .DeleteDocumentRequestJobFromQueue(
+                                                    _generalConfig.Value.CallerCode,
+                                                    message.SourceDocumentId,
+                                                    _generalConfig.Value.GetSourceDoumentWriteableFolderFullPath(message.SourceDocumentId))
+                .ConfigureAwait(false);
 
             if (returnCode.Code.HasValue)
             {
@@ -40,11 +44,6 @@ namespace SourceDocumentCoordinator.Handlers
                         throw new NotImplementedException();
                 }
             }
-        }
-
-        private string ConstructWriteableFolderName(int sdocId)
-        {
-            return "";
         }
     }
 }
