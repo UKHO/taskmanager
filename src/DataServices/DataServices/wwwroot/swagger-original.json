@@ -330,7 +330,7 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{writeableFolderName}/{imageAsGeoTIFF}" : {
+    "/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{imageAsGeoTIFF}" : {
       "get" : {
         "tags" : [ "DataAccess" ],
         "summary" : "Get the Document URL for the Id specified.",
@@ -358,7 +358,7 @@
           }
         }, {
           "name" : "writeableFolderName",
-          "in" : "path",
+          "in" : "query",
           "description" : "The path for the file output\nExample: tbc\n",
           "required" : true,
           "style" : "simple",

@@ -28,7 +28,7 @@ namespace SourceDocumentCoordinator.HttpClients
             var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
 
             var fullUri = new Uri(baseUri,
-                $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{writableFolderName}/{imageAsGeotiff}");
+                $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{imageAsGeotiff}?writeableFolderName={Uri.EscapeDataString(writableFolderName)}");
 
             using (var response = await _httpClient.GetAsync(fullUri.ToString()))
             {

@@ -67,7 +67,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
         {
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode, 
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode,
                 sdocId.Value,
                 writeableFolderName);
 
@@ -120,7 +120,7 @@ namespace DataServices.Controllers
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(LinkedDocument));
 
-            
+
 
 
             string exampleJson = null;
@@ -201,7 +201,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpGet]
-        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{writeableFolderName}/{imageAsGeoTIFF}")]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{imageAsGeoTIFF}")]
         [ValidateModelState]
         [SwaggerOperation("GetDocumentForViewing")]
         [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "A code and description of the document request status")]
@@ -211,7 +211,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string writeableFolderName, [FromRoute][Required]bool? imageAsGeoTIFF)
+        public virtual IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value,
                 writeableFolderName, imageAsGeoTIFF.Value);

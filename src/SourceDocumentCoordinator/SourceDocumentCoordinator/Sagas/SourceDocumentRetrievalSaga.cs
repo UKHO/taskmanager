@@ -50,7 +50,9 @@ namespace SourceDocumentCoordinator.Sagas
             }
 
             // Call GetDocumentForViewing method on DataServices API
-            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "tbc",
+            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode,
+                message.SourceDocumentId,
+                "TBC",
                 true);
 
             // TODO: Think about different return code scenarios
@@ -130,7 +132,7 @@ namespace SourceDocumentCoordinator.Sagas
                         TimeSpan.FromSeconds(_generalConfig.Value
                             .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                         message);
-                    break;;
+                    break; ;
                 default:
                     throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
             }
