@@ -541,7 +541,7 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}/{writeableFolderName}" : {
+    "/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}" : {
       "delete" : {
         "tags" : [ "DataAccess" ],
         "summary" : "Clear the document request job from the queue",
@@ -569,7 +569,7 @@
           }
         }, {
           "name" : "writeableFolderName",
-          "in" : "path",
+          "in" : "query",
           "description" : "The path for the file output\nExample: tbc\n",
           "required" : true,
           "style" : "simple",

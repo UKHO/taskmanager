@@ -94,9 +94,9 @@ namespace SourceDocumentCoordinator.HttpClients
             var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
 
             var fullUri = new Uri(baseUri,
-                $"{_uriConfig.Value.DataServicesWebServiceDeleteDocumentRequestJobFromQueueUri}{callerCode}/{sdocId}/{writeableFolderName}");
+                $"{_uriConfig.Value.DataServicesWebServiceDeleteDocumentRequestJobFromQueueUri}{callerCode}/{sdocId}?writeableFolderName={Uri.EscapeDataString(writeableFolderName)}");
 
-            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            using (var response = await _httpClient.DeleteAsync(fullUri))
             {
                 data = await response.Content.ReadAsStringAsync();
 

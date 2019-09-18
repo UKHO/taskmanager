@@ -9,7 +9,6 @@
  */
 
 using System;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
@@ -18,7 +17,6 @@ using DataServices.Attributes;
 using DataServices.Connected_Services.SDRADataAccessWebService;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -57,7 +55,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpDelete]
-        [Route("/DataServices/v1/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}/{writeableFolderName}")]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}")]
         [ValidateModelState]
         [SwaggerOperation("DeleteDocumentRequestJobFromQueue")]
         [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "An code and message")]
@@ -67,7 +65,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string writeableFolderName)
+        public virtual IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode, 
                 sdocId.Value,
