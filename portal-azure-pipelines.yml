@@ -58,6 +58,11 @@ steps:
     projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
   displayName: 'dotnet build portalspecs'
 
+- task: CmdLine@2
+  inputs:
+    script: '$(System.DefaultWorkingDirectory)\\src\\packages\\Pickles.CommandLine.2.20.1\\tools\\pickles.exe --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
+  displayName: Generate Pickles Documentation
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
