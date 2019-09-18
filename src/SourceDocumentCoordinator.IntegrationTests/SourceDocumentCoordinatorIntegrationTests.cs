@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,8 @@ namespace SourceDocumentCoordinator.IntegrationTests
     public class SourceDocumentCoordinatorIntegrationTests
     {
         private IDataServiceApiClient _dataServiceApiClient;
+        private IContentServiceApiClient _contentServiceApiClient;
+        private OptionsSnapshotWrapper<UriConfig> _uriConfigWrapper;
 
         [SetUp]
         public void SetUp()
@@ -24,15 +27,29 @@ namespace SourceDocumentCoordinator.IntegrationTests
 
             var generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
 
-            var uriOptions = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
+            _uriConfigWrapper = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
 
-            _dataServiceApiClient = new DataServiceApiClient(httpClient, generalConfigOptions, uriOptions);
+            _dataServiceApiClient = new DataServiceApiClient(httpClient, generalConfigOptions, _uriConfigWrapper);
         }
 
         [Test]
         public async Task Test_DataServiceApi_Connectivity()
         {
             Assert.AreEqual(await _dataServiceApiClient.CheckDataServicesConnection(), true);
+        }
+
+        [Test]
+        public async Task Test_ContentService_Connectivity()
+        {
+            var hndlr = new HttpClientHandler()
+            {
+                Credentials = new NetworkCredential("tbc", "tbc"),
+            };
+            
+            var httpClient = new HttpClient(hndlr);
+            _contentServiceApiClient = new ContentServiceApiClient(httpClient, _uriConfigWrapper);
+
+            await _contentServiceApiClient.Post();
         }
 
         private GeneralConfig GetGeneralConfigs(IConfigurationRoot appConfigurationConfigRoot)

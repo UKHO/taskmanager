@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -72,6 +74,9 @@ namespace SourceDocumentCoordinator
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+                services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
                 var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
