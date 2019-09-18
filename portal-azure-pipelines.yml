@@ -60,8 +60,27 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: '$(System.DefaultWorkingDirectory)\\src\\packages\\Pickles.CommandLine.2.20.1\\tools\\pickles.exe --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
+    script: 'choco install pickles'
+  displayName: Install Pickles
+
+- task: CmdLine@2
+  inputs:
+    script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
   displayName: Generate Pickles Documentation
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: Publish Pickles Artifact
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation'
+    TargetFolder: '\\tfsshares\\LivingDocumentation$\\Pickles-Demo-Project'
+    OverWrite: true
+  displayName: Publish Pickles Files to tfsshares 
 
 - task: DotNetCoreCLI@2
   inputs:
