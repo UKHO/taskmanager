@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceDocumentCoordinator.HttpClients
+namespace SourceDocumentCoordinator.Models
 {
     public class ContentServiceMetadata
     {
