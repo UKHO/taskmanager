@@ -14,6 +14,7 @@ namespace SourceDocumentCoordinator.IntegrationTests
         private IDataServiceApiClient _dataServiceApiClient;
         private IContentServiceApiClient _contentServiceApiClient;
         private OptionsSnapshotWrapper<UriConfig> _uriConfigWrapper;
+        private OptionsSnapshotWrapper<SecretsConfig> _secretsConfigWrapper;
 
         [SetUp]
         public void SetUp()
@@ -21,13 +22,16 @@ namespace SourceDocumentCoordinator.IntegrationTests
             var httpClient = new HttpClient();
 
             var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
+            var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
 
             var generalConfig = GetGeneralConfigs(appConfigurationConfigRoot);
             var uriConfig = GetUriConfigs(appConfigurationConfigRoot);
+            var secretsConfig = GetSecretsConfigs(keyVaultConfigRoot);
 
             var generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
 
             _uriConfigWrapper = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
+            _secretsConfigWrapper = new OptionsSnapshotWrapper<SecretsConfig>(secretsConfig);
 
             _dataServiceApiClient = new DataServiceApiClient(httpClient, generalConfigOptions, _uriConfigWrapper);
         }
@@ -43,14 +47,15 @@ namespace SourceDocumentCoordinator.IntegrationTests
         {
             var hndlr = new HttpClientHandler()
             {
-                //Credentials = new NetworkCredential("tbc", "tbc"),
-                UseDefaultCredentials = true
+                Credentials = new NetworkCredential(_secretsConfigWrapper.Value.ContentServiceUsername,
+                    _secretsConfigWrapper.Value.ContentServicePassword,
+                    _secretsConfigWrapper.Value.ContentServiceDomain)
             };
-            
-            var httpClient = new HttpClient(hndlr);
-            _contentServiceApiClient = new ContentServiceApiClient(httpClient, _uriConfigWrapper);
 
-            await _contentServiceApiClient.Post();
+            var httpClient = new HttpClient(hndlr);
+            _contentServiceApiClient = new ContentServiceApiClient(httpClient, _uriConfigWrapper, _secretsConfigWrapper);
+
+            await _contentServiceApiClient.Post(System.IO.File.ReadAllBytes("C:\\temp\\2.pdf"), "2.pdf");
         }
 
         private GeneralConfig GetGeneralConfigs(IConfigurationRoot appConfigurationConfigRoot)
@@ -69,6 +74,15 @@ namespace SourceDocumentCoordinator.IntegrationTests
             appConfigurationConfigRoot.GetSection("urls").Bind(uriConfig);
 
             return uriConfig;
+        }
+
+        private SecretsConfig GetSecretsConfigs(IConfigurationRoot appConfigurationConfigRoot)
+        {
+            var secretsConfig = new SecretsConfig();
+
+            appConfigurationConfigRoot.GetSection("contentservice").Bind(secretsConfig);
+
+            return secretsConfig;
         }
     }
 }

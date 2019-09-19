@@ -408,5 +408,53 @@ namespace DataServices.Controllers
             : default(DocumentObjects);            //TODO: Change the data returned
             return new ObjectResult(example);
         }
+
+        /// <summary>
+        /// Clear the document request queue
+        /// </summary>
+        /// <param name="callerCode">System that is calling the API  Example: HDB </param>
+        /// <response code="200">An code and message</response>
+        /// <response code="400">Bad request.</response>
+        /// <response code="401">Unauthorised.</response>
+        /// <response code="403">Forbidden.</response>
+        /// <response code="404">Not found.</response>
+        /// <response code="406">Not acceptable.</response>
+        /// <response code="500">Internal Server Error.</response>
+        [HttpDelete]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/ClearDocumentRequestQueue/{callerCode}")]
+        [ValidateModelState]
+        [SwaggerOperation("DeleteDocumentQueue")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "An code and message")]
+        [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
+        [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
+        [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
+        [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
+        [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
+        [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
+        public virtual IActionResult ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
+        {
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync(callerCode);
+
+            CallOutcome outcome = null;
+            try
+            {
+                outcome = new CallOutcome
+                {
+                    ErrorCode = task.Result.ErrorCode,
+                    Message = task.Result.Message
+                };
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error clearing document queue");
+                return StatusCode(500, e.Message);
+            }
+            return new ObjectResult(outcome);
+        }
     }
 }

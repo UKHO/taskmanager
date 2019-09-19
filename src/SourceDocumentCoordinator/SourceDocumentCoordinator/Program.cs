@@ -75,10 +75,22 @@ namespace SourceDocumentCoordinator
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
+                var startupSecretConfig = new StartupSecretsConfig();
+                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretConfig);
+
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
                 services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
+                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                    {
+                        Credentials = new NetworkCredential
+                        {
+                            UserName = startupSecretConfig.ContentServiceUsername,
+                            Password = startupSecretConfig.ContentServicePassword,
+                            Domain = startupSecretConfig.ContentServiceDomain
+                        }
+                    })
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
                 var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,

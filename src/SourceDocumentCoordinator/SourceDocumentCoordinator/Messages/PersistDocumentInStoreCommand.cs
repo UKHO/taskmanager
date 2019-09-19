@@ -7,5 +7,6 @@ namespace SourceDocumentCoordinator.Messages
     {
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
+        public string Filepath { get; set; }
     }
 }

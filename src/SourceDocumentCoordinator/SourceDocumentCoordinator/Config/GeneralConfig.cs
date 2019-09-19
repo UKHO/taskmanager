@@ -10,11 +10,11 @@ namespace SourceDocumentCoordinator.Config
         public string LocalDbServer { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
         public int SourceDocumentCoordinatorQueueStatusIntervalSeconds { get; set; }
-        public string SourceDoumentWriteableFolderName { get; set; }
+        public string SourceDocumentWriteableFolderName { get; set; }
 
         public string GetSourceDoumentWriteableFolderFullPath(int sdocId)
         {
-            return Path.Combine(this.SourceDoumentWriteableFolderName,sdocId.ToString());
+            return Path.Combine(this.SourceDocumentWriteableFolderName,sdocId.ToString());
         }
 
     }

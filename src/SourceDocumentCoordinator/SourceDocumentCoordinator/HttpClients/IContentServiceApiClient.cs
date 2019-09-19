@@ -5,6 +5,6 @@ namespace SourceDocumentCoordinator.HttpClients
 {
     public interface IContentServiceApiClient
     {
-        Task<Guid> Post();
+        Task<Guid> Post(byte[] fileBytes, string filename);
     }
 }

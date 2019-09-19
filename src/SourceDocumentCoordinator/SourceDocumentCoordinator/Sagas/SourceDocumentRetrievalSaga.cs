@@ -57,7 +57,7 @@ namespace SourceDocumentCoordinator.Sagas
             // Call GetDocumentForViewing method on DataServices API
             var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode,
                 message.SourceDocumentId,
-                _generalConfig.Value.SourceDoumentWriteableFolderName,
+                _generalConfig.Value.SourceDocumentWriteableFolderName,
                 true);
 
             // TODO: Think about different return code scenarios
@@ -120,11 +120,12 @@ namespace SourceDocumentCoordinator.Sagas
                     };
                     await context.SendLocal(removeFromQueue).ConfigureAwait(false);
 
-                    // TODO: fire new Command to retrieve the doc and save it in Content service
+                    // Fire command to store source doc in Content Service
                     var persistCommand = new PersistDocumentInStoreCommand
                     {
                         CorrelationId = message.CorrelationId,
-                        SourceDocumentId = message.SourceDocumentId
+                        SourceDocumentId = message.SourceDocumentId,
+                        Filepath = sourceDocument.Message
                     };
                     await context.SendLocal(persistCommand).ConfigureAwait(false);
 
