@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SourceDocumentCoordinator.Config;
@@ -23,7 +24,6 @@ namespace SourceDocumentCoordinator.HttpClients
             var bytes = System.IO.File.ReadAllBytes("c:\\temp\\2.pdf");
 
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("cspostrequest", "{\"Tag\":\"cid-48234096\",\"MetaData\":{\"ProductType\":\"SNCChartComponent\",\"UpdatedDate\":\"20150728\",\"HPDChartVersion\":\"12\"}}");
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var byteArrayContent = new ByteArrayContent(bytes);
@@ -31,7 +31,9 @@ namespace SourceDocumentCoordinator.HttpClients
 
             var response = await _httpClient.PostAsync(_uriConfig.Value.ContentServiceBaseUrl, new MultipartFormDataContent
             {
+                {new StringContent("{\"Tag\":\"cid-48234096\",\"MetaData\":{\"ProductType\":\"SNCChartComponent\",\"UpdatedDate\":\"20150728\",\"HPDChartVersion\":\"12\"}}", Encoding.UTF8, "application/json"),  "cspostrequest"},
                 {byteArrayContent, "file", "2.pdf"}
+                
             });
 
             return Guid.NewGuid();

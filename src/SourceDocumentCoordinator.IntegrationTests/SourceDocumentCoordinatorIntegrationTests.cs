@@ -43,7 +43,8 @@ namespace SourceDocumentCoordinator.IntegrationTests
         {
             var hndlr = new HttpClientHandler()
             {
-                Credentials = new NetworkCredential("tbc", "tbc"),
+                //Credentials = new NetworkCredential("tbc", "tbc"),
+                UseDefaultCredentials = true
             };
             
             var httpClient = new HttpClient(hndlr);
