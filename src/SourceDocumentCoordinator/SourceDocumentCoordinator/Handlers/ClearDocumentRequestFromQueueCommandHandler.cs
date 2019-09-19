@@ -31,7 +31,7 @@ namespace SourceDocumentCoordinator.Handlers
                 .DeleteDocumentRequestJobFromQueue(
                                                     _generalConfig.Value.CallerCode,
                                                     message.SourceDocumentId,
-                                                    _generalConfig.Value.GetSourceDoumentWriteableFolderFullPath(message.SourceDocumentId))
+                                                    _generalConfig.Value.SourceDocumentWriteableFolderName)
                 .ConfigureAwait(false);
 
             if (returnCode.Code.HasValue)
@@ -39,6 +39,8 @@ namespace SourceDocumentCoordinator.Handlers
                 switch (returnCode.Code.Value)
                 {
                     case (int)ClearDocumentFromQueueReturnCodeEnum.Success:
+                    case (int)ClearDocumentFromQueueReturnCodeEnum.Warning:
+                        // TODO: Update db with status
                         break;
                     default:
                         throw new NotImplementedException();

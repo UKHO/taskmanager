@@ -11,12 +11,6 @@ namespace SourceDocumentCoordinator.Config
         public ConnectionStrings ConnectionStrings { get; set; }
         public int SourceDocumentCoordinatorQueueStatusIntervalSeconds { get; set; }
         public string SourceDocumentWriteableFolderName { get; set; }
-
-        public string GetSourceDoumentWriteableFolderFullPath(int sdocId)
-        {
-            return Path.Combine(this.SourceDocumentWriteableFolderName,sdocId.ToString());
-        }
-
     }
 
     public class ConnectionStrings
