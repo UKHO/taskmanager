@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using SourceDocumentCoordinator.Config;
@@ -8,6 +9,7 @@ using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Handlers
 {
@@ -40,12 +42,19 @@ namespace SourceDocumentCoordinator.Handlers
                 {
                     case (int)ClearDocumentFromQueueReturnCodeEnum.Success:
                     case (int)ClearDocumentFromQueueReturnCodeEnum.Warning:
-                        // TODO: Update db with status
+                        UpdateSourceDocumentStatus(message.SourceDocumentId, SourceDocumentRetrievalStatus.Complete);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
             }
+        }
+
+        private async void UpdateSourceDocumentStatus(int sdocId, SourceDocumentRetrievalStatus status)
+        {
+            var row = await _dbContext.SourceDocumentStatus.FirstAsync(s => s.SdocId == sdocId);
+            row.Status = status.ToString();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
