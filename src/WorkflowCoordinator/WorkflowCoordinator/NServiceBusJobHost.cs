@@ -135,18 +135,6 @@ namespace WorkflowCoordinator
                         });
 
                 transport.Routing().RouteToEndpoint(
-                    messageType: typeof(StartAssessmentPollingCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
-                    messageType: typeof(StartDbAssessmentCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
-                    messageType: typeof(RetrieveAssessmentDataCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
                     messageType: typeof(InitiateSourceDocumentRetrievalCommand),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
@@ -180,7 +168,7 @@ namespace WorkflowCoordinator
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
                 Guid pollingSagaGuid = _generalConfig.Value.AssessmentPollingSagaCorrelationGuid;
-                await _endpoint.Send(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
+                await _endpoint.SendLocal(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
