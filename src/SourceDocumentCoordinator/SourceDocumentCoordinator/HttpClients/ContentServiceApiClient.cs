@@ -15,14 +15,12 @@ namespace SourceDocumentCoordinator.HttpClients
     public class ContentServiceApiClient : IContentServiceApiClient
     {
         private readonly IOptions<UriConfig> _uriConfig;
-        private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly HttpClient _httpClient;
 
         public ContentServiceApiClient(HttpClient httpClient, IOptions<UriConfig> uriConfig, IOptions<SecretsConfig> secretsConfig)
         {
             _httpClient = httpClient;
             _uriConfig = uriConfig;
-            _secretsConfig = secretsConfig;
         }
 
         public async Task<Guid> Post(byte[] fileBytes, string filename)
@@ -66,7 +64,7 @@ namespace SourceDocumentCoordinator.HttpClients
         {
             var metadata = new ContentServiceMetadata
             {
-                ProductType = "SDRASourceDocument", // TODO: Move to Azure app config
+                ProductType = "SDRASourceDocument",
                 UpdatedDate = DateTime.Today
             };
 
