@@ -6,7 +6,10 @@
 
 <h2>Review</h2>
 
-@await Html.PartialAsync("_TaskInformation", new _TaskInformationModel()).ConfigureAwait(false)
-@await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
-@await Html.PartialAsync("_AssignTask", new _AssignTaskModel()).ConfigureAwait(false)
-@await Html.PartialAsync("_Comments", new _CommentsModel()).ConfigureAwait(false)
+
+<div class="panel-group" id="accordion">
+    @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
+    @await Html.PartialAsync("_AssignTask", new _AssignTaskModel()).ConfigureAwait(false)
+    @await Html.PartialAsync("_Comments", new _CommentsModel()).ConfigureAwait(false)
+</div>
