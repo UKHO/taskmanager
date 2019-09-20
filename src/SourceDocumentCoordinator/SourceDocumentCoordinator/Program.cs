@@ -1,10 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Net;
@@ -12,8 +6,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SourceDocumentCoordinator.Config;
@@ -64,14 +64,13 @@ namespace SourceDocumentCoordinator
 
                 services.AddOptions<UriConfig>()
                     .Bind(hostingContext.Configuration.GetSection("urls"));
+
                 services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("apis"));
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("nsb"));
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("databases"));
-                services.AddOptions<GeneralConfig>()
+                    .Bind(hostingContext.Configuration.GetSection("apis"))
+                    .Bind(hostingContext.Configuration.GetSection("nsb"))
+                    .Bind(hostingContext.Configuration.GetSection("databases"))
                     .Bind(hostingContext.Configuration.GetSection("path"));
+
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
