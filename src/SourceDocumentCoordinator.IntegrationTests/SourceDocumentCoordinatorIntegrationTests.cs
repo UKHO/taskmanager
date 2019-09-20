@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Extensions.Configuration;
@@ -45,17 +48,22 @@ namespace SourceDocumentCoordinator.IntegrationTests
         [Test]
         public async Task Test_ContentService_Connectivity()
         {
-            var hndlr = new HttpClientHandler()
+            var testHandler = new HttpClientHandler()
             {
                 Credentials = new NetworkCredential(_secretsConfigWrapper.Value.ContentServiceUsername,
                     _secretsConfigWrapper.Value.ContentServicePassword,
                     _secretsConfigWrapper.Value.ContentServiceDomain)
             };
 
-            var httpClient = new HttpClient(hndlr);
+            var httpClient = new HttpClient(testHandler);
             _contentServiceApiClient = new ContentServiceApiClient(httpClient, _uriConfigWrapper, _secretsConfigWrapper);
 
-            await _contentServiceApiClient.Post(System.IO.File.ReadAllBytes("C:\\temp\\2.pdf"), "2.pdf");
+            var filename = Path.Combine(Environment.CurrentDirectory, "TestData") + "\\ContentServiceIntegration.txt";
+
+            var returnedGuid = await _contentServiceApiClient.Post(File.ReadAllBytes(filename), "ContentServiceIntegration.txt");
+
+            Assert.IsNotNull(returnedGuid);
+            Assert.AreNotEqual(Guid.NewGuid(), returnedGuid);
         }
 
         private GeneralConfig GetGeneralConfigs(IConfigurationRoot appConfigurationConfigRoot)

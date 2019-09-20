@@ -55,6 +55,8 @@ namespace SourceDocumentCoordinator.HttpClients
                     return "application/pdf";
                 case ".ZIP":
                     return "application/zip";
+                case ".TXT":
+                    return "text/plain";
                 default:
                     throw new NotImplementedException();
             }

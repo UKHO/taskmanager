@@ -17,4 +17,10 @@
     <ProjectReference Include="..\SourceDocumentCoordinator\SourceDocumentCoordinator\SourceDocumentCoordinator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\ContentServiceIntegration.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
