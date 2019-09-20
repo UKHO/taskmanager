@@ -10,215 +10,92 @@
       "url": "/DataServices/v1/"
     }
   ],
-  "paths" : {
-    "/SourceDocument/Assessment/DocumentsForAssessment/{callerCode}" : {
-      "get" : {
-        "tags" : [ "Assessment" ],
-        "summary" : "Get a list of open source document objects",
-        "operationId" : "listDocumentsForAssessment",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "An array of document objects",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DocumentObjects"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+  "paths": {
+    "/SourceDocument/Assessment/DocumentsForAssessment/{callerCode}": {
+      "get": {
+        "tags": [ "Assessment" ],
+        "summary": "Get a list of open source document objects",
+        "operationId": "listDocumentsForAssessment",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           }
-        }
-      }
-    },
-    "/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{action}/{change}" : {
-      "put" : {
-        "tags" : [ "Assessment" ],
-        "summary" : "Create assessment record for specified document.",
-        "operationId" : "putDocumentAssessed",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "transactionId",
-          "in" : "path",
-          "description" : "Cross reference from SDRA to  external system providing the assessment record \n\nExample: tbc\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "action",
-          "in" : "path",
-          "description" : "A action type from a list\n\nExample: Imm Act - NM, Longer-term Action, No Action, No Impact\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "Imm Act - NM", "Longer-term Action", "No Action", "No Impact" ]
-          }
-        }, {
-          "name" : "change",
-          "in" : "path",
-          "description" : "tbc\n\nExample: tbc\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "SDRA notified that document has been assessment"
-          },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of document objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentObjects"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -226,224 +103,130 @@
         }
       }
     },
-    "/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}/{comment}" : {
-      "put" : {
-        "tags" : [ "Assessment" ],
-        "summary" : "Notify SDRA that assessment job has been completed.",
-        "operationId" : "putAssessmentCompleted",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "comment",
-          "in" : "path",
-          "description" : "tbc\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "SDRA notified that assessment has been completed"
-          },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+    "/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{action}/{change}": {
+      "put": {
+        "tags": [ "Assessment" ],
+        "summary": "Create assessment record for specified document.",
+        "operationId": "putDocumentAssessed",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "transactionId",
+            "in": "path",
+            "description": "Cross reference from SDRA to  external system providing the assessment record \n\nExample: tbc\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "action",
+            "in": "path",
+            "description": "A action type from a list\n\nExample: Imm Act - NM, Longer-term Action, No Action, No Impact\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [ "Imm Act - NM", "Longer-term Action", "No Action", "No Impact" ]
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "change",
+            "in": "path",
+            "description": "tbc\n\nExample: tbc\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           }
-        }
-      }
-    },
-    "/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{writeableFolderName}/{imageAsGeoTIFF}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get the Document URL for the Id specified.",
-        "operationId" : "getDocumentForViewing",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "writeableFolderName",
-          "in" : "path",
-          "description" : "The path for the file output\nExample: tbc\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "imageAsGeoTIFF",
-          "in" : "path",
-          "description" : "True if conversion to GeoTiff should be attempted.\nExample: true, false\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "boolean"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "A code and description of the document request status",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ReturnCode"
+        ],
+        "responses": {
+          "200": {
+            "description": "SDRA notified that document has been assessment"
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -451,200 +234,107 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/DocumentRequestQueueStatus/{callerCode}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get the status of all queued documents",
-        "operationId" : "getDocumentRequestQueueStatus",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "An array of queued document objects",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/QueuedDocumentObjects"
-                }
-              }
+    "/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}/{comment}": {
+      "put": {
+        "tags": [ "Assessment" ],
+        "summary": "Notify SDRA that assessment job has been completed.",
+        "operationId": "putAssessmentCompleted",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "comment",
+            "in": "path",
+            "description": "tbc\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           }
-        }
-      }
-    },
-    "/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}/{writeableFolderName}" : {
-      "delete" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Clear the document request job from the queue",
-        "operationId" : "deleteDocumentRequestJobFromQueue",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "writeableFolderName",
-          "in" : "path",
-          "description" : "The path for the file output\nExample: tbc\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "An code and message",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ReturnCode"
+        ],
+        "responses": {
+          "200": {
+            "description": "SDRA notified that assessment has been completed"
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -652,191 +342,125 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/DocumentAssessmentData/{callerCode}/{sdocId}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get the data for the document assessment",
-        "operationId" : "GetDocumentAssessmentData",
-        "parameters" : [ {
-          "name" : "callerCode",
-          "in" : "path",
-          "description" : "System that is calling the API\n\nExample: HDB\n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "A document assessment data object",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DocumentAssessmentData"
-                }
-              }
+    "/SourceDocument/DataAccess/DocumentForViewing/{callerCode}/{sdocId}/{imageAsGeoTIFF}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get the Document URL for the Id specified.",
+        "operationId": "getDocumentForViewing",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "writeableFolderName",
+            "in": "query",
+            "description": "The path for the file output\nExample: tbc\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
-                }
-              }
+          {
+            "name": "imageAsGeoTIFF",
+            "in": "path",
+            "description": "True if conversion to GeoTiff should be attempted.\nExample: true, false\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "boolean"
             }
           }
-        }
-      }
-    },
-    "/SourceDocument/DataAccess/ForwardDocumentLinks/{sdocId}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get documents linked to source document assessment",
-        "operationId" : "GetForwardDocumentLinks",
-        "parameters" : [ {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "AAn array of documents linked to the assessment",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/LinkedDocument"
+        ],
+        "responses": {
+          "200": {
+            "description": "A code and description of the document request status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnCode"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -844,90 +468,91 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/BackwardDocumentLinks/{sdocId}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get documents linked to source document assessment",
-        "operationId" : "GetBackwardDocumentLinks",
-        "parameters" : [ {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
+    "/SourceDocument/DataAccess/DocumentRequestQueueStatus/{callerCode}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get the status of all queued documents",
+        "operationId": "getDocumentRequestQueueStatus",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "An array of documents linked to the assessment",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/LinkedDocument"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of queued document objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueuedDocumentObjects"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -935,90 +560,589 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/SEPDocumentLinks/{sdocId}" : {
-      "get" : {
-        "tags" : [ "DataAccess" ],
-        "summary" : "Get list of document objects linked to source document assessment",
-        "operationId" : "GetSEPDocumentLinks",
-        "parameters" : [ {
-          "name" : "sdocId",
-          "in" : "path",
-          "description" : "Unique identifier for an SDRA Source Document \n\nExample: \n",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
+    "/SourceDocument/DataAccess/ClearDocumentRequestJobFromQueue/{callerCode}/{sdocId}": {
+      "delete": {
+        "tags": [ "DataAccess" ],
+        "summary": "Clear the document request job from the queue",
+        "operationId": "deleteDocumentRequestJobFromQueue",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "writeableFolderName",
+            "in": "query",
+            "description": "The path for the file output\nExample: tbc\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "An array of documents objects linked to the assessment",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DocumentObjects"
+        ],
+        "responses": {
+          "200": {
+            "description": "An code and message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnCode"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorised.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "403" : {
-            "description" : "Forbidden.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not found.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "406" : {
-            "description" : "Not acceptable.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/DefaultErrorResponse"
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SourceDocument/DataAccess/DocumentAssessmentData/{callerCode}/{sdocId}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get the data for the document assessment",
+        "operationId": "GetDocumentAssessmentData",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A document assessment data object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentAssessmentData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SourceDocument/DataAccess/ForwardDocumentLinks/{sdocId}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get documents linked to source document assessment",
+        "operationId": "GetForwardDocumentLinks",
+        "parameters": [
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AAn array of documents linked to the assessment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SourceDocument/DataAccess/BackwardDocumentLinks/{sdocId}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get documents linked to source document assessment",
+        "operationId": "GetBackwardDocumentLinks",
+        "parameters": [
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of documents linked to the assessment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SourceDocument/DataAccess/SEPDocumentLinks/{sdocId}": {
+      "get": {
+        "tags": [ "DataAccess" ],
+        "summary": "Get list of document objects linked to source document assessment",
+        "operationId": "GetSEPDocumentLinks",
+        "parameters": [
+          {
+            "name": "sdocId",
+            "in": "path",
+            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of documents objects linked to the assessment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentObjects"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SourceDocument/DataAccess/ClearDocumentRequestQueue/{callerCode}": {
+      "delete": {
+        "tags": [ "DataAccess" ],
+        "summary": "Clear the document request queue",
+        "operationId": "deleteDocumentQueue",
+        "parameters": [
+          {
+            "name": "callerCode",
+            "in": "path",
+            "description": "System that is calling the API\n\nExample: HDB\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A code and message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorised.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not acceptable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultErrorResponse"
                 }
               }
             }
@@ -1034,7 +1158,7 @@
         "properties" : {
           "id" : {
             "type" : "integer",
-            "description" : "The unique identifier for the SDRA assessment doucument i.e. the sdoc_id",
+            "description" : "The unique identifier for the SDRA assessment document i.e. the sdoc_id",
             "format" : "int32"
           },
           "name" : {

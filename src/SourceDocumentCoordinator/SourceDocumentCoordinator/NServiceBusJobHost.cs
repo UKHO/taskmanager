@@ -51,6 +51,18 @@ namespace SourceDocumentCoordinator
             {
                 _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
                 ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer));
+                var recoverability = _endpointConfig.Recoverability();
+                recoverability.Immediate(
+                    immediate =>
+                    {
+                        immediate.NumberOfRetries(0);
+                    });
+
+                recoverability.Delayed(
+                    delayed =>
+                    {
+                        delayed.NumberOfRetries(0);
+                    });
             }
             else
             {
@@ -70,37 +82,29 @@ namespace SourceDocumentCoordinator
                 throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
             }
 
-            //var sanitisedDbName = dbName.Replace("'", "''");
+            var sanitisedDbName = dbName.Replace("'", "''");
 
-            //var commandText = "USE master " +
-            //            $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
-            //            "BEGIN " +
-            //           $"ALTER DATABASE [{sanitisedDbName}] " +
-            //            "SET MULTI_USER " +
-            //            "WITH ROLLBACK IMMEDIATE; " +
-            //            $"DROP DATABASE [{sanitisedDbName}] " +
-            //            $"CREATE DATABASE [{sanitisedDbName}] " +
-            //            "END " +
-            //            "ELSE " +
-            //            "BEGIN " +
-            //            $"CREATE DATABASE [{sanitisedDbName}] " +
-            //            "END";
+            var commandText = "USE master " +
+                              $"IF NOT EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
+                              "BEGIN " +
+                              $"CREATE DATABASE [{sanitisedDbName}] " +
+                              "END";
 
-            //using (var connection = new SqlConnection(connectionString))
-            //{
-            //    var command = new SqlCommand(commandText, connection);
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var command = new SqlCommand(commandText, connection);
 
-            //    try
-            //    {
-            //        connection.Open();
-            //        command.ExecuteNonQuery();
-            //    }
-            //    finally
-            //    {
-            //        connection.Close();
-            //    }
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    connection.Close();
+                }
 
-            //}
+            }
         }
 
         [FunctionName("StartAsync")]

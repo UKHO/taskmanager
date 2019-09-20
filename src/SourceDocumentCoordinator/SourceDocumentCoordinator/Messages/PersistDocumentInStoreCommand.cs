@@ -3,9 +3,10 @@ using Common.Messages;
 
 namespace SourceDocumentCoordinator.Messages
 {
-    public class GetDocumentRequestQueueStatusCommand : ICorrelate
+    public class PersistDocumentInStoreCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
+        public string Filepath { get; set; }
     }
 }

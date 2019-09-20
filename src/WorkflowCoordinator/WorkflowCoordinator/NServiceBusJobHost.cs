@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -54,6 +53,17 @@ namespace WorkflowCoordinator
             {
                 _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
                 ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer));
+                var recoverability = _endpointConfig.Recoverability();
+                recoverability.Immediate(
+                    immediate =>
+                    {
+                        immediate.NumberOfRetries(0);
+                    });
+                recoverability.Delayed(
+                    delayed =>
+                    {
+                        delayed.NumberOfRetries(0);
+                    });
             }
             else
             {
@@ -76,15 +86,7 @@ namespace WorkflowCoordinator
             var sanitisedDbName = dbName.Replace("'", "''");
 
             var commandText = "USE master " +
-                        $"IF EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
-                        "BEGIN " +
-                       $"ALTER DATABASE [{sanitisedDbName}] " +
-                        "SET MULTI_USER " +
-                        "WITH ROLLBACK IMMEDIATE; " +
-                        $"DROP DATABASE [{sanitisedDbName}] " +
-                        $"CREATE DATABASE [{sanitisedDbName}] " +
-                        "END " +
-                        "ELSE " +
+                        $"IF NOT EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
                         "BEGIN " +
                         $"CREATE DATABASE [{sanitisedDbName}] " +
                         "END";
@@ -133,18 +135,6 @@ namespace WorkflowCoordinator
                         });
 
                 transport.Routing().RouteToEndpoint(
-                    messageType: typeof(StartAssessmentPollingCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
-                    messageType: typeof(StartDbAssessmentCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
-                    messageType: typeof(RetrieveAssessmentDataCommand),
-                    destination: _generalConfig.Value.WorkflowCoordinatorName);
-
-                transport.Routing().RouteToEndpoint(
                     messageType: typeof(InitiateSourceDocumentRetrievalCommand),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
@@ -178,7 +168,7 @@ namespace WorkflowCoordinator
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
                 Guid pollingSagaGuid = _generalConfig.Value.AssessmentPollingSagaCorrelationGuid;
-                await _endpoint.Send(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
+                await _endpoint.SendLocal(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

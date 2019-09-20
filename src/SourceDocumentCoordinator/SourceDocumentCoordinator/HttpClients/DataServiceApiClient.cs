@@ -28,7 +28,7 @@ namespace SourceDocumentCoordinator.HttpClients
             var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
 
             var fullUri = new Uri(baseUri,
-                $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{writableFolderName}/{imageAsGeotiff}");
+                $"{_uriConfig.Value.DataServicesWebServiceGetDocumentForViewingUri}{callerCode}/{sdocId}/{imageAsGeotiff}?writeableFolderName={Uri.EscapeDataString(writableFolderName)}");
 
             using (var response = await _httpClient.GetAsync(fullUri.ToString()))
             {
@@ -84,6 +84,30 @@ namespace SourceDocumentCoordinator.HttpClients
             }
 
             var returnCode = JsonConvert.DeserializeObject<QueuedDocumentObjects>(data);
+
+            return returnCode;
+        }
+
+        public async Task<ReturnCode> DeleteDocumentRequestJobFromQueue(string callerCode, int sdocId, string writeableFolderName)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceDeleteDocumentRequestJobFromQueueUri}{callerCode}/{sdocId}?writeableFolderName={Uri.EscapeDataString(writeableFolderName)}");
+
+            using (var response = await _httpClient.DeleteAsync(fullUri))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+
+            }
+
+            var returnCode = JsonConvert.DeserializeObject<ReturnCode>(data);
 
             return returnCode;
         }

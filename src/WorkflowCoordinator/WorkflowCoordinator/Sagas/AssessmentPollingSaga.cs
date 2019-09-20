@@ -75,7 +75,7 @@ namespace WorkflowCoordinator.Sagas
                     SourceDocumentId = assessment.Id
                 };
 
-                await context.Send(startDbAssessmentCommand).ConfigureAwait(false);
+                await context.SendLocal(startDbAssessmentCommand).ConfigureAwait(false);
             }
 
             await RequestTimeout<ExecuteAssessmentPollingTask>(context,

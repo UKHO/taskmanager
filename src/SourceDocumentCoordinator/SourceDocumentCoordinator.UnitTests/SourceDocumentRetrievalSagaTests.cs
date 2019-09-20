@@ -1,28 +1,20 @@
-using Common.Messages.Commands;
-
-using DataServices.Models;
-
-using FakeItEasy;
-
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-
-using NServiceBus.Testing;
-
-using NUnit.Framework;
-
-using SourceDocumentCoordinator.Config;
-using SourceDocumentCoordinator.HttpClients;
-using SourceDocumentCoordinator.Messages;
-using SourceDocumentCoordinator.Sagas;
-
 using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Common.Messages.Commands;
+using DataServices.Models;
+using FakeItEasy;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using NServiceBus.Testing;
+using NUnit.Framework;
+using SourceDocumentCoordinator.Config;
+using SourceDocumentCoordinator.HttpClients;
+using SourceDocumentCoordinator.Messages;
+using SourceDocumentCoordinator.Sagas;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -199,7 +191,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
             {
                 CorrelationId = correlationId,
-                SdocId = sdocId
+                SourceDocumentId = sdocId
             };
 
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
@@ -237,7 +229,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
             {
                 CorrelationId = correlationId,
-                SdocId = sdocId
+                SourceDocumentId = sdocId
             };
 
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
@@ -257,6 +249,54 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             Assert.IsTrue(_handlerContext.TimeoutMessages.Length > 0);
+        }
+
+        [Test]
+        public async Task Test_Timeout_Handler_Sends_ClearDocumentRequestFromQueueCommand_And_PersistDocumentInStoreCommand_Messages()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+
+            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            {
+                ProcessId = 1,
+                SdocId = sdocId,
+                StartedAt = DateTime.Now,
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
+            });
+            _dbContext.SaveChanges();
+
+            var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId
+            };
+
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored)).Returns(new QueuedDocumentObjects()
+            {
+                new QueuedDocumentObject()
+                {
+                    SodcId = sdocId,
+                    Code = 0
+                }
+            });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
+
+            //Then
+            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
+
+            var clearDocumentRequestFromQueueCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is ClearDocumentRequestFromQueueCommand);
+            Assert.IsNotNull(clearDocumentRequestFromQueueCommand, $"No message of type {nameof(ClearDocumentRequestFromQueueCommand)} seen.");
+
+            var persistDocumentInStoreCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistDocumentInStoreCommand);
+            Assert.IsNotNull(persistDocumentInStoreCommand, $"No message of type {nameof(PersistDocumentInStoreCommand)} seen.");
         }
 
         private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)

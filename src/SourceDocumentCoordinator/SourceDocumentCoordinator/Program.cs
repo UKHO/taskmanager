@@ -1,17 +1,19 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System;
+using System.Data.SqlClient;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Common.Helpers;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Data.SqlClient;
-using System.IO;
-using System.Threading.Tasks;
-using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SourceDocumentCoordinator.Config;
@@ -62,16 +64,32 @@ namespace SourceDocumentCoordinator
 
                 services.AddOptions<UriConfig>()
                     .Bind(hostingContext.Configuration.GetSection("urls"));
+
                 services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("apis"));
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("nsb"));
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("databases"));
+                    .Bind(hostingContext.Configuration.GetSection("apis"))
+                    .Bind(hostingContext.Configuration.GetSection("nsb"))
+                    .Bind(hostingContext.Configuration.GetSection("databases"))
+                    .Bind(hostingContext.Configuration.GetSection("path"));
+
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
+                var startupSecretConfig = new StartupSecretsConfig();
+                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretConfig);
+
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+                services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
+                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                    {
+                        Credentials = new NetworkCredential
+                        {
+                            UserName = startupSecretConfig.ContentServiceUsername,
+                            Password = startupSecretConfig.ContentServicePassword,
+                            Domain = startupSecretConfig.ContentServiceDomain
+                        }
+                    })
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
                 var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,

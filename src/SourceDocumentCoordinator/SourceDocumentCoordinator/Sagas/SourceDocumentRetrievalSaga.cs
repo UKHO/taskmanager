@@ -1,14 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Messages.Commands;
+
 using Microsoft.Extensions.Options;
+
 using NServiceBus;
 using NServiceBus.Logging;
+
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -50,7 +55,9 @@ namespace SourceDocumentCoordinator.Sagas
             }
 
             // Call GetDocumentForViewing method on DataServices API
-            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode, message.SourceDocumentId, "tbc",
+            var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode,
+                message.SourceDocumentId,
+                _generalConfig.Value.SourceDocumentWriteableFolderName,
                 true);
 
             // TODO: Think about different return code scenarios
@@ -77,7 +84,7 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 var requestStatus = new GetDocumentRequestQueueStatusCommand
                 {
-                    SdocId = message.SourceDocumentId,
+                    SourceDocumentId = message.SourceDocumentId,
                     CorrelationId = message.CorrelationId
                 };
 
@@ -92,7 +99,7 @@ namespace SourceDocumentCoordinator.Sagas
             var queuedDocs = _dataServiceApiClient.GetDocumentRequestQueueStatus(_generalConfig.Value.CallerCode);
 
             // TODO: Potentially deal with a list of queued requests...
-            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SdocId);
+            var sourceDocument = queuedDocs.Result.First(x => x.SodcId == message.SourceDocumentId);
 
             if (sourceDocument.Code == null)
                 throw new ApplicationException(
@@ -105,9 +112,24 @@ namespace SourceDocumentCoordinator.Sagas
                     UpdateSourceDocumentStatus(message);
 
                     // TODO: Subsequent stories:
-                    // TODO: fire new Command to retrieve the doc and save it in Content service
                     // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
-                    //MarkAsComplete();
+                    var removeFromQueue = new ClearDocumentRequestFromQueueCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        SourceDocumentId = message.SourceDocumentId
+                    };
+                    await context.SendLocal(removeFromQueue).ConfigureAwait(false);
+
+                    // Fire command to store source doc in Content Service
+                    var persistCommand = new PersistDocumentInStoreCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        SourceDocumentId = message.SourceDocumentId,
+                        Filepath = sourceDocument.Message
+                    };
+                    await context.SendLocal(persistCommand).ConfigureAwait(false);
+
+                    MarkAsComplete();
 
                     break;
                 case 1:
@@ -116,7 +138,7 @@ namespace SourceDocumentCoordinator.Sagas
                         TimeSpan.FromSeconds(_generalConfig.Value
                             .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                         message);
-                    break;
+                    break; ;
                 default:
                     throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
             }
@@ -125,7 +147,7 @@ namespace SourceDocumentCoordinator.Sagas
         private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
         {
             var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SdocId);
+                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
             if (sourceDocumentStatus != null)
             {
                 sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();

@@ -76,7 +76,7 @@ namespace WorkflowCoordinator.Sagas
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
 
             log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
-            await context.Send(new RetrieveAssessmentDataCommand
+            await context.SendLocal(new RetrieveAssessmentDataCommand
             {
                 CorrelationId = Data.CorrelationId,
                 ProcessId = Data.ProcessId,
