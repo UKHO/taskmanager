@@ -39,7 +39,8 @@ namespace SourceDocumentCoordinator.Handlers
 
             var row = await _dbContext.SourceDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
             row.ContentServiceId = newGuid;
-            _dbContext.SaveChanges();
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
