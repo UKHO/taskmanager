@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
@@ -21,6 +23,11 @@ namespace Portal.Pages.DbAssessment
 
         private void SetTaskInformationData()
         {
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+
             TaskInformationModel = new _TaskInformationModel
             {
                 ProcessId = 98,
@@ -33,11 +40,7 @@ namespace Portal.Pages.DbAssessment
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
                 SourceCategories = new SelectList(
-                        new List<SourceCategory>
-                        {
-                            new SourceCategory {SourceCategoryId = 0, Name = "asdas"},
-                            new SourceCategory {SourceCategoryId = 1, Name = "zzzzz"}
-                        }, "SourceCategoryId", "Name")
+                        sourceCategories, "SourceCategoryId", "Name")
             };
         }
 
