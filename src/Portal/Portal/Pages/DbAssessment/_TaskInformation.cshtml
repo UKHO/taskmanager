@@ -7,34 +7,71 @@
         <span>Task Information</span>
     </div>
 
-    <div class="panel-body">
-        @Html.LabelFor(model => model.ProcessId)
-        @Html.DisplayFor(model => model.ProcessId)
-
-        @Html.LabelFor(model => model.DmEndDate)
-        @Html.DisplayFor(model => model.DmEndDate)
-
-        @Html.LabelFor(model => model.DmReceiptDate)
-        @Html.DisplayFor(model => model.DmReceiptDate)
-
-        @Html.LabelFor(model => model.EffectiveReceiptDate)
-        @Html.DisplayFor(model => model.EffectiveReceiptDate)
-
-        @Html.LabelFor(model => model.ExternalEndDate)
-        @Html.DisplayFor(model => model.ExternalEndDate)
-
-        @Html.LabelFor(model => model.OnHold)
-        @Html.DisplayFor(model => model.OnHold)
-
-        @Html.LabelFor(model => model.Ion)
-        @Html.EditorFor(model => model.Ion)
-
-        @Html.LabelFor(model => model.ActivityCode)
-        @Html.DisplayFor(model => model.ActivityCode)
-
-        @Html.DisplayFor(model => model.SourceCategory)
-        @Html.DisplayFor(model => model.SourceCategories)
-
-        @Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories)
+    <div class="col-lg-12">
+        <div class="row" style="padding-left: 5px;">
+            <div class="panel-body">
+                <div class="col-xs-3">
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.ProcessId)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.ProcessId)
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.DmEndDate)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.DmEndDate)
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.EffectiveReceiptDate)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.EffectiveReceiptDate)
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.OnHold)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.OnHold)
+                        </div>
+                    </div>
+                    <div class="row form-row">
+                        @Html.LabelFor(model => model.Ion)
+                        <div class="pull-right">
+                            @Html.TextBoxFor(model => model.Ion, new { @class = "form-control", style = "width:120px;" })
+                        </div>
+                        <br />
+                    </div>
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.ActivityCode)
+                        <div class="pull-right">
+                            @Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control", style = "width:120px;" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-4" style="padding-left: 200px;">
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.DmReceiptDate)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.DmReceiptDate)
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        @Html.LabelFor(model => model.ExternalEndDate)
+                        <div class="pull-right">
+                            @Html.DisplayFor(model => model.ExternalEndDate)
+                        </div>
+                    </div>
+                    @*<div class="col-xs-6">
+                            @Html.DisplayFor(model => model.SourceCategory)
+                            @Html.DisplayFor(model => model.SourceCategories)
+                        </div>*@
+                    @Html.LabelFor(model => model.SourceCategory)
+                    <div class="pull-right">
+                        @Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class="form-control", style = "width:130px;" })
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

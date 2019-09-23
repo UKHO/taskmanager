@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -9,5 +10,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public string Text { get; set; }
         public int WorkflowInstanceId { get; set; }
+        public string Username { get; set; }
+        public DateTime Created { get; set; }
     }
 }

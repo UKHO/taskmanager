@@ -35,6 +35,8 @@ The Comment table holds user entered comments for each workflow.
 |ProcessId          |INT            |No           |The K2 process instance Id                                                                       |
 |Comment            |NVARCHAR(4000) |No           |                                                                                                 |
 |WorkflowInstanceId |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                            |
+|Username		    |NVARCHAR(255)  |No           |The user that entered the comment                      											|
+|Created			|DATETIME       |No           |The date and time that the comment was created							                        |
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
