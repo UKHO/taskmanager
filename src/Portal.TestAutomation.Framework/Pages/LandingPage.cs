@@ -53,6 +53,7 @@ namespace Portal.TestAutomation.Framework.Pages
         public void NavigateTo()
         {
             _driver.Navigate().GoToUrl(LandingPageUrl);
+            _driver.Manage().Window.Maximize();
         }
 
         public void FilterRowsByProcessIdInGlobalSearch(int processId)
