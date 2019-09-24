@@ -62,10 +62,6 @@
                             @Html.DisplayFor(model => model.ExternalEndDate)
                         </div>
                     </div>
-                    @*<div class="col-xs-6">
-                            @Html.DisplayFor(model => model.SourceCategory)
-                            @Html.DisplayFor(model => model.SourceCategories)
-                        </div>*@
                     @Html.LabelFor(model => model.SourceCategory)
                     <div class="pull-right">
                         @Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class="form-control", style = "width:260px;" })
