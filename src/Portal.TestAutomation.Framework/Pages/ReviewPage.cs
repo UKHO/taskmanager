@@ -46,6 +46,7 @@ namespace Portal.TestAutomation.Framework.Pages
         public void NavigateTo()
         {
             _driver.Navigate().GoToUrl(ReviewPageUrl);
+            _driver.Manage().Window.Maximize();
         }
     }
 }
