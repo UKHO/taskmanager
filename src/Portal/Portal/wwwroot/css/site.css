@@ -78,6 +78,11 @@ table.task-list thead tr th {
     margin: 0px;
 }
 
+.form-row {
+    margin: 1.0em 0;
+}
+
+
 #inFlightTasks.table-striped > tbody > tr.even,
 #inFlightTasks.table-striped > tbody > tr.even + tr {
     background-color: #ffffff;

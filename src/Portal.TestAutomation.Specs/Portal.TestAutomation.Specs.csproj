@@ -37,6 +37,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LandingPageTasks.feature</DependentUpon>
     </Compile>
+    <Compile Update="ReviewPageTasks.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReviewPageTasks.feature</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +55,10 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="ReviewPageTasks.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ReviewPageTasks.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 

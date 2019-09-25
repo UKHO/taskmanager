@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Globalization;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +35,12 @@ namespace Portal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
+                options.SupportedCultures = new List<CultureInfo> {new CultureInfo("en-GB"), new CultureInfo("en-GB")};
+            });
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -93,6 +101,7 @@ namespace Portal
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseRequestLocalization();
             app.UseAzureAppConfiguration();
             app.UseMvc();
         }

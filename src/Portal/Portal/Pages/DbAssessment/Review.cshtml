@@ -1,0 +1,53 @@
+﻿@page
+@model Portal.Pages.DbAssessment.ReviewModel
+@{
+    ViewData["Title"] = "Review";
+}
+
+    <div class="row" style="padding-top: 5px">
+        <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+            <a asp-page="/Index">
+                <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+            </a>
+        </div>
+
+        <div class="col-lg-9 col-md-8 col-sm-8 col-xs-8">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="pull-right">
+                        <h1>DB Assessment</h1>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="pull-right"><h1>Review</h1></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12"><hr /></div>
+
+        <br />
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="row">
+                <div class="pull-right">
+                    <button id="btnPutOnHold" class="btn btn-primary"><span style="padding-right: 5px;"></span>Put On Hold</button>
+                    <button id="btnTerminate" class="btn btn-primary"><span style="padding-right: 5px;"></span>Terminate</button>
+                    <input id="btnClose" type="button" class="btn btn-primary" value="Close" onclick="window.location.href='/Index'"/>
+                    <button id="btnSave" class="btn btn-primary"><span style="padding-right: 5px;"></span>Save</button>
+                    <button id="btnDone" class="btn btn-primary"><span style="padding-right: 5px;"></span>Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<br />
+
+<div class="panel-group" id="accordion">
+    @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
+    <br />
+    @await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
+    <br />
+    @await Html.PartialAsync("_AssignTask", Model.AssignTaskModel).ConfigureAwait(false)
+    <br />
+    @await Html.PartialAsync("_Comments", Model.CommentsModel).ConfigureAwait(false)
+</div>
