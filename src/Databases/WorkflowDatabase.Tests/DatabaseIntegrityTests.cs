@@ -1,5 +1,4 @@
 using System;
-using System.Net.NetworkInformation;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
