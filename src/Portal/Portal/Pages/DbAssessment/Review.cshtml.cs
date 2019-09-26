@@ -1,27 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
     public class ReviewModel : PageModel
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
         public _AssignTaskModel AssignTaskModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
+        public WorkflowDbContext DbContext { get; set; }
 
-        public void OnGet()
+        public ReviewModel(WorkflowDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
-            SetTaskInformationData();
-            SetAssignTaskData();
-            SetCommentsData();
+            _httpContextAccessor = httpContextAccessor;
+            DbContext = dbContext;
         }
 
-        private void SetTaskInformationData()
+        public void OnGet(int processId)
+        {
+            ProcessId = processId;
+
+            SetTaskInformationData(processId);
+            SetAssignTaskData();
+            RetrieveComments(processId);
+        }
+
+        public async Task<IActionResult> OnPostNewCommentAsync(string comment, int processId)
+        {
+            // TODO: Repopulate models in a different way
+            OnGet(processId);
+
+            //TODO: Find a more robust way to get the username, this is just the result of Googling, currently
+            string username = string.Empty;
+
+            try
+            {
+                username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            }
+            catch (NullReferenceException ex)
+            {
+                // log "Couldn't get user name..."
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            DbContext.Comment.Add(new Comments
+            {
+                ProcessId = TaskInformationModel.ProcessId,
+                WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
+                Created = DateTime.Now,
+                Username = username == string.Empty ? "TBC" : username, //TODO: Username stuff again
+                Text = comment
+            });
+
+            DbContext.SaveChanges();
+
+            RetrieveComments(processId);
+
+            return new PartialViewResult();
+        }
+
+        private void SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
@@ -30,7 +86,7 @@ namespace Portal.Pages.DbAssessment
 
             TaskInformationModel = new _TaskInformationModel
             {
-                ProcessId = 98,
+                ProcessId = processId,
                 DmEndDate = DateTime.Now,
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
@@ -74,29 +130,12 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private void SetCommentsData()
+        private void RetrieveComments(int processId)
         {
             CommentsModel = new _CommentsModel
             {
-                Comments = new List<Comments>
-                {
-                    new Comments  {
-                        CommentId = 1,
-                        ProcessId = 123,
-                        WorkflowInstanceId = 1,
-                        Text = "This is a sample comment for illustrative purposes.",
-                        Created = DateTime.Now,
-                        Username = "Ross Sandford"
-                    },
-                    new Comments  {
-                        CommentId = 2,
-                        ProcessId = 123,
-                        WorkflowInstanceId = 1,
-                        Text = "A second comment for your enjoyment.",
-                        Created = DateTime.Now.AddDays(-1),
-                        Username = "Peter Bates"
-                    },
-                }
+                ProcessId = processId,
+                Comments = DbContext.Comment.Where(c => c.ProcessId == processId).ToList()
             };
         }
     }

@@ -30,6 +30,33 @@
             </article>
             <br />
         }
-        <button id="btnAddComment" class="btn btn-primary"><span style="padding-right: 5px;"></span>Add Comments</button>
+        <button id="btnAddComment" class="btn btn-primary" data-toggle="modal" data-target="#addCommentModal"><span style="padding-right: 5px;"></span>Add Comments</button>
+
+        @* Modal Add new comment *@
+        <div class="modal fade" id="addCommentModal" tabindex="-1" role="dialog" aria-labelledby="AddComment" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add comment</h4>
+                    </div>
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+                            <div id="OUmodal-body">
+                                <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" name="processId"/>
+                                <textarea style="height: 100px;" id="txtComment" name="comment" class="form-control"></textarea>
+                                <br/>
+                                <div id="AddCommentError"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" id="btnPostComment" accesskey="a" class="btn btn-success" data-toggle="tooltip" data-placement="left" title="Submit comment" value="Add comment" asp-page-handler="NewComment" />
+                            <button type="button" id="btnCloseComment" class="btn btn-default" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>

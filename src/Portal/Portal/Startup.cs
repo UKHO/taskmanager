@@ -48,6 +48,8 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("portal"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
