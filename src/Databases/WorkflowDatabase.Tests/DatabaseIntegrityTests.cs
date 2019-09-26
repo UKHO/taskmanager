@@ -173,6 +173,24 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        [Test]
+        public void Ensure_Comments_table_prevents_insert_for_no_WorkflowInstance()
+        { 
+            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comments()
+            {
+                Created = DateTime.Now,
+                ProcessId = 0,
+                Text = "This is a comment",
+                Username = "Me",
+                WorkflowInstanceId = 555
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+        
     }
 }
 
