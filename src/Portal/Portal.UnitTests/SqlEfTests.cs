@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
 {
@@ -31,16 +26,15 @@ namespace Portal.UnitTests
             _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comments()
             {
                CommentId = 1,
-               Created = new DateTime(),
-               ProcessId = 9876,
+               Created = DateTime.Now,
+                ProcessId = 9876,
                Text = "This is a comment",
                Username = "Me",
                WorkflowInstanceId = 555
             });
 
             _dbContext.SaveChanges();
-
-           
+            
             Assert.AreEqual(_dbContext.Comment.FirstAsync(c => c.CommentId == 1).Result.Text, "This is a comment");
         }
 
