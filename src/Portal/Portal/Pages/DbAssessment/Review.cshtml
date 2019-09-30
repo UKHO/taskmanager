@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Review";
 }
+@section Scripts{
+    <script type="text/javascript" src="~/js/Review.js"></script>
+}
 
 <div class="row" style="padding-top: 5px">
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
@@ -24,6 +27,7 @@
         </div>
     </div>
     <div class="col-lg-12"><hr /></div>
+    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
 
     <br />
 
@@ -49,5 +53,6 @@
     <br />
     @await Html.PartialAsync("_AssignTask", Model.AssignTaskModel).ConfigureAwait(false)
     <br />
-    @await Html.PartialAsync("_Comments", Model.CommentsModel).ConfigureAwait(false)
+    <div id="existingComments"></div>
+    <div id="AddCommentError"></div>
 </div>

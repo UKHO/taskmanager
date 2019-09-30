@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -34,57 +34,58 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            SetTaskInformationData(processId);
-            SetAssignTaskData();
-            RetrieveComments(processId);
+            TaskInformationModel = SetTaskInformationData(processId);
+            AssignTaskModel = SetAssignTaskData();
         }
 
-        public async Task<IActionResult> OnPostNewCommentAsync(string comment, int processId)
+        public IActionResult OnGetRetrieveComments(int processId)
         {
-            // TODO: Repopulate models in a different way
+            var model = new _CommentsModel()
+            {
+                Comments = DbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
+                ProcessId = processId
+            };
+
+            // Repopulate models...
             OnGet(processId);
 
-            //TODO: Find a more robust way to get the username, this is just the result of Googling, currently
-            string username = string.Empty;
+            return new PartialViewResult
+            {
+                ViewName = "_Comments",
+                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = model
+                }
+            };
+        }
 
-            try
-            {
-                username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            }
-            catch (NullReferenceException ex)
-            {
-                // log "Couldn't get user name..."
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+        public IActionResult OnGetCommentsPartial(string comment, int processId)
+        {
+            // TODO: Test with Azure
+            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
             DbContext.Comment.Add(new Comments
             {
-                ProcessId = TaskInformationModel.ProcessId,
+                ProcessId = processId,
                 WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
                 Created = DateTime.Now,
-                Username = username == string.Empty ? "TBC" : username, //TODO: Username stuff again
+                Username = userId == string.Empty ? "Unknown" : userId,
                 Text = comment
             });
 
             DbContext.SaveChanges();
 
-            RetrieveComments(processId);
-
-            return new PartialViewResult();
+            return OnGetRetrieveComments(processId);
         }
 
-        private void SetTaskInformationData(int processId)
+        private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
 
-            TaskInformationModel = new _TaskInformationModel
+            return new _TaskInformationModel
             {
                 ProcessId = processId,
                 DmEndDate = DateTime.Now,
@@ -100,9 +101,9 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private void SetAssignTaskData()
+        private _AssignTaskModel SetAssignTaskData()
         {
-            AssignTaskModel = new _AssignTaskModel
+            return new _AssignTaskModel
             {
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
@@ -127,15 +128,6 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
-            };
-        }
-
-        private void RetrieveComments(int processId)
-        {
-            CommentsModel = new _CommentsModel
-            {
-                ProcessId = processId,
-                Comments = DbContext.Comment.Where(c => c.ProcessId == processId).ToList()
             };
         }
     }

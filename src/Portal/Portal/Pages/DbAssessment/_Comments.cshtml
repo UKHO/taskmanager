@@ -1,34 +1,46 @@
-﻿@using WorkflowDatabase.EF.Models
-@model Portal.Pages.DbAssessment._CommentsModel
+﻿@model Portal.Pages.DbAssessment._CommentsModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
+@section scripts
+{
+    <script type="text/javascript" src="~/js/Comments.js"></script>
+}
+
+@{
+    Layout = "Shared/_Layout";
+}
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <span>Comments</span>
     </div>
     <div class="panel-body">
-        @foreach (var example in Model.Comments)
+        @if (Model != null && Model.Comments != null)
         {
-            <article>
-                <div class="col-xs-6">
-                    <div class="pull-left">
-                        @example.Username
+            @foreach (var comment in Model.Comments)
+            {
+                <article>
+                    <div class="col-xs-6">
+                        <div class="pull-left">
+                            @comment.Username
+                        </div>
                     </div>
-                </div>
-                <div class="col-xs-6">
-                    <div class="pull-right" style="padding-right: 50px;">
-                        @example.Created.ToString("M")
+                    <div class="col-xs-6">
+                        <div class="pull-right" style="padding-right: 50px;">
+                            @comment.Created.ToString("M")
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-12">
-                    <p>
-                        @example.Text
-                    </p>
-                    <hr />
-                </div>
-            </article>
-            <br />
+                    <div class="col-lg-12">
+                        <p>
+                            @comment.Text
+                        </p>
+                        <hr />
+                    </div>
+                </article>
+                <br />
+            }
         }
         <button id="btnAddComment" class="btn btn-primary" data-toggle="modal" data-target="#addCommentModal"><span style="padding-right: 5px;"></span>Add Comments</button>
 
@@ -43,20 +55,19 @@
                         @Html.AntiForgeryToken()
                         <div class="modal-body">
                             <div id="OUmodal-body">
-                                <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" name="processId"/>
                                 <textarea style="height: 100px;" id="txtComment" name="comment" class="form-control"></textarea>
-                                <br/>
+                                <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+                                <br />
                                 <div id="AddCommentError"></div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <input type="submit" id="btnPostComment" accesskey="a" class="btn btn-success" data-toggle="tooltip" data-placement="left" title="Submit comment" value="Add comment" asp-page-handler="NewComment" />
+                            <button type="button" id="btnPostComment" accesskey="a" class="btn btn-success" data-toggle="tooltip" data-placement="left" title="Submit comment">Add comment</button>
                             <button type="button" id="btnCloseComment" class="btn btn-default" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
