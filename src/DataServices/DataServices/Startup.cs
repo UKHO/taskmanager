@@ -34,7 +34,6 @@ namespace DataServices
     public class Startup
     {
         private readonly IHostingEnvironment _hostingEnv;
-        private readonly ILogger _logger;
 
         private IConfiguration Configuration { get; }
 
@@ -43,10 +42,9 @@ namespace DataServices
         /// </summary>
         /// <param name="env"></param>
         /// <param name="configuration"></param>
-        public Startup(IHostingEnvironment env, IConfiguration configuration, ILogger logger)
+        public Startup(IHostingEnvironment env, IConfiguration configuration)
         {
             _hostingEnv = env;
-            _logger = logger;
             Configuration = configuration;
         }
 
