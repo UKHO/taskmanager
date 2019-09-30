@@ -70,17 +70,32 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
+<<<<<<< HEAD
     PathtoPublish: '$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation'
+=======
+    PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+>>>>>>> 328f477877cac438c178097aaaf5c2d8e52ce000
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: Publish Pickles Artifact
 
+<<<<<<< HEAD
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation'
     TargetFolder: '\\tfsshares\\LivingDocumentation$\\Pickles-Demo-Project'
     OverWrite: true
   displayName: Publish Pickles Files to tfsshares 
+=======
+- task: AzureFileCopy@3
+  inputs:
+    SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+    azureSubscription: 'TPE General Dev'
+    Destination: 'AzureBlob'
+    storage: 'leadtestsa'
+    ContainerName: '$web/$(Build.Repository.Name)'
+  displayName: Publish Pickles Artifact to Azure Blob Storage 
+>>>>>>> 328f477877cac438c178097aaaf5c2d8e52ce000
 
 - task: DotNetCoreCLI@2
   inputs:
