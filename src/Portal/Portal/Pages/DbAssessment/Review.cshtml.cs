@@ -62,6 +62,7 @@ namespace Portal.Pages.DbAssessment
         public IActionResult OnGetCommentsPartial(string comment, int processId)
         {
             // TODO: Test with Azure
+            // TODO: This will not work in Azure; need alternative; but will work in local dev
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
             DbContext.Comment.Add(new Comments
@@ -69,7 +70,7 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
                 Created = DateTime.Now,
-                Username = userId == string.Empty ? "Unknown" : userId,
+                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
                 Text = comment
             });
 
