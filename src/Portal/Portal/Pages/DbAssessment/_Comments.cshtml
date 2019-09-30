@@ -3,14 +3,7 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
-@section scripts
-{
-    <script type="text/javascript" src="~/js/Comments.js"></script>
-}
-
-@{
-    Layout = "Shared/_Layout";
-}
+<script type="text/javascript" src="~/js/Comments.js"></script>
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -51,21 +44,18 @@
                     <div class="modal-header">
                         <h4 class="modal-title">Add comment</h4>
                     </div>
-                    <form method="post">
-                        @Html.AntiForgeryToken()
-                        <div class="modal-body">
-                            <div id="OUmodal-body">
-                                <textarea style="height: 100px;" id="txtComment" name="comment" class="form-control"></textarea>
-                                <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-                                <br />
-                                <div id="AddCommentError"></div>
-                            </div>
+                    <div class="modal-body">
+                        <div id="modal-body">
+                            <textarea style="height: 100px;" id="txtComment" name="comment" class="form-control"></textarea>
+                            <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+                            <br />
+                            <div id="AddCommentError"></div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" id="btnPostComment" accesskey="a" class="btn btn-success" data-toggle="tooltip" data-placement="left" title="Submit comment">Add comment</button>
-                            <button type="button" id="btnCloseComment" class="btn btn-default" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button>
-                        </div>
-                    </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnPostComment" accesskey="a" class="btn btn-success" data-toggle="tooltip" data-placement="left" title="Submit comment">Add comment</button>
+                        <button type="button" id="btnCloseComment" class="btn btn-default" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
