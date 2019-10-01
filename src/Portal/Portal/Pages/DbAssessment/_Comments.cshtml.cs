@@ -6,11 +6,13 @@ namespace Portal.Pages.DbAssessment
 {
     public class _CommentsModel : PageModel
     {
+        public int ProcessId { get; set; }
         public List<Comments> Comments { get; set; }
 
         public void OnGet()
         {
 
         }
+
     }
 }
