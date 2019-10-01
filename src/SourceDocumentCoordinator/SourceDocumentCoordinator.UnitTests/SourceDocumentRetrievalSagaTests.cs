@@ -167,11 +167,11 @@ namespace SourceDocumentCoordinator.UnitTests
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(
-                                                                                A<string>.Ignored, 
-                                                                                A<int>.Ignored, 
+                                                                                A<string>.Ignored,
+                                                                                A<int>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<bool>.Ignored))
-                                            .Returns(new ReturnCode() {Message  = "Testing" , Code = (int)returnCode });
+                                            .Returns(new ReturnCode() { Message = "Testing", Code = (int)returnCode });
 
             //When
 
@@ -252,7 +252,7 @@ namespace SourceDocumentCoordinator.UnitTests
                 new QueuedDocumentObject()
                 {
                     SodcId = sdocId,
-                    Code = 1
+                    Code = (int)RequestQueueStatusReturnCodeEnum.Queued
                 }
             });
 
@@ -261,6 +261,78 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             Assert.IsTrue(_handlerContext.TimeoutMessages.Length > 0);
+        }
+
+        [Test]
+        public async Task Test_SourceDocumentRetrievalSaga_When_Request_Queue_Status_Returns_Error_Code_Does_not_fire_Timeout_and_InitiateSourceDocumentRetrievalCommand_Is_Sent_With_GeoReferenced_Set_to_False(
+                        [Values(
+                            RequestQueueStatusReturnCodeEnum.NotGeoreferenced,
+                            RequestQueueStatusReturnCodeEnum.ConversionFailed,
+                            RequestQueueStatusReturnCodeEnum.NotSuitableForConversion,
+            RequestQueueStatusReturnCodeEnum.ConversionTimeOut)]
+                        QueueForRetrievalReturnCodeEnum returnCode)
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored))
+                                            .Returns(new QueuedDocumentObjects() { new QueuedDocumentObject
+                                            {
+                                                Code = (int)returnCode,
+                                                Message = "testing",
+                                                StatusTime = DateTime.Now,
+                                                SodcId = sdocId
+                                            } });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
+
+            // Then no timeout is fired in retry scenarios
+            var timeoutCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
+                t.Message is GetDocumentRequestQueueStatusCommand);
+            Assert.IsNull(timeoutCommand, $"Timeout '{nameof(GetDocumentRequestQueueStatusCommand)}' should only be fired on successful queuing");
+
+            // Ensure new InitiateSourceDocumentRetrievalCommand is sent
+            var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is InitiateSourceDocumentRetrievalCommand);
+            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+
+            Assert.IsFalse(((InitiateSourceDocumentRetrievalCommand)initiateSourceDocumentRetrievalCommand.Message).GeoReferenced);
+        }
+
+        [Test]
+        public async Task Test_SourceDocumentRetrievalSaga_When_Check_Queue_Status_Returns_Error_Throws_ApplicationException(
+                        [Values(
+                            RequestQueueStatusReturnCodeEnum.FolderNotWritable,
+                            RequestQueueStatusReturnCodeEnum.QueueInsertionFailed)]
+                        RequestQueueStatusReturnCodeEnum returnCode)
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+  
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored))
+                .Returns(new QueuedDocumentObjects() { new QueuedDocumentObject
+                {
+                    Code = (int)returnCode,
+                    Message = "testing",
+                    StatusTime = DateTime.Now,
+                    SodcId = sdocId
+                } });
+
+            Assert.ThrowsAsync<ApplicationException>(() => _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext));
         }
 
         [Test]
