@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using SourceDocumentCoordinator.Config;
+using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
 using SourceDocumentCoordinator.Sagas;
@@ -148,7 +149,11 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_When_Failed_Queuing_Does_not_fire_GetDocumentRequestQueueStatusCommand()
+        public async Task Test_SourceDocumentRetrievalSaga_When_Failed_Queuing_Does_not_fire_GetDocumentRequestQueueStatusCommand(
+                        [Values(
+                                QueueForRetrievalReturnCodeEnum.QueueInsertionFailed,
+                                QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised)]
+                        QueueForRetrievalReturnCodeEnum returnCode)
         {
             // Given
             var sdocId = 1111;
@@ -157,13 +162,20 @@ namespace SourceDocumentCoordinator.UnitTests
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
-                ProcessId = 1
+                ProcessId = 1,
+                GeoReferenced = true
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
-            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 2 });
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(
+                                                                                A<string>.Ignored, 
+                                                                                A<int>.Ignored, 
+                                                                                A<string>.Ignored,
+                                                                                A<bool>.Ignored))
+                                            .Returns(new ReturnCode() {Message  = "Testing" , Code = (int)returnCode });
 
             //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+
+            Assert.ThrowsAsync<ApplicationException>(() => _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext));
 
             //Then
             var getDocumentRequestQueueStatusCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
