@@ -7,6 +7,7 @@
         NotGeoreferenced = 20,
         FolderNotWritable = 40,
         NotSuitableForConversion = 43,
+        QueueInsertionFailed = 44,
         ConversionFailed = 45,
         ConversionTimeOut = 46
     }

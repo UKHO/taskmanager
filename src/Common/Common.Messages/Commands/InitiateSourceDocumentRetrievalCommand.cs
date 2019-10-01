@@ -7,5 +7,6 @@ namespace Common.Messages.Commands
         public int SourceDocumentId { get; set; }
         public Guid CorrelationId { get; set; }
         public int ProcessId { get; set; }
+        public bool GeoReferenced { get; set; }
     }
 }

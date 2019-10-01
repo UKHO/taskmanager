@@ -84,15 +84,14 @@ namespace WorkflowCoordinator.Sagas
                 WorkflowInstanceId = workflowInstanceId.Value
             });
 
-            // TODO: Fire InitiateSourceDocumentRetrievalCommand to SourceDocumentCoordinator to retrieve the Document
-            // TODO: Add InitiateSourceDocumentRetrievalCommand handler in SourceDocumentCoordinator to start document retrieval process
             log.Debug($"Sending {nameof(InitiateSourceDocumentRetrievalCommand)}");
 
             var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
             {
                 CorrelationId = Data.CorrelationId,
                 ProcessId = Data.ProcessId,
-                SourceDocumentId = Data.SourceDocumentId
+                SourceDocumentId = Data.SourceDocumentId,
+                GeoReferenced = true
             };
 
             await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
