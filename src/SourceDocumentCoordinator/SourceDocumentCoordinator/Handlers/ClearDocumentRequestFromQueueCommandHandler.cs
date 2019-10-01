@@ -40,8 +40,8 @@ namespace SourceDocumentCoordinator.Handlers
             {
                 switch (returnCode.Code.Value)
                 {
-                    case (int)ClearDocumentFromQueueReturnCodeEnum.Success:
-                    case (int)ClearDocumentFromQueueReturnCodeEnum.Warning:
+                    case (int)ClearFromQueueReturnCodeEnum.Success:
+                    case (int)ClearFromQueueReturnCodeEnum.Warning:
                         UpdateSourceDocumentStatus(message.SourceDocumentId, SourceDocumentRetrievalStatus.Complete);
                         break;
                     default:

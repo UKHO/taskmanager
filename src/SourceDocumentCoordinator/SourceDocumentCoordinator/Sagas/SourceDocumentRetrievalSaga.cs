@@ -13,7 +13,8 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using DataServices.Models;
+using SourceDocumentCoordinator.Enums;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -60,24 +61,12 @@ namespace SourceDocumentCoordinator.Sagas
                 _generalConfig.Value.SourceDocumentWriteableFolderName,
                 true);
 
-            // TODO: Think about different return code scenarios
-            if (returnCode.Code.HasValue
-                && (returnCode.Code.Value == 0)
-                || (returnCode.Code.Value == 1 && Data.SourceDocumentStatusId == 0))
+            var result = HandleSourceDocumentErrorCodes(returnCode.Code.Value, message);
+
+            if (!result)
             {
-                var sourceDocumentStatus = new SourceDocumentStatus
-                {
-                    ProcessId = message.ProcessId,
-                    SdocId = message.SourceDocumentId,
-                    Status = SourceDocumentRetrievalStatus.Started.ToString(),
-                    StartedAt = DateTime.Now
-                };
-
-                _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
-
-                _dbContext.SaveChanges();
-
-                Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
+                // TODO: throw exception
+                return;
             }
 
             if (Data.SourceDocumentStatusId > 0)
@@ -92,6 +81,23 @@ namespace SourceDocumentCoordinator.Sagas
                     TimeSpan.FromSeconds(_generalConfig.Value.SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                     requestStatus);
             }
+        }
+
+        private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalCommand message)
+        {
+            var sourceDocumentStatus = new SourceDocumentStatus
+            {
+                ProcessId = message.ProcessId,
+                SdocId = message.SourceDocumentId,
+                Status = SourceDocumentRetrievalStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            };
+
+            _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
+
+            _dbContext.SaveChanges();
+
+            return sourceDocumentStatus.SourceDocumentStatusId;
         }
 
         public async Task Timeout(GetDocumentRequestQueueStatusCommand message, IMessageHandlerContext context)
@@ -141,6 +147,28 @@ namespace SourceDocumentCoordinator.Sagas
                     break; ;
                 default:
                     throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
+            }
+        }
+
+        private bool HandleSourceDocumentErrorCodes(int returnCode, InitiateSourceDocumentRetrievalCommand message)
+        {
+            switch ((QueueForRetrievalReturnCodeEnum)returnCode)
+            {
+                case QueueForRetrievalReturnCodeEnum.Success:
+                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    return true;
+                case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
+                    if (Data.SourceDocumentStatusId < 1)
+                    {
+                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    }
+                    return true;
+                case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
+                    return false;
+                case QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised:
+                    return false;
+                default:
+                    throw new NotImplementedException($"Return code from GetDocumentForViewing not implemented: {returnCode}");
             }
         }
 
