@@ -134,7 +134,6 @@ namespace SourceDocumentCoordinator.Sagas
                 
                     MarkAsComplete();
 
-                    // TODO: retry with different flag
                     var msg = new InitiateSourceDocumentRetrievalCommand
                     {
                         CorrelationId = message.CorrelationId,
