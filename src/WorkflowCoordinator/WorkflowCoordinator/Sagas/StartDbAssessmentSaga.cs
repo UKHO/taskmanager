@@ -111,7 +111,9 @@ namespace WorkflowCoordinator.Sagas
             log.Debug($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
 
             // Call DataServices to get the assessment data for the given sdoc Id
-            var assessmentData = await _dataServiceApiClient.GetAssessmentData(_generalConfig.Value.CallerCode, message.SourceDocumentId);
+            var assessmentData =
+                await _dataServiceApiClient.GetAssessmentData(_generalConfig.Value.CallerCode,
+                    message.SourceDocumentId);
 
             // Add assessment data and any comments to DB, after auto mapping it
             var mappedAssessmentData = _mapper.Map<DocumentAssessmentData, AssessmentData>(assessmentData);
@@ -120,6 +122,10 @@ namespace WorkflowCoordinator.Sagas
             mappedAssessmentData.ProcessId = message.ProcessId;
             mappedComments.WorkflowInstanceId = message.WorkflowInstanceId;
             mappedComments.ProcessId = message.ProcessId;
+
+            // TODO: Exception triggered due to Created and Username not being populated
+            mappedComments.Created = DateTime.Now;
+            mappedComments.Username = string.Empty;
 
             _dbContext.AssessmentData.Add(mappedAssessmentData);
 
