@@ -62,7 +62,7 @@ namespace SourceDocumentCoordinator.Sagas
                 _generalConfig.Value.SourceDocumentWriteableFolderName,
                 message.GeoReferenced);
 
-            ProcessSourceDocumentErrorCodes(returnCode, message);
+            ProcessGetDocumentForViewingErrorCodes(returnCode, message);
 
             if (Data.SourceDocumentStatusId > 0)
             {
@@ -89,10 +89,38 @@ namespace SourceDocumentCoordinator.Sagas
                 throw new ApplicationException(
                     $"Source Document Retrieval Status Code is null {Environment.NewLine}{sourceDocument.ToJSONSerializedString()}");
 
-            await ProcessSourceDocumentQueueStatuses(message, context, sourceDocument);
+            await ProcessDocumentRequestQueueErrorStatus(message, context, sourceDocument);
         }
 
-        private async Task ProcessSourceDocumentQueueStatuses(GetDocumentRequestQueueStatusCommand message,
+        private void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalCommand message)
+        {
+            switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
+            {
+                case QueueForRetrievalReturnCodeEnum.Success:
+                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    break;
+                case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
+                    if (Data.SourceDocumentStatusId < 1)
+                    {
+                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    }
+                    break;
+                case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Unable to queue source document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                case QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Source document Id not recognised when queuing document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                default:
+                    MarkAsComplete();
+                    throw new NotImplementedException($"Return code from GetDocumentForViewing not implemented: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                      $"{returnCode}");
+            }
+        }
+
+        private async Task ProcessDocumentRequestQueueErrorStatus(GetDocumentRequestQueueStatusCommand message,
             IMessageHandlerContext context, QueuedDocumentObject sourceDocument)
         {
             switch ((RequestQueueStatusReturnCodeEnum)sourceDocument.Code.Value)
@@ -131,7 +159,7 @@ namespace SourceDocumentCoordinator.Sagas
                 case RequestQueueStatusReturnCodeEnum.ConversionTimeOut:
                 case RequestQueueStatusReturnCodeEnum.NotSuitableForConversion:
                 case RequestQueueStatusReturnCodeEnum.NotGeoreferenced:
-                
+
                     MarkAsComplete();
 
                     var msg = new InitiateSourceDocumentRetrievalCommand
@@ -155,34 +183,6 @@ namespace SourceDocumentCoordinator.Sagas
                     MarkAsComplete();
                     throw new NotImplementedException($"sourceDocument.Code: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
                                                       $"{sourceDocument.Code}");
-            }
-        }
-
-        private void ProcessSourceDocumentErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalCommand message)
-        {
-            switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
-            {
-                case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
-                    break;
-                case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
-                    if (Data.SourceDocumentStatusId < 1)
-                    {
-                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
-                    }
-                    break;
-                case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
-                    MarkAsComplete();
-                    throw new ApplicationException($"Unable to queue source document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
-                                                   $"{message.ToJSONSerializedString()}");
-                case QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised:
-                    MarkAsComplete();
-                    throw new ApplicationException($"Source document Id not recognised when queuing document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
-                                                   $"{message.ToJSONSerializedString()}");
-                default:
-                    MarkAsComplete();
-                    throw new NotImplementedException($"Return code from GetDocumentForViewing not implemented: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
-                                                      $"{returnCode}");
             }
         }
 
