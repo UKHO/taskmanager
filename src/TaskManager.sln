@@ -57,7 +57,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataServices.Models", "Data
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkflowCoordinator.IntegrationTests", "WorkflowCoordinator.IntegrationTests\WorkflowCoordinator.IntegrationTests.csproj", "{2C01990D-AE78-4265-BA7E-4C72CA01AC25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceDocumentCoordinator.IntegrationTests", "SourceDocumentCoordinator.IntegrationTests\SourceDocumentCoordinator.IntegrationTests.csproj", "{2020CB3C-3F45-418D-B72D-728DEB2312E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceDocumentCoordinator.IntegrationTests", "SourceDocumentCoordinator.IntegrationTests\SourceDocumentCoordinator.IntegrationTests.csproj", "{2020CB3C-3F45-418D-B72D-728DEB2312E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HpdDatabase.EF", "HpdDatabase.EF\HpdDatabase.EF.csproj", "{51429E63-C0D9-4D25-8BD2-A6E1226E3E32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.IntegrationTests", "Portal.IntegrationTests\Portal.IntegrationTests.csproj", "{65387C63-1F50-4EE1-839B-9446F1FEE0D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +155,14 @@ Global
 		{2020CB3C-3F45-418D-B72D-728DEB2312E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2020CB3C-3F45-418D-B72D-728DEB2312E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2020CB3C-3F45-418D-B72D-728DEB2312E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51429E63-C0D9-4D25-8BD2-A6E1226E3E32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51429E63-C0D9-4D25-8BD2-A6E1226E3E32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51429E63-C0D9-4D25-8BD2-A6E1226E3E32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51429E63-C0D9-4D25-8BD2-A6E1226E3E32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65387C63-1F50-4EE1-839B-9446F1FEE0D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65387C63-1F50-4EE1-839B-9446F1FEE0D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65387C63-1F50-4EE1-839B-9446F1FEE0D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65387C63-1F50-4EE1-839B-9446F1FEE0D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,6 +189,8 @@ Global
 		{6B6269AD-C400-4A5E-B6F8-19E5036BF127} = {9C5DE816-B215-42DD-8ED2-A00895B4CDF6}
 		{2C01990D-AE78-4265-BA7E-4C72CA01AC25} = {AC6D37BD-D8E4-418F-B062-4B7CC6A8FD1A}
 		{2020CB3C-3F45-418D-B72D-728DEB2312E5} = {71BF8B2A-BCF8-4F06-BF31-31B89EC4CE45}
+		{51429E63-C0D9-4D25-8BD2-A6E1226E3E32} = {1EAB5545-7539-44E4-8025-1580F2878997}
+		{65387C63-1F50-4EE1-839B-9446F1FEE0D9} = {1090BDD0-981C-477F-88CB-9C6EF85D568C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}
