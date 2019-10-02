@@ -51,7 +51,9 @@
     <br />
     @await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
     <br />
-    @await Html.PartialAsync("_AssignTask", Model.AssignTaskModel).ConfigureAwait(false)
+    <div id="assignTasks"></div>
+    <div id="assignTasksError"></div>
+    <button id="btnCreateTask" class="btn btn-primary"><span style="padding-right: 5px;"></span>Create additional task</button>
     <br />
     <div id="existingComments"></div>
     <div id="AddCommentError"></div>

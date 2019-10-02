@@ -6,6 +6,7 @@ namespace Portal.Pages.DbAssessment
 {
     public class _AssignTaskModel : PageModel
     {
+        public int AssignTaskId { get; set; }
         [DisplayName("Assessor:")]
         public Assessor Assessor { get; set; }
         public SelectList Assessors { get; set; }

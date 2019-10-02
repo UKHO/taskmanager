@@ -79,6 +79,18 @@ namespace Portal.Pages.DbAssessment
             return OnGetRetrieveComments(processId);
         }
 
+        public IActionResult OnGetRetrieveAssignTasks(int processId)
+        {
+            return new PartialViewResult
+            {
+                ViewName = "_AssignTask",
+                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = SetAssignTaskData()
+                }
+            };
+        }
+
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
@@ -106,6 +118,7 @@ namespace Portal.Pages.DbAssessment
         {
             return new _AssignTaskModel
             {
+                AssignTaskId = DateTime.Now.Second,
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
                     new List<Assessor>
