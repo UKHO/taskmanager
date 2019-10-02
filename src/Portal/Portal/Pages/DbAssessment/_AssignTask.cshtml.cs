@@ -24,6 +24,8 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
 
+        public bool IsDefaultTask { get; set; }
+
         public void OnGet()
         {
         }

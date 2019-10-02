@@ -35,7 +35,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             TaskInformationModel = SetTaskInformationData(processId);
-            AssignTaskModel = SetAssignTaskData();
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -118,7 +117,8 @@ namespace Portal.Pages.DbAssessment
         {
             return new _AssignTaskModel
             {
-                AssignTaskId = DateTime.Now.Second,
+                IsDefaultTask = (AssignTaskData.AssignId == 0),     // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
+                AssignTaskId = ++AssignTaskData.AssignId,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
                     new List<Assessor>
@@ -144,5 +144,11 @@ namespace Portal.Pages.DbAssessment
                     }, "VerifierId", "Name")
             };
         }
+    }
+
+    // TODO: Temporary class for testing; Remove once DB is used to get values
+    public static class AssignTaskData
+    {
+        public static int AssignId;
     }
 }
