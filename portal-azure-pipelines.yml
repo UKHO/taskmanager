@@ -101,6 +101,7 @@ jobs:
       packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
 
 - job: RunAutomatedTests
+  dependsOn: RestoreBuildAndDeploy
   pool:
    UKHO Windows 2019
 
