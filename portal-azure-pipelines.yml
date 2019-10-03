@@ -106,7 +106,7 @@ jobs:
 - job: RunAutomatedTests
   dependsOn: RestoreBuildAndDeploy
   pool:
-   UKHO Windows 2019
+   NautilusBuild
 
   steps:
   - task: DownloadBuildArtifacts@0
