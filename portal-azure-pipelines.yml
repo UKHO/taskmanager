@@ -106,7 +106,7 @@ jobs:
 - job: RunAutomatedTests
   dependsOn: RestoreBuildAndDeploy
   pool:
-   NautilusRelease
+   NautilusBuild
 
   steps:
   - task: DownloadBuildArtifacts@0
