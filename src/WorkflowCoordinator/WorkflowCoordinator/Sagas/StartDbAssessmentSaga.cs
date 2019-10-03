@@ -131,6 +131,8 @@ namespace WorkflowCoordinator.Sagas
 
             await _dbContext.SaveChangesAsync();
 
+            // TODO: Fire message to create the first 'Assigned Task' in the new Tasks table and move MarkAsComplete to its handler
+
             MarkAsComplete();
         }
 
