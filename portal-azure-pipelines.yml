@@ -106,14 +106,21 @@ jobs:
    UKHO Windows 2019
 
   steps:
-    - task: AzureCLI@1
-      inputs:
-        azureSubscription: 'TM2-Dev'
-        scriptLocation: 'inlineScript'
-        inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
-      displayName: 'Run SpecFlow tests'
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      buildType: 'current'
+      downloadType: 'specific'
+      downloadPath: '$(System.ArtifactsDirectory)' 
 
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFiles: '**/*.trx'
-        testResultsFormat: 'VSTest'
+  - task: AzureCLI@1
+    inputs:
+      azureSubscription: 'TM2-Dev'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
+    displayName: 'Run SpecFlow tests'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/*.trx'
+      testResultsFormat: 'VSTest'
