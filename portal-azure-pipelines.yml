@@ -7,6 +7,9 @@ jobs:
   pool: 
     UKHO Windows 2019
 
+  workspace:
+    clean: all
+
   steps:
 
   - task: DotNetCoreCLI@2
