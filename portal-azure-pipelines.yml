@@ -111,7 +111,7 @@ jobs:
     inputs:
       buildType: 'current'
       downloadType: 'specific'
-      downloadPath: '$(System.ArtifactsDirectory)' 
+      downloadPath: '$(System.ArtifactsDirectory)\\specs' 
 
   - task: AzureCLI@1
     inputs:
