@@ -85,7 +85,7 @@ namespace Portal.Pages.DbAssessment
                 ViewName = "_AssignTask",
                 ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
                 {
-                    Model = SetAssignTaskData()
+                    Model = SetAssignTaskData(processId)
                 }
             };
         }
@@ -113,12 +113,13 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private _AssignTaskModel SetAssignTaskData()
+        private _AssignTaskModel SetAssignTaskData(int processId)
         {
             return new _AssignTaskModel
             {
-                IsDefaultTask = (AssignTaskData.AssignId == 0),     // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
                 AssignTaskId = ++AssignTaskData.AssignId,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
+                Ordinal = AssignTaskData.AssignId,
+                ProcessId = processId,
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
                     new List<Assessor>

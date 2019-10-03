@@ -7,6 +7,8 @@ namespace Portal.Pages.DbAssessment
     public class _AssignTaskModel : PageModel
     {
         public int AssignTaskId { get; set; }
+        public int ProcessId { get; set; }
+
         [DisplayName("Assessor:")]
         public Assessor Assessor { get; set; }
         public SelectList Assessors { get; set; }
@@ -24,7 +26,7 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
 
-        public bool IsDefaultTask { get; set; }
+        public int Ordinal { get; set; }
 
         public void OnGet()
         {
