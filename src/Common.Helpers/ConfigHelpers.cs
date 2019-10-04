@@ -9,6 +9,7 @@ namespace Common.Helpers
         public static bool IsLocalDevelopment => EnvironmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
 
         public static bool IsAzureDevOpsBuild => EnvironmentName.Equals("AzureDevOpsBuild", StringComparison.OrdinalIgnoreCase);
+        public static bool IsAzureDevelopment => EnvironmentName.Equals("AzureDevelopment", StringComparison.OrdinalIgnoreCase);
 
         public static bool IsAzure =>
             EnvironmentName.Equals("Azure", StringComparison.OrdinalIgnoreCase);
