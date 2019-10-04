@@ -35,7 +35,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             TaskInformationModel = SetTaskInformationData(processId);
-            AssignTaskModel = SetAssignTaskData();
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -79,6 +78,18 @@ namespace Portal.Pages.DbAssessment
             return OnGetRetrieveComments(processId);
         }
 
+        public IActionResult OnGetRetrieveAssignTasks(int processId)
+        {
+            return new PartialViewResult
+            {
+                ViewName = "_AssignTask",
+                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = SetAssignTaskData(processId)
+                }
+            };
+        }
+
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
@@ -102,10 +113,13 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private _AssignTaskModel SetAssignTaskData()
+        private _AssignTaskModel SetAssignTaskData(int processId)
         {
             return new _AssignTaskModel
             {
+                AssignTaskId = ++AssignTaskData.AssignId,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
+                Ordinal = AssignTaskData.AssignId,
+                ProcessId = processId,
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
                     new List<Assessor>
@@ -131,5 +145,11 @@ namespace Portal.Pages.DbAssessment
                     }, "VerifierId", "Name")
             };
         }
+    }
+
+    // TODO: Temporary class for testing; Remove once DB is used to get values
+    public static class AssignTaskData
+    {
+        public static int AssignId;
     }
 }

@@ -13,7 +13,7 @@ namespace Portal.TestAutomation.Steps
 
         public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
         {
-            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
+            //TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
 
             _reviewPage = new ReviewPage(driver, 5);
         }
