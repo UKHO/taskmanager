@@ -9,12 +9,14 @@
  */
 
 using System.IO;
+using Common.Helpers;
 using DataServices.Adapters;
 using DataServices.Config;
 using DataServices.Filters;
 using DataServices.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,9 +54,9 @@ namespace DataServices
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services
                 .AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(opts =>
                 {
                     opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -125,7 +127,7 @@ namespace DataServices
                     c.SwaggerEndpoint("/swagger-original.json", "SDRA API Original");
                 });
 
-            if (env.IsDevelopment())
+            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }
