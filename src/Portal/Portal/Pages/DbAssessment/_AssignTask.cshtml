@@ -5,9 +5,7 @@
 <div class="panel panel-default" id="@("assignTask" + Model.AssignTaskId)">
     <div class="panel-heading">
         <span>Assign Task @Model.AssignTaskId</span>
-        <input id="@("hdnAssignTaskId" + Model.AssignTaskId)" type="hidden" value="@Model.AssignTaskId" />
-        <input id="@("hdnOrdinal" + Model.AssignTaskId)" type="hidden" value="@Model.Ordinal" />
-        <button id="btnTestIt" class="deleteAssignTask btn btn-danger btn-xs pull-right @( Model.Ordinal == 1 ? "hidden": "" )" data-assignTaskId="@Model.AssignTaskId"><i class="glyphicon glyphicon-remove"></i></button>
+        <button class="deleteAssignTask btn btn-danger btn-xs pull-right @( Model.Ordinal == 1 ? "hidden": "" )" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal" ><i class="glyphicon glyphicon-remove"></i></button>
     </div>
     <div class="panel-body">
         <div class="col-lg-12">
