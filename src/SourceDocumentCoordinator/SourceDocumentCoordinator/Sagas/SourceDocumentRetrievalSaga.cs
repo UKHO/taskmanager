@@ -175,6 +175,10 @@ namespace SourceDocumentCoordinator.Sagas
                     MarkAsComplete();
                     throw new ApplicationException($"Source document folder not writeable: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
                                                    $"{message.ToJSONSerializedString()}");
+                case RequestQueueStatusReturnCodeEnum.NoDocumentFound:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Cannot find source document: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
                 case RequestQueueStatusReturnCodeEnum.QueueInsertionFailed:
                     MarkAsComplete();
                     throw new ApplicationException($"Unable to queue source document for retrieval: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
