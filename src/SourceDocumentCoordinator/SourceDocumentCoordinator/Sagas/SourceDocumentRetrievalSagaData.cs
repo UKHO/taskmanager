@@ -10,5 +10,6 @@ namespace SourceDocumentCoordinator.Sagas
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
         public int SourceDocumentStatusId { get; set; } 
+        public int ProcessId { get; set; }
     }
 }

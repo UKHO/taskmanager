@@ -1,6 +1,6 @@
 ﻿namespace SourceDocumentCoordinator.Enums
 {
-    public enum ClearDocumentFromQueueReturnCodeEnum
+    public enum ClearFromQueueReturnCodeEnum
     {
         Success = 0,
         Warning = 21,

@@ -13,7 +13,8 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using DataServices.Models;
+using SourceDocumentCoordinator.Enums;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -50,6 +51,7 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 Data.IsStarted = true;
                 Data.CorrelationId = message.CorrelationId;
+                Data.ProcessId = message.ProcessId;
                 Data.SourceDocumentId = message.SourceDocumentId;
                 Data.SourceDocumentStatusId = 0;
             }
@@ -58,27 +60,9 @@ namespace SourceDocumentCoordinator.Sagas
             var returnCode = await _dataServiceApiClient.GetDocumentForViewing(_generalConfig.Value.CallerCode,
                 message.SourceDocumentId,
                 _generalConfig.Value.SourceDocumentWriteableFolderName,
-                true);
+                message.GeoReferenced);
 
-            // TODO: Think about different return code scenarios
-            if (returnCode.Code.HasValue
-                && (returnCode.Code.Value == 0)
-                || (returnCode.Code.Value == 1 && Data.SourceDocumentStatusId == 0))
-            {
-                var sourceDocumentStatus = new SourceDocumentStatus
-                {
-                    ProcessId = message.ProcessId,
-                    SdocId = message.SourceDocumentId,
-                    Status = SourceDocumentRetrievalStatus.Started.ToString(),
-                    StartedAt = DateTime.Now
-                };
-
-                _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
-
-                _dbContext.SaveChanges();
-
-                Data.SourceDocumentStatusId = sourceDocumentStatus.SourceDocumentStatusId;
-            }
+            ProcessGetDocumentForViewingErrorCodes(returnCode, message);
 
             if (Data.SourceDocumentStatusId > 0)
             {
@@ -105,14 +89,46 @@ namespace SourceDocumentCoordinator.Sagas
                 throw new ApplicationException(
                     $"Source Document Retrieval Status Code is null {Environment.NewLine}{sourceDocument.ToJSONSerializedString()}");
 
-            switch (sourceDocument.Code.Value)
+            await ProcessDocumentRequestQueueErrorStatus(message, context, sourceDocument);
+        }
+
+        private void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalCommand message)
+        {
+            switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
-                case 0:
+                case QueueForRetrievalReturnCodeEnum.Success:
+                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    break;
+                case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
+                    if (Data.SourceDocumentStatusId < 1)
+                    {
+                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    }
+                    break;
+                case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Unable to queue source document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                case QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Source document Id not recognised when queuing document for retrieval: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                default:
+                    MarkAsComplete();
+                    throw new NotImplementedException($"Return code from GetDocumentForViewing not implemented: {Environment.NewLine}{returnCode.Message}{Environment.NewLine}" +
+                                                      $"{returnCode}");
+            }
+        }
+
+        private async Task ProcessDocumentRequestQueueErrorStatus(GetDocumentRequestQueueStatusCommand message,
+            IMessageHandlerContext context, QueuedDocumentObject sourceDocument)
+        {
+            switch ((RequestQueueStatusReturnCodeEnum)sourceDocument.Code.Value)
+            {
+                case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
                     UpdateSourceDocumentStatus(message);
 
-                    // TODO: Subsequent stories:
-                    // TODO: Once document has been fetched, call ClearDocumentRequestJobFromQueue on DataServices API and close saga...
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
                         CorrelationId = message.CorrelationId,
@@ -132,16 +148,63 @@ namespace SourceDocumentCoordinator.Sagas
                     MarkAsComplete();
 
                     break;
-                case 1:
+                case RequestQueueStatusReturnCodeEnum.Queued:
                     // Still queued; fire another timer
                     await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
                         TimeSpan.FromSeconds(_generalConfig.Value
                             .SourceDocumentCoordinatorQueueStatusIntervalSeconds),
                         message);
-                    break; ;
+                    break;
+                case RequestQueueStatusReturnCodeEnum.ConversionFailed:
+                case RequestQueueStatusReturnCodeEnum.ConversionTimeOut:
+                case RequestQueueStatusReturnCodeEnum.NotSuitableForConversion:
+                case RequestQueueStatusReturnCodeEnum.NotGeoreferenced:
+
+                    MarkAsComplete();
+
+                    var msg = new InitiateSourceDocumentRetrievalCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        ProcessId = Data.ProcessId,
+                        SourceDocumentId = message.SourceDocumentId,
+                        GeoReferenced = false
+                    };
+                    await context.SendLocal(msg);
+                    break;
+                case RequestQueueStatusReturnCodeEnum.FolderNotWritable:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Source document folder not writeable: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                case RequestQueueStatusReturnCodeEnum.NoDocumentFound:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Cannot find source document: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
+                case RequestQueueStatusReturnCodeEnum.QueueInsertionFailed:
+                    MarkAsComplete();
+                    throw new ApplicationException($"Unable to queue source document for retrieval: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
+                                                   $"{message.ToJSONSerializedString()}");
                 default:
-                    throw new NotImplementedException($"sourceDocument.Code: {sourceDocument.Code}");
+                    MarkAsComplete();
+                    throw new NotImplementedException($"sourceDocument.Code: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
+                                                      $"{sourceDocument.Code}");
             }
+        }
+
+        private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalCommand message)
+        {
+            var sourceDocumentStatus = new SourceDocumentStatus
+            {
+                ProcessId = message.ProcessId,
+                SdocId = message.SourceDocumentId,
+                Status = SourceDocumentRetrievalStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            };
+
+            _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
+
+            _dbContext.SaveChanges();
+
+            return sourceDocumentStatus.SourceDocumentStatusId;
         }
 
         private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
