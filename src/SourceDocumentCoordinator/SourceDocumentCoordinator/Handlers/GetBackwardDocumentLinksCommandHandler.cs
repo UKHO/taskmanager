@@ -1,14 +1,22 @@
 ﻿using System.Threading.Tasks;
 using Common.Messages.Commands;
 using NServiceBus;
+using SourceDocumentCoordinator.HttpClients;
 
 namespace SourceDocumentCoordinator.Handlers
 {
     public class GetBackwardDocumentLinksCommandHandler : IHandleMessages<GetBackwardDocumentLinksCommand>
     {
-        public Task Handle(GetBackwardDocumentLinksCommand message, IMessageHandlerContext context)
+        private readonly IDataServiceApiClient _dataServiceApiClient;
+
+        public GetBackwardDocumentLinksCommandHandler(IDataServiceApiClient dataServiceApiClient)
         {
-            throw new System.NotImplementedException();
+            _dataServiceApiClient = dataServiceApiClient;
+        }
+
+        public async Task Handle(GetBackwardDocumentLinksCommand message, IMessageHandlerContext context)
+        {
+            var docLinks = await _dataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId);
         }
     }
 }

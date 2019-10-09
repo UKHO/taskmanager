@@ -1,15 +1,22 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Common.Messages.Commands;
 using NServiceBus;
+using SourceDocumentCoordinator.HttpClients;
 
 namespace SourceDocumentCoordinator.Handlers
 {
     public class GetForwardDocumentLinksCommandHandler : IHandleMessages<GetForwardDocumentLinksCommand>
     {
-        public Task Handle(GetForwardDocumentLinksCommand message, IMessageHandlerContext context)
+        private readonly IDataServiceApiClient _dataServiceApiClient;
+
+        public GetForwardDocumentLinksCommandHandler(IDataServiceApiClient dataServiceApiClient)
         {
-            throw new NotImplementedException();
+
+            _dataServiceApiClient = dataServiceApiClient;
+        }
+        public async Task Handle(GetForwardDocumentLinksCommand message, IMessageHandlerContext context)
+        {
+            var docLinks = await _dataServiceApiClient.GetForwardDocumentLinks(message.SourceDocumentId);
         }
     }
 }
