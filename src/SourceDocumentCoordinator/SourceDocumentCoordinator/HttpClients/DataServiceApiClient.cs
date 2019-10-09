@@ -88,6 +88,11 @@ namespace SourceDocumentCoordinator.HttpClients
             return docObjects;
         }
 
+        public async Task<LinkedDocumentMetadata> GetDocumentsFromList(int sdocId)
+        {
+            return null;
+        }
+
 
         public async Task<ReturnCode> GetDocumentForViewing(string callerCode, int sdocId, string writableFolderName, bool imageAsGeotiff)
         {
