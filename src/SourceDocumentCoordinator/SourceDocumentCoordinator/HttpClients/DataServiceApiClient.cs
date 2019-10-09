@@ -22,6 +22,73 @@ namespace SourceDocumentCoordinator.HttpClients
             _uriConfig = uriConfig;
         }
 
+
+        public async Task<LinkedDocuments> GetBackwardDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceBackwardLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var linkedDocuments = JsonConvert.DeserializeObject<LinkedDocuments>(data);
+
+            return linkedDocuments;
+        }
+        public async Task<LinkedDocuments> GetForwardDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceForwardLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var linkedDocuments = JsonConvert.DeserializeObject<LinkedDocuments>(data);
+
+            return linkedDocuments;
+        }
+
+        public async Task<DocumentObjects> GetSepDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceSepLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var docObjects = JsonConvert.DeserializeObject<DocumentObjects>(data);
+
+            return docObjects;
+        }
+
+
         public async Task<ReturnCode> GetDocumentForViewing(string callerCode, int sdocId, string writableFolderName, bool imageAsGeotiff)
         {
             var data = "";
