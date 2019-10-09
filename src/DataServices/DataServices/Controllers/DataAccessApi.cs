@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
@@ -407,6 +408,79 @@ namespace DataServices.Controllers
             ? JsonConvert.DeserializeObject<DocumentObjects>(exampleJson)
             : default(DocumentObjects);            //TODO: Change the data returned
             return new ObjectResult(example);
+        }
+
+        /// <summary>
+        /// Returns linked document metadata for the given SdocIds
+        /// </summary>
+        /// <param name="sdocIds">SdocIds to retrieve document metadata for</param>
+        /// <response code="200">A code and message</response>
+        /// <response code="400">Bad request.</response>
+        /// <response code="401">Unauthorised.</response>
+        /// <response code="403">Forbidden.</response>
+        /// <response code="404">Not found.</response>
+        /// <response code="406">Not acceptable.</response>
+        /// <response code="500">Internal Server Error.</response>
+        [HttpDelete]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/GetDocumentsFromList/{sdocIds}")]
+        [ValidateModelState]
+        [SwaggerOperation("GetDocumentsFromList")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "A code and message")]
+        [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
+        [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
+        [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
+        [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
+        [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
+        [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
+        public virtual IActionResult GetDocumentsFromList([FromRoute][Required]int[] sdocIds)
+        {
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
+
+            var metadata = new List<Document>(task.Result.Length);
+
+            try
+            {
+                metadata.AddRange(task.Result.Select(t => new Document
+                {
+                    Name = t.Name,
+                    Id = t.Id,
+                    CRSId = t.CRSId,
+                    SourceName = t.SourceName,
+                    Status = t.Status,
+                    CRSParams = t.CRSParams,
+                    DTAccuracy = t.DTAccuracy,
+                    DTDx = t.DTDx,
+                    DTDy = t.DTDy,
+                    DTDz = t.DTDz,
+                    DTFromDatum = t.DTFromDatum,
+                    DTId = t.DTId,
+                    DTMethod = t.DTMethod,
+                    DTName = t.DTName,
+                    DTRx = t.DTRx,
+                    DTRy = t.DTRy,
+                    DTRz = t.DTRz,
+                    DTScale = t.DTScale,
+                    DTSourceFile = t.DTSourceFile,
+                    DTStatus = t.DTStatus,
+                    DocumentTypeId = t.DocumentTypeId,
+                    RegistrationDate = t.RegistrationDate,
+                    Scale = t.Scale,
+                    SepName = t.SepName,
+                    SpatialExtentPolygon = t.SpatialExtentPolygon,
+                    SpatialReferencingAccuracy = t.SpatialReferencingAccuracy
+                }));
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving linked document metadata");
+                return StatusCode(500, e.Message);
+            }
+            return new ObjectResult(metadata);
         }
 
         /// <summary>
