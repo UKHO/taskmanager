@@ -422,7 +422,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpGet]
-        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentsFromList/{sdocIds}")]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentsFromList")]
         [ValidateModelState]
         [SwaggerOperation("GetDocumentsFromList")]
         [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "A code and message")]
@@ -432,7 +432,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentsFromList([FromRoute][Required]int[] sdocIds)
+        public virtual IActionResult GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
 

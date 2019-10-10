@@ -385,17 +385,6 @@
             }
           },
           {
-            "name": "writeableFolderName",
-            "in": "query",
-            "description": "The path for the file output\nExample: tbc\n",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "imageAsGeoTIFF",
             "in": "path",
             "description": "True if conversion to GeoTiff should be attempted.\nExample: true, false\n",
@@ -604,17 +593,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "writeableFolderName",
-            "in": "query",
-            "description": "The path for the file output\nExample: tbc\n",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1177,56 +1155,34 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/GetDocumentsFromList/{sdocIds}": {
-      "delete": {
+    "/SourceDocument/DataAccess/DocumentsFromList": {
+      "get": {
         "tags": [
           "DataAccess"
         ],
-        "summary": "Clear the document request job from the queue",
-        "operationId": "deleteDocumentRequestJobFromQueue",
+        "summary": "Returns linked document metadata for the given SdocIds",
+        "operationId": "GetDocumentsFromList",
         "parameters": [
           {
-            "name": "callerCode",
-            "in": "path",
-            "description": "System that is calling the API\n\nExample: HDB\n",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sdocId",
-            "in": "path",
-            "description": "Unique identifier for an SDRA Source Document \n\nExample: \n",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "writeableFolderName",
+            "name": "sdocIds",
             "in": "query",
-            "description": "The path for the file output\nExample: tbc\n",
+            "description": "Array of unique identifier for an SDRA Source Document \n\nExample: \n",
             "required": true,
-            "style": "simple",
-            "explode": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "An code and message",
+            "description": "An array of documents objects linked to the assessment",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReturnCode"
+                  "$ref": "#/components/schemas/DocumentObjects"
                 }
               }
             }
