@@ -421,8 +421,8 @@ namespace DataServices.Controllers
         /// <response code="404">Not found.</response>
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
-        [HttpDelete]
-        [Route("/DataServices/v1/SourceDocument/DataAccess/GetDocumentsFromList/{sdocIds}")]
+        [HttpGet]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentsFromList/{sdocIds}")]
         [ValidateModelState]
         [SwaggerOperation("GetDocumentsFromList")]
         [SwaggerResponse(statusCode: 200, type: typeof(ReturnCode), description: "A code and message")]
@@ -436,39 +436,11 @@ namespace DataServices.Controllers
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
 
-            var metadata = new List<Document>(task.Result.Length);
+            Document[] result;
 
             try
             {
-                metadata.AddRange(task.Result.Select(t => new Document
-                {
-                    Name = t.Name,
-                    Id = t.Id,
-                    CRSId = t.CRSId,
-                    SourceName = t.SourceName,
-                    Status = t.Status,
-                    CRSParams = t.CRSParams,
-                    DTAccuracy = t.DTAccuracy,
-                    DTDx = t.DTDx,
-                    DTDy = t.DTDy,
-                    DTDz = t.DTDz,
-                    DTFromDatum = t.DTFromDatum,
-                    DTId = t.DTId,
-                    DTMethod = t.DTMethod,
-                    DTName = t.DTName,
-                    DTRx = t.DTRx,
-                    DTRy = t.DTRy,
-                    DTRz = t.DTRz,
-                    DTScale = t.DTScale,
-                    DTSourceFile = t.DTSourceFile,
-                    DTStatus = t.DTStatus,
-                    DocumentTypeId = t.DocumentTypeId,
-                    RegistrationDate = t.RegistrationDate,
-                    Scale = t.Scale,
-                    SepName = t.SepName,
-                    SpatialExtentPolygon = t.SpatialExtentPolygon,
-                    SpatialReferencingAccuracy = t.SpatialReferencingAccuracy
-                }));
+                result = task.Result;
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -480,7 +452,19 @@ namespace DataServices.Controllers
                 _logger.LogError(e, "Error retrieving linked document metadata");
                 return StatusCode(500, e.Message);
             }
-            return new ObjectResult(metadata);
+
+            var documents = result.Select<Document, DocumentObject>(document => new DocumentObject()
+            {
+                Id = document.Id,
+                Name = document.Name,
+                SourceName = document.SourceName
+            });
+
+            var documentObjects = new DocumentObjects();
+
+            documentObjects.AddRange(documents);
+
+            return new ObjectResult(documentObjects);
         }
 
         /// <summary>
