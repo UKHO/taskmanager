@@ -3,7 +3,7 @@
   "info": {
     "title": "SDRA API",
     "description": "This API is for SDRA\n\nIt provides Source Document Assessment Data and Data Access\n",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "servers": [
     {
