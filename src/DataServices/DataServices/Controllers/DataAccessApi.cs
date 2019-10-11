@@ -379,35 +379,42 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetSEPDocumentLinks([FromRoute][Required]int? sdocId)
+        public virtual IActionResult GetSepDocumentLinks([FromRoute][Required]int? sdocId)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(DocumentObjects));
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error retrieving SEP linked document due to invalid parameter", nameof(sdocId));
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetSEPDocumentLinksAsync(sdocId.Value);
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            Document[] result;
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+            try
+            {
+                result = task.Result;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving SEP linked document metadata");
+                return StatusCode(500, e.Message);
+            }
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+            var documents = result.Select<Document, DocumentObject>(document => new DocumentObject()
+            {
+                Id = document.Id,
+                Name = document.Name,
+                SourceName = document.SourceName
+            });
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
+            var documentObjects = new DocumentObjects();
 
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"name\" : \"NM_LAR_4_18, North Channel to the Firth of Lorne\",\n  \"id\" : 0,\n  \"sourceName\" : \"RSDRA2006000006072\"\n}, {\n  \"name\" : \"NM_LAR_4_18, North Channel to the Firth of Lorne\",\n  \"id\" : 0,\n  \"sourceName\" : \"RSDRA2006000006072\"\n} ]";
+            documentObjects.AddRange(documents);
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<DocumentObjects>(exampleJson)
-            : default(DocumentObjects);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            return new ObjectResult(documentObjects);
         }
 
         /// <summary>
@@ -434,6 +441,9 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
+            if (sdocIds == null || sdocIds.Length == 0)
+                throw  new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
+
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
 
             Document[] result;
