@@ -15,6 +15,8 @@ namespace SourceDocumentCoordinator.Config
         public Uri DataServicesWebServiceSepLinksUri { get; set; }
         public Uri DataServicesWebServiceForwardLinksUri { get; set; }
         public Uri DataServicesWebServiceBackwardLinksUri { get; set; }
+        public Uri DataServicesWebServiceDocumentsFromListUri { get; set; }
+        public string DataServicesWebServiceDocumentsFromListUriSdocIdQuery { get; set; }  
         public Uri DataServicesWebServiceHealthcheckUri { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
         public Uri ContentServiceBaseUrl { get; set; }

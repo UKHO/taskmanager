@@ -12,6 +12,6 @@ namespace SourceDocumentCoordinator.HttpClients
         Task<bool> CheckDataServicesConnection();
         Task<QueuedDocumentObjects> GetDocumentRequestQueueStatus(string callerCode);
         Task<ReturnCode> DeleteDocumentRequestJobFromQueue(string callerCode, int sdocId, string writeableFolderName);
-        Task<LinkedDocumentMetadata> GetDocumentsFromList(int sdocId);
+        Task<DocumentObjects> GetDocumentsFromList(int[] linkedDocsId);
     }
 }
