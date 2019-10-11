@@ -118,19 +118,40 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(LinkedDocument));
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
 
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetBackwardDocumentLinksAsync(sdocId.Value);
 
+            Link[] result;
 
+            try
+            {
+                result = task.Result;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving Backward linked document metadata");
+                return StatusCode(500, e.Message);
+            }
 
-            string exampleJson = null;
-            exampleJson = "{\n  \"docId1\" : 0,\n  \"docId2\" : 6,\n  \"linkType\" : \"PARENTCHILD, CHARTPANELAFFECTED, CROSSREFERENCE\"\n}";
+            var documents = result.Select<Link, LinkedDocument>(link => new LinkedDocument()
+            {
+                DocId1 = link.DocId1,
+                DocId2 = link.DocId2,
+                LinkType = link.LinkType
+            });
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<LinkedDocument>(exampleJson)
-            : default(LinkedDocument);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            var linkedDocuments = new LinkedDocuments();
+
+            linkedDocuments.AddRange(documents);
+
+            return new ObjectResult(linkedDocuments);
         }
 
         /// <summary>
@@ -346,7 +367,7 @@ namespace DataServices.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error retrieving SEP linked document metadata");
+                _logger.LogError(e, "Error retrieving Forward linked document metadata");
                 return StatusCode(500, e.Message);
             }
 
