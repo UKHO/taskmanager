@@ -328,33 +328,40 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(LinkedDocument));
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error retrieving Forward linked document due to invalid parameter", nameof(sdocId));
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetForwardDocumentLinksAsync(sdocId.Value);
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            Link[] result;
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+            try
+            {
+                result = task.Result;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error retrieving SEP linked document metadata");
+                return StatusCode(500, e.Message);
+            }
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+            var documents = result.Select<Link, LinkedDocument>(link => new LinkedDocument()
+            {
+                DocId1 = link.DocId1,
+                DocId2 = link.DocId2,
+                LinkType = link.LinkType
+            });
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
+            var linkedDocuments = new LinkedDocuments();
 
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "{\n  \"docId1\" : 0,\n  \"docId2\" : 6,\n  \"linkType\" : \"PARENTCHILD, CHARTPANELAFFECTED, CROSSREFERENCE\"\n}";
+            linkedDocuments.AddRange(documents);
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<LinkedDocument>(exampleJson)
-            : default(LinkedDocument);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            return new ObjectResult(linkedDocuments);
         }
 
         /// <summary>
