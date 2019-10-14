@@ -1,13 +1,9 @@
-﻿using Common.Messages.Commands;
-
-using NServiceBus;
-
-using SourceDocumentCoordinator.HttpClients;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Common.Messages.Commands;
+using NServiceBus;
+using SourceDocumentCoordinator.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -26,7 +22,9 @@ namespace SourceDocumentCoordinator.Handlers
         public async Task Handle(GetForwardDocumentLinksCommand message, IMessageHandlerContext context)
         {
             var docLinks = await _dataServiceApiClient.GetForwardDocumentLinks(message.SourceDocumentId);
-            var linkedDocIds = docLinks.Select(s => s.DocId2);
+            var linkedDocIds = docLinks.Select(s => s.DocId2).ToList();
+
+            if (linkedDocIds?.Count == 0) return;
 
             var documentObjects = await _dataServiceApiClient.GetDocumentsFromList(linkedDocIds.ToArray());
 
