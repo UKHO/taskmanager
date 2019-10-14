@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -12,6 +13,6 @@ namespace WorkflowDatabase.EF.Models
         public string SourceDocumentName { get; set; }
         public string LinkType { get; set; }
         public int LinkedSdocId { get; set; }
-        //public DateTime Created { get; set; }
+        public DateTime Created { get; set; }
     }
 }
