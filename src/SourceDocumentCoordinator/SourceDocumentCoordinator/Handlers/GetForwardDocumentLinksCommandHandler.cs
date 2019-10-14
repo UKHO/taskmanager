@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Common.Messages.Commands;
+
+using NServiceBus;
+
+using SourceDocumentCoordinator.HttpClients;
+
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
-using NServiceBus;
-using SourceDocumentCoordinator.HttpClients;
+
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -31,12 +35,13 @@ namespace SourceDocumentCoordinator.Handlers
                 var linkedDocument = new LinkedDocument
                 {
                     SdocId = message.SourceDocumentId,
-                    LinkedSdocId = documentObject.Id, //Same as docid2?
+                    LinkedSdocId = documentObject.Id,
                     RsdraNumber = documentObject.SourceName,
                     SourceDocumentName = documentObject.Name,
                     LinkType = "Forward",
                     Created = DateTime.Now
                 };
+
                 _dbContext.Add(linkedDocument);
                 _dbContext.SaveChanges();
             }
