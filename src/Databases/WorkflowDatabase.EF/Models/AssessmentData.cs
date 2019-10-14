@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -16,5 +17,7 @@ namespace WorkflowDatabase.EF.Models
         public string SourceNature { get; set; }
         public string Datum { get; set; }
         public int ProcessId { get; set; }
+
+        public virtual List<LinkedDocument> LinkedDocuments { get; set; }
     }
 }
