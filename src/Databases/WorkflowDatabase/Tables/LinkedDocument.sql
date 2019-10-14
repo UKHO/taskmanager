@@ -6,5 +6,6 @@
     [SourceDocumentName] NVARCHAR(255) NOT NULL, 
     [LinkType] NVARCHAR(10) NOT NULL, 
     [LinkedSdocId] INT NOT NULL, 
-    [Created] DATETIME NOT NULL
+    [Created] DATETIME NOT NULL, 
+    CONSTRAINT [FK_LinkedDocument_AssessmentData] FOREIGN KEY ([SdocId]) REFERENCES [AssessmentData]([SdocId])
 )

@@ -13,6 +13,7 @@
 			[Datum] NVARCHAR(2000) NULL, 
 			[ProcessId] INT NOT NULL, 
     CONSTRAINT [AK_AssessmentData_ProcessId] UNIQUE ([ProcessId]), 
-    CONSTRAINT [FK_AssessmentData_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId])
+    CONSTRAINT [FK_AssessmentData_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]), 
+    CONSTRAINT [AK_AssessmentData_SdocId] UNIQUE ([SdocId])
 )
 
