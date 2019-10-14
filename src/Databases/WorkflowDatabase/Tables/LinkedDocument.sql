@@ -6,5 +6,5 @@
     [SourceDocumentName] NVARCHAR(255) NOT NULL, 
     [LinkType] NVARCHAR(10) NOT NULL, 
     [LinkedSdocId] INT NOT NULL, 
-    [Created] DATETIME NOT NULL DEFAULT GETDATE()
+    [Created] DATETIME NOT NULL
 )
