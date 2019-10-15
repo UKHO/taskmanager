@@ -12,7 +12,7 @@
                     <th scope="col">RSDRA</th>
                     <th scope="col">SDOC</th>
                     <th scope="col">Source Name</th>
-                    <th scope="col">Rcpt Date</th>
+                    <th scope="col">Receipt Date</th>
                     <th scope="col">Document Type</th>
                     <th scope="col">Datum</th>
                     <th scope="col">Type</th>
@@ -20,68 +20,85 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-toggle="collapse" data-target=".order1">
+            @for (int i = 0; i < Model.Assessments.Count; i++)
+            {
+                var assessment = Model.Assessments[i];
+
+                <tr data-toggle="collapse" data-target=".order@(i+1)">
                     <th><i class="fa fa-plus"></i></th>
-                    <th>2019123456789</th>
-                    <td id="rows">194987</td>
-                    <td>19_190_HDB_OWP_TEST</td>
-                    <td>09/09/2019</td>
-                    <td>Chart Panel Navigational</td>
-                    <td></td>
-                    <td>SEP</td>
-                    <td></td>
-                </tr>
-                <tr class="collapse order1">
-                    <th></th>
-                    <td></td>
-                    <td>TM_Test_Run</td>
-                    <td>11/09/2019</td>
-                    <td></td>
-                    <td></td>
-                    <td>Forward</td>
-                    <td><i class="fa fa-times-circle" style="color:red"></i></td>
-                </tr>
-                <tr class="collapse order1">
-                    <th></th>
-                    <td></td>
-                    <td>HDB_Test_Run</td>
-                    <td>09/09/2019</td>
-                    <td></td>
-                    <td></td>
-                    <td>SEP</td>
+                    <th>@assessment.RsdraNumber</th>
+                    <td id="rows">@assessment.SdocId</td>
+                    <td>@assessment.SourceDocumentName</td>
+                    <td>@assessment.ReceiptDate</td>
+                    <td>@assessment.SourceDocumentType</td>
+                    <td>@assessment.Datum</td>
+                    <td>@assessment.SourceNature</td>
                     <td></td>
                 </tr>
-                <tr data-toggle="collapse" data-target=".order2">
-                    <th><i class="fa fa-plus"></i></th>
-                    <th scope="row">201943734354</th>
-                    <td>194110</td>
-                    <td>19_221_TM_REVIEW_TEST</td>
-                    <td>11/10/2019</td>
-                    <td>Chart Panel Navigational or Repromat</td>
-                    <td></td>
-                    <td>SEP</td>
-                    <td></td>
-                </tr>
-                <tr class="collapse order2">
-                    <th scope="row"></th>
-                    <td></td>
-                    <td>TM_Test_Run</td>
-                    <td>11/09/2019</td>
-                    <td></td>
-                    <td></td>
-                    <td>Forward</td>
-                    <td></td>
-                </tr>
-                <tr class="collapse order2">
-                    <th scope="row"></th>
-                    <td></td>
-                    <td>HDB_Test_Run</td>
-                    <td>09/09/2019</td>
-                    <td></td>
-                    <td></td>
-                    <td>SEP</td>
-                    <td><i class="fa fa-times-circle" style="color:red"></i></td>
-                </tr>
+
+            }
+            <tr data-toggle="collapse" data-target=".order10">
+                <th><i class="fa fa-plus"></i></th>
+                <th>2019123456789</th>
+                <td id="rows">194987</td>
+                <td>19_190_HDB_OWP_TEST</td>
+                <td>09/09/2019</td>
+                <td>Chart Panel Navigational</td>
+                <td></td>
+                <td>SEP</td>
+                <td></td>
+            </tr>
+            <tr class="collapse order10">
+                <th></th>
+                <td></td>
+                <td>TM_Test_Run</td>
+                <td>11/09/2019</td>
+                <td></td>
+                <td></td>
+                <td>Forward</td>
+                <td><i class="fa fa-times-circle" style="color: red"></i></td>
+            </tr>
+            <tr class="collapse order10">
+                <th></th>
+                <td></td>
+                <td>HDB_Test_Run</td>
+                <td>09/09/2019</td>
+                <td></td>
+                <td></td>
+                <td>SEP</td>
+                <td></td>
+            </tr>
+            <tr data-toggle="collapse" data-target=".order20">
+                <th><i class="fa fa-plus"></i></th>
+                <th scope="row">201943734354</th>
+                <td>194110</td>
+                <td>19_221_TM_REVIEW_TEST</td>
+                <td>11/10/2019</td>
+                <td>Chart Panel Navigational or Repromat</td>
+                <td></td>
+                <td>SEP</td>
+                <td></td>
+            </tr>
+            <tr class="collapse order20">
+                <th scope="row"></th>
+                <td></td>
+                <td>TM_Test_Run</td>
+                <td>11/09/2019</td>
+                <td></td>
+                <td></td>
+                <td>Forward</td>
+                <td></td>
+            </tr>
+            <tr class="collapse order20">
+                <th scope="row"></th>
+                <td></td>
+                <td>HDB_Test_Run</td>
+                <td>09/09/2019</td>
+                <td></td>
+                <td></td>
+                <td>SEP</td>
+                <td><i class="fa fa-times-circle" style="color: red"></i></td>
+            </tr>
             </tbody>
         </table>
         <button id="btnAddSource" class="btn btn-primary"><span style="padding-right: 5px;"></span>Add Source</button>
