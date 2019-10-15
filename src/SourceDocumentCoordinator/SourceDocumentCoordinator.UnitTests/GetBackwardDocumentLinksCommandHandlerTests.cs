@@ -87,7 +87,7 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.AreEqual("Backward", _dbContext.LinkedDocument.First().LinkType);
         }
 
- [Test]
+        [Test]
         public async Task Test_when_no_linkeddocument_nothing_saved_to_db()
         {
             //Given
@@ -106,29 +106,7 @@ namespace SourceDocumentCoordinator.UnitTests
             await _dbContext.AssessmentData.AddAsync(assessmentData);
             await _dbContext.SaveChangesAsync();
 
-            var docLinks = new LinkedDocuments()
-            {
-                new LinkedDocument()
-                {
-                    DocId1 = message.SourceDocumentId,
-                    DocId2 = 9282837,
-                    LinkType = "PARENTCHILD"
-                }
-            };
             A.CallTo(() => _fakeDataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId)).Returns(new LinkedDocuments());
-
-            //var documentObjects = new DocumentObjects()
-            //{
-            //    new DocumentObject()
-            //    {
-            //        Id = docLinks[0].DocId2,
-            //        SourceName = assessmentData.RsdraNumber,
-            //        Name = "a very long description"
-
-            //    }
-            //};
-
-            //A.CallTo(() => _fakeDataServiceApiClient.GetDocumentsFromList(A<int[]>.Ignored)).Returns(documentObjects);
 
             //When
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
@@ -136,9 +114,6 @@ namespace SourceDocumentCoordinator.UnitTests
             //Then
             CollectionAssert.IsEmpty(_dbContext.LinkedDocument);
         }
-
-
-
 
     }
 }
