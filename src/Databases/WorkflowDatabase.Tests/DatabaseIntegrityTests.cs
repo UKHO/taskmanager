@@ -190,7 +190,22 @@ namespace WorkflowDatabase.Tests
             Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
         }
 
-        
+        [Test]
+        public void Ensure_LinkedDocument_table_prevents_insert_for_no_AssessmentData()
+        {
+            _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                SdocId = 1234,
+                LinkType = "Forward",
+                RsdraNumber = "x345",
+                LinkedSdocId = 5678,
+                SourceDocumentName = "terstingf",
+                Created = DateTime.Now
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
 

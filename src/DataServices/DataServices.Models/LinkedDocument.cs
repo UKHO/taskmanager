@@ -25,14 +25,14 @@ namespace DataServices.Models
         /// </summary>
         /// <value>The sdocId of the forward linked document or the source document sdocId</value>
         [DataMember(Name="docId1")]
-        public int? DocId1 { get; set; }
+        public int DocId1 { get; set; }
 
         /// <summary>
         /// The sdocId of the backward linked document or the source document sdocId
         /// </summary>
         /// <value>The sdocId of the backward linked document or the source document sdocId</value>
         [DataMember(Name="docId2")]
-        public int? DocId2 { get; set; }
+        public int DocId2 { get; set; }
 
         /// <summary>
         /// Gets or Sets LinkType
@@ -79,14 +79,10 @@ namespace DataServices.Models
 
             return 
                 (
-                    DocId1 == other.DocId1 ||
-                    DocId1 != null &&
-                    DocId1.Equals(other.DocId1)
+                    DocId1 == other.DocId1
                 ) && 
                 (
-                    DocId2 == other.DocId2 ||
-                    DocId2 != null &&
-                    DocId2.Equals(other.DocId2)
+                    DocId2 == other.DocId2
                 ) && 
                 (
                     LinkType == other.LinkType ||
@@ -105,11 +101,9 @@ namespace DataServices.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (DocId1 != null)
-                    hashCode = hashCode * 59 + DocId1.GetHashCode();
-                    if (DocId2 != null)
-                    hashCode = hashCode * 59 + DocId2.GetHashCode();
-                    if (LinkType != null)
+                hashCode = hashCode * 59 + DocId1.GetHashCode();
+                hashCode = hashCode * 59 + DocId2.GetHashCode();
+                if (LinkType != null)
                     hashCode = hashCode * 59 + LinkType.GetHashCode();
                 return hashCode;
             }

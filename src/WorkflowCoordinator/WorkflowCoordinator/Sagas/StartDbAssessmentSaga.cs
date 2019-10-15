@@ -96,6 +96,7 @@ namespace WorkflowCoordinator.Sagas
 
             await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
 
+            ConstructAndSendLinkedDocumentRetrievalCommands(context);
 
             log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
         }
@@ -162,6 +163,36 @@ namespace WorkflowCoordinator.Sagas
 
             var newId = workflowInstance.WorkflowInstanceId;
             return newId;
+        }
+
+        private async void ConstructAndSendLinkedDocumentRetrievalCommands(IMessageHandlerContext context)
+        {
+            var backwardDocumentLinkCommand = new GetBackwardDocumentLinksCommand()
+            {
+                CorrelationId = Data.CorrelationId,
+                ProcessId = Data.ProcessId,
+                SourceDocumentId = Data.SourceDocumentId
+            };
+
+            await context.Send(backwardDocumentLinkCommand).ConfigureAwait(false);
+
+            var forwardDocumentLinkCommand = new GetForwardDocumentLinksCommand()
+            {
+                CorrelationId = Data.CorrelationId,
+                ProcessId = Data.ProcessId,
+                SourceDocumentId = Data.SourceDocumentId
+            };
+
+            await context.Send(forwardDocumentLinkCommand).ConfigureAwait(false);
+
+            var sepDocumentLinkCommand = new GetSepDocumentLinksCommand()
+            {
+                CorrelationId = Data.CorrelationId,
+                ProcessId = Data.ProcessId,
+                SourceDocumentId = Data.SourceDocumentId
+            };
+
+            await context.Send(sepDocumentLinkCommand).ConfigureAwait(false);
         }
     }
 }

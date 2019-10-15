@@ -138,6 +138,18 @@ namespace WorkflowCoordinator
                     messageType: typeof(InitiateSourceDocumentRetrievalCommand),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(GetBackwardDocumentLinksCommand),
+                    destination: _generalConfig.Value.SourceDocumentCoordinatorName);
+
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(GetForwardDocumentLinksCommand),
+                    destination: _generalConfig.Value.SourceDocumentCoordinatorName);
+
+                transport.Routing().RouteToEndpoint(
+                    messageType: typeof(GetSepDocumentLinksCommand),
+                    destination: _generalConfig.Value.SourceDocumentCoordinatorName);
+
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
                 persistence.ConnectionBuilder(connectionBuilder: () =>

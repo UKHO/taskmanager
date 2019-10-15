@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Common.Helpers;
 using DataServices.Models;
@@ -20,6 +22,114 @@ namespace SourceDocumentCoordinator.HttpClients
             _generalConfig = generalConfig;
             _httpClient = httpClient;
             _uriConfig = uriConfig;
+        }
+        
+        public async Task<LinkedDocuments> GetBackwardDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceBackwardLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var linkedDocuments = JsonConvert.DeserializeObject<LinkedDocuments>(data);
+
+            return linkedDocuments;
+        }
+
+        public async Task<LinkedDocuments> GetForwardDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceForwardLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var linkedDocuments = JsonConvert.DeserializeObject<LinkedDocuments>(data);
+
+            return linkedDocuments;
+        }
+
+        public async Task<DocumentObjects> GetSepDocumentLinks(int sdocId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceSepLinksUri}{sdocId}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var docObjects = JsonConvert.DeserializeObject<DocumentObjects>(data);
+
+            return docObjects;
+        }
+
+        public async Task<DocumentObjects> GetDocumentsFromList(int[] linkedDocsId)
+        {
+            var data = "";
+            var baseUri = _uriConfig.Value.BuildDataServicesBaseUri();
+            var queryString =
+                CreateUrlQueryStringForArray(_uriConfig.Value.DataServicesWebServiceDocumentsFromListUriSdocIdQuery,
+                    linkedDocsId);
+            var fullUri = new Uri(baseUri,
+                $"{_uriConfig.Value.DataServicesWebServiceDocumentsFromListUri}?{queryString}");
+
+            using (var response = await _httpClient.GetAsync(fullUri.ToString()))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            var docObjects = JsonConvert.DeserializeObject<DocumentObjects>(data);
+
+            return docObjects;
+        }
+
+        private string CreateUrlQueryStringForArray(string queryTerm, IEnumerable<int> values)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var value in values)
+            {
+                sb.Append(queryTerm);
+                sb.Append("=");
+                sb.Append(value.ToString());
+                sb.Append("&");
+            }
+
+            sb.Remove(sb.Length-1, 1);
+
+            return sb.ToString();
         }
 
         public async Task<ReturnCode> GetDocumentForViewing(string callerCode, int sdocId, string writableFolderName, bool imageAsGeotiff)
