@@ -62,7 +62,6 @@ namespace DataServices.Models
         /// TO_SDO_DATE
         /// </summary>
         /// <value>TO_SDO_DATE</value>
-        [Required]
         [Column("TO_SDO_DATE")]
         [DataMember(Name="SDODate")]
         public DateTime? SDODate { get; set; }
@@ -88,7 +87,6 @@ namespace DataServices.Models
         /// The team to which the source document assessment has been assigned
         /// </summary>
         /// <value>The team to which the source document assessment has been assigned</value>
-        [Required]
         [Column("TEAM")]
         [DataMember(Name="team")]
         public string Team { get; set; }
