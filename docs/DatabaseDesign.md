@@ -24,6 +24,7 @@ database assessment workflow for an open assessment.
 
 The ProcessId column has a unique constraint.
 There is a foreign key constraint to the WorkflowInstance table, on that table's ProcessId column.
+The SdocId column has a unique constraint.
 
 ### Comment
 
@@ -90,3 +91,19 @@ and then update the row with subsequent statuses.
 |StartedAt                  |DATETIME           |No           |                                                                                                 |
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
+
+### LinkedDocument
+
+The LinkedDocument table holds linked documents from SDRA for open assessments.
+
+| Column Name               | Datatype          | Allow nulls | Description                                                                                     |
+|-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
+|LinkedDocumentId     |INT                |No           |The primary key of this table     |
+|SdocId                  |INT                |No           |   |
+|RsdraNumber                     |NVARCHAR(50)                |No           |        |
+|SourceDocumentName           |NVARCHAR(255)   |No          | |
+|LinkType                     |NVARCHAR(10)       |No           |Can be Forward, Backward or SEP    |
+|LinkedSdocId                     |INT       |No           |          |
+|Created                  |DATETIME           |No           |            |
+
+The SdocId column has a foreign key constraint to the AssessmentData table.
