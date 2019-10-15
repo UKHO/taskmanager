@@ -17,7 +17,7 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
 
-        public GetSepDocumentLinksCommandHandler(IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
+        public GetSepDocumentLinksCommandHandler(WorkflowDbContext dbContext, IDataServiceApiClient dataServiceApiClient)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _dbContext = dbContext;

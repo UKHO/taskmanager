@@ -13,11 +13,11 @@ using WorkflowDatabase.EF;
 
 namespace SourceDocumentCoordinator.UnitTests
 {
-    public class GetBackwardDocumentLinksCommandHandlerTests
+    public class GetForwardDocumentLinksCommandHandlerTests
     {
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private TestableMessageHandlerContext _handlerContext;
-        private GetBackwardDocumentLinksCommandHandler _handler;
+        private GetForwardDocumentLinksCommandHandler _handler;
         private WorkflowDbContext _dbContext;
 
         [SetUp]
@@ -32,7 +32,7 @@ namespace SourceDocumentCoordinator.UnitTests
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             _handlerContext = new TestableMessageHandlerContext();
-            _handler = new GetBackwardDocumentLinksCommandHandler(_dbContext, _fakeDataServiceApiClient);
+            _handler = new GetForwardDocumentLinksCommandHandler(_dbContext, _fakeDataServiceApiClient);
         }
 
         [TearDown]
@@ -47,7 +47,7 @@ namespace SourceDocumentCoordinator.UnitTests
         public async Task Test_expected_linkdocument_saved_to_dbcontext()
         {
             //Given
-            var message = new GetBackwardDocumentLinksCommand()
+            var message = new GetForwardDocumentLinksCommand()
             {
                 CorrelationId = Guid.NewGuid(),
                 ProcessId = 5678,
@@ -71,7 +71,7 @@ namespace SourceDocumentCoordinator.UnitTests
                     LinkType = "PARENTCHILD"
                 }
             };
-            A.CallTo(() => _fakeDataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId)).Returns(docLinks);
+            A.CallTo(() => _fakeDataServiceApiClient.GetForwardDocumentLinks(message.SourceDocumentId)).Returns(docLinks);
 
             var documentObjects = new DocumentObjects()
             {
@@ -91,14 +91,14 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
-            Assert.AreEqual("Backward", _dbContext.LinkedDocument.First().LinkType);
+            Assert.AreEqual("Forward", _dbContext.LinkedDocument.First().LinkType);
         }
 
         [Test]
         public async Task Test_when_no_linkeddocument_nothing_saved_to_db()
         {
             //Given
-            var message = new GetBackwardDocumentLinksCommand()
+            var message = new GetForwardDocumentLinksCommand()
             {
                 CorrelationId = Guid.NewGuid(),
                 ProcessId = 1234,
@@ -113,7 +113,7 @@ namespace SourceDocumentCoordinator.UnitTests
             await _dbContext.AssessmentData.AddAsync(assessmentData);
             await _dbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeDataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId)).Returns(new LinkedDocuments());
+            A.CallTo(() => _fakeDataServiceApiClient.GetForwardDocumentLinks(message.SourceDocumentId)).Returns(new LinkedDocuments());
 
             //When
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);

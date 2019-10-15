@@ -14,7 +14,7 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
 
-        public GetBackwardDocumentLinksCommandHandler(IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
+        public GetBackwardDocumentLinksCommandHandler(WorkflowDbContext dbContext, IDataServiceApiClient dataServiceApiClient)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _dbContext = dbContext;
