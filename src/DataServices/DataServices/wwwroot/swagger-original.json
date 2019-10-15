@@ -3,7 +3,7 @@
   "info": {
     "title": "SDRA API",
     "description": "This API is for SDRA\n\nIt provides Source Document Assessment Data and Data Access\n",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "servers": [
     {
@@ -670,7 +670,7 @@
         }
       }
     },
-    "/SourceDocument/DataAccess/DocumentAssessmentData/{callerCode}/{sdocId}": {
+    "/SourceDocument/DataAccess/DocumentAssessmentData/{sdocId}": {
       "get": {
         "tags": [
           "DataAccess"
@@ -678,17 +678,6 @@
         "summary": "Get the data for the document assessment",
         "operationId": "GetDocumentAssessmentData",
         "parameters": [
-          {
-            "name": "callerCode",
-            "in": "path",
-            "description": "System that is calling the API\n\nExample: HDB\n",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "sdocId",
             "in": "path",
