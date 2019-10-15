@@ -34,13 +34,15 @@ namespace WorkflowDatabase.EF
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
-            modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId); 
+
+            modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
+            modelBuilder.Entity<AssessmentData>()
+                .HasMany(x => x.LinkedDocuments)
+                .WithOne()
+                .HasPrincipalKey(p => p.SdocId)
+                .HasForeignKey(p => p.SdocId);
 
             modelBuilder.Entity<LinkedDocument>().HasKey(x => x.LinkedDocumentId);
-
-
-            modelBuilder.Entity<AssessmentData>().
-                HasMany(a => a.LinkedDocuments);
 
             base.OnModelCreating(modelBuilder);
         }

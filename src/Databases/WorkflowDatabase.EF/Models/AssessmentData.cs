@@ -20,7 +20,7 @@ namespace WorkflowDatabase.EF.Models
         public string Datum { get; set; }
         public int ProcessId { get; set; }
 
-        [ForeignKey("SdocId")]
+        //[ForeignKey("SdocId")]
         public virtual List<LinkedDocument> LinkedDocuments { get; set; }
     }
 }
