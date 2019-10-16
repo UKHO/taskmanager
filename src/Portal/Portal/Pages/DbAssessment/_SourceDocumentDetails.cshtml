@@ -34,7 +34,7 @@
                     <td>@assessment.SourceDocumentType</td>
                     <td>@assessment.Datum</td>
                     <td>@assessment.SourceNature</td>
-                    <td></td>
+                    <td><i class="fa fa-times-circle" style="color: red"></i></td>
                 </tr>
                 foreach (var linkedDocument in assessment.LinkedDocuments)
                 {
@@ -47,7 +47,7 @@
                         <td>@linkedDocument.SourceDocumentType</td>
                         <td>@linkedDocument.Datum</td>
                         <td>@linkedDocument.SourceNature</td>
-                        <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                        <td></td>
                     </tr>
 
                 }
