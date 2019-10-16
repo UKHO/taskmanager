@@ -11,6 +11,10 @@ namespace WorkflowDatabase.EF.Models
         public int SdocId { get; set; }
         public string RsdraNumber { get; set; }
         public string SourceDocumentName { get; set; }
+        public DateTime? ReceiptDate { get; set; }
+        public string SourceDocumentType { get; set; }
+        public string SourceNature { get; set; }
+        public string Datum { get; set; }
         public string LinkType { get; set; }
         public int LinkedSdocId { get; set; }
         public DateTime Created { get; set; }
