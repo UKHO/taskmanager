@@ -31,9 +31,9 @@
                     <td id="rows">@assessment.SdocId</td>
                     <td>@assessment.SourceDocumentName</td>
                     <td>@assessment.ReceiptDate</td>
-                    <td>@assessment.SourceNature</td>
+                    <td>@assessment.SourceDocumentType</td>
                     <td>@assessment.Datum</td>
-                    <td>TBC</td>
+                    <td>@assessment.SourceNature</td>
                     <td></td>
                 </tr>
                 foreach (var linkedDocument in assessment.LinkedDocuments)
@@ -43,10 +43,10 @@
                         <td></td>
                         <td id="rows">@linkedDocument.SdocId</td>
                         <td>@linkedDocument.SourceDocumentName</td>
-                        <td>TBC</td>
-                        <td>TBC</td>
-                        <td>TBC</td>
-                        <td>@linkedDocument.LinkType</td>
+                        <td>@linkedDocument.ReceiptDate</td>
+                        <td>@linkedDocument.SourceDocumentType</td>
+                        <td>@linkedDocument.Datum</td>
+                        <td>@linkedDocument.SourceNature</td>
                         <td><i class="fa fa-times-circle" style="color: red"></i></td>
                     </tr>
 

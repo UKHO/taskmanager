@@ -35,9 +35,13 @@
       "processId": 123,
       "linkedDocuments": [
         {
-          "SdocId":  12345, 
+          "SdocId": 12345,
           "rsdraNumber": "RSDRA1234567891",
           "sourceDocumentName": "NM_GER_27_34_06",
+          "receiptDate": "2019-02-01T00:00:00",
+          "sourceDocumentType": "PDF",
+          "sourceNature": "It is au naturale",
+          "datum": null,
           "linkType": "Forward",
           "linkedSdocId": "12346",
           "created": "2019-10-15T00:00:00"
@@ -46,6 +50,10 @@
           "SdocId": 12345,
           "rsdraNumber": "RSDRA1234567892",
           "sourceDocumentName": "NM_GER_27_35_06",
+          "receiptDate": "2019-02-02T00:00:00",
+          "sourceDocumentType": "PDF",
+          "sourceNature": "It is au naturale",
+          "datum": null,
           "linkType": "Backward",
           "linkedSdocId": "12347",
           "created": "2019-10-15T00:00:00"
