@@ -102,6 +102,10 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 |SdocId                  |INT                |No           |   |
 |RsdraNumber                     |NVARCHAR(50)                |No           |        |
 |SourceDocumentName           |NVARCHAR(255)   |No          | |
+|ReceiptDate           |NVARCHAR(255)   |Yes          | |
+|SourceDocumentType           |NVARCHAR(4000)   |Yes          | |
+|SourceNature           |NVARCHAR(255)   |Yes          | |
+|Datum           |NVARCHAR(2000)   |Yes          | |
 |LinkType                     |NVARCHAR(10)       |No           |Can be Forward, Backward or SEP    |
 |LinkedSdocId                     |INT       |No           |          |
 |Created                  |DATETIME           |No           |            |
