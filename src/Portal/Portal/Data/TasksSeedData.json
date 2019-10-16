@@ -22,40 +22,40 @@
       }
     ],
     "assessmentData": {
-      "sdocId": 12345,
-      "rsdraNumber": "RSDRA1234567890",
-      "sourceDocumentName": "NMBN_GER_27_06",
-      "receiptDate": "2019-01-01T00:00:00",
-      "toSdoDate": "2019-01-01T00:00:00",
-      "effectiveStartDate": "2019-01-01T00:00:00",
-      "teamDistributedTo": "HW",
-      "sourceDocumentType": "PDF",
-      "sourceNature": "It is au naturale",
+      "sdocId": 217547,
+      "rsdraNumber": "RSDRA2006000110163",
+      "sourceDocumentName": "HUA HIN",
+      "receiptDate": "2001-06-12T00:00:00",
+      "toSdoDate": null,
+      "effectiveStartDate": "2001-06-12T00:00:00",
+      "teamDistributedTo": null,
+      "sourceDocumentType": "Chart - Navigational",
+      "sourceNature": "Graphical",
       "datum": null,
       "processId": 123,
       "linkedDocuments": [
         {
-          "SdocId": 12345,
-          "rsdraNumber": "RSDRA1234567891",
-          "sourceDocumentName": "NM_GER_27_34_06",
-          "receiptDate": "2019-02-01T00:00:00",
-          "sourceDocumentType": "PDF",
-          "sourceNature": "It is au naturale",
-          "datum": null,
+          "SdocId": 217547,
+          "rsdraNumber": "RSDRA2006000169482",
+          "sourceDocumentName": "HUA HIN",
+          "receiptDate": "2001-06-12T00:00:00",
+          "sourceDocumentType": "Chart Panel Navigational or Repromat",
+          "sourceNature": "Graphical",
+          "datum": "Non-WGS84",
           "linkType": "Forward",
-          "linkedSdocId": "12346",
+          "linkedSdocId": 332373,
           "created": "2019-10-15T00:00:00"
         },
         {
-          "SdocId": 12345,
-          "rsdraNumber": "RSDRA1234567892",
-          "sourceDocumentName": "NM_GER_27_35_06",
-          "receiptDate": "2019-02-02T00:00:00",
-          "sourceDocumentType": "PDF",
-          "sourceNature": "It is au naturale",
+          "SdocId": 217547,
+          "rsdraNumber": "RSDRA2007000067413",
+          "sourceDocumentName": "NM_THA_119_119_(T)_2007",
+          "receiptDate": "2007-09-17T00:00:00",
+          "sourceDocumentType": "Source NM",
+          "sourceNature": "Textual",
           "datum": null,
           "linkType": "Backward",
-          "linkedSdocId": "12347",
+          "linkedSdocId": 1018253,
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -91,17 +91,43 @@
       }
     ],
     "assessmentData": {
-      "sdocId": 544224,
-      "rsdraNumber": "RSDRA9876543210",
-      "sourceDocumentName": "113131313.pdf",
-      "receiptDate": "2019-04-11T00:00:00",
-      "toSdoDate": "2019-06-12T00:00:00",
-      "effectiveStartDate": "2019-05-12T00:00:00",
+      "sdocId": 1101541,
+      "rsdraNumber": "RSDRA2008000078062",
+      "sourceDocumentName": "NMBK_JAP_38_1323_2008_W14_W/14 - A1_1",
+      "receiptDate": "2008-09-18T00:00:00",
+      "toSdoDate": null,
+      "effectiveStartDate": "2008-09-18T00:00:00",
       "teamDistributedTo": "HW",
-      "sourceDocumentType": "PDF",
-      "sourceNature": "Receipted, thanks",
-      "datum": null,
-      "processId": 321
+      "sourceDocumentType": "Source NM Block",
+      "sourceNature": "Graphical",
+      "datum": "WGS84",
+      "processId": 321,
+      "linkedDocuments": [
+        {
+          "SdocId": 1101541,
+          "rsdraNumber": "RSDRA2006000160952",
+          "sourceDocumentName": "APPROACHES TO MURORAN KO",
+          "receiptDate": "2002-07-12T00:00:00",
+          "sourceDocumentType": "Chart Panel Navigational or Repromat",
+          "sourceNature": "Graphical",
+          "datum": "WGS84",
+          "linkType": "Forward",
+          "linkedSdocId": 320532,
+          "created": "2019-10-15T00:00:00"
+        },
+        {
+          "SdocId": 1101541,
+          "rsdraNumber": "RSDRA2008000078061",
+          "sourceDocumentName": "NM_JAP_38_1323_2008",
+          "receiptDate": "2008-09-18T00:00:00",
+          "sourceDocumentType": "Source NM",
+          "sourceNature": "Textual",
+          "datum": null,
+          "linkType": "Backward",
+          "linkedSdocId": 1101540,
+          "created": "2019-10-15T00:00:00"
+        }
+      ]
     },
     "dbAssessmentReviewData": {
       "processId": 321,
@@ -134,17 +160,31 @@
       }
     ],
     "assessmentData": {
-      "sdocId": 3457878,
-      "rsdraNumber": "RSDRA3455543211",
-      "sourceDocumentName": "35676.pdf",
-      "receiptDate": "2019-05-12T00:00:00",
-      "toSdoDate": "2019-07-09T00:00:00",
-      "effectiveStartDate": "2019-07-12T00:00:00",
+      "sdocId": 206733,
+      "rsdraNumber": "RSDRA2006000104322",
+      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+      "receiptDate": "1994-08-05T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+      "toSdoDate": null,
+      "effectiveStartDate": "1994-08-05T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
       "teamDistributedTo": "HW",
-      "sourceDocumentType": "PDF",
-      "sourceNature": "Source nature",
+      "sourceDocumentType": "Photographic Sortie",
+      "sourceNature": "Graphical",
       "datum": null,
-      "processId": 125
+      "processId": 125,
+      "linkedDocuments": [
+        {
+          "SdocId": 206733,
+          "rsdraNumber": "RSDRA2006000267725",
+          "sourceDocumentName": "BANGOR",
+          "receiptDate": "1994-08-05T00:00:00",
+          "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+          "sourceNature": "Textual",
+          "datum": null,
+          "linkType": "Forward",
+          "linkedSdocId": 606203,
+          "created": "2019-10-15T00:00:00"
+        }
+      ]
     },
     "dbAssessmentReviewData": {
       "processId": 125,
@@ -177,17 +217,56 @@
       }
     ],
     "assessmentData": {
-      "sdocId": 65533,
-      "rsdraNumber": "RSDRA342130001",
-      "sourceDocumentName": "4532ss.pdf",
-      "receiptDate": "2019-07-11T00:00:00",
-      "toSdoDate": "2019-07-03T00:00:00",
-      "effectiveStartDate": "2019-07-10T00:00:00",
+      "sdocId": 938096,
+      "rsdraNumber": "RSDRA2006000374923",
+      "sourceDocumentName": "NM_DEN_30_235_06",
+      "receiptDate": "2006-08-03T00:00:00",
+      "toSdoDate": "2006-08-10T16:32:35",
+      "effectiveStartDate": "2006-08-03T00:00:00",
       "teamDistributedTo": "HW",
-      "sourceDocumentType": "Email",
-      "sourceNature": "Aggressive",
+      "sourceDocumentType": "Source NM",
+      "sourceNature": "Textual",
       "datum": null,
-      "processId": 126
+      "processId": 126,
+      "linkedDocuments": [
+        {
+          "SdocId": 938096,
+          "rsdraNumber": "RSDRA2006000156073",
+          "sourceDocumentName": "NAKSKOV",
+          "receiptDate": "1999-07-09T00:00:00",
+          "sourceDocumentType": "Chart Panel Navigational or Repromat",
+          "sourceNature": "Graphical",
+          "datum": "WGS84",
+          "linkType": "Forward",
+          "linkedSdocId": 306707,
+          "created": "2019-10-15T00:00:00"
+        },
+        {
+          "SdocId": 938096,
+          "rsdraNumber": "RSDRA2006000374850",
+          "sourceDocumentName": "NMBN_DEN_30_06",
+          "receiptDate": "2006-08-03T00:00:00",
+          "sourceDocumentType": "Notices to Mariners - FG Bulletin",
+          "sourceNature": "Textual",
+          "datum": null,
+          "linkType": "Backward",
+          "linkedSdocId": 938037,
+          "created": "2019-10-15T00:00:00"
+        },
+        {
+          "SdocId": 938096,
+          "rsdraNumber": "RSDRA2006000012977",
+          "sourceDocumentName": "Main Panel",
+          "receiptDate": null,
+          "sourceDocumentType": null,
+          "sourceNature": null,
+          "datum": null,
+          "linkType": "SEP",
+          "linkedSdocId": 83848,
+          "created": "2019-10-15T00:00:00"
+        }
+
+      ]
     },
     "dbAssessmentReviewData": {
       "processId": 126,
@@ -220,17 +299,31 @@
       }
     ],
     "assessmentData": {
-      "sdocId": 65534,
-      "rsdraNumber": "RSDRA342130002",
-      "sourceDocumentName": "4532ss.pdf",
-      "receiptDate": "2019-07-11T00:00:00",
-      "toSdoDate": "2019-07-03T00:00:00",
-      "effectiveStartDate": "2019-07-10T00:00:00",
+      "sdocId": 934153,
+      "rsdraNumber": "RSDRA2006000369682",
+      "sourceDocumentName": "NMBN_GER_27_06",
+      "receiptDate": "2006-07-07T00:00:00",
+      "toSdoDate": null,
+      "effectiveStartDate": "2006-07-07T00:00:00",
       "teamDistributedTo": "HW",
-      "sourceDocumentType": "Email",
-      "sourceNature": "Aggressive",
+      "sourceDocumentType": "Notices to Mariners - FG Bulletin",
+      "sourceNature": "Textual",
       "datum": null,
-      "processId": 127
+      "processId": 127,
+      "linkedDocuments": [
+        {
+          "SdocId": 934153,
+          "rsdraNumber": "RSDRA2006000369735",
+          "sourceDocumentName": "NM_GER_27_34_06",
+          "receiptDate": "2006-07-07T00:00:00",
+          "sourceDocumentType": "Source NM",
+          "sourceNature": "Textual",
+          "datum": null,
+          "linkType": "Forward",
+          "linkedSdocId": 934203,
+          "created": "2019-10-15T00:00:00"
+        }
+      ]
     },
     "dbAssessmentReviewData": {
       "processId": 127,
