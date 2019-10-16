@@ -27,16 +27,20 @@ namespace SourceDocumentCoordinator.Handlers
 
             if (linkedDocIds?.Count == 0) return;
 
-            var documentObjects = await _dataServiceApiClient.GetDocumentsFromList(linkedDocIds.ToArray());
-
-            foreach (var documentObject in documentObjects)
+            foreach (var linkedDocId in linkedDocIds)
             {
+                var documentAssessmentData = await _dataServiceApiClient.GetAssessmentData(linkedDocId);
+
                 var linkedDocument = new LinkedDocument
                 {
                     SdocId = message.SourceDocumentId,
-                    LinkedSdocId = documentObject.Id,
-                    RsdraNumber = documentObject.SourceName,
-                    SourceDocumentName = documentObject.Name,
+                    LinkedSdocId = documentAssessmentData.SdocId,
+                    RsdraNumber = documentAssessmentData.SourceName,
+                    SourceDocumentName = documentAssessmentData.Name,
+                    ReceiptDate = documentAssessmentData.ReceiptDate,
+                    SourceDocumentType = documentAssessmentData.DocumentType,
+                    SourceNature = documentAssessmentData.SourceName,
+                    Datum = documentAssessmentData.Datum,
                     LinkType = "Backward",
                     Created = DateTime.Now
                 };
@@ -44,7 +48,6 @@ namespace SourceDocumentCoordinator.Handlers
                 _dbContext.Add(linkedDocument);
                 _dbContext.SaveChanges();
             }
-
         }
     }
 }

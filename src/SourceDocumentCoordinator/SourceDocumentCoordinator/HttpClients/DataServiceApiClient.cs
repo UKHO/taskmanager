@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,28 @@ namespace SourceDocumentCoordinator.HttpClients
             _httpClient = httpClient;
             _uriConfig = uriConfig;
         }
-        
+
+        public async Task<DocumentAssessmentData> GetAssessmentData(int sdocId)
+        {
+            var data = "";
+            var fullUri = _uriConfig.Value.BuildDataServicesUri(sdocId);
+
+            using (var response = await _httpClient.GetAsync(fullUri))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+
+            }
+
+            var assessmentData = JsonConvert.DeserializeObject<DocumentAssessmentData>(data);
+
+            return assessmentData;
+        }
+
         public async Task<LinkedDocuments> GetBackwardDocumentLinks(int sdocId)
         {
             var data = "";

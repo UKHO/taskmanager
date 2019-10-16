@@ -1,12 +1,8 @@
-﻿using Common.Messages.Commands;
-
-using NServiceBus;
-
-using SourceDocumentCoordinator.HttpClients;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
-
+using Common.Messages.Commands;
+using NServiceBus;
+using SourceDocumentCoordinator.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -25,14 +21,23 @@ namespace SourceDocumentCoordinator.Handlers
         public async Task Handle(GetSepDocumentLinksCommand message, IMessageHandlerContext context)
         {
             var docLinks = await _dataServiceApiClient.GetSepDocumentLinks(message.SourceDocumentId);
+
+            if (docLinks?.Count == 0) return;
+
             foreach (var documentObject in docLinks)
             {
+                var documentAssessmentData = await _dataServiceApiClient.GetAssessmentData(documentObject.Id);
+
                 var linkedDocument = new LinkedDocument
                 {
                     SdocId = message.SourceDocumentId,
-                    LinkedSdocId = documentObject.Id,
-                    RsdraNumber = documentObject.SourceName,
-                    SourceDocumentName = documentObject.Name,
+                    LinkedSdocId = documentAssessmentData.SdocId,
+                    RsdraNumber = documentAssessmentData.SourceName,
+                    SourceDocumentName = documentAssessmentData.Name,
+                    ReceiptDate = documentAssessmentData.ReceiptDate,
+                    SourceDocumentType = documentAssessmentData.DocumentType,
+                    SourceNature = documentAssessmentData.SourceName,
+                    Datum = documentAssessmentData.Datum,
                     LinkType = "SEP",
                     Created = DateTime.Now
                 };
@@ -40,7 +45,6 @@ namespace SourceDocumentCoordinator.Handlers
                 _dbContext.Add(linkedDocument);
                 _dbContext.SaveChanges();
             }
-
         }
     }
 }

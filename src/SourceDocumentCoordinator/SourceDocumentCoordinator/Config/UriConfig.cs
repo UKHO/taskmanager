@@ -8,6 +8,7 @@ namespace SourceDocumentCoordinator.Config
         public Uri DataAccessLocalhostBaseUri { get; set; }
         public Uri DataServicesLocalhostHealthcheckUrl { get; set; }
         public Uri DataServicesHealthcheckUrl { get; set; }
+        public Uri DataServicesDocumentAssessmentDataUri { get; set; }
         public Uri DataServicesWebServiceBaseUri { get; set; }
         public Uri DataServicesWebServiceGetDocumentForViewingUri { get; set; }
         public Uri DataServicesWebServiceDocumentRequestQueueStatusUri { get; set; }
@@ -24,7 +25,12 @@ namespace SourceDocumentCoordinator.Config
         public Uri BuildDataServicesBaseUri()
         {
             return ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri;
+        }
 
+
+        public Uri BuildDataServicesUri(int sdocId)
+        {
+            return new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
         }
     }
 }
