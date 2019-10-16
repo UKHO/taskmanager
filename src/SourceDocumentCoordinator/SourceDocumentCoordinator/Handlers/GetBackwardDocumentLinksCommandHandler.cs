@@ -23,7 +23,7 @@ namespace SourceDocumentCoordinator.Handlers
         public async Task Handle(GetBackwardDocumentLinksCommand message, IMessageHandlerContext context)
         {
             var docLinks = await _dataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId);
-            var linkedDocIds = docLinks.Select(s => s.DocId2).ToList();
+            var linkedDocIds = docLinks.Select(s => s.DocId1).ToList(); //Backward Linked will have DocId2 as sdocId, while DocId1 as LinkedSdocId
 
             if (linkedDocIds?.Count == 0) return;
 
