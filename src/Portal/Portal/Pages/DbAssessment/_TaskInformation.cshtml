@@ -2,12 +2,12 @@
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-<div class="card">
+<div class="card mb-4 mt-3">
     <div class="card-header">
         <span>Task Information</span>
     </div>
 
-    <div class="col-11">
+    <div class="col-12">
         <div class="card-body">
             <div class="row justify-content-between">
                 <div class="col-4">
@@ -20,7 +20,7 @@
                         <div class="col-4">@Html.DisplayFor(model => model.DmEndDate)</div>
                     </div>
                     <div class="form-row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.EffectiveReceiptDate)</div>
+                        <div class="col-8">@Html.LabelFor(model => model.EffectiveReceiptDate)</div>
                         <div class="col-4">@Html.DisplayFor(model => model.EffectiveReceiptDate)</div>
                     </div>
                     <div class="form-row justify-content-between">
@@ -36,14 +36,14 @@
                         <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-7">
                     <div class="form-row justify-content-between">
-                        <div class="col-6">@Html.LabelFor(model => model.DmReceiptDate)</div>
-                        <div class="col-6">@Html.DisplayFor(model => model.DmReceiptDate)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.DmReceiptDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.DmReceiptDate)</div>
                     </div>
                     <div class="form-row justify-content-between">
-                        <div class="col-6">@Html.LabelFor(model => model.ExternalEndDate)</div>
-                        <div class="col-6">@Html.DisplayFor(model => model.ExternalEndDate)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.ExternalEndDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
                     </div>
                     <div class="form-row justify-content-between">
                         <div class="col-5">@Html.LabelFor(model => model.SourceCategory)</div>

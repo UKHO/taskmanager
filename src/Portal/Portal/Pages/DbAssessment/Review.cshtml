@@ -6,54 +6,53 @@
 
 <script type="text/javascript" src="~/js/Review.js"></script>
 
-<div class="row" style="padding-top: 5px">
-    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+<div class="row mt-1">
+    <div class="col-4">
         <a asp-page="/Index">
             <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
         </a>
     </div>
 
-    <div class="col-lg-9 col-md-8 col-sm-8 col-xs-8">
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                <div class="pull-right">
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
                     <h1>DB Assessment</h1>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                <div class="pull-right"><h1>Review</h1></div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Review</h1>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-12"><hr /></div>
-    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
 
-    <br />
+</div>
 
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="row">
-            <div class="pull-right">
-                <button id="btnPutOnHold" class="btn btn-primary"><span style="padding-right: 5px;"></span>Put On Hold</button>
-                <button id="btnTerminate" class="btn btn-primary"><span style="padding-right: 5px;"></span>Terminate</button>
-                <input id="btnClose" type="button" class="btn btn-primary" value="Close" onclick="window.location.href='/Index'" />
-                <button id="btnSave" class="btn btn-primary"><span style="padding-right: 5px;"></span>Save</button>
-                <button id="btnDone" class="btn btn-primary"><span style="padding-right: 5px;"></span>Done</button>
-            </div>
-        </div>
+<hr />
+
+<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        <div class="col-2"><button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button></div>
+        <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+        <div class="col-2"><button id="btnDone" class="btn btn-primary btn-block">Done</button></div>
     </div>
 </div>
 
-<br />
+@await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
 
-<div class="panel-group" id="accordion">
-    @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
-    <br />
-    @await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
-    <br />
-    <div id="assignTasks"></div>
-    <div id="assignTasksError"></div>
-    <button id="btnCreateTask" class="btn btn-primary"><span style="padding-right: 5px;"></span>Create additional task</button>
-    <br />
-    <div id="existingComments"></div>
-    <div id="AddCommentError"></div>
-</div>
+@await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
+
+<div id="assignTasks"></div>
+<div id="assignTasksError"></div>
+
+<button id="btnCreateTask" class="btn btn-primary mb-4"><span style="padding-right: 5px;"></span>Create additional task</button>
+
+<div id="existingComments"></div>
+<div id="AddCommentError"></div>
+

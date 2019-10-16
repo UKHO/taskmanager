@@ -67,28 +67,6 @@
       ]
     },
     {
-      "library": "twitter-bootstrap@3.4.1",
-      "destination": "wwwroot/lib/bootstrap/",
-      "files": [
-        "js/bootstrap.js",
-        "js/bootstrap.min.js",
-        "js/npm.js",
-        "fonts/glyphicons-halflings-regular.eot",
-        "fonts/glyphicons-halflings-regular.svg",
-        "fonts/glyphicons-halflings-regular.ttf",
-        "fonts/glyphicons-halflings-regular.woff",
-        "fonts/glyphicons-halflings-regular.woff2",
-        "css/bootstrap-theme.css",
-        "css/bootstrap-theme.css.map",
-        "css/bootstrap-theme.min.css",
-        "css/bootstrap-theme.min.css.map",
-        "css/bootstrap.css",
-        "css/bootstrap.css.map",
-        "css/bootstrap.min.css",
-        "css/bootstrap.min.css.map"
-      ]
-    },
-    {
       "library": "font-awesome@5.10.2",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
@@ -110,6 +88,71 @@
         "webfonts/fa-solid-900.woff",
         "webfonts/fa-solid-900.woff2"
       ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@4.3.1",
+      "destination": "wwwroot/lib/bootstrap4/",
+      "files": [
+        "dist/css/bootstrap-grid.css",
+        "dist/css/bootstrap-grid.css.map",
+        "dist/css/bootstrap-grid.min.css",
+        "dist/css/bootstrap-grid.min.css.map",
+        "dist/css/bootstrap-reboot.css",
+        "dist/css/bootstrap-reboot.css.map",
+        "dist/css/bootstrap-reboot.min.css",
+        "dist/css/bootstrap-reboot.min.css.map",
+        "dist/css/bootstrap.css",
+        "dist/css/bootstrap.css.map",
+        "dist/css/bootstrap.min.css",
+        "dist/css/bootstrap.min.css.map",
+        "dist/js/bootstrap.bundle.js",
+        "dist/js/bootstrap.bundle.js.map",
+        "dist/js/bootstrap.bundle.min.js",
+        "dist/js/bootstrap.bundle.min.js.map",
+        "dist/js/bootstrap.js",
+        "dist/js/bootstrap.js.map",
+        "dist/js/bootstrap.min.js",
+        "dist/js/bootstrap.min.js.map"
+      ]
     }
+  ,
+{
+  "provider": "unpkg",
+  "library": "@ukho/styles@1.1.0",
+  "destination": "wwwroot/lib/ukhostyles",
+  "files": [
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot",
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.otf",
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.svg",
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.ttf",
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff",
+    "fonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff2",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.otf",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.svg",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.ttf",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff",
+    "fonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff2",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.eot",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.otf",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.svg",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.ttf",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.woff",
+    "fonts/JohnstonITC/light/JohnstonITCStd-Light.woff2",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.otf",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.svg",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.ttf",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff",
+    "fonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff2",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.otf",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.svg",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.ttf",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff",
+    "fonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff2"
   ]
+}
+]
 }

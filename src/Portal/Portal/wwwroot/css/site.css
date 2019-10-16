@@ -1,8 +1,14 @@
 /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
+
+
 body {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
+    color: #333333;
+    font-family: 'JohnstonITC', Helvetica, sans-serif;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 300;
 }
 
 /* Wrapping element */
@@ -114,3 +120,53 @@ table.task-list thead tr th {
 }
 
 .deleteAssignTask{}
+
+.btn-size > div {
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    max-width: 7.8rem;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #09315B;
+    border-color: #09315B;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: unset;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+label {
+    font-weight: 500;
+}
+
+.navbar-header {
+    visibility: hidden;
+}
+
+.btn {
+    border: 2px solid #09315B;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0px;
+}
+
+h1, .h1 {
+    font-size: 2.1rem;
+}
+
+h2, .h2 {
+    font-size: 1.6rem;
+}
