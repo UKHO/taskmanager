@@ -70,7 +70,7 @@
                 {
                     <tr>
                         <td>
-                            <a asp-page="Review" >@task.ProcessId</a>
+                            <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
                             @task.DaysToDmEndDate
@@ -157,10 +157,9 @@
                     {
                         rowColour = "red";
                     }
-
                     <tr class="@rowColour">
                         <td>
-                            <a  asp-page="Review" >@task.ProcessId</a>
+                            <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
                             @task.DaysToDmEndDate
