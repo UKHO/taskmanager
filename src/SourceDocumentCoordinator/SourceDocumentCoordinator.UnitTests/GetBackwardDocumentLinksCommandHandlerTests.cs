@@ -66,8 +66,8 @@ namespace SourceDocumentCoordinator.UnitTests
             {
                 new LinkedDocument()
                 {
-                    DocId1 = message.SourceDocumentId,
-                    DocId2 = 9888888,
+                    DocId1 = 9888888,
+                    DocId2 = message.SourceDocumentId,
                     LinkType = "PARENTCHILD"
                 }
             };
