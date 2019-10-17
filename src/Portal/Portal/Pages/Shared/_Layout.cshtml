@@ -7,27 +7,31 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/font-awesome/css/all.css">
-        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/lib/datatables/css/dataTables.bootstrap.css" />
+        <link rel="stylesheet" href="~/css/fonts.css" />
+        <link rel="stylesheet" href="~/css/ukho-styles/cards.css" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css">
-        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/lib/datatables/css/dataTables.bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/fonts.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/ukho-styles/cards.min.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+        <script src="~/lib/bootstrap4/dist/js/bootstrap.js"></script>
         <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
         <script src="~/lib/datatables/js/dataTables.bootstrap.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="~/lib/jquery/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+        <script src="~/lib/bootstrap4/dist/js/bootstrap.min.js"></script>
         <script src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
         <script src="~/lib/datatables/js/dataTables.bootstrap.min.js"></script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
@@ -40,9 +44,9 @@
 
     <div class="container body-content">
         @RenderBody()
-        <footer>
+        <footer class="mt-3">
             <div class="well landingpagefooter">
-                <p>&copy; 2019 - UKHO</p>
+                <p>&copy; Crown copyright 2019 UK Hydrographic Office</p>
             </div>
         </footer>
     </div>
