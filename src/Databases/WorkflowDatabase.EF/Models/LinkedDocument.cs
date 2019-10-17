@@ -18,5 +18,7 @@ namespace WorkflowDatabase.EF.Models
         public string LinkType { get; set; }
         public int LinkedSdocId { get; set; }
         public DateTime Created { get; set; }
+
+        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
     }
 }

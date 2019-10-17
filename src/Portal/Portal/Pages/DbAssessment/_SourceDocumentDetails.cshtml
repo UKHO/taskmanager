@@ -27,7 +27,7 @@
 
                 <tr data-toggle="collapse" data-target=".@(childRowsMarker)">
                     <td>@{ if (assessment.LinkedDocuments.Count > 0){ <i class='fa fa-plus' ></i> } }</td>
-                    <td>@assessment.RsdraNumber</td>
+                    <td>@assessment.ParsedRsdraNumber</td>
                     <td id="rows">@assessment.SdocId</td>
                     <td>@assessment.SourceDocumentName</td>
                     <td>@assessment.ReceiptDate</td>

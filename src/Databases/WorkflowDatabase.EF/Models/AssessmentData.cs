@@ -20,6 +20,8 @@ namespace WorkflowDatabase.EF.Models
         public string Datum { get; set; }
         public int ProcessId { get; set; }
 
+        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+
         public virtual List<LinkedDocument> LinkedDocuments { get; set; }
     }
 }
