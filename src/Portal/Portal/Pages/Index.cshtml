@@ -70,7 +70,7 @@
                 {
                     <tr>
                         <td>
-                            <a href="/dbassessment/Review?=@task.ProcessId">@task.ProcessId</a>
+                            <a asp-page="Review" >@task.ProcessId</a>
                         </td>
                         <td>
                             @task.DaysToDmEndDate
@@ -160,7 +160,7 @@
 
                     <tr class="@rowColour">
                         <td>
-                            <a href="/dbassessment/Review?=@task.ProcessId">@task.ProcessId</a>
+                            <a  asp-page="Review" >@task.ProcessId</a>
                         </td>
                         <td>
                             @task.DaysToDmEndDate
