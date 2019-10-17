@@ -6,8 +6,8 @@ body {
     padding-bottom: 10px;
     color: #333333;
     font-family: 'JohnstonITC', Helvetica, sans-serif;
-    font-size: 18px;
-    line-height: 24px;
+    font-size: 16px;
+    line-height: 14px;
     font-weight: 300;
 }
 
@@ -77,7 +77,7 @@ table.task-list thead tr th {
 .well.landingpagefooter {
     background-color: #337ab7;
     color: white;
-    padding: 5px 19px 5px 19px;
+    padding: 15px 19px 15px 19px;
 }
 
 .well.landingpagefooter p {
@@ -169,4 +169,33 @@ h1, .h1 {
 
 h2, .h2 {
     font-size: 1.6rem;
+}
+
+.card .close-x {
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.card > h6 {
+    height: 45px;
+    line-height: 45px;
+    padding: 0 15px;
+}
+
+table thead {
+    border-bottom: 5px solid #09315B;
+}
+table th {
+    border-bottom: 5px solid #09315B;
+    text-align: left;
+    font-weight: normal;
+}
+table td {
+    border-right: 1px solid #d8d8d8;
+    font-weight: 300;
+}
+
+table > tbody > tr > th {
+    font-weight: 300;
+    border-bottom: unset;
 }

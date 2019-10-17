@@ -6,15 +6,13 @@
 <script type="text/javascript" src="~/js/Comments.js"></script>
 
 <div class="card">
-    <div class="card-header">
-        <span>Comments</span>
-    </div>
+    <h6>Comments</h6>
     <div class="card-body">
         @if (Model != null && Model.Comments != null)
         {
             @foreach (var comment in Model.Comments)
             {
-                <div class="row justify-content-between">
+                <div class="row justify-content-between mb-3">
                     <div class="col-6">
                         @comment.Username
                     </div>

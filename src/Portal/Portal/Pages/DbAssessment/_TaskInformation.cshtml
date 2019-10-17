@@ -3,50 +3,55 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 <div class="card mb-4 mt-3">
-    <div class="card-header">
-        <span>Task Information</span>
-    </div>
+    <h6>Task Information</h6>
 
     <div class="col-12">
-        <div class="card-body">
+        <div class="card-body pb-0">
             <div class="row justify-content-between">
                 <div class="col-4">
-                    <div class="form-row justify-content-between">
+                    <div class="form-group row justify-content-between">
                         <div class="col-7">@Html.LabelFor(model => model.ProcessId)</div>
                         <div class="col-4">@Html.DisplayFor(model => model.ProcessId)</div>
                     </div>
-                    <div class="form-row justify-content-between">
+                    <div class="form-group row justify-content-between">
                         <div class="col-7">@Html.LabelFor(model => model.DmEndDate)</div>
                         <div class="col-4">@Html.DisplayFor(model => model.DmEndDate)</div>
                     </div>
-                    <div class="form-row justify-content-between">
+                    <div class="form-group row justify-content-between">
                         <div class="col-8">@Html.LabelFor(model => model.EffectiveReceiptDate)</div>
                         <div class="col-4">@Html.DisplayFor(model => model.EffectiveReceiptDate)</div>
                     </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.OnHold)</div>
-                        <div class="col-4">@Html.DisplayFor(model => model.OnHold)</div>
+                </div>
+                <div class="col-7">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.DmReceiptDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.DmReceiptDate)</div>
                     </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.Ion)</div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.ExternalEndDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.OnHold)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.OnHold)</div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-1 mb-4" />
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
                         <div class="col-4">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
                     </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.ActivityCode)</div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
                         <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
                     </div>
                 </div>
                 <div class="col-7">
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.DmReceiptDate)</div>
-                        <div class="col-7">@Html.DisplayFor(model => model.DmReceiptDate)</div>
-                    </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.ExternalEndDate)</div>
-                        <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
-                    </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.SourceCategory)</div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class = "form-control" })</div>
                     </div>
                 </div>

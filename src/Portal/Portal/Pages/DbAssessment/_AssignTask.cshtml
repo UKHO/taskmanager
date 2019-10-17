@@ -4,33 +4,37 @@
 
 
 <div class="card mb-4" id="@("assignTask" + Model.AssignTaskId)">
-    <div class="card-header">
-        <span>Assign Task @Model.AssignTaskId</span>
-        <button type="button" class="close deleteAssignTask @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    @*<div class="card-header">
+            Assign Task @Model.AssignTaskId
+            <button type="button" class="deleteAssignTask @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>*@
+
+
+    <h6>Assign Task @Model.AssignTaskId <i class="deleteAssignTask float-right close-x @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">&times;</i></h6>
+
 
     <div class="col-12">
-        <div class="card-body">
+        <div class="card-body pb-0">
             <div class="row justify-content-between">
                 <div class="col-5">
                     <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.Assessor)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.Assessor, Model.Assessors, new { @class = "form-control" })</div>
                     </div>
                     <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.Verifier)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.SourceType)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.SourceType, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.SourceType, Model.SourceTypes, new { @class = "form-control" })</div>
                     </div>
                     <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.WorkspaceAffected)</div>
+                        <div class="col-5">@Html.LabelFor(model => model.WorkspaceAffected, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.TextBoxFor(model => model.WorkspaceAffected, new { @class = "form-control" })</div>
                     </div>
                 </div>
