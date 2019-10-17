@@ -167,7 +167,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpGet]
-        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentAssessmentData/{callerCode}/{sdocId}")]
+        [Route("/DataServices/v1/SourceDocument/DataAccess/DocumentAssessmentData/{sdocId}")]
         [ValidateModelState]
         [SwaggerOperation("GetDocumentAssessmentData")]
         [SwaggerResponse(statusCode: 200, type: typeof(DocumentAssessmentData), description: "A document assessment data object")]
@@ -177,13 +177,13 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentAssessmentData([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId)
+        public virtual IActionResult GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
         {
             DocumentAssessmentData data = null;
 
             try
             {
-                var retrievedData = _dbContext.AssessmentData.Where(x => x.SdocId == sdocId).ToList();
+                var retrievedData = _dbContext.AssessmentData.Where(x => x.SdocId == sdocId.Value).ToList();
                 data = retrievedData.Single();
             }
             catch (DbException e)

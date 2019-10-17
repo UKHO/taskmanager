@@ -21,7 +21,7 @@ namespace WorkflowCoordinator.Config
         public Uri BuildDataServicesUri(string callerCode, int sdocId)
         {
             return sdocId == 0 ? new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesWebServiceDocumentsForAssessmentUri}{callerCode}") : 
-                new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{callerCode}/{sdocId}");
+                new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
         }
     }
 }

@@ -46,7 +46,8 @@
 
 @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
 
-@await Html.PartialAsync("_SourceDocumentDetails", new _SourceDocumentDetailsModel()).ConfigureAwait(false)
+<div id="sourceDocuments"></div>
+<div id="sourceDocumentsError"></div>
 
 <div id="assignTasks"></div>
 <div id="assignTasksError"></div>

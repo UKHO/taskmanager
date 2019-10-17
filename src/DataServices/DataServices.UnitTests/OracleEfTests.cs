@@ -50,7 +50,7 @@ namespace DataServices.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var actionResult = controller.GetDocumentAssessmentData("HDB", 1871160);
+            var actionResult = controller.GetDocumentAssessmentData(1871160);
             var objectResult = actionResult as ObjectResult;
             var data = objectResult.Value as DocumentAssessmentData;
 

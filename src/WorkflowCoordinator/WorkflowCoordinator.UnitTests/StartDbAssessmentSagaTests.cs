@@ -105,7 +105,7 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_StartDbAssessmentCommand_Sends_2_Messages()
+        public async Task Test_StartDbAssessmentCommand_Sends_5_Messages()
         {
             //Given
             
@@ -113,7 +113,7 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Handle(A.Dummy<StartDbAssessmentCommand>(), _handlerContext);
 
             //Then
-            Assert.AreEqual(2, _handlerContext.SentMessages.Length);
+            Assert.AreEqual(5, _handlerContext.SentMessages.Length);
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -35,6 +36,30 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             TaskInformationModel = SetTaskInformationData(processId);
+        }
+
+        public IActionResult OnGetRetrieveSourceDocuments(int processId)
+        {
+            var model = new _SourceDocumentDetailsModel()
+            {
+                Assessments = DbContext
+                    .AssessmentData
+                    .Include(a => a.LinkedDocuments)
+                    .Where(c => c.ProcessId == processId).ToList(),
+                ProcessId = processId
+            };
+
+            // Repopulate models...
+            OnGet(processId);
+
+            return new PartialViewResult
+            {
+                ViewName = "_SourceDocumentDetails",
+                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = model
+                }
+            };
         }
 
         public IActionResult OnGetRetrieveComments(int processId)

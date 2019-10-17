@@ -23,20 +23,24 @@ namespace SourceDocumentCoordinator.Handlers
         public async Task Handle(GetBackwardDocumentLinksCommand message, IMessageHandlerContext context)
         {
             var docLinks = await _dataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId);
-            var linkedDocIds = docLinks.Select(s => s.DocId2).ToList();
+            var linkedDocIds = docLinks.Select(s => s.DocId1).ToList(); //Backward Linked will have DocId2 as sdocId, while DocId1 as LinkedSdocId
 
             if (linkedDocIds?.Count == 0) return;
 
-            var documentObjects = await _dataServiceApiClient.GetDocumentsFromList(linkedDocIds.ToArray());
-
-            foreach (var documentObject in documentObjects)
+            foreach (var linkedDocId in linkedDocIds)
             {
+                var documentAssessmentData = await _dataServiceApiClient.GetAssessmentData(linkedDocId);
+
                 var linkedDocument = new LinkedDocument
                 {
                     SdocId = message.SourceDocumentId,
-                    LinkedSdocId = documentObject.Id,
-                    RsdraNumber = documentObject.SourceName,
-                    SourceDocumentName = documentObject.Name,
+                    LinkedSdocId = documentAssessmentData.SdocId,
+                    RsdraNumber = documentAssessmentData.SourceName,
+                    SourceDocumentName = documentAssessmentData.Name,
+                    ReceiptDate = documentAssessmentData.ReceiptDate,
+                    SourceDocumentType = documentAssessmentData.DocumentType,
+                    SourceNature = documentAssessmentData.SourceName,
+                    Datum = documentAssessmentData.Datum,
                     LinkType = "Backward",
                     Created = DateTime.Now
                 };
@@ -44,7 +48,6 @@ namespace SourceDocumentCoordinator.Handlers
                 _dbContext.Add(linkedDocument);
                 _dbContext.SaveChanges();
             }
-
         }
     }
 }

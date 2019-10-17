@@ -66,31 +66,24 @@ namespace SourceDocumentCoordinator.UnitTests
             {
                 new LinkedDocument()
                 {
-                    DocId1 = message.SourceDocumentId,
-                    DocId2 = 9888888,
+                    DocId1 = 9888888,
+                    DocId2 = message.SourceDocumentId,
                     LinkType = "PARENTCHILD"
                 }
             };
             A.CallTo(() => _fakeDataServiceApiClient.GetBackwardDocumentLinks(message.SourceDocumentId)).Returns(docLinks);
 
-            var documentObjects = new DocumentObjects()
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(9888888)).Returns(new DocumentAssessmentData()
             {
-                new DocumentObject()
-                {
-                    Id = docLinks[0].DocId2,
-                    SourceName = assessmentData.RsdraNumber,
-                    Name = "a very long description"
-
-                }
-            };
-
-            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentsFromList(A<int[]>.Ignored)).Returns(documentObjects);
+                SourceName = "RSDRA2019000130872"
+            });
 
             //When
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
 
             //Then
             Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
+            Assert.AreEqual("RSDRA2019000130872", _dbContext.LinkedDocument.First().RsdraNumber);
             Assert.AreEqual("Backward", _dbContext.LinkedDocument.First().LinkType);
         }
 
