@@ -61,11 +61,26 @@
             data: processId,
             success: function (result) {
                 $("#sourceDocuments").html(result);
+                applyCollapseIconHandler();
             },
             error: function (error) {
                 $("#sourceDocumentsError")
                     .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
             }
+        });
+    }
+
+    function applyCollapseIconHandler() {
+        $(".collapse").on("show.bs.collapse", function (e) {
+            var el = $(e.currentTarget).prev("[data-toggle='collapse']");
+            var icon = $(el).find("i.fa.fa-plus");
+            icon.removeClass("fa-plus").addClass("fa-minus");
+        });
+
+        $(".collapse").on("hide.bs.collapse", function (e) {
+            var el = $(e.currentTarget).prev("[data-toggle='collapse']");
+            var icon = $(el).find("i.fa.fa-minus");
+            icon.removeClass("fa-minus").addClass("fa-plus");
         });
     }
 });
