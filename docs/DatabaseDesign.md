@@ -13,9 +13,9 @@ database assessment workflow for an open assessment.
 |SdocId             |INT            |No           |                                                                                                 |
 |RsdraNumber        |NVARCHAR(50)   |No           |                                                                                                 |
 |SourceDocumentName |NVARCHAR(255)  |No           |                                                                                                 |
-|ReceiptDate        |DATETIME       |No           |                                                                                                 |
-|ToSdoDate          |DATETIME       |Yes          |                                                                                                 |
-|EffectiveStartDate |DATETIME       |Yes          |                                                                                                 |
+|ReceiptDate        |DATETIME2       |No           |                                                                                                 |
+|ToSdoDate          |DATETIME2       |Yes          |                                                                                                 |
+|EffectiveStartDate |DATETIME2       |Yes          |                                                                                                 |
 |TeamDistributedTo  |NVARCHAR(20)   |Yes          |                                                                                                 |
 |SourceDocumentType |NVARCHAR(4000)  |Yes          |                                                                                                 |
 |SourceNature       |NVARCHAR(255)   |Yes          |                                                                                                 |
@@ -102,7 +102,7 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 |SdocId                  |INT                |No           |   |
 |RsdraNumber                     |NVARCHAR(50)                |No           |        |
 |SourceDocumentName           |NVARCHAR(255)   |No          | |
-|ReceiptDate           |NVARCHAR(255)   |Yes          | |
+|ReceiptDate           |DateTime2  |Yes          | |
 |SourceDocumentType           |NVARCHAR(4000)   |Yes          | |
 |SourceNature           |NVARCHAR(255)   |Yes          | |
 |Datum           |NVARCHAR(2000)   |Yes          | |

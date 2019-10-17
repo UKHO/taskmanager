@@ -4,7 +4,7 @@
     [SdocId] INT NOT NULL, 
     [RsdraNumber] NVARCHAR(50) NOT NULL, 
     [SourceDocumentName] NVARCHAR(255) NOT NULL, 
-	[ReceiptDate] DATETIME NULL,
+	[ReceiptDate] DATETIME2 NULL,
 	[SourceDocumentType] NVARCHAR(4000) NULL,
 	[SourceNature] NVARCHAR(255) NULL,
 	[Datum] NVARCHAR(2000) NULL, 
