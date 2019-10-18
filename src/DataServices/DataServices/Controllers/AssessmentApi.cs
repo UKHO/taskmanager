@@ -122,19 +122,20 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public async Task<IActionResult> PutAssessmentCompleted([FromRoute] [Required] string callerCode,
+        public IActionResult PutAssessmentCompleted([FromRoute] [Required] string callerCode,
             [FromRoute] [Required] int? sdocId, [FromRoute] [Required] string comment)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error marking assessment complete due to invalid parameter", nameof(sdocId));
 
-            var task = await _assessmentWebServiceSoapClientAdapter.SoapClient.NotifyAssessmentCompletedAsync(
+            var task = _assessmentWebServiceSoapClientAdapter.SoapClient.NotifyAssessmentCompletedAsync(
                 new NotifyAssessmentCompletedRequest(new NotifyAssessmentCompletedRequestBody(callerCode, sdocId.Value, comment)));
 
             CallOutcome result;
+
             try
             {
-                result = task.Body.NotifyAssessmentCompletedResult;
+                result = task.Result.Body.NotifyAssessmentCompletedResult;
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -143,7 +144,7 @@ namespace DataServices.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error marking assessment complete, Message");
+                _logger.LogError(e, "Error marking assessment complete");
                 return StatusCode(500, e.Message);
             }
 
