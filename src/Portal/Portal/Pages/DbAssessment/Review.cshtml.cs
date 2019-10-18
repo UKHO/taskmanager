@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -18,6 +19,7 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDataServiceApiClient _dataServiceApiClient;
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
@@ -25,10 +27,13 @@ namespace Portal.Pages.DbAssessment
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
-        public ReviewModel(WorkflowDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public ReviewModel(WorkflowDbContext dbContext,
+            IDataServiceApiClient dataServiceApiClient,
+            IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
             DbContext = dbContext;
+            _dataServiceApiClient = dataServiceApiClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void OnGet(int processId)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Portal.Configuration;
+using Portal.HttpClients;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
 
@@ -50,7 +52,11 @@ namespace Portal
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("portal"));
+            services.AddOptions<GeneralConfig>()
+                .Bind(Configuration.GetSection("portal"))
+                .Bind(Configuration.GetSection("apis"));
+            services.AddOptions<UriConfig>()
+                .Bind(Configuration.GetSection("urls"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -80,6 +86,10 @@ namespace Portal
                     TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
+
+            services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             var mapper = mappingConfig.CreateMapper();
