@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using DataServices.Adapters;
 using DataServices.Attributes;
 using DataServices.Connected_Services.SDRADataAccessWebService;
@@ -66,19 +67,20 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
+        public async Task<IActionResult> DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
         {
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode,
-                sdocId.Value,
-                writeableFolderName);
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
 
-            ReturnCode returnCode = null;
+            ReturnCode returnCode;
             try
-            {
+            {            
+                var task = await _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode, sdocId.Value, writeableFolderName);
+
                 returnCode = new ReturnCode
                 {
-                    Code = task.Result.ErrorCode,
-                    Message = task.Result.Message
+                    Code = task.ErrorCode,
+                    Message = task.Message
                 };
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
@@ -116,18 +118,16 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
+        public async Task<IActionResult> GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
-
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetBackwardDocumentLinksAsync(sdocId.Value);
 
             Link[] result;
 
             try
             {
-                result = task.Result;
+                result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetBackwardDocumentLinksAsync(sdocId.Value);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -177,9 +177,9 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
+        public async Task<IActionResult> GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
         {
-            DocumentAssessmentData data = null;
+            DocumentAssessmentData data;
 
             try
             {
@@ -233,18 +233,18 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
+        public async Task<IActionResult> GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
         {
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value,
-                writeableFolderName, imageAsGeoTIFF.Value);
 
-            ReturnCode returnCode = null;
+            ReturnCode returnCode;
             try
             {
+                var task = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value, writeableFolderName, imageAsGeoTIFF.Value);
+
                 returnCode = new ReturnCode
                 {
-                    Code = task.Result.ErrorCode,
-                    Message = task.Result.Message
+                    Code = task.ErrorCode,
+                    Message = task.Message
                 };
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
@@ -282,14 +282,13 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
+        public async Task<IActionResult> GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
         {
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync(callerCode);
 
-            ProcessingStatus[] docStatus = null;
+            ProcessingStatus[] docStatus;
             try
             {
-                docStatus = task.Result;
+                docStatus = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync(callerCode);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -347,18 +346,16 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
+        public async Task<IActionResult> GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Forward linked document due to invalid parameter", nameof(sdocId));
-
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetForwardDocumentLinksAsync(sdocId.Value);
 
             Link[] result;
 
             try
             {
-                result = task.Result;
+                result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetForwardDocumentLinksAsync(sdocId.Value);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -407,18 +404,16 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetSepDocumentLinks([FromRoute][Required]int? sdocId)
+        public async Task<IActionResult> GetSepDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving SEP linked document due to invalid parameter", nameof(sdocId));
-
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetSEPDocumentLinksAsync(sdocId.Value);
 
             Document[] result;
 
             try
             {
-                result = task.Result;
+                result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetSEPDocumentLinksAsync(sdocId.Value);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -467,18 +462,16 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
+        public async Task<IActionResult> GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
             if (sdocIds == null || sdocIds.Length == 0)
                 throw  new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
-
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
 
             Document[] result;
 
             try
             {
-                result = task.Result;
+                result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -527,18 +520,12 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public IActionResult ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
+        public async Task<IActionResult> ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
         {
-            var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync(callerCode);
-
-            CallOutcome outcome = null;
+            CallOutcome outcome;
             try
             {
-                outcome = new CallOutcome
-                {
-                    ErrorCode = task.Result.ErrorCode,
-                    Message = task.Result.Message
-                };
+                outcome = await _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync(callerCode);
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
