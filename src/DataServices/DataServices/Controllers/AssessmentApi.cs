@@ -64,7 +64,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult ListDocumentsForAssessment([FromRoute][Required]string callerCode)
+        public IActionResult ListDocumentsForAssessment([FromRoute][Required]string callerCode)
         {
             var task = _assessmentWebServiceSoapClientAdapter.SoapClient.GetDocumentsForAssessmentAsync(
                 new GetDocumentsForAssessmentRequest(new GetDocumentsForAssessmentRequestBody(callerCode)));
@@ -182,7 +182,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
+        public IActionResult PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
         {
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200);

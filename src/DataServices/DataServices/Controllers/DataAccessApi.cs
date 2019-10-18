@@ -66,7 +66,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
+        public IActionResult DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode,
                 sdocId.Value,
@@ -116,7 +116,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
+        public IActionResult GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
@@ -177,7 +177,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
+        public IActionResult GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
         {
             DocumentAssessmentData data = null;
 
@@ -233,7 +233,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
+        public IActionResult GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value,
                 writeableFolderName, imageAsGeoTIFF.Value);
@@ -282,7 +282,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
+        public IActionResult GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync(callerCode);
 
@@ -347,7 +347,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
+        public IActionResult GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Forward linked document due to invalid parameter", nameof(sdocId));
@@ -407,7 +407,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetSepDocumentLinks([FromRoute][Required]int? sdocId)
+        public IActionResult GetSepDocumentLinks([FromRoute][Required]int? sdocId)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving SEP linked document due to invalid parameter", nameof(sdocId));
@@ -467,7 +467,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
+        public IActionResult GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
             if (sdocIds == null || sdocIds.Length == 0)
                 throw  new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
@@ -527,7 +527,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
+        public IActionResult ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
         {
             var task = _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync(callerCode);
 
