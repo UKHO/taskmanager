@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Common.Helpers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
@@ -18,6 +19,10 @@ namespace Portal.TestAutomation.Framework.Pages
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
+        private IWebElement ExpandSourceDocument => _driver.FindElement(By.XPath("//*[@id='sourceDocuments']/div/div/table/tbody/tr[1]"));
+
+        private IWebElement SourceDocumentTable => _driver.FindElement(By.XPath("//*[@id='sourceDocuments']/div/div/table/tbody"));
+        
         public ReviewPage(IWebDriver driver, int seconds)
         {
             var configRoot = AzureAppConfigConfigurationRoot.Instance;
@@ -47,6 +52,18 @@ namespace Portal.TestAutomation.Framework.Pages
         {
             _driver.Navigate().GoToUrl(ReviewPageUrl);
             _driver.Manage().Window.Maximize();
+        }
+
+        public void ExpandSourceDocumentDetails()
+        {
+            ExpandSourceDocument.Click();
+        }
+
+        public int SourceDocumentRowCount()
+        {
+            int rowCount = SourceDocumentTable.FindElements(By.TagName("tr")).Count;
+
+            return rowCount;
         }
     }
 }

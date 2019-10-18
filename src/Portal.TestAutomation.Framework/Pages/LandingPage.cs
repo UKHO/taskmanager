@@ -21,6 +21,7 @@ namespace Portal.TestAutomation.Framework.Pages
         private IWebElement UnassignedTaskTable => _driver.FindElement(By.Id("unassignedTasks"));
         private IWebElement AssignedTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
         private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
+        private IWebElement ClickOnTask => _driver.FindElement(By.XPath("//*[@id='inFlightTasks']/tbody/tr[1]/td[1]/a"));
         private List<IWebElement> UnassignedTaskTableRows => UnassignedTaskTable.FindElements(By.TagName("tr")).ToList();
         private List<IWebElement> AssignedTaskTableRows => AssignedTaskTable.FindElements(By.TagName("tr")).ToList();
 
@@ -72,6 +73,11 @@ namespace Portal.TestAutomation.Framework.Pages
             // Checks both unassigned and assigned tables for correct process id
             return UnassignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(UnassignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId
                    && AssignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(AssignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId;
+        }
+
+        public void SelectAssessment()
+        {
+            ClickOnTask.Click();
         }
     }
 }

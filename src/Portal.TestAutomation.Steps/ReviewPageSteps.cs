@@ -1,4 +1,6 @@
-﻿using Common.Helpers;
+﻿using System.Runtime.CompilerServices;
+using Common.Helpers;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
@@ -10,7 +12,7 @@ namespace Portal.TestAutomation.Steps
     public class ReviewPageSteps
     {
         private readonly ReviewPage _reviewPage;
-
+        
         public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
         {
             //TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
@@ -30,35 +32,24 @@ namespace Portal.TestAutomation.Steps
             _reviewPage.HasLoaded();
         }
 
-        [When(@"I click an assessment")]
-        public void WhenIClickAnAssessment()
+        [When(@"I expand the source document details")]
+        public void WhenIExpandTheSourceDocumentDetails()
         {
-            ScenarioContext.Current.Pending();
+            _reviewPage.ExpandSourceDocumentDetails();
         }
 
-        //[Then(@"process ID on the screen has a unique entry in the database")]
-        //public void ThenProcessIDOnTheScreenHasAUniqueEntryInTheDatabase()
-        //{
-        //    ScenarioContext.Current.Pending();
-        //}
-
-        //[When(@"I expand the source document details")]
-        //public void WhenIExpandTheSourceDocumentDetails()
-        //{
-        //    ScenarioContext.Current.Pending();
-        //}
-
-        //[Then(@"the linked documents are displayed on the screen")]
-        //public void ThenTheLinkedDocumentsAreDisplayedOnTheScreen()
-        //{
-        //    ScenarioContext.Current.Pending();
-        //}
+        [Then(@"the linked documents are displayed on the screen")]
+        public void ThenTheLinkedDocumentsAreDisplayedOnTheScreen()
+        {
+            Assert.IsTrue(_reviewPage.SourceDocumentRowCount() > 1);
+        }
 
         //[Then(@"the linked documents displayed on the screen are the same as in the database")]
         //public void ThenTheLinkedDocumentsDisplayedOnTheScreenAreTheSameAsInTheDatabase()
         //{
         //    ScenarioContext.Current.Pending();
         //}
-
     }
 }
+
+
