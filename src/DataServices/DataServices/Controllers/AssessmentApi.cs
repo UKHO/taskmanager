@@ -11,6 +11,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using DataServices.Adapters;
 using DataServices.Attributes;
 using DataServices.Connected_Services.SDRAAssessmentWebService;
@@ -29,17 +31,14 @@ namespace DataServices.Controllers
     public class AssessmentApiController : ControllerBase
     {
         private readonly IAssessmentWebServiceSoapClientAdapter _assessmentWebServiceSoapClientAdapter;
-        private readonly IDataAccessWebServiceSoapClientAdapter _dataAccessWebServiceSoapClientAdapter;
 
         private readonly ILogger _logger;
 
         public AssessmentApiController(
             IAssessmentWebServiceSoapClientAdapter assessmentWebServiceSoapClientAdapter,
-            IDataAccessWebServiceSoapClientAdapter dataAccessWebServiceSoapClientAdapter,
             ILogger<AssessmentApiController> logger)
         {
             _assessmentWebServiceSoapClientAdapter = assessmentWebServiceSoapClientAdapter;
-            _dataAccessWebServiceSoapClientAdapter = dataAccessWebServiceSoapClientAdapter;
             _logger = logger;
         }
 
@@ -123,30 +122,39 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PutAssessmentCompleted([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string comment)
+        public async Task<IActionResult> PutAssessmentCompleted([FromRoute] [Required] string callerCode,
+            [FromRoute] [Required] int? sdocId, [FromRoute] [Required] string comment)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error marking assessment complete due to invalid parameter", nameof(sdocId));
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            var task = await _assessmentWebServiceSoapClientAdapter.SoapClient.NotifyAssessmentCompletedAsync(
+                new NotifyAssessmentCompletedRequest(new NotifyAssessmentCompletedRequestBody(callerCode, sdocId.Value, comment)));
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            CallOutcome result;
+            try
+            {
+                result = task.Body.NotifyAssessmentCompletedResult;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error marking assessment complete, Message");
+                return StatusCode(500, e.Message);
+            }
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+            if (result.ErrorCode != 0)
+            {
+                _logger.LogError($"Error marking assessment complete, Message: {result.Message}");
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+                return StatusCode(500, $"Error marking assessment complete, Message: {result.Message}");
+            }
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-
-            throw new NotImplementedException();
+            return new ObjectResult(HttpStatusCode.OK);
         }
 
         /// <summary>

@@ -3,7 +3,7 @@
   "info": {
     "title": "SDRA API",
     "description": "This API is for SDRA\n\nIt provides Source Document Assessment Data and Data Access\n",
-    "version": "1.1.1"
+    "version": "1.1.2"
   },
   "servers": [
     {
@@ -277,7 +277,7 @@
           {
             "name": "comment",
             "in": "path",
-            "description": "tbc\n",
+            "description": "Reasons for Termination\n",
             "required": true,
             "style": "simple",
             "explode": false,
