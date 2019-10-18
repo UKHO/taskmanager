@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using DataServices.Adapters;
 using DataServices.Controllers;
 using DataServices.Models;
@@ -30,27 +31,27 @@ namespace DataServices.UnitTests
         }
 
         [Test]
-        public void Test_GetDocumentAssessmentData_returns_assessment_data_for_given_sdoc_Id()
+        public async Task Test_GetDocumentAssessmentData_returns_assessment_data_for_given_sdoc_Id()
         {
             var controller = new DataAccessApiController(_dbContext, _fakeLogger, _fakeDataAccessWebServiceSoapClientAdapter);
 
-            _dbContext.AssessmentData.AddAsync(new DocumentAssessmentData()
+            await _dbContext.AssessmentData.AddAsync(new DocumentAssessmentData()
             {
-               SdocId = 1871160,
-               Datum = null,
-               DocumentNature = "Textual",
-               DocumentType = "Correspondence (Letter / Email / Fax / Signal) - requiring action",
-               EffectiveStartDate = new DateTime(2017, 03, 27),
-               Name = "COR_IN_GBENC_GB303790_000_P007_07-03-17",
-               Notes = null,
-               ReceiptDate = new DateTime(17, 03, 30),
-               SDODate = new DateTime(17,03,30),
-               SourceName = "RSDRA2017000073439",
-               Team = "HDB Master Data"
-            });
+                SdocId = 1871160,
+                Datum = null,
+                DocumentNature = "Textual",
+                DocumentType = "Correspondence (Letter / Email / Fax / Signal) - requiring action",
+                EffectiveStartDate = new DateTime(2017, 03, 27),
+                Name = "COR_IN_GBENC_GB303790_000_P007_07-03-17",
+                Notes = null,
+                ReceiptDate = new DateTime(17, 03, 30),
+                SDODate = new DateTime(17,03,30),
+                SourceName = "RSDRA2017000073439",
+                Team = "HDB Master Data"
+            }).ConfigureAwait(false);
             _dbContext.SaveChanges();
 
-            var actionResult = controller.GetDocumentAssessmentData(1871160);
+            var actionResult = await controller.GetDocumentAssessmentData(1871160).ConfigureAwait(false);
             var objectResult = actionResult as ObjectResult;
             var data = objectResult.Value as DocumentAssessmentData;
 
