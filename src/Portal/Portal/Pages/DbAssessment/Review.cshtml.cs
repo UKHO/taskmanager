@@ -110,41 +110,46 @@ namespace Portal.Pages.DbAssessment
 
         public IActionResult OnPostReviewTerminate(string comment, int processId)
         {
+            //TODO: Log!
+
             // TODO: Update WorkflowDB WorkflowInstance table status to Terminated
             // TODO: Add Terminate comment to WorkflowDB Comment table
             // TODO: Terminate process in K2 
             // TODO: Close process in SDRA
             if (string.IsNullOrWhiteSpace(comment))
             {
-                //TODO: Log!
+                //TODO: Log error!
                 throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
             }
 
             if (processId < 1)
             {
-                //TODO: Log!
+                //TODO: Log error!
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            var workflowInstance = DbContext.WorkflowInstance.FirstOrDefault(wi => wi.ProcessId == ProcessId);
+            var workflowInstance = DbContext.WorkflowInstance.FirstOrDefault(wi => wi.ProcessId == processId);
 
             if (workflowInstance == null)
             {
-                //TODO: Log!
+                //TODO: Log error!
                 throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
             }
+
+            workflowInstance.Status = WorkflowStatus.Terminated.ToString();
+            DbContext.SaveChanges();
+            //TODO: Log debug!
 
             DbContext.Comment.Add(new Comments
             {
                 ProcessId = processId,
-                WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
+                WorkflowInstanceId = workflowInstance.WorkflowInstanceId,
                 Created = DateTime.Now,
                 Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
                 Text = $"Terminate comment: {comment}"
             });
-
             DbContext.SaveChanges();
 
             return RedirectToPage("/Index");
