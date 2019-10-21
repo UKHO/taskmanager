@@ -9,6 +9,12 @@ namespace Portal.Configuration
         public Uri DataAccessLocalhostBaseUri { get; set; }
         public Uri DataServicesWebServiceBaseUri { get; set; }
         public string DataServicesWebServiceAssessmentCompletedUri { get; set; }
+        public Uri K2WebServiceBaseUri { get; set; }
+        public Uri K2WebServiceGetTasksUri { get; set; }
+        public Uri K2WebServiceTerminateWorkflowInstanceUri { get; set; }
+
+
+
 
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
