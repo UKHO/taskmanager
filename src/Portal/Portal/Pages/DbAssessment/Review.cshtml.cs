@@ -170,6 +170,16 @@ namespace Portal.Pages.DbAssessment
                 //TODO: Log error!
             }
 
+            try
+            {
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+
             return RedirectToPage("/Index");
         }
 
