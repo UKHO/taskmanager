@@ -12,7 +12,7 @@ Scenario: The linked documents on the review page are present
 	 Then The review page has loaded
 	 When I expand the source document details
 	 Then the linked documents are displayed on the screen
-	 #Then the linked documents displayed on the screen are the same as in the database
+	 Then the linked documents displayed on the screen are the same as in the database
 
 
 
