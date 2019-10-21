@@ -21,6 +21,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
@@ -30,10 +31,12 @@ namespace Portal.Pages.DbAssessment
 
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
+            IWorkflowServiceApiClient workflowServiceApiClient,
             IHttpContextAccessor httpContextAccessor)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
+            _workflowServiceApiClient = workflowServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -131,7 +134,8 @@ namespace Portal.Pages.DbAssessment
 
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            var workflowInstance = await DbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == processId)
+            var workflowInstance = await DbContext.WorkflowInstance.Include(wi => wi.AssessmentData)
+                .FirstOrDefaultAsync(wi => wi.ProcessId == processId)
                 .ConfigureAwait(false);
 
             if (workflowInstance == null)
@@ -155,6 +159,16 @@ namespace Portal.Pages.DbAssessment
             });
             await DbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+
+            try
+            {
+                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
 
             return RedirectToPage("/Index");
         }
