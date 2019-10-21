@@ -11,9 +11,11 @@ namespace Portal.TestAutomation.Steps
     [Binding]
     public class ReviewPageSteps
     {
+        private IWebElement firstUiDisplayDoc => _driver.FindElement(By.XPath("/html/body//table/tbody/tr/td[contains(text(),'217547')]"));
         private readonly ReviewPage _reviewPage;
         private readonly WorkflowDbContext _workflowDbContext;
         private readonly WorkflowInstanceContext _workflowContext;
+        private readonly IWebDriver _driver;
 
         public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, WorkflowInstanceContext workflowContext)
         {
@@ -62,6 +64,7 @@ namespace Portal.TestAutomation.Steps
           var sourcedocs = _workflowDbContext.SourceDocumentStatus.Where(x => x.ProcessId == _workflowContext.ProcessId).ToList();
 
           var d = sourcedocs.First(x => x.SdocId == sdocId);
+          Assert.AreSame(d, firstUiDisplayDoc);
         }
     }
 }
