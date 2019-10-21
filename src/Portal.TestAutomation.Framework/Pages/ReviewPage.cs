@@ -54,6 +54,12 @@ namespace Portal.TestAutomation.Framework.Pages
             _driver.Manage().Window.Maximize();
         }
 
+        public void NavigateToProcessId(int processId)
+        {
+            _driver.Navigate().GoToUrl(ReviewPageUrl + "?processId=" + processId);
+            _driver.Manage().Window.Maximize();
+        }
+
         public void ExpandSourceDocumentDetails()
         {
             ExpandSourceDocument.Click();

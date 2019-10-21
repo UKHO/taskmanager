@@ -7,9 +7,7 @@ Scenario: The review page loads
 
 @mytag
 Scenario: The linked documents on the review page are present
-	Given I navigate to the landing page
-	 When I click an assessment
-	 Then The review page has loaded
+	 Given The review page has loaded with the first process Id
 	 When I expand the source document details
 	 Then the linked documents are displayed on the screen
 	 Then the linked documents displayed on the screen are the same as in the database

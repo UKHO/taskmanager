@@ -1,11 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-using Common.Helpers;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
 using System.Linq;
+using Portal.TestAutomation.Framework.ContextClasses;
 
 namespace Portal.TestAutomation.Steps
 {
@@ -13,12 +12,14 @@ namespace Portal.TestAutomation.Steps
     public class ReviewPageSteps
     {
         private readonly ReviewPage _reviewPage;
-        private readonly WorkflowDbContext workflowDbContext;
+        private readonly WorkflowDbContext _workflowDbContext;
+        private readonly WorkflowInstanceContext _workflowContext;
 
-        public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
+        public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, WorkflowInstanceContext workflowContext)
         {
-            //TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
-
+            _workflowDbContext = workflowDbContext;
+            _workflowContext = workflowContext;
+            //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
             _reviewPage = new ReviewPage(driver, 5);
         }
 
@@ -26,6 +27,14 @@ namespace Portal.TestAutomation.Steps
         public void GivenINavigateToTheReviewPage()
         {
             _reviewPage.NavigateTo();
+        }
+
+        [Given(@"The review page has loaded with the first process Id")]
+        public void GivenTheReviewPageHasLoadedWithTheFirstProcessId()
+        {
+            var firstProcessId = _workflowDbContext.WorkflowInstance.First().ProcessId;
+            _workflowContext.ProcessId = firstProcessId;
+            _reviewPage.NavigateToProcessId(firstProcessId);
         }
 
         [Then(@"The review page has loaded")]
@@ -49,9 +58,8 @@ namespace Portal.TestAutomation.Steps
         [Then(@"the linked documents displayed on the screen are the same as in the database")]
         public void ThenTheLinkedDocumentsDisplayedOnTheScreenAreTheSameAsInTheDatabase()
         {
-          var firstProcessId =  workflowDbContext.WorkflowInstance.First().ProcessId;
-          var sdocId = workflowDbContext.AssessmentData.First(x => x.ProcessId == firstProcessId).SdocId;
-          var sourcedocs = workflowDbContext.SourceDocumentStatus.Where(x => x.ProcessId == firstProcessId).ToList();
+          var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).SdocId;
+          var sourcedocs = _workflowDbContext.SourceDocumentStatus.Where(x => x.ProcessId == _workflowContext.ProcessId).ToList();
 
           var d = sourcedocs.First(x => x.SdocId == sdocId);
         }
