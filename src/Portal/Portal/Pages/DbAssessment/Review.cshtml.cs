@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -108,7 +109,7 @@ namespace Portal.Pages.DbAssessment
             return OnGetRetrieveComments(processId);
         }
 
-        public IActionResult OnPostReviewTerminate(string comment, int processId)
+        public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
         {
             //TODO: Log!
 
@@ -130,7 +131,8 @@ namespace Portal.Pages.DbAssessment
 
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            var workflowInstance = DbContext.WorkflowInstance.FirstOrDefault(wi => wi.ProcessId == processId);
+            var workflowInstance = await DbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == processId)
+                .ConfigureAwait(false);
 
             if (workflowInstance == null)
             {
@@ -139,7 +141,8 @@ namespace Portal.Pages.DbAssessment
             }
 
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
-            DbContext.SaveChanges();
+            await DbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             //TODO: Log debug!
 
             DbContext.Comment.Add(new Comments
@@ -150,7 +153,8 @@ namespace Portal.Pages.DbAssessment
                 Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
                 Text = $"Terminate comment: {comment}"
             });
-            DbContext.SaveChanges();
+            await DbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
             return RedirectToPage("/Index");
         }
