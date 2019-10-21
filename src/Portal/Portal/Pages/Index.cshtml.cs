@@ -29,6 +29,7 @@ namespace Portal.Pages
                 .Include(c => c.Comment)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
+                .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToList();
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
