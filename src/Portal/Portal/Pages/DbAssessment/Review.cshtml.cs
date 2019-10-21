@@ -108,13 +108,33 @@ namespace Portal.Pages.DbAssessment
             return OnGetRetrieveComments(processId);
         }
 
-        public IActionResult OnGetReviewTerminate(string comment, int processId)
+        public IActionResult OnPostReviewTerminate(string comment, int processId)
         {
             // TODO: Update WorkflowDB WorkflowInstance table status to Terminated
             // TODO: Add Terminate comment to WorkflowDB Comment table
             // TODO: Terminate process in K2 
             // TODO: Close process in SDRA
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                //TODO: Log!
+                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+            }
+
+            if (processId < 1)
+            {
+                //TODO: Log!
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
+
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
+
+            var workflowInstance = DbContext.WorkflowInstance.FirstOrDefault(wi => wi.ProcessId == ProcessId);
+
+            if (workflowInstance == null)
+            {
+                //TODO: Log!
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
 
             DbContext.Comment.Add(new Comments
             {
@@ -127,7 +147,7 @@ namespace Portal.Pages.DbAssessment
 
             DbContext.SaveChanges();
 
-            return OnGetRetrieveComments(processId);
+            return RedirectToPage("/Index");
         }
 
         public IActionResult OnGetRetrieveAssignTasks(int processId)
