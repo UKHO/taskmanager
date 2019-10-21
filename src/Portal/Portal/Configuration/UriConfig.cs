@@ -1,6 +1,5 @@
-﻿using Common.Helpers;
-
-using System;
+﻿using System;
+using Common.Helpers;
 
 namespace Portal.Configuration
 {
@@ -13,15 +12,11 @@ namespace Portal.Configuration
         public Uri K2WebServiceGetTasksUri { get; set; }
         public Uri K2WebServiceTerminateWorkflowInstanceUri { get; set; }
 
-
-
-
-
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
         {
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
-                $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}/{comment}");
+                $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}?comment={Uri.EscapeDataString(comment)}");
         }
     }
 }

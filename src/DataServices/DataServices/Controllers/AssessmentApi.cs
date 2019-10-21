@@ -112,7 +112,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPut]
-        [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}/{comment}")]
+        [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}")]
         [ValidateModelState]
         [SwaggerOperation("PutAssessmentCompleted")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
@@ -122,7 +122,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> PutAssessmentCompleted([FromRoute] [Required] string callerCode,
-            [FromRoute] [Required] int? sdocId, [FromRoute] [Required] string comment)
+            [FromRoute] [Required] int? sdocId, [FromQuery] [Required] string comment)
         {
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error marking assessment complete due to invalid parameter", nameof(sdocId));
