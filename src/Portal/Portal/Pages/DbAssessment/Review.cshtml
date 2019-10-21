@@ -57,3 +57,50 @@
 <div id="existingComments"></div>
 <div id="AddCommentError"></div>
 
+@* Modal Add Termination comment *@
+<div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Terminate DB Assessment</h4>
+            </div>
+            <div class="modal-body">
+                <p>Provide a reason for terminating this DB Assessment?</p>
+                <div id="modal-body">
+                    <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
+                    <br />
+                    <div id="ConfirmTerminateError"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
+                    <div class="col-5 pl-1 pr-0"><button type="button" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Termination wait *@
+<div class="modal fade" id="modalTerminateWait" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fa fa-spinner fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Updating Database...</li>
+                    <li>Updating K2...</li>
+                    <li>Updating SDRA...</li>
+                    <li>Please do not close or refresh this window or click the Back button on your browser.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

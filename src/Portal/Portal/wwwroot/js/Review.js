@@ -10,6 +10,48 @@
         getAssignTasks();
     });
 
+    $('#btnTerminate').on('click', function () {
+        $('#ConfirmTerminate').modal('show');
+    });
+
+    $("#btnConfirmTerminate").click(function () {
+
+        if ($('#txtTerminateComment').val() === "") {
+            $("#ConfirmTerminateError")
+                .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
+            $('#txtTerminateComment').focus();
+        } else {
+
+            $('#ConfirmTerminate').modal('hide');
+            $("#modalTerminateWait").modal("show");
+
+            var jsonData = {
+                "comment": $("#txtTerminateComment").val(),
+                "processId": $("#hdnProcessId").val()
+            };
+
+            $.ajax({
+                type: "GET",
+                url: "Review/?handler=ReviewTerminate",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                contentType: 'application/json; charset=utf-8"',
+                data: jsonData,
+                success: function (result) {
+                    $("#existingComments").html(result);
+                    $("#ConfirmTerminate").modal("hide");
+                    $(".modal-backdrop").remove();
+                    $("body").removeClass("modal-open");
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+
+
     function getAssignTasks() {
         $.ajax({
             type: "GET",

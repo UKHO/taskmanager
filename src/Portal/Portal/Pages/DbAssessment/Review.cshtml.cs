@@ -108,6 +108,28 @@ namespace Portal.Pages.DbAssessment
             return OnGetRetrieveComments(processId);
         }
 
+        public IActionResult OnGetReviewTerminate(string comment, int processId)
+        {
+            // TODO: Update WorkflowDB WorkflowInstance table status to Terminated
+            // TODO: Add Terminate comment to WorkflowDB Comment table
+            // TODO: Terminate process in K2 
+            // TODO: Close process in SDRA
+            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
+
+            DbContext.Comment.Add(new Comments
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
+                Created = DateTime.Now,
+                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
+                Text = $"Terminate comment: {comment}"
+            });
+
+            DbContext.SaveChanges();
+
+            return OnGetRetrieveComments(processId);
+        }
+
         public IActionResult OnGetRetrieveAssignTasks(int processId)
         {
             return new PartialViewResult
