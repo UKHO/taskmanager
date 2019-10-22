@@ -6,11 +6,9 @@ Scenario: The review page loads
 	 Then The review page has loaded
 
 @mytag
-Scenario: The linked documents on the review page are present
+Scenario: The source document on the review page is present
 	 Given The review page has loaded with the first process Id
-	 When I expand the source document details
-	 Then the linked documents are displayed on the screen
-	 Then the linked documents displayed on the screen are the same as in the database
+	  Then The source document with the corresponding process Id in the database matches the sdocId on the UI
 
 
 

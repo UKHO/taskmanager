@@ -19,8 +19,6 @@ namespace Portal.TestAutomation.Framework.Pages
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
-        private IWebElement ExpandSourceDocument => _driver.FindElement(By.XPath("//*[@id='sourceDocuments']//table/tbody/tr[1]"));
-
         private IWebElement SourceDocumentTable => _driver.FindElement(By.XPath("//*[@id='sourceDocuments']//table/tbody"));
         
         public ReviewPage(IWebDriver driver, int seconds)

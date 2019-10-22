@@ -11,7 +11,6 @@ namespace Portal.TestAutomation.Steps
     [Binding]
     public class ReviewPageSteps
     {
-        private IWebElement firstUiDisplayDoc => _driver.FindElement(By.XPath("/html/body//table/tbody/tr/td[contains(text(),'217547')]"));
         private readonly ReviewPage _reviewPage;
         private readonly WorkflowDbContext _workflowDbContext;
         private readonly WorkflowInstanceContext _workflowContext;
@@ -45,26 +44,12 @@ namespace Portal.TestAutomation.Steps
             _reviewPage.HasLoaded();
         }
 
-        [When(@"I expand the source document details")]
-        public void WhenIExpandTheSourceDocumentDetails()
+       [Then(@"The source document with the corresponding process Id in the database matches the sdocId on the UI")]
+        public void ThenTheSourceDocumentWithTheCorrespondingProcessIdInTheDatabaseMatchesTheSdocIdOnTheUI()
         {
-            _reviewPage.ExpandSourceDocumentDetails();
-        }
-
-        [Then(@"the linked documents are displayed on the screen")]
-        public void ThenTheLinkedDocumentsAreDisplayedOnTheScreen()
-        {
-            Assert.IsTrue(_reviewPage.SourceDocumentRowCount() > 1);
-        }
-
-        [Then(@"the linked documents displayed on the screen are the same as in the database")]
-        public void ThenTheLinkedDocumentsDisplayedOnTheScreenAreTheSameAsInTheDatabase()
-        {
-          var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).SdocId;
-          var sourcedocs = _workflowDbContext.SourceDocumentStatus.Where(x => x.ProcessId == _workflowContext.ProcessId).ToList();
-
-          var d = sourcedocs.First(x => x.SdocId == sdocId);
-          Assert.AreSame(d, firstUiDisplayDoc);
+            var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).SdocId;
+            var firstUiDisplayDoc = _driver.FindElement(By.XPath($"/html/body//table/tbody/tr/td[contains(text(),{sdocId})]"));
+            Assert.AreSame(sdocId, firstUiDisplayDoc);
         }
     }
 }
