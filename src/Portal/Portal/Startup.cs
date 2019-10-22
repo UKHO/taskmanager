@@ -101,12 +101,12 @@ namespace Portal
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                {
-                    ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                    Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
-                });
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                //.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                //{
+                //    ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                //    Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
+                //});
 
 
             // Auto mapper config
