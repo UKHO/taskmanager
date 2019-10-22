@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Common.Helpers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
@@ -57,20 +56,5 @@ namespace Portal.TestAutomation.Framework.Pages
             _driver.Navigate().GoToUrl(ReviewPageUrl + "?processId=" + processId);
             _driver.Manage().Window.Maximize();
         }
-
-        public void ExpandSourceDocumentDetails()
-        {
-            ExpandSourceDocument.Click();
-        }
-
-        public int SourceDocumentRowCount()
-        {
-            int rowCount = SourceDocumentTable.FindElements(By.TagName("tr")).Count;
-
-            return rowCount;
-        }
-
-
-
     }
 }

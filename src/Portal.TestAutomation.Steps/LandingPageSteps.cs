@@ -42,11 +42,5 @@ namespace Portal.TestAutomation.Steps
         {
             Assert.IsTrue(_landingPage.FindTaskByProcessId(p0));
         }
-
-        [When(@"I click an assessment")]
-        public void WhenIClickAnAssessment()
-        {
-            _landingPage.SelectAssessment();
-        }
     }
 }

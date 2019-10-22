@@ -74,10 +74,5 @@ namespace Portal.TestAutomation.Framework.Pages
             return UnassignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(UnassignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId
                    && AssignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(AssignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId;
         }
-
-        public void SelectAssessment()
-        {
-            ClickOnTask.Click();
-        }
     }
 }
