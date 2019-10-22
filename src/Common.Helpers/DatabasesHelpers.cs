@@ -14,7 +14,6 @@ namespace Common.Helpers
                 DataSource = dataSource,
                 InitialCatalog = initialCatalog,
                 IntegratedSecurity = isLocalDb,
-                MultipleActiveResultSets = true,
                 Encrypt = isLocalDb ? false : true,
                 ConnectTimeout = 20,
                 UserID = userId,
