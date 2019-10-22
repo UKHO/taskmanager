@@ -92,22 +92,14 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        public IActionResult OnGetCommentsPartial(string comment, int processId)
+        public IActionResult OnGetCommentsPartialAsync(string comment, int processId)
         {
             // TODO: Test with Azure
             // TODO: This will not work in Azure; need alternative; but will work in local dev
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            DbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
+            var workflowInstance = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
 
-            DbContext.SaveChanges();
+            AddComment(comment, processId, workflowInstance);
 
             return OnGetRetrieveComments(processId);
         }
@@ -116,10 +108,6 @@ namespace Portal.Pages.DbAssessment
         {
             //TODO: Log!
 
-            // TODO: Update WorkflowDB WorkflowInstance table status to Terminated
-            // TODO: Add Terminate comment to WorkflowDB Comment table
-            // TODO: Terminate process in K2 
-            // TODO: Close process in SDRA
             if (string.IsNullOrWhiteSpace(comment))
             {
                 //TODO: Log error!
@@ -132,11 +120,60 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
+
+            var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
+            AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
+            await UpdateK2WorkflowAsTerminated(workflowInstance);
+            await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
+            return RedirectToPage("/Index");
+        }
+
+        private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
+        {
+            try
+            {
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+        }
+
+        private async Task UpdateK2WorkflowAsTerminated(WorkflowInstance workflowInstance)
+        {
+            try
+            {
+               await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+        }
+
+        private void AddComment(string comment, int processId, int workflowInstanceId)
+        {
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            var workflowInstance = await DbContext.WorkflowInstance.Include(wi => wi.AssessmentData)
-                .FirstOrDefaultAsync(wi => wi.ProcessId == processId)
-                .ConfigureAwait(false);
+            DbContext.Comment.Add(new Comments
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                Created = DateTime.Now,
+                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
+                Text = comment
+            });
+
+            DbContext.SaveChanges();
+        }
+
+        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
+        {
+            var workflowInstance = DbContext.WorkflowInstance
+                .Include(wi => wi.AssessmentData)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
 
             if (workflowInstance == null)
             {
@@ -145,42 +182,9 @@ namespace Portal.Pages.DbAssessment
             }
 
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
-            await DbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
-            //TODO: Log debug!
+            DbContext.SaveChanges();
 
-            DbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstance.WorkflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = $"Terminate comment: {comment}"
-            });
-            await DbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
-
-            try
-            {
-                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber)
-                    .ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                //TODO: Log error!
-            }
-
-            try
-            {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment)
-                    .ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                //TODO: Log error!
-            }
-
-            return RedirectToPage("/Index");
+            return workflowInstance;
         }
 
         public IActionResult OnGetRetrieveAssignTasks(int processId)
