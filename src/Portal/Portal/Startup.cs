@@ -61,7 +61,8 @@ namespace Portal
 
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
-                .Bind(Configuration.GetSection("apis"));
+                .Bind(Configuration.GetSection("apis"))
+                .Bind(Configuration.GetSection("K2"));
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
 
