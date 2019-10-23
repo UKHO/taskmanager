@@ -11,6 +11,7 @@ namespace Portal.Configuration
         public Uri K2WebServiceBaseUri { get; set; }
         public Uri K2WebServiceGetTasksUri { get; set; }
         public Uri K2WebServiceTerminateWorkflowInstanceUri { get; set; }
+        public Uri K2WebServiceGetWorkflowsUri { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
         {

@@ -1,5 +1,49 @@
 [
   {
+    "processId": 445,
+    "serialNumber": "445_14",
+    "parentProcessId": null,
+    "workflowType": "DbAssessment",
+    "activityName": "Review",
+    "startedAt": "2019-01-01T00:00:00",
+    "status": "Started",
+    "comment": [
+      {
+        "processId": 445,
+        "text": "A comment",
+        "username": "Ross",
+        "created": "2019-01-01T00:00:00"
+      },
+      {
+        "processId": 445,
+        "text": "A 2nd comment",
+        "username": "Ben",
+        "created": "2019-01-03T00:00:00"
+      }
+    ],
+    "assessmentData": {
+      "sdocId": 1936906,
+      "rsdraNumber": "RSDRA2017000302065",
+      "sourceDocumentName": "HUA HIN",
+      "receiptDate": "2001-06-12T00:00:00",
+      "toSdoDate": null,
+      "effectiveStartDate": "2001-06-12T00:00:00",
+      "teamDistributedTo": null,
+      "sourceDocumentType": "Chart - Navigational",
+      "sourceNature": "Graphical",
+      "datum": null,
+      "processId": 445
+
+    },
+    "dbAssessmentReviewData": {
+      "processId": 445,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "assessor": "BarzeyS",
+      "verifier": "StensonB"
+    }
+  },
+  {
     "processId": 123,
     "serialNumber": "123_sn",
     "parentProcessId": null,
@@ -12,7 +56,7 @@
         "processId": 123,
         "text": "A comment",
         "username": "Ross",
-        "created":  "2019-01-01T00:00:00" 
+        "created": "2019-01-01T00:00:00"
       },
       {
         "processId": 123,
