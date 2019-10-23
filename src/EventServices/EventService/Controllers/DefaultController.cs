@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Common.Messages.Commands;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using NServiceBus;
@@ -20,8 +22,16 @@ namespace EventService.Controllers
         [Route("getit")]
         public async Task<string> GetIt()
         {
-            var message = new GregTestEvent();
-            await _messageSession.Send(message)
+            var message = new InitiateSourceDocumentRetrievalCommand()
+            {
+                CorrelationId = Guid.NewGuid(),
+                GeoReferenced = false,
+                ProcessId = 28238,
+                SourceDocumentId = 23312
+            };
+            var sendOptions = new SendOptions();
+            sendOptions.SetDestination("UKHO.TaskManager.SourceDocumentCoordinator");
+            await _messageSession.Send(message, sendOptions)
                 .ConfigureAwait(false);
             return "Message sent to endpoint";
         }

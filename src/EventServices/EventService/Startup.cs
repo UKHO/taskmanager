@@ -1,3 +1,6 @@
+using System.Data.SqlClient;
+using Common.Helpers;
+using EventService.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NServiceBus;
 using NServiceBus.Extensions.DependencyInjection;
+using NServiceBus.Transport.SQLServer;
 
 namespace EventService
 {
@@ -33,8 +37,41 @@ namespace EventService
                 });
             });
 
+            var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+            var startupConfig = new StartupConfig();
+            Configuration.GetSection("urls").Bind(startupConfig);
+            Configuration.GetSection("databases").Bind(startupConfig);
+            //TODO: FIXME
+            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, "TODO"/*"_secretsConfig.Value.NsbInitialCatalog"*/);
+
+            
             var endpointConfiguration = new EndpointConfiguration("Event Service");
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
+                .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
+                    async () =>
+                    {
+                        var con = new SqlConnection();
+                        try
+                        {
+                            con.ConnectionString = connectionString;
+                            //TODO: FIXME
+                            //if (!isLocalDebugging) con.AccessToken = _azureAccessToken;
+                            await con.OpenAsync().ConfigureAwait(false);
+                            return con;
+                        }
+                        catch
+                        {
+                            con.Dispose();
+                            throw;
+                        }
+                    });
+            transport.DisablePublishing(); //TODO: FIXME temporary as no persistence
+
+            endpointConfiguration.Conventions()
+                .DefiningCommandsAs(type => type.Namespace == "Common.Messages.Commands")
+                .DefiningEventsAs(type => type.Namespace == "Common.Messages.Events")
+                .DefiningMessagesAs(type => type.Namespace == "Common.Messages");
+
             endpointConfiguration.SendOnly();
             services.AddNServiceBus(endpointConfiguration);
 
