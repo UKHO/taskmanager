@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Globalization;
 using AutoMapper;
+
 using Common.Helpers;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,8 +11,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Portal.Configuration;
+using Portal.HttpClients;
 using Portal.MappingProfiles;
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Net;
+using System.Net.Http;
+
 using WorkflowDatabase.EF;
 
 namespace Portal
@@ -50,7 +59,11 @@ namespace Portal
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddOptions<GeneralSettings>().Bind(Configuration.GetSection("portal"));
+            services.AddOptions<GeneralConfig>()
+                .Bind(Configuration.GetSection("portal"))
+                .Bind(Configuration.GetSection("apis"));
+            services.AddOptions<UriConfig>()
+                .Bind(Configuration.GetSection("urls"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -80,6 +93,22 @@ namespace Portal
                     TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
+
+            var startupSecretConfig = new StartupSecretsConfig();
+            Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+
+            services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+            services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                    Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
+                });
+
+
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             var mapper = mappingConfig.CreateMapper();

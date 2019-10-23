@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -18,6 +20,8 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
@@ -25,10 +29,15 @@ namespace Portal.Pages.DbAssessment
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
-        public ReviewModel(WorkflowDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public ReviewModel(WorkflowDbContext dbContext,
+            IDataServiceApiClient dataServiceApiClient,
+            IWorkflowServiceApiClient workflowServiceApiClient,
+            IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
             DbContext = dbContext;
+            _dataServiceApiClient = dataServiceApiClient;
+            _workflowServiceApiClient = workflowServiceApiClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void OnGet(int processId)
@@ -83,24 +92,99 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        public IActionResult OnGetCommentsPartial(string comment, int processId)
+        public IActionResult OnGetCommentsPartialAsync(string comment, int processId)
         {
             // TODO: Test with Azure
             // TODO: This will not work in Azure; need alternative; but will work in local dev
+
+            var workflowInstance = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
+
+            AddComment(comment, processId, workflowInstance);
+
+            return OnGetRetrieveComments(processId);
+        }
+
+        public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
+        {
+            //TODO: Log!
+
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                //TODO: Log error!
+                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+            }
+
+            if (processId < 1)
+            {
+                //TODO: Log error!
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
+
+
+            var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
+            AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
+            await UpdateK2WorkflowAsTerminated(workflowInstance);
+            await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
+            return RedirectToPage("/Index");
+        }
+
+        private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
+        {
+            try
+            {
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+        }
+
+        private async Task UpdateK2WorkflowAsTerminated(WorkflowInstance workflowInstance)
+        {
+            try
+            {
+               await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+        }
+
+        private void AddComment(string comment, int processId, int workflowInstanceId)
+        {
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
             DbContext.Comment.Add(new Comments
             {
                 ProcessId = processId,
-                WorkflowInstanceId = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId,
+                WorkflowInstanceId = workflowInstanceId,
                 Created = DateTime.Now,
                 Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
                 Text = comment
             });
 
             DbContext.SaveChanges();
+        }
 
-            return OnGetRetrieveComments(processId);
+        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
+        {
+            var workflowInstance = DbContext.WorkflowInstance
+                .Include(wi => wi.AssessmentData)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
+
+            if (workflowInstance == null)
+            {
+                //TODO: Log error!
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
+
+            workflowInstance.Status = WorkflowStatus.Terminated.ToString();
+            DbContext.SaveChanges();
+
+            return workflowInstance;
         }
 
         public IActionResult OnGetRetrieveAssignTasks(int processId)

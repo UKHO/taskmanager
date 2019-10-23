@@ -11,6 +11,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using DataServices.Adapters;
 using DataServices.Attributes;
 using DataServices.Connected_Services.SDRAAssessmentWebService;
@@ -29,17 +31,14 @@ namespace DataServices.Controllers
     public class AssessmentApiController : ControllerBase
     {
         private readonly IAssessmentWebServiceSoapClientAdapter _assessmentWebServiceSoapClientAdapter;
-        private readonly IDataAccessWebServiceSoapClientAdapter _dataAccessWebServiceSoapClientAdapter;
 
         private readonly ILogger _logger;
 
         public AssessmentApiController(
             IAssessmentWebServiceSoapClientAdapter assessmentWebServiceSoapClientAdapter,
-            IDataAccessWebServiceSoapClientAdapter dataAccessWebServiceSoapClientAdapter,
             ILogger<AssessmentApiController> logger)
         {
             _assessmentWebServiceSoapClientAdapter = assessmentWebServiceSoapClientAdapter;
-            _dataAccessWebServiceSoapClientAdapter = dataAccessWebServiceSoapClientAdapter;
             _logger = logger;
         }
 
@@ -65,15 +64,14 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult ListDocumentsForAssessment([FromRoute][Required]string callerCode)
+        public async Task<IActionResult> ListDocumentsForAssessment([FromRoute][Required]string callerCode)
         {
-            var task = _assessmentWebServiceSoapClientAdapter.SoapClient.GetDocumentsForAssessmentAsync(
-                new GetDocumentsForAssessmentRequest(new GetDocumentsForAssessmentRequestBody(callerCode)));
-
             GetDocumentsForAssessmentResponse result = null;
             try
             {
-                result = task.Result;
+                result = await _assessmentWebServiceSoapClientAdapter.SoapClient.GetDocumentsForAssessmentAsync(
+                    new GetDocumentsForAssessmentRequest(new GetDocumentsForAssessmentRequestBody(callerCode)));
+
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -114,7 +112,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPut]
-        [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}/{comment}")]
+        [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}")]
         [ValidateModelState]
         [SwaggerOperation("PutAssessmentCompleted")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
@@ -123,30 +121,40 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PutAssessmentCompleted([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]string comment)
+        public async Task<IActionResult> PutAssessmentCompleted([FromRoute] [Required] string callerCode,
+            [FromRoute] [Required] int? sdocId, [FromQuery] [Required] string comment)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error marking assessment complete due to invalid parameter", nameof(sdocId));
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            CallOutcome result;
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            try
+            {
+                var task = await _assessmentWebServiceSoapClientAdapter.SoapClient.NotifyAssessmentCompletedAsync(
+                    new NotifyAssessmentCompletedRequest(new NotifyAssessmentCompletedRequestBody(callerCode, sdocId.Value, comment)));
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+                result = task.Body.NotifyAssessmentCompletedResult;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error marking assessment complete");
+                return StatusCode(500, e.Message);
+            }
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+            if (result.ErrorCode != 0)
+            {
+                _logger.LogError($"Error marking assessment complete, Message: {result.Message}");
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
+                return StatusCode(500, $"Error marking assessment complete, Message: {result.Message}");
+            }
 
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-
-            throw new NotImplementedException();
+            return new ObjectResult(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -174,7 +182,7 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
+        public async Task<IActionResult> PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
         {
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200);
