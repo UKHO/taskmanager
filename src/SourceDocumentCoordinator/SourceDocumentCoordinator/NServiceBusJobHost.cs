@@ -51,7 +51,10 @@ namespace SourceDocumentCoordinator
             if (_isLocalDebugging)
             {
                 _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
-                ReCreateLocalDb(_secretsConfig.Value.NsbInitialCatalog, DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer));
+                DatabasesHelpers.ReCreateLocalDb(_localDbServer,
+                    _secretsConfig.Value.NsbInitialCatalog,
+                    DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer),
+                    _isLocalDebugging);
                 var recoverability = _endpointConfig.Recoverability();
                 recoverability.Immediate(
                     immediate =>
@@ -72,39 +75,6 @@ namespace SourceDocumentCoordinator
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 var azureDbTokenUrl = _uriConfig.Value.AzureDbTokenUrl;
                 _azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
-            }
-        }
-
-        private void ReCreateLocalDb(string dbName, string connectionString)
-        {
-            var connectionStringObject = new SqlConnectionStringBuilder(connectionString);
-            if (!_isLocalDebugging || !connectionStringObject.DataSource.Equals(_localDbServer))
-            {
-                throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
-            }
-
-            var sanitisedDbName = dbName.Replace("'", "''");
-
-            var commandText = "USE master " +
-                              $"IF NOT EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
-                              "BEGIN " +
-                              $"CREATE DATABASE [{sanitisedDbName}] " +
-                              "END";
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                var command = new SqlCommand(commandText, connection);
-
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                finally
-                {
-                    connection.Close();
-                }
-
             }
         }
 

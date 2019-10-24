@@ -157,7 +157,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                return StatusCode(500, $"Failed to load assembly {e.ToString()}");
+                return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
             }
 
             try
@@ -168,7 +168,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                return StatusCode(500, $"Failed to get event type {e.ToString()}");
+                return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
             }
 
             try
@@ -178,7 +178,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                return StatusCode(500, $"Failed to deserialise event {e.ToString()}");
+                return StatusCode(500, $"Failed to deserialise event {eventName}: {e.ToString()}");
             }
 
             try
@@ -189,7 +189,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                return StatusCode(500, $"Failed to publish event {e.ToString()}");
+                return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
             }
 
             return new ObjectResult(HttpStatusCode.OK);
