@@ -49,9 +49,41 @@ namespace EventService
             var startupSecretsConfig = new StartupSecretsConfig();
             Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
 
-            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, startupSecretsConfig.NsbInitialCatalog);
+            string connectionString = null;
 
             var endpointConfiguration = new EndpointConfiguration(startupConfig.EventServiceName);
+
+            if (isLocalDebugging)
+            {
+                connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                    startupConfig.LocalDbServer,
+                    startupSecretsConfig.NsbInitialCatalog);
+                DatabasesHelpers.ReCreateLocalDb(startupConfig.LocalDbServer,
+                    startupSecretsConfig.NsbInitialCatalog,
+                    DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer),
+                    isLocalDebugging);
+                var recoverability = endpointConfiguration.Recoverability();
+                recoverability.Immediate(
+                    immediate =>
+                    {
+                        immediate.NumberOfRetries(0);
+                    });
+
+                recoverability.Delayed(
+                    delayed =>
+                    {
+                        delayed.NumberOfRetries(0);
+                    });
+            }
+            else
+            {
+                //_connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
+
+                //var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                //var azureDbTokenUrl = _uriConfig.Value.AzureDbTokenUrl;
+                //_azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+            }
+
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
                 .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
                     async () =>
