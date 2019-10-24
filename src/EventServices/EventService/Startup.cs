@@ -4,6 +4,7 @@ using Common.Helpers;
 using EventService.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,6 +18,8 @@ namespace EventService
 {
     public class Startup
     {
+        public string AzureAccessToken { get; set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -77,11 +80,11 @@ namespace EventService
             }
             else
             {
-                //_connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _secretsConfig.Value.NsbDataSource, _secretsConfig.Value.NsbInitialCatalog);
+                connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupSecretsConfig.NsbDataSource, startupSecretsConfig.NsbInitialCatalog);
 
-                //var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                //var azureDbTokenUrl = _uriConfig.Value.AzureDbTokenUrl;
-                //_azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var azureDbTokenUrl = startupConfig.AzureDbTokenUrl;
+                AzureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
             }
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
@@ -92,8 +95,7 @@ namespace EventService
                         try
                         {
                             con.ConnectionString = connectionString;
-                            //TODO: FIXME
-                            //if (!isLocalDebugging) con.AccessToken = _azureAccessToken;
+                            if (!isLocalDebugging) con.AccessToken = AzureAccessToken;
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
                         }
@@ -112,8 +114,7 @@ namespace EventService
                 try
                 {
                     con.ConnectionString = connectionString;
-                    //TODO: FIXME
-                    //if (!isLocalDebugging) con.AccessToken = azureAccessToken;
+                    if (!isLocalDebugging) con.AccessToken = AzureAccessToken;
                     return con;
                 }
                 catch
