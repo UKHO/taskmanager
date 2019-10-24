@@ -1,28 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Net;
+using System.Net.Http;
 using AutoMapper;
-
 using Common.Helpers;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
 using Portal.Configuration;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
-
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Globalization;
-using System.Net;
-using System.Net.Http;
-
 using WorkflowDatabase.EF;
 
 namespace Portal
@@ -47,7 +40,7 @@ namespace Portal
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
-                options.SupportedCultures = new List<CultureInfo> {new CultureInfo("en-GB"), new CultureInfo("en-GB")};
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB"), new CultureInfo("en-GB") };
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -76,14 +69,8 @@ namespace Portal
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
-            var connection = new SqlConnection(workflowDbConnectionString)
-            {
-                AccessToken = isLocalDevelopment ?
-                    null :
-                    new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-            };
             services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                options.UseSqlServer(connection));
+                options.UseSqlServer(workflowDbConnectionString));
 
             if (isLocalDevelopment)
             {
