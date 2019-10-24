@@ -11,6 +11,7 @@ namespace SourceDocumentCoordinator.Config
         public ConnectionStrings ConnectionStrings { get; set; }
         public int SourceDocumentCoordinatorQueueStatusIntervalSeconds { get; set; }
         public string SourceDocumentWriteableFolderName { get; set; }
+        public string EventServiceName { get; set; }
     }
 
     public class ConnectionStrings

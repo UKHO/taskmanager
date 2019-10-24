@@ -1,5 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 using EventService.Attributes;
 using EventService.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -136,15 +140,22 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PostEvent([FromBody]Object body, [FromRoute][Required]string eventName)
+        public virtual async Task<IActionResult> PostEvent([FromBody]Object body, [FromRoute][Required]string eventName)
         {
+            // Use reflection to discover events, retrieve the correct event by name and 
+            // deserialize it via the provided JSON body.
+            var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+            var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
+            var assembly = Assembly.Load(assemblyName);
+            var events = assembly.GetTypes().ToList();
+            var selectedEvent = events.First(x => x.Name == eventName);
+
+            var populatedEvent = System.Text.Json.JsonSerializer.Deserialize(body.ToString(), selectedEvent, null);
+
             var publishOptions = new PublishOptions();
-            //await _messageSession.Publish(message, publishOptions).ConfigureAwait(false);
-            //var sendOptions = new SendOptions();
-            //sendOptions.SetDestination("UKHO.TaskManager.SourceDocumentCoordinator");
-            //await _messageSession.Send(message, sendOptions)
-            //    .ConfigureAwait(false);
-            return null; //"Message sent to endpoint";
+            await _messageSession.Publish(populatedEvent, publishOptions).ConfigureAwait(false);
+           
+            return new ObjectResult(HttpStatusCode.Created); //"Message sent to endpoint";
         }
     }
 }
