@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using Common.Helpers;
 using EventService.Config;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NServiceBus;
 using NServiceBus.Extensions.DependencyInjection;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
 
 namespace EventService
@@ -41,11 +43,13 @@ namespace EventService
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
+            Configuration.GetSection("nsb").Bind(startupConfig);
             //TODO: FIXME
-            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, "TODO"/*"_secretsConfig.Value.NsbInitialCatalog"*/);
+            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, "taskmanager-dev-sqldatabase"/*"_secretsConfig.Value.NsbInitialCatalog"*/);
 
             
-            var endpointConfiguration = new EndpointConfiguration("Event Service");
+            //TODO: FIXME move endpoint name to config
+            var endpointConfiguration = new EndpointConfiguration(startupConfig.EventServiceName);
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
                 .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
                     async () =>
@@ -65,16 +69,36 @@ namespace EventService
                             throw;
                         }
                     });
-            transport.DisablePublishing(); //TODO: FIXME temporary as no persistence
+
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            persistence.SqlDialect<SqlDialect.MsSqlServer>();
+            persistence.ConnectionBuilder(connectionBuilder: () =>
+            {
+                var con = new SqlConnection();
+                try
+                {
+                    con.ConnectionString = connectionString;
+                    //TODO: FIXME
+                    //if (!isLocalDebugging) con.AccessToken = azureAccessToken;
+                    return con;
+                }
+                catch
+                {
+                    con.Dispose();
+                    throw;
+                }
+            });
+            persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
 
             endpointConfiguration.Conventions()
                 .DefiningCommandsAs(type => type.Namespace == "Common.Messages.Commands")
                 .DefiningEventsAs(type => type.Namespace == "Common.Messages.Events")
                 .DefiningMessagesAs(type => type.Namespace == "Common.Messages");
 
-            endpointConfiguration.SendOnly();
-            services.AddNServiceBus(endpointConfiguration);
+            endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
+            endpointConfiguration.EnableInstallers();
 
+            services.AddNServiceBus(endpointConfiguration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

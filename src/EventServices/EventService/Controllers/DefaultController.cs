@@ -22,17 +22,17 @@ namespace EventService.Controllers
         [Route("getit")]
         public async Task<string> GetIt()
         {
-            var message = new InitiateSourceDocumentRetrievalCommand()
+            var message = new GregTestEvent()
             {
                 CorrelationId = Guid.NewGuid(),
-                GeoReferenced = false,
-                ProcessId = 28238,
-                SourceDocumentId = 23312
+                Gregio = "blah"
             };
-            var sendOptions = new SendOptions();
-            sendOptions.SetDestination("UKHO.TaskManager.SourceDocumentCoordinator");
-            await _messageSession.Send(message, sendOptions)
-                .ConfigureAwait(false);
+            var publishOptions = new PublishOptions();
+            await _messageSession.Publish(message, publishOptions).ConfigureAwait(false);
+            //var sendOptions = new SendOptions();
+            //sendOptions.SetDestination("UKHO.TaskManager.SourceDocumentCoordinator");
+            //await _messageSession.Send(message, sendOptions)
+            //    .ConfigureAwait(false);
             return "Message sent to endpoint";
         }
     }

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Messages.Events;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
@@ -133,6 +134,11 @@ namespace SourceDocumentCoordinator
                             }
                         });
 
+                //var routing = transport.Routing();
+                //routing.RegisterPublisher(
+                //    assembly: typeof(GregTestEvent).Assembly,
+                //    publisherEndpoint: _generalConfig.EventServiceName);
+
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
                 persistence.ConnectionBuilder(connectionBuilder: () =>
@@ -157,10 +163,12 @@ namespace SourceDocumentCoordinator
                     .DefiningEventsAs(type => type.Namespace == "Common.Messages.Events")
                     .DefiningMessagesAs(type => type.Namespace == "Common.Messages")
                     .DefiningMessagesAs(type => type.Namespace == "SourceDocumentCoordinator.Messages");
-                ;
+
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
+                //await _endpoint.Subscribe<GregTestEvent>()
+                //    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
