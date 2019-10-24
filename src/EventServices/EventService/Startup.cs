@@ -44,11 +44,12 @@ namespace EventService
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
             Configuration.GetSection("nsb").Bind(startupConfig);
-            //TODO: FIXME
-            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, "taskmanager-dev-sqldatabase"/*"_secretsConfig.Value.NsbInitialCatalog"*/);
 
-            
-            //TODO: FIXME move endpoint name to config
+            var startupSecretsConfig = new StartupSecretsConfig();
+            Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
+
+            var connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupConfig.LocalDbServer, startupSecretsConfig.NsbInitialCatalog);
+
             var endpointConfiguration = new EndpointConfiguration(startupConfig.EventServiceName);
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
                 .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
