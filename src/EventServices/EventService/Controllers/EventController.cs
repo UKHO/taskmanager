@@ -144,18 +144,55 @@ namespace EventService.Controllers
         {
             // Use reflection to discover events, retrieve the correct event by name and 
             // deserialize it via the provided JSON body.
-            var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
-            var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
-            var assembly = Assembly.Load(assemblyName);
-            var events = assembly.GetTypes().ToList();
-            var selectedEvent = events.First(x => x.Name == eventName);
+            Assembly assembly = null;
+            Type eventType = null;
+            Object populatedEvent = null;
 
-            var populatedEvent = System.Text.Json.JsonSerializer.Deserialize(body.ToString(), selectedEvent, null);
+            try
+            {
+                var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+                var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
+                assembly = Assembly.Load(assemblyName);
+            }
+            catch (Exception e)
+            {
+                //TODO: LOG
+                return StatusCode(500, $"Failed to load assembly {e.ToString()}");
+            }
 
-            var publishOptions = new PublishOptions();
-            await _messageSession.Publish(populatedEvent, publishOptions).ConfigureAwait(false);
-           
-            return new ObjectResult(HttpStatusCode.Created); //"Message sent to endpoint";
+            try
+            {
+                var events = assembly.GetTypes().ToList();
+                eventType = events.First(x => x.Name == eventName);
+            }
+            catch (Exception e)
+            {
+                //TODO: LOG
+                return StatusCode(500, $"Failed to get event type {e.ToString()}");
+            }
+
+            try
+            {
+                populatedEvent = System.Text.Json.JsonSerializer.Deserialize(body.ToString(), eventType, null);
+            }
+            catch (Exception e)
+            {
+                //TODO: LOG
+                return StatusCode(500, $"Failed to deserialise event {e.ToString()}");
+            }
+
+            try
+            {
+                var publishOptions = new PublishOptions();
+                await _messageSession.Publish(populatedEvent, publishOptions).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                //TODO: LOG
+                return StatusCode(500, $"Failed to publish event {e.ToString()}");
+            }
+
+            return new ObjectResult(HttpStatusCode.OK);
         }
     }
 }
