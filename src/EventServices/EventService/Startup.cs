@@ -18,8 +18,6 @@ namespace EventService
 {
     public class Startup
     {
-        public string AzureAccessToken { get; set; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -43,6 +41,7 @@ namespace EventService
                 });
             });
 
+            string azureAccessToken = null;
             var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
@@ -84,7 +83,7 @@ namespace EventService
 
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 var azureDbTokenUrl = startupConfig.AzureDbTokenUrl;
-                AzureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
             }
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
@@ -95,7 +94,7 @@ namespace EventService
                         try
                         {
                             con.ConnectionString = connectionString;
-                            if (!isLocalDebugging) con.AccessToken = AzureAccessToken;
+                            if (!isLocalDebugging) con.AccessToken = azureAccessToken;
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
                         }
@@ -114,7 +113,7 @@ namespace EventService
                 try
                 {
                     con.ConnectionString = connectionString;
-                    if (!isLocalDebugging) con.AccessToken = AzureAccessToken;
+                    if (!isLocalDebugging) con.AccessToken = azureAccessToken;
                     return con;
                 }
                 catch
