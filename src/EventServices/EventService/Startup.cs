@@ -29,6 +29,7 @@ namespace EventService
         {
             services.AddControllers();
             services.AddMvc();
+            services.AddHealthChecks();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("1.0.0", new OpenApiInfo()
@@ -126,6 +127,7 @@ namespace EventService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
