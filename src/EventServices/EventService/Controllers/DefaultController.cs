@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using NServiceBus;
