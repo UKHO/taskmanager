@@ -146,11 +146,11 @@ namespace EventService.Controllers
             // deserialize it via the provided JSON body.
             Assembly assembly = null;
             Type eventType = null;
-            Object populatedEvent = null;
+            object populatedEvent = null;
 
             try
             {
-                var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+                var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
                 var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
                 assembly = Assembly.Load(assemblyName);
             }
@@ -178,7 +178,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                return StatusCode(500, $"Failed to deserialise event {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
             }
 
             try
