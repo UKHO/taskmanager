@@ -11,16 +11,13 @@ namespace WorkflowDatabase.EF
         public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
-
-            //TODO slight issue around this being replicated ni our helpers but cannot ref else circular ref
             var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
-            bool isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
+            var isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
 
-
-            var conn = this.Database.GetDbConnection() as SqlConnection;
-            conn.AccessToken = isLocalDevelopment
-                ? null
-                : new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+            if (!isLocalDevelopment)
+            {
+                (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
         }
 
         public DbSet<AssessmentData> AssessmentData { get; set; }
