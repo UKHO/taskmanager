@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Data.SqlClient;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF.Models;
 
 namespace WorkflowDatabase.EF
@@ -8,6 +11,13 @@ namespace WorkflowDatabase.EF
         public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
+            var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
+            var isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
+
+            if (!isLocalDevelopment)
+            {
+                (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
         }
 
         public DbSet<AssessmentData> AssessmentData { get; set; }
@@ -30,7 +40,7 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(p => p.AssessmentData)
                 .WithOne()
-                .HasPrincipalKey<WorkflowInstance>(p=>p.ProcessId)
+                .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
