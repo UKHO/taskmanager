@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -20,6 +22,7 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOptions<UriConfig> _uriConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
 
@@ -32,12 +35,14 @@ namespace Portal.Pages.DbAssessment
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<UriConfig> uriConfig)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
+            _uriConfig = uriConfig;
         }
 
         public void OnGet(int processId)
@@ -49,14 +54,23 @@ namespace Portal.Pages.DbAssessment
 
         public IActionResult OnGetRetrieveSourceDocuments(int processId)
         {
-            var model = new _SourceDocumentDetailsModel()
+            var model = new _SourceDocumentDetailsModel();
+            try
             {
-                Assessments = DbContext
+
+                model.Assessments = DbContext
                     .AssessmentData
                     .Include(a => a.LinkedDocuments)
-                    .Where(c => c.ProcessId == processId).ToList(),
-                ProcessId = processId
-            };
+                    .Where(c => c.ProcessId == processId).ToList();
+                model.ProcessId = processId;
+                model.SourceDocumentStatus = DbContext.SourceDocumentStatus.First(s => s.ProcessId == processId);
+                SetContentServiceUrl(model);
+            }
+            catch (InvalidOperationException e)
+            {
+                // Log that we're unable to get a Source Doc Status row
+                Console.WriteLine(e);
+            }
 
             // Repopulate models...
             OnGet(processId);
@@ -145,7 +159,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-               await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
+                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
             }
             catch (Exception e)
             {
@@ -253,6 +267,11 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
             };
+        }
+
+        private void SetContentServiceUrl(_SourceDocumentDetailsModel model)
+        {
+            model.ContentServiceUri = _uriConfig.Value.ContentServiceBaseUrl + model.SourceDocumentStatus.ContentServiceId.ToString() + "/data";
         }
     }
 

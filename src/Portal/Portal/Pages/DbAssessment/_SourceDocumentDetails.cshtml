@@ -1,4 +1,5 @@
-﻿@model Portal.Pages.DbAssessment._SourceDocumentDetailsModel
+﻿@using WorkflowDatabase.EF
+@model Portal.Pages.DbAssessment._SourceDocumentDetailsModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -20,39 +21,53 @@
                 </tr>
             </thead>
             <tbody>
-            @for (int i = 0; i < Model.Assessments.Count; i++)
-            {
-                var assessment = Model.Assessments[i];
-                var childRowsMarker = $"childRows{i + 1}";
-
-                <tr data-toggle="collapse" data-target=".@(childRowsMarker)">
-                    <td>@{ if (assessment.LinkedDocuments.Count > 0){ <i class='fa fa-plus' ></i> } }</td>
-                    <td>@assessment.ParsedRsdraNumber</td>
-                    <td id="rows">@assessment.SdocId</td>
-                    <td>@assessment.SourceDocumentName</td>
-                    <td>@assessment.ReceiptDate</td>
-                    <td>@assessment.SourceDocumentType</td>
-                    <td>@assessment.Datum</td>
-                    <td>@assessment.SourceNature</td>
-                    <td><i class="fa fa-times-circle" style="color: red"></i></td>
-                </tr>
-                foreach (var linkedDocument in assessment.LinkedDocuments)
+                @for (var i = 0; i < Model.Assessments.Count; i++)
                 {
-                    <tr class="collapse @(childRowsMarker)">
-                        <td></td>
-                        <td></td>
-                        <td id="rows">@linkedDocument.SdocId</td>
-                        <td>@linkedDocument.SourceDocumentName</td>
-                        <td>@linkedDocument.ReceiptDate</td>
-                        <td>@linkedDocument.SourceDocumentType</td>
-                        <td>@linkedDocument.Datum</td>
-                        <td>@linkedDocument.SourceNature</td>
-                        <td></td>
+                    var assessment = Model.Assessments[i];
+                    var childRowsMarker = $"childRows{i + 1}";
+
+                    <tr data-toggle="collapse" data-target=".@(childRowsMarker)">
+                        <td>
+                            @{ if (assessment.LinkedDocuments.Count > 0)
+                                { <i class='fa fa-plus'></i> } }
+                        </td>
+                        <td>
+                            @{
+                                if (Model.SourceDocumentStatus != null && Model.SourceDocumentStatus.Status == SourceDocumentRetrievalStatus.Complete.ToString())
+                                {
+                                    <a href="@Model.ContentServiceUri" target="_blank">@assessment.ParsedRsdraNumber</a>
+                                }
+                                else
+                                {
+                                    @assessment.ParsedRsdraNumber
+                                }
+                            }
+                        </td>
+                        <td id="rows">@assessment.SdocId</td>
+                        <td>@assessment.SourceDocumentName</td>
+                        <td>@assessment.ReceiptDate</td>
+                        <td>@assessment.SourceDocumentType</td>
+                        <td>@assessment.Datum</td>
+                        <td>@assessment.SourceNature</td>
+                        <td><i class="fa fa-times-circle" style="color: red"></i></td>
                     </tr>
+                    foreach (var linkedDocument in assessment.LinkedDocuments)
+                    {
+                        <tr class="collapse @(childRowsMarker)">
+                            <td></td>
+                            <td></td>
+                            <td id="rows">@linkedDocument.SdocId</td>
+                            <td>@linkedDocument.SourceDocumentName</td>
+                            <td>@linkedDocument.ReceiptDate</td>
+                            <td>@linkedDocument.SourceDocumentType</td>
+                            <td>@linkedDocument.Datum</td>
+                            <td>@linkedDocument.SourceNature</td>
+                            <td></td>
+                        </tr>
+
+                    }
 
                 }
-
-            }
             </tbody>
         </table>
         <button id="btnAddSource" class="btn btn-primary"><span style="padding-right: 5px;"></span>Add Source</button>

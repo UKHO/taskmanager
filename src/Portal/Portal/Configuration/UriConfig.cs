@@ -5,6 +5,7 @@ namespace Portal.Configuration
 {
     public class UriConfig
     {
+        public Uri ContentServiceBaseUrl { get; set; }
         public Uri DataAccessLocalhostBaseUri { get; set; }
         public Uri DataServicesWebServiceBaseUri { get; set; }
         public string DataServicesWebServiceAssessmentCompletedUri { get; set; }
