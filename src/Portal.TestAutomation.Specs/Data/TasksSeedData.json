@@ -12,7 +12,7 @@
         "processId": 123,
         "text": "A comment",
         "username": "Ross",
-        "created":  "2019-01-01T00:00:00" 
+        "created": "2019-01-01T00:00:00"
       },
       {
         "processId": 123,
@@ -66,6 +66,13 @@
       "activityCode": "78798",
       "assessor": "BarzeyS",
       "verifier": "StensonB"
+    },
+    "SourceDocumentStatus": {
+      "processId": 123,
+      "SdocId": 217547,
+      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
+      "Status": "Complete",
+      "StartedAt": "2019-06-12T00:00:00"
     }
   },
   {
@@ -192,6 +199,13 @@
       "activityCode": "743543",
       "assessor": "BarzeyS",
       "verifier": "StensonB"
+    },
+    "SourceDocumentStatus": {
+      "processId": 125,
+      "SdocId": 206733,
+      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
+      "Status": "Ready",
+      "StartedAt": "2019-06-12T00:00:00"
     }
   },
   {

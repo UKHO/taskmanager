@@ -35,6 +35,12 @@ namespace WorkflowDatabase.EF
                 .HasMany(x => x.Comment);
 
             modelBuilder.Entity<WorkflowInstance>()
+                .HasOne(x => x.SourceDocumentStatus)
+                .WithOne()
+                .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
+                .HasForeignKey<SourceDocumentStatus>(p => p.ProcessId);
+
+            modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.DbAssessmentReviewData);
 
             modelBuilder.Entity<WorkflowInstance>()
@@ -44,6 +50,8 @@ namespace WorkflowDatabase.EF
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
+
+            modelBuilder.Entity<SourceDocumentStatus>().HasKey(x => x.SourceDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
             modelBuilder.Entity<AssessmentData>()
