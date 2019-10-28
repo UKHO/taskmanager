@@ -72,7 +72,9 @@ namespace Portal.Pages.DbAssessment
             try
             {
                 model.SourceDocumentStatus = DbContext.SourceDocumentStatus.First(s => s.ProcessId == processId);
-                model.SourceDocumentContentServiceUri = _uriConfig.Value.BuildContentServiceUri(model.SourceDocumentStatus.ContentServiceId);
+
+                if (model.SourceDocumentStatus.ContentServiceId != null)
+                    model.SourceDocumentContentServiceUri = _uriConfig.Value.BuildContentServiceUri(model.SourceDocumentStatus.ContentServiceId.Value);
 
             }
             catch (InvalidOperationException e)
