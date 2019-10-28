@@ -39,6 +39,7 @@ namespace SourceDocumentCoordinator.Handlers
                     SourceNature = documentAssessmentData.SourceName,
                     Datum = documentAssessmentData.Datum,
                     LinkType = "SEP",
+                    Status = LinkedDocumentRetrievalStatus.NotAttached.ToString(),
                     Created = DateTime.Now
                 };
 

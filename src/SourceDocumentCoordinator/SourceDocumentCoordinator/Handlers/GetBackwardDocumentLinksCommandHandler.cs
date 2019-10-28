@@ -42,6 +42,7 @@ namespace SourceDocumentCoordinator.Handlers
                     SourceNature = documentAssessmentData.SourceName,
                     Datum = documentAssessmentData.Datum,
                     LinkType = "Backward",
+                    Status = LinkedDocumentRetrievalStatus.NotAttached.ToString(),
                     Created = DateTime.Now
                 };
 
