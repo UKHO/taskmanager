@@ -45,7 +45,7 @@
     "SourceDocumentStatus": {
       "processId": 445,
       "SdocId": 1936906,
-      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
+      "ContentServiceId": null,
       "Status": "Started",
       "StartedAt": "2019-06-12T00:00:00"
     }
@@ -95,6 +95,8 @@
           "datum": "Non-WGS84",
           "linkType": "Forward",
           "linkedSdocId": 332373,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -107,6 +109,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 1018253,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -171,6 +175,8 @@
           "datum": "WGS84",
           "linkType": "Forward",
           "linkedSdocId": 320532,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -183,6 +189,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 1101540,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -240,6 +248,8 @@
           "datum": null,
           "linkType": "Forward",
           "linkedSdocId": 606203,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -254,7 +264,7 @@
     "SourceDocumentStatus": {
       "processId": 125,
       "SdocId": 206733,
-      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
+      "ContentServiceId": null,
       "Status": "Ready",
       "StartedAt": "2019-06-12T00:00:00"
     }
@@ -304,6 +314,8 @@
           "datum": "WGS84",
           "linkType": "Forward",
           "linkedSdocId": 306707,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -316,6 +328,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 938037,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -328,6 +342,8 @@
           "datum": null,
           "linkType": "SEP",
           "linkedSdocId": 83848,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
 
@@ -386,6 +402,8 @@
           "datum": null,
           "linkType": "Forward",
           "linkedSdocId": 934203,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
