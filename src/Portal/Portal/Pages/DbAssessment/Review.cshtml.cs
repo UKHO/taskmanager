@@ -48,7 +48,6 @@ namespace Portal.Pages.DbAssessment
         public void OnGet(int processId)
         {
             ProcessId = processId;
-
             TaskInformationModel = SetTaskInformationData(processId);
         }
 
@@ -65,6 +64,7 @@ namespace Portal.Pages.DbAssessment
             catch (InvalidOperationException e)
             {
                 // Log and throw, as we're unable to get assessment data
+                e.Data.Add("OurMessage", "Unable to retrieve AssessmentData");
                 Console.WriteLine(e);
                 throw;
             }
@@ -78,6 +78,7 @@ namespace Portal.Pages.DbAssessment
             catch (InvalidOperationException e)
             {
                 // Log that we're unable to get a Source Doc Status row
+                e.Data.Add("OurMessage", "Unable to retrieve SourceDocumentStatus");
                 Console.WriteLine(e);
             }
 
