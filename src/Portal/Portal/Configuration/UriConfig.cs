@@ -20,5 +20,10 @@ namespace Portal.Configuration
                 ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
                 $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}?comment={Uri.EscapeDataString(comment)}");
         }
+
+        public Uri BuildContentServiceUri(Guid fileGuid)
+        {
+            return new Uri(ContentServiceBaseUrl, fileGuid + "/data");
+        }
     }
 }

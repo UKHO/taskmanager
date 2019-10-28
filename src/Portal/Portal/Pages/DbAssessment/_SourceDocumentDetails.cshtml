@@ -21,37 +21,39 @@
                 </tr>
             </thead>
             <tbody>
-                @for (var i = 0; i < Model.Assessments.Count; i++)
-                {
-                    var assessment = Model.Assessments[i];
-                    var childRowsMarker = $"childRows{i + 1}";
+                @{
+                    var childRowsMarker = $"childRows1";
 
                     <tr data-toggle="collapse" data-target=".@(childRowsMarker)">
                         <td>
-                            @{ if (assessment.LinkedDocuments.Count > 0)
-                                { <i class='fa fa-plus'></i> } }
+                            @{
+                                if (Model.Assessment.LinkedDocuments.Count > 0)
+                                {
+                                    <i class='fa fa-plus'></i>
+                                }
+                            }
                         </td>
                         <td>
                             @{
                                 if (Model.SourceDocumentStatus != null && Model.SourceDocumentStatus.Status == SourceDocumentRetrievalStatus.Complete.ToString())
                                 {
-                                    <a href="@Model.ContentServiceUri" target="_blank">@assessment.ParsedRsdraNumber</a>
+                                    <a href="@Model.SourceDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
                                 }
                                 else
                                 {
-                                    @assessment.ParsedRsdraNumber
+                                    @Model.Assessment.ParsedRsdraNumber
                                 }
                             }
                         </td>
-                        <td id="rows">@assessment.SdocId</td>
-                        <td>@assessment.SourceDocumentName</td>
-                        <td>@assessment.ReceiptDate</td>
-                        <td>@assessment.SourceDocumentType</td>
-                        <td>@assessment.Datum</td>
-                        <td>@assessment.SourceNature</td>
-                        <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                        <td id="rows">@Model.Assessment.SdocId</td>
+                        <td>@Model.Assessment.SourceDocumentName</td>
+                        <td>@Model.Assessment.ReceiptDate</td>
+                        <td>@Model.Assessment.SourceDocumentType</td>
+                        <td>@Model.Assessment.Datum</td>
+                        <td>@Model.Assessment.SourceNature</td>
+                        <td>@*<i class="fa fa-times-circle" style="color: red"></i>*@</td>
                     </tr>
-                    foreach (var linkedDocument in assessment.LinkedDocuments)
+                    foreach (var linkedDocument in Model.Assessment.LinkedDocuments)
                     {
                         <tr class="collapse @(childRowsMarker)">
                             <td></td>

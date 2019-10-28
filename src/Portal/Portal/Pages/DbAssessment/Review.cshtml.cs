@@ -57,20 +57,31 @@ namespace Portal.Pages.DbAssessment
             var model = new _SourceDocumentDetailsModel();
             try
             {
-
-                model.Assessments = DbContext
+                model.Assessment = DbContext
                     .AssessmentData
                     .Include(a => a.LinkedDocuments)
-                    .Where(c => c.ProcessId == processId).ToList();
-                model.ProcessId = processId;
+                    .First(c => c.ProcessId == processId);
+            }
+            catch (InvalidOperationException e)
+            {
+                // Log and throw, as we're unable to get assessment data
+                Console.WriteLine(e);
+                throw;
+            }
+
+            try
+            {
                 model.SourceDocumentStatus = DbContext.SourceDocumentStatus.First(s => s.ProcessId == processId);
-                SetContentServiceUrl(model);
+                model.SourceDocumentContentServiceUri = _uriConfig.Value.BuildContentServiceUri(model.SourceDocumentStatus.ContentServiceId);
+
             }
             catch (InvalidOperationException e)
             {
                 // Log that we're unable to get a Source Doc Status row
                 Console.WriteLine(e);
             }
+
+            model.ProcessId = processId;
 
             // Repopulate models...
             OnGet(processId);
@@ -267,11 +278,6 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
             };
-        }
-
-        private void SetContentServiceUrl(_SourceDocumentDetailsModel model)
-        {
-            model.ContentServiceUri = _uriConfig.Value.ContentServiceBaseUrl + model.SourceDocumentStatus.ContentServiceId.ToString() + "/data";
         }
     }
 
