@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using WorkflowDatabase.EF;
@@ -40,6 +41,39 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [SourceDocumentStatus]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
+        }
+
+        public static void ReCreateLocalDb(string localDbServer, string dbName, string connectionString, bool isLocalDebugging)
+        {
+            var connectionStringObject = new SqlConnectionStringBuilder(connectionString);
+            if (!isLocalDebugging || !connectionStringObject.DataSource.Equals(localDbServer))
+            {
+                throw new InvalidOperationException($@"{nameof(ReCreateLocalDb)} should only be called when executing in local development environment.");
+            }
+
+            var sanitisedDbName = dbName.Replace("'", "''");
+
+            var commandText = "USE master " +
+                              $"IF NOT EXISTS(select * from sys.databases where name='{sanitisedDbName}') " +
+                              "BEGIN " +
+                              $"CREATE DATABASE [{sanitisedDbName}] " +
+                              "END";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var command = new SqlCommand(commandText, connection);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    connection.Close();
+                }
+
+            }
         }
     }
 }

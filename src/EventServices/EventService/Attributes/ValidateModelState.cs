@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -7,9 +7,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EventService.Attributes
 {
-    /// <summary>
-    /// Model state validation attribute
-    /// </summary>
     public class ValidateModelStateAttribute : ActionFilterAttribute
     {
         /// <summary>
@@ -26,7 +23,7 @@ namespace EventService.Attributes
                 {
                     object args = null;
                     if (context.ActionArguments.ContainsKey(parameter.Name))
-                    { 
+                    {
                         args = context.ActionArguments[parameter.Name];
                     }
 
