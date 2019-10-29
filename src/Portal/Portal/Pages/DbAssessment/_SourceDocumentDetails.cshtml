@@ -64,10 +64,16 @@
                             <td>@linkedDocument.SourceDocumentType</td>
                             <td>@linkedDocument.Datum</td>
                             <td>@linkedDocument.SourceNature</td>
-                            <td></td>
+                            <td>
+                                @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
+                                {
+                                    <i class="fa fa-paperclip"></i>
+                                }
+                            </td>
                         </tr>
-
                     }
+                    @* TODO: Here were are going to render the attached linked documents *@
+                    @* TODO: child row will start at 2 *@
 
                 }
             </tbody>
