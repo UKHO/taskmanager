@@ -16,11 +16,38 @@
             success: function (result) {
                 $("#sourceDocuments").html(result);
                 applyCollapseIconHandler();
+                applyAttachLinkedDocumentHandlers();
             },
             error: function (error) {
                 $("#sourceDocumentsError")
                     .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
             }
+        });
+    }
+
+    function applyAttachLinkedDocumentHandlers() {
+        $(".attachLinkedDocument").on("click", function (e) {
+            var linkedSdocId = $(this).data("linkedsdocid");
+
+            $.ajax({
+                type: "POST",
+                url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    linkedSdocId: linkedSdocId
+                },
+                success: function (result) {
+                    alert("success");
+                    //$("#assignTasks").append(result);
+                },
+                error: function (error) {
+                    alert("error");
+                    //$("#assignTasksError")
+                    //    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+                }
+            });
         });
     }
 

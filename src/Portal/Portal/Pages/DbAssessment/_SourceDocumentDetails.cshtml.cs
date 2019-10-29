@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,11 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
 
-        [BindProperty(SupportsGet = true)]
-        public int ProcessId { get; set; }
+        [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
         public SourceDocumentStatus SourceDocumentStatus { get; set; }
         public Uri SourceDocumentContentServiceUri { get; set; }
-        
+
 
         public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
             IOptions<UriConfig> uriConfig)
@@ -51,7 +51,8 @@ namespace Portal.Pages.DbAssessment
                 SourceDocumentStatus = _dbContext.SourceDocumentStatus.First(s => s.ProcessId == ProcessId);
 
                 if (SourceDocumentStatus.ContentServiceId != null)
-                    SourceDocumentContentServiceUri = _uriConfig.Value.BuildContentServiceUri(SourceDocumentStatus.ContentServiceId.Value);
+                    SourceDocumentContentServiceUri =
+                        _uriConfig.Value.BuildContentServiceUri(SourceDocumentStatus.ContentServiceId.Value);
 
             }
             catch (InvalidOperationException e)
@@ -60,6 +61,12 @@ namespace Portal.Pages.DbAssessment
                 e.Data.Add("OurMessage", "Unable to retrieve SourceDocumentStatus");
                 Console.WriteLine(e);
             }
+        }
+
+        public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
+        {
+            return StatusCode(200);
+            //TODO: Log!
         }
     }
 }

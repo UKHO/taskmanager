@@ -70,7 +70,9 @@
                             <td>
                                 @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
                                 {
+                                <button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
                                     <i class="fa fa-paperclip"></i>
+                                </button>
                                 }
                             </td>
                         </tr>
