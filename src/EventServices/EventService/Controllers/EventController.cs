@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -150,9 +151,9 @@ namespace EventService.Controllers
 
             try
             {
-                var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
-                var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
-                assembly = Assembly.Load(assemblyName);
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\","");
+                var assemblyPath = Path.Combine(path, "Common.Messages.dll");
+                assembly = Assembly.LoadFrom(assemblyPath);
             }
             catch (Exception e)
             {
