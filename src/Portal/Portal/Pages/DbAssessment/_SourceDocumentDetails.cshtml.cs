@@ -71,7 +71,7 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
         {
             // TODO: Update DB here
-            var docType = new InitiateSourceDocumentRetrievalEvent
+            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = SourceDocumentStatus.CorrelationId.HasValue
                     ? SourceDocumentStatus.CorrelationId.Value
@@ -82,8 +82,8 @@ namespace Portal.Pages.DbAssessment
                 DocumentType = SourceDocumentType.Linked
             };
 
-            // TODO: work out how to get the event body in ere
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent));
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),
+                docRetrievalEvent);
 
             return StatusCode(200);
             //TODO: Log!

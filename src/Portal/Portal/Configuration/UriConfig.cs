@@ -28,7 +28,7 @@ namespace Portal.Configuration
         {
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? EventServiceLocalhostBaseUri : EventServicesWebServiceBaseUri,
-                $@"{EventServiceWebServicePostEventUrl}?eventname={Uri.EscapeDataString(eventName)}");
+                $@"{EventServiceWebServicePostEventUrl}{Uri.EscapeDataString(eventName)}");
         }
 
         public Uri BuildContentServiceUri(Guid fileGuid)

@@ -140,7 +140,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostEvent([FromBody]Object body, [FromRoute][Required]string eventName)
+        public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
         {
             // Use reflection to discover events, retrieve the correct event by name and 
             // deserialize it via the provided JSON body.
@@ -157,6 +157,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
+                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt",Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
             }
 
@@ -168,6 +169,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
+                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
             }
 
@@ -178,6 +180,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
+                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
             }
 
@@ -189,6 +192,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
+                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
             }
 

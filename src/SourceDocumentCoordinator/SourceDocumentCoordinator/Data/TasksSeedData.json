@@ -1,5 +1,56 @@
 [
   {
+    "processId": 445,
+    "serialNumber": "445_14",
+    "parentProcessId": null,
+    "workflowType": "DbAssessment",
+    "activityName": "Review",
+    "startedAt": "2019-01-01T00:00:00",
+    "status": "Started",
+    "comment": [
+      {
+        "processId": 445,
+        "text": "A comment",
+        "username": "Ross",
+        "created": "2019-01-01T00:00:00"
+      },
+      {
+        "processId": 445,
+        "text": "A 2nd comment",
+        "username": "Ben",
+        "created": "2019-01-03T00:00:00"
+      }
+    ],
+    "assessmentData": {
+      "sdocId": 1936906,
+      "rsdraNumber": "RSDRA2017000302065",
+      "sourceDocumentName": "HUA HIN",
+      "receiptDate": "2001-06-12T00:00:00",
+      "toSdoDate": null,
+      "effectiveStartDate": "2001-06-12T00:00:00",
+      "teamDistributedTo": null,
+      "sourceDocumentType": "Chart - Navigational",
+      "sourceNature": "Graphical",
+      "datum": null,
+      "processId": 445
+
+    },
+    "dbAssessmentReviewData": {
+      "processId": 445,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "assessor": "BarzeyS",
+      "verifier": "StensonB"
+    },
+    "SourceDocumentStatus": {
+      "processId": 445,
+      "SdocId": 1936906,
+      "ContentServiceId": null,
+      "Status": "Started",
+      "StartedAt": "2019-06-12T00:00:00"
+    }
+  },
+  {
     "processId": 123,
     "serialNumber": "123_sn",
     "parentProcessId": null,
@@ -44,6 +95,8 @@
           "datum": "Non-WGS84",
           "linkType": "Forward",
           "linkedSdocId": 332373,
+          "ContentServiceId": null,
+          "Status": "Started",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -56,6 +109,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 1018253,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -71,7 +126,7 @@
       "processId": 123,
       "SdocId": 217547,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
-      "Status": "Started",
+      "Status": "Complete",
       "StartedAt": "2019-06-12T00:00:00"
     }
   },
@@ -120,6 +175,8 @@
           "datum": "WGS84",
           "linkType": "Forward",
           "linkedSdocId": 320532,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -132,6 +189,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 1101540,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -142,13 +201,6 @@
       "activityCode": "78798",
       "assessor": "BatesP",
       "verifier": "RigdenT"
-    },
-    "SourceDocumentStatus": {
-      "processId": 321,
-      "SdocId": 1101541,
-      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
-      "Status": "Ready",
-      "StartedAt": "2019-06-12T00:00:00"
     }
   },
   {
@@ -196,6 +248,8 @@
           "datum": null,
           "linkType": "Forward",
           "linkedSdocId": 606203,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
@@ -210,8 +264,8 @@
     "SourceDocumentStatus": {
       "processId": 125,
       "SdocId": 206733,
-      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
-      "Status": "Complete",
+      "ContentServiceId": null,
+      "Status": "Ready",
       "StartedAt": "2019-06-12T00:00:00"
     }
   },
@@ -260,6 +314,8 @@
           "datum": "WGS84",
           "linkType": "Forward",
           "linkedSdocId": 306707,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -272,6 +328,8 @@
           "datum": null,
           "linkType": "Backward",
           "linkedSdocId": 938037,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         },
         {
@@ -284,6 +342,8 @@
           "datum": null,
           "linkType": "SEP",
           "linkedSdocId": 83848,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
 
@@ -342,6 +402,8 @@
           "datum": null,
           "linkType": "Forward",
           "linkedSdocId": 934203,
+          "ContentServiceId": null,
+          "Status": "NotAttached",
           "created": "2019-10-15T00:00:00"
         }
       ]
