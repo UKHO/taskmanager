@@ -153,7 +153,7 @@ namespace EventService
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger-original.json", "SDRA API Original");
+                c.SwaggerEndpoint("/swagger-original.json", "Event Service API Original");
             });
 
             app.UseEndpoints(endpoints =>
