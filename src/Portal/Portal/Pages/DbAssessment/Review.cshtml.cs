@@ -51,54 +51,6 @@ namespace Portal.Pages.DbAssessment
             TaskInformationModel = SetTaskInformationData(processId);
         }
 
-        public IActionResult OnGetRetrieveSourceDocuments(int processId)
-        {
-            var model = new _SourceDocumentDetailsModel();
-            try
-            {
-                model.Assessment = DbContext
-                    .AssessmentData
-                    .Include(a => a.LinkedDocuments)
-                    .First(c => c.ProcessId == processId);
-            }
-            catch (InvalidOperationException e)
-            {
-                // Log and throw, as we're unable to get assessment data
-                e.Data.Add("OurMessage", "Unable to retrieve AssessmentData");
-                Console.WriteLine(e);
-                throw;
-            }
-
-            try
-            {
-                model.SourceDocumentStatus = DbContext.SourceDocumentStatus.First(s => s.ProcessId == processId);
-
-                if (model.SourceDocumentStatus.ContentServiceId != null)
-                    model.SourceDocumentContentServiceUri = _uriConfig.Value.BuildContentServiceUri(model.SourceDocumentStatus.ContentServiceId.Value);
-
-            }
-            catch (InvalidOperationException e)
-            {
-                // Log that we're unable to get a Source Doc Status row
-                e.Data.Add("OurMessage", "Unable to retrieve SourceDocumentStatus");
-                Console.WriteLine(e);
-            }
-
-            model.ProcessId = processId;
-
-            // Repopulate models...
-            OnGet(processId);
-
-            return new PartialViewResult
-            {
-                ViewName = "_SourceDocumentDetails",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                }
-            };
-        }
-
         public IActionResult OnGetRetrieveComments(int processId)
         {
             var model = new _CommentsModel()
