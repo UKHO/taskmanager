@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
+using Common.Messages.Events;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -100,8 +101,8 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-                t.Message is InitiateSourceDocumentRetrievalCommand);
-            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+                t.Message is InitiateSourceDocumentRetrievalEvent);
+            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalEvent)} seen.");
         }
 
         [Test]

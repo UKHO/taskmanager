@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
+using Common.Messages.Events;
 using DataServices.Models;
 using FakeItEasy;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -55,7 +56,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -78,7 +79,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -102,7 +103,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -130,7 +131,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -158,7 +159,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -298,12 +299,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 t.Message is GetDocumentRequestQueueStatusCommand);
             Assert.IsNull(timeoutCommand, $"Timeout '{nameof(GetDocumentRequestQueueStatusCommand)}' should only be fired on successful queuing");
 
-            // Ensure new InitiateSourceDocumentRetrievalCommand is sent
+            // Ensure new InitiateSourceDocumentRetrievalEvent is sent
             var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-                t.Message is InitiateSourceDocumentRetrievalCommand);
-            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+                t.Message is InitiateSourceDocumentRetrievalEvent);
+            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalEvent)} seen.");
 
-            Assert.IsFalse(((InitiateSourceDocumentRetrievalCommand)initiateSourceDocumentRetrievalCommand.Message).GeoReferenced);
+            Assert.IsFalse(((InitiateSourceDocumentRetrievalEvent)initiateSourceDocumentRetrievalCommand.Message).GeoReferenced);
         }
 
         [Test]

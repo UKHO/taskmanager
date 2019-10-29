@@ -13,6 +13,7 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Events;
 using DataServices.Models;
 using SourceDocumentCoordinator.Enums;
 using WorkflowDatabase.EF;
@@ -21,7 +22,7 @@ using WorkflowDatabase.EF.Models;
 namespace SourceDocumentCoordinator.Sagas
 {
     public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>,
-        IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>,
+        IAmStartedByMessages<InitiateSourceDocumentRetrievalEvent>,
         IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
         private readonly WorkflowDbContext _dbContext;
@@ -39,13 +40,13 @@ namespace SourceDocumentCoordinator.Sagas
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SourceDocumentRetrievalSagaData> mapper)
         {
-            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalCommand>(message => message.SourceDocumentId)
+            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.SourceDocumentId)
                 .ToSaga(sagaData => sagaData.SourceDocumentId);
         }
 
-        public async Task Handle(InitiateSourceDocumentRetrievalCommand message, IMessageHandlerContext context)
+        public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalCommand)}: {message.ToJSONSerializedString()}");
+            log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
 
             if (!Data.IsStarted)
             {
@@ -92,7 +93,7 @@ namespace SourceDocumentCoordinator.Sagas
             await ProcessDocumentRequestQueueErrorStatus(message, context, sourceDocument);
         }
 
-        private void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalCommand message)
+        private void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalEvent message)
         {
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
@@ -162,7 +163,7 @@ namespace SourceDocumentCoordinator.Sagas
 
                     MarkAsComplete();
 
-                    var msg = new InitiateSourceDocumentRetrievalCommand
+                    var msg = new InitiateSourceDocumentRetrievalEvent
                     {
                         CorrelationId = message.CorrelationId,
                         ProcessId = Data.ProcessId,
@@ -190,7 +191,7 @@ namespace SourceDocumentCoordinator.Sagas
             }
         }
 
-        private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalCommand message)
+        private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalEvent message)
         {
             var sourceDocumentStatus = new SourceDocumentStatus
             {

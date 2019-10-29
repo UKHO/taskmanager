@@ -6,6 +6,7 @@
     [ContentServiceId] UNIQUEIDENTIFIER NULL, 
     [Status] NVARCHAR(25) NOT NULL, 
     [StartedAt] DATETIME NOT NULL, 
+    [CorrelationId] UNIQUEIDENTIFIER NULL, 
     CONSTRAINT [FK_SourceDocumentStatus_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]), 
     CONSTRAINT [AK_SourceDocumentStatus_ProcessId] UNIQUE ([ProcessId])
 )

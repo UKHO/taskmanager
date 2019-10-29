@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
+using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -15,6 +18,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
+        private readonly IEventServiceApiClient _eventServiceApiClient;
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
@@ -23,10 +27,11 @@ namespace Portal.Pages.DbAssessment
 
 
         public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
-            IOptions<UriConfig> uriConfig)
+            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient)
         {
             _dbContext = DbContext;
             _uriConfig = uriConfig;
+            _eventServiceApiClient = eventServiceApiClient;
         }
 
         public void OnGet()
@@ -65,6 +70,21 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
         {
+            // TODO: Update DB here
+            var docType = new InitiateSourceDocumentRetrievalEvent
+            {
+                CorrelationId = SourceDocumentStatus.CorrelationId.HasValue
+                    ? SourceDocumentStatus.CorrelationId.Value
+                    : Guid.NewGuid(),
+                ProcessId = ProcessId,
+                SourceDocumentId = linkedSdocId,
+                GeoReferenced = false,
+                DocumentType = SourceDocumentType.Linked
+            };
+
+            // TODO: work out how to get the event body in ere
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent));
+
             return StatusCode(200);
             //TODO: Log!
         }

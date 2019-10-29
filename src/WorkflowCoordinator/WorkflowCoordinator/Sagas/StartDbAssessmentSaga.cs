@@ -15,6 +15,8 @@ using WorkflowDatabase.EF.Models;
 using Task = System.Threading.Tasks.Task;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -84,17 +86,18 @@ namespace WorkflowCoordinator.Sagas
                 WorkflowInstanceId = workflowInstanceId.Value
             });
 
-            log.Debug($"Sending {nameof(InitiateSourceDocumentRetrievalCommand)}");
+            log.Debug($"Sending {nameof(InitiateSourceDocumentRetrievalEvent)}");
 
-            var initiateRetrievalCommand = new InitiateSourceDocumentRetrievalCommand()
+            var initiateRetrievalEvent = new InitiateSourceDocumentRetrievalEvent()
             {
                 CorrelationId = Data.CorrelationId,
                 ProcessId = Data.ProcessId,
                 SourceDocumentId = Data.SourceDocumentId,
-                GeoReferenced = true
+                GeoReferenced = true,
+                DocumentType = SourceDocumentType.Primary
             };
 
-            await context.Send(initiateRetrievalCommand).ConfigureAwait(false);
+            await context.Publish(initiateRetrievalEvent).ConfigureAwait(false);
 
             ConstructAndSendLinkedDocumentRetrievalCommands(context);
 

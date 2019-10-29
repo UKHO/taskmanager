@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
+using Common.Messages.Events;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
@@ -105,7 +106,7 @@ namespace WorkflowCoordinator
                         });
 
                 transport.Routing().RouteToEndpoint(
-                    messageType: typeof(InitiateSourceDocumentRetrievalCommand),
+                    messageType: typeof(InitiateSourceDocumentRetrievalEvent),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
                 transport.Routing().RouteToEndpoint(

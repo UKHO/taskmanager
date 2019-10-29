@@ -112,4 +112,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[AK_SourceDocumentStatus_ProcessId]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="82a0eb32-3b9a-44ab-aeaa-c3fec346b9b4" ChangeDateTime="10/29/2019 13:59:19">
+    <Property Name="ElementName" Value="[dbo].[SourceDocumentStatus].[Correlationid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SourceDocumentStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CorrelationId" />
+  </Operation>
 </Operations>
