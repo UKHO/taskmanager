@@ -357,3 +357,4 @@ ASALocalRun/
 # ignoring maven files?
 *.lst
 /src/EventServices/EventServices.ApiTestsOld
+/src/EventServices/EventServices.ApiTests/src/.vscode/launch.json

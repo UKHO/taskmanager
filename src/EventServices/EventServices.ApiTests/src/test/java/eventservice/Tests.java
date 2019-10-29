@@ -15,7 +15,8 @@ public class Tests extends TestData {
                 .filter(EventServices_ValidationFilter)
 
         .when()
-                .get("eventservice/v1/workflow/event")
+                .get("EventService/v1/Workflow/Event")
+        
 
         .then()
                 .assertThat()
