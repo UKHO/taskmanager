@@ -39,9 +39,9 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var reviewModel = new ReviewModel(_dbContext, null, null, null, null);
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null);
             var ex = Assert.Throws<InvalidOperationException>(() =>
-                reviewModel.OnGetRetrieveSourceDocuments(ProcessId));
+                sourceDocumentDetailsModel.OnGet());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
         }
 
@@ -72,8 +72,8 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var reviewModel = new ReviewModel(_dbContext, null, null, null, null);
-            Assert.DoesNotThrow(() => reviewModel.OnGetRetrieveSourceDocuments(ProcessId));
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null) { ProcessId = ProcessId };
+            Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
     }
 }
