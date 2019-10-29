@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Portal.Configuration;
 
 namespace Portal.HttpClients
@@ -20,14 +20,14 @@ namespace Portal.HttpClients
             _uriConfig = uriConfig;
         }
 
-        public async Task PostEvent<T>(string eventName, T eventBody) where T : ICorrelate
+        public async Task PostEvent<T>(string eventName, T eventBody) where T : class, ICorrelate, new()
         {
             var data = "";
             var fullUri = _uriConfig.Value.BuildEventServicesUri(eventName);
 
-            var eh = JsonConvert.SerializeObject(eventBody);
+            var content = new StringContent(eventBody.ToJSONSerializedString(), Encoding.UTF8, "application/json");
 
-            using (var response = await _httpClient.PostAsync(fullUri.ToString(), null).ConfigureAwait(false))
+            using (var response = await _httpClient.PostAsync(fullUri.ToString(), content).ConfigureAwait(false))
             {
                 data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)

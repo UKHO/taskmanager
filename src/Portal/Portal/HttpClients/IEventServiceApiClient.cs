@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using Common.Messages;
 
 namespace Portal.HttpClients
 {
     public interface IEventServiceApiClient
     {
-        Task PostEvent(string eventName, JObject eventBody);
+        Task PostEvent<T>(string eventName, T eventBody) where T : class, ICorrelate, new();
     }
 }
