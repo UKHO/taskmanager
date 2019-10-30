@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
-using Portal.Configuration;
-using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -16,11 +10,7 @@ namespace Portal.UnitTests
     public class SourceDocumentDetailsTests
     {
         private WorkflowDbContext _dbContext;
-        private OptionsSnapshotWrapper<GeneralConfig> _generalConfigWrapper;
-        private OptionsSnapshotWrapper<UriConfig> _uriConfigWrapper;
         private int ProcessId { get; set; }
-
-        public IEventServiceApiClient _HttpClient { get; set; }
 
         [SetUp]
         public void Setup()
@@ -30,16 +20,6 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
-
-            var httpClient = new HttpClient();
-
-            var appConfigurationConfigRoot = AzureAppConfigConfigurationRoot.Instance;
-            var generalConfig = GetGeneralConfigs(appConfigurationConfigRoot);
-            var uriConfig = GetUriConfigs(appConfigurationConfigRoot);
-            var generalConfigOptions = new OptionsSnapshotWrapper<GeneralConfig>(generalConfig);
-            _uriConfigWrapper = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
-
-            _HttpClient = new EventServiceApiClient(httpClient, generalConfigOptions, _uriConfigWrapper);
 
             ProcessId = 123;
         }
@@ -95,43 +75,5 @@ namespace Portal.UnitTests
             var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null) { ProcessId = ProcessId };
             Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
-
-        [Test]
-        public async Task Test_InitiateSourceDocumentRetrievalEvent_publishes_when_OnPostAttachLinkedDocumentAsync_invoked()
-        {
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, _uriConfigWrapper, _HttpClient)
-            {
-                SourceDocumentStatus = new SourceDocumentStatus
-                {
-                    ProcessId = ProcessId,
-                    SdocId = 12345,
-                    CorrelationId = null,
-                    Status = "Ready",
-                    ContentServiceId = null,
-                    StartedAt = DateTime.Now
-                }
-            };
-
-            await sourceDocumentDetailsModel.OnPostAttachLinkedDocumentAsync(1235);
-        }
-
-        private GeneralConfig GetGeneralConfigs(IConfigurationRoot appConfigurationConfigRoot)
-        {
-            var generalConfig = new GeneralConfig();
-
-            appConfigurationConfigRoot.GetSection("apis").Bind(generalConfig);
-
-            return generalConfig;
-        }
-
-        private UriConfig GetUriConfigs(IConfigurationRoot appConfigurationConfigRoot)
-        {
-            var uriConfig = new UriConfig();
-
-            appConfigurationConfigRoot.GetSection("urls").Bind(uriConfig);
-
-            return uriConfig;
-        }
-
     }
 }
