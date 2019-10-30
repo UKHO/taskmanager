@@ -7,6 +7,7 @@ namespace SourceDocumentCoordinator.Messages
     public class ClearDocumentRequestFromQueueCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
+        public int ProcessId { get; set; }  
         public int SourceDocumentId { get; set; }
         public SourceDocumentType DocumentType { get; set; }
     }

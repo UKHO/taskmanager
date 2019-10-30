@@ -44,7 +44,12 @@ namespace SourceDocumentCoordinator.Handlers
                 {
                     case (int)ClearFromQueueReturnCodeEnum.Success:
                     case (int)ClearFromQueueReturnCodeEnum.Warning:
-                        SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, 0, message.SourceDocumentId, SourceDocumentRetrievalStatus.Complete, message.DocumentType);
+                        await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                                                    _documentStatusFactory, 
+                                                    message.ProcessId, 
+                                                    message.SourceDocumentId, 
+                                                    SourceDocumentRetrievalStatus.Complete, 
+                                                    message.DocumentType);
                         break;
                     default:
                         throw new NotImplementedException();

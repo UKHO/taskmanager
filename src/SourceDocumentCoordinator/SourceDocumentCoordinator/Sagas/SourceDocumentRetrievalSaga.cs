@@ -137,6 +137,7 @@ namespace SourceDocumentCoordinator.Sagas
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
                         CorrelationId = message.CorrelationId,
+                        ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId
                     };
                     await context.SendLocal(removeFromQueue).ConfigureAwait(false);
