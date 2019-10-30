@@ -88,6 +88,9 @@ namespace Portal
             services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+            services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
