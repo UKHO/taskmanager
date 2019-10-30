@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -99,6 +101,8 @@ namespace Portal
                     Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
                 });
 
+
+            services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

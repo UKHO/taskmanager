@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +21,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly IDocumentStatusFactory _documentStatusFactory;
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
@@ -27,11 +30,12 @@ namespace Portal.Pages.DbAssessment
 
 
         public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
-            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient)
+            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDocumentStatusFactory documentStatusFactory)
         {
             _dbContext = DbContext;
             _uriConfig = uriConfig;
             _eventServiceApiClient = eventServiceApiClient;
+            _documentStatusFactory = documentStatusFactory;
         }
 
         public void OnGet()
@@ -71,6 +75,13 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
         {
             // TODO: Update DB here
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                                                                    _documentStatusFactory, 
+                                                                    ProcessId, 
+                                                                    linkedSdocId, 
+                                                                    SourceDocumentRetrievalStatus.Started, 
+                                                                    SourceDocumentType.Linked);
+
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = PrimaryDocumentStatus.CorrelationId.HasValue
@@ -86,7 +97,7 @@ namespace Portal.Pages.DbAssessment
                 docRetrievalEvent);
 
             return StatusCode(200);
-            //TODO: Log!
+            ////TODO: Log!
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var processId = { "processId": $("#hdnProcessId").val() };
+    var processId = Number($("#hdnProcessId").val());
 
     getSourceDocuments();
 
@@ -12,7 +12,7 @@
                 xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             contentType: "application/json; charset=utf-8",
-            data: processId,
+            data: { "processId": processId },
             success: function (result) {
                 $("#sourceDocuments").html(result);
                 applyCollapseIconHandler();
@@ -27,7 +27,7 @@
 
     function applyAttachLinkedDocumentHandlers() {
         $(".attachLinkedDocument").on("click", function (e) {
-            var linkedSdocId = $(this).data("linkedsdocid");
+            var linkedSdocId = Number($(this).data("linkedsdocid"));
 
             $.ajax({
                 type: "POST",
@@ -36,11 +36,11 @@
                     xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
                 data: {
-                    linkedSdocId: linkedSdocId
+                    "linkedSdocId": linkedSdocId,
+                    "processId": processId
                 },
                 success: function (result) {
-                    alert("success");
-                    //$("#assignTasks").append(result);
+                    getSourceDocuments();
                 },
                 error: function (error) {
                     alert("error");

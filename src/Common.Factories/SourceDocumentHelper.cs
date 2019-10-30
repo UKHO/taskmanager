@@ -11,8 +11,6 @@ namespace Common.Factories
             int processId, int sourceDocumentId,
             SourceDocumentRetrievalStatus status, SourceDocumentType docType)
         {
-            if (docType != SourceDocumentType.Primary) return sourceDocumentId;
-
             var documentStatusProcessor = documentStatusFactory.GetDocumentStatusProcessor(docType);
             return await documentStatusProcessor.Update(processId, sourceDocumentId, status);
         }
