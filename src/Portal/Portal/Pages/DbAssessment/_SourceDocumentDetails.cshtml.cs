@@ -22,7 +22,7 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
-        public SourceDocumentStatus SourceDocumentStatus { get; set; }
+        public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public Uri SourceDocumentContentServiceUri { get; set; }
 
 
@@ -53,17 +53,17 @@ namespace Portal.Pages.DbAssessment
 
             try
             {
-                SourceDocumentStatus = _dbContext.SourceDocumentStatus.First(s => s.ProcessId == ProcessId);
+                PrimaryDocumentStatus = _dbContext.PrimaryDocumentStatus.First(s => s.ProcessId == ProcessId);
 
-                if (SourceDocumentStatus.ContentServiceId != null)
+                if (PrimaryDocumentStatus.ContentServiceId != null)
                     SourceDocumentContentServiceUri =
-                        _uriConfig.Value.BuildContentServiceUri(SourceDocumentStatus.ContentServiceId.Value);
+                        _uriConfig.Value.BuildContentServiceUri(PrimaryDocumentStatus.ContentServiceId.Value);
 
             }
             catch (InvalidOperationException e)
             {
                 // Log that we're unable to get a Source Doc Status row
-                e.Data.Add("OurMessage", "Unable to retrieve SourceDocumentStatus");
+                e.Data.Add("OurMessage", "Unable to retrieve PrimaryDocumentStatus");
                 Console.WriteLine(e);
             }
         }
@@ -73,8 +73,8 @@ namespace Portal.Pages.DbAssessment
             // TODO: Update DB here
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
-                CorrelationId = SourceDocumentStatus.CorrelationId.HasValue
-                    ? SourceDocumentStatus.CorrelationId.Value
+                CorrelationId = PrimaryDocumentStatus.CorrelationId.HasValue
+                    ? PrimaryDocumentStatus.CorrelationId.Value
                     : Guid.NewGuid(),
                 ProcessId = ProcessId,
                 SourceDocumentId = linkedSdocId,

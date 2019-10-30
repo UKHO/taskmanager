@@ -52,7 +52,7 @@ namespace SourceDocumentCoordinator.Handlers
 
         private async void UpdateSourceDocumentStatus(int sdocId, SourceDocumentRetrievalStatus status)
         {
-            var row = await _dbContext.SourceDocumentStatus.FirstAsync(s => s.SdocId == sdocId);
+            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(s => s.SdocId == sdocId);
             row.Status = status.ToString();
             await _dbContext.SaveChangesAsync();
         }

@@ -100,7 +100,7 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_sourcedocumentstatus_table_prevents_duplicate_processId_due_to_FK()
+        public void Ensure_primarydocumentstatus_table_prevents_duplicate_processId_due_to_FK()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
@@ -111,7 +111,7 @@ namespace WorkflowDatabase.Tests
                 ActivityName = "Review"
             });
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = 12345,
@@ -120,7 +120,7 @@ namespace WorkflowDatabase.Tests
                 Status = "Started"
             });
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = 12346,
@@ -134,7 +134,7 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_sourcedocumentstatus_table_prevents_duplicate_processid_due_to_UQ()
+        public void Ensure_primarydocumentstatus_table_prevents_duplicate_processid_due_to_UQ()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
@@ -148,7 +148,7 @@ namespace WorkflowDatabase.Tests
             });
             _dbContext.SaveChanges();
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = 12345,
@@ -160,7 +160,7 @@ namespace WorkflowDatabase.Tests
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+                newContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
                 {
                     ProcessId = 1,
                     SdocId = 12345,

@@ -46,7 +46,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public void Test_no_exception_thrown_when_no_sourcedocumentstatus_row_exists()
+        public void Test_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {

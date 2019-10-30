@@ -13,6 +13,7 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
 using SourceDocumentCoordinator.Enums;
@@ -54,7 +55,7 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.CorrelationId = message.CorrelationId;
                 Data.ProcessId = message.ProcessId;
                 Data.SourceDocumentId = message.SourceDocumentId;
-                Data.SourceDocumentStatusId = 0;
+                Data.DocumentStatusId = 0;
             }
 
             // Call GetDocumentForViewing method on DataServices API
@@ -65,7 +66,7 @@ namespace SourceDocumentCoordinator.Sagas
 
             ProcessGetDocumentForViewingErrorCodes(returnCode, message);
 
-            if (Data.SourceDocumentStatusId > 0)
+            if (Data.DocumentStatusId > 0)
             {
                 var requestStatus = new GetDocumentRequestQueueStatusCommand
                 {
@@ -98,12 +99,12 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    Data.DocumentStatusId = AddSourceDocumentStatus(message);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
-                    if (Data.SourceDocumentStatusId < 1)
+                    if (Data.DocumentStatusId < 1)
                     {
-                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                        Data.DocumentStatusId = AddSourceDocumentStatus(message);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -193,7 +194,9 @@ namespace SourceDocumentCoordinator.Sagas
 
         private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalEvent message)
         {
-            var sourceDocumentStatus = new SourceDocumentStatus
+            if (message.DocumentType != SourceDocumentType.Primary) return message.SourceDocumentId;
+
+            var primaryDocumentStatus = new PrimaryDocumentStatus
             {
                 ProcessId = message.ProcessId,
                 SdocId = message.SourceDocumentId,
@@ -201,20 +204,21 @@ namespace SourceDocumentCoordinator.Sagas
                 StartedAt = DateTime.Now
             };
 
-            _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
+            _dbContext.PrimaryDocumentStatus.Add(primaryDocumentStatus);
 
             _dbContext.SaveChanges();
 
-            return sourceDocumentStatus.SourceDocumentStatusId;
+            return primaryDocumentStatus.PrimaryDocumentStatusId;
+
         }
 
         private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
         {
-            var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
-            if (sourceDocumentStatus != null)
+            var primaryDocumentStatus =
+                _dbContext.PrimaryDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
+            if (primaryDocumentStatus != null)
             {
-                sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
+                primaryDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
                 _dbContext.SaveChanges();
             }
         }

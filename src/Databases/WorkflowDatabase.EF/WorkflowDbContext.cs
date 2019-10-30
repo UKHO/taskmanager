@@ -24,7 +24,7 @@ namespace WorkflowDatabase.EF
         public DbSet<Comments> Comment { get; set; }
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
-        public DbSet<SourceDocumentStatus> SourceDocumentStatus { get; set; }
+        public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<LinkedDocument> LinkedDocument { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,10 +35,10 @@ namespace WorkflowDatabase.EF
                 .HasMany(x => x.Comment);
 
             modelBuilder.Entity<WorkflowInstance>()
-                .HasOne(x => x.SourceDocumentStatus)
+                .HasOne(x => x.PrimaryDocumentStatus)
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
-                .HasForeignKey<SourceDocumentStatus>(p => p.ProcessId);
+                .HasForeignKey<PrimaryDocumentStatus>(p => p.ProcessId);
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.DbAssessmentReviewData);
@@ -51,7 +51,7 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
 
-            modelBuilder.Entity<SourceDocumentStatus>().HasKey(x => x.SourceDocumentStatusId);
+            modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
             modelBuilder.Entity<AssessmentData>()

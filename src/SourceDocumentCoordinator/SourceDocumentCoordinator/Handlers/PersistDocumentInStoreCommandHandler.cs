@@ -37,7 +37,7 @@ namespace SourceDocumentCoordinator.Handlers
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
 
-            var row = await _dbContext.SourceDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
+            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
             row.ContentServiceId = newGuid;
 
             await _dbContext.SaveChangesAsync();

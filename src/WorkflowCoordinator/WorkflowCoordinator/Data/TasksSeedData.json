@@ -67,7 +67,7 @@
       "assessor": "BarzeyS",
       "verifier": "StensonB"
     },
-    "SourceDocumentStatus": {
+    "PrimaryDocumentStatus": {
       "processId": 123,
       "SdocId": 217547,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
@@ -143,7 +143,7 @@
       "assessor": "BatesP",
       "verifier": "RigdenT"
     },
-    "SourceDocumentStatus": {
+    "PrimaryDocumentStatus": {
       "processId": 321,
       "SdocId": 1101541,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
@@ -207,7 +207,7 @@
       "assessor": "BarzeyS",
       "verifier": "StensonB"
     },
-    "SourceDocumentStatus": {
+    "PrimaryDocumentStatus": {
       "processId": 125,
       "SdocId": 206733,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",

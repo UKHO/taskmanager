@@ -94,7 +94,7 @@ namespace SourceDocumentCoordinator.UnitTests
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
             Assert.AreEqual(sdocId, _sourceDocumentRetrievalSaga.Data.SourceDocumentId);
-            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), true);
+            Assert.AreEqual(_dbContext.PrimaryDocumentStatus.Any(), true);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace SourceDocumentCoordinator.UnitTests
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData
             {
                 CorrelationId = correlationId,
-                SourceDocumentStatusId = 1,
+                DocumentStatusId = 1,
                 IsStarted = true
             };
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
@@ -122,7 +122,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
-            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), false);
+            Assert.AreEqual(_dbContext.PrimaryDocumentStatus.Any(), false);
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = sdocId,
@@ -223,11 +223,11 @@ namespace SourceDocumentCoordinator.UnitTests
             await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
 
             //Then
-            var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == sdocId);
+            var primaryDocumentStatus =
+                _dbContext.PrimaryDocumentStatus.FirstOrDefault(s => s.SdocId == sdocId);
 
-            Assert.IsNotNull(sourceDocumentStatus, $"'{nameof(sourceDocumentStatus)}' should exists in SourceDocumentStatus table");
-            Assert.IsTrue(sourceDocumentStatus.Status.Equals(SourceDocumentRetrievalStatus.Ready.ToString(), StringComparison.OrdinalIgnoreCase));
+            Assert.IsNotNull(primaryDocumentStatus, $"'{nameof(primaryDocumentStatus)}' should exists in PrimaryDocumentStatus table");
+            Assert.IsTrue(primaryDocumentStatus.Status.Equals(SourceDocumentRetrievalStatus.Ready.ToString(), StringComparison.OrdinalIgnoreCase));
 
             Assert.IsTrue(_handlerContext.TimeoutMessages.Length == 0);
         }
@@ -343,7 +343,7 @@ namespace SourceDocumentCoordinator.UnitTests
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = sdocId,
