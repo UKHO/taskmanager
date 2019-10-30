@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using SourceDocumentCoordinator.Messages;
 using System.IO;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SourceDocumentCoordinator.Config;

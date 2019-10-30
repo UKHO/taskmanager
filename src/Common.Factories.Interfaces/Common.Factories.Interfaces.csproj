@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.Messages\Common.Messages.csproj" />
+    <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
+  </ItemGroup>
+
+</Project>

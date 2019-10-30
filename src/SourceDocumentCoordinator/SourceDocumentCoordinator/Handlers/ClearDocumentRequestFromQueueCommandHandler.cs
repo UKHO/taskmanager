@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -9,7 +8,6 @@ using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Handlers
 {
