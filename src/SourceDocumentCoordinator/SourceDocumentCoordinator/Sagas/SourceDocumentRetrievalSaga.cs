@@ -56,6 +56,7 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.ProcessId = message.ProcessId;
                 Data.SourceDocumentId = message.SourceDocumentId;
                 Data.DocumentStatusId = 0;
+                Data.DocumentType = message.DocumentType;
             }
 
             // Call GetDocumentForViewing method on DataServices API
@@ -71,7 +72,8 @@ namespace SourceDocumentCoordinator.Sagas
                 var requestStatus = new GetDocumentRequestQueueStatusCommand
                 {
                     SourceDocumentId = message.SourceDocumentId,
-                    CorrelationId = message.CorrelationId
+                    CorrelationId = message.CorrelationId,
+                    DocumentType = message.DocumentType
                 };
 
                 await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
@@ -99,12 +101,14 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.DocumentStatusId = await UpdateSourceDocumentStatus(message);
+                    Data.DocumentStatusId = await UpdateSourceDocumentStatus(message.ProcessId,
+                        message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
                     if (Data.DocumentStatusId < 1)
                     {
-                        Data.DocumentStatusId = await UpdateSourceDocumentStatus(message);
+                        Data.DocumentStatusId = await UpdateSourceDocumentStatus(message.ProcessId,
+                            message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -129,7 +133,8 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
-                    UpdateSourceDocumentStatus(Data.ProcessId, Data.SourceDocumentId, Data);
+                    UpdateSourceDocumentStatus(Data.ProcessId,
+                        Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.DocumentType);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {

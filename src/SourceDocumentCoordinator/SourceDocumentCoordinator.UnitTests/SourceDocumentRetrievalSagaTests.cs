@@ -2,7 +2,7 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
+using Common.Factories.Interfaces;
 using Common.Messages.Events;
 using DataServices.Models;
 using FakeItEasy;
@@ -28,6 +28,7 @@ namespace SourceDocumentCoordinator.UnitTests
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private WorkflowDbContext _dbContext;
         private SourceDocumentRetrievalSaga _sourceDocumentRetrievalSaga;
+        private IDocumentStatusFactory _fakeDocumentStatusFactory;
 
 
         [SetUp]
@@ -44,9 +45,12 @@ namespace SourceDocumentCoordinator.UnitTests
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
+            _fakeDocumentStatusFactory = A.Fake<IDocumentStatusFactory>();
+
             _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
                 _fakeDataServiceApiClient,
-                generalConfig);
+                generalConfig,
+                _fakeDocumentStatusFactory);
 
         }
 
