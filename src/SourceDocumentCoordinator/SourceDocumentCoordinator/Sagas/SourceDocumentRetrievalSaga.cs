@@ -11,6 +11,7 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using Common.Messages.Events;
@@ -101,14 +102,12 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.DocumentStatusId = await UpdateSourceDocumentStatus(message.ProcessId,
-                        message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
+                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
                     if (Data.DocumentStatusId < 1)
                     {
-                        Data.DocumentStatusId = await UpdateSourceDocumentStatus(message.ProcessId,
-                            message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
+                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -133,8 +132,7 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
-                    UpdateSourceDocumentStatus(Data.ProcessId,
-                        Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.DocumentType);
+                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.DocumentType);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
@@ -195,15 +193,6 @@ namespace SourceDocumentCoordinator.Sagas
                     throw new NotImplementedException($"sourceDocument.Code: {Environment.NewLine}{sourceDocument.Message}{Environment.NewLine}" +
                                                       $"{sourceDocument.Code}");
             }
-        }
-
-        private async Task<int> UpdateSourceDocumentStatus(int processId, int sourceDocumentId,
-            SourceDocumentRetrievalStatus status, SourceDocumentType docType)
-        {
-            if (docType != SourceDocumentType.Primary) return sourceDocumentId;
-
-            var documentStatusProcessor = _documentStatusFactory.GetDocumentStatusProcessor(docType);
-            return await documentStatusProcessor.Update(processId, sourceDocumentId, status);
         }
 
         //private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
