@@ -14,7 +14,7 @@ namespace Portal.Configuration
         public Uri K2WebServiceTerminateWorkflowInstanceUri { get; set; }
         public Uri K2WebServiceGetWorkflowsUri { get; set; }
         public Uri EventServiceLocalhostBaseUri { get; set; }
-        public Uri EventServicesWebServiceBaseUri { get; set; }
+        public Uri EventServiceWebServiceBaseUri { get; set; }
         public Uri EventServiceWebServicePostEventUrl { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
@@ -24,10 +24,10 @@ namespace Portal.Configuration
                 $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}?comment={Uri.EscapeDataString(comment)}");
         }
 
-        public Uri BuildEventServicesUri(string eventName)
+        public Uri BuildEventServiceUri(string eventName)
         {
             return new Uri(
-                ConfigHelpers.IsLocalDevelopment ? EventServiceLocalhostBaseUri : EventServicesWebServiceBaseUri,
+                ConfigHelpers.IsLocalDevelopment ? EventServiceLocalhostBaseUri : EventServiceWebServiceBaseUri,
                 $@"{EventServiceWebServicePostEventUrl}{Uri.EscapeDataString(eventName)}");
         }
 

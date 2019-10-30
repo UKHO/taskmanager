@@ -23,7 +23,7 @@ namespace Portal.HttpClients
         public async Task PostEvent<T>(string eventName, T eventBody) where T : class, ICorrelate, new()
         {
             var data = "";
-            var fullUri = _uriConfig.Value.BuildEventServicesUri(eventName);
+            var fullUri = _uriConfig.Value.BuildEventServiceUri(eventName);
 
             var content = new StringContent(eventBody.ToJSONSerializedString(), Encoding.UTF8, "application/json");
 
