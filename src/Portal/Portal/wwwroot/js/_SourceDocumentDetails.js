@@ -17,6 +17,7 @@
                 $("#sourceDocuments").html(result);
                 applyCollapseIconHandler();
                 applyAttachLinkedDocumentHandlers();
+                $(".spinner-border").hide();
             },
             error: function (error) {
                 $("#sourceDocumentsError")
@@ -27,27 +28,30 @@
 
     function applyAttachLinkedDocumentHandlers() {
         $(".attachLinkedDocument").on("click", function (e) {
+            $(this).siblings(".spinner-border").show();
+            $(this).hide();
+
             var linkedSdocId = Number($(this).data("linkedsdocid"));
 
-            $.ajax({
-                type: "POST",
-                url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                data: {
-                    "linkedSdocId": linkedSdocId,
-                    "processId": processId
-                },
-                success: function (result) {
-                    getSourceDocuments();
-                },
-                error: function (error) {
-                    alert("error");
-                    //$("#assignTasksError")
-                    //    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
-                }
-            });
+            //$.ajax({
+            //    type: "POST",
+            //    url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
+            //    beforeSend: function (xhr) {
+            //        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            //    },
+            //    data: {
+            //        "linkedSdocId": linkedSdocId,
+            //        "processId": processId
+            //    },
+            //    success: function (result) {
+            //        getSourceDocuments();
+            //    },
+            //    error: function (error) {
+            //        alert("error");
+            //        //$("#assignTasksError")
+            //        //    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+            //    }
+            //});
         });
     }
 

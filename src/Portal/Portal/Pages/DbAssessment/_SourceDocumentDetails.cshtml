@@ -6,6 +6,7 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{ Layout = null; }
+<style type="text/css">.attachLinkedDocumentWait { }</style>
 <div class="card mb-4">
     <h6>Source Document Details</h6>
     <div class="card-body">
@@ -54,7 +55,7 @@
                         <td>@Model.Assessment.SourceDocumentType</td>
                         <td>@Model.Assessment.Datum</td>
                         <td>@Model.Assessment.SourceNature</td>
-                        <td>@*<i class="fa fa-times-circle" style="color: red"></i>*@</td>
+                        <td></td>
                     </tr>
 
                     foreach (var linkedDocument in Model.Assessment.LinkedDocuments)
@@ -74,6 +75,10 @@
                                     <button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
                                         <i class="fa fa-paperclip"></i>
                                     </button>
+                                    
+                                    <div class="spinner-border text-light" >
+                                        <i class="fa fa-paperclip" style="color: indigo"></i>
+                                    </div>
                                 }
                             </td>
                         </tr>
