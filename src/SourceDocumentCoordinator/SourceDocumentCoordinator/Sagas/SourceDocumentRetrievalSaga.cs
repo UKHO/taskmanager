@@ -66,7 +66,7 @@ namespace SourceDocumentCoordinator.Sagas
                 _generalConfig.Value.SourceDocumentWriteableFolderName,
                 message.GeoReferenced);
 
-            ProcessGetDocumentForViewingErrorCodes(returnCode, message);
+            await ProcessGetDocumentForViewingErrorCodes(returnCode, message);
 
             if (Data.DocumentStatusId > 0)
             {
@@ -97,7 +97,7 @@ namespace SourceDocumentCoordinator.Sagas
             await ProcessDocumentRequestQueueErrorStatus(message, context, sourceDocument);
         }
 
-        private async void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalEvent message)
+        private async Task ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalEvent message)
         {
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
