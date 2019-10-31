@@ -72,13 +72,24 @@
                             <td>
                                 @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
                                 {
-                                    <button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
+                                    <div class="attachLinkedDocumentButtonContainer">
+                                        <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId">
+                                            <i class="fa fa-paperclip" style="color: #09315B; font-size: 24px;"></i>
+                                        </a>
+                                    </div>
+                                    <div class="attachLinkedDocumentSpinnerContainer">
+                                        <div class="spinner-border" style="color: #09315B; width: 2.75em; height: 2.75em;">
+                                        
+                                        </div>
+                                        <i class="fa fa-paperclip" style="color: #09315B; font-size: 24px; position: relative; bottom: 34px; left: 11px;"></i>
+                                    </div>
+                                    @*<button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
                                         <i class="fa fa-paperclip"></i>
                                     </button>
-                                    
-                                    <div class="spinner-border text-light" >
+
+                                    <div class="spinner-border text-light">
                                         <i class="fa fa-paperclip" style="color: indigo"></i>
-                                    </div>
+                                    </div>*@
                                 }
                             </td>
                         </tr>
