@@ -61,6 +61,7 @@ namespace WorkflowDatabase.EF
                 .HasForeignKey(p => p.SdocId);
 
             modelBuilder.Entity<LinkedDocument>().HasKey(x => x.LinkedDocumentId);
+            modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
@@ -25,8 +26,9 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
+        public IEnumerable<LinkedDocument> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
-        public Uri SourceDocumentContentServiceUri { get; set; }
+        public Uri PrimaryDocumentContentServiceUri { get; set; }
 
 
         public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
@@ -39,6 +41,13 @@ namespace Portal.Pages.DbAssessment
         }
 
         public void OnGet()
+        {
+            GetPrimaryDocumentData();
+            GetPrimaryDocumentStatus();
+            GetAttachedLinkedDocuments();
+        }
+
+        private void GetPrimaryDocumentData()
         {
             try
             {
@@ -54,15 +63,17 @@ namespace Portal.Pages.DbAssessment
                 Console.WriteLine(e);
                 throw;
             }
+        }
 
+        private void GetPrimaryDocumentStatus()
+        {
             try
             {
                 PrimaryDocumentStatus = _dbContext.PrimaryDocumentStatus.First(s => s.ProcessId == ProcessId);
 
-                if (PrimaryDocumentStatus.ContentServiceId != null)
-                    SourceDocumentContentServiceUri =
+                if (PrimaryDocumentStatus.ContentServiceId.HasValue)
+                    PrimaryDocumentContentServiceUri =
                         _uriConfig.Value.BuildContentServiceUri(PrimaryDocumentStatus.ContentServiceId.Value);
-
             }
             catch (InvalidOperationException e)
             {
@@ -72,14 +83,31 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
+        private void GetAttachedLinkedDocuments()
+        {
+            if (Assessment.LinkedDocuments != null && Assessment.LinkedDocuments.Count > 0)
+            {
+                AttachedLinkedDocuments = Assessment.LinkedDocuments.Where(l =>
+                    !l.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(),
+                        StringComparison.OrdinalIgnoreCase));
+
+                foreach (var attachedLinkedDocument in AttachedLinkedDocuments)
+                {
+                    if (attachedLinkedDocument.ContentServiceId.HasValue)
+                        attachedLinkedDocument.ContentServiceUri =
+                            _uriConfig.Value.BuildContentServiceUri(attachedLinkedDocument.ContentServiceId.Value);
+                }
+            }
+        }
+
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
         {
-            // TODO: Update DB here
+            // Update DB first, as it is the one used for populating Attached secondary sources
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                                                                    _documentStatusFactory, 
-                                                                    ProcessId, 
-                                                                    linkedSdocId, 
-                                                                    SourceDocumentRetrievalStatus.Started, 
+                                                                    _documentStatusFactory,
+                                                                    ProcessId,
+                                                                    linkedSdocId,
+                                                                    SourceDocumentRetrievalStatus.Started,
                                                                     SourceDocumentType.Linked);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent

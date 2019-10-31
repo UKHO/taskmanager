@@ -22,5 +22,6 @@ namespace WorkflowDatabase.EF.Models
         public DateTime Created { get; set; }
 
         public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+        public Uri ContentServiceUri { get; set; }
     }
 }

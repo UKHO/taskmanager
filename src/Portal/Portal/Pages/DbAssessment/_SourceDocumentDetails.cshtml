@@ -25,7 +25,7 @@
             </thead>
             <tbody>
                 @{
-                    var childRowsMarker = $"childRows1";
+                    var childRowsMarker = "childRows1";
 
                     <tr data-toggle="collapse" data-target=".@(childRowsMarker)">
                         <td>
@@ -40,7 +40,7 @@
                             @{
                                 if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.Complete.ToString())
                                 {
-                                    <a href="@Model.SourceDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
+                                    <a href="@Model.PrimaryDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
                                 }
                                 else
                                 {
@@ -56,12 +56,13 @@
                         <td>@Model.Assessment.SourceNature</td>
                         <td>@*<i class="fa fa-times-circle" style="color: red"></i>*@</td>
                     </tr>
+
                     foreach (var linkedDocument in Model.Assessment.LinkedDocuments)
                     {
                         <tr class="collapse @(childRowsMarker)">
                             <td></td>
                             <td></td>
-                            <td id="rows">@linkedDocument.SdocId</td>
+                            <td id="rows">@linkedDocument.LinkedSdocId</td>
                             <td>@linkedDocument.SourceDocumentName</td>
                             <td>@linkedDocument.ReceiptDate</td>
                             <td>@linkedDocument.SourceDocumentType</td>
@@ -70,17 +71,42 @@
                             <td>
                                 @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
                                 {
-                                <button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
-                                    <i class="fa fa-paperclip"></i>
-                                </button>
+                                    <button class="attachLinkedDocument" type="button" data-linkedSdocId="@linkedDocument.LinkedSdocId">
+                                        <i class="fa fa-paperclip"></i>
+                                    </button>
                                 }
                             </td>
                         </tr>
                     }
-                    @* TODO: Here were are going to render the attached linked documents *@
-                    @* TODO: child row will start at 2 *@
 
+                    foreach (var attachedLinkedDocument in Model.AttachedLinkedDocuments)
+                    {
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                @{
+                                    if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
+                                    }
+                                    else
+                                    {
+                                        @attachedLinkedDocument.ParsedRsdraNumber
+                                    }
+                                }
+                            </td>
+                            <td id="rows">@attachedLinkedDocument.LinkedSdocId</td>
+                            <td>@attachedLinkedDocument.SourceDocumentName</td>
+                            <td>@attachedLinkedDocument.ReceiptDate</td>
+                            <td>@attachedLinkedDocument.SourceDocumentType</td>
+                            <td>@attachedLinkedDocument.Datum</td>
+                            <td>@attachedLinkedDocument.SourceNature</td>
+                            <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                        </tr>
+                    }
                 }
+
             </tbody>
         </table>
         <button id="btnAddSource" class="btn btn-primary"><span style="padding-right: 5px;"></span>Add Source</button>
