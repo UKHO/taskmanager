@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
-using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
@@ -84,29 +83,6 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_InitiateSourceDocumentRetrievalEvent_Handler_Uses_PrimaryDocumentStatusProcessor_to_set_status()
-        {
-            // Given
-            var sdocId = 1111;
-            var correlationId = Guid.NewGuid();
-
-            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
-            {
-                CorrelationId = correlationId,
-                SourceDocumentId = sdocId,
-                ProcessId = 1
-            };
-            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
-            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
-
-            //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
-
-            A.CallTo(() => _documentStatusFactory.GetDocumentStatusProcessor(SourceDocumentType.Primary))
-                .Returns(new PrimaryDocumentStatusProcessor(_dbContext));
-        }
-
-        [Test]
         public async Task Test_InitiateSourceDocumentRetrievalEvent_Handler_Uses_PrimaryDocumentStatusProcessor_to_create_a_PrimaryDocumentStatus_row()
         {
             // Given
@@ -171,12 +147,6 @@ namespace SourceDocumentCoordinator.UnitTests
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
-            var fakeDocumentStatusProcessor = A.Fake<IDocumentStatusProcessor>();
-            A.CallTo(() => _documentStatusFactory.GetDocumentStatusProcessor(SourceDocumentType.Primary))
-                .Returns(fakeDocumentStatusProcessor);
-            A.CallTo(() => fakeDocumentStatusProcessor.Update(
-                    A<int>.Ignored, A<int>.Ignored, A<SourceDocumentRetrievalStatus>.Ignored))
-                .Returns(sourceDocumentId);
 
             //When
             await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
@@ -228,11 +198,12 @@ namespace SourceDocumentCoordinator.UnitTests
         {
             // Given
             var sdocId = 1111;
+            var processId = 1;
             var correlationId = Guid.NewGuid();
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
-                ProcessId = 1,
+                ProcessId = processId,
                 SdocId = sdocId,
                 StartedAt = DateTime.Now,
                 Status = SourceDocumentRetrievalStatus.Started.ToString()
@@ -245,7 +216,11 @@ namespace SourceDocumentCoordinator.UnitTests
                 SourceDocumentId = sdocId
             };
 
-            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData()
+            {
+                ProcessId = processId,
+                SourceDocumentId = sdocId
+            };
 
             //_sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored)).Returns(new QueuedDocumentObjects()
