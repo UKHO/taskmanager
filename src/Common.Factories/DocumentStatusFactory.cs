@@ -9,9 +9,9 @@ namespace Common.Factories
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public DocumentStatusFactory(WorkflowDbContext _dbContext)
+        public DocumentStatusFactory(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            _dbContext = dbContext;
         }
         public IDocumentStatusProcessor GetDocumentStatusProcessor(SourceDocumentType documentType)
         {
