@@ -36,12 +36,10 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [TearDown]
-        public void CleanUp()
+        public void TearDown()
         {
-            _dbContext.LinkedDocument.RemoveRange(_dbContext.LinkedDocument.ToArray());
-            _dbContext.SaveChanges();
+            _dbContext.Database.EnsureDeleted();
         }
-
 
         [Test]
         public async Task Test_expected_linkdocument_saved_to_dbcontext()

@@ -24,6 +24,12 @@ namespace Portal.UnitTests
             ProcessId = 123;
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
+
         [Test]
         public void Test_InvalidOperationException_thrown_when_no_assessmentdata_exists()
         {

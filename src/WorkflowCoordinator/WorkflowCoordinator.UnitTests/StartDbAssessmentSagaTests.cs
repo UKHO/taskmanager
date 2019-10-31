@@ -58,6 +58,12 @@ namespace WorkflowCoordinator.UnitTests
             _handlerContext = new TestableMessageHandlerContext();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
+
         [Test]
         public async Task Test_StartDbAssessmentCommand_Saves_Saga_Data()
         {

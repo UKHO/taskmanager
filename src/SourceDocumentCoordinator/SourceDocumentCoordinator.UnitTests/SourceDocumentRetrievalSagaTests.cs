@@ -51,7 +51,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 _fakeDataServiceApiClient,
                 generalConfig,
                 _fakeDocumentStatusFactory);
+        }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
         }
 
         [Test]

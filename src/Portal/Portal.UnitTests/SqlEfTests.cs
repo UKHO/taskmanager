@@ -20,6 +20,12 @@ namespace Portal.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
+
         [Test]
         public void Test_Comment_can_be_added_to_db_using_ef()
         {
