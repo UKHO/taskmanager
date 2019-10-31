@@ -45,7 +45,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null);
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null);
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sourceDocumentDetailsModel.OnGet());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
@@ -78,7 +78,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null) { ProcessId = ProcessId };
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null) { ProcessId = ProcessId };
             Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
     }
