@@ -100,7 +100,7 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_primarydocumentstatus_table_prevents_duplicate_processId_due_to_FK()
+        public void Ensure_primarydocumentstatus_table_prevents_duplicate_processId_due_to_UQ()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
@@ -108,7 +108,9 @@ namespace WorkflowDatabase.Tests
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
                 WorkflowType = "DbAssessment",
-                ActivityName = "Review"
+                ActivityName = "Review",
+                StartedAt = DateTime.Now,
+                Status = WorkflowStatus.Started.ToString()
             });
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
@@ -119,18 +121,22 @@ namespace WorkflowDatabase.Tests
                 StartedAt = DateTime.Now,
                 Status = "Started"
             });
+            _dbContext.SaveChanges();
 
-            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                ProcessId = 1,
-                SdocId = 12346,
-                ContentServiceId = Guid.NewGuid(),
-                StartedAt = DateTime.Now,
-                Status = "Started"
-            });
+                newContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+                {
+                    ProcessId = 1,
+                    SdocId = 12346,
+                    ContentServiceId = Guid.NewGuid(),
+                    StartedAt = DateTime.Now,
+                    Status = "Started"
+                });
 
-            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
-            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
         }
 
         [Test]
