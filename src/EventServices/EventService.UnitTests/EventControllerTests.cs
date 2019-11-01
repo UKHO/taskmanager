@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Common.Messages.Enums;
 using Common.Messages.Events;
 using NServiceBus.Testing;
 using NUnit.Framework;
@@ -20,16 +21,19 @@ namespace EventService.UnitTests
 
             var eventController = new Controllers.EventController(testableSession);
 
-            var theEvent = new GregTestEvent
+            var theEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = Guid.NewGuid(),
-                Gregio = "Wow"
+                ProcessId = 123,
+                SourceDocumentId = 12345,
+                DocumentType = SourceDocumentType.Primary,
+                GeoReferenced = false
             };
 
-            await eventController.PostEvent(System.Text.Json.JsonSerializer.Serialize(theEvent, typeof(GregTestEvent), null), "GregTestEvent");
+            await eventController.PostEvent(System.Text.Json.JsonSerializer.Serialize(theEvent, typeof(InitiateSourceDocumentRetrievalEvent), null), "InitiateSourceDocumentRetrievalEvent");
 
             Assert.AreEqual(1, testableSession.PublishedMessages.Length);
-            Assert.IsInstanceOf<GregTestEvent>(testableSession.PublishedMessages[0].Message);
+            Assert.IsInstanceOf<InitiateSourceDocumentRetrievalEvent>(testableSession.PublishedMessages[0].Message);
         }
     }
 }

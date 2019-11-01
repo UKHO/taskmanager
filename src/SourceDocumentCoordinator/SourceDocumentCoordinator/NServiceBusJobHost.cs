@@ -105,9 +105,11 @@ namespace SourceDocumentCoordinator
                         });
 
                 var routing = transport.Routing();
-                routing.RegisterPublisher(
-                    assembly: typeof(GregTestEvent).Assembly,
-                    publisherEndpoint: _generalConfig.Value.EventServiceName);
+
+                // TODO: use proper events
+                //routing.RegisterPublisher(
+                //    assembly: typeof(GregTestEvent).Assembly,
+                //    publisherEndpoint: _generalConfig.Value.EventServiceName);
 
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
@@ -137,8 +139,10 @@ namespace SourceDocumentCoordinator
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
-                await _endpoint.Subscribe<GregTestEvent>()
-                    .ConfigureAwait(false);
+
+                // TODO: use proper events
+                //await _endpoint.Subscribe<GregTestEvent>()
+                //    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {

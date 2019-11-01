@@ -158,7 +158,6 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt",Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
             }
 
@@ -170,7 +169,6 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
             }
 
@@ -181,7 +179,6 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
             }
 
@@ -193,7 +190,6 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 //TODO: LOG
-                System.IO.File.AppendAllText(@"C:\temp\gregtest.txt", Environment.NewLine + e.ToString());
                 return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
             }
 

@@ -36,7 +36,7 @@ namespace Portal.UnitTests
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
                 ProcessId = ProcessId,
-                ActivityName = "GregTest",
+                ActivityName = "ActName",
                 AssessmentData = null,
                 SerialNumber = "123_sn",
                 Status = "Started",
@@ -57,7 +57,7 @@ namespace Portal.UnitTests
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
                 ProcessId = ProcessId,
-                ActivityName = "GregTest",
+                ActivityName = "AnActName",
                 AssessmentData = null,
                 SerialNumber = "123_sn",
                 Status = "Started",
