@@ -76,19 +76,20 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 
 The ProcessId column has a unique constraint, to facilitate the foreign key from the AssessmentData table.
 
-### SourceDocumentStatus
+### PrimaryDocumentStatus
 
 The SourceDocumentStatus table holds the status of a source document retrieval operation from SDRA. We will initially set this to Started when we initiate the retrieval,
 and then update the row with subsequent statuses.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
 |-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
-|SourceDocumentStatusId     |INT                |No           |The primary key of this table                                                                    |
+|PrimaryDocumentStatusId    |INT                |No           |The primary key of this table                                                                    |
 |ProcessId                  |INT                |No           |The K2 process instance Id                                                                       |
 |SdocId                     |INT                |No           |                                                                                                 |
 |ContentServiceId           |UniqueIdentifier   |Yes          |Once stored in the Content Service, the Content Service unique identifier of the source document.|
 |Status                     |NVARCHAR(25)       |No           |                                                                                                 |
 |StartedAt                  |DATETIME           |No           |                                                                                                 |
+|CorrelationId              |UniqueIdentifier   |Yes          |                                                                                                 |
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 
@@ -108,7 +109,7 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 |Datum                      |NVARCHAR(2000)     |Yes          | |
 |LinkType                   |NVARCHAR(10)       |No           |Can be Forward, Backward or SEP    |
 |LinkedSdocId               |INT                |No           |          |
-|ContentServiceId           |UNIQUEIDENTIFIER   |No           |The guid for the linked document once stored in the Content service                              |
+|ContentServiceId           |UNIQUEIDENTIFIER   |Yes          |The guid for the linked document once stored in the Content service                              |
 |Status                     |INT                |No           |The status of retrieving the linked document from SDRA                                           |
 |Created                    |DATETIME           |No           |                                                                                                 |
 
