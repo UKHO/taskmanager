@@ -36,12 +36,10 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [TearDown]
-        public void CleanUp()
+        public void TearDown()
         {
-            _dbContext.LinkedDocument.RemoveRange(_dbContext.LinkedDocument.ToArray());
-            _dbContext.SaveChanges();
+            _dbContext.Database.EnsureDeleted();
         }
-
 
         [Test]
         public async Task Test_expected_linkdocument_saved_to_dbcontext()
@@ -56,7 +54,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             var assessmentData = new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = message.SourceDocumentId,
+                PrimarySdocId = message.SourceDocumentId,
                 RsdraNumber = "RSDRA2019000130865"
             };
             await _dbContext.AssessmentData.AddAsync(assessmentData);
@@ -101,7 +99,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             var assessmentData = new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = message.SourceDocumentId,
+                PrimarySdocId = message.SourceDocumentId,
                 RsdraNumber = "RSDRA2017000130865"
             };
             await _dbContext.AssessmentData.AddAsync(assessmentData);

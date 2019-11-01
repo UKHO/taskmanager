@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace WorkflowDatabase.EF.Models
 {
     public class AssessmentData
     {
         public int AssessmentDataId { get; set; }
-        public int SdocId { get; set; }
+        public int PrimarySdocId { get; set; }
         public string RsdraNumber { get; set; }
         public string SourceDocumentName { get; set; }
         public DateTime ReceiptDate { get; set; }
@@ -21,7 +19,5 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
 
         public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
-
-        public virtual List<LinkedDocument> LinkedDocuments { get; set; }
     }
 }

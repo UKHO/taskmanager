@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -88,6 +90,9 @@ namespace Portal
             services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+            services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
@@ -96,6 +101,8 @@ namespace Portal
                     Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
                 });
 
+
+            services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

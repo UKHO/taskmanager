@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
@@ -76,6 +78,8 @@ namespace SourceDocumentCoordinator
 
                 var startupSecretConfig = new StartupSecretsConfig();
                 hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretConfig);
+
+                services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));

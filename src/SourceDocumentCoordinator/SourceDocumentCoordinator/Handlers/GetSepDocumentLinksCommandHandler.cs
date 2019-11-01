@@ -30,7 +30,8 @@ namespace SourceDocumentCoordinator.Handlers
 
                 var linkedDocument = new LinkedDocument
                 {
-                    SdocId = message.SourceDocumentId,
+                    ProcessId = message.ProcessId,
+                    PrimarySdocId = message.SourceDocumentId,
                     LinkedSdocId = documentAssessmentData.SdocId,
                     RsdraNumber = documentAssessmentData.SourceName,
                     SourceDocumentName = documentAssessmentData.Name,
@@ -39,6 +40,7 @@ namespace SourceDocumentCoordinator.Handlers
                     SourceNature = documentAssessmentData.SourceName,
                     Datum = documentAssessmentData.Datum,
                     LinkType = "SEP",
+                    Status = LinkedDocumentRetrievalStatus.NotAttached.ToString(),
                     Created = DateTime.Now
                 };
 

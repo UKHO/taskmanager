@@ -44,6 +44,11 @@ namespace WorkflowCoordinator.UnitTests
             _handlerContext = new TestableMessageHandlerContext();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
 
         [Test]
         public async Task Test_startassessmentpolling_requests_timeout()
@@ -177,7 +182,7 @@ namespace WorkflowCoordinator.UnitTests
 
             await _dbContext.AssessmentData.AddAsync(new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = 1888403,
+                PrimarySdocId = 1888403,
                 RsdraNumber = "RSDRA2017000130865"
             });
             await _dbContext.SaveChangesAsync();

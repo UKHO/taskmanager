@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NServiceBus;
@@ -9,7 +10,6 @@ using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Handlers
 {
@@ -18,13 +18,15 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private readonly IDocumentStatusFactory _documentStatusFactory;
 
         public ClearDocumentRequestFromQueueCommandHandler(IDataServiceApiClient dataServiceApiClient,
-            WorkflowDbContext dbContext, IOptionsSnapshot<GeneralConfig> generalConfig)
+            WorkflowDbContext dbContext, IOptionsSnapshot<GeneralConfig> generalConfig, IDocumentStatusFactory documentStatusFactory)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _dbContext = dbContext;
             _generalConfig = generalConfig;
+            _documentStatusFactory = documentStatusFactory;
         }
 
         public async Task Handle(ClearDocumentRequestFromQueueCommand message, IMessageHandlerContext context)
@@ -42,19 +44,17 @@ namespace SourceDocumentCoordinator.Handlers
                 {
                     case (int)ClearFromQueueReturnCodeEnum.Success:
                     case (int)ClearFromQueueReturnCodeEnum.Warning:
-                        UpdateSourceDocumentStatus(message.SourceDocumentId, SourceDocumentRetrievalStatus.Complete);
+                        await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                                                    _documentStatusFactory, 
+                                                    message.ProcessId, 
+                                                    message.SourceDocumentId, 
+                                                    SourceDocumentRetrievalStatus.Complete, 
+                                                    message.DocumentType);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
             }
-        }
-
-        private async void UpdateSourceDocumentStatus(int sdocId, SourceDocumentRetrievalStatus status)
-        {
-            var row = await _dbContext.SourceDocumentStatus.FirstAsync(s => s.SdocId == sdocId);
-            row.Status = status.ToString();
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

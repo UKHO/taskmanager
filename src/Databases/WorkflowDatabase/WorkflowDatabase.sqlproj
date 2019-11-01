@@ -63,7 +63,7 @@
     <Build Include="Tables\AssessmentData.sql" />
     <Build Include="Tables\Comment.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />
-    <Build Include="Tables\SourceDocumentStatus.sql" />
+    <Build Include="Tables\PrimaryDocumentStatus.sql" />
     <Build Include="Tables\LinkedDocument.sql" />
   </ItemGroup>
   <ItemGroup>

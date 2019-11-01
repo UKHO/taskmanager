@@ -250,9 +250,9 @@
             
             </summary>
         </member>
-        <member name="P:DataServices.Models.DocumentAssessmentData.SdocId">
+        <member name="P:DataServices.Models.DocumentAssessmentData.PrimarySdocId">
             <summary>
-            Gets or Sets SdocId
+            Gets or Sets PrimarySdocId
             </summary>
         </member>
         <member name="P:DataServices.Models.DocumentAssessmentData.Name">
@@ -674,38 +674,38 @@
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:DataServices.Models.SdocId">
+        <member name="T:DataServices.Models.PrimarySdocId">
             <summary>
             The unique identifier for the SDRA assessment document i.e. the sdoc_id
             </summary>
         </member>
-        <member name="M:DataServices.Models.SdocId.ToString">
+        <member name="M:DataServices.Models.PrimarySdocId.ToString">
             <summary>
             Returns the string presentation of the object
             </summary>
             <returns>String presentation of the object</returns>
         </member>
-        <member name="M:DataServices.Models.SdocId.ToJson">
+        <member name="M:DataServices.Models.PrimarySdocId.ToJson">
             <summary>
             Returns the JSON string presentation of the object
             </summary>
             <returns>JSON string presentation of the object</returns>
         </member>
-        <member name="M:DataServices.Models.SdocId.Equals(System.Object)">
+        <member name="M:DataServices.Models.PrimarySdocId.Equals(System.Object)">
             <summary>
             Returns true if objects are equal
             </summary>
             <param name="obj">Object to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:DataServices.Models.SdocId.Equals(DataServices.Models.SdocId)">
+        <member name="M:DataServices.Models.PrimarySdocId.Equals(DataServices.Models.PrimarySdocId)">
             <summary>
-            Returns true if SdocId instances are equal
+            Returns true if PrimarySdocId instances are equal
             </summary>
-            <param name="other">Instance of SdocId to be compared</param>
+            <param name="other">Instance of PrimarySdocId to be compared</param>
             <returns>Boolean</returns>
         </member>
-        <member name="M:DataServices.Models.SdocId.GetHashCode">
+        <member name="M:DataServices.Models.PrimarySdocId.GetHashCode">
             <summary>
             Gets the hash code
             </summary>
@@ -851,7 +851,7 @@
         <member name="T:SDRADataAccessWebService.ProcessingStatus">
             <remarks/>
         </member>
-        <member name="P:SDRADataAccessWebService.ProcessingStatus.SdocId">
+        <member name="P:SDRADataAccessWebService.ProcessingStatus.PrimarySdocId">
             <remarks/>
         </member>
         <member name="P:SDRADataAccessWebService.ProcessingStatus.ErrorCode">

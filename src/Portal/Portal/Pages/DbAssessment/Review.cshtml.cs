@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -20,6 +22,7 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOptions<UriConfig> _uriConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
 
@@ -32,43 +35,20 @@ namespace Portal.Pages.DbAssessment
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<UriConfig> uriConfig)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
+            _uriConfig = uriConfig;
         }
 
         public void OnGet(int processId)
         {
             ProcessId = processId;
-
             TaskInformationModel = SetTaskInformationData(processId);
-        }
-
-        public IActionResult OnGetRetrieveSourceDocuments(int processId)
-        {
-            var model = new _SourceDocumentDetailsModel()
-            {
-                Assessments = DbContext
-                    .AssessmentData
-                    .Include(a => a.LinkedDocuments)
-                    .Where(c => c.ProcessId == processId).ToList(),
-                ProcessId = processId
-            };
-
-            // Repopulate models...
-            OnGet(processId);
-
-            return new PartialViewResult
-            {
-                ViewName = "_SourceDocumentDetails",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                }
-            };
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -133,7 +113,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment);
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
             }
             catch (Exception e)
             {
@@ -145,7 +125,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-               await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
+                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
             }
             catch (Exception e)
             {

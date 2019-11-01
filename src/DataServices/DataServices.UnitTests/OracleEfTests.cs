@@ -30,6 +30,12 @@ namespace DataServices.UnitTests
             _fakeDataAccessWebServiceSoapClientAdapter = A.Fake<DataAccessWebServiceSoapClientAdapter>();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
+
         [Test]
         public async Task Test_GetDocumentAssessmentData_returns_assessment_data_for_given_sdoc_Id()
         {

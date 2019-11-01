@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using SourceDocumentCoordinator.Messages;
 using System.IO;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SourceDocumentCoordinator.Config;
@@ -37,7 +35,7 @@ namespace SourceDocumentCoordinator.Handlers
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
 
-            var row = await _dbContext.SourceDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
+            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
             row.ContentServiceId = newGuid;
 
             await _dbContext.SaveChangesAsync();

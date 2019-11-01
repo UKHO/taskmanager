@@ -39,7 +39,7 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [Comment]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [AssessmentData]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [SourceDocumentStatus]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [PrimaryDocumentStatus]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
         }
 

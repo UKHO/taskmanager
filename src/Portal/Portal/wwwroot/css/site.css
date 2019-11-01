@@ -199,3 +199,21 @@ table > tbody > tr > th {
     font-weight: 300;
     border-bottom: unset;
 }
+
+.attachLinkedDocumentButtonContainer .fa.fa-paperclip,
+.attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
+    color: #09315B;
+    font-size: 24px;
+}
+
+.attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
+    position: relative;
+    bottom: 34px;
+    left: 11px;
+}
+
+.attachLinkedDocumentSpinnerContainer .spinner-border {
+    color: #09315B;
+    width: 2.75em;
+    height: 2.75em;
+}

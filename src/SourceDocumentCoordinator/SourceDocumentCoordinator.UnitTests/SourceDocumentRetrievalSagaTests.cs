@@ -2,7 +2,9 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
+using Common.Factories;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 using DataServices.Models;
 using FakeItEasy;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -27,7 +29,7 @@ namespace SourceDocumentCoordinator.UnitTests
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private WorkflowDbContext _dbContext;
         private SourceDocumentRetrievalSaga _sourceDocumentRetrievalSaga;
-
+        private DocumentStatusFactory _documentStatusFactory;
 
         [SetUp]
         public void Setup()
@@ -43,19 +45,27 @@ namespace SourceDocumentCoordinator.UnitTests
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
+            _documentStatusFactory = new DocumentStatusFactory(_dbContext);
+
             _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
                 _fakeDataServiceApiClient,
-                generalConfig);
+                generalConfig,
+                _documentStatusFactory);
+        }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_saves_saga_data_when_return_code_is_0()
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Saves_Saga_Data_When_Return_Code_Is_0()
         {
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -65,7 +75,7 @@ namespace SourceDocumentCoordinator.UnitTests
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
 
             //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
 
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
@@ -73,12 +83,13 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_saves_saga_data_and_source_doc_status_when_return_code_is_1_and_source_document_status_is_0()
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Handler_Uses_PrimaryDocumentStatusProcessor_to_create_a_PrimaryDocumentStatus_row()
         {
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -88,21 +99,18 @@ namespace SourceDocumentCoordinator.UnitTests
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
 
             //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
 
-            //Then
-            Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
-            Assert.AreEqual(sdocId, _sourceDocumentRetrievalSaga.Data.SourceDocumentId);
-            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), true);
+            Assert.IsNotNull(_dbContext.PrimaryDocumentStatus.First(r => r.ProcessId == 1 && r.SdocId == sdocId));
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_does_not_save_source_doc_status_when_return_code_is_1_and_source_document_status_is_1()
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Does_Not_Save_Source_Doc_Status_When_Return_Code_Is_1_And_Source_Document_Status_Is_1()
         {
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -111,36 +119,37 @@ namespace SourceDocumentCoordinator.UnitTests
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData
             {
                 CorrelationId = correlationId,
-                SourceDocumentStatusId = 1,
+                DocumentStatusId = 1,
                 IsStarted = true
             };
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 1 });
 
             //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
 
             //Then
             Assert.AreEqual(correlationId, _sourceDocumentRetrievalSaga.Data.CorrelationId);
-            Assert.AreEqual(_dbContext.SourceDocumentStatus.Any(), false);
+            Assert.AreEqual(_dbContext.PrimaryDocumentStatus.Any(), false);
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_requests_timeout()
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Requests_Timeout()
         {
             // Given
-            var sdocId = 1111;
+            var sourceDocumentId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
-                SourceDocumentId = sdocId,
-                ProcessId = 1
+                SourceDocumentId = sourceDocumentId,
+                ProcessId = 1,
+                DocumentType = SourceDocumentType.Primary
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
 
             //When
-            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext);
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
 
             //Then
             var getDocumentRequestQueueStatusCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
@@ -149,7 +158,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_When_Failed_Queuing_Does_not_fire_GetDocumentRequestQueueStatusCommand(
+        public void Test_InitiateSourceDocumentRetrievalEvent_When_Failed_Queuing_Does_Not_Fire_GetDocumentRequestQueueStatusCommand(
                         [Values(
                                 QueueForRetrievalReturnCodeEnum.QueueInsertionFailed,
                                 QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised)]
@@ -158,7 +167,7 @@ namespace SourceDocumentCoordinator.UnitTests
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
-            var initiateSourceDocumentRetrievalCommand = new InitiateSourceDocumentRetrievalCommand
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
                 SourceDocumentId = sdocId,
@@ -175,7 +184,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //When
 
-            Assert.ThrowsAsync<ApplicationException>(() => _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalCommand, _handlerContext));
+            Assert.ThrowsAsync<ApplicationException>(() => _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext));
 
             //Then
             var getDocumentRequestQueueStatusCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
@@ -185,15 +194,16 @@ namespace SourceDocumentCoordinator.UnitTests
 
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_GetDocumentRequestQueueStatusCommand_Handler_Updates_DocumentRetrievalStatus_To_Ready()
+        public async Task Test_GetDocumentRequestQueueStatusCommand_Updates_DocumentRetrievalStatus_To_Ready()
         {
             // Given
             var sdocId = 1111;
+            var processId = 1;
             var correlationId = Guid.NewGuid();
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
-                ProcessId = 1,
+                ProcessId = processId,
                 SdocId = sdocId,
                 StartedAt = DateTime.Now,
                 Status = SourceDocumentRetrievalStatus.Started.ToString()
@@ -206,7 +216,11 @@ namespace SourceDocumentCoordinator.UnitTests
                 SourceDocumentId = sdocId
             };
 
-            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData()
+            {
+                ProcessId = processId,
+                SourceDocumentId = sdocId
+            };
 
             //_sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored)).Returns(new QueuedDocumentObjects()
@@ -222,17 +236,17 @@ namespace SourceDocumentCoordinator.UnitTests
             await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
 
             //Then
-            var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == sdocId);
+            var primaryDocumentStatus =
+                _dbContext.PrimaryDocumentStatus.FirstOrDefault(s => s.SdocId == sdocId);
 
-            Assert.IsNotNull(sourceDocumentStatus, $"'{nameof(sourceDocumentStatus)}' should exists in SourceDocumentStatus table");
-            Assert.IsTrue(sourceDocumentStatus.Status.Equals(SourceDocumentRetrievalStatus.Ready.ToString(), StringComparison.OrdinalIgnoreCase));
+            Assert.IsNotNull(primaryDocumentStatus, $"'{nameof(primaryDocumentStatus)}' should exists in PrimaryDocumentStatus table");
+            Assert.IsTrue(primaryDocumentStatus.Status.Equals(SourceDocumentRetrievalStatus.Ready.ToString(), StringComparison.OrdinalIgnoreCase));
 
             Assert.IsTrue(_handlerContext.TimeoutMessages.Length == 0);
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_GetDocumentRequestQueueStatusCommand_Handler_Fires_Another_Timeout_When_DocumentRetrievalStatus_Queued()
+        public async Task Test_GetDocumentRequestQueueStatusCommand_Fires_Another_Timeout_When_DocumentRetrievalStatus_Queued()
         {
             // Given
             var sdocId = 1111;
@@ -264,7 +278,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_When_Request_Queue_Status_Returns_Error_Code_Does_not_fire_Timeout_and_InitiateSourceDocumentRetrievalCommand_Is_Sent_With_GeoReferenced_Set_to_False(
+        public async Task Test_GetDocumentRequestQueueStatusCommand_When_Request_Queue_Status_Returns_Error_Code_Does_Not_Fire_Timeout_And_InitiateSourceDocumentRetrievalCommand_Is_Sent_With_GeoReferenced_Set_to_False(
                         [Values(
                             RequestQueueStatusReturnCodeEnum.NotGeoreferenced,
                             RequestQueueStatusReturnCodeEnum.ConversionFailed,
@@ -298,16 +312,16 @@ namespace SourceDocumentCoordinator.UnitTests
                 t.Message is GetDocumentRequestQueueStatusCommand);
             Assert.IsNull(timeoutCommand, $"Timeout '{nameof(GetDocumentRequestQueueStatusCommand)}' should only be fired on successful queuing");
 
-            // Ensure new InitiateSourceDocumentRetrievalCommand is sent
+            // Ensure new InitiateSourceDocumentRetrievalEvent is sent
             var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-                t.Message is InitiateSourceDocumentRetrievalCommand);
-            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalCommand)} seen.");
+                t.Message is InitiateSourceDocumentRetrievalEvent);
+            Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalEvent)} seen.");
 
-            Assert.IsFalse(((InitiateSourceDocumentRetrievalCommand)initiateSourceDocumentRetrievalCommand.Message).GeoReferenced);
+            Assert.IsFalse(((InitiateSourceDocumentRetrievalEvent)initiateSourceDocumentRetrievalCommand.Message).GeoReferenced);
         }
 
         [Test]
-        public async Task Test_SourceDocumentRetrievalSaga_When_Check_Queue_Status_Returns_Error_Throws_ApplicationException(
+        public void Test_GetDocumentRequestQueueStatusCommand_When_Check_Queue_Status_Returns_Error_Throws_ApplicationException(
                         [Values(
                             RequestQueueStatusReturnCodeEnum.FolderNotWritable,
                             RequestQueueStatusReturnCodeEnum.QueueInsertionFailed)]
@@ -322,7 +336,7 @@ namespace SourceDocumentCoordinator.UnitTests
                 SourceDocumentId = sdocId
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
-  
+
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored))
                 .Returns(new QueuedDocumentObjects() { new QueuedDocumentObject
                 {
@@ -336,13 +350,13 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_Timeout_Handler_Sends_ClearDocumentRequestFromQueueCommand_And_PersistDocumentInStoreCommand_Messages()
+        public async Task Test_GetDocumentRequestQueueStatusCommand_Sends_ClearDocumentRequestFromQueueCommand_And_PersistDocumentInStoreCommand_Messages()
         {
             // Given
             var sdocId = 1111;
             var correlationId = Guid.NewGuid();
 
-            _dbContext.SourceDocumentStatus.Add(new SourceDocumentStatus()
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = 1,
                 SdocId = sdocId,

@@ -1,6 +1,4 @@
 ﻿using Common.Helpers;
-using Common.Messages.Commands;
-
 using Microsoft.Extensions.Options;
 
 using NServiceBus;
@@ -13,39 +11,44 @@ using SourceDocumentCoordinator.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Factories;
+using Common.Factories.Interfaces;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 using DataServices.Models;
 using SourceDocumentCoordinator.Enums;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.Sagas
 {
     public class SourceDocumentRetrievalSaga : Saga<SourceDocumentRetrievalSagaData>,
-        IAmStartedByMessages<InitiateSourceDocumentRetrievalCommand>,
+        IAmStartedByMessages<InitiateSourceDocumentRetrievalEvent>,
         IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private readonly IDocumentStatusFactory _documentStatusFactory;
         ILog log = LogManager.GetLogger<SourceDocumentRetrievalSaga>();
 
         public SourceDocumentRetrievalSaga(WorkflowDbContext dbContext, IDataServiceApiClient dataServiceApiClient,
-            IOptionsSnapshot<GeneralConfig> generalConfig)
+            IOptionsSnapshot<GeneralConfig> generalConfig, IDocumentStatusFactory documentStatusFactory)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _generalConfig = generalConfig;
+            _documentStatusFactory = documentStatusFactory;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SourceDocumentRetrievalSagaData> mapper)
         {
-            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalCommand>(message => message.SourceDocumentId)
+            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.SourceDocumentId)
                 .ToSaga(sagaData => sagaData.SourceDocumentId);
         }
 
-        public async Task Handle(InitiateSourceDocumentRetrievalCommand message, IMessageHandlerContext context)
+        public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalCommand)}: {message.ToJSONSerializedString()}");
+            log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
 
             if (!Data.IsStarted)
             {
@@ -53,7 +56,8 @@ namespace SourceDocumentCoordinator.Sagas
                 Data.CorrelationId = message.CorrelationId;
                 Data.ProcessId = message.ProcessId;
                 Data.SourceDocumentId = message.SourceDocumentId;
-                Data.SourceDocumentStatusId = 0;
+                Data.DocumentStatusId = 0;
+                Data.DocumentType = message.DocumentType;
             }
 
             // Call GetDocumentForViewing method on DataServices API
@@ -62,14 +66,15 @@ namespace SourceDocumentCoordinator.Sagas
                 _generalConfig.Value.SourceDocumentWriteableFolderName,
                 message.GeoReferenced);
 
-            ProcessGetDocumentForViewingErrorCodes(returnCode, message);
+            await ProcessGetDocumentForViewingErrorCodes(returnCode, message);
 
-            if (Data.SourceDocumentStatusId > 0)
+            if (Data.DocumentStatusId > 0)
             {
                 var requestStatus = new GetDocumentRequestQueueStatusCommand
                 {
                     SourceDocumentId = message.SourceDocumentId,
-                    CorrelationId = message.CorrelationId
+                    CorrelationId = message.CorrelationId,
+                    DocumentType = message.DocumentType
                 };
 
                 await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
@@ -92,17 +97,17 @@ namespace SourceDocumentCoordinator.Sagas
             await ProcessDocumentRequestQueueErrorStatus(message, context, sourceDocument);
         }
 
-        private void ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalCommand message)
+        private async Task ProcessGetDocumentForViewingErrorCodes(ReturnCode returnCode, InitiateSourceDocumentRetrievalEvent message)
         {
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
-                    if (Data.SourceDocumentStatusId < 1)
+                    if (Data.DocumentStatusId < 1)
                     {
-                        Data.SourceDocumentStatusId = AddSourceDocumentStatus(message);
+                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.DocumentType);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -127,11 +132,12 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
-                    UpdateSourceDocumentStatus(message);
+                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.DocumentType);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
                         CorrelationId = message.CorrelationId,
+                        ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId
                     };
                     await context.SendLocal(removeFromQueue).ConfigureAwait(false);
@@ -162,7 +168,7 @@ namespace SourceDocumentCoordinator.Sagas
 
                     MarkAsComplete();
 
-                    var msg = new InitiateSourceDocumentRetrievalCommand
+                    var msg = new InitiateSourceDocumentRetrievalEvent
                     {
                         CorrelationId = message.CorrelationId,
                         ProcessId = Data.ProcessId,
@@ -190,32 +196,15 @@ namespace SourceDocumentCoordinator.Sagas
             }
         }
 
-        private int AddSourceDocumentStatus(InitiateSourceDocumentRetrievalCommand message)
-        {
-            var sourceDocumentStatus = new SourceDocumentStatus
-            {
-                ProcessId = message.ProcessId,
-                SdocId = message.SourceDocumentId,
-                Status = SourceDocumentRetrievalStatus.Started.ToString(),
-                StartedAt = DateTime.Now
-            };
-
-            _dbContext.SourceDocumentStatus.Add(sourceDocumentStatus);
-
-            _dbContext.SaveChanges();
-
-            return sourceDocumentStatus.SourceDocumentStatusId;
-        }
-
-        private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
-        {
-            var sourceDocumentStatus =
-                _dbContext.SourceDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
-            if (sourceDocumentStatus != null)
-            {
-                sourceDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
-                _dbContext.SaveChanges();
-            }
-        }
+        //private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
+        //{
+        //    var primaryDocumentStatus =
+        //        _dbContext.PrimaryDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
+        //    if (primaryDocumentStatus != null)
+        //    {
+        //        primaryDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
+        //        _dbContext.SaveChanges();
+        //    }
+        //}
     }
 }

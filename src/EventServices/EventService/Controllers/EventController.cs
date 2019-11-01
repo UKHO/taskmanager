@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -140,7 +141,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostEvent([FromBody]Object body, [FromRoute][Required]string eventName)
+        public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
         {
             // Use reflection to discover events, retrieve the correct event by name and 
             // deserialize it via the provided JSON body.
@@ -150,9 +151,9 @@ namespace EventService.Controllers
 
             try
             {
-                var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
-                var assemblyName = assemblies.FirstOrDefault(i => i.Name == "Common.Messages");
-                assembly = Assembly.Load(assemblyName);
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\","");
+                var assemblyPath = Path.Combine(path, "Common.Messages.dll");
+                assembly = Assembly.LoadFrom(assemblyPath);
             }
             catch (Exception e)
             {

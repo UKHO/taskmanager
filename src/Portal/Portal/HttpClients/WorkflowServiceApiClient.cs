@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Portal.Configuration;
-using Portal.Models;
 
 namespace Portal.HttpClients
 {
@@ -13,13 +10,11 @@ namespace Portal.HttpClients
     {
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<GeneralConfig> _generalConfig;
 
         public WorkflowServiceApiClient(HttpClient httpClient, IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig)
         {
             _uriConfig = uriConfig;
             _httpClient = httpClient;
-            _generalConfig = generalConfig;
         }
 
         public async Task<bool> CheckK2Connection()

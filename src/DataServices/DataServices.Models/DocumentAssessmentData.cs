@@ -70,7 +70,6 @@ namespace DataServices.Models
         /// The Effective start date, based on either the Receipt Date or To_SDO_Date
         /// </summary>
         /// <value>The Effective start date, based on either the Receipt Date or To_SDO_Date</value>
-        [Required]
         [Column("EFFECTIVE_START_DATE")]
         [DataMember(Name="effectiveStartDate")]
         public DateTime? EffectiveStartDate { get; set; }

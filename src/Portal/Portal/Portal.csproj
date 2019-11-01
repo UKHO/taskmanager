@@ -19,13 +19,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common.Factories.Interfaces\Common.Factories.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Common.Factories\Common.Factories.csproj" />
     <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
     <ProjectReference Include="..\..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Update="Data\TasksSeedData.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 

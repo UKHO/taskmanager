@@ -13,13 +13,13 @@ database assessment workflow for an open assessment.
 |SdocId             |INT            |No           |                                                                                                 |
 |RsdraNumber        |NVARCHAR(50)   |No           |                                                                                                 |
 |SourceDocumentName |NVARCHAR(255)  |No           |                                                                                                 |
-|ReceiptDate        |DATETIME2       |No           |                                                                                                 |
-|ToSdoDate          |DATETIME2       |Yes          |                                                                                                 |
-|EffectiveStartDate |DATETIME2       |Yes          |                                                                                                 |
+|ReceiptDate        |DATETIME2      |No           |                                                                                                 |
+|ToSdoDate          |DATETIME2      |Yes          |                                                                                                 |
+|EffectiveStartDate |DATETIME2      |Yes          |                                                                                                 |
 |TeamDistributedTo  |NVARCHAR(20)   |Yes          |                                                                                                 |
-|SourceDocumentType |NVARCHAR(4000)  |Yes          |                                                                                                 |
-|SourceNature       |NVARCHAR(255)   |Yes          |                                                                                                 |
-|Datum              |NVARCHAR(2000)   |Yes          |                                                                                                 |
+|SourceDocumentType |NVARCHAR(4000) |Yes          |                                                                                                 |
+|SourceNature       |NVARCHAR(255)  |Yes          |                                                                                                 |
+|Datum              |NVARCHAR(2000) |Yes          |                                                                                                 |
 |ProcessId          |INT            |No           |The K2 process instance Id (FK)                                                                  |
 
 The ProcessId column has a unique constraint.
@@ -60,7 +60,7 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 
 ### WorkflowInstance
 
-The WorkflowInstance table will hold the instances of a Database Assessment workflow. The ParentProcessId column will be used when an instance is a 
+The WorkflowInstance table will hold the instances of a Database Assessment workflow. The ParentProcessId column will be used when an instance is a
 sub workflow, and will hold the ProcessId of the parent workflow that the sub was generated from.
 
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
@@ -76,19 +76,20 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 
 The ProcessId column has a unique constraint, to facilitate the foreign key from the AssessmentData table.
 
-### SourceDocumentStatus
+### PrimaryDocumentStatus
 
 The SourceDocumentStatus table holds the status of a source document retrieval operation from SDRA. We will initially set this to Started when we initiate the retrieval,
 and then update the row with subsequent statuses.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
 |-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
-|SourceDocumentStatusId     |INT                |No           |The primary key of this table                                                                    |
+|PrimaryDocumentStatusId    |INT                |No           |The primary key of this table                                                                    |
 |ProcessId                  |INT                |No           |The K2 process instance Id                                                                       |
 |SdocId                     |INT                |No           |                                                                                                 |
 |ContentServiceId           |UniqueIdentifier   |Yes          |Once stored in the Content Service, the Content Service unique identifier of the source document.|
 |Status                     |NVARCHAR(25)       |No           |                                                                                                 |
 |StartedAt                  |DATETIME           |No           |                                                                                                 |
+|CorrelationId              |UniqueIdentifier   |Yes          |                                                                                                 |
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 
@@ -98,16 +99,18 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
 |-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
-|LinkedDocumentId     |INT                |No           |The primary key of this table     |
-|SdocId                  |INT                |No           |   |
-|RsdraNumber                     |NVARCHAR(50)                |No           |        |
-|SourceDocumentName           |NVARCHAR(255)   |No          | |
-|ReceiptDate           |DateTime2  |Yes          | |
-|SourceDocumentType           |NVARCHAR(4000)   |Yes          | |
-|SourceNature           |NVARCHAR(255)   |Yes          | |
-|Datum           |NVARCHAR(2000)   |Yes          | |
-|LinkType                     |NVARCHAR(10)       |No           |Can be Forward, Backward or SEP    |
-|LinkedSdocId                     |INT       |No           |          |
-|Created                  |DATETIME           |No           |            |
+|LinkedDocumentId           |INT                |No           |The primary key of this table                                                                    |
+|SdocId                     |INT                |No           |                                                                                                 |
+|RsdraNumber                |NVARCHAR(50)       |No           |                                                                                                 |
+|SourceDocumentName         |NVARCHAR(255)      |No           | |
+|ReceiptDate                |DateTime2          |Yes          | |
+|SourceDocumentType         |NVARCHAR(4000)     |Yes          | |
+|SourceNature               |NVARCHAR(255)      |Yes          | |
+|Datum                      |NVARCHAR(2000)     |Yes          | |
+|LinkType                   |NVARCHAR(10)       |No           |Can be Forward, Backward or SEP    |
+|LinkedSdocId               |INT                |No           |          |
+|ContentServiceId           |UNIQUEIDENTIFIER   |Yes          |The guid for the linked document once stored in the Content service                              |
+|Status                     |INT                |No           |The status of retrieving the linked document from SDRA                                           |
+|Created                    |DATETIME           |No           |                                                                                                 |
 
 The SdocId column has a foreign key constraint to the AssessmentData table.
