@@ -158,7 +158,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_InitiateSourceDocumentRetrievalEvent_When_Failed_Queuing_Does_Not_Fire_GetDocumentRequestQueueStatusCommand(
+        public void Test_InitiateSourceDocumentRetrievalEvent_When_Failed_Queuing_Does_Not_Fire_GetDocumentRequestQueueStatusCommand(
                         [Values(
                                 QueueForRetrievalReturnCodeEnum.QueueInsertionFailed,
                                 QueueForRetrievalReturnCodeEnum.SdocIdNotRecognised)]
@@ -321,7 +321,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_GetDocumentRequestQueueStatusCommand_When_Check_Queue_Status_Returns_Error_Throws_ApplicationException(
+        public void Test_GetDocumentRequestQueueStatusCommand_When_Check_Queue_Status_Returns_Error_Throws_ApplicationException(
                         [Values(
                             RequestQueueStatusReturnCodeEnum.FolderNotWritable,
                             RequestQueueStatusReturnCodeEnum.QueueInsertionFailed)]
