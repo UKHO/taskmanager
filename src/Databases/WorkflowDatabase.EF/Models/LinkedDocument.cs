@@ -8,7 +8,8 @@ namespace WorkflowDatabase.EF.Models
     public class LinkedDocument
     {
         public int LinkedDocumentId { get; set; }
-        public int SdocId { get; set; }
+        public int ProcessId { get; set; }
+        public int PrimarySdocId { get; set; }
         public string RsdraNumber { get; set; }
         public string SourceDocumentName { get; set; }
         public DateTime? ReceiptDate { get; set; }

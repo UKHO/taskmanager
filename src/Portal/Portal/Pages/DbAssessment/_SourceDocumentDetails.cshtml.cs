@@ -26,6 +26,7 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
+        public IEnumerable<LinkedDocument> LinkedDocuments { get; set; }
         public IEnumerable<LinkedDocument> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
@@ -44,6 +45,7 @@ namespace Portal.Pages.DbAssessment
         {
             GetPrimaryDocumentData();
             GetPrimaryDocumentStatus();
+            GetLinkedDocuments();
             GetAttachedLinkedDocuments();
         }
 
@@ -53,13 +55,29 @@ namespace Portal.Pages.DbAssessment
             {
                 Assessment = _dbContext
                     .AssessmentData
-                    .Include(a => a.LinkedDocuments)
                     .First(c => c.ProcessId == ProcessId);
             }
             catch (InvalidOperationException e)
             {
                 // Log and throw, as we're unable to get assessment data
                 e.Data.Add("OurMessage", "Unable to retrieve AssessmentData");
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private void GetLinkedDocuments()
+        {
+            try
+            {
+                LinkedDocuments = _dbContext
+                    .LinkedDocument
+                    .Where(c => c.ProcessId == ProcessId).ToList();
+            }
+            catch (ArgumentNullException e)
+            {
+                // Log and throw, as we're unable to get Linked Documents
+                e.Data.Add("OurMessage", "Unable to retrieve Linked Documents");
                 Console.WriteLine(e);
                 throw;
             }
@@ -85,9 +103,9 @@ namespace Portal.Pages.DbAssessment
 
         private void GetAttachedLinkedDocuments()
         {
-            if (Assessment.LinkedDocuments != null && Assessment.LinkedDocuments.Count > 0)
+            if (LinkedDocuments != null && LinkedDocuments.Any())
             {
-                AttachedLinkedDocuments = Assessment.LinkedDocuments.Where(l =>
+                AttachedLinkedDocuments = LinkedDocuments.Where(l =>
                     !l.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(),
                         StringComparison.OrdinalIgnoreCase));
 

@@ -47,7 +47,7 @@ namespace Portal.TestAutomation.Steps
        [Then(@"The source document with the corresponding process Id in the database matches the sdocId on the UI")]
         public void ThenTheSourceDocumentWithTheCorrespondingProcessIdInTheDatabaseMatchesTheSdocIdOnTheUI()
         {
-            var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).SdocId;
+            var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).PrimarySdocId;
             var firstUiDisplayDoc = _driver.FindElement(By.XPath($"/html/body//table/tbody/tr/td[contains(text(),{sdocId})]"));
             Assert.AreSame(sdocId, firstUiDisplayDoc);
         }

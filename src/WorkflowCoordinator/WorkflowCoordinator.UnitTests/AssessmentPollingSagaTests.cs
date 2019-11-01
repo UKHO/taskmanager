@@ -182,7 +182,7 @@ namespace WorkflowCoordinator.UnitTests
 
             await _dbContext.AssessmentData.AddAsync(new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = 1888403,
+                PrimarySdocId = 1888403,
                 RsdraNumber = "RSDRA2017000130865"
             });
             await _dbContext.SaveChangesAsync();

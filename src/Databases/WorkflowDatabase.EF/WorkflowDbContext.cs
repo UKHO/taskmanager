@@ -54,11 +54,12 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
-            modelBuilder.Entity<AssessmentData>()
-                .HasMany(x => x.LinkedDocuments)
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.LinkedDocument)
                 .WithOne()
-                .HasPrincipalKey(p => p.SdocId)
-                .HasForeignKey(p => p.SdocId);
+                .HasPrincipalKey(w => w.ProcessId)
+                .HasForeignKey(l => l.ProcessId);
 
             modelBuilder.Entity<LinkedDocument>().HasKey(x => x.LinkedDocumentId);
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);

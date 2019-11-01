@@ -66,7 +66,7 @@ namespace Portal.UnitTests
             _dbContext.AssessmentData.Add(new AssessmentData
             {
                 ProcessId = ProcessId,
-                SdocId = 123456,
+                PrimarySdocId = 123456,
                 SourceDocumentName = "MyName",
                 RsdraNumber = "12345",
                 ReceiptDate = DateTime.Now,

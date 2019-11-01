@@ -191,16 +191,17 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_LinkedDocument_table_prevents_insert_for_no_AssessmentData()
+        public void Ensure_LinkedDocument_table_prevents_insert_for_no_ProcessId()
         {
             _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
             {
-                SdocId = 1234,
+                PrimarySdocId = 1234,
                 LinkType = "Forward",
                 RsdraNumber = "x345",
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
-                Created = DateTime.Now
+                Created = DateTime.Now,
+                Status = LinkedDocumentRetrievalStatus.Started.ToString()
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());

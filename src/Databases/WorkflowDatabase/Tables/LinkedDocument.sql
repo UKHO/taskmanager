@@ -1,7 +1,8 @@
 ﻿CREATE TABLE [dbo].[LinkedDocument]
 (
 	[LinkedDocumentId] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [SdocId] INT NOT NULL, 
+	[ProcessId] INT NOT NULL, 
+    [PrimarySdocId] INT NOT NULL, 
     [RsdraNumber] NVARCHAR(50) NOT NULL, 
     [SourceDocumentName] NVARCHAR(255) NOT NULL, 
 	[ReceiptDate] DATETIME2 NULL,
@@ -13,5 +14,5 @@
     [ContentServiceId] UNIQUEIDENTIFIER NULL, 
     [Status] NVARCHAR(25) NOT NULL,
     [Created] DATETIME NOT NULL, 
-    CONSTRAINT [FK_LinkedDocument_AssessmentData] FOREIGN KEY ([SdocId]) REFERENCES [AssessmentData]([SdocId])
+    CONSTRAINT [FK_LinkedDocument_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId])
 )

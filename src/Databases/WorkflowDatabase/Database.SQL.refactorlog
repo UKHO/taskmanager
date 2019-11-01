@@ -119,4 +119,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CorrelationId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="35210690-0118-4db9-be0e-ddd7f1cc46a2" ChangeDateTime="11/01/2019 11:06:59">
+    <Property Name="ElementName" Value="[dbo].[LinkedDocument].[SdocId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[LinkedDocument]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PrimarySdocId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cc293b59-cd5e-4e5c-bd3b-2b50e9f67d8f" ChangeDateTime="11/01/2019 11:07:21">
+    <Property Name="ElementName" Value="[dbo].[AssessmentData].[SdocId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssessmentData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PrimarySdocId" />
+  </Operation>
 </Operations>

@@ -91,7 +91,7 @@ namespace WorkflowCoordinator.Sagas
             foreach (var assessment in assessments)
             {
                 var isExists = await
-                    _dbContext.AssessmentData.AnyAsync(a => a.SdocId == assessment.Id);
+                    _dbContext.AssessmentData.AnyAsync(a => a.PrimarySdocId == assessment.Id);
 
                 if (!isExists) return assessment;
             }

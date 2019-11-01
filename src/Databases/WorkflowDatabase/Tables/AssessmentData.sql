@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[AssessmentData]
 (
 			[AssessmentDataId] INT NOT NULL PRIMARY KEY IDENTITY,
-			[SdocId] INT NOT NULL,
+			[PrimarySdocId] INT NOT NULL,
 			[RsdraNumber] NVARCHAR(50) NOT NULL,
 			[SourceDocumentName] NVARCHAR(255) NOT NULL,
 			[ReceiptDate] DATETIME2 NOT NULL,
@@ -14,6 +14,6 @@
 			[ProcessId] INT NOT NULL, 
     CONSTRAINT [AK_AssessmentData_ProcessId] UNIQUE ([ProcessId]), 
     CONSTRAINT [FK_AssessmentData_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]), 
-    CONSTRAINT [AK_AssessmentData_SdocId] UNIQUE ([SdocId])
+    CONSTRAINT [AK_AssessmentData_SdocId] UNIQUE ([PrimarySdocId])
 )
 

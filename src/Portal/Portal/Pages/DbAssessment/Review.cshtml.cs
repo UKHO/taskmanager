@@ -113,7 +113,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.SdocId, comment);
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
             }
             catch (Exception e)
             {

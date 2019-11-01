@@ -54,7 +54,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             var assessmentData = new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = message.SourceDocumentId,
+                PrimarySdocId = message.SourceDocumentId,
                 RsdraNumber = "RSDRA2019000130865"
             };
             await _dbContext.AssessmentData.AddAsync(assessmentData);
@@ -98,7 +98,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             var assessmentData = new WorkflowDatabase.EF.Models.AssessmentData()
             {
-                SdocId = message.SourceDocumentId,
+                PrimarySdocId = message.SourceDocumentId,
                 RsdraNumber = "RSDRA2017000130865"
             };
             await _dbContext.AssessmentData.AddAsync(assessmentData);

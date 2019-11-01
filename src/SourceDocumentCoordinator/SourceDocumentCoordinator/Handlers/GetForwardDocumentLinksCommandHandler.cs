@@ -32,7 +32,8 @@ namespace SourceDocumentCoordinator.Handlers
 
                 var linkedDocument = new LinkedDocument
                 {
-                    SdocId = message.SourceDocumentId,
+                    ProcessId = message.ProcessId,
+                    PrimarySdocId = message.SourceDocumentId,
                     LinkedSdocId = documentAssessmentData.SdocId,
                     RsdraNumber = documentAssessmentData.SourceName,
                     SourceDocumentName = documentAssessmentData.Name,
