@@ -106,10 +106,9 @@ namespace SourceDocumentCoordinator
 
                 var routing = transport.Routing();
 
-                // TODO: use proper events
-                //routing.RegisterPublisher(
-                //    assembly: typeof(GregTestEvent).Assembly,
-                //    publisherEndpoint: _generalConfig.Value.EventServiceName);
+                routing.RegisterPublisher(
+                    assembly: typeof(InitiateSourceDocumentRetrievalEvent).Assembly,
+                    publisherEndpoint: _generalConfig.Value.EventServiceName);
 
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
@@ -140,9 +139,8 @@ namespace SourceDocumentCoordinator
                 endpointConfiguration.EnableInstallers();
                 _endpoint = await Endpoint.Start(endpointConfiguration);
 
-                // TODO: use proper events
-                //await _endpoint.Subscribe<GregTestEvent>()
-                //    .ConfigureAwait(false);
+                await _endpoint.Subscribe<InitiateSourceDocumentRetrievalEvent>()
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
