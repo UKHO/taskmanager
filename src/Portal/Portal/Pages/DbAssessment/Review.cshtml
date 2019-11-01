@@ -41,7 +41,7 @@
         <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
         <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
         <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
-        <div class="col-2"><button id="btnDone" class="btn btn-primary btn-block">Done</button></div>
+        <div class="col-2"><form method="post" asp-page-handler="Done"><button id="btnDone" class="btn btn-primary btn-block" type="submit">Done</button></form></div>
     </div>
 </div>
 
@@ -71,7 +71,7 @@
                     <div id="modal-body">
                         <input type="hidden" asp-for="ProcessId" />
                         <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
-                        <br/>
+                        <br />
                         <div id="ConfirmTerminateError"></div>
                     </div>
                 </div>

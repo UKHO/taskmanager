@@ -109,6 +109,12 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
+        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        {
+            // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
+            return null;
+        }
+
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
             try
