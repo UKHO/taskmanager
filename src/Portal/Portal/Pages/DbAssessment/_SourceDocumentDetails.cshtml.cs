@@ -26,8 +26,8 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
-        public IEnumerable<LinkedDocument> LinkedDocuments { get; set; }
-        public IEnumerable<LinkedDocument> AttachedLinkedDocuments { get; set; }
+        public IEnumerable<LinkedDocuments> LinkedDocuments { get; set; }
+        public IEnumerable<LinkedDocuments> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 

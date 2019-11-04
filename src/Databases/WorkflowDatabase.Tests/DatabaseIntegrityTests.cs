@@ -199,7 +199,7 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_LinkedDocument_table_prevents_insert_for_no_ProcessId()
         {
-            _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            _dbContext.LinkedDocument.AddAsync(new LinkedDocuments()
             {
                 PrimarySdocId = 1234,
                 LinkType = "Forward",
