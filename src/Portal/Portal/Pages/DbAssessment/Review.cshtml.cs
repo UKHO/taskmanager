@@ -28,7 +28,8 @@ namespace Portal.Pages.DbAssessment
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
-        public _AssignTaskModel AssignTaskModel { get; set; }
+        [BindProperty]
+        public List<_AssignTaskModel> AssignTaskModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
@@ -49,6 +50,19 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             TaskInformationModel = SetTaskInformationData(processId);
+            AssignTaskModel = new List<_AssignTaskModel>()
+            {
+                new _AssignTaskModel()
+                {
+                    ProcessId = ProcessId,
+                    Ordinal = 0
+                },
+                new _AssignTaskModel()
+                {
+                    ProcessId = ProcessId,
+                    Ordinal = 1
+                }
+            };
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
