@@ -137,7 +137,7 @@ namespace Portal.Pages.DbAssessment
                 DocumentType = SourceDocumentType.Linked
             };
 
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
+            //await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
 
             return StatusCode(200);
             ////TODO: Log!
