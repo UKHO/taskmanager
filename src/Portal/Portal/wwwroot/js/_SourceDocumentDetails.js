@@ -32,6 +32,7 @@
             $(this).parent().hide();
 
             var linkedSdocId = Number($(this).data("linkedsdocid"));
+            var correlationId = Number($(this).data("correlationId"));
 
             $.ajax({
                 type: "POST",
@@ -41,7 +42,8 @@
                 },
                 data: {
                     "linkedSdocId": linkedSdocId,
-                    "processId": processId
+                    "processId": processId,
+                    "correlationId": correlationId
                 },
                 success: function (result) {
                     getSourceDocuments();

@@ -200,6 +200,10 @@ table > tbody > tr > th {
     border-bottom: unset;
 }
 
+.attachLinkedDocumentSpinnerContainer {
+    width: 68px;
+}
+
 .attachLinkedDocumentButtonContainer .fa.fa-paperclip,
 .attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
     color: #09315B;

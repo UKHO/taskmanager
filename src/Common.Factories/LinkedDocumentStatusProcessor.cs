@@ -24,7 +24,7 @@ namespace Common.Factories
         {
             var row = await _dbContext.LinkedDocument
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
-                                           && r.LinkedDocumentId == sourceDocumentId);
+                                           && r.LinkedSdocId == sourceDocumentId);
 
             if (row == null)
             {

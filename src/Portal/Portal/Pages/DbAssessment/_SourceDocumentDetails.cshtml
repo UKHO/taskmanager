@@ -73,7 +73,7 @@
                                      @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
                                      {
                                          <div class="attachLinkedDocumentButtonContainer">
-                                             <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId">
+                                             <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
                                                  <i class="fa fa-paperclip"></i>
                                              </a>
                                          </div>
