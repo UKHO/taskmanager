@@ -55,12 +55,58 @@ namespace Portal.Pages.DbAssessment
                 new _AssignTaskModel()
                 {
                     ProcessId = ProcessId,
-                    Ordinal = 0
+                    Ordinal = 0,
+                    Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
+                    Assessors = new SelectList(
+                        new List<Assessor>
+                        {
+                            new Assessor {AssessorId = 0, Name = "Brian Stenson"},
+                            new Assessor {AssessorId = 1, Name = "Peter Bates"}
+                        }, "AssessorId", "Name"),
+                    SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
+                    SourceTypes = new SelectList(
+                        new List<SourceType>
+                        {
+                            new SourceType{SourceTypeId = 0, Name = "Simple"},
+                            new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
+                            new SourceType{SourceTypeId = 2, Name = "LTA"}
+                        }, "SourceTypeId", "Name"),
+                    Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
+                    Verifiers = new SelectList(
+                        new List<Verifier>
+                        {
+                            new Verifier{VerifierId = 0, Name = "Brian Stenson"},
+                            new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
+                            new Verifier{VerifierId = 2, Name = "Peter Bates"}
+                        }, "VerifierId", "Name")
                 },
                 new _AssignTaskModel()
                 {
                     ProcessId = ProcessId,
-                    Ordinal = 1
+                    Ordinal = 1,
+                    Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
+                    Assessors = new SelectList(
+                        new List<Assessor>
+                        {
+                            new Assessor {AssessorId = 0, Name = "Brian Stenson"},
+                            new Assessor {AssessorId = 1, Name = "Peter Bates"}
+                        }, "AssessorId", "Name"),
+                    SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
+                    SourceTypes = new SelectList(
+                        new List<SourceType>
+                        {
+                            new SourceType{SourceTypeId = 0, Name = "Simple"},
+                            new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
+                            new SourceType{SourceTypeId = 2, Name = "LTA"}
+                        }, "SourceTypeId", "Name"),
+                    Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
+                    Verifiers = new SelectList(
+                        new List<Verifier>
+                        {
+                            new Verifier{VerifierId = 0, Name = "Brian Stenson"},
+                            new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
+                            new Verifier{VerifierId = 2, Name = "Peter Bates"}
+                        }, "VerifierId", "Name")
                 }
             };
         }
