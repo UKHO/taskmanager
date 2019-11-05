@@ -16,11 +16,11 @@ steps:
     msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=WorkflowDatabase.LocalDb.publish.xml
   displayName: 'Build WorkflowDatabase and publish to LocalDb'
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'test'
-#     projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
-#   displayName: 'dotnet test LocalDb instance of database'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
+  displayName: 'dotnet test LocalDb instance of database'
 
 - task: VSBuild@1
   inputs:
