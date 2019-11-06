@@ -10,9 +10,9 @@ namespace Common.Factories
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public LinkedDocumentStatusProcessor(WorkflowDbContext _dbContext)
+        public LinkedDocumentStatusProcessor(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext;
         }
 
         public int Add()
@@ -24,7 +24,7 @@ namespace Common.Factories
         {
             var row = await _dbContext.LinkedDocument
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
-                                           && r.LinkedDocumentId == sourceDocumentId);
+                                           && r.LinkedSdocId == sourceDocumentId);
 
             if (row == null)
             {

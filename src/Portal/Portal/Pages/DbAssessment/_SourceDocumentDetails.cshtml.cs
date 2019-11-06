@@ -118,29 +118,26 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId)
+        public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId, int processId, Guid correlationId)
         {
             // Update DB first, as it is the one used for populating Attached secondary sources
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                                     _documentStatusFactory,
-                                                                    ProcessId,
+                                                                    processId,
                                                                     linkedSdocId,
                                                                     SourceDocumentRetrievalStatus.Started,
                                                                     SourceDocumentType.Linked);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
-                CorrelationId = PrimaryDocumentStatus.CorrelationId.HasValue
-                    ? PrimaryDocumentStatus.CorrelationId.Value
-                    : Guid.NewGuid(),
-                ProcessId = ProcessId,
+                CorrelationId = correlationId,
+                ProcessId = processId,
                 SourceDocumentId = linkedSdocId,
                 GeoReferenced = false,
                 DocumentType = SourceDocumentType.Linked
             };
 
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),
-                docRetrievalEvent);
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
 
             return StatusCode(200);
             ////TODO: Log!

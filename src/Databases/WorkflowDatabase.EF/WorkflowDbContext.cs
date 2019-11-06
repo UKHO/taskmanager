@@ -13,8 +13,9 @@ namespace WorkflowDatabase.EF
         {
             var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
             var isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
+            var azureDevOpsBuild = environmentName.Equals("AzureDevOpsBuild", StringComparison.OrdinalIgnoreCase);
 
-            if (!isLocalDevelopment)
+            if (!isLocalDevelopment && !azureDevOpsBuild)
             {
                 (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
             }
