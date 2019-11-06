@@ -10,9 +10,9 @@ namespace Common.Factories
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public LinkedDocumentStatusProcessor(WorkflowDbContext _dbContext)
+        public LinkedDocumentStatusProcessor(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext;
         }
 
         public int Add()
