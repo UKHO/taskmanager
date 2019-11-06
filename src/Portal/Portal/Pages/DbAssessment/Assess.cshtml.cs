@@ -234,7 +234,8 @@ namespace Portal.Pages.DbAssessment
                         new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
                         new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
                         new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
-                    }, "WorkspaceId", "Workspace")
+                    }, "WorkspaceId", "Workspace"),
+                ProjectName = "Testing Project"
             };
         }
 
