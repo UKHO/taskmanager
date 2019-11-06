@@ -24,7 +24,7 @@
     };
 
     function setCreateHandler() {
-        $("#btnCreateTask").prop("type", "button").off("click").on("click", function (e) {
+        $("#btnCreateTask").on("click", function (e) {
             var currentCount = $(".assignTask").length;
             var newThing = $($(".assignTask")[0]).clone();
 
