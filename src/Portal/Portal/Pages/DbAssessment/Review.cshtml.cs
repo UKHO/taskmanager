@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -117,7 +119,24 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostDoneAsync(int processId)
         {
             // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
-            return null;
+            //TODO: Log
+
+            var correlationId = DbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
+
+            for (int i = 1; i < AssignTaskModel.Count; i++)
+            {
+                //TODO: Log
+                //TODO: Must validate incoming models
+                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                {
+                    CorrelationId = correlationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = processId
+                };
+                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+            }
+
+            return RedirectToPage("/Index");
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
