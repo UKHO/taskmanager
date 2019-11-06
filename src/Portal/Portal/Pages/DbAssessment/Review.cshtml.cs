@@ -25,6 +25,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
+        private readonly IEventServiceApiClient _eventServiceApiClient;
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
@@ -36,12 +37,14 @@ namespace Portal.Pages.DbAssessment
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
+            IEventServiceApiClient eventServiceApiClient,
             IHttpContextAccessor httpContextAccessor,
             IOptions<UriConfig> uriConfig)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
+            _eventServiceApiClient = eventServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
             _uriConfig = uriConfig;
         }
@@ -49,66 +52,8 @@ namespace Portal.Pages.DbAssessment
         public void OnGet(int processId)
         {
             ProcessId = processId;
+            AssignTaskModel = SetAssignTaskDummyData(processId);
             TaskInformationModel = SetTaskInformationData(processId);
-            AssignTaskModel = new List<_AssignTaskModel>()
-            {
-                new _AssignTaskModel()
-                {
-                    ProcessId = ProcessId,
-                    Ordinal = 0,
-                    Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                    Assessors = new SelectList(
-                        new List<Assessor>
-                        {
-                            new Assessor {AssessorId = 0, Name = "Brian Stenson"},
-                            new Assessor {AssessorId = 1, Name = "Peter Bates"}
-                        }, "AssessorId", "Name"),
-                    SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
-                    SourceTypes = new SelectList(
-                        new List<SourceType>
-                        {
-                            new SourceType{SourceTypeId = 0, Name = "Simple"},
-                            new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
-                            new SourceType{SourceTypeId = 2, Name = "LTA"}
-                        }, "SourceTypeId", "Name"),
-                    Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
-                    Verifiers = new SelectList(
-                        new List<Verifier>
-                        {
-                            new Verifier{VerifierId = 0, Name = "Brian Stenson"},
-                            new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
-                            new Verifier{VerifierId = 2, Name = "Peter Bates"}
-                        }, "VerifierId", "Name")
-                },
-                new _AssignTaskModel()
-                {
-                    ProcessId = ProcessId,
-                    Ordinal = 1,
-                    Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                    Assessors = new SelectList(
-                        new List<Assessor>
-                        {
-                            new Assessor {AssessorId = 0, Name = "Brian Stenson"},
-                            new Assessor {AssessorId = 1, Name = "Peter Bates"}
-                        }, "AssessorId", "Name"),
-                    SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
-                    SourceTypes = new SelectList(
-                        new List<SourceType>
-                        {
-                            new SourceType{SourceTypeId = 0, Name = "Simple"},
-                            new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
-                            new SourceType{SourceTypeId = 2, Name = "LTA"}
-                        }, "SourceTypeId", "Name"),
-                    Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
-                    Verifiers = new SelectList(
-                        new List<Verifier>
-                        {
-                            new Verifier{VerifierId = 0, Name = "Brian Stenson"},
-                            new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
-                            new Verifier{VerifierId = 2, Name = "Peter Bates"}
-                        }, "VerifierId", "Name")
-                }
-            };
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -233,18 +178,6 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        public IActionResult OnGetRetrieveAssignTasks(int processId)
-        {
-            return new PartialViewResult
-            {
-                ViewName = "_AssignTask",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = SetAssignTaskData(processId)
-                }
-            };
-        }
-
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
@@ -268,12 +201,12 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private _AssignTaskModel SetAssignTaskData(int processId)
+        private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
         {
-            return new _AssignTaskModel
+            return new List<_AssignTaskModel>{new _AssignTaskModel
             {
-                AssignTaskId = ++AssignTaskData.AssignId,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
-                Ordinal = AssignTaskData.AssignId,
+                AssignTaskId = 1,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
+                Ordinal = 1,
                 ProcessId = processId,
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
@@ -298,13 +231,7 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
-            };
+            }};
         }
-    }
-
-    // TODO: Temporary class for testing; Remove once DB is used to get values
-    public static class AssignTaskData
-    {
-        public static int AssignId;
     }
 }
