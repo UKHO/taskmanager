@@ -47,7 +47,8 @@
       "SdocId": 1936906,
       "ContentServiceId": null,
       "Status": "Started",
-      "StartedAt": "2019-06-12T00:00:00"
+      "StartedAt": "2019-06-12T00:00:00",
+      "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
     }
   },
   {
@@ -129,7 +130,8 @@
       "SdocId": 217547,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
       "Status": "Complete",
-      "StartedAt": "2019-06-12T00:00:00"
+      "StartedAt": "2019-06-12T00:00:00",
+      "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
     }
   },
   {
@@ -271,7 +273,8 @@
       "SdocId": 206733,
       "ContentServiceId": null,
       "Status": "Ready",
-      "StartedAt": "2019-06-12T00:00:00"
+      "StartedAt": "2019-06-12T00:00:00",
+      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
     }
   },
   {
