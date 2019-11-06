@@ -29,7 +29,8 @@ namespace Portal.Pages.DbAssessment
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
-        [BindProperty] public _OperatorsModel OperatorsModel { get; set; }
+        public _OperatorsModel OperatorsModel { get; set; }
+        public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
@@ -53,6 +54,7 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData(processId);
             TaskInformationModel = SetTaskInformationData(processId);
+            EditDatabaseModel = SetEditDatabaseModel();
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -218,6 +220,21 @@ namespace Portal.Pages.DbAssessment
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
                 SourceCategories = new SelectList(
                     sourceCategories, "SourceCategoryId", "Name")
+            };
+        }
+
+        private _EditDatabaseModel SetEditDatabaseModel()
+        {
+            return new _EditDatabaseModel
+            {
+                CarisWorkspace = new CarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
+                CarisWorkspaces = new SelectList(
+                    new List<CarisWorkspace>
+                    {
+                        new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
+                        new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
+                        new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
+                    }, "WorkspaceId", "Workspace")
             };
         }
 

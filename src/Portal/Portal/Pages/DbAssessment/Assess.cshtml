@@ -54,6 +54,8 @@
 
     <div id="sourceDocuments"></div>
     <div id="sourceDocumentsError"></div>
+    
+    @await Html.PartialAsync("_EditDatabase", Model.EditDatabaseModel).ConfigureAwait(false))
 
     <div id="existingComments"></div>
     <div id="AddCommentError"></div>

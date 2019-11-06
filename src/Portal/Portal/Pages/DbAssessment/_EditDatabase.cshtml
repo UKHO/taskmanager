@@ -1,0 +1,25 @@
+﻿@model Portal.Pages.DbAssessment._EditDatabaseModel
+
+<div class="card mb-4">
+    <h6>
+        <span>Edit Database</span>
+        <i class="deleteAssignTask float-right close-x" aria-label="Close">&times;</i>
+    </h6>
+    <div class="col-12">
+        <div class="card-body pb-0 pt-0">
+            <div class="row justify-content-between">
+                <div class="col-5">
+                    <div class="form-row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.CarisWorkspace, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.CarisWorkspace, Model.CarisWorkspaces, new { @class = "form-control" })</div>
+                    </div>
+                    <div class="form-row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control" })</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
