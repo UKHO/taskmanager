@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages.Enums;
-using Common.Messages.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -31,8 +29,7 @@ namespace Portal.Pages.DbAssessment
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
-        [BindProperty]
-        public List<_AssignTaskModel> AssignTaskModel { get; set; }
+        [BindProperty] public _OperatorsModel OperatorsModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
@@ -54,7 +51,7 @@ namespace Portal.Pages.DbAssessment
         public void OnGet(int processId)
         {
             ProcessId = processId;
-            AssignTaskModel = SetAssignTaskDummyData(processId);
+            OperatorsModel = SetOperatorsDummyData(processId);
             TaskInformationModel = SetTaskInformationData(processId);
         }
 
@@ -118,23 +115,24 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
         {
-            // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
-            //TODO: Log
+            //// Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
+            ////TODO: Log
 
-            var correlationId = DbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
+            //var correlationId = DbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId
+            //    .Value;
 
-            for (int i = 1; i < AssignTaskModel.Count; i++)
-            {
-                //TODO: Log
-                //TODO: Must validate incoming models
-                var docRetrievalEvent = new StartWorkflowInstanceEvent
-                {
-                    CorrelationId = correlationId,
-                    WorkflowType = WorkflowType.DbAssessment,
-                    ParentProcessId = processId
-                };
-                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-            }
+            //for (int i = 1; i < AssignTaskModel.Count; i++)
+            //{
+            //    //TODO: Log
+            //    //TODO: Must validate incoming models
+            //    var docRetrievalEvent = new StartWorkflowInstanceEvent
+            //    {
+            //        CorrelationId = correlationId,
+            //        WorkflowType = WorkflowType.DbAssessment,
+            //        ParentProcessId = processId
+            //    };
+            //    await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+            //}
 
             return RedirectToPage("/Index");
         }
@@ -143,7 +141,8 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
+                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId,
+                    comment);
             }
             catch (Exception e)
             {
@@ -188,7 +187,8 @@ namespace Portal.Pages.DbAssessment
             if (workflowInstance == null)
             {
                 //TODO: Log error!
-                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+                throw new ArgumentException(
+                    $"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
             }
 
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
@@ -199,7 +199,8 @@ namespace Portal.Pages.DbAssessment
 
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json"))
+                throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
@@ -216,41 +217,25 @@ namespace Portal.Pages.DbAssessment
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
                 SourceCategories = new SelectList(
-                        sourceCategories, "SourceCategoryId", "Name")
+                    sourceCategories, "SourceCategoryId", "Name")
             };
         }
 
-        private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
+        private _OperatorsModel SetOperatorsDummyData(int processId)
         {
-            return new List<_AssignTaskModel>{new _AssignTaskModel
+            return new _OperatorsModel
             {
-                AssignTaskId = 1,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
-                Ordinal = 1,
-                ProcessId = processId,
+                WorkManager = "Greg Williams",
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                Assessors = new SelectList(
-                    new List<Assessor>
-                    {
-                        new Assessor {AssessorId = 0, Name = "Brian Stenson"},
-                        new Assessor {AssessorId = 1, Name = "Peter Bates"}
-                    }, "AssessorId", "Name"),
-                SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
-                SourceTypes = new SelectList(
-                    new List<SourceType>
-                    {
-                        new SourceType{SourceTypeId = 0, Name = "Simple"},
-                        new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
-                        new SourceType{SourceTypeId = 2, Name = "LTA"}
-                    }, "SourceTypeId", "Name"),
                 Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(
                     new List<Verifier>
                     {
-                        new Verifier{VerifierId = 0, Name = "Brian Stenson"},
-                        new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
-                        new Verifier{VerifierId = 2, Name = "Peter Bates"}
+                        new Verifier {VerifierId = 0, Name = "Brian Stenson"},
+                        new Verifier {VerifierId = 1, Name = "Matt Stoodley"},
+                        new Verifier {VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
-            }};
+            };
         }
     }
 }

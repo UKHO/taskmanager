@@ -1,5 +1,5 @@
 ﻿@page
-@model Portal.Pages.DbAssessment.ReviewModel
+@model Portal.Pages.DbAssessment.AssessModel
 @{
     ViewData["Title"] = "Assess";
 }
@@ -50,6 +50,7 @@
     </div>
 
     @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
 
     <div id="sourceDocuments"></div>
     <div id="sourceDocumentsError"></div>
