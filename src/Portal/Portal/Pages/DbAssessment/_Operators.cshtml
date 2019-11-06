@@ -6,22 +6,22 @@
     <h6>Operators</h6>
 
     <div class="col-12">
-        <div class="card-body pb-0">
-            <div class="row justify-content-between">
+        <div class="card-body p-2">
+            <div class="row justify-content-center align-items-center">
                 <div class="col-4">
-                    <div class="row align-items-start">
+                    <div class="row">
                         <div class="col-6">@Html.LabelFor(model => model.WorkManager)</div>
                         <div class="col-5">@Html.DisplayFor(model => model.WorkManager)</div>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="row align-items-start">
+                    <div class="row">
                         <div class="col-5">@Html.LabelFor(model => model.Assessor)</div>
                         <div class="col-7">@Html.DisplayFor(model => model.Assessor.Name)</div>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="row align-items-start">
+                    <div class="row">
                         <div class="col-5">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
                     </div>
