@@ -26,7 +26,7 @@ namespace WorkflowDatabase.EF
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
-        public DbSet<LinkedDocument> LinkedDocument { get; set; }
+        public DbSet<LinkedDocuments> LinkedDocument { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +34,12 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.Comment);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.LinkedDocument)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.PrimaryDocumentStatus)
@@ -52,18 +58,13 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
 
+            modelBuilder.Entity<LinkedDocuments>().HasKey(x => x.LinkedDocumentId);
+
             modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
 
-            modelBuilder.Entity<WorkflowInstance>()
-                .HasMany(x => x.LinkedDocument)
-                .WithOne()
-                .HasPrincipalKey(w => w.ProcessId)
-                .HasForeignKey(l => l.ProcessId);
-
-            modelBuilder.Entity<LinkedDocument>().HasKey(x => x.LinkedDocumentId);
-            modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
+            modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);
         }

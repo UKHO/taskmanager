@@ -439,63 +439,26 @@
             </summary>
             <returns>Hash code</returns>
         </member>
-        <member name="T:DataServices.Models.LinkedDocument">
+        <member name="T:DataServices.Models.LinkedDocuments">
             <summary>
             
             </summary>
         </member>
-        <member name="P:DataServices.Models.LinkedDocument.DocId1">
+        <member name="P:DataServices.Models.LinkedDocuments.DocId1">
             <summary>
             The sdocId of the forward linked document or the source document sdocId
             </summary>
             <value>The sdocId of the forward linked document or the source document sdocId</value>
         </member>
-        <member name="P:DataServices.Models.LinkedDocument.DocId2">
+        <member name="P:DataServices.Models.LinkedDocuments.DocId2">
             <summary>
             The sdocId of the backward linked document or the source document sdocId
             </summary>
             <value>The sdocId of the backward linked document or the source document sdocId</value>
         </member>
-        <member name="P:DataServices.Models.LinkedDocument.LinkType">
+        <member name="P:DataServices.Models.LinkedDocuments.LinkType">
             <summary>
             Gets or Sets LinkType
-            </summary>
-        </member>
-        <member name="M:DataServices.Models.LinkedDocument.ToString">
-            <summary>
-            Returns the string presentation of the object
-            </summary>
-            <returns>String presentation of the object</returns>
-        </member>
-        <member name="M:DataServices.Models.LinkedDocument.ToJson">
-            <summary>
-            Returns the JSON string presentation of the object
-            </summary>
-            <returns>JSON string presentation of the object</returns>
-        </member>
-        <member name="M:DataServices.Models.LinkedDocument.Equals(System.Object)">
-            <summary>
-            Returns true if objects are equal
-            </summary>
-            <param name="obj">Object to be compared</param>
-            <returns>Boolean</returns>
-        </member>
-        <member name="M:DataServices.Models.LinkedDocument.Equals(DataServices.Models.LinkedDocument)">
-            <summary>
-            Returns true if LinkedDocument instances are equal
-            </summary>
-            <param name="other">Instance of LinkedDocument to be compared</param>
-            <returns>Boolean</returns>
-        </member>
-        <member name="M:DataServices.Models.LinkedDocument.GetHashCode">
-            <summary>
-            Gets the hash code
-            </summary>
-            <returns>Hash code</returns>
-        </member>
-        <member name="T:DataServices.Models.LinkedDocuments">
-            <summary>
-            
             </summary>
         </member>
         <member name="M:DataServices.Models.LinkedDocuments.ToString">
@@ -525,6 +488,43 @@
             <returns>Boolean</returns>
         </member>
         <member name="M:DataServices.Models.LinkedDocuments.GetHashCode">
+            <summary>
+            Gets the hash code
+            </summary>
+            <returns>Hash code</returns>
+        </member>
+        <member name="T:DataServices.Models.LinkedDocumentss">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:DataServices.Models.LinkedDocumentss.ToString">
+            <summary>
+            Returns the string presentation of the object
+            </summary>
+            <returns>String presentation of the object</returns>
+        </member>
+        <member name="M:DataServices.Models.LinkedDocumentss.ToJson">
+            <summary>
+            Returns the JSON string presentation of the object
+            </summary>
+            <returns>JSON string presentation of the object</returns>
+        </member>
+        <member name="M:DataServices.Models.LinkedDocumentss.Equals(System.Object)">
+            <summary>
+            Returns true if objects are equal
+            </summary>
+            <param name="obj">Object to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:DataServices.Models.LinkedDocumentss.Equals(DataServices.Models.LinkedDocumentss)">
+            <summary>
+            Returns true if LinkedDocumentss instances are equal
+            </summary>
+            <param name="other">Instance of LinkedDocumentss to be compared</param>
+            <returns>Boolean</returns>
+        </member>
+        <member name="M:DataServices.Models.LinkedDocumentss.GetHashCode">
             <summary>
             Gets the hash code
             </summary>

@@ -34,7 +34,6 @@ namespace Common.Helpers
 
         public static void ClearWorkflowDbTables(WorkflowDbContext workflowDbContext)
         {
-
             workflowDbContext.Database.ExecuteSqlCommand("delete from [LinkedDocument]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [Comment]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [AssessmentData]");

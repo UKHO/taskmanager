@@ -5,7 +5,7 @@ namespace WorkflowDatabase.EF.Models
 {
 
     [Table("LinkedDocument")]
-    public class LinkedDocument
+    public class LinkedDocuments
     {
         public int LinkedDocumentId { get; set; }
         public int ProcessId { get; set; }

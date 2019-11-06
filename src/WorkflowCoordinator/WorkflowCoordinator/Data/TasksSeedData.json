@@ -86,7 +86,7 @@
       "datum": null,
       "processId": 123
     },
-    "linkedDocuments": [
+    "linkedDocument": [
       {
         "processId": 123,
         "PrimarySdocId": 217547,
@@ -169,7 +169,7 @@
       "datum": "WGS84",
       "processId": 321
     },
-    "linkedDocuments": [
+    "linkedDocument": [
       {
         "processId": 321,
         "PrimarySdocId": 1101541,
@@ -244,7 +244,7 @@
       "datum": null,
       "processId": 125
     },
-    "linkedDocuments": [
+    "linkedDocument": [
       {
         "processId": 125,
         "PrimarySdocId": 206733,
@@ -312,7 +312,7 @@
       "datum": null,
       "processId": 126
     },
-    "linkedDocuments": [
+    "linkedDocument": [
       {
         "processId": 126,
         "PrimarySdocId": 938096,
@@ -365,6 +365,14 @@
       "activityCode": "4881",
       "assessor": "BatesP",
       "verifier": "BarzeyS"
+    },
+    "PrimaryDocumentStatus": {
+      "processId": 126,
+      "SdocId": 938096,
+      "ContentServiceId": null,
+      "Status": "Ready",
+      "StartedAt": "2019-06-12T00:00:00",
+      "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
     }
   },
   {
@@ -402,7 +410,7 @@
       "datum": null,
       "processId": 127
     },
-    "linkedDocuments": [
+    "linkedDocument": [
       {
         "processId": 127,
         "PrimarySdocId": 934153,

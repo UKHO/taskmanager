@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using SourceDocumentCoordinator.Config;

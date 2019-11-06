@@ -1,50 +1,47 @@
-﻿@model Portal.Pages.DbAssessment._AssignTaskModel
+﻿@using System.Linq
+@model List<Portal.Pages.DbAssessment._AssignTaskModel>
 
 <script type="text/javascript" src="~/js/AssignTask.js"></script>
 
 
-<div class="card mb-4" id="@("assignTask" + Model.AssignTaskId)">
-    @*<div class="card-header">
-            Assign Task @Model.AssignTaskId
-            <button type="button" class="deleteAssignTask @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>*@
-
-
-    <h6>Assign Task @Model.AssignTaskId <i class="deleteAssignTask float-right close-x @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">&times;</i></h6>
-
-
-    <div class="col-12">
-        <div class="card-body pb-0 pt-0">
-            <div class="row justify-content-between">
-                <div class="col-5">
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.Assessor, Model.Assessors, new { @class = "form-control" })</div>
+@for (var i = 0; i < Model.Count; i++)
+{
+    <div class="card mb-4 assignTask">
+        <h6>
+            <span>Assign Task @(i + 1)</span>
+            <i class="deleteAssignTask float-right close-x" aria-label="Close" style="@( i == 0 ? "display: none;": "" )">&times;</i>
+        </h6>
+        <div class="col-12">
+            <div class="card-body pb-0 pt-0">
+                <div class="row justify-content-between">
+                    <div class="col-5">
+                        <div class="form-row justify-content-between">
+                            <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).Assessor, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.DropDownListFor(model => model.ElementAt(i).Assessor, Model.ElementAt(i).Assessors, new { @class = "form-control assignTaskAssessor" })</div>
+                        </div>
+                        <div class="form-row justify-content-between">
+                            <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).Verifier, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.DropDownListFor(model => model.ElementAt(i).Verifier, Model.ElementAt(i).Verifiers, new { @class = "form-control assignTaskVerifier" })</div>
+                        </div>
                     </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.SourceType, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.SourceType, Model.SourceTypes, new { @class = "form-control" })</div>
-                    </div>
-                    <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.WorkspaceAffected, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.TextBoxFor(model => model.WorkspaceAffected, new { @class = "form-control" })</div>
+                    <div class="col-6">
+                        <div class="form-row justify-content-between">
+                            <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).SourceType, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.DropDownListFor(model => model.ElementAt(i).SourceType, Model.ElementAt(i).SourceTypes, new { @class = "form-control assignTaskSourceType" })</div>
+                        </div>
+                        <div class="form-row justify-content-between">
+                            <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).WorkspaceAffected, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.ElementAt(i).WorkspaceAffected, new { @class = "form-control assignTaskWorkspaceAffected" })</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-row justify-content-start">
-                <div class="form-group col-12">
-                    <div>@Html.LabelFor(model => model.Notes)</div>
-                    <div>@Html.TextAreaFor(model => model.Notes, htmlAttributes: new { @class = "form-control" })</div>
+                <div class="form-row justify-content-start">
+                    <div class="form-group col-12">
+                        <div>@Html.LabelFor(model => model.ElementAt(i).Notes)</div>
+                        <div>@Html.TextAreaFor(model => model.ElementAt(i).Notes, htmlAttributes: new { @class = "form-control assignTaskNotes" })</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}

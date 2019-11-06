@@ -18,6 +18,6 @@ namespace WorkflowDatabase.EF.Models
         public virtual AssessmentData AssessmentData { get; set; }
         public virtual DbAssessmentReviewData DbAssessmentReviewData { get; set; }
         public virtual PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
-        public virtual List<LinkedDocument> LinkedDocument { get; set; }
+        public virtual List<LinkedDocuments> LinkedDocument { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace SourceDocumentCoordinator.Handlers
             {
                 var documentAssessmentData = await _dataServiceApiClient.GetAssessmentData(documentObject.Id);
 
-                var linkedDocument = new LinkedDocument
+                var linkedDocument = new LinkedDocuments
                 {
                     ProcessId = message.ProcessId,
                     PrimarySdocId = message.SourceDocumentId,

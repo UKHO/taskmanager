@@ -121,6 +121,12 @@ namespace WorkflowCoordinator
                     messageType: typeof(GetSepDocumentLinksCommand),
                     destination: _generalConfig.Value.SourceDocumentCoordinatorName);
 
+                var routing = transport.Routing();
+
+                routing.RegisterPublisher(
+                    assembly: typeof(StartWorkflowInstanceEvent).Assembly,
+                    publisherEndpoint: _generalConfig.Value.EventServiceName);
+
                 var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
                 persistence.SqlDialect<SqlDialect.MsSqlServer>();
                 persistence.ConnectionBuilder(connectionBuilder: () =>

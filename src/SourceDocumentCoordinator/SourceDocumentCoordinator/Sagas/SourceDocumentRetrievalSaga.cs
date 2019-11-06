@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
-using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
 using SourceDocumentCoordinator.Enums;
@@ -25,7 +24,6 @@ namespace SourceDocumentCoordinator.Sagas
         IAmStartedByMessages<InitiateSourceDocumentRetrievalEvent>,
         IHandleTimeouts<GetDocumentRequestQueueStatusCommand>
     {
-        private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDocumentStatusFactory _documentStatusFactory;
@@ -34,7 +32,6 @@ namespace SourceDocumentCoordinator.Sagas
         public SourceDocumentRetrievalSaga(WorkflowDbContext dbContext, IDataServiceApiClient dataServiceApiClient,
             IOptionsSnapshot<GeneralConfig> generalConfig, IDocumentStatusFactory documentStatusFactory)
         {
-            _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _generalConfig = generalConfig;
             _documentStatusFactory = documentStatusFactory;
@@ -42,8 +39,8 @@ namespace SourceDocumentCoordinator.Sagas
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SourceDocumentRetrievalSagaData> mapper)
         {
-            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.SourceDocumentId)
-                .ToSaga(sagaData => sagaData.SourceDocumentId);
+            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.CorrelationId)
+                .ToSaga(sagaData => sagaData.CorrelationId);
         }
 
         public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)

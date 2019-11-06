@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Enums;
+using Common.Messages.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -25,22 +27,26 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
+        private readonly IEventServiceApiClient _eventServiceApiClient;
 
         public int ProcessId { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
-        public _AssignTaskModel AssignTaskModel { get; set; }
+        [BindProperty]
+        public List<_AssignTaskModel> AssignTaskModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
+            IEventServiceApiClient eventServiceApiClient,
             IHttpContextAccessor httpContextAccessor,
             IOptions<UriConfig> uriConfig)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
+            _eventServiceApiClient = eventServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
             _uriConfig = uriConfig;
         }
@@ -48,6 +54,7 @@ namespace Portal.Pages.DbAssessment
         public void OnGet(int processId)
         {
             ProcessId = processId;
+            AssignTaskModel = SetAssignTaskDummyData(processId);
             TaskInformationModel = SetTaskInformationData(processId);
         }
 
@@ -105,6 +112,29 @@ namespace Portal.Pages.DbAssessment
             AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
+            return RedirectToPage("/Index");
+        }
+
+        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        {
+            // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
+            //TODO: Log
+
+            var correlationId = DbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
+
+            for (int i = 1; i < AssignTaskModel.Count; i++)
+            {
+                //TODO: Log
+                //TODO: Must validate incoming models
+                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                {
+                    CorrelationId = correlationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = processId
+                };
+                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+            }
 
             return RedirectToPage("/Index");
         }
@@ -167,18 +197,6 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        public IActionResult OnGetRetrieveAssignTasks(int processId)
-        {
-            return new PartialViewResult
-            {
-                ViewName = "_AssignTask",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = SetAssignTaskData(processId)
-                }
-            };
-        }
-
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
@@ -202,12 +220,12 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private _AssignTaskModel SetAssignTaskData(int processId)
+        private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
         {
-            return new _AssignTaskModel
+            return new List<_AssignTaskModel>{new _AssignTaskModel
             {
-                AssignTaskId = ++AssignTaskData.AssignId,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
-                Ordinal = AssignTaskData.AssignId,
+                AssignTaskId = 1,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
+                Ordinal = 1,
                 ProcessId = processId,
                 Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
                 Assessors = new SelectList(
@@ -232,13 +250,7 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
                     }, "VerifierId", "Name")
-            };
+            }};
         }
-    }
-
-    // TODO: Temporary class for testing; Remove once DB is used to get values
-    public static class AssignTaskData
-    {
-        public static int AssignId;
     }
 }
