@@ -1,7 +1,6 @@
 ﻿$(document).ready(function () {
     var processId = { "processId": $("#hdnProcessId").val() };
 
-    //getAssignTasks();
     getComments();
 
     // Create child div under assignTasks and insert partial into it
