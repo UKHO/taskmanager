@@ -6,24 +6,12 @@
 
 @for (var i = 0; i < Model.Count; i++)
 {
-    <div class="card mb-4 assignTask" @*id="@("assignTask" + Model.AssignTaskId)"*@>
-        @*<div class="card-header">
-                Assign Task @Model.AssignTaskId
-                <button type="button" class="deleteAssignTask @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>*@
-
-
+    <div class="card mb-4 assignTask">
         <h6>
             <span>Assign Task @(i + 1)</span>
             <i class="deleteAssignTask float-right close-x" aria-label="Close" style="@( i == 0 ? "display: none;": "" )">&times;</i>
         </h6>
         <div class="col-12">
-            @*<input type="text" asp-for="@Model[i].Notes" />*@
-            @*<input type="text" name="[@i].Notes" value="@Model[i].Notes"/>*@
-            
-
             <div class="card-body pb-0 pt-0">
                 <div class="row justify-content-between">
                     <div class="col-5">
@@ -55,62 +43,5 @@
                 </div>
             </div>
         </div>
-        
-        
-
-        @*<h6>Assign Task @Model.AssignTaskId <i class="deleteAssignTask float-right close-x @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">&times;</i></h6>
-
-
-        <div class="col-12">
-            <div class="card-body pb-0 pt-0">
-                <div class="row justify-content-between">
-                    <div class="col-5">
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.Assessor, Model.Assessors, new { @class = "form-control" })</div>
-                        </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.SourceType, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.SourceType, Model.SourceTypes, new { @class = "form-control" })</div>
-                        </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.WorkspaceAffected, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.WorkspaceAffected, new { @class = "form-control" })</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row justify-content-start">
-                    <div class="form-group col-12">
-                        <div>@Html.LabelFor(model => model.Notes)</div>
-                        <div>@Html.TextAreaFor(model => model.Notes, htmlAttributes: new { @class = "form-control" })</div>
-                    </div>
-                </div>
-            </div>
-        </div>*@
     </div>
 }
-
-
-<div id="hiddenAssignTask" class="card mb-4" style="display: none;"@*id="@("assignTask" + Model.AssignTaskId)"*@>
-    @*<div class="card-header">
-                    Assign Task @Model.AssignTaskId
-                    <button type="button" class="deleteAssignTask @( Model.Ordinal == 1 ? "hidden": "" )" aria-label="Close" data-assigntaskid="@Model.AssignTaskId" data-ordinal="@Model.Ordinal">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>*@
-
-
-    <h6><span>Assign Task</span><i class="deleteAssignTask float-right close-x" aria-label="Close">&times;</i></h6>
-    <div class="col-12">
-        @*<input type="text" asp-for="@Model[i].Notes" />*@
-        @*<input type="text" name="[@i].Notes" value="@Model[i].Notes"/>*@
-        <input type="text" data-name="Notes" disabled="disabled"/>
-                
-    </div>
-</div>
