@@ -32,6 +32,7 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
+        public List<_DataImpactModel> DataImpactModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
         public WorkflowDbContext DbContext { get; set; }
 
@@ -57,6 +58,7 @@ namespace Portal.Pages.DbAssessment
             TaskInformationModel = SetTaskInformationData(processId);
             EditDatabaseModel = SetEditDatabaseModel();
             RecordProductActionModel = SetProductActionDummyData();
+            DataImpactModel = SetDataImpactModelDummyData();
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -281,6 +283,18 @@ namespace Portal.Pages.DbAssessment
                         new ProductActionType {ActionTypeId = 2, ActionType = "Product Only"},
                         new ProductActionType {ActionTypeId = 2, ActionType = "Scale too small"}
                     }, "ActionTypeId", "ActionType")
+            };
+        }
+
+        private List<_DataImpactModel> SetDataImpactModelDummyData()
+        {
+            return new List<_DataImpactModel>
+            {
+                new _DataImpactModel{Usage = "Nav 1"},
+                new _DataImpactModel{Usage = "Nav 2"},
+                new _DataImpactModel{Usage = "Nav 3"},
+                new _DataImpactModel{Usage = "Other"},
+                new _DataImpactModel{Usage = "POLAR"}
             };
         }
     }
