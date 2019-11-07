@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Configuration;
@@ -190,7 +189,6 @@ namespace Portal.Pages.DbAssessment
             return new _RecordProductActionModel
             {
                 Action = true,
-                Change = "Please update this one as per instruction.",
                 ImpactedProduct = new ImpactedProduct { ProductId = 0, Product = "GB123456" },
                 ImpactedProducts = new SelectList(
                     new List<ImpactedProduct>
