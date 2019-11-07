@@ -1,5 +1,7 @@
 ﻿@model Portal.Pages.DbAssessment._RecordProductActionModel
 
+<script type="text/javascript" src="~/js/RecordProductAction.js"></script>
+
 <div class="card mb-4">
     <h6>
         <span>Record Product Action</span>
@@ -19,16 +21,18 @@
                 <div class="col-2">@Html.LabelFor(model => model.Change, new { @class = "col-form-label" })</div>
                 <div class="col-9">@Html.TextAreaFor(model => model.Change, new { @class = "form-control", @placeholder = "Enter change details..." })</div>
             </div>
-            @foreach (var row in Model.ProductActions)
-            {
-                <div class="form-group row justify-content-start align-items-center recordProductAction">
-                    <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
-                    <div class="col-3">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control, impactedProduct" })</div>
-                    <div class="col-2">@Html.LabelFor(model => row.ActionType, new { @class = "col-form-label" })</div>
-                    <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control, productActionType" })</div>
-                    <div class="col-1"><i class="fa fa-times-circle" style="color: red; @(Model.ProductActions.Count() > 1 ? "display:inline;" : "display:none;")"></i></div>
-                </div>
-            }
+            <div id="productActions">
+                @foreach (var row in Model.ProductActions)
+                {
+                    <div class="form-group row justify-content-start align-items-center recordProductAction">
+                        <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
+                        <div class="col-3">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control, impactedProduct" })</div>
+                        <div class="col-2">@Html.LabelFor(model => row.ActionType, new { @class = "col-form-label" })</div>
+                        <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control, productActionType" })</div>
+                        <div class="col-1"><i class="fa fa-times-circle" style="color: red; @(Model.ProductActions.Count() > 1 ? "display:inline;" : "display:none;")"></i></div>
+                    </div>
+                }
+            </div>
             <div class="row justify-content-start">
                 <div class="col-5"><button id="btnAddImpact" class="btn btn-primary" type="button">Add Impact</button></div>
             </div>
