@@ -43,7 +43,7 @@
 
     function setDeleteHandler(element) {
         $(element).off("click").click(function () {
-            $(this).parent().parent().remove();
+            $(element).parents(".assignTask").remove();
 
             update();
         }).show();

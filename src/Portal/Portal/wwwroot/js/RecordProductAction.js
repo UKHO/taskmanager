@@ -45,7 +45,7 @@
 
     function setDeleteHandler(element) {
         $(element).on("click").click(function () {
-            $(element).parent().parent().remove();
+            $(element).parents(".recordProductAction").remove();
 
             update();
         }).show();
