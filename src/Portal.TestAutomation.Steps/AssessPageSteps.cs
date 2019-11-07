@@ -8,13 +8,11 @@ using Portal.TestAutomation.Framework.ContextClasses;
 
 
 namespace Portal.TestAutomation.Steps
-{
-  
-    
+{    
     [Binding]
     public class AssessPageSteps
     {
-        //private readonly AssessPage _assessPage;
+        private readonly AssessPage _assessPage;
         private readonly WorkflowDbContext _workflowDbContext;
         private readonly WorkflowInstanceContext _workflowContext;
         private readonly IWebDriver _driver;
@@ -24,22 +22,19 @@ namespace Portal.TestAutomation.Steps
             _workflowDbContext = workflowDbContext;
             _workflowContext = workflowContext;
             //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
-           // _assessPage = new AssessPage(driver, 5);
+            _assessPage = new AssessPage(driver, 5);
         }
-
-        
+                
         [Given(@"I navigate to the assess page")]
         public void GivenINavigateToTheAssessPage()
         {
-            //_assessPage.NavigateTo();
+            _assessPage.NavigateTo();
         }
 
         [Then(@"The assess page has loaded")]
         public void ThenTheAssessPageHasLoaded()
         {
-            //_assessPage.HasLoaded();
+            _assessPage.HasLoaded();
         }
-
-                          
     }
 }
