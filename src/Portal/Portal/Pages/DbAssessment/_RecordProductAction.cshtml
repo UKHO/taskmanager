@@ -26,10 +26,10 @@
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
                         <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
-                        <div class="col-3">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control, impactedProduct" })</div>
+                        <div class="col-3">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control impactedProduct" })</div>
                         <div class="col-2">@Html.LabelFor(model => row.ActionType, new { @class = "col-form-label" })</div>
-                        <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control, productActionType" })</div>
-                        <div class="col-1"><i class="fa fa-times-circle" style="color: red; @(Model.ProductActions.Count() > 1 ? "display:inline;" : "display:none;")"></i></div>
+                        <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control productActionType" })</div>
+                        <div class="col-1"><i class="fa fa-times-circle deleteAction" style="color: red;"></i></div>
                     </div>
                 }
             </div>

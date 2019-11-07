@@ -193,33 +193,28 @@ namespace Portal.Pages.DbAssessment
                 {
                     new ProductAction
                     {
-                        ActionType = "CPTS/LTA",
-                        ImpactedProduct = "GB123456",
+                        ActionType = "Please select a value...",
+                        ImpactedProduct = "Unknown",
                         ProcessId = ProcessId,
                         ProductActionId = 1
-                    },
-                    new ProductAction
-                    {
-                        ActionType = "CPTS/LTA MCOVER",
-                        ImpactedProduct = "GB111222",
-                        ProcessId = ProcessId,
-                        ProductActionId = 2
                     }
                 },
                 ImpactedProducts = new SelectList(
                     new List<ImpactedProduct>
                     {
-                        new ImpactedProduct {ProductId = 0, Product = "GB123456"},
-                        new ImpactedProduct {ProductId = 1, Product = "GB111222"},
-                        new ImpactedProduct {ProductId = 2, Product = "GB987651"}
+                        new ImpactedProduct {ProductId = 0, Product = "Select..."},
+                        new ImpactedProduct {ProductId = 1, Product = "GB123456"},
+                        new ImpactedProduct {ProductId = 2, Product = "GB111222"},
+                        new ImpactedProduct {ProductId = 3, Product = "GB987651"}
                     }, "ProductId", "Product"),
                 ProductActionTypes = new SelectList(
                     new List<ProductActionType>
                     {
-                        new ProductActionType {ActionTypeId = 0, ActionType = "CPTS/LTA"},
-                        new ProductActionType {ActionTypeId = 1, ActionType = "CPTS/LTA MCOVER"},
-                        new ProductActionType {ActionTypeId = 2, ActionType = "Product Only"},
-                        new ProductActionType {ActionTypeId = 2, ActionType = "Scale too small"}
+                        new ProductActionType {ActionTypeId = 0, ActionType = "Select..."},
+                        new ProductActionType {ActionTypeId = 1, ActionType = "CPTS/LTA"},
+                        new ProductActionType {ActionTypeId = 2, ActionType = "CPTS/LTA MCOVER"},
+                        new ProductActionType {ActionTypeId = 3, ActionType = "Product Only"},
+                        new ProductActionType {ActionTypeId = 4, ActionType = "Scale too small"}
                     }, "ActionTypeId", "ActionType")
             };
         }

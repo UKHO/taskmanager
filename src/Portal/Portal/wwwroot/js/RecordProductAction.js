@@ -5,21 +5,26 @@
     update();
 
     function update() {
-        $(".assignTask").each(function (index, element) {
+
+        $(".recordProductAction").each(function (index, element) {
+            if (index > 0) {
+                $(element).find(".deleteAction").show();
+            } else {
+                $(element).find(".deleteAction").hide();
+            }
             //Set Form Control Names
-            $(element).find($(".assignTaskAssessor")).prop("name", "AssignTaskModel[" + index + "].Assessor.AssessorId");
-            $(element).find($(".assignTaskVerifier")).prop("name", "AssignTaskModel[" + index + "].Verifier.VerifierId");
-            $(element).find($(".assignTaskSourceType")).prop("name", "AssignTaskModel[" + index + "].SourceType.SourceTypeId");
-            $(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AssignTaskModel[" + index + "].WorkspaceAffected");
-            $(element).find($(".assignTaskNotes")).prop("name", "AssignTaskModel[" + index + "].Notes");
+            //$(element).find($(".assignTaskAssessor")).prop("name", "AssignTaskModel[" + index + "].Assessor.AssessorId");
+            //$(element).find($(".assignTaskVerifier")).prop("name", "AssignTaskModel[" + index + "].Verifier.VerifierId");
+            //$(element).find($(".assignTaskSourceType")).prop("name", "AssignTaskModel[" + index + "].SourceType.SourceTypeId");
+            //$(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AssignTaskModel[" + index + "].WorkspaceAffected");
+            //$(element).find($(".assignTaskNotes")).prop("name", "AssignTaskModel[" + index + "].Notes");
 
             //Set Heading
-            $(element).find("span").text("Assign Task " + (index + 1));
-
+            //$(element).find("span").text("Assign Task " + (index + 1));
             if (index > 0) {
-                setDeleteHandler($(element).find(".deleteAssignTask"));
+                setDeleteHandler($(element).find(".deleteAction"));
             }
-            
+
         });
     };
 
@@ -39,8 +44,8 @@
     }
 
     function setDeleteHandler(element) {
-        $(element).off("click").click(function () {
-            $(this).parent().parent().remove();
+        $(element).on("click").click(function () {
+            $(element).parent().parent().remove();
 
             update();
         }).show();
