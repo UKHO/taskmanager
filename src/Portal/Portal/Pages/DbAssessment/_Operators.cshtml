@@ -1,0 +1,33 @@
+﻿@model Portal.Pages.DbAssessment._OperatorsModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="card mb-4 mt-3">
+    <h6>Operators</h6>
+
+    <div class="col-12">
+        <div class="card-body p-2">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-4">
+                    <div class="row align-items-center">
+                        <div class="col-5">@Html.LabelFor(model => model.WorkManager, new { @class = "col-form-label" })</div>
+                        <div class="col-5">@Html.DisplayFor(model => model.WorkManager)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="row align-items-center">
+                        <div class="col-4">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.Assessor.Name)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="row align-items-center">
+                        <div class="col-4">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
+                        <div class="col-8">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

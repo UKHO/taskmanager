@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="ReviewPageTasks - Copy.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\TasksSeedData.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -39,6 +43,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LandingPageTasks.feature</DependentUpon>
     </Compile>
+    <Compile Update="AssessPageTasks.feature.cs">
+      <DependentUpon>AssessPageTasks.feature</DependentUpon>
+    </Compile>
     <Compile Update="ReviewPageTasks.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -57,6 +64,12 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="AssessPageTasks.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <LastGenOutput>ReviewPageTasks.feature.cs</LastGenOutput>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="ReviewPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>

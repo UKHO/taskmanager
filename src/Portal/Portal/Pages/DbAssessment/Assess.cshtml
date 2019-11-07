@@ -1,0 +1,62 @@
+﻿@page
+@model Portal.Pages.DbAssessment.AssessModel
+@{
+    ViewData["Title"] = "Assess";
+}
+
+<script type="text/javascript" src="~/js/Assess.js"></script>
+<script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
+
+<div class="row mt-1">
+    <div class="col-4">
+        <a asp-page="/Index">
+            <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+        </a>
+    </div>
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>DB Assessment</h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Assess</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+<form method="post" asp-page-handler="Done">
+    <div class="col-12">
+        <div class="row justify-content-end btn-size">
+            <div class="col-2"><button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button></div>
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+            <div class="col-2">
+
+                <input type="hidden" asp-for="ProcessId" />
+                <button id="btnDone" class="btn btn-primary btn-block" type="submit">Done</button>
+
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
+
+    <div id="sourceDocuments"></div>
+    <div id="sourceDocumentsError"></div>
+
+    @await Html.PartialAsync("_EditDatabase", Model.EditDatabaseModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_RecordProductAction", Model.RecordProductActionModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_DataImpact", Model.DataImpactModel).ConfigureAwait(false)
+
+    <div id="existingComments"></div>
+    <div id="AddCommentError"></div>
+</form>
