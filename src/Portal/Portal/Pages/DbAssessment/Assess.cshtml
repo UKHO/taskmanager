@@ -54,7 +54,9 @@
     <div id="sourceDocumentsError"></div>
 
     @await Html.PartialAsync("_EditDatabase", Model.EditDatabaseModel).ConfigureAwait(false)
-    @await Html.PartialAsync("_RecordProductAction", Model.RecordProductActionModel).ConfigureAwait(false)
+    <div id="productActions">
+        @await Html.PartialAsync("_RecordProductAction", Model.RecordProductActionModel).ConfigureAwait(false)
+    </div>
     @await Html.PartialAsync("_DataImpact", Model.DataImpactModel).ConfigureAwait(false)
 
     <div id="existingComments"></div>
