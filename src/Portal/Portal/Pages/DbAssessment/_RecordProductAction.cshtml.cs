@@ -15,12 +15,8 @@ namespace Portal.Pages.DbAssessment
 
         public List<ProductAction> ProductActions { get; set; }
 
-        //[DisplayName("Impacted Product:")]
-        //public ImpactedProduct ImpactedProduct { get; set; }
         public SelectList ImpactedProducts { get; set; }
 
-        //[DisplayName("Product Action Type:")]
-        //public ProductActionType ProductActionType { get; set; }
         public SelectList ProductActionTypes { get; set; }
 
 
