@@ -5,23 +5,26 @@
         <span>Record Product Action</span>
     </h6>
     <div class="col-12">
-        <div class="card-body p-0">
-            <div class="row justify-content-start">
-                <div class="col-2">@Html.LabelFor(model => model.Action, new { @class = "form-check-label col-form-label" })</div>
-                <div class="col-10">@Html.CheckBoxFor(model => model.Action, new { @class = "form-check-input form-check-input-reverse", @placeholder = "Mooo" })</div>
+        <div class="form-group card-body p-0">
+            <div class="row justify-content-start align-items-center mb-1">
+                <div class="col-2">@Html.LabelFor(model => model.Action, new { @class = "col-form-label" })</div>
+                <div class="col-1">
+                    <div class="custom-control custom-checkbox">
+                        @Html.CheckBoxFor(model => model.Action, new { @class = "custom-control-input" })
+                        <label class="custom-control-label" for="Action"></label> @*Need empty label to keep custom control working*@
+                    </div>
+                </div>
             </div>
             <div class="form-group row justify-content-start">
                 <div class="col-2">@Html.LabelFor(model => model.Change, new { @class = "col-form-label" })</div>
                 <div class="col-9">@Html.TextAreaFor(model => model.Change, new { @class = "form-control", @placeholder = "Enter change details..." })</div>
             </div>
-
             <div class="form-group row justify-content-start align-items-center">
                 <div class="col-2">@Html.LabelFor(model => model.ImpactedProduct, new { @class = "col-form-label" })</div>
                 <div class="col-3">@Html.DropDownListFor(model => model.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control" })</div>
                 <div class="col-2">@Html.LabelFor(model => model.ProductActionType, new { @class = "col-form-label" })</div>
                 <div class="col-3">@Html.DropDownListFor(model => model.ProductActionType, Model.ProductActionTypes, new { @class = "form-control" })</div>
             </div>
-
             @*<div class="form-group row justify-content-start align-items-center">
                     <div class="col-2">@Html.LabelFor(model => model.ImpactedProduct, new { @class = "col-form-label" })</div>
                     <div class="col-3">@Html.DropDownListFor(model => model.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control" })</div>

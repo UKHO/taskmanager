@@ -222,6 +222,11 @@ table > tbody > tr > th {
     height: 2.75em;
 }
 
-.form-check-input-reverse {
-    margin-left: 0px;
+.custom-control-label::before, .custom-control-label::after {
+    right: 0;
+}
+
+label span {
+    position: absolute;
+    right: 21px;
 }
