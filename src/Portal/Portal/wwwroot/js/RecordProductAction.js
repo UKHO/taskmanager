@@ -33,8 +33,8 @@
             var currentCount = $(".recordProductAction").length;
             var newThing = $($(".recordProductAction")[0]).clone();
 
-            $(newThing).find(".impactedProduct").val("");
-            $(newThing).find(".productActionType").val("");
+            $(newThing).find(".impactedProduct").val(0);
+            $(newThing).find(".productActionType").val(0);
 
             $("#productActions").append(newThing);
             $(newThing).show();
