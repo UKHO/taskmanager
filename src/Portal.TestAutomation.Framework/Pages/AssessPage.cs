@@ -23,7 +23,7 @@ namespace Portal.TestAutomation.Framework.Pages
             var configRoot = AzureAppConfigConfigurationRoot.Instance;
             configRoot.GetSection("urls").Bind(_config);
 
-            AssessPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.ReviewPageUrl : _config.LocalDevReviewPageUrl;
+            AssessPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.AssessPageUrl : _config.LocalDevAssessPageUrl;
 
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
