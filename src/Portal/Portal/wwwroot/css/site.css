@@ -221,3 +221,7 @@ table > tbody > tr > th {
     width: 2.75em;
     height: 2.75em;
 }
+
+.form-check-input-reverse {
+    margin-left: 0px;
+}
