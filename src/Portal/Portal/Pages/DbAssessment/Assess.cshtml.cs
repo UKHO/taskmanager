@@ -189,7 +189,23 @@ namespace Portal.Pages.DbAssessment
             return new _RecordProductActionModel
             {
                 Action = true,
-                ImpactedProduct = new ImpactedProduct { ProductId = 0, Product = "GB123456" },
+                ProductActions = new List<ProductAction>
+                {
+                    new ProductAction
+                    {
+                        ActionType = "CPTS/LTA",
+                        ImpactedProduct = "GB123456",
+                        ProcessId = ProcessId,
+                        ProductActionId = 1
+                    },
+                    new ProductAction
+                    {
+                        ActionType = "CPTS/LTA MCOVER",
+                        ImpactedProduct = "GB111222",
+                        ProcessId = ProcessId,
+                        ProductActionId = 2
+                    }
+                },
                 ImpactedProducts = new SelectList(
                     new List<ImpactedProduct>
                     {
@@ -197,7 +213,6 @@ namespace Portal.Pages.DbAssessment
                         new ImpactedProduct {ProductId = 1, Product = "GB111222"},
                         new ImpactedProduct {ProductId = 2, Product = "GB987651"}
                     }, "ProductId", "Product"),
-                ProductActionType = new ProductActionType { ActionTypeId = 0, ActionType = "CPTS/LTA" },
                 ProductActionTypes = new SelectList(
                     new List<ProductActionType>
                     {
