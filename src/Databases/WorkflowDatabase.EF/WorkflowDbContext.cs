@@ -36,6 +36,9 @@ namespace WorkflowDatabase.EF
                 .HasMany(x => x.Comment);
 
             modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.OnHold);
+
+            modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.LinkedDocument)
                 .WithOne()
                 .HasPrincipalKey(p => p.ProcessId)
@@ -63,6 +66,8 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
+
+            modelBuilder.Entity<OnHold>().HasKey(x => x.OnHoldId);
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
 
