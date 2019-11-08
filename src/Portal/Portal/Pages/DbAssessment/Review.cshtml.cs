@@ -147,12 +147,12 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 OnHoldTime = DateTime.Now,
                 OnHoldUser = "Ross",
-                WorkflowInstanceId = DbContext.WorkflowInstance.First(p=>p.ProcessId == processId).WorkflowInstanceId
+                WorkflowInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId
             };
 
             await DbContext.OnHold.AddAsync(onHoldRecord);
             await DbContext.SaveChangesAsync();
-            
+
             IsOnHold = true;
 
             OnGet(processId);
@@ -255,7 +255,8 @@ namespace Portal.Pages.DbAssessment
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
                 ExternalEndDate = DateTime.Now,
-                OnHold = 4,
+                IsOnHold = true,
+                OnHoldDays = 4,
                 Ion = "2929",
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },

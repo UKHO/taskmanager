@@ -142,7 +142,7 @@ namespace Portal.Pages.DbAssessment
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
                 ExternalEndDate = DateTime.Now,
-                OnHold = 4,
+                OnHoldDays = 4,
                 Ion = "2929",
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },

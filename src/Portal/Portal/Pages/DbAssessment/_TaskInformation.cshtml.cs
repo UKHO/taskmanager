@@ -27,8 +27,10 @@ namespace Portal.Pages.DbAssessment
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime ExternalEndDate { get; set; }
 
+        public bool IsOnHold { get; set; }
+
         [DisplayName("On Hold:")]
-        public int OnHold { get; set; }
+        public int OnHoldDays { get; set; }
 
         [DisplayName("ION:")]
         public string Ion { get; set; }
