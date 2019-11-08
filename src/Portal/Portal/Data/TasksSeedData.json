@@ -132,7 +132,14 @@
       "Status": "Complete",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
-    }
+    },
+    "OnHold": [
+      {
+        "processId": 123,
+        "OnHoldTime": "2019-11-12T09:31:00",
+        "OnHoldUser": "Ross"
+      }
+    ]
   },
   {
     "processId": 321,
