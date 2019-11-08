@@ -142,20 +142,33 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
+            var wfInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId;
+
             var onHoldRecord = new OnHold
             {
                 ProcessId = processId,
                 OnHoldTime = DateTime.Now,
                 OnHoldUser = "Ross",
-                WorkflowInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId
+                WorkflowInstanceId = wfInstanceId
             };
 
             await DbContext.OnHold.AddAsync(onHoldRecord);
             await DbContext.SaveChangesAsync();
 
             IsOnHold = true;
-
             ProcessId = processId;
+
+            // Add comment that user has put the task on hold
+            DbContext.Comment.Add(new Comments
+            {
+                ProcessId = processId,
+                Created = DateTime.Now,
+                Text = $"Ross has put task {processId} on hold",
+                Username = "Ross",
+                WorkflowInstanceId = wfInstanceId
+            });
+            await DbContext.SaveChangesAsync();
+
             AssignTaskModel = SetAssignTaskDummyData(processId);
             // As we're submitting, re-get task info for now
             TaskInformationModel = SetTaskInformationData(processId, true);
@@ -178,11 +191,22 @@ namespace Portal.Pages.DbAssessment
                 IsOnHold = false;
 
                 ProcessId = processId;
+
+                // Add comment that user has taken the task off hold
+                DbContext.Comment.Add(new Comments
+                {
+                    ProcessId = processId,
+                    Created = DateTime.Now,
+                    Text = $"Bon has taken task {processId} off hold",
+                    Username = "Bon",
+                    WorkflowInstanceId = DbContext.WorkflowInstance.First(p=>p.ProcessId == processId).WorkflowInstanceId
+                });
+                await DbContext.SaveChangesAsync();
+
                 AssignTaskModel = SetAssignTaskDummyData(processId);
+
                 // As we're submitting, re-get task info for now
                 TaskInformationModel = SetTaskInformationData(processId, false);
-
-
             }
             catch (InvalidOperationException e)
             {
