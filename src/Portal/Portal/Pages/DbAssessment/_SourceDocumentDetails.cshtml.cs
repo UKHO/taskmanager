@@ -31,7 +31,6 @@ namespace Portal.Pages.DbAssessment
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
-
         public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
             IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDocumentStatusFactory documentStatusFactory)
         {

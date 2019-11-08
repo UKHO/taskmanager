@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -11,17 +13,16 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("Change:")]
         public string Change { get; set; }
 
-        [DisplayName("Impacted Product:")]
-        public ImpactedProduct ImpactedProduct { get; set; }
+        public List<ProductAction> ProductActions { get; set; }
+
         public SelectList ImpactedProducts { get; set; }
 
-        [DisplayName("Product Action Type:")]
-        public ProductActionType ProductActionType { get; set; }
         public SelectList ProductActionTypes { get; set; }
 
 
         public void OnGet()
         {
+
         }
     }
 }

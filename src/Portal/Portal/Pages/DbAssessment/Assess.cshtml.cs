@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Configuration;
@@ -190,23 +189,32 @@ namespace Portal.Pages.DbAssessment
             return new _RecordProductActionModel
             {
                 Action = true,
-                Change = "Please update this one as per instruction.",
-                ImpactedProduct = new ImpactedProduct { ProductId = 0, Product = "GB123456" },
+                ProductActions = new List<ProductAction>
+                {
+                    new ProductAction
+                    {
+                        ActionType = "Please select a value...",
+                        ImpactedProduct = "Unknown",
+                        ProcessId = ProcessId,
+                        ProductActionId = 1
+                    }
+                },
                 ImpactedProducts = new SelectList(
                     new List<ImpactedProduct>
                     {
-                        new ImpactedProduct {ProductId = 0, Product = "GB123456"},
-                        new ImpactedProduct {ProductId = 1, Product = "GB111222"},
-                        new ImpactedProduct {ProductId = 2, Product = "GB987651"}
+                        new ImpactedProduct {ProductId = 0, Product = "Select..."},
+                        new ImpactedProduct {ProductId = 1, Product = "GB123456"},
+                        new ImpactedProduct {ProductId = 2, Product = "GB111222"},
+                        new ImpactedProduct {ProductId = 3, Product = "GB987651"}
                     }, "ProductId", "Product"),
-                ProductActionType = new ProductActionType { ActionTypeId = 0, ActionType = "CPTS/LTA" },
                 ProductActionTypes = new SelectList(
                     new List<ProductActionType>
                     {
-                        new ProductActionType {ActionTypeId = 0, ActionType = "CPTS/LTA"},
-                        new ProductActionType {ActionTypeId = 1, ActionType = "CPTS/LTA MCOVER"},
-                        new ProductActionType {ActionTypeId = 2, ActionType = "Product Only"},
-                        new ProductActionType {ActionTypeId = 2, ActionType = "Scale too small"}
+                        new ProductActionType {ActionTypeId = 0, ActionType = "Select..."},
+                        new ProductActionType {ActionTypeId = 1, ActionType = "CPTS/LTA"},
+                        new ProductActionType {ActionTypeId = 2, ActionType = "CPTS/LTA MCOVER"},
+                        new ProductActionType {ActionTypeId = 3, ActionType = "Product Only"},
+                        new ProductActionType {ActionTypeId = 4, ActionType = "Scale too small"}
                     }, "ActionTypeId", "ActionType")
             };
         }
