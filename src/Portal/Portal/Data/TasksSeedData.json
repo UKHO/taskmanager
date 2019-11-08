@@ -136,7 +136,7 @@
     "OnHold": [
       {
         "processId": 123,
-        "OnHoldTime": "2019-11-12T09:31:00",
+        "OnHoldTime": "2019-11-12",
         "OnHoldUser": "Ross"
       }
     ]
