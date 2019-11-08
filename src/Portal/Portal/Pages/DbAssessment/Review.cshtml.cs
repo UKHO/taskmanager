@@ -30,6 +30,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IEventServiceApiClient _eventServiceApiClient;
 
         public int ProcessId { get; set; }
+        public bool IsOnHold { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
@@ -137,6 +138,49 @@ namespace Portal.Pages.DbAssessment
             }
 
             return RedirectToPage("/Index");
+        }
+
+        public async void OnPostOnHoldAsync(int processId)
+        {
+            var onHoldRecord = new OnHold
+            {
+                ProcessId = processId,
+                OnHoldTime = DateTime.Now,
+                OnHoldUser = "Ross",
+                WorkflowInstanceId = DbContext.WorkflowInstance.First(p=>p.ProcessId == processId).WorkflowInstanceId
+            };
+
+            await DbContext.OnHold.AddAsync(onHoldRecord);
+            await DbContext.SaveChangesAsync();
+            
+            IsOnHold = true;
+
+            OnGet(processId);
+        }
+
+        public async void OnPostOffHoldAsync(int processId)
+        {
+            try
+            {
+                var onHoldRecord = DbContext.OnHold.First(r => r.ProcessId == processId
+                                                           && r.OffHoldTime == null);
+
+                onHoldRecord.OffHoldTime = DateTime.Now;
+                onHoldRecord.OffHoldUser = "Bon";
+
+                await DbContext.SaveChangesAsync();
+
+                IsOnHold = false;
+
+                // As we're submitting, re-get task info for now
+                SetTaskInformationData(processId);
+            }
+            catch (InvalidOperationException e)
+            {
+                // Log error
+                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId:  {processId}");
+                //throw;
+            }
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)

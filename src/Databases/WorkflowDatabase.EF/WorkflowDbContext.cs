@@ -27,6 +27,7 @@ namespace WorkflowDatabase.EF
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<LinkedDocuments> LinkedDocument { get; set; }
+        public DbSet<OnHold> OnHold { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

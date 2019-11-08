@@ -33,22 +33,41 @@
 
 <hr />
 
-<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-<form method="post" asp-page-handler="Done">
-    <div class="col-12">
-        <div class="row justify-content-end btn-size">
-            <div class="col-2"><button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button></div>
-            <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
-            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
-            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        @if (!Model.IsOnHold)
+        {
             <div class="col-2">
-
-                <input type="hidden" asp-for="ProcessId" />
-                <button id="btnDone" class="btn btn-primary btn-block" type="submit">Done</button>
-
+                <form method="post" asp-page-handler="OnHold">
+                    <input type="hidden" asp-for="ProcessId" />
+                    <button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button>
+                </form>
             </div>
+        }
+        else
+        {
+            <div class="col-2">
+                <form method="post" asp-page-handler="OffHold">
+                    <input type="hidden" asp-for="ProcessId" />
+                    <button id="btnTakeOffHold" class="btn btn-primary btn-block">Take Off Hold</button>
+                </form>
+            </div>
+        }
+        <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+        <div class="col-2">
+
+            <input type="hidden" asp-for="ProcessId" />
+            <button id="btnDone" class="btn btn-primary btn-block" type="submit" form="frmReviewPage">Done</button>
+
         </div>
     </div>
+</div>
+
+<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+<form id="frmReviewPage" method="post" asp-page-handler="Done">
 
     @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
 
