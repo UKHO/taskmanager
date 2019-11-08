@@ -140,7 +140,7 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
-        public async void OnPostOnHoldAsync(int processId)
+        public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
             var onHoldRecord = new OnHold
             {
@@ -155,10 +155,16 @@ namespace Portal.Pages.DbAssessment
 
             IsOnHold = true;
 
-            OnGet(processId);
+
+            ProcessId = processId;
+            AssignTaskModel = SetAssignTaskDummyData(processId);
+            // As we're submitting, re-get task info for now
+            TaskInformationModel = SetTaskInformationData(processId);
+
+            return Page();
         }
 
-        public async void OnPostOffHoldAsync(int processId)
+        public async Task<IActionResult> OnPostOffHoldAsync(int processId)
         {
             try
             {
@@ -172,8 +178,12 @@ namespace Portal.Pages.DbAssessment
 
                 IsOnHold = false;
 
+                ProcessId = processId;
+                AssignTaskModel = SetAssignTaskDummyData(processId);
                 // As we're submitting, re-get task info for now
-                SetTaskInformationData(processId);
+                TaskInformationModel = SetTaskInformationData(processId);
+
+
             }
             catch (InvalidOperationException e)
             {
@@ -181,6 +191,8 @@ namespace Portal.Pages.DbAssessment
                 e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId:  {processId}");
                 //throw;
             }
+
+            return Page();
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
