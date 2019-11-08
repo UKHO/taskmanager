@@ -56,7 +56,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
-            TaskInformationModel = SetTaskInformationData(processId);
+            TaskInformationModel = SetTaskInformationData(processId, false);
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -155,11 +155,10 @@ namespace Portal.Pages.DbAssessment
 
             IsOnHold = true;
 
-
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
             // As we're submitting, re-get task info for now
-            TaskInformationModel = SetTaskInformationData(processId);
+            TaskInformationModel = SetTaskInformationData(processId, true);
 
             return Page();
         }
@@ -181,7 +180,7 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId;
                 AssignTaskModel = SetAssignTaskDummyData(processId);
                 // As we're submitting, re-get task info for now
-                TaskInformationModel = SetTaskInformationData(processId);
+                TaskInformationModel = SetTaskInformationData(processId, false);
 
 
             }
@@ -253,7 +252,7 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        private _TaskInformationModel SetTaskInformationData(int processId)
+        private _TaskInformationModel SetTaskInformationData(int processId, bool isOnHold)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
@@ -267,7 +266,7 @@ namespace Portal.Pages.DbAssessment
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
                 ExternalEndDate = DateTime.Now,
-                IsOnHold = true,
+                IsOnHold = isOnHold,
                 OnHoldDays = 4,
                 Ion = "2929",
                 ActivityCode = "1272",
