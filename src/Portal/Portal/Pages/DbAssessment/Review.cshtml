@@ -39,7 +39,7 @@
         @if (!Model.IsOnHold)
         {
             <div class="col-2">
-                <form method="post" asp-page-handler="OnHold">
+                <form id="OnHold" method="post" asp-page-handler="OnHold">
                     <input type="hidden" asp-for="ProcessId" />
                     <button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button>
                 </form>
@@ -48,7 +48,7 @@
         else
         {
             <div class="col-2">
-                <form method="post" asp-page-handler="OffHold">
+                <form id="OffHold" method="post" asp-page-handler="OffHold">
                     <input type="hidden" asp-for="ProcessId" />
                     <button id="btnTakeOffHold" class="btn btn-primary btn-block">Take Off Hold</button>
                 </form>

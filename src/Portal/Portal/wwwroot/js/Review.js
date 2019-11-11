@@ -3,6 +3,14 @@
 
     getComments();
 
+    $('#OnHold').submit(function (event) {
+        $('#btnPutOnHold').prop('disabled', 'disabled');
+    });
+
+    $('#OffHold').submit(function (event) {
+        $('#btnTakeOffHold').prop('disabled', 'disabled');
+    });
+
     $('#btnTerminate').on('click', function () {
         $('#ConfirmTerminate').modal('show');
     });
