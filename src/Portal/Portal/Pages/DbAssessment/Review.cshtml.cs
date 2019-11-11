@@ -159,6 +159,7 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             // Add comment that user has put the task on hold
+            // TODO: swap out hardcoded user for one from AD
             DbContext.Comment.Add(new Comments
             {
                 ProcessId = processId,
@@ -193,6 +194,7 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId;
 
                 // Add comment that user has taken the task off hold
+                // TODO: swap out hardcoded user for one from AD
                 DbContext.Comment.Add(new Comments
                 {
                     ProcessId = processId,
