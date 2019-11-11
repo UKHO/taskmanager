@@ -22,17 +22,15 @@ namespace Portal.TestAutomation.Framework.Pages
         private IWebElement InFlightTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
         private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
         private IWebElement ClickOnTask => _driver.FindElement(By.XPath("//*[@id='inFlightTasks']/tbody/tr[1]/td[1]/a"));
-        //private List<IWebElement> UnassignedTaskTableActualDataRows => UnassignedTaskTable.FindElements(By.TagName("tr")).ToList();
-        //private List<IWebElement> InFlightTaskTableActualDataRows => InFlightTaskTable.(By.TagName("tr")).ToList();
 
         private List<IWebElement> UnassignedTaskTableActualDataRows =>
             UnassignedTaskTable.FindElements(By.XPath("//*[@id='unassignedTasks']/tbody/tr"))
                 .Where(r => r.FindElements(By.TagName("td")).Count > 1)
                 .ToList();
-        private List<IWebElement> InFlightTaskTableActualDataRows => InFlightTaskTable.FindElements(By.XPath("//*[@id='inFlightTasks']/tbody/tr"))
+        private List<IWebElement> InFlightTaskTableActualDataRows =>
+            InFlightTaskTable.FindElements(By.XPath("//*[@id='inFlightTasks']/tbody/tr"))
             .Where(r => r.FindElements(By.TagName("td")).Count > 1)
             .ToList();
-
 
         public LandingPage(IWebDriver driver, int seconds)
         {
