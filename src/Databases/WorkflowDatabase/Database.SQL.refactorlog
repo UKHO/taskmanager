@@ -133,4 +133,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="PrimarySdocId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c75934f3-f4ab-4269-ba6c-861a2f4d681c" ChangeDateTime="11/08/2019 09:20:56">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[Created]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OffHoldTime" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="766589e6-0e5e-4d82-a607-1d71b60c3a91" ChangeDateTime="11/08/2019 09:23:40">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OnHoldUser" />
+  </Operation>
 </Operations>

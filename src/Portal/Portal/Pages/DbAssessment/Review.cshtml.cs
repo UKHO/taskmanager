@@ -12,9 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -24,12 +22,13 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOptions<UriConfig> _uriConfig;
+        private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
 
         public int ProcessId { get; set; }
+        public bool IsOnHold { get; set; }
         public _TaskInformationModel TaskInformationModel { get; set; }
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
@@ -41,21 +40,21 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<UriConfig> uriConfig)
+            IOnHoldCalculator onHoldCalculator)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
-            _uriConfig = uriConfig;
+            _onHoldCalculator = onHoldCalculator;
         }
 
         public void OnGet(int processId)
         {
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
-            TaskInformationModel = SetTaskInformationData(processId);
+            TaskInformationModel = SetTaskInformationDummyData(processId);
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -139,6 +138,70 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
+        public async Task<IActionResult> OnPostOnHoldAsync(int processId)
+        {
+            var wfInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId;
+
+            var onHoldRecord = new OnHold
+            {
+                ProcessId = processId,
+                OnHoldTime = DateTime.Now,
+                OnHoldUser = "Ross",
+                WorkflowInstanceId = wfInstanceId
+            };
+
+            await DbContext.OnHold.AddAsync(onHoldRecord);
+            await DbContext.SaveChangesAsync();
+
+            IsOnHold = true;
+            ProcessId = processId;
+
+            // Add comment that user has put the task on hold
+            // TODO: swap out hardcoded user for one from AD
+            await AddComment($"Task {processId} has been put on hold", processId, wfInstanceId);
+
+            AssignTaskModel = SetAssignTaskDummyData(processId);
+            // As we're submitting, re-get task info for now
+            TaskInformationModel = SetTaskInformationDummyData(processId);
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostOffHoldAsync(int processId)
+        {
+            try
+            {
+                var onHoldRecord = DbContext.OnHold.First(r => r.ProcessId == processId
+                                                           && r.OffHoldTime == null);
+
+                onHoldRecord.OffHoldTime = DateTime.Now;
+                onHoldRecord.OffHoldUser = "Bon";
+
+                await DbContext.SaveChangesAsync();
+
+                IsOnHold = false;
+
+                ProcessId = processId;
+
+                // Add comment that user has taken the task off hold
+                // TODO: swap out hardcoded user for one from AD
+                await AddComment($"Task {processId} taken off hold", processId, DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
+                
+                AssignTaskModel = SetAssignTaskDummyData(processId);
+
+                // As we're submitting, re-get task info for now
+                TaskInformationModel = SetTaskInformationDummyData(processId);
+            }
+            catch (InvalidOperationException e)
+            {
+                // Log error
+                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId: {processId}");
+                //throw;
+            }
+
+            return Page();
+        }
+
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
             try
@@ -163,7 +226,7 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private void AddComment(string comment, int processId, int workflowInstanceId)
+        private async Task AddComment(string comment, int processId, int workflowInstanceId)
         {
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
@@ -176,7 +239,7 @@ namespace Portal.Pages.DbAssessment
                 Text = comment
             });
 
-            DbContext.SaveChanges();
+            await DbContext.SaveChangesAsync();
         }
 
         private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
@@ -197,12 +260,15 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        private _TaskInformationModel SetTaskInformationData(int processId)
+        private _TaskInformationModel SetTaskInformationDummyData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+
+            var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
+            IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
 
             return new _TaskInformationModel
             {
@@ -211,7 +277,8 @@ namespace Portal.Pages.DbAssessment
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
                 ExternalEndDate = DateTime.Now,
-                OnHold = 4,
+                IsOnHold = IsOnHold,
+                OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date),
                 Ion = "2929",
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },

@@ -27,6 +27,7 @@ namespace WorkflowDatabase.EF
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<LinkedDocuments> LinkedDocument { get; set; }
+        public DbSet<OnHold> OnHold { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,9 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.Comment);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.OnHold);
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.LinkedDocument)
@@ -63,6 +67,8 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
+
+            modelBuilder.Entity<OnHold>().HasKey(x => x.OnHoldId);
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
 

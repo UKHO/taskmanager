@@ -32,30 +32,36 @@
                         <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
                     </div>
                     <div class="form-group row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.OnHold)</div>
-                        <div class="col-7">@Html.DisplayFor(model => model.OnHold)</div>
-                    </div>
-                </div>
-            </div>
-            <hr class="mt-1 mb-4" />
-            <div class="row justify-content-between">
-                <div class="col-4">
-                    <div class="form-group row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
-                        <div class="col-4">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
-                    </div>
-                    <div class="form-group row justify-content-between">
-                        <div class="col-7">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
-                        <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
-                    </div>
-                </div>
-                <div class="col-7">
-                    <div class="form-group row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class = "form-control" })</div>
+                        <div class="col-5">@Html.LabelFor(model => model.OnHoldDays)</div>
+                        <div class="col-7">
+                            @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
+                        @if (Model.IsOnHold)
+                        {
+                            <i class="fa fa-pause-circle"></i>
+                        }
                     </div>
                 </div>
             </div>
         </div>
+        <hr class="mt-1 mb-4" />
+        <div class="row justify-content-between">
+            <div class="col-4">
+                <div class="form-group row justify-content-between">
+                    <div class="col-7">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                    <div class="col-4">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
+                </div>
+                <div class="form-group row justify-content-between">
+                    <div class="col-7">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
+                    <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
+                </div>
+            </div>
+            <div class="col-7">
+                <div class="form-group row justify-content-between">
+                    <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
+                    <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class = "form-control" })</div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 </div>

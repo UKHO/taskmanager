@@ -33,22 +33,43 @@
 
 <hr />
 
-<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-<form method="post" asp-page-handler="Done">
-    <div class="col-12">
-        <div class="row justify-content-end btn-size">
-            <div class="col-2"><button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button></div>
-            <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
-            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
-            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        @if (!Model.IsOnHold)
+        {
             <div class="col-2">
-
-                <input type="hidden" asp-for="ProcessId" />
-                <button id="btnDone" class="btn btn-primary btn-block" type="submit">Done</button>
-
+                <form id="OnHold" method="post" asp-page-handler="OnHold">
+                    <input type="hidden" asp-for="ProcessId" />
+                    <button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button>
+                </form>
             </div>
+        }
+        else
+        {
+            <div class="col-2">
+                <form id="OffHold" method="post" asp-page-handler="OffHold">
+                    <input type="hidden" asp-for="ProcessId" />
+                    <button id="btnTakeOffHold" class="btn btn-primary btn-block">Take Off Hold</button>
+                </form>
+            </div>
+        }
+        <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+        <div class="col-2">
+
+            <input type="hidden" asp-for="ProcessId" />
+            <button id="btnDone" class="btn btn-primary btn-block" type="submit" form="frmReviewPage">Done</button>
+
         </div>
     </div>
+</div>
+
+
+<form id="frmReviewPage" method="post" asp-page-handler="Done">
+
+    <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
 
     @await Html.PartialAsync("_TaskInformation", Model.TaskInformationModel).ConfigureAwait(false)
 
@@ -65,31 +86,32 @@
     <div id="existingComments"></div>
     <div id="AddCommentError"></div>
 
-    @* Modal Add Termination comment *@
-    <div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="terminatingReview" asp-page-handler="ReviewTerminate" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Terminate DB Assessment</h4>
+</form>
+
+@* Modal Add Termination comment *@
+<div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="terminatingReview" asp-page-handler="ReviewTerminate" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Terminate DB Assessment</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Provide a reason for terminating this DB Assessment?</p>
+                    <div id="modal-body">
+                        <input type="hidden" asp-for="ProcessId" />
+                        <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
+                        <br />
+                        <div id="ConfirmTerminateError"></div>
                     </div>
-                    <div class="modal-body">
-                        <p>Provide a reason for terminating this DB Assessment?</p>
-                        <div id="modal-body">
-                            <input type="hidden" asp-for="ProcessId" />
-                            <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
-                            <br />
-                            <div id="ConfirmTerminateError"></div>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="row col-11 justify-content-end">
-                            <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
-                            <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>
