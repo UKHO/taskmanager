@@ -56,7 +56,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
-            TaskInformationModel = SetTaskInformationData(processId, false);
+            TaskInformationModel = SetTaskInformationDummyData(processId);
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -171,7 +171,7 @@ namespace Portal.Pages.DbAssessment
 
             AssignTaskModel = SetAssignTaskDummyData(processId);
             // As we're submitting, re-get task info for now
-            TaskInformationModel = SetTaskInformationData(processId, true);
+            TaskInformationModel = SetTaskInformationDummyData(processId);
 
             return Page();
         }
@@ -199,19 +199,19 @@ namespace Portal.Pages.DbAssessment
                     Created = DateTime.Now,
                     Text = $"Bon has taken task {processId} off hold",
                     Username = "Bon",
-                    WorkflowInstanceId = DbContext.WorkflowInstance.First(p=>p.ProcessId == processId).WorkflowInstanceId
+                    WorkflowInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId
                 });
                 await DbContext.SaveChangesAsync();
 
                 AssignTaskModel = SetAssignTaskDummyData(processId);
 
                 // As we're submitting, re-get task info for now
-                TaskInformationModel = SetTaskInformationData(processId, false);
+                TaskInformationModel = SetTaskInformationDummyData(processId);
             }
             catch (InvalidOperationException e)
             {
                 // Log error
-                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId:  {processId}");
+                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId: {processId}");
                 //throw;
             }
 
@@ -276,12 +276,15 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        private _TaskInformationModel SetTaskInformationData(int processId, bool isOnHold)
+        private _TaskInformationModel SetTaskInformationDummyData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+
+            var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
+            IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
 
             return new _TaskInformationModel
             {
@@ -290,8 +293,8 @@ namespace Portal.Pages.DbAssessment
                 DmReceiptDate = DateTime.Now,
                 EffectiveReceiptDate = DateTime.Now,
                 ExternalEndDate = DateTime.Now,
-                IsOnHold = isOnHold,
-                OnHoldDays = 4,
+                IsOnHold = IsOnHold,
+                OnHoldDays = OnHoldCalculator.CalculateOnHoldDays(onHoldRows),
                 Ion = "2929",
                 ActivityCode = "1272",
                 SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
