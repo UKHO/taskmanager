@@ -4,14 +4,20 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal
 {
-    public static class OnHoldCalculator
+    public class OnHoldCalculator : IOnHoldCalculator
     {
+        public OnHoldCalculator()
+        {
+            
+        }
+
         /// <summary>
         /// Returns the number of days a task has been on hold.
         /// </summary>
         /// <param name="rowsToCalculate">All the OnHold rows from the DB for the task.</param>
+        /// <param name="currentDate">The current date.</param>
         /// <returns></returns>
-        public static int CalculateOnHoldDays(IEnumerable<OnHold> rowsToCalculate)
+        public int CalculateOnHoldDays(IEnumerable<OnHold> rowsToCalculate, DateTime currentDate)
         {
             double onHoldTotal = 0;
 
@@ -19,11 +25,11 @@ namespace Portal
             {
                 if (row.OffHoldTime == null)
                 {
-                    onHoldTotal += (DateTime.Now.Date- row.OnHoldTime).TotalDays;
+                    onHoldTotal += (currentDate.Date - row.OnHoldTime.Date).TotalDays;
                 }
                 else
                 {
-                    onHoldTotal += (row.OffHoldTime.Value- row.OnHoldTime).TotalDays;
+                    onHoldTotal += (row.OffHoldTime.Value.Date - row.OnHoldTime.Date).TotalDays;
                 }
             }
 

@@ -8,6 +8,13 @@ namespace Portal.UnitTests
     public class OnHoldCalculatorTests
     {
         private IList<OnHold> _onHoldRows;
+        private OnHoldCalculator _onHoldCalculator;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _onHoldCalculator = new OnHoldCalculator();
+        }
 
         [Test]
         public void Test_OnHoldCalculator_Returns_Correct_Number_Of_Days_When_Task_Put_On_Hold_3_Days_Ago_And_Still_On_Hold()
@@ -25,7 +32,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(3, amount);
         }
 
@@ -45,7 +52,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(2, amount);
         }
 
@@ -83,7 +90,7 @@ namespace Portal.UnitTests
                 },
             };
 
-            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(2, amount);
         }
 
@@ -121,7 +128,7 @@ namespace Portal.UnitTests
                 },
             };
 
-            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(1, amount);
         }
 
@@ -141,7 +148,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(0, amount);
         }
     }

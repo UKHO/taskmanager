@@ -103,6 +103,7 @@ namespace Portal
 
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
+            services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
