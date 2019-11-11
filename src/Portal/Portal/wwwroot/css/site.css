@@ -1,9 +1,7 @@
-/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
+r/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
 
-
 body {
-    padding-bottom: 10px;
     color: #333333;
     font-family: 'JohnstonITC', Helvetica, sans-serif;
     font-size: 16px;
@@ -18,39 +16,15 @@ body {
     padding-right: 15px;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
-    width: 100%;
-}
-
-/* QR code generator */
-#qrCode {
-    margin: 15px;
-}
-
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    /* Hide captions */
-    .carousel-caption {
-        display: none;
-    }
-}
-
 @media (min-width: 1400px) {
     .container {
-        width: 1370px;
+        max-width: 1340px;
     }
 }
 
 @media (min-width: 1600px) {
     .container {
-        width: 1570px;
+        max-width: 1540px;
     }
 }
 
@@ -59,37 +33,14 @@ table.task-list thead tr th {
     text-align: center;
 }
 
-.right-inner-addon {
-    position: relative;
-}
-
-.right-inner-addon input {
-        padding-right: 30px;
-}
-
-.right-inner-addon i {
-        position: absolute;
-        right: 0px;
-        padding: 10px 12px;
-        pointer-events: none;
-}
-
-.well.landingpagefooter {
-    background-color: #337ab7;
-    color: white;
-    padding: 15px 19px 15px 19px;
-}
-
-.well.landingpagefooter p {
-    margin: 0px;
-}
-
 .form-row {
     margin: 1.0em 0;
 }
 
 
-#inFlightTasks.table-striped > tbody > tr.even,
+/* TODO fix up in tasks note story */
+
+/*#inFlightTasks.table-striped > tbody > tr.even,
 #inFlightTasks.table-striped > tbody > tr.even + tr {
     background-color: #ffffff;
 }
@@ -97,23 +48,10 @@ table.task-list thead tr th {
 #inFlightTasks.table-striped > tbody > tr.odd,
 #inFlightTasks.table-striped > tbody > tr.odd + tr {
     background-color: #f9f9f9;
-}
-
-#inFlightTasks.table-striped > tbody > tr > td.note-formatting {
+}*/
+/*#inFlightTasks.table-striped > tbody > tr > td.note-formatting {
     padding: 5px 0px 10px 15px;
-}
-
-.red {
-    color: red;
-}
-
-.amber {
-    color: orange;
-}
-
-.black {
-    color: black;
-}
+}*/
 
 .panel {
     overflow: auto;
@@ -182,6 +120,27 @@ h2, .h2 {
     padding: 0 15px;
 }
 
+/* DataTables tweaked for UKHO design system */
+table.dataTable td {
+    line-height: 1.8rem;
+}
+table.dataTable td,
+table.dataTable th
+{
+    padding-left: 0.5rem;
+}
+table.dataTable thead tr {
+  
+    vertical-align: bottom;
+}
+/* Moving sort arrows down in line with titles */
+table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead .sorting_desc_disabled:after 
+{
+    bottom: 0.05em;
+}
+
+/* General table tweaks for UKHO design */
+
 table thead {
     border-bottom: 5px solid #09315B;
 }
@@ -194,14 +153,9 @@ table td {
     border-right: 1px solid #d8d8d8;
     font-weight: 300;
 }
-
 table > tbody > tr > th {
     font-weight: 300;
     border-bottom: unset;
-}
-
-.attachLinkedDocumentSpinnerContainer {
-    width: 68px;
 }
 
 .attachLinkedDocumentButtonContainer .fa.fa-paperclip,
@@ -209,24 +163,181 @@ table > tbody > tr > th {
     color: #09315B;
     font-size: 24px;
 }
-
 .attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
     position: relative;
     bottom: 34px;
     left: 11px;
 }
-
 .attachLinkedDocumentSpinnerContainer .spinner-border {
     color: #09315B;
     width: 2.75em;
     height: 2.75em;
 }
 
+/* For checkbox sitting on right of text on assess page */
 .custom-control-label::before, .custom-control-label::after {
     right: 0;
 }
 
-label span {
+/* TODO is this actually being used? */
+/*label span {
     position: absolute;
     right: 21px;
+}*/
+
+.form-text-input {
+    width: 100%;
+    border: 2px solid #03284F;
+    color: #09315B;
+    padding-left: 18px;
+    padding: 0px 20px 0px 14px;
+    outline: none;
+    background-color: #f6f6f6;
+    line-height: 2.3rem;
+    border-radius: unset;
 }
+.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
+}
+
+/* Footer start */
+footer {
+    bottom: 0;
+    width: 100%;
+    font-size: 16px;
+    color: #09315B;
+    background-color: #b3bcc8;
+    font-weight: normal;
+    height: 60px;
+    line-height: 60px;
+    padding: 0 20px;
+    margin-top: 60px;
+}
+@media (max-width: 1023px) {
+    footer {
+        font-size: 14px;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 10px;
+    }
+}
+body, .sticky-footer-wrapper {
+    min-height:100vh;
+}
+.flex-fill {
+    flex:1 1 auto;
+}
+/* Footer end */
+
+
+/* UKHO design dropdown
+    TODO try and bring in the font awesome arrow
+*/
+.custom-select {
+    position: relative;
+    font-family: Arial;
+    background-color: #f6f6f6;
+    border: 2px solid #03284F;
+    max-width: 300px;
+}
+.custom-select select {
+    display: none;
+    /*hide original SELECT element: */
+}
+.custom-select .select-selected.select-arrow-active {
+    background-color: #ffffff;
+}
+/*.arrow-icon-wrap {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    pointer-events: none;
+}*/
+
+
+/* style the items (options), including the selected item: */
+.select-items div, .select-selected {
+    color: #09315B;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+/* Style items (options): */
+.select-items {
+    border: 2px solid #03284F;
+    border-top: none;
+    padding-top: 30px;
+    position: absolute;
+    background-color: #ffffff;
+    width: calc(100% + 4px);
+    top: 100%;
+    left: -2px;
+    right: 0;
+    z-index: 99;
+}
+.select-items div {
+    font-size: 21px;
+}
+
+/* Hide the items when the select box is closed: */
+.select-hide {
+    display: none;
+}
+.select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: 400;
+}
+/* END UKHO design dropdown */
+
+/* START of pagination matching UKHO design system */
+
+.page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #09315B;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+/* Square off prev/next buttons button corners */
+.page-item:last-child .page-link {
+    border-top-right-radius: 0rem;
+    border-bottom-right-radius: 0rem;
+}
+.page-item:first-child .page-link {
+    border-top-left-radius: 0rem;
+    border-bottom-left-radius: 0rem;
+}
+
+/* Admiralty blue for prev/next buttons */
+.pagination > li:first-child a {
+    background-color: #09315B;
+    color: #ffffff;
+}
+.pagination > li:last-child a {
+    background-color: #09315B;
+    color: #ffffff;
+}
+.page-link:focus {
+    z-index: 2;
+    outline: 0;
+    box-shadow: unset;
+}
+
+/* Format for clicking prev/next buttons */
+.pagination .page-item:last-child .page-link:active {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
+.pagination .page-item:first-child .page-link:active {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
+/* END of pagination matching UKHO design system */
