@@ -18,8 +18,8 @@ namespace Portal.TestAutomation.Framework.Pages
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
-        private IWebElement SourceDocumentTable => _driver.FindElement(By.XPath("//*[@id='sourceDocuments']//table/tbody"));
-        
+        private IWebElement SourceDocumentTable => _driver.FindElement(By.XPath("//*[@id='srcDocDetailsTable']"));
+
         public ReviewPage(IWebDriver driver, int seconds)
         {
             var configRoot = AzureAppConfigConfigurationRoot.Instance;
@@ -56,5 +56,12 @@ namespace Portal.TestAutomation.Framework.Pages
             _driver.Navigate().GoToUrl(ReviewPageUrl + "?processId=" + processId);
             _driver.Manage().Window.Maximize();
         }
+
+        public bool IsSdocIdInDetails(int sDocId)
+        {
+            int.TryParse(SourceDocumentTable.FindElement(By.XPath("//tbody/tr/td[3]")).Text, out var sDocOnPage);
+            return sDocId == sDocOnPage;
+        }
+
     }
 }
