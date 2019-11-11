@@ -124,5 +124,25 @@ namespace Portal.UnitTests
             var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
             Assert.AreEqual(1, amount);
         }
+
+        [Test]
+        public void Test_OnHoldCalculator_Returns_Correct_Number_Of_Days_When_Task_Put_On_Hold_And_Taken_Off_Hold_On_The_Same_Day()
+        {
+            _onHoldRows = new List<OnHold>
+            {
+                new OnHold
+                {
+                    ProcessId = 123,
+                    WorkflowInstanceId = 1,
+                    OnHoldTime = DateTime.Now.Date.AddDays(-1),
+                    OnHoldUser = "TestUser",
+                    OffHoldTime = DateTime.Now.Date.AddDays(-1),
+                    OffHoldUser = "TestUser"
+                }
+            };
+
+            var amount = OnHoldCalculator.CalculateOnHoldDays(_onHoldRows);
+            Assert.AreEqual(0, amount);
+        }
     }
 }
