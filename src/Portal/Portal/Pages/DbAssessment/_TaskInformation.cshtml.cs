@@ -1,13 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
     public class _TaskInformationModel : PageModel
     {
+        private readonly WorkflowDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOnHoldCalculator _onHoldCalculator;
+
+        [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
         public int ProcessId { get; set; }
 
@@ -43,9 +58,117 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList SourceCategories { get; set; }
 
+        public _TaskInformationModel(WorkflowDbContext DbContext, IHttpContextAccessor httpContextAccessor, IOnHoldCalculator onHoldCalculator)
+        {
+            _dbContext = DbContext;
+            _httpContextAccessor = httpContextAccessor;
+            _onHoldCalculator = onHoldCalculator;
+        }
+
         public void OnGet()
         {
-
+            SetTaskInformationDummyData();
         }
+
+        public async Task<IActionResult> OnPostOnHoldAsync(int processId)
+        {
+            var wfInstanceId = _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId;
+
+            var onHoldRecord = new OnHold
+            {
+                ProcessId = processId,
+                OnHoldTime = DateTime.Now,
+                OnHoldUser = "Ross",
+                WorkflowInstanceId = wfInstanceId
+            };
+
+            await _dbContext.OnHold.AddAsync(onHoldRecord);
+            await _dbContext.SaveChangesAsync();
+
+            IsOnHold = true;
+            ProcessId = processId;
+
+            // Add comment that user has put the task on hold
+            // TODO: swap out hardcoded user for one from AD
+            await AddComment($"Task {processId} has been put on hold", processId, wfInstanceId);
+
+            // As we're submitting, re-get task info for now
+            SetTaskInformationDummyData();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostOffHoldAsync(int processId)
+        {
+            try
+            {
+                var onHoldRecord = _dbContext.OnHold.First(r => r.ProcessId == processId
+                                                           && r.OffHoldTime == null);
+
+                onHoldRecord.OffHoldTime = DateTime.Now;
+                onHoldRecord.OffHoldUser = "Bon";
+
+                await _dbContext.SaveChangesAsync();
+
+                IsOnHold = false;
+
+                ProcessId = processId;
+
+                // Add comment that user has taken the task off hold
+                // TODO: swap out hardcoded user for one from AD
+                await AddComment($"Task {processId} taken off hold", processId, _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
+
+                // As we're submitting, re-get task info for now
+                SetTaskInformationDummyData();
+            }
+            catch (InvalidOperationException e)
+            {
+                // Log error
+                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId: {processId}");
+                //throw;
+            }
+
+            return Page();
+        }
+
+        private void SetTaskInformationDummyData()
+        {
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+
+            var onHoldRows = _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToList();
+            IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
+
+            DmEndDate = DateTime.Now;
+            DmReceiptDate = DateTime.Now;
+            EffectiveReceiptDate = DateTime.Now;
+            ExternalEndDate = DateTime.Now;
+            IsOnHold = IsOnHold;
+            OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
+            Ion = "2929";
+            ActivityCode = "1272";
+            SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" };
+            SourceCategories = new SelectList(
+                sourceCategories, "SourceCategoryId", "Name");
+        }
+
+        private async Task AddComment(string comment, int processId, int workflowInstanceId)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
+
+            _dbContext.Comment.Add(new Comments
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                Created = DateTime.Now,
+                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
+                Text = comment
+            });
+
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
 }

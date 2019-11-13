@@ -29,7 +29,7 @@ namespace Portal.Pages.DbAssessment
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
-        public _TaskInformationModel TaskInformationModel { get; set; }
+
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
@@ -54,7 +54,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
-            TaskInformationModel = SetTaskInformationDummyData(processId);
+            SetTaskInformationDummyData(processId);
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -138,70 +138,6 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
-        public async Task<IActionResult> OnPostOnHoldAsync(int processId)
-        {
-            var wfInstanceId = DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId;
-
-            var onHoldRecord = new OnHold
-            {
-                ProcessId = processId,
-                OnHoldTime = DateTime.Now,
-                OnHoldUser = "Ross",
-                WorkflowInstanceId = wfInstanceId
-            };
-
-            await DbContext.OnHold.AddAsync(onHoldRecord);
-            await DbContext.SaveChangesAsync();
-
-            IsOnHold = true;
-            ProcessId = processId;
-
-            // Add comment that user has put the task on hold
-            // TODO: swap out hardcoded user for one from AD
-            await AddComment($"Task {processId} has been put on hold", processId, wfInstanceId);
-
-            AssignTaskModel = SetAssignTaskDummyData(processId);
-            // As we're submitting, re-get task info for now
-            TaskInformationModel = SetTaskInformationDummyData(processId);
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostOffHoldAsync(int processId)
-        {
-            try
-            {
-                var onHoldRecord = DbContext.OnHold.First(r => r.ProcessId == processId
-                                                           && r.OffHoldTime == null);
-
-                onHoldRecord.OffHoldTime = DateTime.Now;
-                onHoldRecord.OffHoldUser = "Bon";
-
-                await DbContext.SaveChangesAsync();
-
-                IsOnHold = false;
-
-                ProcessId = processId;
-
-                // Add comment that user has taken the task off hold
-                // TODO: swap out hardcoded user for one from AD
-                await AddComment($"Task {processId} taken off hold", processId, DbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
-                
-                AssignTaskModel = SetAssignTaskDummyData(processId);
-
-                // As we're submitting, re-get task info for now
-                TaskInformationModel = SetTaskInformationDummyData(processId);
-            }
-            catch (InvalidOperationException e)
-            {
-                // Log error
-                e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId: {processId}");
-                //throw;
-            }
-
-            return Page();
-        }
-
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
             try
@@ -260,7 +196,7 @@ namespace Portal.Pages.DbAssessment
             return workflowInstance;
         }
 
-        private _TaskInformationModel SetTaskInformationDummyData(int processId)
+        private void SetTaskInformationDummyData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
@@ -270,21 +206,6 @@ namespace Portal.Pages.DbAssessment
             var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
 
-            return new _TaskInformationModel
-            {
-                ProcessId = processId,
-                DmEndDate = DateTime.Now,
-                DmReceiptDate = DateTime.Now,
-                EffectiveReceiptDate = DateTime.Now,
-                ExternalEndDate = DateTime.Now,
-                IsOnHold = IsOnHold,
-                OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date),
-                Ion = "2929",
-                ActivityCode = "1272",
-                SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
-                SourceCategories = new SelectList(
-                        sourceCategories, "SourceCategoryId", "Name")
-            };
         }
 
         private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
