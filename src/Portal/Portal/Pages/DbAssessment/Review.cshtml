@@ -33,7 +33,6 @@
 
 <hr />
 
-
 <div class="col-12">
     <div class="row justify-content-end btn-size">
         @if (!Model.IsOnHold)
@@ -41,7 +40,7 @@
             <div class="col-2">
                 <form id="OnHold" method="post" asp-page-handler="OnHold">
                     <input type="hidden" asp-for="ProcessId" />
-                    <button id="btnPutOnHold" class="btn btn-primary btn-block">Put On Hold</button>
+                    <button id="btnPutOnHold" class="btn btn-primary btn-block" data-processId="@Model.ProcessId">Put On Hold</button>
                 </form>
             </div>
         }
@@ -50,7 +49,7 @@
             <div class="col-2">
                 <form id="OffHold" method="post" asp-page-handler="OffHold">
                     <input type="hidden" asp-for="ProcessId" />
-                    <button id="btnTakeOffHold" class="btn btn-primary btn-block">Take Off Hold</button>
+                    <button id="btnTakeOffHold" class="btn btn-primary btn-block" data-processId="@Model.ProcessId">Take Off Hold</button>
                 </form>
             </div>
         }
@@ -65,7 +64,6 @@
         </div>
     </div>
 </div>
-
 
 <form id="frmReviewPage" method="post" asp-page-handler="Done">
 
@@ -87,6 +85,30 @@
     <div id="AddCommentError"></div>
 
 </form>
+
+@* Modal On Hold error comment *@
+<div class="modal fade" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="frmOnHoldError">
+                <div class="modal-header">
+                    <h4 class="modal-title">Error On Hold</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Error either placing task on hold or taking task off hold. Please try again later.</p>
+                    <div id="onHoldModal-body">
+                        <input type="hidden" asp-for="ProcessId" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnOnHoldErrorOk" class="btn btn-outline-secondary btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="On Hold Error">Ok</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @* Modal Add Termination comment *@
 <div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
