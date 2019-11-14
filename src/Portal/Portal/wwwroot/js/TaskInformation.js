@@ -29,7 +29,7 @@
 
         $.ajax({
             type: "POST",
-            url: "_TaskInformation/?handler=OnHold1",
+            url: "_TaskInformation/?handler=OnHold",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -60,7 +60,7 @@
 
         $.ajax({
             type: "POST",
-            url: "_TaskInformation/?handler=OffHold1",
+            url: "_TaskInformation/?handler=OffHold",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
