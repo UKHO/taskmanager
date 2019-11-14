@@ -22,7 +22,6 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -39,15 +38,13 @@ namespace Portal.Pages.DbAssessment
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
-            IHttpContextAccessor httpContextAccessor,
-            IOnHoldCalculator onHoldCalculator)
+            IHttpContextAccessor httpContextAccessor)
         {
             DbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _httpContextAccessor = httpContextAccessor;
-            _onHoldCalculator = onHoldCalculator;
         }
 
         public void OnGet(int processId)

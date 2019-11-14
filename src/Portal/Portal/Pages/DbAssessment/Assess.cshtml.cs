@@ -26,8 +26,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
 
+        public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
-        public _TaskInformationModel TaskInformationModel { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
@@ -54,10 +54,10 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
-            TaskInformationModel = SetTaskInformationData(processId);
             EditDatabaseModel = SetEditDatabaseModel();
             RecordProductActionModel = SetProductActionDummyData();
             DataImpactModel = SetDataImpactModelDummyData();
+            SetTaskInformationDummyData(processId);
         }
 
         public IActionResult OnGetRetrieveComments(int processId)
@@ -125,31 +125,6 @@ namespace Portal.Pages.DbAssessment
             });
 
             DbContext.SaveChanges();
-        }
-
-        // TODO: Update to match Review
-        private _TaskInformationModel SetTaskInformationData(int processId)
-        {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json"))
-                throw new FileNotFoundException(@"Data\SourceCategories.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
-
-            return new _TaskInformationModel(DbContext,null, null)
-            {
-                ProcessId = processId,
-                DmEndDate = DateTime.Now,
-                DmReceiptDate = DateTime.Now,
-                EffectiveReceiptDate = DateTime.Now,
-                ExternalEndDate = DateTime.Now,
-                OnHoldDays = 4,
-                Ion = "2929",
-                ActivityCode = "1272",
-                SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" },
-                SourceCategories = new SelectList(
-                    sourceCategories, "SourceCategoryId", "Name")
-            };
         }
 
         private _EditDatabaseModel SetEditDatabaseModel()
@@ -230,6 +205,18 @@ namespace Portal.Pages.DbAssessment
                 new _DataImpactModel{Usage = "Other"},
                 new _DataImpactModel{Usage = "POLAR"}
             };
+        }
+
+        private void SetTaskInformationDummyData(int processId)
+        {
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+
+            var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
+            IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
+
         }
     }
 }
