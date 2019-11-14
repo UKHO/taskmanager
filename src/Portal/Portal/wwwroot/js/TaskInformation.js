@@ -29,7 +29,7 @@
 
         $.ajax({
             type: "POST",
-            url: "_TaskInformation/?handler=OnHold",
+            url: "_TaskInformation/?handler=OnHold1",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -45,7 +45,11 @@
                 getComments();
             },
             error: function (error) {
+                $("#OnHoldErrorMessage")
+                    .text("Error Putting task on hold. Please try again later");
+
                 $("#OnHoldError").modal("show");
+                $("#btnPutOnHold").prop("disabled", false);
             }
         });
 
@@ -56,7 +60,7 @@
 
         $.ajax({
             type: "POST",
-            url: "_TaskInformation/?handler=OffHold",
+            url: "_TaskInformation/?handler=OffHold1",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -72,7 +76,10 @@
                 getComments();
             },
             error: function (error) {
+                $("#OnHoldErrorMessage")
+                    .text("Error Taking task off hold. Please try again later");
                 $("#OnHoldError").modal("show");
+                $("#btnTakeOffHold").prop("disabled", false);
             }
         });
     });

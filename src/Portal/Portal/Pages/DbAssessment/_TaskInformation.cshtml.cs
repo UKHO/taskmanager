@@ -65,21 +65,21 @@ namespace Portal.Pages.DbAssessment
             _onHoldCalculator = onHoldCalculator;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            SetTaskInformationDummyData();
+            await SetTaskInformationDummyData();
         }
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
-            var wfInstanceId = _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId;
+            var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(p => p.ProcessId == processId);
 
             var onHoldRecord = new OnHold
             {
                 ProcessId = processId,
                 OnHoldTime = DateTime.Now,
                 OnHoldUser = "Ross",
-                WorkflowInstanceId = wfInstanceId
+                WorkflowInstanceId = workflowInstance.WorkflowInstanceId
             };
 
             await _dbContext.OnHold.AddAsync(onHoldRecord);
@@ -90,10 +90,10 @@ namespace Portal.Pages.DbAssessment
 
             // Add comment that user has put the task on hold
             // TODO: swap out hardcoded user for one from AD
-            await AddComment($"Task {processId} has been put on hold", processId, wfInstanceId);
+            await AddComment($"Task {processId} has been put on hold", processId, workflowInstance.WorkflowInstanceId);
 
             // As we're submitting, re-get task info for now
-            SetTaskInformationDummyData();
+            await SetTaskInformationDummyData();
 
             return Page();
         }
@@ -102,7 +102,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                var onHoldRecord = _dbContext.OnHold.First(r => r.ProcessId == processId
+                var onHoldRecord = await _dbContext.OnHold.FirstAsync(r => r.ProcessId == processId
                                                            && r.OffHoldTime == null);
 
                 onHoldRecord.OffHoldTime = DateTime.Now;
@@ -119,7 +119,7 @@ namespace Portal.Pages.DbAssessment
                 await AddComment($"Task {processId} taken off hold", processId, _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
 
                 // As we're submitting, re-get task info for now
-                SetTaskInformationDummyData();
+                await SetTaskInformationDummyData();
             }
             catch (InvalidOperationException e)
             {
@@ -131,14 +131,14 @@ namespace Portal.Pages.DbAssessment
             return Page();
         }
 
-        private void SetTaskInformationDummyData()
+        private async Task SetTaskInformationDummyData()
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
 
-            var onHoldRows = _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToList();
+            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
 
             DmEndDate = DateTime.Now;
