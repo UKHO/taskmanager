@@ -1,6 +1,5 @@
-r/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
+r /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
-
 body {
     color: #333333;
     font-family: 'JohnstonITC', Helvetica, sans-serif;
@@ -57,7 +56,8 @@ table.task-list thead tr th {
     overflow: auto;
 }
 
-.deleteAssignTask{}
+.deleteAssignTask {
+}
 
 .btn-size > div {
     padding-left: 0.2rem;
@@ -86,6 +86,32 @@ table.task-list thead tr th {
 .show > .btn-primary.dropdown-toggle:focus {
     box-shadow: unset;
 }
+
+.btn-danger {
+    color: #ffffff;
+    background-color: #e20d0d;
+    border-color: #09315B;
+}
+
+.btn-danger:hover, .btn-danger.hover {
+    border-color: #09315B;
+    }
+
+.btn-danger:focus, .btn-danger.focus {
+    box-shadow: unset;
+}
+
+    .btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
+    .show > .btn-danger.dropdown-toggle {
+        color: #ffffff;
+        background-color: #e20d0d;
+        border-color: #09315B;
+    }
+
+    .btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
+    .show > .btn-danger.dropdown-toggle:focus {
+        box-shadow: unset;
+    }
 
 label {
     font-weight: 500;
@@ -124,18 +150,17 @@ h2, .h2 {
 table.dataTable td {
     line-height: 1.8rem;
 }
+
 table.dataTable td,
-table.dataTable th
-{
+table.dataTable th {
     padding-left: 0.5rem;
 }
+
 table.dataTable thead tr {
-  
     vertical-align: bottom;
 }
 /* Moving sort arrows down in line with titles */
-table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead .sorting_desc_disabled:after 
-{
+table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead .sorting_desc_disabled:after {
     bottom: 0.05em;
 }
 
@@ -144,15 +169,18 @@ table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, tab
 table thead {
     border-bottom: 5px solid #09315B;
 }
+
 table th {
     border-bottom: 5px solid #09315B;
     text-align: left;
     font-weight: normal;
 }
+
 table td {
     border-right: 1px solid #d8d8d8;
     font-weight: 300;
 }
+
 table > tbody > tr > th {
     font-weight: 300;
     border-bottom: unset;
@@ -163,11 +191,13 @@ table > tbody > tr > th {
     color: #09315B;
     font-size: 24px;
 }
+
 .attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
     position: relative;
     bottom: 34px;
     left: 11px;
 }
+
 .attachLinkedDocumentSpinnerContainer .spinner-border {
     color: #09315B;
     width: 2.75em;
@@ -196,11 +226,12 @@ table > tbody > tr > th {
     line-height: 2.3rem;
     border-radius: unset;
 }
-.form-text-input:focus {
-    border-color: #0177c1;
-    color: #0177c1;
-    background-color: #ffffff;
-}
+
+    .form-text-input:focus {
+        border-color: #0177c1;
+        color: #0177c1;
+        background-color: #ffffff;
+    }
 
 /* Footer start */
 footer {
@@ -215,6 +246,7 @@ footer {
     padding: 0 20px;
     margin-top: 60px;
 }
+
 @media (max-width: 1023px) {
     footer {
         font-size: 14px;
@@ -223,11 +255,13 @@ footer {
         padding: 0 10px;
     }
 }
+
 body, .sticky-footer-wrapper {
-    min-height:100vh;
+    min-height: 100vh;
 }
+
 .flex-fill {
-    flex:1 1 auto;
+    flex: 1 1 auto;
 }
 /* Footer end */
 
@@ -242,13 +276,15 @@ body, .sticky-footer-wrapper {
     border: 2px solid #03284F;
     max-width: 300px;
 }
-.custom-select select {
-    display: none;
-    /*hide original SELECT element: */
-}
-.custom-select .select-selected.select-arrow-active {
-    background-color: #ffffff;
-}
+
+    .custom-select select {
+        display: none;
+        /*hide original SELECT element: */
+    }
+
+    .custom-select .select-selected.select-arrow-active {
+        background-color: #ffffff;
+    }
 /*.arrow-icon-wrap {
     position: absolute;
     right: 20px;
@@ -277,14 +313,16 @@ body, .sticky-footer-wrapper {
     right: 0;
     z-index: 99;
 }
-.select-items div {
-    font-size: 21px;
-}
+
+    .select-items div {
+        font-size: 21px;
+    }
 
 /* Hide the items when the select box is closed: */
 .select-hide {
     display: none;
 }
+
 .select-items div:hover, .same-as-selected {
     background-color: rgba(0, 0, 0, 0.1);
     font-weight: 400;
@@ -309,6 +347,7 @@ body, .sticky-footer-wrapper {
     border-top-right-radius: 0rem;
     border-bottom-right-radius: 0rem;
 }
+
 .page-item:first-child .page-link {
     border-top-left-radius: 0rem;
     border-bottom-left-radius: 0rem;
@@ -319,10 +358,12 @@ body, .sticky-footer-wrapper {
     background-color: #09315B;
     color: #ffffff;
 }
+
 .pagination > li:last-child a {
     background-color: #09315B;
     color: #ffffff;
 }
+
 .page-link:focus {
     z-index: 2;
     outline: 0;
@@ -335,9 +376,71 @@ body, .sticky-footer-wrapper {
     background-color: #ffffff;
     border-color: #09315B;
 }
+
 .pagination .page-item:first-child .page-link:active {
     color: #09315B;
     background-color: #ffffff;
     border-color: #09315B;
 }
 /* END of pagination matching UKHO design system */
+
+/* Start UKHO design system error dialog stuff*/
+.modal-dialog.error {
+    border-left: 5px solid #e20d0d;
+}
+
+    .modal-dialog.error h3 {
+        color: #e20d0d;
+    }
+
+        .fa, .modal-dialog h3::before, .modal-dialog.error h3::before, .modal-dialog.success h3::before, .modal-dialog.warning h3::before,
+        .fas,
+        .far,
+        .fal,
+        .fad,
+        .fab {
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-font-smoothing: antialiased;
+            display: inline-block;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            line-height: 1;
+        }
+
+.modal-content {
+    border-radius: unset;
+    border: 0px;
+}
+
+.dialog {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    padding: 30px 18px;
+    /* info type is default */
+    border-left: 5px solid #0177c1;
+}
+
+@media (max-width: 1023px) {
+    .dialog {
+        padding: 24px 18px;
+    }
+}
+
+.dialog h3 {
+    color: #0177c1;
+}
+
+    .dialog h3::before, .dialog.warning h3::before, .dialog.success h3::before, .dialog.error h3::before {
+        color: inherit;
+        font-size: 18px;
+        margin: 0 10px 0 0;
+    }
+
+.dialog.error {
+    border-left: 5px solid #e20d0d;
+}
+
+    .dialog.error h3 {
+        color: #e20d0d;
+    }
+/* End UKHO design system error dialog */

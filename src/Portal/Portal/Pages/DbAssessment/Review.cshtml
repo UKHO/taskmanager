@@ -79,21 +79,21 @@
 
 @* Modal On Hold error comment *@
 <div class="modal fade" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog error ">
         <div class="modal-content">
             <form id="frmOnHoldError">
                 <div class="modal-header">
-                    <h3  id="OnHoldErrorTitle" class="modal-title">Error</h3>
+                    <h3 id="OnHoldErrorTitle">Error</h3>
                 </div>
                 <div class="modal-body">
-                    <p id="OnHoldErrorMessage">Error either placing task on hold or taking task off hold. Please try again later.</p>
+                    <div id="OnHoldErrorMessage"><i class="fa fa-info-circle"></i></div>
                     <div id="onHoldModal-body">
                         <input type="hidden" asp-for="ProcessId" />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <div class="row col-11 justify-content-end">
-                        <div class="col-5 pr-1"><button type="button" id="btnOnHoldErrorOk" class="btn btn-outline-secondary btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="On Hold Error">Ok</button></div>
+                        <div class="col-5 pr-1"><button type="button" id="btnOnHoldErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="On Hold Error">Ok</button></div>
                     </div>
                 </div>
             </form>
