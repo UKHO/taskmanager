@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Configuration;
@@ -50,17 +51,17 @@ namespace Portal.Pages.DbAssessment
             _uriConfig = uriConfig;
         }
 
-        public void OnGet(int processId)
+        public async Task OnGet(int processId)
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
             EditDatabaseModel = SetEditDatabaseModel();
             RecordProductActionModel = SetProductActionDummyData();
             DataImpactModel = SetDataImpactModelDummyData();
-            SetTaskInformationDummyData(processId);
+            await GetOnHoldData(processId);
         }
 
-        public IActionResult OnGetRetrieveComments(int processId)
+        public async Task<IActionResult> OnGetRetrieveComments(int processId)
         {
             var model = new _CommentsModel()
             {
@@ -69,7 +70,7 @@ namespace Portal.Pages.DbAssessment
             };
 
             // Repopulate models...
-            OnGet(processId);
+            await OnGet(processId);
 
             return new PartialViewResult
             {
@@ -81,7 +82,7 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        public IActionResult OnGetCommentsPartialAsync(string comment, int processId)
+        public async Task<IActionResult> OnGetCommentsPartialAsync(string comment, int processId)
         {
             // TODO: Test with Azure
             // TODO: This will not work in Azure; need alternative; but will work in local dev
@@ -90,7 +91,7 @@ namespace Portal.Pages.DbAssessment
 
             AddComment(comment, processId, workflowInstance);
 
-            return OnGetRetrieveComments(processId);
+            return await OnGetRetrieveComments(processId);
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
@@ -207,16 +208,10 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private void SetTaskInformationDummyData(int processId)
+        private async Task GetOnHoldData(int processId)
         {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
-
-            var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
+            var onHoldRows = await DbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
-
         }
     }
 }
