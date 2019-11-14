@@ -85,8 +85,9 @@
                 <div class="modal-header">
                     <h3 id="OnHoldErrorTitle">Error</h3>
                 </div>
-                <div class="modal-body">
-                    <div id="OnHoldErrorMessage"><i class="fa fa-info-circle"></i></div>
+                <div class="modal-body"  style="overflow: hidden;">
+                        <p class="mr-2" style="float: left; color: crimson"><i class="fa fa-info-circle"></i></p>
+                        <p id="OnHoldErrorMessage"></p>
                     <div id="onHoldModal-body">
                         <input type="hidden" asp-for="ProcessId" />
                     </div>

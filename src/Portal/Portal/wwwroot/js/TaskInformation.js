@@ -45,7 +45,7 @@
                 getComments();
             },
             error: function (error) {
-                $("#OnHoldErrorMessage").html("<p><i class='fa fa-info-circle' style='color:#e20d0d;'></i> Error putting task on hold. Please try again later. </p>");
+                $("#OnHoldErrorMessage").text("Error putting task on hold. Please try again later.");
                     //.text("Error Putting task on hold. Please try again later");
 
                 $("#OnHoldError").modal("show");
@@ -76,7 +76,7 @@
                 getComments();
             },
             error: function (error) {
-                $("#OnHoldErrorMessage").html("<p><i class='fa fa-info-circle' style='color:#e20d0d;'></i> Error taking task off hold. Please try again later. </p>");
+                $("#OnHoldErrorMessage").text("Error taking task off hold. Please try again later.");
                     //.text("Error Taking task off hold. Please try again later");
                 $("#OnHoldError").modal("show");
                 $("#btnTakeOffHold").prop("disabled", false);
