@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
@@ -32,7 +30,6 @@ namespace Portal.Pages.DbAssessment
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
         public List<_DataImpactModel> DataImpactModel { get; set; }
-        public _CommentsModel CommentsModel { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -57,39 +54,6 @@ namespace Portal.Pages.DbAssessment
             RecordProductActionModel = SetProductActionDummyData();
             DataImpactModel = SetDataImpactModelDummyData();
             await GetOnHoldData(processId);
-        }
-
-        public async Task<IActionResult> OnGetRetrieveComments(int processId)
-        {
-            var model = new _CommentsModel()
-            {
-                Comments = _dbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
-                ProcessId = processId
-            };
-
-            // Repopulate models...
-            await OnGet(processId);
-
-            return new PartialViewResult
-            {
-                ViewName = "_Comments",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                }
-            };
-        }
-
-        public async Task<IActionResult> OnGetCommentsPartialAsync(string comment, int processId)
-        {
-            // TODO: Test with Azure
-            // TODO: This will not work in Azure; need alternative; but will work in local dev
-
-            var workflowInstance = _dbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
-
-            AddComment(comment, processId, workflowInstance);
-
-            return await OnGetRetrieveComments(processId);
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)

@@ -1,9 +1,10 @@
-﻿@model Portal.Pages.DbAssessment._CommentsModel
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@page
 
-<script type="text/javascript" src="~/js/Comments.js"></script>
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@model Portal.Pages.DbAssessment._CommentsModel
+
+@{ Layout = null; }
+
 
 <div class="card">
     <h6>Comments</h6>
@@ -11,26 +12,26 @@
         @if (Model != null && Model.Comments != null)
         {
             @foreach (var comment in Model.Comments)
-            {
-                <div class="row justify-content-between mb-3">
-                    <div class="col-6">
-                        @comment.Username
-                    </div>
-                    <div class="col-6">
-                        <div class="row justify-content-end mr-1">
-                            @comment.Created.ToString("M")
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-start">
-                    <div class="col-12">
-                        <p>
-                            @comment.Text
-                        </p>
-                        <hr />
-                    </div>
-                </div>
-            }
+             {
+                 <div class="row justify-content-between mb-3">
+                     <div class="col-6">
+                         @comment.Username
+                     </div>
+                     <div class="col-6">
+                         <div class="row justify-content-end mr-1">
+                             @comment.Created.ToString("M")
+                         </div>
+                     </div>
+                 </div>
+                 <div class="row justify-content-start">
+                     <div class="col-12">
+                         <p>
+                             @comment.Text
+                         </p>
+                         <hr />
+                     </div>
+                 </div>
+             }
         }
         <button id="btnAddComment" class="btn btn-primary" data-toggle="modal" data-target="#addCommentModal" type="button"><span style="padding-right: 5px;"></span>Add Comment</button>
 
@@ -44,7 +45,6 @@
                     <div class="modal-body">
                         <div id="modal-body">
                             <textarea style="height: 100px;" id="txtComment" name="comment" class="form-control"></textarea>
-                            <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
                             <br />
                             <div id="AddCommentError"></div>
                         </div>

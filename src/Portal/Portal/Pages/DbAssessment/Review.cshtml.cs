@@ -6,10 +6,8 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
@@ -30,7 +28,6 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
-        public _CommentsModel CommentsModel { get; set; }
 
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -50,39 +47,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
             await GetOnHoldData(processId);
-        }
-
-        public async Task<IActionResult> OnGetRetrieveComments(int processId)
-        {
-            var model = new _CommentsModel()
-            {
-                Comments = _dbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
-                ProcessId = processId
-            };
-
-            // Repopulate models...
-            await OnGet(processId);
-
-            return new PartialViewResult
-            {
-                ViewName = "_Comments",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                }
-            };
-        }
-
-        public async Task<IActionResult> OnGetCommentsPartialAsync(string comment, int processId)
-        {
-            // TODO: Test with Azure
-            // TODO: This will not work in Azure; need alternative; but will work in local dev
-
-            var workflowInstance = _dbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
-
-            await AddComment(comment, processId, workflowInstance);
-
-            return await OnGetRetrieveComments(processId);
         }
 
         public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
