@@ -1,7 +1,8 @@
-﻿@model Portal.Pages.DbAssessment._TaskInformationModel
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@page
+@model Portal.Pages.DbAssessment._TaskInformationModel
+
+@{ Layout = null; }
+
 <div class="card mb-4 mt-3">
     <h6>Task Information</h6>
 
@@ -35,33 +36,33 @@
                         <div class="col-5">@Html.LabelFor(model => model.OnHoldDays)</div>
                         <div class="col-7">
                             @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
-                        @if (Model.IsOnHold)
-                        {
-                            <i class="fa fa-pause-circle"></i>
-                        }
+                            @if (Model.IsOnHold)
+                            {
+                                <i class="fa fa-pause-circle"></i>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-1 mb-4" />
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                        <div class="col-4">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
+                        <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class = "form-control" })</div>
                     </div>
                 </div>
             </div>
         </div>
-        <hr class="mt-1 mb-4" />
-        <div class="row justify-content-between">
-            <div class="col-4">
-                <div class="form-group row justify-content-between">
-                    <div class="col-7">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
-                    <div class="col-4">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
-                </div>
-                <div class="form-group row justify-content-between">
-                    <div class="col-7">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
-                    <div class="col-4">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
-                </div>
-            </div>
-            <div class="col-7">
-                <div class="form-group row justify-content-between">
-                    <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
-                    <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, new { @class = "form-control" })</div>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
 </div>

@@ -127,6 +127,7 @@ namespace Portal.Pages.DbAssessment
             DbContext.SaveChanges();
         }
 
+        // TODO: Update to match Review
         private _TaskInformationModel SetTaskInformationData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\SourceCategories.json"))
@@ -135,7 +136,7 @@ namespace Portal.Pages.DbAssessment
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
             var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
 
-            return new _TaskInformationModel
+            return new _TaskInformationModel(DbContext,null, null)
             {
                 ProcessId = processId,
                 DmEndDate = DateTime.Now,
