@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
@@ -23,6 +21,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOptions<UriConfig> _uriConfig;
+        private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -34,7 +33,6 @@ namespace Portal.Pages.DbAssessment
         public _RecordProductActionModel RecordProductActionModel { get; set; }
         public List<_DataImpactModel> DataImpactModel { get; set; }
         public _CommentsModel CommentsModel { get; set; }
-        public WorkflowDbContext DbContext { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -43,7 +41,7 @@ namespace Portal.Pages.DbAssessment
             IHttpContextAccessor httpContextAccessor,
             IOptions<UriConfig> uriConfig)
         {
-            DbContext = dbContext;
+            _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
@@ -65,7 +63,7 @@ namespace Portal.Pages.DbAssessment
         {
             var model = new _CommentsModel()
             {
-                Comments = DbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
+                Comments = _dbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
                 ProcessId = processId
             };
 
@@ -87,7 +85,7 @@ namespace Portal.Pages.DbAssessment
             // TODO: Test with Azure
             // TODO: This will not work in Azure; need alternative; but will work in local dev
 
-            var workflowInstance = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
+            var workflowInstance = _dbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
 
             AddComment(comment, processId, workflowInstance);
 
@@ -116,7 +114,7 @@ namespace Portal.Pages.DbAssessment
         {
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            DbContext.Comment.Add(new Comments
+            _dbContext.Comment.Add(new Comments
             {
                 ProcessId = processId,
                 WorkflowInstanceId = workflowInstanceId,
@@ -125,7 +123,7 @@ namespace Portal.Pages.DbAssessment
                 Text = comment
             });
 
-            DbContext.SaveChanges();
+            _dbContext.SaveChanges();
         }
 
         private _EditDatabaseModel SetEditDatabaseModel()
@@ -210,7 +208,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetOnHoldData(int processId)
         {
-            var onHoldRows = await DbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
+            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
     }
