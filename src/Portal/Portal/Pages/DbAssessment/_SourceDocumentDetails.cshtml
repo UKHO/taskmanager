@@ -8,7 +8,7 @@
 <div class="card mb-4">
     <h6>Source Document Details</h6>
     <div class="card-body">
-        <table class="table table-striped">
+        <table id="srcDocDetailsTable" class="table table-striped">
             <thead>
                 <tr>
                     <th scope="col"></th>
@@ -57,66 +57,66 @@
                     </tr>
 
                     @if (Model.LinkedDocuments != null)
-                     {
-                         foreach (var linkedDocument in Model.LinkedDocuments)
-                         {
-                             <tr class="collapse @(childRowsMarker)">
-                                 <td></td>
-                                 <td></td>
-                                 <td id="rows">@linkedDocument.LinkedSdocId</td>
-                                 <td>@linkedDocument.SourceDocumentName</td>
-                                 <td>@linkedDocument.ReceiptDate</td>
-                                 <td>@linkedDocument.SourceDocumentType</td>
-                                 <td>@linkedDocument.Datum</td>
-                                 <td>@linkedDocument.SourceNature</td>
-                                 <td>
-                                     @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
-                                     {
-                                         <div class="attachLinkedDocumentButtonContainer">
-                                             <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
-                                                 <i class="fa fa-paperclip"></i>
-                                             </a>
-                                         </div>
-                                         <div class="attachLinkedDocumentSpinnerContainer">
-                                             <div class="spinner-border">
-                                             </div>
-                                             <i class="fa fa-paperclip"></i>
-                                         </div>
-                                     }
-                                 </td>
-                             </tr>
-                         }
-                     }
+                    {
+                        foreach (var linkedDocument in Model.LinkedDocuments)
+                        {
+                            <tr class="collapse @(childRowsMarker)">
+                                <td></td>
+                                <td></td>
+                                <td id="rows">@linkedDocument.LinkedSdocId</td>
+                                <td>@linkedDocument.SourceDocumentName</td>
+                                <td>@linkedDocument.ReceiptDate</td>
+                                <td>@linkedDocument.SourceDocumentType</td>
+                                <td>@linkedDocument.Datum</td>
+                                <td>@linkedDocument.SourceNature</td>
+                                <td>
+                                    @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
+                                    {
+                                        <div class="attachLinkedDocumentButtonContainer">
+                                            <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                <i class="fa fa-paperclip"></i>
+                                            </a>
+                                        </div>
+                                        <div class="attachLinkedDocumentSpinnerContainer">
+                                            <div class="spinner-border">
+                                            </div>
+                                            <i class="fa fa-paperclip"></i>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
 
                     @if (Model.AttachedLinkedDocuments != null)
-                     {
-                         foreach (var attachedLinkedDocument in Model.AttachedLinkedDocuments)
-                         {
-                             <tr>
-                                 <td>
-                                 </td>
-                                 <td>
-                                     @{
-                                         if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
-                                         {
-                                             <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
-                                         }
-                                         else
-                                         {
-                                             @attachedLinkedDocument.ParsedRsdraNumber
-                                         }
-                                     }
-                                 </td>
-                                 <td id="rows">@attachedLinkedDocument.LinkedSdocId</td>
-                                 <td>@attachedLinkedDocument.SourceDocumentName</td>
-                                 <td>@attachedLinkedDocument.ReceiptDate</td>
-                                 <td>@attachedLinkedDocument.SourceDocumentType</td>
-                                 <td>@attachedLinkedDocument.Datum</td>
-                                 <td>@attachedLinkedDocument.SourceNature</td>
-                                 <td><i class="fa fa-times-circle" style="color: red"></i></td>
-                             </tr>
-                         }
-                     }
+                    {
+                        foreach (var attachedLinkedDocument in Model.AttachedLinkedDocuments)
+                        {
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                    @{
+                                        if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
+                                        }
+                                        else
+                                        {
+                                            @attachedLinkedDocument.ParsedRsdraNumber
+                                        }
+                                    }
+                                </td>
+                                <td id="rows">@attachedLinkedDocument.LinkedSdocId</td>
+                                <td>@attachedLinkedDocument.SourceDocumentName</td>
+                                <td>@attachedLinkedDocument.ReceiptDate</td>
+                                <td>@attachedLinkedDocument.SourceDocumentType</td>
+                                <td>@attachedLinkedDocument.Datum</td>
+                                <td>@attachedLinkedDocument.SourceNature</td>
+                                <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                            </tr>
+                        }
+                    }
                 }
 
             </tbody>

@@ -1,10 +1,10 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using OpenQA.Selenium;
+using Portal.TestAutomation.Framework.ContextClasses;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
-using System.Linq;
-using Portal.TestAutomation.Framework.ContextClasses;
 
 namespace Portal.TestAutomation.Steps
 {
@@ -44,12 +44,11 @@ namespace Portal.TestAutomation.Steps
             _reviewPage.HasLoaded();
         }
 
-       [Then(@"The source document with the corresponding process Id in the database matches the sdocId on the UI")]
+        [Then(@"The source document with the corresponding process Id in the database matches the sdocId on the UI")]
         public void ThenTheSourceDocumentWithTheCorrespondingProcessIdInTheDatabaseMatchesTheSdocIdOnTheUI()
         {
-            var sdocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).PrimarySdocId;
-            var firstUiDisplayDoc = _driver.FindElement(By.XPath($"/html/body//table/tbody/tr/td[contains(text(),{sdocId})]"));
-            Assert.AreSame(sdocId, firstUiDisplayDoc);
+            var sDocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).PrimarySdocId;
+            Assert.IsTrue(_reviewPage.IsSdocIdInDetails(sDocId));
         }
     }
 }

@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="ReviewPageTasks - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Data\TasksSeedData.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

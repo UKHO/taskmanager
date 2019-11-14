@@ -19,12 +19,18 @@ namespace Portal.TestAutomation.Framework.Pages
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
         private IWebElement UnassignedTaskTable => _driver.FindElement(By.Id("unassignedTasks"));
-        private IWebElement AssignedTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
+        private IWebElement InFlightTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
         private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
         private IWebElement ClickOnTask => _driver.FindElement(By.XPath("//*[@id='inFlightTasks']/tbody/tr[1]/td[1]/a"));
-        private List<IWebElement> UnassignedTaskTableRows => UnassignedTaskTable.FindElements(By.TagName("tr")).ToList();
-        private List<IWebElement> AssignedTaskTableRows => AssignedTaskTable.FindElements(By.TagName("tr")).ToList();
 
+        private List<IWebElement> UnassignedTaskTableActualDataRows =>
+            UnassignedTaskTable.FindElements(By.XPath("//*[@id='unassignedTasks']/tbody/tr"))
+                .Where(r => r.FindElements(By.TagName("td")).Count > 1)
+                .ToList();
+        private List<IWebElement> InFlightTaskTableActualDataRows =>
+            InFlightTaskTable.FindElements(By.XPath("//*[@id='inFlightTasks']/tbody/tr"))
+            .Where(r => r.FindElements(By.TagName("td")).Count > 1)
+            .ToList();
 
         public LandingPage(IWebDriver driver, int seconds)
         {
@@ -64,15 +70,21 @@ namespace Portal.TestAutomation.Framework.Pages
 
         public bool FindTaskByProcessId(int processId)
         {
-            // Ensure we only have the one row (including the header row) for each filtered table
-            if (UnassignedTaskTableRows.Count > 2 || AssignedTaskTableRows.Count > 3)
+            if (UnassignedTaskTableActualDataRows.Count > 0 && InFlightTaskTableActualDataRows.Count > 0) return false;
+
+            foreach (var row in UnassignedTaskTableActualDataRows)
             {
-                return false;
+                int.TryParse(row.FindElements(By.TagName("td"))[0].Text, out var found);
+                if (found == processId) return true;
             }
 
-            // Checks both unassigned and assigned tables for correct process id
-            return UnassignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(UnassignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId
-                   && AssignedTaskTableRows[1].FindElements(By.TagName("td")).Count != 0 && int.Parse(AssignedTaskTableRows[1].FindElements(By.TagName("td"))[0].Text) == processId;
+            foreach (var row in InFlightTaskTableActualDataRows)
+            {
+                int.TryParse(row.FindElements(By.TagName("td"))[0].Text, out var found);
+                if (found == processId) return true;
+            }
+
+            return false;
         }
     }
 }
