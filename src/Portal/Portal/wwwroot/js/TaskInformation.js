@@ -23,6 +23,7 @@
         });
     }
 
+
     $("#btnPutOnHold").on("click", function () {
         $("#btnPutOnHold").prop("disabled", true);
 
@@ -41,6 +42,7 @@
                 $("#btnTakeOffHold").prop("disabled", false);
 
                 $("#taskInformation").html(result);
+                getComments();
             },
             error: function (error) {
                 $("#OnHoldError").modal("show");
@@ -67,6 +69,7 @@
                 $("#btnPutOnHold").prop("disabled", false);
 
                 $("#taskInformation").html(result);
+                getComments();
             },
             error: function (error) {
                 $("#OnHoldError").modal("show");
