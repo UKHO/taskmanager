@@ -125,7 +125,7 @@ namespace Portal.Pages.DbAssessment
             {
                 // Log error
                 e.Data.Add("OurMessage", $"Cannot find an on hold row for ProcessId: {processId}");
-                //throw;
+                throw;
             }
 
             return Page();
