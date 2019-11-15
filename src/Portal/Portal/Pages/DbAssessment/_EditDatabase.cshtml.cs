@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Portal.Models;
 
 namespace Portal.Pages.DbAssessment
 {
