@@ -168,7 +168,16 @@
                             @task.Team
                         </td>
                         <td>
-                            <i class="fas fa-cog black"></i>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#">
+                                        <i class="far fa-edit">
+                                        </i>
+                                        Add Task Note
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             @task.TaskNote
