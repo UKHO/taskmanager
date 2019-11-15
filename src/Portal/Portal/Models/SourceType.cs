@@ -1,4 +1,4 @@
-﻿namespace Portal.Pages.DbAssessment
+﻿namespace Portal.Models
 {
     public class SourceType
     {

@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Messages.Enums;
 using Common.Messages.Events;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -21,70 +18,36 @@ namespace Portal.Pages.DbAssessment
 {
     public class ReviewModel : PageModel
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly ICommentsHelper _commentsHelper;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
 
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
-        public _CommentsModel CommentsModel { get; set; }
-        public WorkflowDbContext DbContext { get; set; }
 
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            IEventServiceApiClient eventServiceApiClient,
-            IHttpContextAccessor httpContextAccessor)
+            IEventServiceApiClient eventServiceApiClient, 
+            ICommentsHelper commentsHelper)
         {
-            DbContext = dbContext;
+            _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
-            _httpContextAccessor = httpContextAccessor;
+            _commentsHelper = commentsHelper;
         }
 
-        public void OnGet(int processId)
+        public async Task OnGet(int processId)
         {
             ProcessId = processId;
             AssignTaskModel = SetAssignTaskDummyData(processId);
-            SetTaskInformationDummyData(processId);
-        }
-
-        public IActionResult OnGetRetrieveComments(int processId)
-        {
-            var model = new _CommentsModel()
-            {
-                Comments = DbContext.Comment.Where(c => c.ProcessId == processId).ToList(),
-                ProcessId = processId
-            };
-
-            // Repopulate models...
-            OnGet(processId);
-
-            return new PartialViewResult
-            {
-                ViewName = "_Comments",
-                ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                }
-            };
-        }
-
-        public IActionResult OnGetCommentsPartialAsync(string comment, int processId)
-        {
-            // TODO: Test with Azure
-            // TODO: This will not work in Azure; need alternative; but will work in local dev
-
-            var workflowInstance = DbContext.WorkflowInstance.First(c => c.ProcessId == processId).WorkflowInstanceId;
-
-            AddComment(comment, processId, workflowInstance);
-
-            return OnGetRetrieveComments(processId);
+            await GetOnHoldData(processId);
         }
 
         public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
@@ -105,7 +68,7 @@ namespace Portal.Pages.DbAssessment
 
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
-            AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
@@ -117,7 +80,7 @@ namespace Portal.Pages.DbAssessment
             // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
             //TODO: Log
 
-            var correlationId = DbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
+            var correlationId = _dbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
 
             for (int i = 1; i < AssignTaskModel.Count; i++)
             {
@@ -159,25 +122,9 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task AddComment(string comment, int processId, int workflowInstanceId)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            DbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
-
-            await DbContext.SaveChangesAsync();
-        }
-
         private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
         {
-            var workflowInstance = DbContext.WorkflowInstance
+            var workflowInstance = _dbContext.WorkflowInstance
                 .Include(wi => wi.AssessmentData)
                 .FirstOrDefault(wi => wi.ProcessId == processId);
 
@@ -188,21 +135,15 @@ namespace Portal.Pages.DbAssessment
             }
 
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
-            DbContext.SaveChanges();
+            _dbContext.SaveChanges();
 
             return workflowInstance;
         }
 
-        private void SetTaskInformationDummyData(int processId)
+        private async Task GetOnHoldData(int processId)
         {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
-
-            var onHoldRows = DbContext.OnHold.Where(r => r.ProcessId == processId).ToList();
+            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
-
         }
 
         private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
