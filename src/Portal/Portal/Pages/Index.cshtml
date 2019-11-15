@@ -4,6 +4,8 @@
     ViewData["Title"] = "Home page";
 }
 
+<script type="text/javascript" src="~/js/Index.js"></script>
+
 <div class="row pt-1">
     <div class="col-4">
         <a asp-page="/Index">
@@ -171,7 +173,7 @@
                             <div class="dropdown" style="cursor: pointer;">
                                 <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId">
                                         <i class="far fa-edit">
                                         </i>
                                         Add Task Note
@@ -189,6 +191,32 @@
         </table>
     </div>
 </div>
+
+@* Modal Add task note *@
+<div class="modal fade" id="addTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="AddTaskNote" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Task Note</h4>
+            </div>
+            <div class="modal-body">
+                <div id="modal-body">
+                    <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                    <input type="hidden" id="hdnProcessId" value="@*@Model.ProcessId*@" />
+                    <br />
+                    <div id="AddTaskNoteError"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnCloseTaskNote" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button></div>
+                    <div class="col-5 pl-1 pr-0"><button type="button" id="btnPostTaskNote" accesskey="a" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="left" title="Add Task Note">Add Task Note</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 
     <script>

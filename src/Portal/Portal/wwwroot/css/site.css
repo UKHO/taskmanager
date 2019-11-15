@@ -240,6 +240,10 @@ table > tbody > tr > th {
         background-color: #ffffff;
     }
 
+.attachLinkedDocumentSpinnerContainer {
+    width: 68px;
+}
+
 /* Footer start */
 footer {
     bottom: 0;
