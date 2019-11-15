@@ -196,23 +196,25 @@
 <div class="modal fade" id="addTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="AddTaskNote" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add Task Note</h4>
-            </div>
-            <div class="modal-body">
-                <div id="modal-body">
-                    <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
-                    <input type="hidden" id="hdnProcessId" value="@*@Model.ProcessId*@" />
-                    <br />
-                    <div id="AddTaskNoteError"></div>
+            <form method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Task Note</h4>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <div class="row col-11 justify-content-end">
-                    <div class="col-5 pr-1"><button type="button" id="btnCloseTaskNote" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button></div>
-                    <div class="col-5 pl-1 pr-0"><button type="button" id="btnPostTaskNote" accesskey="a" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="left" title="Add Task Note">Add Task Note</button></div>
+                <div class="modal-body">
+                    <div id="modal-body">
+                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                        <input type="hidden" id="hdnProcessId" />
+                        <br />
+                        <div id="AddTaskNoteError"></div>
+                    </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCloseTaskNote" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="button" id="btnPostTaskNote" accesskey="a" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="left" title="Add Task Note">Add Task Note</button></div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

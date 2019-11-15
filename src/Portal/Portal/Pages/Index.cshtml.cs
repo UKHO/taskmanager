@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Portal.ViewModels;
@@ -22,6 +24,7 @@ namespace Portal.Pages
             _dbContext = dbContext;
             _mapper = mapper;
         }
+
         public void OnGet()
         {
             var workflows = _dbContext.WorkflowInstance
@@ -32,6 +35,11 @@ namespace Portal.Pages
                 .ToList();
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
+        }
+
+        public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
+        {
+            return null;
         }
     }
 }
