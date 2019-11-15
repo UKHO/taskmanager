@@ -74,22 +74,6 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private void AddComment(string comment, int processId, int workflowInstanceId)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            _dbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
-
-            _dbContext.SaveChanges();
-        }
-
         private _EditDatabaseModel SetEditDatabaseModel()
         {
             return new _EditDatabaseModel
