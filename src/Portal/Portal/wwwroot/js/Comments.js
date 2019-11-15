@@ -62,11 +62,10 @@ function postCommentsHandler() {
                     "newCommentMessage": newCommentMessage
                 },
                 success: function (result) {
-                    $("#existingComments").html(result);
                     $("#addCommentModal").modal("hide");
-                    $(".modal-backdrop").remove();
                     $("body").removeClass("modal-open");
-                    $("#btnPostComment").prop("disabled", false);
+                    $(".modal-backdrop").remove();
+                    getComments();
                 },
                 error: function (error) {
                     $("#AddCommentError")
