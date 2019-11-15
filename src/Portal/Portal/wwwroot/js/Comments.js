@@ -28,10 +28,6 @@ function getComments() {
 }
 
 function postComments() {
-    $("#btnAddCommentTest").on("click", function () {
-        alert("Test");
-    });
-
     $("#btnPostComment").on("click", function () {
         $("#btnPostComment").prop("disabled", true);
 
