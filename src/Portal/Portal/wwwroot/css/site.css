@@ -8,6 +8,21 @@ body {
     font-weight: 300;
 }
 
+/* Start chevron for notes on landing page */
+table.dataTable td.details-control i:before {
+    content: '\f078';
+    font-family: 'Font Awesome 5 Free';
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #09315B;
+    padding-right: 0.35em;
+}
+table.dataTable tr.shown td.details-control i:before {
+    content: '\f077';
+    color: #09315B;
+}
+/* End chevron for notes on landing page */
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
@@ -15,16 +30,8 @@ body {
     padding-right: 15px;
 }
 
-@media (min-width: 1400px) {
-    .container {
-        max-width: 1340px;
-    }
-}
-
-@media (min-width: 1600px) {
-    .container {
-        max-width: 1540px;
-    }
+.container {
+    max-width: 1540px;
 }
 
 table.task-list thead tr th {

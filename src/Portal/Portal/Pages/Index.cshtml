@@ -109,6 +109,7 @@
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
                 <tr>
+                    <th></th>
                     <th>ID</th>
                     <th style="min-width: 3.6rem;">DM End</th>
                     <th style="min-width: 5.8rem;">DM End Date</th>
@@ -129,6 +130,7 @@
                 @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.DbAssessmentReviewDataAssessor) || !string.IsNullOrEmpty(t.DbAssessmentReviewDataVerifier)))
                 {
                     <tr>
+                        <td class="details-control"><i class="fa"></i></td>
                         <td>
                             <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
@@ -186,24 +188,6 @@
                 "pageLength": 5,
                 'sDom': 'ltipr',
                 "lengthMenu": [5, 10, 25, 50],
-                'columnDefs': [{
-                    'targets': [12],
-                    'orderable': false,
-                    'searchable': false
-                },
-                {
-                    'targets': [13],
-                    'visible': false,
-                    'searchable': false
-                }],
-                "scrollX": true,
-                "ordering": true
-            });
-            var inFlightTasksTable = $('#inFlightTasks').DataTable({
-                "pageLength": 5,
-                "lengthMenu": [5, 10, 25, 50],
-                'sDom': 'ltipr',
-                'autoWidth': true,
                 'columnDefs': [
                     {
                         'targets': [12],
@@ -217,33 +201,60 @@
                     }
                 ],
                 "scrollX": true,
+                "order": [[1, 'dsc']],
                 "ordering": true
             });
+            var inFlightTasksTable = $('#inFlightTasks').DataTable({
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+                'sDom': 'ltipr',
+                'autoWidth': true,
+                'columnDefs': [
+                    {
+                        'targets': [0],
+                        'orderable': false,
+                        'searchable': false
+                    },
+                    {
+                        'targets': [13],
+                        'orderable': false,
+                        'searchable': false
+                    },
+                    {
+                        'targets': [14],
+                        'visible': false,
+                        'searchable': false
+                    }
+                ],
+                "order": [[1, 'dsc']],
+                "scrollX": true,
+                "createdRow": function (row, data, dataIndex) {
+                    if (data[14] === "") {
+                        $("td.details-control", row).removeClass("details-control");
+                        $("td.details-control i", row).removeClass("fa");
+                    }
+                }
+            });
 
-            // TODO fix up in tasks note story
+            function format(data) {
+                return '<span class="note-formatting">' + data[14] + '</span>';
+            }
 
-            //$('#inFlightTasks tbody tr').each(function (index, tr) {
+            $('#inFlightTasks tbody').on('click',
+                'td.details-control i',
+                function () {
 
-            //    var row = inFlightTasksTable.row(tr);
-            //    var taskNote = row.data()[13];
+                    var tr = $(this).closest('tr');
+                    var row = inFlightTasksTable.row(tr);
 
-            //    if (taskNote.length > 0) {
-            //        row.child("<b>Note: </b>" + taskNote).show();
-            //        row.child().children("td").addClass("note-formatting");
-            //    } else {
-            //        row.child("").show();
-            //    }
-
-            //    $(tr).addClass('shown');
-
-            //    if ($(tr).hasClass('red')) {
-            //        row.child().addClass('red');
-            //    } else if ($(tr).hasClass('amber')) {
-            //        row.child().addClass('amber');
-            //    } else if ($(tr).hasClass('black')) {
-            //        row.child().addClass('black');
-            //    }
-            //});
+                    if (row.child.isShown()) {
+                        row.child.hide();
+                        tr.removeClass('shown');
+                    } else {
+                        row.child(format(row.data()), 'no-padding').show();
+                        tr.addClass('shown');
+                    }
+                });
 
             $('#txtGlobalSearch').keyup(function () {
                 unassignedTasksTable.search($(this).val()).draw();
