@@ -30,16 +30,8 @@ table.dataTable tr.shown td.details-control i:before {
     padding-right: 15px;
 }
 
-@media (min-width: 1400px) {
-    .container {
-        max-width: 1340px;
-    }
-}
-
-@media (min-width: 1600px) {
-    .container {
-        max-width: 1540px;
-    }
+.container {
+    max-width: 1540px;
 }
 
 table.task-list thead tr th {
