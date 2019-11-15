@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
+using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -17,8 +19,8 @@ namespace Portal.Pages.DbAssessment
 {
     public class AssessModel : PageModel
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOptions<UriConfig> _uriConfig;
+        private readonly ICommentsHelper _commentsHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -35,15 +37,15 @@ namespace Portal.Pages.DbAssessment
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
-            IHttpContextAccessor httpContextAccessor,
-            IOptions<UriConfig> uriConfig)
+            IOptions<UriConfig> uriConfig,
+            ICommentsHelper commentsHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
-            _httpContextAccessor = httpContextAccessor;
             _uriConfig = uriConfig;
+            _commentsHelper = commentsHelper;
         }
 
         public async Task OnGet(int processId)

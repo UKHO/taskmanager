@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Portal.Configuration;
+using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
@@ -104,6 +105,7 @@ namespace Portal
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
+            services.AddScoped<ICommentsHelper, CommentsHelper>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

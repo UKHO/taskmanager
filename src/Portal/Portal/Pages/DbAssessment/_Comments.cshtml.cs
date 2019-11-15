@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Portal.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -14,17 +13,17 @@ namespace Portal.Pages.DbAssessment
     public class _CommentsModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICommentsHelper _commentsHelper;
 
         [BindProperty(SupportsGet = true)]
         public int ProcessId { get; set; }
 
         public List<Comments> Comments { get; set; }
 
-        public _CommentsModel(WorkflowDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public _CommentsModel(WorkflowDbContext dbContext, ICommentsHelper commentsHelper)
         {
             _dbContext = dbContext;
-            _httpContextAccessor = httpContextAccessor;
+            _commentsHelper = commentsHelper;
         }
 
         public async Task OnGetAsync(int processId)
@@ -41,28 +40,11 @@ namespace Portal.Pages.DbAssessment
 
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(c => c.ProcessId == ProcessId);
 
-            await AddComment(newCommentMessage, ProcessId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment(newCommentMessage, ProcessId, workflowInstance.WorkflowInstanceId);
 
             Comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             return Page();
         }
-
-        private async Task AddComment(string comment, int processId, int workflowInstanceId)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            await _dbContext.Comment.AddAsync(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
-
-            await _dbContext.SaveChangesAsync();
-        }
-
     }
 }

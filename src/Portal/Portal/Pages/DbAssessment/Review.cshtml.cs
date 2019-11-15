@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -17,11 +19,11 @@ namespace Portal.Pages.DbAssessment
 {
     public class ReviewModel : PageModel
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly ICommentsHelper _commentsHelper;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
@@ -32,14 +34,14 @@ namespace Portal.Pages.DbAssessment
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            IEventServiceApiClient eventServiceApiClient,
-            IHttpContextAccessor httpContextAccessor)
+            IEventServiceApiClient eventServiceApiClient, 
+            ICommentsHelper commentsHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
-            _httpContextAccessor = httpContextAccessor;
+            _commentsHelper = commentsHelper;
         }
 
         public async Task OnGet(int processId)
@@ -67,7 +69,7 @@ namespace Portal.Pages.DbAssessment
 
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
-            await AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
@@ -119,22 +121,6 @@ namespace Portal.Pages.DbAssessment
             {
                 //TODO: Log error!
             }
-        }
-
-        private async Task AddComment(string comment, int processId, int workflowInstanceId)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            _dbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
-
-            await _dbContext.SaveChangesAsync();
         }
 
         private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
