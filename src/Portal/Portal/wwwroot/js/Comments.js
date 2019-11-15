@@ -18,7 +18,8 @@ function getComments() {
         data: processId,
         success: function (result) {
             $("#existingComments").html(result);
-            postComments();
+            addCommentsHandler();
+            postCommentsHandler();
         },
         error: function (error) {
             $("#AddCommentError")
@@ -27,7 +28,15 @@ function getComments() {
     });
 }
 
-function postComments() {
+function addCommentsHandler() {
+    $("#btnAddComment").on("click", function() {
+        $("#btnPostComment").prop("disabled", false);
+        $("#AddCommentError").html("");
+        $("#addCommentModal").modal("show");
+    });
+}
+
+function postCommentsHandler() {
     $("#btnPostComment").on("click", function () {
         $("#btnPostComment").prop("disabled", true);
 
@@ -35,6 +44,8 @@ function postComments() {
             $("#AddCommentError")
                 .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
             $('#txtComment').focus();
+
+            $("#btnPostComment").prop("disabled", false);
         } else {
 
             var processId = Number($("#hdnProcessId").val());
