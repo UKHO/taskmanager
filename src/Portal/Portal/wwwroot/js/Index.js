@@ -4,14 +4,33 @@
         function () {
             var processId = $(this).data("processid");
             $("#hdnProcessId").val(processId);
+
             var taskNote = $(this).data("tasknote");
             $("#txtNote").val(taskNote);
+
             $("#editTaskNoteModal").modal("show");
         });
 
     $("#btnClearTaskNote").click(function() {
         $("#txtNote").val("");
     });
+
+    function getTasks() {
+
+        $.ajax({
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function (error) {
+                //$("#AddCommentError")
+                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load comments.</div>");
+            }
+        });
+    }
 
     $("#btnPostTaskNote").click(function () {
 
@@ -29,6 +48,7 @@
                 $("#editTaskNoteModal").modal("hide");
                 $(".modal-backdrop").remove();
                 $("body").removeClass("modal-open");
+                getTasks();
             },
             error: function (error) {
                 console.log(error);

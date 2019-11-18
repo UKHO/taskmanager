@@ -20,6 +20,7 @@ namespace Portal.Pages
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
 
         public IndexModel(WorkflowDbContext dbContext, IMapper mapper,
@@ -30,15 +31,15 @@ namespace Portal.Pages
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            var workflows = _dbContext.WorkflowInstance
+            var workflows = await _dbContext.WorkflowInstance
                 .Include(c => c.Comment)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
                 .Include(t => t.TaskNote)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
-                .ToList();
+                .ToListAsync();
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
@@ -71,7 +72,6 @@ namespace Portal.Pages
                     await _dbContext.SaveChangesAsync();
                 }
 
-                OnGet();
                 return StatusCode(200);
             }
 
@@ -80,7 +80,6 @@ namespace Portal.Pages
             existingTaskNote.LastModifiedByUsername = username;
             await _dbContext.SaveChangesAsync();
 
-            OnGet();
             return StatusCode(200);
         }
     }
