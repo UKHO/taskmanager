@@ -66,7 +66,7 @@
     <Build Include="Tables\PrimaryDocumentStatus.sql" />
     <Build Include="Tables\LinkedDocument.sql" />
     <Build Include="Tables\OnHold.sql" />
-    <Build Include="Tables\TaskNotes.sql" />
+    <Build Include="Tables\TaskNote.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
