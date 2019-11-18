@@ -68,6 +68,8 @@ function postCommentsHandler() {
                     getComments();
                 },
                 error: function (error) {
+                    console.log(error);
+
                     $("#AddCommentError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
 

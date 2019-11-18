@@ -2,6 +2,10 @@
 
     $(".taskNoteItem").on("click",
         function () {
+
+            $("#btnPostTaskNote").prop("disabled", false);
+            $("#editTaskNoteError").html("");
+
             var processId = $(this).data("processid");
             $("#hdnProcessId").val(processId);
 
@@ -33,6 +37,7 @@
     }
 
     $("#btnPostTaskNote").click(function () {
+        $("#btnPostTaskNote").prop("disabled", true);
 
         $.ajax({
             type: "POST",
@@ -52,6 +57,9 @@
             },
             error: function (error) {
                 console.log(error);
+                $("#editTaskNoteError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Error updating task note. Please try again later.</div>");
+
             }
         });
     });
