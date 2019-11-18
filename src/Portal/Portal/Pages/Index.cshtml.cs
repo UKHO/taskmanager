@@ -48,25 +48,28 @@ namespace Portal.Pages
             //TODO: LOG!
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
             var username = string.IsNullOrEmpty(userId) ? "Unknown" : userId;
-            taskNote = taskNote.Trim();
+            taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
 
             if (existingTaskNote == null)
             {
-                var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
-
-                await _dbContext.TaskNote.AddAsync(new TaskNote()
+                if (!string.IsNullOrEmpty(taskNote))
                 {
-                    WorkflowInstanceId = workflowInstance.WorkflowInstanceId,
-                    ProcessId = processId,
-                    Text = taskNote,
-                    Created = DateTime.Now,
-                    CreatedByUsername = username,
-                    LastModified = DateTime.Now,
-                    LastModifiedByUsername = username,
-                });
-                await _dbContext.SaveChangesAsync();
+                    var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+
+                    await _dbContext.TaskNote.AddAsync(new TaskNote()
+                    {
+                        WorkflowInstanceId = workflowInstance.WorkflowInstanceId,
+                        ProcessId = processId,
+                        Text = taskNote,
+                        Created = DateTime.Now,
+                        CreatedByUsername = username,
+                        LastModified = DateTime.Now,
+                        LastModifiedByUsername = username,
+                    });
+                    await _dbContext.SaveChangesAsync();
+                }
 
                 return StatusCode(200);
             }
