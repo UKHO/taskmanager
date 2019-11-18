@@ -96,7 +96,7 @@
                             <i class="fas fa-cog black"></i>
                         </td>
                         <td>
-                            @task.TaskNote
+                            @task.TaskNoteText
                         </td>
                     </tr>
                 }
@@ -173,7 +173,7 @@
                             <div class="dropdown" style="cursor: pointer;">
                                 <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
@@ -182,7 +182,7 @@
                             </div>
                         </td>
                         <td>
-                            @task.TaskNote
+                            @task.TaskNoteText
                         </td>
                     </tr>
                 }

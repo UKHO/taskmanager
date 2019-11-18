@@ -19,7 +19,7 @@ namespace Portal.ViewModels
         public string DbAssessmentReviewDataAssessor { get; set; }
         public string DbAssessmentReviewDataVerifier { get; set; }
         public string Team { get; set; }
-        public string TaskNote { get; set; }
+        public string TaskNoteText { get; set; }
         public List<Comments> Comment { get; set; }
     }
 }

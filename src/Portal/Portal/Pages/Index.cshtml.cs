@@ -71,6 +71,7 @@ namespace Portal.Pages
                     await _dbContext.SaveChangesAsync();
                 }
 
+                OnGet();
                 return StatusCode(200);
             }
 
@@ -79,6 +80,7 @@ namespace Portal.Pages
             existingTaskNote.LastModifiedByUsername = username;
             await _dbContext.SaveChangesAsync();
 
+            OnGet();
             return StatusCode(200);
         }
     }
