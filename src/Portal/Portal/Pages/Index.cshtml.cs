@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +18,16 @@ namespace Portal.Pages
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public IList<TaskViewModel> Tasks { get; set; }
 
-        public IndexModel(WorkflowDbContext dbContext, IMapper mapper)
+        public IndexModel(WorkflowDbContext dbContext, IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void OnGet()
@@ -31,6 +36,7 @@ namespace Portal.Pages
                 .Include(c => c.Comment)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
+                .Include(t => t.TaskNote)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToList();
 
@@ -39,7 +45,38 @@ namespace Portal.Pages
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            return null;
+            //TODO: LOG!
+            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
+            var username = string.IsNullOrEmpty(userId) ? "Unknown" : userId;
+            taskNote = taskNote.Trim();
+
+            var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
+
+            if (existingTaskNote == null)
+            {
+                var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+
+                await _dbContext.TaskNote.AddAsync(new TaskNote()
+                {
+                    WorkflowInstanceId = workflowInstance.WorkflowInstanceId,
+                    ProcessId = processId,
+                    Text = taskNote,
+                    Created = DateTime.Now,
+                    CreatedByUsername = username,
+                    LastModified = DateTime.Now,
+                    LastModifiedByUsername = username,
+                });
+                await _dbContext.SaveChangesAsync();
+
+                return StatusCode(200);
+            }
+
+            existingTaskNote.Text = taskNote;
+            existingTaskNote.LastModified = DateTime.Now;
+            existingTaskNote.LastModifiedByUsername = username;
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(200);
         }
     }
 }
