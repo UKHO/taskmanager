@@ -173,7 +173,7 @@
                             <div class="dropdown" style="cursor: pointer;">
                                 <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
@@ -207,9 +207,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="row col-11 justify-content-end">
-                        <div class="col-5 pr-1"><button type="button" id="btnCloseTaskNote" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button></div>
-                        <div class="col-5 pl-1 pr-0"><button type="button" id="btnPostTaskNote" accesskey="a" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button></div>
+                    <div class="row col-12 p-0 justify-content-end">
+                        <div class="col-3 pl-1 pr-0 float-sm-left"><button type="button" id="btnClearTaskNote" accesskey="a" class="btn btn-outline-secondary btn-block" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button></div>
+                        <div class="col-3 pr-1"><button type="button" id="btnCloseTaskNote" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Close this popup">Close</button></div>
+                        <div class="col-3 pl-1 pr-0"><button type="button" id="btnPostTaskNote" accesskey="a" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button></div>
                     </div>
                 </div>
             </form>

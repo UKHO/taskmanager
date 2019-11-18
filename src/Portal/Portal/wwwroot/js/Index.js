@@ -4,8 +4,14 @@
         function () {
             var processId = $(this).data("processid");
             $("#hdnProcessId").val(processId);
+            var taskNote = $(this).data("tasknote");
+            $("#txtNote").val(taskNote);
             $("#editTaskNoteModal").modal("show");
         });
+
+    $("#btnClearTaskNote").click(function() {
+        $("#txtNote").val("");
+    });
 
     $("#btnPostTaskNote").click(function () {
 
