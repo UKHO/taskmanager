@@ -2,8 +2,15 @@
 
     getComments();
 
+
 });
 
+function focusTextAreaHandler() {
+    $("#addCommentModal").on("shown.bs.modal",
+        function () {
+            $("#txtComment").focus();
+        });
+}
 
 function getComments() {
     var processId = { "processId": $("#hdnProcessId").val() };
@@ -19,6 +26,7 @@ function getComments() {
         success: function (result) {
             $("#existingComments").html(result);
             addCommentsHandler();
+            focusTextAreaHandler();
             postCommentsHandler();
         },
         error: function (error) {
@@ -29,7 +37,7 @@ function getComments() {
 }
 
 function addCommentsHandler() {
-    $("#btnAddComment").on("click", function() {
+    $("#btnAddComment").on("click", function () {
         $("#btnPostComment").prop("disabled", false);
         $("#AddCommentError").html("");
         $("#addCommentModal").modal("show");
@@ -68,6 +76,8 @@ function postCommentsHandler() {
                     getComments();
                 },
                 error: function (error) {
+                    console.log(error);
+
                     $("#AddCommentError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
 

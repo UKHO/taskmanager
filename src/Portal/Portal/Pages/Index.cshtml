@@ -4,6 +4,8 @@
     ViewData["Title"] = "Home page";
 }
 
+<script type="text/javascript" src="~/js/Index.js"></script>
+
 <div class="row pt-1">
     <div class="col-4">
         <a asp-page="/Index">
@@ -94,7 +96,7 @@
                             <i class="fas fa-cog black"></i>
                         </td>
                         <td>
-                            @task.TaskNote
+                            @task.TaskNoteText
                         </td>
                     </tr>
                 }
@@ -168,10 +170,19 @@
                             @task.Team
                         </td>
                         <td>
-                            <i class="fas fa-cog black"></i>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
+                                        <i class="far fa-edit">
+                                        </i>
+                                        Edit Task Note
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                         <td>
-                            @task.TaskNote
+                            @task.TaskNoteText
                         </td>
                     </tr>
                 }
@@ -180,6 +191,33 @@
         </table>
     </div>
 </div>
+
+@* Modal Edit task note *@
+<div class="modal fade" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskNote" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="frmTaskNote" asp-page-handler="TaskNote">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Task Note</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-body">
+                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                        <input type="hidden" id="hdnProcessId" name="processId" />
+                        <br />
+                        <div id="editTaskNoteError"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClearTaskNote" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                    <button type="button" id="btnCancelTaskNote" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                    <button type="submit" form="frmTaskNote" id="btnPostTaskNote" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 
     <script>

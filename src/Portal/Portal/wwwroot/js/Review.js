@@ -12,4 +12,9 @@
             event.preventDefault();
         }
     });
+
+    $("#ConfirmTerminate").on("shown.bs.modal",
+        function () {
+            $("#txtTerminateComment").focus();
+        });
 });

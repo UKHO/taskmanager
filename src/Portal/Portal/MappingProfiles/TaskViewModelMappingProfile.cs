@@ -16,6 +16,8 @@ namespace Portal.MappingProfiles
 
             CreateMap<AssessmentData, TaskViewModel>();
             CreateMap<DbAssessmentReviewData, TaskViewModel>();
+            CreateMap<TaskNote, TaskViewModel>().ForMember(destination => destination.TaskNoteText,
+                opts=>opts.MapFrom(source=>source.Text));
         }
     }
 }

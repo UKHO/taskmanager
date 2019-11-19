@@ -147,4 +147,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="OnHoldUser" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b6a89f45-255e-4e47-8356-3dd34e1f90ec" ChangeDateTime="11/18/2019 10:14:29">
+    <Property Name="ElementName" Value="[dbo].[TaskNote].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskNote]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedByUsername" />
+  </Operation>
 </Operations>
