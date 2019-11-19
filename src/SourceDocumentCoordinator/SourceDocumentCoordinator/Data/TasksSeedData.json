@@ -132,7 +132,21 @@
       "Status": "Complete",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
-    }
+    },
+    "OnHold": [
+      {
+        "processId": 123,
+        "OnHoldTime": "2019-11-10",
+        "OnHoldUser": "Ross"
+      },
+      {
+        "processId": 123,
+        "OnHoldTime": "2019-11-09",
+        "OnHoldUser": "Ross",
+        "OffHoldTime": "2019-11-10",
+        "OffHoldUser": "Samir"
+      }
+    ]
   },
   {
     "processId": 321,
@@ -207,6 +221,14 @@
       "activityCode": "78798",
       "assessor": "BatesP",
       "verifier": "RigdenT"
+    },
+    "PrimaryDocumentStatus": {
+      "processId": 321,
+      "SdocId": 1101541,
+      "ContentServiceId": null,
+      "Status": "Started",
+      "StartedAt": "2019-06-12T00:00:00",
+      "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
     }
   },
   {
