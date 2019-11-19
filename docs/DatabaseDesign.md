@@ -34,10 +34,43 @@ The Comment table holds user entered comments for each workflow.
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
 |CommentId          |INT            |No           |The primary key of this table                                                                    |
 |ProcessId          |INT            |No           |The K2 process instance Id                                                                       |
-|Comment            |NVARCHAR(4000) |No           |                                                                                                 |
+|Text               |NVARCHAR(4000) |No           |                                                                                                 |
 |WorkflowInstanceId |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                            |
 |Username		    |NVARCHAR(255)  |No           |The user that entered the comment                      											|
 |Created			|DATETIME       |No           |The date and time that the comment was created							                        |
+
+There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+### OnHold
+
+The OnHold table records when a task has been put on hold as well as whether it has been taken off hold.
+
+| Column Name       | Datatype      | Allow nulls | Description                                                         |
+|-------------------|---------------|-------------|---------------------------------------------------------------------|
+|OnHoldId           |INT            |No     |The primary key of this table                                              |
+|WorkflowInstanceId |INT            |No     |The unique Id for the relevant row in the WorkflowInstance table (FK)      |
+|ProcessId          |INT            |No     |The K2 process instance Id                                                 |
+|OnHoldTime         |Date           |No     |The date (not time) when the task was put on hold                          |
+|OffHoldTime        |Date           |Yes    |The date (not time) when the task was taken off hold                       |
+|OnHoldUser		    |NVARCHAR(255)  |No     |The user that put the task on hold                                			|
+|OffHoldUser		|NVARCHAR(255)  |Yes    |The user that took the task off hold                           			|
+
+There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+### TaskNote
+
+The TaskNote table holds user entered notes for each workflow.
+
+| Column Name       | Datatype      | Allow nulls | Description                                                                                     |
+|-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|TaskNoteId             |INT            |No           |The primary key of this table                                                                |
+|ProcessId              |INT            |No           |The K2 process instance Id                                                                   |
+|Text                   |NVARCHAR(MAX)  |No           |                                                                                             |
+|WorkflowInstanceId     |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                        |
+|CreatedByUsername	    |NVARCHAR(255)  |No           |The user that created the Task Note                      									|
+|Created		     	|DATETIME       |No           |The date and time that the Task Note was created							                    |
+|LastModified			|DATETIME       |No           |The date and time that the Task Note was last modified							            |
+|LastModifiedByUsername |NVARCHAR(255)  |No           |The user that last modified the Task Note                      								|
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
