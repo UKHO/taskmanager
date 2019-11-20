@@ -121,25 +121,37 @@
 
             </tbody>
         </table>
-
-        <h5>Add Source From SDRA</h5>
-        <div class="row">
-            <div class="col-3">
-                <div class="text-input-wrap">
-                    <input id="sourceDocumentId" type="text" class="form-text-input" placeholder="SDOC ID">
+        
+        <div id="addSourceDocumentFromSDRA">
+            <h5>Add Source From SDRA</h5>
+            <div class="row">
+                <div class="col-3">
+                    <div class="text-input-wrap">
+                        <input id="sourceDocumentId" type="text" class="form-text-input" placeholder="SDOC ID">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button id="btnSearchSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Search</button>
+                    @*<button id="btnAddSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Add Source</button>*@
                 </div>
             </div>
-            <div class="col-2">
-                <button id="btnSearchSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Search</button>
-                @*<button id="btnAddSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Add Source</button>*@
-            </div>
+
+            <section class="dialog error mt-3">
+                <h3>
+                    <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
+                     Failed to load Source Documents
+                </h3>
+                <div>Please try again later</div>
+            </section>
+
+            <section class="dialog success mt-3">
+                <h3>
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                     The following source information was found
+                </h3>
+                <div>adasdas asdasd asda</div>
+            </section>
         </div>
-
-        <section class="dialog error mt-3">
-            <h3>Failed to load Source Documents</h3>
-            <div>Please try again later</div>
-        </section>
-
 
     </div>
 </div>
