@@ -13,6 +13,7 @@ using Portal.HttpClients;
 using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
+using SourceType = Portal.Models.SourceType;
 
 namespace Portal.Pages.DbAssessment
 {

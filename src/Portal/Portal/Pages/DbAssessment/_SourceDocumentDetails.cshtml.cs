@@ -161,9 +161,9 @@ namespace Portal.Pages.DbAssessment
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                                     _documentStatusFactory,
                                                                     processId,
-                                                                    linkedSdocId,
+                                                                    linkedSdocId, null, null,
                                                                     SourceDocumentRetrievalStatus.Started,
-                                                                    SourceDocumentType.Linked);
+                                                                    SourceType.Linked);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
@@ -171,7 +171,7 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 SourceDocumentId = linkedSdocId,
                 GeoReferenced = false,
-                DocumentType = SourceDocumentType.Linked
+                SourceType = SourceType.Linked
             };
 
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
@@ -184,6 +184,8 @@ namespace Portal.Pages.DbAssessment
         /// Result of user clicking the Add Source from SDRA button
         /// </summary>
         /// <param name="sdocId"></param>
+        /// <param name="docName"></param>
+        /// <param name="docType"></param>
         /// <param name="processId"></param>
         /// <param name="correlationId"></param>
         /// <returns></returns>
@@ -193,9 +195,9 @@ namespace Portal.Pages.DbAssessment
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                 _documentStatusFactory,
                 processId,
-                sdocId,
+                sdocId, docName, docType,
                 SourceDocumentRetrievalStatus.Started,
-                SourceDocumentType.Database);
+                SourceType.Database);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
@@ -203,7 +205,7 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 SourceDocumentId = sdocId,
                 GeoReferenced = false,
-                DocumentType = SourceDocumentType.Database
+                SourceType = SourceType.Database
             };
 
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);

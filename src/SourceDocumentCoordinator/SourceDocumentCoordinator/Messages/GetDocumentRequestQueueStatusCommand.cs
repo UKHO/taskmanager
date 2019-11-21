@@ -8,6 +8,6 @@ namespace SourceDocumentCoordinator.Messages
     {
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
-        public SourceDocumentType DocumentType { get; set; }
+        public SourceType SourceType { get; set; }
     }
 }

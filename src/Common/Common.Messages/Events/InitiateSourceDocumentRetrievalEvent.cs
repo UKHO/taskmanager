@@ -9,6 +9,6 @@ namespace Common.Messages.Events
         public Guid CorrelationId { get; set; }
         public int ProcessId { get; set; }
         public bool GeoReferenced { get; set; }
-        public SourceDocumentType DocumentType { get; set; }
+        public SourceType SourceType { get; set; }
     }
 }

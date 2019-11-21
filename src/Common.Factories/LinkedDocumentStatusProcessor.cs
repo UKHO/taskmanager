@@ -20,7 +20,8 @@ namespace Common.Factories
             throw new NotImplementedException();
         }
 
-        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status, Guid? correlationId)
+        public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
+            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
         {
             var row = await _dbContext.LinkedDocument
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
