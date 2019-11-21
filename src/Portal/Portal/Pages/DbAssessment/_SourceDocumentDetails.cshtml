@@ -119,6 +119,37 @@
                     }
                 }
 
+                @if (Model.DatabaseDocuments != null)
+                {
+                    foreach (var databaseDocument in Model.DatabaseDocuments)
+                    {
+                        <tr>
+                            <td>
+                            </td>
+                            <td></td>
+                            <td>@databaseDocument.SdocId</td>
+                            <td>
+                                @{
+                                    if (databaseDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a href="@databaseDocument.ContentServiceUri" target="_blank"></a>
+                                    }
+                                    else
+                                    {
+                                        @databaseDocument.SourceDocumentName
+                                    }
+                                }
+                            </td>
+                            <td></td>
+                            <td>@databaseDocument.SourceDocumentType</td>
+                            <td></td>
+                            <td></td>
+                            <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                        </tr>
+                    }
+                }
+                }
+
             </tbody>
         </table>
 
