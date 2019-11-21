@@ -199,16 +199,16 @@ namespace Portal.Pages.DbAssessment
                 SourceDocumentRetrievalStatus.Started,
                 SourceType.Database);
 
-            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
-            {
-                CorrelationId = correlationId,
-                ProcessId = processId,
-                SourceDocumentId = sdocId,
-                GeoReferenced = false,
-                SourceType = SourceType.Database
-            };
+            //var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
+            //{
+            //    CorrelationId = correlationId,
+            //    ProcessId = processId,
+            //    SourceDocumentId = sdocId,
+            //    GeoReferenced = false,
+            //    SourceType = SourceType.Database
+            //};
 
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+            //await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
 
             return StatusCode(200);
             // TODO: Log!
