@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
+using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
@@ -51,7 +52,7 @@ namespace Portal.Pages.DbAssessment
             GetAttachedLinkedDocuments();
         }
         
-        public async Task<DocumentAssessmentData> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
+        public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
         {
             DocumentAssessmentData sourceDocumentData = null;
             try
@@ -63,7 +64,7 @@ namespace Portal.Pages.DbAssessment
                 //TODO: Log error!
             }
 
-            return sourceDocumentData;
+            return new JsonResult(sourceDocumentData);
         }
 
         private void GetPrimaryDocumentData()
