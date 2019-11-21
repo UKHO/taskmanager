@@ -121,6 +121,52 @@
 
             </tbody>
         </table>
-        <button id="btnAddSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Add Source</button>
+
+        <div id="addDatabaseSourceDocument">
+            <h5>Add Source From SDRA</h5>
+            <div class="row">
+                <div class="col-3">
+                    <div class="text-input-wrap">
+                        <input id="txtSourceDocumentId" type="text" class="form-text-input" placeholder="SDOC ID">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button id="btnSearchSource" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Search</button>
+                </div>
+            </div>
+
+            <section class="dialog error collapse mt-3">
+                <h5>
+                    <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                    Failed to load Source Documents
+                </h5>
+                <div>Please try again later</div>
+            </section>
+
+            <section class="dialog success collapse mt-3">
+                <h5>
+                    <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                    The following source information was found
+                </h5>
+                <div class="row">
+                    <div class="col-5">
+                        <label>Name</label>
+                        <div id="addSourceName">asdasdasda</div>
+                    </div>
+                    <div class="col-2">
+                        <label>ID</label>
+                        <div id="addSourceSdocId">21323323</div>
+                    </div>
+                    <div class="col-3">
+                        <label>Doc Type</label>
+                        <div id="addSourceDocType">Thing</div>
+                    </div>
+                    <div class="col-2">
+                        <button id="btnAddSource" class="btn btn-primary" type="button" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId"><span style="padding-right: 5px;"></span>Add Source</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
     </div>
 </div>

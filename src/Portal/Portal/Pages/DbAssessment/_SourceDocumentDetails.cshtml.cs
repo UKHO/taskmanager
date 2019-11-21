@@ -4,16 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
+using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
+using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
+using LinkedDocuments = WorkflowDatabase.EF.Models.LinkedDocuments;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -22,6 +24,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IDocumentStatusFactory _documentStatusFactory;
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
@@ -29,14 +32,16 @@ namespace Portal.Pages.DbAssessment
         public IEnumerable<LinkedDocuments> LinkedDocuments { get; set; }
         public IEnumerable<LinkedDocuments> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
+        public IEnumerable<DatabaseDocumentStatus> DatabaseDocuments { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
-        public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
-            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDocumentStatusFactory documentStatusFactory)
+        public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
+            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDataServiceApiClient dataServiceApiClient, IDocumentStatusFactory documentStatusFactory)
         {
-            _dbContext = DbContext;
+            _dbContext = dbContext;
             _uriConfig = uriConfig;
             _eventServiceApiClient = eventServiceApiClient;
+            _dataServiceApiClient = dataServiceApiClient;
             _documentStatusFactory = documentStatusFactory;
         }
 
@@ -46,6 +51,22 @@ namespace Portal.Pages.DbAssessment
             GetPrimaryDocumentStatus();
             GetLinkedDocuments();
             GetAttachedLinkedDocuments();
+            //GetDatabaseDocuments();
+        }
+        
+        public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
+        {
+            DocumentAssessmentData sourceDocumentData = null;
+            try
+            {
+                sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+
+            return new JsonResult(sourceDocumentData);
         }
 
         private void GetPrimaryDocumentData()
@@ -77,6 +98,23 @@ namespace Portal.Pages.DbAssessment
             {
                 // Log and throw, as we're unable to get Linked Documents
                 e.Data.Add("OurMessage", "Unable to retrieve Linked Documents");
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private void GetDatabaseDocuments()
+        {
+            try
+            {
+                DatabaseDocuments = _dbContext
+                    .DatabaseDocumentStatus
+                    .Where(c => c.ProcessId == ProcessId).ToList();
+            }
+            catch (ArgumentNullException e)
+            {
+                // Log and throw, as we're unable to get Database Documents
+                e.Data.Add("OurMessage", "Unable to retrieve Database Documents");
                 Console.WriteLine(e);
                 throw;
             }
@@ -139,7 +177,39 @@ namespace Portal.Pages.DbAssessment
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
 
             return StatusCode(200);
-            ////TODO: Log!
+            // TODO: Log!
+        }
+
+        /// <summary>
+        /// Result of user clicking the Add Source from SDRA button
+        /// </summary>
+        /// <param name="sdocId"></param>
+        /// <param name="processId"></param>
+        /// <param name="correlationId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, string docName, string docType, int processId, Guid correlationId)
+        {
+            // Update DB first
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                _documentStatusFactory,
+                processId,
+                sdocId,
+                SourceDocumentRetrievalStatus.Started,
+                SourceDocumentType.Database);
+
+            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
+            {
+                CorrelationId = correlationId,
+                ProcessId = processId,
+                SourceDocumentId = sdocId,
+                GeoReferenced = false,
+                DocumentType = SourceDocumentType.Database
+            };
+
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+
+            return StatusCode(200);
+            // TODO: Log!
         }
     }
 }
