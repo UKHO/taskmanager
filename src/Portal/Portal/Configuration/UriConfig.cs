@@ -16,6 +16,7 @@ namespace Portal.Configuration
         public Uri EventServiceLocalhostBaseUri { get; set; }
         public Uri EventServiceWebServiceBaseUri { get; set; }
         public Uri EventServiceWebServicePostEventUrl { get; set; }
+        public Uri DataServicesDocumentAssessmentDataUri { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
         {
@@ -34,6 +35,11 @@ namespace Portal.Configuration
         public Uri BuildContentServiceUri(Guid fileGuid)
         {
             return new Uri(ContentServiceBaseUrl, fileGuid + "/data");
+        }
+
+        public Uri BuildDocumentAssessmentDataDataServicesUri(int sdocId)
+        {
+            return new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
         }
     }
 }

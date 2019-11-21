@@ -77,10 +77,30 @@
 
     function applySearchSourceHandler() {
 
-        $("#btnSearchSource").on("click", function(e) {
+        $("#btnSearchSource").on("click", function (e) {
+
+            var sdocId = Number($("#txtSourceDocumentId").val());
+
+            $.ajax({
+                type: "GET",
+                url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                contentType: "application/json; charset=utf-8",
+                data: { "sdocId": sdocId },
+                success: function (data) {
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("show");
+                    $("#addSourceName").val(data.Name);
+                },
+                error: function (error) {
+                    $("#sourceDocumentsError")
+                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
+                }
+            });
+
 
             //success
-            $("#addDatabaseSourceDocument .dialog.success").collapse("show");
 
         });
     }

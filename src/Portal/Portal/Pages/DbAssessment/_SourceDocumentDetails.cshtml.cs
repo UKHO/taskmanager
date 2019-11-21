@@ -6,6 +6,7 @@ using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using Common.Messages.Events;
+using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ using Portal.Configuration;
 using Portal.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
+using LinkedDocuments = WorkflowDatabase.EF.Models.LinkedDocuments;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -21,6 +23,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IDocumentStatusFactory _documentStatusFactory;
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
@@ -31,11 +34,12 @@ namespace Portal.Pages.DbAssessment
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
         public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
-            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDocumentStatusFactory documentStatusFactory)
+            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDataServiceApiClient dataServiceApiClient, IDocumentStatusFactory documentStatusFactory)
         {
             _dbContext = dbContext;
             _uriConfig = uriConfig;
             _eventServiceApiClient = eventServiceApiClient;
+            _dataServiceApiClient = dataServiceApiClient;
             _documentStatusFactory = documentStatusFactory;
         }
 
@@ -45,6 +49,21 @@ namespace Portal.Pages.DbAssessment
             GetPrimaryDocumentStatus();
             GetLinkedDocuments();
             GetAttachedLinkedDocuments();
+        }
+        
+        public async Task<DocumentAssessmentData> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
+        {
+            DocumentAssessmentData sourceDocumentData = null;
+            try
+            {
+                sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log error!
+            }
+
+            return sourceDocumentData;
         }
 
         private void GetPrimaryDocumentData()
