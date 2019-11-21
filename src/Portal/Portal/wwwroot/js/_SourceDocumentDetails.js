@@ -114,6 +114,35 @@
             //success
             $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
 
+            var sdocId = Number($("#addSourceSdocId").text());
+            var sourceName = $("#addSourceName").text();
+            var docType = $("#addSourceDocType").text();
+            //var processId = Number($(this).data("processid"));
+            var correlationId = $(this).data("correlationid");
+
+            $.ajax({
+                type: "POST",
+                url: "_SourceDocumentDetails/?handler=AddSourceFromSdra",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "sdocId": sdocId,
+                    "docName": sourceName,
+                    "docType": docType,
+                    "processId": processId,
+                    "correlationId": correlationId
+                },
+                success: function (result) {
+                    getSourceDocuments();
+                },
+                error: function (error) {
+                    //TODO: Implement error dialogs
+                    $("#assignTasksError")
+                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+                }
+            });
+
         });
     }
 

@@ -107,7 +107,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_DatabaseDocumentStatusProcessor_Is_Used_To_Create_A_New_DatabaseDocumentStatus_Row()
         {
-            await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, ProcessId, Guid.NewGuid());
+            await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, "", "", ProcessId, Guid.NewGuid());
 
             Assert.IsNotNull(_dbContext.DatabaseDocumentStatus.FirstAsync(dds => dds.ProcessId == ProcessId && dds.SdocId == SdocId));
         }
@@ -115,7 +115,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_InitiateSourceDocumentRetrievalEvent_Is_Fired_When_Adding_Source_From_Database()
         {
-            await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, ProcessId, CorrelationId);
+            await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, "", "", ProcessId, CorrelationId);
 
             A.CallTo(() => _fakeEventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), A<InitiateSourceDocumentRetrievalEvent>.Ignored))
                 .MustHaveHappened();

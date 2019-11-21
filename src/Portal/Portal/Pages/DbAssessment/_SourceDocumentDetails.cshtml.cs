@@ -32,6 +32,7 @@ namespace Portal.Pages.DbAssessment
         public IEnumerable<LinkedDocuments> LinkedDocuments { get; set; }
         public IEnumerable<LinkedDocuments> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
+        public IEnumerable<DatabaseDocumentStatus> DatabaseDocuments { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
         public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
@@ -50,6 +51,7 @@ namespace Portal.Pages.DbAssessment
             GetPrimaryDocumentStatus();
             GetLinkedDocuments();
             GetAttachedLinkedDocuments();
+            //GetDatabaseDocuments();
         }
         
         public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
@@ -96,6 +98,23 @@ namespace Portal.Pages.DbAssessment
             {
                 // Log and throw, as we're unable to get Linked Documents
                 e.Data.Add("OurMessage", "Unable to retrieve Linked Documents");
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private void GetDatabaseDocuments()
+        {
+            try
+            {
+                DatabaseDocuments = _dbContext
+                    .DatabaseDocumentStatus
+                    .Where(c => c.ProcessId == ProcessId).ToList();
+            }
+            catch (ArgumentNullException e)
+            {
+                // Log and throw, as we're unable to get Database Documents
+                e.Data.Add("OurMessage", "Unable to retrieve Database Documents");
                 Console.WriteLine(e);
                 throw;
             }
@@ -168,7 +187,7 @@ namespace Portal.Pages.DbAssessment
         /// <param name="processId"></param>
         /// <param name="correlationId"></param>
         /// <returns></returns>
-        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, int processId, Guid correlationId)
+        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, string docName, string docType, int processId, Guid correlationId)
         {
             // Update DB first
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
