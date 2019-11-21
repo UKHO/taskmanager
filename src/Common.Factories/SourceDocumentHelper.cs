@@ -9,10 +9,11 @@ namespace Common.Factories
     {
         public static async Task<int> UpdateSourceDocumentStatus(IDocumentStatusFactory documentStatusFactory,
             int processId, int sourceDocumentId,
-            SourceDocumentRetrievalStatus status, SourceDocumentType docType)
+            string sourceDocumentName, string sourceDocumentType,
+            SourceDocumentRetrievalStatus status, SourceType sourceType)
         {
-            var documentStatusProcessor = documentStatusFactory.GetDocumentStatusProcessor(docType);
-            return await documentStatusProcessor.Update(processId, sourceDocumentId, status);
+            var documentStatusProcessor = documentStatusFactory.GetDocumentStatusProcessor(sourceType);
+            return await documentStatusProcessor.Update(processId, sourceDocumentId, sourceDocumentName, sourceDocumentType, status);
         }
     }
 }

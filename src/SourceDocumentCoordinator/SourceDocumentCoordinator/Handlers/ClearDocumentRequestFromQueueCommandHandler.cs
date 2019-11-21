@@ -46,9 +46,9 @@ namespace SourceDocumentCoordinator.Handlers
                         await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                     _documentStatusFactory, 
                                                     message.ProcessId, 
-                                                    message.SourceDocumentId, 
+                                                    message.SourceDocumentId, null, null, 
                                                     SourceDocumentRetrievalStatus.Complete, 
-                                                    message.DocumentType);
+                                                    message.SourceType);
                         break;
                     default:
                         throw new NotImplementedException();

@@ -143,7 +143,7 @@ namespace SourceDocumentCoordinator.UnitTests
                 CorrelationId = correlationId,
                 SourceDocumentId = sourceDocumentId,
                 ProcessId = 1,
-                DocumentType = SourceDocumentType.Primary
+                SourceType = SourceType.Primary
             };
             _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
             A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });

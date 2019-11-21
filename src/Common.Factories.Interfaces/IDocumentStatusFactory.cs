@@ -4,6 +4,6 @@ namespace Common.Factories.Interfaces
 {
     public interface IDocumentStatusFactory
     {
-        IDocumentStatusProcessor GetDocumentStatusProcessor(SourceDocumentType documentType);
+        IDocumentStatusProcessor GetDocumentStatusProcessor(SourceType sourceType);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Common.Messages.Enums
 {
-    public enum SourceDocumentType
+    public enum SourceType
     {
         Primary,
         Linked,

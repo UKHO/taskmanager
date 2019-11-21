@@ -94,7 +94,7 @@ namespace WorkflowCoordinator.Sagas
                 ProcessId = Data.ProcessId,
                 SourceDocumentId = Data.SourceDocumentId,
                 GeoReferenced = true,
-                DocumentType = SourceDocumentType.Primary
+                SourceType = SourceType.Primary
             };
 
             await context.Publish(initiateRetrievalEvent).ConfigureAwait(false);

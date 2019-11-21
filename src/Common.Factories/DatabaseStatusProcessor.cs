@@ -21,7 +21,8 @@ namespace Common.Factories
             throw new NotImplementedException();
         }
 
-        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status, Guid? correlationId)
+        public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
+            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
         {
             var row = await _dbContext.DatabaseDocumentStatus
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
@@ -32,11 +33,12 @@ namespace Common.Factories
                 // add
                 var databaseDocumentStatus = new DatabaseDocumentStatus
                 {
-                    CorrelationId = correlationId,
                     ProcessId = processId,
                     SdocId = sourceDocumentId,
+                    SourceDocumentName = sourceDocumentName,
+                    SourceDocumentType = sourceDocumentType,
                     Status = status.ToString(),
-                    StartedAt = DateTime.Now
+                    Created = DateTime.Now
                 };
 
                 await _dbContext.DatabaseDocumentStatus.AddAsync(databaseDocumentStatus);

@@ -26,7 +26,7 @@ namespace EventService.UnitTests
                 CorrelationId = Guid.NewGuid(),
                 ProcessId = 123,
                 SourceDocumentId = 12345,
-                DocumentType = SourceDocumentType.Primary,
+                SourceType = SourceType.Primary,
                 GeoReferenced = false
             };
 

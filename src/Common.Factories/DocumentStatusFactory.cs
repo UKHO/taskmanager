@@ -13,20 +13,20 @@ namespace Common.Factories
         {
             _dbContext = dbContext;
         }
-        public IDocumentStatusProcessor GetDocumentStatusProcessor(SourceDocumentType documentType)
+        public IDocumentStatusProcessor GetDocumentStatusProcessor(SourceType sourceType)
         {
-            switch (documentType)
+            switch (sourceType)
             {
-                case SourceDocumentType.Primary:
+                case SourceType.Primary:
                     return new PrimaryDocumentStatusProcessor(_dbContext);
-                case SourceDocumentType.Linked:
+                case SourceType.Linked:
                     return new LinkedDocumentStatusProcessor(_dbContext);
-                case SourceDocumentType.Database:
+                case SourceType.Database:
                     return new DatabaseDocumentStatusProcessor(_dbContext);
-                case SourceDocumentType.Folder:
+                case SourceType.Folder:
                     throw new NotImplementedException("Document type not implemented.");
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(documentType), documentType, null);
+                    throw new ArgumentOutOfRangeException(nameof(sourceType), sourceType, null);
             }
         }
     }

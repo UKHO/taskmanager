@@ -1,6 +1,6 @@
 ﻿namespace Portal.Models
 {
-    public class SourceType
+    public class AssignedTaskSourceType
     {
         public int SourceTypeId { get; set; }
         public string Name { get; set; }
