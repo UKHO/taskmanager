@@ -8,7 +8,6 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.HttpClients;
@@ -31,10 +30,10 @@ namespace Portal.Pages.DbAssessment
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
-        public _SourceDocumentDetailsModel(WorkflowDbContext DbContext,
+        public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
             IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDocumentStatusFactory documentStatusFactory)
         {
-            _dbContext = DbContext;
+            _dbContext = dbContext;
             _uriConfig = uriConfig;
             _eventServiceApiClient = eventServiceApiClient;
             _documentStatusFactory = documentStatusFactory;
@@ -139,7 +138,39 @@ namespace Portal.Pages.DbAssessment
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
 
             return StatusCode(200);
-            ////TODO: Log!
+            // TODO: Log!
+        }
+
+        /// <summary>
+        /// Result of user clicking the Add Source from SDRA button
+        /// </summary>
+        /// <param name="sdocId"></param>
+        /// <param name="processId"></param>
+        /// <param name="correlationId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, int processId, Guid correlationId)
+        {
+            // Update DB first
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                _documentStatusFactory,
+                processId,
+                sdocId,
+                SourceDocumentRetrievalStatus.Started,
+                SourceDocumentType.Database);
+
+            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
+            {
+                CorrelationId = correlationId,
+                ProcessId = processId,
+                SourceDocumentId = sdocId,
+                GeoReferenced = false,
+                DocumentType = SourceDocumentType.Database
+            };
+
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+
+            return StatusCode(200);
+            // TODO: Log!
         }
     }
 }

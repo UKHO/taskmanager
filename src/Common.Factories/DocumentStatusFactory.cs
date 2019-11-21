@@ -22,7 +22,7 @@ namespace Common.Factories
                 case SourceDocumentType.Linked:
                     return new LinkedDocumentStatusProcessor(_dbContext);
                 case SourceDocumentType.Database:
-                    throw new NotImplementedException("Document type not implemented.");
+                    return new DatabaseDocumentStatusProcessor(_dbContext);
                 case SourceDocumentType.Folder:
                     throw new NotImplementedException("Document type not implemented.");
                 default:

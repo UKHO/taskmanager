@@ -26,6 +26,7 @@ namespace WorkflowDatabase.EF
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
+        public DbSet<DatabaseDocumentStatus> DatabaseDocumentStatus { get; set; }
         public DbSet<LinkedDocuments> LinkedDocument { get; set; }
         public DbSet<OnHold> OnHold { get; set; }
         public DbSet<TaskNote> TaskNote { get; set; }
@@ -51,6 +52,13 @@ namespace WorkflowDatabase.EF
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<PrimaryDocumentStatus>(p => p.ProcessId);
+
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.DatabaseDocumentStatus)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.DbAssessmentReviewData);
