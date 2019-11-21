@@ -430,7 +430,7 @@ body, .sticky-footer-wrapper {
     border: 0px;
 }
 
-.fa, .dialog h3::before, .dialog.error h3::before, .dialog.success h3::before, .dialog.warning h3::before,
+.fa, .dialog h5::before, .dialog.error h5::before, .dialog.success h5::before, .dialog.warning h5::before,
 .fas {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
@@ -442,10 +442,10 @@ body, .sticky-footer-wrapper {
     /* info type is default */
     border-left: 5px solid #0177c1;
 }
-.dialog h3 {
+.dialog h5 {
     color: #0177c1;
 }
-.dialog h3::before, .dialog.warning h3::before, .dialog.success h3::before, .dialog.error h3::before {
+.dialog h5::before, .dialog.warning h5::before, .dialog.success h5::before, .dialog.error h5::before {
     color: inherit;
     font-size: 18px;
     margin: 0 10px 0 0;
@@ -453,18 +453,18 @@ body, .sticky-footer-wrapper {
 .dialog.error {
     border-left: 5px solid #e20d0d;
 }
-.dialog.error h3 {
+.dialog.error h5 {
     color: #e20d0d;
 }
 .dialog.success {
     border-left: 5px solid #4aab37;
 }
-.dialog.success h3 {
+.dialog.success h5 {
     color: #4aab37;
 }
 .dialog.warning {
     border-left: 5px solid #ef8123;
 }
-.dialog.warning h3 {
+.dialog.warning h5 {
     color: #ef8123;
 }

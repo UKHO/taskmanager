@@ -4,7 +4,6 @@
     getSourceDocuments();
 
     function getSourceDocuments() {
-
         $.ajax({
             type: "GET",
             url: "_SourceDocumentDetails",
@@ -15,9 +14,13 @@
             data: { "processId": processId },
             success: function (result) {
                 $("#sourceDocuments").html(result);
+
+                $(".attachLinkedDocumentSpinnerContainer").hide();
+
                 applyCollapseIconHandler();
                 applyAttachLinkedDocumentHandlers();
-                $(".attachLinkedDocumentSpinnerContainer").hide();
+                applySearchSourceHandler();
+                applyAddSourceHandler();
             },
             error: function (error) {
                 $("#sourceDocumentsError")
@@ -71,4 +74,25 @@
             icon.removeClass("fa-minus").addClass("fa-plus");
         });
     }
+
+    function applySearchSourceHandler() {
+
+        $("#btnSearchSource").on("click", function(e) {
+
+            //success
+            $("#addDatabaseSourceDocument .dialog.success").collapse("show");
+
+        });
+    }
+
+    function applyAddSourceHandler() {
+
+        $("#btnAddSource").on("click", function (e) {
+
+            //success
+            $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+
+        });
+    }
+
 });
