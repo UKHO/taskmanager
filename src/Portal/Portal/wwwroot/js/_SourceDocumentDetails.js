@@ -91,7 +91,9 @@
                 data: { "sdocId": sdocId },
                 success: function (data) {
                     $("#addDatabaseSourceDocument .dialog.success").collapse("show");
+                    $("#addSourceSdocId").text(data.sdocId);
                     $("#addSourceName").text(data.name);
+                    $("#addSourceDocType").text(data.documentType);
                 },
                 error: function (error) {
                     $("#sourceDocumentsError")
