@@ -13,7 +13,6 @@ using Portal.HttpClients;
 using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
-using SourceType = Portal.Models.SourceType;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -161,13 +160,13 @@ namespace Portal.Pages.DbAssessment
                         new Assessor {AssessorId = 0, Name = "Brian Stenson"},
                         new Assessor {AssessorId = 1, Name = "Peter Bates"}
                     }, "AssessorId", "Name"),
-                SourceType = new SourceType { SourceTypeId = 0, Name = "Simple" },
-                SourceTypes = new SelectList(
-                    new List<SourceType>
+                AssignedTaskSourceType = new AssignedTaskSourceType { SourceTypeId = 0, Name = "Simple" },
+                AssignedTaskSourceTypes = new SelectList(
+                    new List<AssignedTaskSourceType>
                     {
-                        new SourceType{SourceTypeId = 0, Name = "Simple"},
-                        new SourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
-                        new SourceType{SourceTypeId = 2, Name = "LTA"}
+                        new AssignedTaskSourceType{SourceTypeId = 0, Name = "Simple"},
+                        new AssignedTaskSourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
+                        new AssignedTaskSourceType{SourceTypeId = 2, Name = "LTA"}
                     }, "SourceTypeId", "Name"),
                 Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(

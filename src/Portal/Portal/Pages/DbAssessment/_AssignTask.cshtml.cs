@@ -19,8 +19,8 @@ namespace Portal.Pages.DbAssessment
         public SelectList Verifiers { get; set; }
 
         [DisplayName("Source Type:")]
-        public SourceType SourceType { get; set; }
-        public SelectList SourceTypes { get; set; }
+        public AssignedTaskSourceType AssignedTaskSourceType { get; set; }
+        public SelectList AssignedTaskSourceTypes { get; set; }
 
         [DisplayName("Notes:")]
         public string Notes { get; set; }
