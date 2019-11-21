@@ -21,6 +21,7 @@ namespace Portal.UnitTests
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private DocumentStatusFactory _documentStatusFactory;
         private _SourceDocumentDetailsModel _sourceDocumentDetailsModel;
+        private IDataServiceApiClient _fakeDataServiceApiClient;
 
         private int ProcessId { get; set; }
         private int SdocId { get; set; }
@@ -35,14 +36,14 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
-
+            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _documentStatusFactory = new DocumentStatusFactory(_dbContext);
 
             ProcessId = 123;
             SdocId = 123456;
             CorrelationId = Guid.NewGuid();
 
-            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, new OptionsSnapshotWrapper<UriConfig>(new UriConfig()), _fakeEventServiceApiClient, _documentStatusFactory);
+            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, new OptionsSnapshotWrapper<UriConfig>(new UriConfig()), _fakeEventServiceApiClient, _fakeDataServiceApiClient, _documentStatusFactory);
         }
 
         [TearDown]
@@ -66,7 +67,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null);
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null);
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sourceDocumentDetailsModel.OnGet());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
@@ -99,7 +100,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null) { ProcessId = ProcessId };
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null) { ProcessId = ProcessId };
             Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
 
