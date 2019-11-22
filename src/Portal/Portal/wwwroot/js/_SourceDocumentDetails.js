@@ -81,13 +81,13 @@
 
             var enteredSdocId = $("#txtSourceDocumentId").val();
 
-            if (!Number.isNaN(enteredSdocId)) {
+            if (enteredSdocId.match(/^[1-9]+d*$/) == null) {
                 $("#sdocTextValidationError")
                     .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a numeric Sdoc Id</div>");
                 return;
             }
 
-            $("#sdocTextValidationError").html();
+            $("#sdocTextValidationError").html("");
 
             var sdocId = Number(enteredSdocId);
 
