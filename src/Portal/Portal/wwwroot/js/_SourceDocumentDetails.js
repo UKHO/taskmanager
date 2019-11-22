@@ -76,8 +76,7 @@
     }
 
     function applySearchSourceHandler() {
-
-        $("#btnSearchSource").on("click", function (e) {
+        function searchSource(event) {
 
             var enteredSdocId = $("#txtSourceDocumentId").val();
 
@@ -110,10 +109,19 @@
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
                 }
             });
+        }
 
+        $("#btnSearchSource").on("click", function (e) {
+            searchSource(e);
+        });
 
-            //success
+        $("#txtSourceDocumentId").keypress(function (e) {
+            if (e.keyCode !== 13) { //If not enter key then return
+                return;
+            }
 
+            e.preventDefault(); //Prevent 'Done' form submission when user hit enter
+            searchSource(e);
         });
     }
 
