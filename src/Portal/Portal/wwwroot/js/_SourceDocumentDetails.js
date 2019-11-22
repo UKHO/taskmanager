@@ -79,7 +79,17 @@
 
         $("#btnSearchSource").on("click", function (e) {
 
-            var sdocId = Number($("#txtSourceDocumentId").val());
+            var enteredSdocId = $("#txtSourceDocumentId").val();
+
+            if (!Number.isNaN(enteredSdocId)) {
+                $("#sdocTextValidationError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a numeric Sdoc Id</div>");
+                return;
+            }
+
+            $("#sdocTextValidationError").html();
+
+            var sdocId = Number(enteredSdocId);
 
             $.ajax({
                 type: "GET",
