@@ -49,7 +49,18 @@
       "Status": "Started",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
-    }
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 445,
+        "SdocId": 1936906,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
+    ]
   },
   {
     "processId": 123,
@@ -146,6 +157,17 @@
         "OffHoldTime": "2019-11-10",
         "OffHoldUser": "Samir"
       }
+    ],
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 123,
+        "SdocId": 217547,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
     ]
   },
   {
@@ -229,7 +251,18 @@
       "Status": "Started",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
-    }
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 321,
+        "SdocId": 1101541,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
+    ]
   },
   {
     "processId": 125,
@@ -297,7 +330,18 @@
       "Status": "Ready",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    }
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 125,
+        "SdocId": 206733,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
+    ]
   },
   {
     "processId": 126,
@@ -395,7 +439,18 @@
       "Status": "Ready",
       "StartedAt": "2019-06-12T00:00:00",
       "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
-    }
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 126,
+        "SdocId": 938096,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
+    ]
   },
   {
     "processId": 127,
@@ -453,6 +508,17 @@
       "processId": 127,
       "ion": "I8766",
       "activityCode": "4881"
-    }
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 127,
+        "SdocId": 934153,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2019-10-15T00:00:00"
+      }
+    ]
   }
 ]

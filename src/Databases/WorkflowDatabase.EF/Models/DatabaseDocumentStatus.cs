@@ -12,5 +12,7 @@ namespace WorkflowDatabase.EF.Models
         public Guid? ContentServiceId { get; set; }
         public string Status { get; set; }
         public DateTime Created { get; set; }
+
+        public Uri ContentServiceUri { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace Portal.Pages.DbAssessment
             GetPrimaryDocumentStatus();
             GetLinkedDocuments();
             GetAttachedLinkedDocuments();
-            //GetDatabaseDocuments();
+            GetDatabaseDocuments();
         }
         
         public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)

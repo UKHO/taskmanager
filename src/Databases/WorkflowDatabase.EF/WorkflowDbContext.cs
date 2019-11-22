@@ -78,6 +78,8 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<PrimaryDocumentStatus>().HasKey(x => x.PrimaryDocumentStatusId);
 
+            modelBuilder.Entity<DatabaseDocumentStatus>().HasKey(x => x.DatabaseDocumentStatusId);
+
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
 
             modelBuilder.Entity<OnHold>().HasKey(x => x.OnHoldId);
@@ -85,6 +87,7 @@ namespace WorkflowDatabase.EF
 
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
+            modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);
         }

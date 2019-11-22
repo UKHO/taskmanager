@@ -3,7 +3,6 @@
 	[DatabaseDocumentStatusId] INT NOT NULL PRIMARY KEY IDENTITY, 
 	[ProcessId] INT NOT NULL, 
     [SdocId] INT NOT NULL, 
-    [RsdraNumber] NVARCHAR(50) NOT NULL, 
     [SourceDocumentName] NVARCHAR(255) NOT NULL, 
 	[SourceDocumentType] NVARCHAR(4000) NULL,
     [ContentServiceId] UNIQUEIDENTIFIER NULL, 
