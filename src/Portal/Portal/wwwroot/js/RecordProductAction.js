@@ -25,6 +25,13 @@
                 setDeleteHandler($(element).find(".deleteAction"));
             }
 
+            var pageIdentity = $("#pageIdentity").val();
+            if (pageIdentity === "Assess") {
+                $(".verified").prop("disabled", true);
+            } else if (pageIdentity === "Verify") {
+                $(".verified").prop("disabled", false);
+            }
+
         });
     };
 
