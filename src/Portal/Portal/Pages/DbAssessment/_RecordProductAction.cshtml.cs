@@ -10,6 +10,7 @@ namespace Portal.Pages.DbAssessment
     {
         [DisplayName("Action:")]
         public bool Action { get; set; }
+
         [DisplayName("Change:")]
         public string Change { get; set; }
 

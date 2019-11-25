@@ -26,10 +26,21 @@
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
                         <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
-                        <div class="col-3">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control impactedProduct" })</div>
-                        <div class="col-2">@Html.LabelFor(model => row.ActionType, new { @class = "col-form-label" })</div>
-                        <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control productActionType" })</div>
-                        <div class="col-1"><i class="fa fa-times-circle deleteAction" style="color: red;"></i></div>
+                        <div class="col-2">@Html.DropDownListFor(model => row.ImpactedProduct, Model.ImpactedProducts, new { @class = "form-control impactedProduct" })</div>
+
+                        <div class="row col-8 align-items-center">
+                            <div class="col-2">@Html.LabelFor(model => row.ActionType, new { @class = "col-form-label" })</div>
+                            <div class="col-3">@Html.DropDownListFor(model => row.ActionType, Model.ProductActionTypes, new { @class = "form-control productActionType" })</div>
+                            <div class="col-2">@Html.LabelFor(model => row.Verified, new { @class = "col-form-label" })</div>
+                            <div class="col-1">
+                                <div class="custom-control custom-checkbox">
+                                    @Html.CheckBoxFor(model => row.Verified, new { @class = "custom-control-input" })
+                                    <label class="custom-control-label" for="row_Verified"></label> @*Need empty label to keep custom control working*@
+                                </div>
+                            </div>
+
+                            <div class="col-1"><i class="fa fa-times-circle deleteAction" style="color: red;"></i></div>
+                        </div>
                     </div>
                 }
             </div>
