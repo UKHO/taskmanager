@@ -24,7 +24,7 @@
             },
             error: function (error) {
                 $("#sourceDocumentsError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents. Please try again later.</div>");
             }
         });
     }
@@ -61,6 +61,52 @@
         });
     }
 
+    function searchSource() {
+
+        var enteredSdocId = $("#txtSourceDocumentId").val().trim();
+
+        if (enteredSdocId.match(/^[1-9][0-9]*$/) === null) {
+            $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+            $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+            $("#addSourceErrorMessage").text("Please enter a numeric Source Document ID.");
+            $("#addDatabaseSourceDocument .dialog.error").collapse("show");
+            return;
+        }
+
+        var sdocId = Number(enteredSdocId);
+
+        $.ajax({
+            type: "GET",
+            url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: { "sdocId": sdocId },
+            success: function (data) {
+                if (data === null) {
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").text("Source Document ID " + sdocId + " not found.");
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("show");
+                    return;
+                }
+
+                $("#addDatabaseSourceDocument .dialog.success").collapse("show");
+                $("#addSourceSdocId").text(data.sdocId);
+                $("#addSourceName").text(data.name);
+                $("#addSourceDocType").text(data.documentType);
+                $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
+                $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                $("#addSourceErrorMessage").text("");
+            },
+            error: function () {
+                $("#sourceDocumentsError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents. Please try again later.</div>");
+            }
+        });
+    }
+
     function applyCollapseIconHandler() {
         $(".collapse").on("show.bs.collapse", function (e) {
             var el = $(e.currentTarget).prev("[data-toggle='collapse']");
@@ -78,33 +124,25 @@
     function applySearchSourceHandler() {
 
         $("#btnSearchSource").on("click", function (e) {
-
-            var sdocId = Number($("#txtSourceDocumentId").val());
-
-            $.ajax({
-                type: "GET",
-                url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                contentType: "application/json; charset=utf-8",
-                data: { "sdocId": sdocId },
-                success: function (data) {
-                    $("#addDatabaseSourceDocument .dialog.success").collapse("show");
-                    $("#addSourceSdocId").text(data.sdocId);
-                    $("#addSourceName").text(data.name);
-                    $("#addSourceDocType").text(data.documentType);
-                },
-                error: function (error) {
-                    $("#sourceDocumentsError")
-                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
-                }
-            });
-
-
-            //success
-
+            hideAddSourceDialogs();
+            searchSource();
         });
+
+        $("#txtSourceDocumentId").keypress(function (e) {
+            if (e.keyCode !== 13) { //If not enter key then return
+                return;
+            }
+
+            e.preventDefault(); //Prevent 'Done' form submission when user hit enter
+            searchSource();
+        });
+    }
+
+    function hideAddSourceDialogs() {
+        $("#sourceDocumentsError").html("");
+        $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+        $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+        $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
     }
 
     function applyAddSourceHandler() {
@@ -117,7 +155,6 @@
             var sdocId = Number($("#addSourceSdocId").text());
             var sourceName = $("#addSourceName").text();
             var docType = $("#addSourceDocType").text();
-            //var processId = Number($(this).data("processid"));
             var correlationId = $(this).data("correlationid");
 
             $.ajax({
@@ -134,16 +171,22 @@
                     "correlationId": correlationId
                 },
                 success: function (result) {
+                    $("#addSourceErrorMessage").val();
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
                     getSourceDocuments();
                 },
-                error: function (error) {
+                error: function (xhr, error) {
+                    if (xhr.status === 405) {
+                        $("#addSourceWarningMessage").text("Sdoc " + sdocId + " already added.");
+                        $("#addDatabaseSourceDocument .dialog.warning").collapse("show");
+                        return;
+                    }
+
                     //TODO: Implement error dialogs
                     $("#assignTasksError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
                 }
             });
-
         });
     }
-
 });
