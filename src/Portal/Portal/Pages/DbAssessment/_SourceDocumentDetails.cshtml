@@ -167,11 +167,19 @@
             </div>
 
             <section class="dialog error collapse mt-3">
-                <h5>
+                <h5 id="addSourceErrorMessage">
                     <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
                     Failed to load Source Documents
                 </h5>
-                <div>Please try again later</div>
+                <div id="addSourceSubErrorMessage">Please try again later</div>
+            </section>
+            
+            <section class="dialog warning collapse mt-3">
+                <h5 id="addSourceWarningMessage">
+                    <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                    Failed to load Source Documents
+                </h5>
+                <div id="addSourceSubWarningMessage">Please try again later</div>
             </section>
 
             <section class="dialog success collapse mt-3">

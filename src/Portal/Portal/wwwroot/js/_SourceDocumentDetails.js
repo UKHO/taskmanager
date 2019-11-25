@@ -80,9 +80,9 @@
 
             var enteredSdocId = $("#txtSourceDocumentId").val();
 
-            if (enteredSdocId.match(/^[1-9]+d*$/) == null) {
+            if (enteredSdocId.match(/^[1-9][0-9]*$/) === null) {
                 $("#sdocTextValidationError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a numeric Sdoc Id</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a numeric Sdoc Id.</div>");
                 return;
             }
 
@@ -99,10 +99,22 @@
                 contentType: "application/json; charset=utf-8",
                 data: { "sdocId": sdocId },
                 success: function (data) {
+                    if (data === null) {
+                        $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                        $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                        $("#addSourceSubErrorMessage").html("");
+                        $("#addSourceErrorMessage").html("<i class=\"fas fa-times-circle\" style=\"font-size: 1.25rem;\"></i> Sdoc Id " + sdocId + " not found.");
+                        $("#addDatabaseSourceDocument .dialog.error").collapse("show");
+                        return;
+                    }
+
                     $("#addDatabaseSourceDocument .dialog.success").collapse("show");
                     $("#addSourceSdocId").text(data.sdocId);
                     $("#addSourceName").text(data.name);
                     $("#addSourceDocType").text(data.documentType);
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").html("");
                 },
                 error: function (error) {
                     $("#sourceDocumentsError")
@@ -135,7 +147,6 @@
             var sdocId = Number($("#addSourceSdocId").text());
             var sourceName = $("#addSourceName").text();
             var docType = $("#addSourceDocType").text();
-            //var processId = Number($(this).data("processid"));
             var correlationId = $(this).data("correlationid");
 
             $.ajax({
@@ -152,16 +163,25 @@
                     "correlationId": correlationId
                 },
                 success: function (result) {
+                    $("#addSourceErrorMessage").val();
+                    $("#addSourceSubErrorMessage").html("Please try again later");
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
                     getSourceDocuments();
                 },
-                error: function (error) {
+                error: function (xhr, error) {
+                    if (xhr.status === 405) {
+                        $("#addSourceSubErrorMessage").html("");
+                        $("#addSourceSubWarningMessage").html("");
+                        $("#addSourceWarningMessage").html("<i class=\"fas fa-info-circle\" style=\"font-size: 1.25rem;\"></i> Sdoc " + sdocId + " already added.");
+                        $("#addDatabaseSourceDocument .dialog.warning").collapse("show");
+                        return;
+                    }
+
                     //TODO: Implement error dialogs
                     $("#assignTasksError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
                 }
             });
-
         });
     }
-
 });

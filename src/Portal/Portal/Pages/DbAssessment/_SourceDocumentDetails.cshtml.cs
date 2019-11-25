@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Factories;
+﻿using Common.Factories;
 using Common.Factories.Interfaces;
-using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
@@ -14,6 +8,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.HttpClients;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using LinkedDocuments = WorkflowDatabase.EF.Models.LinkedDocuments;
@@ -192,6 +190,12 @@ namespace Portal.Pages.DbAssessment
         /// <returns></returns>
         public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, string docName, string docType, int processId, Guid correlationId)
         {
+            if (_dbContext.DatabaseDocumentStatus.Any(dds => dds.SdocId == sdocId && dds.ProcessId == processId))
+            {
+                // Method not allowed - Sdoc Id already added previously
+                return StatusCode(405);
+            }
+
             // Update DB first
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                 _documentStatusFactory,
