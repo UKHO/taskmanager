@@ -73,8 +73,6 @@
             return;
         }
 
-        $("#sdocTextValidationError").html("");
-
         var sdocId = Number(enteredSdocId);
 
         $.ajax({
