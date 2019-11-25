@@ -24,7 +24,7 @@
             },
             error: function (error) {
                 $("#sourceDocumentsError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents. Please try again later.</div>");
             }
         });
     }
@@ -61,6 +61,54 @@
         });
     }
 
+    function searchSource() {
+
+        var enteredSdocId = $("#txtSourceDocumentId").val().trim();
+
+        if (enteredSdocId.match(/^[1-9][0-9]*$/) === null) {
+            $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+            $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+            $("#addSourceErrorMessage").text("Please enter a numeric Source Document ID.");
+            $("#addDatabaseSourceDocument .dialog.error").collapse("show");
+            return;
+        }
+
+        $("#sdocTextValidationError").html("");
+
+        var sdocId = Number(enteredSdocId);
+
+        $.ajax({
+            type: "GET",
+            url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: { "sdocId": sdocId },
+            success: function (data) {
+                if (data === null) {
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").text("Source Document ID " + sdocId + " not found.");
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("show");
+                    return;
+                }
+
+                $("#addDatabaseSourceDocument .dialog.success").collapse("show");
+                $("#addSourceSdocId").text(data.sdocId);
+                $("#addSourceName").text(data.name);
+                $("#addSourceDocType").text(data.documentType);
+                $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
+                $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                $("#addSourceErrorMessage").text("");
+            },
+            error: function () {
+                $("#sourceDocumentsError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents. Please try again later.</div>");
+            }
+        });
+    }
+
     function applyCollapseIconHandler() {
         $(".collapse").on("show.bs.collapse", function (e) {
             var el = $(e.currentTarget).prev("[data-toggle='collapse']");
@@ -76,55 +124,10 @@
     }
 
     function applySearchSourceHandler() {
-        function searchSource(event) {
-
-            var enteredSdocId = $("#txtSourceDocumentId").val();
-
-            if (enteredSdocId.match(/^[1-9][0-9]*$/) === null) {
-                $("#sdocTextValidationError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a numeric Sdoc Id.</div>");
-                return;
-            }
-
-            $("#sdocTextValidationError").html("");
-
-            var sdocId = Number(enteredSdocId);
-
-            $.ajax({
-                type: "GET",
-                url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                contentType: "application/json; charset=utf-8",
-                data: { "sdocId": sdocId },
-                success: function (data) {
-                    if (data === null) {
-                        $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
-                        $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
-                        $("#addSourceSubErrorMessage").html("");
-                        $("#addSourceErrorMessage").html("<i class=\"fas fa-times-circle\" style=\"font-size: 1.25rem;\"></i> Sdoc Id " + sdocId + " not found.");
-                        $("#addDatabaseSourceDocument .dialog.error").collapse("show");
-                        return;
-                    }
-
-                    $("#addDatabaseSourceDocument .dialog.success").collapse("show");
-                    $("#addSourceSdocId").text(data.sdocId);
-                    $("#addSourceName").text(data.name);
-                    $("#addSourceDocType").text(data.documentType);
-                    $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
-                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
-                    $("#addSourceErrorMessage").html("");
-                },
-                error: function (error) {
-                    $("#sourceDocumentsError")
-                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents.</div>");
-                }
-            });
-        }
 
         $("#btnSearchSource").on("click", function (e) {
-            searchSource(e);
+            hideAddSourceDialogs();
+            searchSource();
         });
 
         $("#txtSourceDocumentId").keypress(function (e) {
@@ -133,8 +136,15 @@
             }
 
             e.preventDefault(); //Prevent 'Done' form submission when user hit enter
-            searchSource(e);
+            searchSource();
         });
+    }
+
+    function hideAddSourceDialogs() {
+        $("#sourceDocumentsError").html("");
+        $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+        $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+        $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
     }
 
     function applyAddSourceHandler() {
@@ -164,15 +174,12 @@
                 },
                 success: function (result) {
                     $("#addSourceErrorMessage").val();
-                    $("#addSourceSubErrorMessage").html("Please try again later");
                     $("#addDatabaseSourceDocument .dialog.error").collapse("hide");
                     getSourceDocuments();
                 },
                 error: function (xhr, error) {
                     if (xhr.status === 405) {
-                        $("#addSourceSubErrorMessage").html("");
-                        $("#addSourceSubWarningMessage").html("");
-                        $("#addSourceWarningMessage").html("<i class=\"fas fa-info-circle\" style=\"font-size: 1.25rem;\"></i> Sdoc " + sdocId + " already added.");
+                        $("#addSourceWarningMessage").text("Sdoc " + sdocId + " already added.");
                         $("#addDatabaseSourceDocument .dialog.warning").collapse("show");
                         return;
                     }
