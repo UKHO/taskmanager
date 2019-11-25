@@ -1,0 +1,98 @@
+﻿@page
+@model Portal.Pages.DbAssessment.VerifyModel
+@{
+    ViewData["Title"] = "Verify";
+}
+
+<script type="text/javascript" src="~/js/TaskInformation.js"></script>
+<script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
+<script type="text/javascript" src="~/js/Comments.js"></script>
+
+<div class="row mt-1">
+    <div class="col-4">
+        <a asp-page="/Index">
+            <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>DB Assessment</h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Verify</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr />
+
+<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+<form method="post" asp-page-handler="Done">
+    <div class="col-12">
+        <div class="row justify-content-end btn-size">
+            <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
+                <button id="btnPutOnHold" type="button" class="btn btn-primary btn-block">Put On Hold</button>
+            </div>
+            <div id="takeOffHold" class="col-2" @(Model.IsOnHold ? "" : "hidden")>
+                <button id="btnTakeOffHold" type="button" class="btn btn-primary btn-block">Take Off Hold</button>
+            </div>
+
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+            <div class="col-2">
+
+                <input type="hidden" asp-for="ProcessId" />
+                <button id="btnSignOff" class="btn btn-primary btn-block" type="submit">Sign Off</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="taskInformation"></div>
+    <div id="taskInformationError"></div>
+
+    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
+
+    <div id="sourceDocuments"></div>
+    <div id="sourceDocumentsError"></div>
+
+    @await Html.PartialAsync("_EditDatabase", Model.EditDatabaseModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_RecordProductAction", Model.RecordProductActionModel).ConfigureAwait(false)
+    @await Html.PartialAsync("_DataImpact", Model.DataImpactModel).ConfigureAwait(false)
+
+    <div id="existingComments"></div>
+    <div id="AddCommentError"></div>
+</form>
+
+@* Modal On Hold error comment *@
+<div class="modal fade" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <form id="frmOnHoldError">
+                <div class="modal-header">
+                    <h3 id="OnHoldErrorTitle">Error</h3>
+                </div>
+                <div class="modal-body pb-0">
+                    <div class="align-items-center align-content-center" style="overflow: hidden;">
+                        <p class="mr-2" style="float: left"><i class="fa fa-info-circle"></i></p>
+                        <p id="OnHoldErrorMessage"></p>
+                    </div>
+                    <input type="hidden" asp-for="ProcessId" />
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnOnHoldErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="On Hold Error">Ok</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
