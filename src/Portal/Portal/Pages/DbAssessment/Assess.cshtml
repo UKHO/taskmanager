@@ -6,6 +6,7 @@
 
 <script type="text/javascript" src="~/js/TaskInformation.js"></script>
 <script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
+<script type="text/javascript" src="~/js/DataImpact.js"></script>
 <script type="text/javascript" src="~/js/Comments.js"></script>
 
 <div class="row mt-1">
@@ -67,7 +68,10 @@
 
     @await Html.PartialAsync("_EditDatabase", Model.EditDatabaseModel).ConfigureAwait(false)
     @await Html.PartialAsync("_RecordProductAction", Model.RecordProductActionModel).ConfigureAwait(false)
-    @await Html.PartialAsync("_DataImpact", Model.DataImpactModel).ConfigureAwait(false)
+
+    <div id="existingDataImpacts"></div>
+    <div id="AddDataImpactsError"></div>
+
 
     <div id="existingComments"></div>
     <div id="AddCommentError"></div>
