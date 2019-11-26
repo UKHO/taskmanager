@@ -11,6 +11,6 @@ namespace WorkflowDatabase.EF.Models
         public string Comments { get; set; }
         public bool Verified { get; set; }
 
-        public virtual HpdUsages HpdUsages { get; set; }
+        public virtual HpdUsage HpdUsage { get; set; }
     }
 }

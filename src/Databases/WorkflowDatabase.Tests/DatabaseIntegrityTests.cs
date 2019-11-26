@@ -213,6 +213,27 @@ namespace WorkflowDatabase.Tests
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
             Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
         }
+
+        [Test]
+        public void Ensure_hpdusage_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.HpdUsage.Add(new HpdUsage
+            {
+                Name = "Offshore Energy"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.HpdUsage.Add(new HpdUsage
+                {
+                    Name = "Offshore Energy"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
 

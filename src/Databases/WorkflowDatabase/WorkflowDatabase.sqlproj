@@ -68,7 +68,7 @@
     <Build Include="Tables\OnHold.sql" />
     <Build Include="Tables\TaskNote.sql" />
     <Build Include="Tables\DatabaseDocumentStatus.sql" />
-    <Build Include="Tables\HpdUsages.sql" />
+    <Build Include="Tables\HpdUsage.sql" />
     <Build Include="Tables\DataImpact.sql" />
   </ItemGroup>
   <ItemGroup>

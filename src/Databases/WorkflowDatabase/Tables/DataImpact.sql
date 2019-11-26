@@ -7,5 +7,5 @@
 	[Comments] NVARCHAR(4000),
 	[Verified] BIT NOT NULL,
     CONSTRAINT [FK_DataImpact_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]),
-	CONSTRAINT [FK_DataImpact_HpdUsages] FOREIGN KEY ([HpdUsageId]) REFERENCES [HpdUsages]([HpdUsageId])
+	CONSTRAINT [FK_DataImpact_HpdUsage] FOREIGN KEY ([HpdUsageId]) REFERENCES [HpdUsage]([HpdUsageId])
 )

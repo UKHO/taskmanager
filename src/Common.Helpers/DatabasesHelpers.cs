@@ -42,7 +42,7 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [OnHold]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [TaskNote]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DatabaseDocumentStatus]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsages]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsage]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DataImpact]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
         }
