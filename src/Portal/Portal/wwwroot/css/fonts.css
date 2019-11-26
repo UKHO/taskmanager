@@ -1,64 +1,64 @@
 @font-face {
     font-family: "JohnstonITC";
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot"); /* IE9 Compat Modes */
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.otf") format("opentype"), /* Open Type Font */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.svg") format("svg"), /* Legacy iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff") format("woff"), /* Modern Browsers */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff2") format("woff2"); /* Modern Browsers */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot"); /* IE9 Compat Modes */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.otf") format("opentype"), /* Open Type Font */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.svg") format("svg"), /* Legacy iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff") format("woff"), /* Modern Browsers */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff2") format("woff2"); /* Modern Browsers */
     font-weight: 400;
     font-style: normal;
 }
 
 @font-face {
     font-family: "JohnstonITC";
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot"); /* IE9 Compat Modes */
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.otf") format("opentype"), /* Open Type Font */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.svg") format("svg"), /* Legacy iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff") format("woff"), /* Modern Browsers */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff2") format("woff2"); /* Modern Browsers */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot"); /* IE9 Compat Modes */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.otf") format("opentype"), /* Open Type Font */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.svg") format("svg"), /* Legacy iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff") format("woff"), /* Modern Browsers */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff2") format("woff2"); /* Modern Browsers */
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: "JohnstonITC";
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot"); /* IE9 Compat Modes */
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.otf") format("opentype"), /* Open Type Font */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.svg") format("svg"), /* Legacy iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff") format("woff"), /* Modern Browsers */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff2") format("woff2"); /* Modern Browsers */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot"); /* IE9 Compat Modes */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.otf") format("opentype"), /* Open Type Font */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.svg") format("svg"), /* Legacy iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff") format("woff"), /* Modern Browsers */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff2") format("woff2"); /* Modern Browsers */
     font-weight: 400;
     font-style: italic;
 }
 
 @font-face {
     font-family: "JohnstonITC";
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.eot"); /* IE9 Compat Modes */
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.otf") format("opentype"), /* Open Type Font */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.svg") format("svg"), /* Legacy iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff") format("woff"), /* Modern Browsers */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff2") format("woff2"); /* Modern Browsers */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.eot"); /* IE9 Compat Modes */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.otf") format("opentype"), /* Open Type Font */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.svg") format("svg"), /* Legacy iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff") format("woff"), /* Modern Browsers */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff2") format("woff2"); /* Modern Browsers */
     font-weight: 300;
     font-style: normal;
 }
 
 @font-face {
     font-family: "JohnstonITC";
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot"); /* IE9 Compat Modes */
-    src: url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.otf") format("opentype"), /* Open Type Font */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.svg") format("svg"), /* Legacy iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff") format("woff"), /* Modern Browsers */
-    url("/lib/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff2") format("woff2"); /* Modern Browsers */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot"); /* IE9 Compat Modes */
+    src: url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.otf") format("opentype"), /* Open Type Font */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.svg") format("svg"), /* Legacy iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff") format("woff"), /* Modern Browsers */
+    url("/css/@ukho/styles/webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff2") format("woff2"); /* Modern Browsers */
     font-weight: 300;
     font-style: italic;
 }

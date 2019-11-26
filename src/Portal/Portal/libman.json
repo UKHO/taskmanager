@@ -125,43 +125,6 @@
         "umd/popper.js.map",
         "umd/popper.min.js.map"
       ]
-    },
-    {
-      "provider": "unpkg",
-      "library": "@ukho/styles@1.3.16",
-      "destination": "wwwroot/lib/@ukho/styles/",
-      "files": [
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.eot",
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.otf",
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.svg",
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.ttf",
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff",
-        "webfonts/JohnstonITC/bold/JohnstonITCStd-Bold.woff2",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.eot",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.otf",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.svg",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.ttf",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff",
-        "webfonts/JohnstonITC/italic/JohnstonITCStd-MediumIta.woff2",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.eot",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.otf",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.svg",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.ttf",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff",
-        "webfonts/JohnstonITC/light/JohnstonITCStd-Light.woff2",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.eot",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.otf",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.svg",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.ttf",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff",
-        "webfonts/JohnstonITC/light-italic/JohnstonITCStd-LightIta.woff2",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.eot",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.otf",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.svg",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.ttf",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff",
-        "webfonts/JohnstonITC/medium/JohnstonITCStd-Medium.woff2"
-      ]
     }
   ]
 }
