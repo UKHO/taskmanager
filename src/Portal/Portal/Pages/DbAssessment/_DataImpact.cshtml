@@ -4,6 +4,9 @@
     var i = 0;
 }
 @* end temporary to make UsageVerified checkbox functional*@
+
+    <script type="text/javascript" src="~/js/DataImpact.js"></script>
+
 <div class="card mb-4">
     <h6>
         <span>Data Impact</span>
@@ -39,7 +42,7 @@
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="UsageVerified-@i">
+                                    <input type="checkbox" class="custom-control-input usageVerified" id="UsageVerified-@i">
                                     <label class="custom-control-label" for="UsageVerified-@i"></label>
                                 </div>
                             </div>
