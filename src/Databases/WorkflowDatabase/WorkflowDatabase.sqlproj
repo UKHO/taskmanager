@@ -68,6 +68,8 @@
     <Build Include="Tables\OnHold.sql" />
     <Build Include="Tables\TaskNote.sql" />
     <Build Include="Tables\DatabaseDocumentStatus.sql" />
+    <Build Include="Tables\HpdUsages.sql" />
+    <Build Include="Tables\DataImpact.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
