@@ -1,26 +1,20 @@
 [
   {
-    "HpdUsageId": 1,
     "Name": "Nav 1"
   },
   {
-    "HpdUsageId": 2,
     "Name": "Nav 2"
   },
   {
-    "HpdUsageId": 3,
     "Name": "Nav 3"
   },
   {
-    "HpdUsageId": 4,
     "Name": "Nav 4"
   },
   {
-    "HpdUsageId": 5,
     "Name": "Nav 5"
   },
   {
-    "HpdUsageId": 6,
     "Name": "Offshore Energy"
   }
 ]
