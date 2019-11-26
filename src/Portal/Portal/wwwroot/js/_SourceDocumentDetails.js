@@ -75,6 +75,8 @@
 
         var sdocId = Number(enteredSdocId);
 
+        hideAddSourceDialogs();
+
         $.ajax({
             type: "GET",
             url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
@@ -124,7 +126,6 @@
     function applySearchSourceHandler() {
 
         $("#btnSearchSource").on("click", function (e) {
-            hideAddSourceDialogs();
             searchSource();
         });
 
