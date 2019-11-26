@@ -1,4 +1,11 @@
 ﻿@model List<Portal.Pages.DbAssessment._DataImpactModel>
+@* start temporary to make UsageVerified checkbox functional*@
+@{
+    var i = 0;
+}
+@* end temporary to make UsageVerified checkbox functional*@
+
+    <script type="text/javascript" src="~/js/DataImpact.js"></script>
 
 <div class="card mb-4">
     <h6>
@@ -6,19 +13,23 @@
     </h6>
     <div class="col-12">
         <div class="card-body p-0">
-            <div class="row justify-content-between">
+            <div class="row">
                 <div class="col-12">
-                    <div class="form-row justify-content-start">
+                    <div class="form-row justify-content-start mb-0">
                         <div class="col-2"><label>Usage</label></div>
                         <div class="col-2"><label>Edited</label></div>
                         <div class="col-6"><label>Comments</label></div>
+                        <div class="col-1"><label>Verified</label></div>
                     </div>
                 </div>
                 @foreach (var m in Model)
                 {
+                    @* start temporary to make UsageVerified checkbox functional*@
+                    i = i + 1;
+                    @* end temporary to make UsageVerified checkbox functional*@
                     <div class="col-12">
-                        <div class="form-row justify-content-start">
-                            <div class="col-2">@Html.DisplayTextFor(model=> m.Usage)</div>
+                        <div class="form-row align-items-center">
+                            <div class="col-2">@Html.DisplayTextFor(model => m.Usage)</div>
                             <div class="col-2">
                                 @Html.DropDownListFor(model => m.Edited, new List<SelectListItem>
                                 {
@@ -29,6 +40,12 @@
                                     new { @class = "form-control" })
                             </div>
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control" })</div>
+                            <div class="col-1">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input usageVerified" id="UsageVerified-@i">
+                                    <label class="custom-control-label" for="UsageVerified-@i"></label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 }

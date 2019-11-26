@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    var id = 100; // TODO: Temporary solution for ADDED Record Product Action
 
     setCreateHandler();
 
@@ -25,16 +26,26 @@
                 setDeleteHandler($(element).find(".deleteAction"));
             }
 
+            var pageIdentity = $("#pageIdentity").val();
+            if (pageIdentity === "Assess") {
+                $(".verifiedProduct").prop("disabled", true);
+            } else if (pageIdentity === "Verify") {
+                $(".verifiedProduct").prop("disabled", false);
+            }
+
         });
     };
 
     function setCreateHandler() {
         $("#btnAddImpact").on("click", function (e) {
+            id += 1; // TODO: Temporary solution for ADDED Record Product Action
             var currentCount = $(".recordProductAction").length;
             var newThing = $($(".recordProductAction")[0]).clone();
 
             $(newThing).find(".impactedProduct").val(0);
             $(newThing).find(".productActionType").val(0);
+            $(newThing).find(".verifiedProduct").attr('id', 'newImpact-' + id); // TODO: Temporary solution for ADDED Record Product Action
+            $(newThing).find(".verifiedProductLabel").attr('for', 'newImpact-' + id); // TODO: Temporary solution for ADDED Record Product Action
 
             $("#productActions").append(newThing);
             $(newThing).show();
