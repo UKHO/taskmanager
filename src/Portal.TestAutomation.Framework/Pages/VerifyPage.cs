@@ -9,13 +9,13 @@ namespace Portal.TestAutomation.Framework.Pages
 {
     public class VerifyPage : BasePage
 
-        {
+    {
         private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
         private readonly VerifyPageConfig _config = new VerifyPageConfig();
 
         //add below to azure config values
-        private Uri AssessPageUrl;
+        private Uri VerifyPageUrl;
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
@@ -24,7 +24,7 @@ namespace Portal.TestAutomation.Framework.Pages
             var configRoot = AzureAppConfigConfigurationRoot.Instance;
             configRoot.GetSection("urls").Bind(_config);
 
-            AssessPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.VerifyPageUrl : _config.LocalDevVerifyPageUrl;
+            VerifyPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.VerifyPageUrl : _config.LocalDevVerifyPageUrl;
 
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
@@ -53,4 +53,3 @@ namespace Portal.TestAutomation.Framework.Pages
 }
 
 
-    

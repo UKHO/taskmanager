@@ -11,9 +11,8 @@ namespace Portal.TestAutomation.Steps
 {
     [Binding]
     public class VerifyPageSteps
-
     {
-        private readonly VerifyPage verifyPage;
+        private readonly VerifyPage _verifyPage;
         private readonly WorkflowDbContext _workflowDbContext;
         private readonly WorkflowInstanceContext _workflowContext;
         private readonly IWebDriver _driver;
@@ -30,7 +29,6 @@ namespace Portal.TestAutomation.Steps
         public void GivenINavigateToTheVerifyPage()
         {
             _verifyPage.NavigateTo();
-
         }
 
         [Then(@"The verify page has loaded")]
@@ -39,9 +37,5 @@ namespace Portal.TestAutomation.Steps
             _verifyPage.HasLoaded();
 
         }
-
-
-
     }
-
 }
