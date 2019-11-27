@@ -20,7 +20,7 @@
                 <div class="col-12">
                     <div class="form-row justify-content-start mb-0">
                         <div class="col-2"><label>Usage</label></div>
-                        <div class="col-2"><label>Edited</label></div>
+                        <div class="col-1"><label>Edited</label></div>
                         <div class="col-6"><label>Comments</label></div>
                         <div class="col-1"><label>Verified</label></div>
                     </div>
@@ -36,14 +36,11 @@
                                 @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages,
                                     new { @class = "form-control" })
                             </div>
-                            <div class="col-2">
-                                @Html.DropDownListFor(model => m.Edited, new List<SelectListItem>
-                                {
-                                    new SelectListItem("", "0"),
-                                    new SelectListItem("Yes", "1"),
-                                    new SelectListItem("No", "2")
-                                },
-                                    new { @class = "form-control" })
+                            <div class="col-1">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input usageEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "")>
+                                    <label class="custom-control-label" for="UsageEdited-@i"></label>
+                                </div>
                             </div>
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control" })</div>
                             <div class="col-1">

@@ -64,7 +64,7 @@ namespace Portal.Pages.DbAssessment
                     Comments = "Test2",
                     HpdUsageId = 2,
                     HpdUsage = usages.FirstOrDefault(h =>h.HpdUsageId == 2),
-                    Edited = false,
+                    Edited = true,
                     ProcessId = ProcessId,
                     Verified = false
                 }
