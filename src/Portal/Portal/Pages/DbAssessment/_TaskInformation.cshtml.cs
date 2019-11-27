@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Portal.Helpers;
 using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -22,6 +23,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOnHoldCalculator _onHoldCalculator;
+        private readonly ICommentsHelper _commentsHelper;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -59,11 +61,15 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList SourceCategories { get; set; }
 
-        public _TaskInformationModel(WorkflowDbContext DbContext, IHttpContextAccessor httpContextAccessor, IOnHoldCalculator onHoldCalculator)
+        public _TaskInformationModel(WorkflowDbContext DbContext,
+            IHttpContextAccessor httpContextAccessor,
+            IOnHoldCalculator onHoldCalculator,
+            ICommentsHelper commentsHelper)
         {
             _dbContext = DbContext;
             _httpContextAccessor = httpContextAccessor;
             _onHoldCalculator = onHoldCalculator;
+            _commentsHelper = commentsHelper;
         }
 
         public async Task OnGetAsync()
@@ -89,9 +95,7 @@ namespace Portal.Pages.DbAssessment
             IsOnHold = true;
             ProcessId = processId;
 
-            // Add comment that user has put the task on hold
-            // TODO: swap out hardcoded user for one from AD
-            await AddComment($"Task {processId} has been put on hold", processId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment($"Task {processId} has been put on hold", processId, workflowInstance.WorkflowInstanceId);
 
             // As we're submitting, re-get task info for now
             await SetTaskInformationDummyData();
@@ -115,9 +119,7 @@ namespace Portal.Pages.DbAssessment
 
                 ProcessId = processId;
 
-                // Add comment that user has taken the task off hold
-                // TODO: swap out hardcoded user for one from AD
-                await AddComment($"Task {processId} taken off hold", processId, _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
+                await _commentsHelper.AddComment($"Task {processId} taken off hold", processId, _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
 
                 // As we're submitting, re-get task info for now
                 await SetTaskInformationDummyData();
@@ -154,22 +156,5 @@ namespace Portal.Pages.DbAssessment
             SourceCategories = new SelectList(
                 sourceCategories, "SourceCategoryId", "Name");
         }
-
-        private async Task AddComment(string comment, int processId, int workflowInstanceId)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            _dbContext.Comment.Add(new Comments
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                Created = DateTime.Now,
-                Username = string.IsNullOrEmpty(userId) ? "Unknown" : userId,
-                Text = comment
-            });
-
-            await _dbContext.SaveChangesAsync();
-        }
-
     }
 }
