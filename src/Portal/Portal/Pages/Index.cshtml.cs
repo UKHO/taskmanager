@@ -23,7 +23,13 @@ namespace Portal.Pages
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPortalUser _portalUser;
-        public string Username { get; private set; }
+
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
 
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
@@ -49,16 +55,15 @@ namespace Portal.Pages
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
 
-            Username = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _portalUser.GetFullNameForUser(this.User);
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            //TODO: LOG!
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-            var username = string.IsNullOrEmpty(userId) ? "Unknown" : userId;
+            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -75,9 +80,9 @@ namespace Portal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = username,
+                        CreatedByUsername = UserFullName,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = username,
+                        LastModifiedByUsername = UserFullName,
                     });
                     await _dbContext.SaveChangesAsync();
                 }
@@ -88,7 +93,7 @@ namespace Portal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = username;
+            existingTaskNote.LastModifiedByUsername = UserFullName;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();
