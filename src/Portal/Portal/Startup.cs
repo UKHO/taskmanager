@@ -19,7 +19,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Graph;
 using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -127,15 +126,15 @@ namespace Portal
             {
                 options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
                 options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
-
             });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
-            services.AddScoped<IAuthenticationProvider,
-                MsalAuthenticationProvider>(s => new MsalAuthenticationProvider(s.GetService<IOptions<SecretsConfig>>(),
-                s.GetService<IOptions<GeneralConfig>>(), ConfigHelpers.IsLocalDevelopment));
+            services.AddScoped<IPortalUser,
+                PortalUser>(s => new PortalUser(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(),
+                ConfigHelpers.IsLocalDevelopment));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

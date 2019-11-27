@@ -2,10 +2,8 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
-using Portal.Configuration;
 
 namespace Portal.Auth
 {
@@ -14,14 +12,11 @@ namespace Portal.Auth
         private IConfidentialClientApplication ClientApplication { get; }
         private List<string> Scopes { get; }
 
-
-        public MsalAuthenticationProvider(IOptions<SecretsConfig> secretsConfig,
-                                          IOptions<GeneralConfig> generalConfig,
+        public MsalAuthenticationProvider(string azureAdClientId,
+                                          string azureAdSecret,
+                                          string azureAdTenantId,
                                           bool isLocalDev)
         {
-            var clientId = generalConfig.Value.AzureAdClientId;
-            var clientSecret = secretsConfig.Value.ClientAzureAdSecret;
-
             // TODO look at keeping these all in config
             string redirectUri;
             if (isLocalDev)
@@ -34,12 +29,12 @@ namespace Portal.Auth
                 redirectUri = "http://taskmanager-dev-web-portal.azurewebsites.net/signin-oidc";
             }
 
-            var authority = $"https://login.microsoftonline.com/{generalConfig.Value.TenantId}/v2.0";
+            var authority = $"https://login.microsoftonline.com/{azureAdTenantId}/v2.0";
 
-            ClientApplication = ConfidentialClientApplicationBuilder.Create(clientId)
+            ClientApplication = ConfidentialClientApplicationBuilder.Create(azureAdClientId)
                 .WithAuthority(authority)
                 .WithRedirectUri(redirectUri)
-                .WithClientSecret(clientSecret)
+                .WithClientSecret(azureAdSecret)
                 .Build();
 
             Scopes = new List<string>

@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Graph;
-using Microsoft.Graph.Auth;
+using Portal.Auth;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -23,7 +22,7 @@ namespace Portal.Pages
 
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IAuthenticationProvider _authenticationProvider;
+        private readonly IPortalUser _portalUser;
         public string Username { get; private set; }
 
         [BindProperty(SupportsGet = true)]
@@ -32,12 +31,12 @@ namespace Portal.Pages
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IAuthenticationProvider authenticationProvider)
+            IPortalUser portalUser)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _authenticationProvider = authenticationProvider;
+            _portalUser = portalUser;
         }
 
         public async Task OnGetAsync()
@@ -50,10 +49,7 @@ namespace Portal.Pages
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
 
-            var graphUser = this.User.ToGraphUserAccount();
-            var graphClient = new GraphServiceClient(_authenticationProvider);
-            var graphResult = await graphClient.Users[graphUser.ObjectId].Request().GetAsync();
-            Username = graphResult.DisplayName;
+            Username = await _portalUser.GetFullNameForUser(this.User);
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
