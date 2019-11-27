@@ -7,6 +7,9 @@ using AutoMapper;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +18,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
@@ -58,10 +64,12 @@ namespace Portal
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
+                .Bind(Configuration.GetSection("azure"))
                 .Bind(Configuration.GetSection("K2"));
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
-
+            services.AddOptions<SecretsConfig>()
+                .Bind(Configuration.GetSection("PortalSection"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
@@ -69,6 +77,8 @@ namespace Portal
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
+            Configuration.GetSection("azure").Bind(startupConfig);
+            Configuration.GetSection("portal").Bind(startupConfig);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
@@ -102,10 +112,30 @@ namespace Portal
                     Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
                 });
 
+            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
+                .AddAzureAD(options =>
+                {
+                    options.ClientId = startupConfig.AzureAdClientId;
+                    options.Instance = "https://ukho.onmicrosoft.com";
+                    options.CallbackPath = "/signin-oidc";
+                    options.TenantId = startupConfig.TenantId;
+                    options.Domain = "ukho.onmicrosoft.com";
+
+                });
+
+            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
+            {
+                options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
+                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
+
+            });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
+            services.AddScoped<IAuthenticationProvider,
+                MsalAuthenticationProvider>(s => new MsalAuthenticationProvider(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(), ConfigHelpers.IsLocalDevelopment));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
@@ -132,6 +162,9 @@ namespace Portal
 
             app.UseRequestLocalization();
             app.UseAzureAppConfiguration();
+
+            app.UseAuthentication();
+
             app.UseMvc();
         }
     }

@@ -7,6 +7,5 @@
         public string Password { get; set; }
         public string K2RestApiUsername { get; set; }
         public string K2RestApiPassword { get; set; }
-
     }
 }

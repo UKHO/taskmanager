@@ -3,32 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
+using Microsoft.Graph.Auth;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAuthenticationProvider _authenticationProvider;
+        public string Username { get; private set; }
 
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
 
-        public IndexModel(WorkflowDbContext dbContext, IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+        public IndexModel(WorkflowDbContext dbContext,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
+            IAuthenticationProvider authenticationProvider)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _authenticationProvider = authenticationProvider;
         }
 
         public async Task OnGetAsync()
@@ -40,6 +49,11 @@ namespace Portal.Pages
                 .Include(t => t.TaskNote)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
+
+            var graphUser = this.User.ToGraphUserAccount();
+            var graphClient = new GraphServiceClient(_authenticationProvider);
+            var graphResult = await graphClient.Users[graphUser.ObjectId].Request().GetAsync();
+            Username = graphResult.DisplayName;
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
