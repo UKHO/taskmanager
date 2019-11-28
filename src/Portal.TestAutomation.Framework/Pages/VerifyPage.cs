@@ -14,7 +14,6 @@ namespace Portal.TestAutomation.Framework.Pages
         private readonly WebDriverWait _wait;
         private readonly VerifyPageConfig _config = new VerifyPageConfig();
 
-        //add below to azure config values
         private Uri VerifyPageUrl;
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
