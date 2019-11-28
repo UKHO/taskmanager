@@ -1,11 +1,6 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
-using WorkflowDatabase.EF;
-using System.Linq;
-using Portal.TestAutomation.Framework.ContextClasses;
-
 
 namespace Portal.TestAutomation.Steps
 {
@@ -13,14 +8,9 @@ namespace Portal.TestAutomation.Steps
     public class VerifyPageSteps
     {
         private readonly VerifyPage _verifyPage;
-        private readonly WorkflowDbContext _workflowDbContext;
-        private readonly WorkflowInstanceContext _workflowContext;
-        private readonly IWebDriver _driver;
 
-        public VerifyPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, WorkflowInstanceContext workflowContext)
+        public VerifyPageSteps(IWebDriver driver)
         {
-            _workflowDbContext = workflowDbContext;
-            _workflowContext = workflowContext;
             //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
             _verifyPage = new VerifyPage(driver, 5);
         }
