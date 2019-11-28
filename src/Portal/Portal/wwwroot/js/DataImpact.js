@@ -67,8 +67,8 @@ function setVerified() {
 
     var pageIdentity = $("#pageIdentity").val();
     if (pageIdentity === "Assess") {
-        $(".usageVerified").prop("disabled", true);
+        $(".dataImpactVerified").prop("disabled", true);
     } else if (pageIdentity === "Verify") {
-        $(".usageVerified").prop("disabled", false);
+        $(".dataImpactVerified").prop("disabled", false);
     }
 }

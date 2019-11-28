@@ -55,7 +55,7 @@ namespace Portal.Pages.DbAssessment
                     HpdUsage = usages.FirstOrDefault(h =>h.HpdUsageId == 1), 
                     Edited = false,
                     ProcessId = ProcessId, 
-                    Verified = false
+                    Verified = true
                 },
 
                 new DataImpact()

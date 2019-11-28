@@ -38,14 +38,14 @@
                             </div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "")>
+                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "") value="true">
                                     <label class="custom-control-label" for="UsageEdited-@i"></label>
                                 </div>
                             </div>
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-@i">
+                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-@i" @(m.Verified ? "checked" : "") value="true" >
                                     <label class="custom-control-label" for="UsageVerified-@i"></label>
                                 </div>
                             </div>
