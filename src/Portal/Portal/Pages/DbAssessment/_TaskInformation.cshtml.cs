@@ -113,9 +113,10 @@ namespace Portal.Pages.DbAssessment
             {
                 var onHoldRecord = await _dbContext.OnHold.FirstAsync(r => r.ProcessId == processId
                                                            && r.OffHoldTime == null);
+                var userFullName = await _portalUser.GetFullNameForUser(_httpContextAccessor.HttpContext.User);
 
                 onHoldRecord.OffHoldTime = DateTime.Now;
-                onHoldRecord.OffHoldUser = "Bon";
+                onHoldRecord.OffHoldUser = string.IsNullOrEmpty(userFullName) ? "Unknown user" : userFullName;
 
                 await _dbContext.SaveChangesAsync();
 
