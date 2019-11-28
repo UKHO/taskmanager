@@ -17,17 +17,9 @@ namespace Portal.Auth
                                           string azureAdTenantId,
                                           bool isLocalDev)
         {
-            // TODO look at keeping these all in config
-            string redirectUri;
-            if (isLocalDev)
-            {
-                redirectUri = "https://localhost:44308/signin-oidc";
-            }
-            else
-            {
-                // TODO no access to check if we have this setup in AAD as a reply URL under app reg.
-                redirectUri = "http://taskmanager-dev-web-portal.azurewebsites.net/signin-oidc";
-            }
+            // TODO RS to check AAD app registration. Explore options for syncing developer's SSL port.
+            var redirectUri = isLocalDev ? "https://localhost:44308/signin-oidc" :
+                                           "http://taskmanager-dev-web-portal.azurewebsites.net/signin-oidc";
 
             var authority = $"https://login.microsoftonline.com/{azureAdTenantId}/v2.0";
 
