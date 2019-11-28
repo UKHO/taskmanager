@@ -16,7 +16,7 @@
     </h6>
     <div class="col-12">
         <div class="card-body p-0">
-            <div class="row">
+            <div class="row" id="dataImpactContainer">
                 <div class="col-12">
                     <div class="form-row justify-content-start mb-0">
                         <div class="col-2"><label>Usage</label></div>
@@ -30,28 +30,31 @@
                     @* start temporary to make UsageVerified checkbox functional*@
                     i = i + 1;
                     @* end temporary to make UsageVerified checkbox functional*@
-                    <div class="col-12">
+                    <div class="col-12 dataImpact">
                         <div class="form-row align-items-center">
                             <div class="col-2">
-                                @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages,"",
-                                    new { @class = "form-control" })
+                                @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages, "",
+                                    new { @class = "form-control dataImpactUsage" })
                             </div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input usageEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "")>
+                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "")>
                                     <label class="custom-control-label" for="UsageEdited-@i"></label>
                                 </div>
                             </div>
-                            <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control" })</div>
+                            <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input usageVerified" id="UsageVerified-@i">
+                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-@i">
                                     <label class="custom-control-label" for="UsageVerified-@i"></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
+            </div>
+            <div class="row justify-content-start">
+                <div class="col-5"><button id="btnAddUsage" class="btn btn-primary" type="button">Add Usage</button></div>
             </div>
         </div>
     </div>

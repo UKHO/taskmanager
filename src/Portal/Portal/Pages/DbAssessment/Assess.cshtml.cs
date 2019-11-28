@@ -30,6 +30,8 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
+        [BindProperty]
+        public List<DataImpact> DataImpacts { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
