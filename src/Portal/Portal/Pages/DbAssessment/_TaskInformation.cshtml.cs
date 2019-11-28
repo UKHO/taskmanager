@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Portal.Auth;
 using Portal.Helpers;
 using Portal.Models;
 using WorkflowDatabase.EF;
@@ -24,6 +25,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
+        private readonly IPortalUser _portalUser;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -64,12 +66,13 @@ namespace Portal.Pages.DbAssessment
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IHttpContextAccessor httpContextAccessor,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper)
+            ICommentsHelper commentsHelper, IPortalUser portalUser)
         {
             _dbContext = DbContext;
             _httpContextAccessor = httpContextAccessor;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
+            _portalUser = portalUser;
         }
 
         public async Task OnGetAsync()
@@ -80,12 +83,13 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(p => p.ProcessId == processId);
+            var userFullName = await _portalUser.GetFullNameForUser(_httpContextAccessor.HttpContext.User);
 
             var onHoldRecord = new OnHold
             {
                 ProcessId = processId,
                 OnHoldTime = DateTime.Now,
-                OnHoldUser = "Ross",
+                OnHoldUser = string.IsNullOrEmpty(userFullName) ? "Unknown user" : userFullName,
                 WorkflowInstanceId = workflowInstance.WorkflowInstanceId
             };
 

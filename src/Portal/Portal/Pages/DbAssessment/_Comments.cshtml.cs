@@ -35,9 +35,6 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostCommentsAsync(string newCommentMessage)
         {
-            // TODO: Test with Azure
-            // TODO: This will not work in Azure; need alternative; but will work in local dev
-
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(c => c.ProcessId == ProcessId);
 
             await _commentsHelper.AddComment(newCommentMessage, ProcessId, workflowInstance.WorkflowInstanceId);
