@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -131,10 +132,14 @@ namespace Portal
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
+
+            // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
+            services.AddSingleton<IHttpProvider, HttpProvider>();
             services.AddScoped<IPortalUser,
                 PortalUser>(s => new PortalUser(s.GetService<IOptions<SecretsConfig>>(),
                 s.GetService<IOptions<GeneralConfig>>(),
-                ConfigHelpers.IsLocalDevelopment));
+                isLocalDevelopment,
+                s.GetService<HttpProvider>()));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

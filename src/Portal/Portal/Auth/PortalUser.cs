@@ -12,7 +12,7 @@ namespace Portal.Auth
         private GraphServiceClient GraphClient { get; }
 
         public PortalUser(IOptions<SecretsConfig> secretsConfig,
-            IOptions<GeneralConfig> generalConfig, bool isLocalDevelopment)
+            IOptions<GeneralConfig> generalConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
             var authenticationProvider =
                 new MsalAuthenticationProvider(generalConfig.Value.AzureAdClientId,
@@ -20,7 +20,7 @@ namespace Portal.Auth
                     generalConfig.Value.TenantId,
                     isLocalDevelopment);
 
-            GraphClient = new GraphServiceClient(authenticationProvider);
+            GraphClient = new GraphServiceClient(authenticationProvider, httpProvider);
         }
 
         public async Task<string> GetFullNameForUser(ClaimsPrincipal user)
