@@ -8,7 +8,6 @@ using Portal.TestAutomation.Framework.Configuration;
 namespace Portal.TestAutomation.Framework.Pages
 {
     public class VerifyPage : BasePage
-
     {
         private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
