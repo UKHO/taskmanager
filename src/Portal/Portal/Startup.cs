@@ -62,7 +62,7 @@ namespace Portal
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 

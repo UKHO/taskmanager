@@ -1,13 +1,11 @@
-﻿using Common.Helpers;
-
+﻿using System;
+using Common.Helpers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Logging;
-
-using System;
 
 
 namespace Portal
