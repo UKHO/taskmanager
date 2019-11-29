@@ -4,12 +4,6 @@
 
 @{ Layout = null; }
 
-@* start temporary to make UsageVerified checkbox functional*@
-@{
-    var i = 0;
-}
-@* end temporary to make UsageVerified checkbox functional*@
-
 <div class="card mb-4">
     <h6>
         <span>Data Impact</span>
@@ -27,9 +21,6 @@
                 </div>
                 @foreach (var m in Model.DataImpacts)
                 {
-                    @* start temporary to make UsageVerified checkbox functional*@
-                    i = i + 1;
-                    @* end temporary to make UsageVerified checkbox functional*@
                     <div class="col-12 dataImpact">
                         <div class="form-row align-items-center">
                             <div class="col-2">
@@ -38,17 +29,18 @@
                             </div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-@i" @(m.Edited ? "checked" : "") value="true">
-                                    <label class="custom-control-label" for="UsageEdited-@i"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-0" @(m.Edited ? "checked" : "") value="true">
+                                    <label class="custom-control-label dataImpactEditedLabel"></label>
                                 </div>
                             </div>
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-@i" @(m.Verified ? "checked" : "") value="true" >
-                                    <label class="custom-control-label" for="UsageVerified-@i"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-0" @(m.Verified ? "checked" : "") value="true">
+                                    <label class="custom-control-label dataImpactVerifiedLabel"></label>
                                 </div>
                             </div>
+                            <div class="col-1"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
                         </div>
                     </div>
                 }

@@ -5,17 +5,30 @@
 
 
 function updateDataImpact() {
-    $(".dataImpact").each(function(index, element) {
-        //Set Form Control Names
+    $(".dataImpact").each(function (index, element) {
+        if (index > 0) {
+            $(element).find(".deleteUsage").show();
+        } else {
+            $(element).find(".deleteUsage").hide();
+        }
+
+        // Set Form Control Names
         $(element).find($(".dataImpactUsage")).prop("name", "DataImpacts[" + index + "].HpdUsageId");
         $(element).find($(".dataImpactEdited")).prop("name", "DataImpacts[" + index + "].Edited");
         $(element).find($(".dataImpactComments")).prop("name", "DataImpacts[" + index + "].Comments");
         $(element).find($(".dataImpactVerified")).prop("name", "DataImpacts[" + index + "].Verified");
 
+        // Additional required markup settings for checkboxes...
+        $(element).find($(".dataImpactEdited")).prop("id", "UsageEdited-" + index);
+        $(element).find($(".dataImpactVerified")).prop("id", "UsageVerified-" + index);
+        $(element).find($(".dataImpactEditedLabel")).prop("id", "UsageEdited-" + index);
+        $(element).find($(".dataImpactVerifiedLabel")).prop("id", "UsageVerified-" + index);
+        $(element).find($(".dataImpactEditedLabel")).prop("for", "UsageEdited-" + index);
+        $(element).find($(".dataImpactVerifiedLabel")).prop("for", "UsageVerified-" + index);
 
-        //if (index > 0) {
-        //    setDeleteHandler($(element).find(".deleteAssignTask"));
-        //}
+        if (index > 0) {
+            setDeleteHandler($(element).find(".deleteUsage"));
+        }
 
     });
 }
@@ -62,6 +75,13 @@ function getDataImpacts() {
     });
 }
 
+function setDeleteHandler(element) {
+    $(element).on("click").click(function () {
+        $(element).parents(".dataImpact").remove();
+
+        updateDataImpact();
+    }).show();
+}
 
 function setVerified() {
 
