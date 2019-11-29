@@ -1,8 +1,6 @@
 ﻿$(document).ready(function () {
     getDataImpacts();
-    
 });
-
 
 function updateDataImpact() {
     $(".dataImpact").each(function (index, element) {
@@ -30,23 +28,36 @@ function updateDataImpact() {
             setDeleteHandler($(element).find(".deleteUsage"));
         }
 
+        setChangedHandler($(element).find(".dataImpactUsage"));
+    });
+}
+
+function setChangedHandler(element) {
+    $(element).on("change", function () {
+        //getDataImpacts();
+
+        var selectedItem = $(this).val();
+
+        // For each usage drop down that isn't the one that the user has just selected a value on, remove the selectedItem from the drop down options
+        // TODO - Something like this...
+        $("select[name='DataImpacts[1].HpdUsageId'] > option[value=" + selectedItem + "]").remove();
     });
 }
 
 function setAddUsageHandler() {
-        $("#btnAddUsage").on("click", function (e) {
-            var newUsage = $($(".dataImpact")[0]).clone();
+    $("#btnAddUsage").on("click", function (e) {
+        var newUsage = $($(".dataImpact")[0]).clone();
 
-            $(newUsage).find(".dataImpactUsage").val(0);
-            $(newUsage).find(".dataImpactEdited").removeAttr("checked");
-            $(newUsage).find(".dataImpactComments").val("");
-            $(newUsage).find(".dataImpactVerified").removeAttr("checked");
+        $(newUsage).find(".dataImpactUsage").val(0);
+        $(newUsage).find(".dataImpactEdited").removeAttr("checked");
+        $(newUsage).find(".dataImpactComments").val("");
+        $(newUsage).find(".dataImpactVerified").removeAttr("checked");
 
-            $("#dataImpactContainer").append(newUsage);
-            $(newUsage).show();
+        $("#dataImpactContainer").append(newUsage);
+        $(newUsage).show();
 
-            updateDataImpact();
-        });
+        updateDataImpact();
+    });
 
 };
 
