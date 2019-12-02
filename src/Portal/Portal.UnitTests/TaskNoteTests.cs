@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Portal.Auth;
 using Portal.Pages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
-using FakeItEasy;
-using System.Linq;
 
 namespace Portal.UnitTests
 {
@@ -19,6 +20,7 @@ namespace Portal.UnitTests
         private int ProcessId { get; set; }
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private IMapper _fakeMapper;
+        private IUserIdentityService _fakeUserIdentityService;
 
         [SetUp]
         public async Task Setup()
@@ -31,6 +33,7 @@ namespace Portal.UnitTests
 
             _fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
             _fakeMapper = A.Fake<IMapper>();
+            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
             ProcessId = 123;
 
@@ -70,7 +73,9 @@ namespace Portal.UnitTests
                 LastModified = DateTime.Now,
                 LastModifiedByUsername = "Tests"
             };
-            var indexModel = new IndexModel(_dbContext, _fakeMapper, _fakeHttpContextAccessor);
+            var indexModel = new IndexModel(_dbContext,
+                _fakeMapper,
+                _fakeUserIdentityService);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -90,7 +95,10 @@ namespace Portal.UnitTests
                 LastModified = DateTime.Now,
                 LastModifiedByUsername = "Tests"
             };
-            var indexModel = new IndexModel(_dbContext, _fakeMapper, _fakeHttpContextAccessor);
+
+            var indexModel = new IndexModel(_dbContext,
+                _fakeMapper,
+                _fakeUserIdentityService);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -123,7 +131,9 @@ namespace Portal.UnitTests
             await _dbContext.TaskNote.AddAsync(taskNote);
             await _dbContext.SaveChangesAsync();
 
-            var indexModel = new IndexModel(_dbContext, _fakeMapper, _fakeHttpContextAccessor);
+            var indexModel = new IndexModel(_dbContext,
+                _fakeMapper,
+                _fakeUserIdentityService);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
@@ -157,7 +167,9 @@ namespace Portal.UnitTests
             await _dbContext.TaskNote.AddAsync(taskNote);
             await _dbContext.SaveChangesAsync();
 
-            var indexModel = new IndexModel(_dbContext, _fakeMapper, _fakeHttpContextAccessor);
+            var indexModel = new IndexModel(_dbContext,
+                _fakeMapper,
+                _fakeUserIdentityService);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
