@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,7 +21,6 @@ namespace Portal.Pages.DbAssessment
     public class _TaskInformationModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IPortalUser _portalUser;
@@ -63,13 +61,18 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList SourceCategories { get; set; }
 
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+
         public _TaskInformationModel(WorkflowDbContext DbContext,
-            IHttpContextAccessor httpContextAccessor,
             IOnHoldCalculator onHoldCalculator,
             ICommentsHelper commentsHelper, IPortalUser portalUser)
         {
             _dbContext = DbContext;
-            _httpContextAccessor = httpContextAccessor;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _portalUser = portalUser;
@@ -83,13 +86,13 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(p => p.ProcessId == processId);
-            var userFullName = await _portalUser.GetFullNameForUser(_httpContextAccessor.HttpContext.User);
+            UserFullName = await _portalUser.GetFullNameForUser(this.User);
 
             var onHoldRecord = new OnHold
             {
                 ProcessId = processId,
                 OnHoldTime = DateTime.Now,
-                OnHoldUser = string.IsNullOrEmpty(userFullName) ? "Unknown user" : userFullName,
+                OnHoldUser = UserFullName,
                 WorkflowInstanceId = workflowInstance.WorkflowInstanceId
             };
 
@@ -99,7 +102,10 @@ namespace Portal.Pages.DbAssessment
             IsOnHold = true;
             ProcessId = processId;
 
-            await _commentsHelper.AddComment($"Task {processId} has been put on hold", processId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment($"Task {processId} has been put on hold",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
 
             // As we're submitting, re-get task info for now
             await SetTaskInformationDummyData();
@@ -113,10 +119,10 @@ namespace Portal.Pages.DbAssessment
             {
                 var onHoldRecord = await _dbContext.OnHold.FirstAsync(r => r.ProcessId == processId
                                                            && r.OffHoldTime == null);
-                var userFullName = await _portalUser.GetFullNameForUser(_httpContextAccessor.HttpContext.User);
+                UserFullName = await _portalUser.GetFullNameForUser(this.User);
 
                 onHoldRecord.OffHoldTime = DateTime.Now;
-                onHoldRecord.OffHoldUser = string.IsNullOrEmpty(userFullName) ? "Unknown user" : userFullName;
+                onHoldRecord.OffHoldUser = UserFullName;
 
                 await _dbContext.SaveChangesAsync();
 
@@ -124,7 +130,11 @@ namespace Portal.Pages.DbAssessment
 
                 ProcessId = processId;
 
-                await _commentsHelper.AddComment($"Task {processId} taken off hold", processId, _dbContext.WorkflowInstance.First(p => p.ProcessId == processId).WorkflowInstanceId);
+                await _commentsHelper.AddComment($"Task {processId} taken off hold",
+                    processId,
+                    _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
+                        .WorkflowInstanceId,
+                    UserFullName);
 
                 // As we're submitting, re-get task info for now
                 await SetTaskInformationDummyData();

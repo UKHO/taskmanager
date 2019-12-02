@@ -59,12 +59,10 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
-                .Bind(Configuration.GetSection("azure"))
+                .Bind(Configuration.GetSection("subscription"))
                 .Bind(Configuration.GetSection("K2"));
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
@@ -77,7 +75,7 @@ namespace Portal
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
-            Configuration.GetSection("azure").Bind(startupConfig);
+            Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("portal").Bind(startupConfig);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
@@ -23,6 +24,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ICommentsHelper _commentsHelper;
+        private readonly IPortalUser _portalUser;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
@@ -30,17 +32,26 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
 
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+
         public ReviewModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            IEventServiceApiClient eventServiceApiClient, 
-            ICommentsHelper commentsHelper)
+            IEventServiceApiClient eventServiceApiClient,
+            ICommentsHelper commentsHelper,
+            IPortalUser portalUser)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
+            _portalUser = portalUser;
         }
 
         public async Task OnGet(int processId)
@@ -66,9 +77,13 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
+            UserFullName = await _portalUser.GetFullNameForUser(this.User);
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
-            await _commentsHelper.AddComment($"Terminate comment: {comment}", processId, workflowInstance.WorkflowInstanceId);
+            await _commentsHelper.AddComment($"Terminate comment: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 

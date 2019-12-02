@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,6 @@ namespace Portal.Pages
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPortalUser _portalUser;
 
         private string _userFullName;
@@ -36,12 +34,10 @@ namespace Portal.Pages
 
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
             IPortalUser portalUser)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
             _portalUser = portalUser;
         }
 
