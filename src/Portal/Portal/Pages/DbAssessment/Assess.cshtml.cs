@@ -76,13 +76,14 @@ namespace Portal.Pages.DbAssessment
             }
             else
             {
+                await OnGet(processId);
                 return Page();
             }
         }
 
         private bool ValidateDataImpactPage()
         {
-            if (DataImpacts.GroupBy(x => x)
+            if (DataImpacts.GroupBy(x => x.HpdUsageId)
                 .Where(g => g.Count() > 1)
                 .Select(y => y.Key).Any())
             {
