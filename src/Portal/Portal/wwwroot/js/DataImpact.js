@@ -27,20 +27,6 @@ function updateDataImpact() {
         if (index > 0) {
             setDeleteHandler($(element).find(".deleteUsage"));
         }
-
-        setChangedHandler($(element).find(".dataImpactUsage"));
-    });
-}
-
-function setChangedHandler(element) {
-    $(element).on("change", function () {
-        //getDataImpacts();
-
-        var selectedItem = $(this).val();
-
-        // For each usage drop down that isn't the one that the user has just selected a value on, remove the selectedItem from the drop down options
-        // TODO - Something like this...
-        $("select[name='DataImpacts[1].HpdUsageId'] > option[value=" + selectedItem + "]").remove();
     });
 }
 
