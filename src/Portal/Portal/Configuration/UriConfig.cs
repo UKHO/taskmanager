@@ -17,6 +17,8 @@ namespace Portal.Configuration
         public Uri EventServiceWebServiceBaseUri { get; set; }
         public Uri EventServiceWebServicePostEventUrl { get; set; }
         public Uri DataServicesDocumentAssessmentDataUri { get; set; }
+        public string LocalDevLandingPageHttpsUrl { get; set; }
+        public string LandingPageUrl { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
         {

@@ -20,7 +20,7 @@ namespace Portal.Pages
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
-        private readonly IPortalUser _portalUser;
+        private readonly IUserIdentityService _userIdentityService;
 
         private string _userFullName;
         public string UserFullName
@@ -34,11 +34,11 @@ namespace Portal.Pages
 
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
-            IPortalUser portalUser)
+            IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _portalUser = portalUser;
+            _userIdentityService = userIdentityService;
         }
 
         public async Task OnGetAsync()
@@ -51,14 +51,14 @@ namespace Portal.Pages
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
 
-            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 

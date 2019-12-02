@@ -24,7 +24,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IPortalUser _portalUser;
+        private readonly IUserIdentityService _userIdentityService;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
@@ -44,14 +44,14 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
-            IPortalUser portalUser)
+            IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
-            _portalUser = portalUser;
+            _userIdentityService = userIdentityService;
         }
 
         public async Task OnGet(int processId)
@@ -77,7 +77,7 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
             await _commentsHelper.AddComment($"Terminate comment: {comment}",

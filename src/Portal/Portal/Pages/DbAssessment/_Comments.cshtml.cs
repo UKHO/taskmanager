@@ -15,7 +15,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IPortalUser _portalUser;
+        private readonly IUserIdentityService _userIdentityService;
 
         [BindProperty(SupportsGet = true)]
         public int ProcessId { get; set; }
@@ -29,11 +29,11 @@ namespace Portal.Pages.DbAssessment
             private set => _userFullName = value;
         }
 
-        public _CommentsModel(WorkflowDbContext dbContext, ICommentsHelper commentsHelper, IPortalUser portalUser)
+        public _CommentsModel(WorkflowDbContext dbContext, ICommentsHelper commentsHelper, IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _commentsHelper = commentsHelper;
-            _portalUser = portalUser;
+            _userIdentityService = userIdentityService;
         }
 
         public async Task OnGetAsync(int processId)
@@ -46,7 +46,7 @@ namespace Portal.Pages.DbAssessment
         {
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(c => c.ProcessId == ProcessId);
 
-            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             await _commentsHelper.AddComment(newCommentMessage,
                 ProcessId,

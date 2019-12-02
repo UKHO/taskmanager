@@ -23,7 +23,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IPortalUser _portalUser;
+        private readonly IUserIdentityService _userIdentityService;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -70,12 +70,12 @@ namespace Portal.Pages.DbAssessment
 
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper, IPortalUser portalUser)
+            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
-            _portalUser = portalUser;
+            _userIdentityService = userIdentityService;
         }
 
         public async Task OnGetAsync()
@@ -86,7 +86,7 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(p => p.ProcessId == processId);
-            UserFullName = await _portalUser.GetFullNameForUser(this.User);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             var onHoldRecord = new OnHold
             {
@@ -119,7 +119,7 @@ namespace Portal.Pages.DbAssessment
             {
                 var onHoldRecord = await _dbContext.OnHold.FirstAsync(r => r.ProcessId == processId
                                                            && r.OffHoldTime == null);
-                UserFullName = await _portalUser.GetFullNameForUser(this.User);
+                UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
                 onHoldRecord.OffHoldTime = DateTime.Now;
                 onHoldRecord.OffHoldUser = UserFullName;

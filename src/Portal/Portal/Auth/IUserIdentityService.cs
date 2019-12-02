@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Portal.Auth
 {
-    public interface IPortalUser
+    public interface IUserIdentityService
     {
         Task<string> GetFullNameForUser(ClaimsPrincipal user);
     }

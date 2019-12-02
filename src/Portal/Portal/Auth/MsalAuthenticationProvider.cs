@@ -15,12 +15,8 @@ namespace Portal.Auth
         public MsalAuthenticationProvider(string azureAdClientId,
                                           string azureAdSecret,
                                           string azureAdTenantId,
-                                          bool isLocalDev)
+                                          string redirectUri)
         {
-            // TODO RS to check AAD app registration. Explore options for syncing developer's SSL port.
-            var redirectUri = isLocalDev ? "https://localhost:44308/signin-oidc" :
-                                           "http://taskmanager-dev-web-portal.azurewebsites.net/signin-oidc";
-
             var authority = $"https://login.microsoftonline.com/{azureAdTenantId}/v2.0";
 
             ClientApplication = ConfidentialClientApplicationBuilder.Create(azureAdClientId)

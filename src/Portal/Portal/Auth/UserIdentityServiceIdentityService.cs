@@ -7,18 +7,21 @@ using Portal.Configuration;
 
 namespace Portal.Auth
 {
-    public class PortalUser : IPortalUser
+    public class UserIdentityServiceIdentityService : IUserIdentityService
     {
         private GraphServiceClient GraphClient { get; }
 
-        public PortalUser(IOptions<SecretsConfig> secretsConfig,
-            IOptions<GeneralConfig> generalConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
+        public UserIdentityServiceIdentityService(IOptions<SecretsConfig> secretsConfig,
+            IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
+            var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
+                $"{uriConfig.Value.LandingPageUrl}/signin-oidc";
+
             var authenticationProvider =
                 new MsalAuthenticationProvider(generalConfig.Value.AzureAdClientId,
                     secretsConfig.Value.ClientAzureAdSecret,
                     generalConfig.Value.TenantId,
-                    isLocalDevelopment);
+                    redirectUri);
 
             GraphClient = new GraphServiceClient(authenticationProvider, httpProvider);
         }
