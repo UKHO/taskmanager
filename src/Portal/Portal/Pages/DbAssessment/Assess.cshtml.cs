@@ -32,6 +32,7 @@ namespace Portal.Pages.DbAssessment
         public _RecordProductActionModel RecordProductActionModel { get; set; }
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
+        public string DataImpactErrorMessage { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -59,7 +60,37 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
         {
-            return RedirectToPage("/Index");
+            bool validationSucceeded = true;
+
+            // Show error to user, that they've chosen the same usage more than once
+            if (!ValidateDataImpactPage())
+            {
+                validationSucceeded = false;
+
+            }
+
+            // TODO: validate the other partials where required.
+            if (validationSucceeded)
+            {
+                return RedirectToPage("/Index");
+            }
+            else
+            {
+                return Page();
+            }
+        }
+
+        private bool ValidateDataImpactPage()
+        {
+            if (DataImpacts.GroupBy(x => x)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key).Any())
+            {
+                DataImpactErrorMessage = "More than one of the same Usage selected";
+                return false;
+            }
+
+            return true;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
