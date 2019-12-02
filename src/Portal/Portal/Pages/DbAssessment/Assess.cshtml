@@ -38,7 +38,7 @@
 
 <input type="hidden" id="pageIdentity" value="Assess" />
 <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-<form id="assessDone"  method="post" asp-page-handler="Done">
+<form id="assessDone" method="post" asp-page-handler="Done">
     <div class="col-12">
         <div class="row justify-content-end btn-size">
             <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
@@ -111,11 +111,45 @@
             </div>
             <div class="modal-body">
                 <ul>
-                    <li>Verifying...</li>
+                    <li>Verifying Data...</li>
                     <li>Saving Data...</li>
                 </ul>
             </div>
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="modalWaitAssessDoneErrors" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <form id="frmAssessDoneError">
+                <div class="modal-header">
+                    <h3>Error while saving data</h3>
+                </div>
+                <div class="modal-body pb-0">
+                    <div class="row align-items-center align-content-center" style="overflow: hidden;">
+                        <p class="ml-2 mr-2" style="float: left"><i class="fa fa-info-circle" style="font-size: 1.50rem;"></i></p>
+                        <div id="assessDoneErrorMessage">
+                            @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
+                            {
+                                <ul>
+                                    @foreach (var message in Model.ValidationErrorMessages)
+                                    {
+                                        <li>@message</li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="ProcessId" />
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnAssessDoneErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
