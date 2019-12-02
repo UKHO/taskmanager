@@ -7,11 +7,11 @@ using Portal.Configuration;
 
 namespace Portal.Auth
 {
-    public class UserIdentityServiceIdentityService : IUserIdentityService
+    public class UserIdentityService : IUserIdentityService
     {
         private GraphServiceClient GraphClient { get; }
 
-        public UserIdentityServiceIdentityService(IOptions<SecretsConfig> secretsConfig,
+        public UserIdentityService(IOptions<SecretsConfig> secretsConfig,
             IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
             var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :

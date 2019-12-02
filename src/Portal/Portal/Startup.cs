@@ -134,7 +134,7 @@ namespace Portal
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
             services.AddScoped<IUserIdentityService,
-                UserIdentityServiceIdentityService>(s => new UserIdentityServiceIdentityService(s.GetService<IOptions<SecretsConfig>>(),
+                UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
                 s.GetService<IOptions<GeneralConfig>>(),
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
