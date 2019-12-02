@@ -4,6 +4,7 @@
     ViewData["Title"] = "Assess";
 }
 
+<script type="text/javascript" src="~/js/Assess.js"></script>
 <script type="text/javascript" src="~/js/TaskInformation.js"></script>
 <script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
 <script type="text/javascript" src="~/js/DataImpact.js"></script>
@@ -37,7 +38,7 @@
 
 <input type="hidden" id="pageIdentity" value="Assess" />
 <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-<form method="post" asp-page-handler="Done">
+<form id="assessDone"  method="post" asp-page-handler="Done">
     <div class="col-12">
         <div class="row justify-content-end btn-size">
             <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
@@ -100,4 +101,21 @@
             </form>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="modalWaitAssessDone" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Verifying...</li>
+                    <li>Saving Data...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>
