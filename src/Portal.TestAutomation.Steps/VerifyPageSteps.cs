@@ -25,7 +25,6 @@ namespace Portal.TestAutomation.Steps
         public void ThenTheVerifyPageHasLoaded()
         {
             _verifyPage.HasLoaded();
-
         }
     }
 }
