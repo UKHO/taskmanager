@@ -30,7 +30,10 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
-        public List<_DataImpactModel> DataImpactModel { get; set; }
+        [BindProperty]
+        public List<DataImpact> DataImpacts { get; set; }
+
+        public List<string> ValidationErrorMessages { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -45,6 +48,8 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _uriConfig = uriConfig;
             _commentsHelper = commentsHelper;
+
+            ValidationErrorMessages = new List<string>();
         }
 
         public async Task OnGet(int processId)
@@ -53,13 +58,55 @@ namespace Portal.Pages.DbAssessment
             OperatorsModel = SetOperatorsDummyData();
             EditDatabaseModel = SetEditDatabaseModel();
             RecordProductActionModel = SetProductActionDummyData();
-            DataImpactModel = SetDataImpactModelDummyData();
             await GetOnHoldData(processId);
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
         {
-            return RedirectToPage("/Index");
+            bool validationSucceeded = true;
+            ValidationErrorMessages.Clear();
+
+            // Show error to user, that they've chosen the same usage more than once
+            if (!ValidateRecordProductAction())
+            {
+                validationSucceeded = false;
+            }
+
+            if (!ValidateDataImpact())
+            {
+                validationSucceeded = false;
+            }
+
+            // TODO: validate the other partials where required.
+            if (validationSucceeded)
+            {
+                return RedirectToPage("/Index");
+            }
+            else
+            {
+                await OnGet(processId);
+                return Page();
+            }
+        }
+
+        private bool ValidateDataImpact()
+        {
+            if (DataImpacts.GroupBy(x => x.HpdUsageId)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key).Any())
+            {
+                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateRecordProductAction()
+        {
+            // TODO: this is set to always error to show the error popup
+            ValidationErrorMessages.Add("Record Product Action: Failed to save Record Product Action");
+            return false;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
@@ -140,18 +187,6 @@ namespace Portal.Pages.DbAssessment
                         new ProductActionType {ActionTypeId = 3, ActionType = "Product Only"},
                         new ProductActionType {ActionTypeId = 4, ActionType = "Scale too small"}
                     }, "ActionTypeId", "ActionType")
-            };
-        }
-
-        private List<_DataImpactModel> SetDataImpactModelDummyData()
-        {
-            return new List<_DataImpactModel>
-            {
-                new _DataImpactModel{Usage = "Nav 1"},
-                new _DataImpactModel{Usage = "Nav 2"},
-                new _DataImpactModel{Usage = "Nav 3"},
-                new _DataImpactModel{Usage = "Other"},
-                new _DataImpactModel{Usage = "POLAR"}
             };
         }
 

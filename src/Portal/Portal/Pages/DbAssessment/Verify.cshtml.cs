@@ -30,7 +30,6 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
         public _RecordProductActionModel RecordProductActionModel { get; set; }
-        public List<_DataImpactModel> DataImpactModel { get; set; }
 
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
@@ -53,7 +52,6 @@ namespace Portal.Pages.DbAssessment
             OperatorsModel = SetOperatorsDummyData();
             EditDatabaseModel = SetEditDatabaseModel();
             RecordProductActionModel = SetProductActionDummyData();
-            DataImpactModel = SetDataImpactModelDummyData();
             await GetOnHoldData(processId);
         }
 
@@ -140,18 +138,6 @@ namespace Portal.Pages.DbAssessment
                         new ProductActionType {ActionTypeId = 3, ActionType = "Product Only"},
                         new ProductActionType {ActionTypeId = 4, ActionType = "Scale too small"}
                     }, "ActionTypeId", "ActionType")
-            };
-        }
-
-        private List<_DataImpactModel> SetDataImpactModelDummyData()
-        {
-            return new List<_DataImpactModel>
-            {
-                new _DataImpactModel{Usage = "Nav 1"},
-                new _DataImpactModel{Usage = "Nav 2"},
-                new _DataImpactModel{Usage = "Nav 3"},
-                new _DataImpactModel{Usage = "Other"},
-                new _DataImpactModel{Usage = "POLAR"}
             };
         }
 

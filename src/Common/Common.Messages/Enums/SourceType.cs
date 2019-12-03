@@ -4,7 +4,6 @@
     {
         Primary,
         Linked,
-        Database,
-        Folder
+        Database
     }
 }

@@ -1,11 +1,8 @@
-﻿@model List<Portal.Pages.DbAssessment._DataImpactModel>
-@* start temporary to make UsageVerified checkbox functional*@
-@{
-    var i = 0;
-}
-@* end temporary to make UsageVerified checkbox functional*@
+﻿@page
 
-    <script type="text/javascript" src="~/js/DataImpact.js"></script>
+@model Portal.Pages.DbAssessment._DataImpactModel
+
+@{ Layout = null; }
 
 <div class="card mb-4">
     <h6>
@@ -13,42 +10,43 @@
     </h6>
     <div class="col-12">
         <div class="card-body p-0">
-            <div class="row">
+            <div class="row" id="dataImpactContainer">
                 <div class="col-12">
                     <div class="form-row justify-content-start mb-0">
                         <div class="col-2"><label>Usage</label></div>
-                        <div class="col-2"><label>Edited</label></div>
+                        <div class="col-1"><label>Edited</label></div>
                         <div class="col-6"><label>Comments</label></div>
                         <div class="col-1"><label>Verified</label></div>
                     </div>
                 </div>
-                @foreach (var m in Model)
+                @foreach (var m in Model.DataImpacts)
                 {
-                    @* start temporary to make UsageVerified checkbox functional*@
-                    i = i + 1;
-                    @* end temporary to make UsageVerified checkbox functional*@
-                    <div class="col-12">
+                    <div class="col-12 dataImpact">
                         <div class="form-row align-items-center">
-                            <div class="col-2">@Html.DisplayTextFor(model => m.Usage)</div>
                             <div class="col-2">
-                                @Html.DropDownListFor(model => m.Edited, new List<SelectListItem>
-                                {
-                                    new SelectListItem("", "0"),
-                                    new SelectListItem("Yes", "1"),
-                                    new SelectListItem("No", "2")
-                                },
-                                    new { @class = "form-control" })
+                                @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages, "",
+                                    new { @class = "form-control dataImpactUsage" })
                             </div>
-                            <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input usageVerified" id="UsageVerified-@i">
-                                    <label class="custom-control-label" for="UsageVerified-@i"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-0" @(m.Edited ? "checked" : "") value="true">
+                                    <label class="custom-control-label dataImpactEditedLabel"></label>
                                 </div>
                             </div>
+                            <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
+                            <div class="col-1">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-0" @(m.Verified ? "checked" : "") value="true">
+                                    <label class="custom-control-label dataImpactVerifiedLabel"></label>
+                                </div>
+                            </div>
+                            <div class="col-1"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
                         </div>
                     </div>
                 }
+            </div>
+            <div class="row justify-content-start">
+                <div class="col-5"><button id="btnAddUsage" class="btn btn-primary" type="button">Add Usage</button></div>
             </div>
         </div>
     </div>

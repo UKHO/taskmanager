@@ -23,8 +23,6 @@ namespace Common.Factories
                     return new LinkedDocumentStatusProcessor(_dbContext);
                 case SourceType.Database:
                     return new DatabaseDocumentStatusProcessor(_dbContext);
-                case SourceType.Folder:
-                    throw new NotImplementedException("Document type not implemented.");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sourceType), sourceType, null);
             }
