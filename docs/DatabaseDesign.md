@@ -111,7 +111,7 @@ The ProcessId column has a unique constraint, to facilitate the foreign key from
 
 ### PrimaryDocumentStatus
 
-The SourceDocumentStatus table holds the status of a source document retrieval operation from SDRA. We will initially set this to Started when we initiate the retrieval,
+The PrimaryDocumentStatus table holds the status of a source document retrieval operation from SDRA. We will initially set this to Started when we initiate the retrieval,
 and then update the row with subsequent statuses.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
@@ -147,3 +147,31 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 |Created                    |DATETIME           |No           |                                                                                                 |
 
 The SdocId column has a foreign key constraint to the AssessmentData table.
+
+### HpdUsage
+
+The HpdUsage table holds the usages from HPD.
+
+| Column Name       | Datatype          | Allow nulls | Description                          |
+|-------------------|-------------------|-------------|--------------------------------------|
+|HpdUsageId         |INT                |No           |The primary key of this table         |
+|Name               |NVARCHAR(25)       |No           |                                      |
+
+The Name column has a unique constraint.
+
+### DataImpact
+
+The DataImpact table can hold zero/one/multiple Data Impact records per ProcessId.
+The same HpdUsageId should not be used multiple times per ProcessId.
+
+| Column Name       | Datatype          | Allow nulls | Description                          |
+|-------------------|-------------------|-------------|--------------------------------------|
+|DataImpactId       |INT                |No           |The primary key of this table         |
+|ProcessId          |INT                |No           |The K2 process instance Id            |
+|HpdUsageId         |INT                |No           |                                      |
+|Edited             |BIT                |No           |                                      |
+|Comments           |NVARCHAR(4000)     |Yes          |                                      |
+|Verified           |BIT                |No           |                                      |
+
+The ProcessId column has a foreign key constraint to the WorkflowInstance table.
+The HpdUsageId column has a foreign key constraint to the HpdUsage table.
