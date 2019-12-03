@@ -70,13 +70,11 @@ namespace Portal.Pages.DbAssessment
             if (!ValidateRecordProductAction())
             {
                 validationSucceeded = false;
-
             }
 
             if (!ValidateDataImpact())
             {
                 validationSucceeded = false;
-
             }
 
             // TODO: validate the other partials where required.
@@ -109,7 +107,6 @@ namespace Portal.Pages.DbAssessment
             // TODO: this is set to always error to show the error popup
             ValidationErrorMessages.Add("Record Product Action: Failed to save Record Product Action");
             return false;
-
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)

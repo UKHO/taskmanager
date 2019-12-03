@@ -219,6 +219,7 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.HpdUsage.Add(new HpdUsage
             {
+                HpdUsageId = 1,
                 Name = "Offshore Energy"
             });
             _dbContext.SaveChanges();
@@ -227,6 +228,7 @@ namespace WorkflowDatabase.Tests
             {
                 newContext.HpdUsage.Add(new HpdUsage
                 {
+                    HpdUsageId = 2,
                     Name = "Offshore Energy"
                 });
 
