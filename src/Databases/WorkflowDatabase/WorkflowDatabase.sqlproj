@@ -57,6 +57,8 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Post Deployment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\WorkflowInstance.sql" />
@@ -80,5 +82,8 @@
     <None Include="WorkflowDatabase.LocalDb.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Post Deployment\ProductActionType.sql" />
   </ItemGroup>
 </Project>
