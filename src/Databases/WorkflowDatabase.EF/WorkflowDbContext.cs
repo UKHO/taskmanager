@@ -32,6 +32,7 @@ namespace WorkflowDatabase.EF
         public DbSet<TaskNote> TaskNote { get; set; }
         public DbSet<HpdUsage> HpdUsage { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
+        public DbSet<HpdUser> HpdUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,6 +100,8 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<HpdUsage>().HasKey(x => x.HpdUsageId);
 
             modelBuilder.Entity<DataImpact>().HasKey(x => x.DataImpactId);
+
+            modelBuilder.Entity<HpdUser>().HasKey(x => x.HpdUserId);
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
 
