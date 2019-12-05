@@ -46,7 +46,7 @@ GO`
 
 1). Log in as the DBCreator SQL account and create the NSB database.
 
-2). Whilst logged in with a UKHO A account, grant the NSB app services access to the database:
+2). Whilst logged in with a UKHO A account, grant the NSB app services, and the Event Service app service, access to the database:
 
 `CREATE USER [nsb-app-service-name] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [nsb-app-service-name];
