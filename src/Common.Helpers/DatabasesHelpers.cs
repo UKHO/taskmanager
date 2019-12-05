@@ -45,6 +45,7 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DataImpact]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsage]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUser]");
         }
 
         public static void ReCreateLocalDb(string localDbServer, string dbName, string connectionString, bool isLocalDebugging)

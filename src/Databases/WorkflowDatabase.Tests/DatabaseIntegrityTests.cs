@@ -236,6 +236,52 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
+        
+        [Test]
+        public void Ensure_hpduser_table_prevents_duplicate_adusername_due_to_UQ()
+        {
+            _dbContext.HpdUser.Add(new HpdUser
+            {
+                AdUsername = "TMAccount1",
+                HpdUsername = "Person1"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.HpdUser.Add(new HpdUser
+                {
+                    AdUsername = "TMAccount1",
+                    HpdUsername = "Person2"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        [Test]
+        public void Ensure_hpduser_table_prevents_duplicate_hpdusername_due_to_UQ()
+        {
+            _dbContext.HpdUser.Add(new HpdUser
+            {
+                AdUsername = "TMAccount1",
+                HpdUsername = "Person1"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.HpdUser.Add(new HpdUser
+                {
+                    AdUsername = "TMAccount2",
+                    HpdUsername = "Person1"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
 
