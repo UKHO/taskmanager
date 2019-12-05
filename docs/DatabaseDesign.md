@@ -175,3 +175,16 @@ The same HpdUsageId should not be used multiple times per ProcessId.
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 The HpdUsageId column has a foreign key constraint to the HpdUsage table.
+
+### HpdUser
+
+The HpdUser table holds mappings for the AD user to the HPD user.
+
+| Column Name       | Datatype          | Allow nulls | Description                          |
+|-------------------|-------------------|-------------|--------------------------------------|
+|HpdUserId          |INT                |No           |The primary key of this table         |
+|AdUsername         |NVARCHAR(255)      |No           |                                      |
+|HpdUsername        |NVARCHAR(255)      |No           |                                      |
+
+The AdUsername column has a unique constraint.
+The HpdUsername column has a unique constraint.
