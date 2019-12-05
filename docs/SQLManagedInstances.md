@@ -40,6 +40,12 @@ go
 ALTER ROLE [db_owner] ADD MEMBER [PortalUITestDev]
 GO`
 
+6). Grant PSCT access to HpdUser table:
+
+`CREATE USER [PSCT AD GROUP] FOR LOGIN [PSCT AD GROUP]
+go
+GRANT SELECT, INSERT, UPDATE, DELETE ON HpdUser TO [PSCT AD GROUP]`
+
 ### SQLDatabase (used by NSB)
 
 *Based on the above steps for the WorkflowDatabase being done*
