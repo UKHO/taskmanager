@@ -71,6 +71,7 @@
     <Build Include="Tables\HpdUsage.sql" />
     <Build Include="Tables\DataImpact.sql" />
     <Build Include="Tables\HpdUser.sql" />
+    <Build Include="Tables\ProductActionType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
