@@ -167,7 +167,7 @@ namespace Portal
             // app.UseCors() goes here if and when required
 
             app.UseAuthentication();
-            app.UseAuthorization()
+            app.UseAuthorization();
             // app.UseSession() goes here if we want to maintain user sessions
 
             app.UseCookiePolicy();
