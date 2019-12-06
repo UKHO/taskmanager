@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -6,6 +7,8 @@ namespace WorkflowDatabase.EF.Models
     public class ProductActionType
     {
         public int ProductActionTypeId { get; set; }
+
+        [DisplayName("Action Type:")]
         public string Name { get; set; }
     }
 }

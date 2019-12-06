@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
@@ -12,8 +11,6 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         [DisplayName("Impacted Product:")]
         public string ImpactedProduct { get; set; }
-        [DisplayName("Action Type:")]
-        public string  ActionType { get; set; }
 
         public int ProductActionTypeId { get; set; }
 
