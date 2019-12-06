@@ -24,6 +24,7 @@ namespace WorkflowDatabase.EF
         public DbSet<AssessmentData> AssessmentData { get; set; }
         public DbSet<Comments> Comment { get; set; }
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
+        public DbSet<DbAssessmentAssessData> DbAssessmentAssessData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<DatabaseDocumentStatus> DatabaseDocumentStatus { get; set; }
@@ -72,6 +73,9 @@ namespace WorkflowDatabase.EF
                 .HasOne(x => x.DbAssessmentReviewData);
 
             modelBuilder.Entity<WorkflowInstance>()
+                .HasOne(x => x.DbAssessmentAssessData);
+
+            modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(p => p.AssessmentData)
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
@@ -82,6 +86,10 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<DataImpact>()
                 .HasOne(x => x.HpdUsage);
+
+            modelBuilder.Entity<DbAssessmentReviewData>().HasKey(x => x.DbAssessmentReviewDataId);
+
+            modelBuilder.Entity<DbAssessmentAssessData>().HasKey(x => x.DbAssessmentAssessDataId);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
 

@@ -67,6 +67,40 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
+        public void Ensure_dbassessmentassessdata_table_prevents_duplicate_workflowinstanceid_due_to_FK()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Assess"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                Assessor = "Me",
+                WorkflowInstanceId = 1,
+                Verifier = "Someone",
+                ActivityCode = "Act666",
+                TaskComplexity = "Simples"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                Assessor = "Me",
+                WorkflowInstanceId = 1,
+                Verifier = "You",
+                ActivityCode = "Act111",
+                TaskComplexity = "Simples"
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Test]
         public void Ensure_workflowinstance_table_prevents_duplicate_processid_due_to_UQ()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()

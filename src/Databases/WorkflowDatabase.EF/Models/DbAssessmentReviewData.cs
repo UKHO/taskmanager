@@ -1,5 +1,8 @@
-﻿namespace WorkflowDatabase.EF.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WorkflowDatabase.EF.Models
 {
+    [Table("DbAssessmentReviewData")]
     public class DbAssessmentReviewData
     {
         public int DbAssessmentReviewDataId { get; set; }

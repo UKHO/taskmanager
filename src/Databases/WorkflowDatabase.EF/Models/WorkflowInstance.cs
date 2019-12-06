@@ -17,6 +17,7 @@ namespace WorkflowDatabase.EF.Models
         public virtual List<Comments> Comment { get; set; }
         public virtual AssessmentData AssessmentData { get; set; }
         public virtual DbAssessmentReviewData DbAssessmentReviewData { get; set; }
+        public virtual DbAssessmentAssessData DbAssessmentAssessData { get; set; }
         public virtual PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public virtual List<DatabaseDocumentStatus> DatabaseDocumentStatus { get; set; }
         public virtual List<LinkedDocuments> LinkedDocument { get; set; }
