@@ -91,6 +91,26 @@ The DbAssessmentReviewData table holds the data that may change on the Review st
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
+### DbAssessmentAssessData
+
+The DbAssessmentAssessData table holds the data that may change on the Assess step of a Database Assessment workflow instance.
+
+| Column Name               | Datatype      | Allow nulls | Description                              |
+|---------------------------|---------------|-------------|------------------------------------------|
+|DbAssessmentAssessDataId   |INT            |No           |The primary key of this table             |
+|ProcessId                  |INT            |No           |The K2 process instance Id                |
+|Ion                        |NVARCHAR(50)   |Yes          |                                          |
+|ActivityCode               |NVARCHAR(50)   |Yes          |                                          |
+|WorkManager                |NVARCHAR(255)  |Yes          |                                          |
+|Assessor                   |NVARCHAR(255)  |Yes          |                                          |
+|Verifier                   |NVARCHAR(255)  |Yes          |                                          |
+|TaskComplexity             |NVARCHAR(50)   |Yes          |                                          |
+|ProductActioned            |BIT            |Yes          |                                          |
+|ProductActionChangeDetails |NVARCHAR(Max)  |Yes          |                                          |
+|WorkflowInstanceId         |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)   |
+
+There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
 ### WorkflowInstance
 
 The WorkflowInstance table will hold the instances of a Database Assessment workflow. The ParentProcessId column will be used when an instance is a
@@ -188,3 +208,30 @@ The HpdUser table holds mappings for the AD user to the HPD user.
 
 The AdUsername column has a unique constraint.
 The HpdUsername column has a unique constraint.
+
+### ProductAction
+
+The ProductAction table holds records of product actions used in the Database Assessment workflow Assess & Verify steps.
+
+| Column Name       | Datatype          | Allow nulls | Description                          |
+|-------------------|-------------------|-------------|--------------------------------------|
+|ProductActionId    |INT                |No           |The primary key of this table         |
+|ProcessId          |INT                |No           |The K2 process instance Id            |
+|ImpactedProduct    |NVARCHAR(100)      |No           |                                      |
+|ProductActionTypeId|INT                |No           |                                      |
+|Verified           |BIT                |No           |                                      |
+
+The ProcessId column has a foreign key constraint to the WorkflowInstance table.
+The ProductActionTypeId column has a foreign key constraint to the ProductActionType table.
+The ProcessId & ProductActionTypeId columns have a unique constraint.
+
+### ProductActionType
+
+The ProductActionType table is a lookup table used by ProductAction.
+
+| Column Name       | Datatype          | Allow nulls | Description                          |
+|-------------------|-------------------|-------------|--------------------------------------|
+|ProductActionTypeId|INT                |No           |The primary key of this table         |
+|Name               |NVARCHAR(255)      |No           |                                      |
+
+The Name column has a unique constraint.
