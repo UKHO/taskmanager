@@ -33,7 +33,7 @@ namespace WorkflowDatabase.EF
         public DbSet<OnHold> OnHold { get; set; }
         public DbSet<TaskNote> TaskNote { get; set; }
         public DbSet<HpdUsage> HpdUsage { get; set; }
-
+        public DbSet<ProductAction> ProductAction { get; set; }
         public DbSet<ProductActionType> ProductActionType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
