@@ -22,5 +22,6 @@ namespace WorkflowDatabase.EF.Models
         public virtual List<LinkedDocuments> LinkedDocument { get; set; }
         public virtual List<OnHold> OnHold { get; set; }
         public virtual TaskNote TaskNote { get; set; }
+        public virtual List<DataImpact> DataImpact { get; set; }
     }
 }

@@ -14,6 +14,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Graph" Version="1.20.0" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.2" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.7.1" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.76" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.1" />
   </ItemGroup>

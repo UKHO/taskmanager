@@ -3,32 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Portal.Auth;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserIdentityService _userIdentityService;
+
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
 
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
 
-        public IndexModel(WorkflowDbContext dbContext, IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+        public IndexModel(WorkflowDbContext dbContext,
+            IMapper mapper,
+            IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
+            _userIdentityService = userIdentityService;
         }
 
         public async Task OnGetAsync()
@@ -41,14 +51,15 @@ namespace Portal.Pages
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
 
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            //TODO: LOG!
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name;
-            var username = string.IsNullOrEmpty(userId) ? "Unknown" : userId;
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -65,9 +76,9 @@ namespace Portal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = username,
+                        CreatedByUsername = UserFullName,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = username,
+                        LastModifiedByUsername = UserFullName,
                     });
                     await _dbContext.SaveChangesAsync();
                 }
@@ -78,7 +89,7 @@ namespace Portal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = username;
+            existingTaskNote.LastModifiedByUsername = UserFullName;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();

@@ -30,6 +30,9 @@ namespace WorkflowDatabase.EF
         public DbSet<LinkedDocuments> LinkedDocument { get; set; }
         public DbSet<OnHold> OnHold { get; set; }
         public DbSet<TaskNote> TaskNote { get; set; }
+        public DbSet<HpdUsage> HpdUsage { get; set; }
+        public DbSet<DataImpact> DataImpact { get; set; }
+        public DbSet<HpdUser> HpdUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,9 +56,14 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<PrimaryDocumentStatus>(p => p.ProcessId);
 
-
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.DatabaseDocumentStatus)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.DataImpact)
                 .WithOne()
                 .HasPrincipalKey(p => p.ProcessId)
                 .HasForeignKey(p => p.ProcessId);
@@ -68,9 +76,12 @@ namespace WorkflowDatabase.EF
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
+
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.TaskNote);
 
+            modelBuilder.Entity<DataImpact>()
+                .HasOne(x => x.HpdUsage);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
 
@@ -83,10 +94,17 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<AssessmentData>().HasKey(x => x.AssessmentDataId);
 
             modelBuilder.Entity<OnHold>().HasKey(x => x.OnHoldId);
+
             modelBuilder.Entity<TaskNote>().HasKey(x => x.TaskNoteId);
 
+            modelBuilder.Entity<HpdUsage>().HasKey(x => x.HpdUsageId);
+
+            modelBuilder.Entity<DataImpact>().HasKey(x => x.DataImpactId);
+
+            modelBuilder.Entity<HpdUser>().HasKey(x => x.HpdUserId);
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
+
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);

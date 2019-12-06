@@ -7,6 +7,9 @@ using AutoMapper;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +22,10 @@ using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Portal.Auth;
 
 namespace Portal
 {
@@ -47,14 +54,15 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
+                .Bind(Configuration.GetSection("subscription"))
                 .Bind(Configuration.GetSection("K2"));
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
+            services.AddOptions<SecretsConfig>()
+                .Bind(Configuration.GetSection("PortalSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -63,6 +71,8 @@ namespace Portal
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
+            Configuration.GetSection("subscription").Bind(startupConfig);
+            Configuration.GetSection("portal").Bind(startupConfig);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
@@ -96,10 +106,35 @@ namespace Portal
                     Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
                 });
 
+            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
+                .AddAzureAD(options =>
+                {
+                    options.ClientId = startupConfig.AzureAdClientId;
+                    options.Instance = "https://ukho.onmicrosoft.com";
+                    options.CallbackPath = "/signin-oidc";
+                    options.TenantId = startupConfig.TenantId;
+                    options.Domain = "ukho.onmicrosoft.com";
+
+                });
+
+            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
+            {
+                options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
+                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
+            });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
+
+            // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
+            services.AddSingleton<IHttpProvider, HttpProvider>();
+            services.AddScoped<IUserIdentityService,
+                UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(),
+                s.GetService<IOptions<UriConfig>>(),
+                isLocalDevelopment,
+                s.GetService<HttpProvider>()));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
@@ -126,14 +161,13 @@ namespace Portal
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0#middleware-order
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles(); // must remain before UseRoutine()
+            app.UseStaticFiles(); // must remain before UseRouting()
             app.UseRouting();
             app.UseRequestLocalization();
             // app.UseCors() goes here if and when required
 
-            // These will go in this position
-            // app.UseAuthentication();
-            // app.UseAuthorization()
+            app.UseAuthentication();
+            app.UseAuthorization()
             // app.UseSession() goes here if we want to maintain user sessions
 
             app.UseCookiePolicy();

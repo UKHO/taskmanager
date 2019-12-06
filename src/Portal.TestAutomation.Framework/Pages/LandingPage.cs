@@ -80,7 +80,7 @@ namespace Portal.TestAutomation.Framework.Pages
 
             foreach (var row in InFlightTaskTableActualDataRows)
             {
-                int.TryParse(row.FindElements(By.TagName("td"))[0].Text, out var found);
+                int.TryParse(row.FindElements(By.TagName("td"))[1].Text, out var found);
                 if (found == processId) return true;
             }
 
