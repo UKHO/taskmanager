@@ -216,7 +216,7 @@ namespace WorkflowDatabase.Tests
 
         [Test]
         public void Ensure_Comments_table_prevents_insert_for_no_WorkflowInstance()
-        { 
+        {
             _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comments()
             {
                 Created = DateTime.Now,
@@ -270,7 +270,7 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
-        
+
         [Test]
         public void Ensure_hpduser_table_prevents_duplicate_adusername_due_to_UQ()
         {
@@ -310,6 +310,147 @@ namespace WorkflowDatabase.Tests
                 {
                     AdUsername = "TMAccount2",
                     HpdUsername = "Person1"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        [Test]
+        public void Ensure_productAction_table_prevents_duplicate_productActiontypeId_for_the_same_processId_due_to_FK()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 123,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review",
+                StartedAt = DateTime.Today,
+                Status = "Started"
+
+            });
+
+            _dbContext.ProductActionType.Add(new ProductActionType()
+            {
+                ProductActionTypeId = 1,
+                Name = "CPTS/IA"
+            });
+            
+            _dbContext.SaveChanges();
+
+            _dbContext.ProductAction.Add(new ProductAction()
+            {
+                ProcessId = 123,
+                ImpactedProduct = "GB1234",
+                ProductActionTypeId = 1,
+                Verified = false
+            });
+
+            _dbContext.ProductAction.Add(new ProductAction()
+            {
+                ProcessId = 123,
+                ImpactedProduct = "GB5678",
+                ProductActionTypeId = 1,
+                Verified = false
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+        
+        [Test]
+        public void Ensure_productAction_table_allows_duplicate_productActiontypeId_for_different_processId()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 123,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review",
+                StartedAt = DateTime.Today,
+                Status = "Started"
+
+            });
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 124,
+                SerialNumber = "2_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review",
+                StartedAt = DateTime.Today,
+                Status = "Started"
+            });
+
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 125,
+                SerialNumber = "3_sn",
+                ParentProcessId = null,
+                WorkflowType = "DbAssessment",
+                ActivityName = "Review",
+                StartedAt = DateTime.Today,
+                Status = "Started"
+            });
+
+            _dbContext.ProductActionType.Add(new ProductActionType()
+            {
+                ProductActionTypeId = 1,
+                Name = "CPTS/IA"
+            });
+
+            _dbContext.SaveChanges();
+
+            _dbContext.ProductAction.Add(new ProductAction()
+            {
+                ProcessId = 123,
+                ImpactedProduct = "GB1234",
+                ProductActionTypeId = 1,
+                Verified = false
+            });
+
+            _dbContext.ProductAction.Add(new ProductAction()
+            {
+                ProcessId = 124,
+                ImpactedProduct = "GB5678",
+                ProductActionTypeId = 1,
+                Verified = false
+            });
+
+            _dbContext.ProductAction.Add(new ProductAction()
+            {
+                ProcessId = 125,
+                ImpactedProduct = "GB1111",
+                ProductActionTypeId = 1,
+                Verified = false
+            });
+
+            var newProductActionCount = _dbContext.SaveChanges();
+
+            Assert.AreEqual(3,newProductActionCount);
+        }
+
+        [Test]
+        public void Ensure_productactiontype_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.ProductActionType.Add(new ProductActionType()
+            {
+                ProductActionTypeId = 1,
+                Name = "CPTS/IA"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.ProductActionType.Add(new ProductActionType
+                {
+                    ProductActionTypeId = 2,
+                    Name = "CPTS/IA"
                 });
 
                 var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
