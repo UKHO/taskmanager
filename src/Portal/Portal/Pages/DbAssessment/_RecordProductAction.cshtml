@@ -29,7 +29,7 @@
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
                         <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
-                        <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control impactedProduct" })</div>
+                        <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control productActionImpactedProduct" })</div>
 
                         <div class="row col-8 align-items-center">
                             <div class="col-2">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label" })</div>
@@ -37,8 +37,8 @@
                             <div class="col-2">@Html.LabelFor(model => row.Verified, new { @class = "col-form-label" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input verifiedProduct" id="verified-@(row.ProductActionId)">
-                                    <label class="custom-control-label verifiedProductLabel" for="verified-@(row.ProductActionId)"></label>
+                                    <input type="checkbox" class="custom-control-input productActionVerified" id="ProductActionVerified-0" @(row.Verified ? "checked" : "") value="true">
+                                    <label class="custom-control-label productActionVerifiedLabel" for="ProductActionVerified-0"></label>
                                 </div>
                             </div>
 

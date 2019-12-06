@@ -1,6 +1,4 @@
 ﻿$(document).ready(function () {
-    var id = 100; // TODO: Temporary solution for ADDED Record Product Action
-
     getProductActions();
 
     function getProductActions() {
@@ -37,23 +35,24 @@
                 $(element).find(".deleteAction").hide();
             }
             //Set Form Control Names
-            //$(element).find($(".assignTaskAssessor")).prop("name", "AssignTaskModel[" + index + "].Assessor.AssessorId");
-            //$(element).find($(".assignTaskVerifier")).prop("name", "AssignTaskModel[" + index + "].Verifier.VerifierId");
-            //$(element).find($(".assignTaskSourceType")).prop("name", "AssignTaskModel[" + index + "].SourceType.SourceTypeId");
-            //$(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AssignTaskModel[" + index + "].WorkspaceAffected");
-            //$(element).find($(".assignTaskNotes")).prop("name", "AssignTaskModel[" + index + "].Notes");
+            $(element).find($(".productActionImpactedProduct")).prop("name", "RecordProductAction[" + index + "].ImpactedProduct");
+            $(element).find($(".productActionType")).prop("name", "RecordProductAction[" + index + "].ProductActionTypeId");
+            $(element).find($(".productActionVerified")).prop("name", "RecordProductAction[" + index + "].Verified");
 
-            //Set Heading
-            //$(element).find("span").text("Assign Task " + (index + 1));
+            // Additional required markup settings for checkboxes...
+            $(element).find($(".productActionVerified")).prop("id", "ProductActionVerified-" + index);
+            $(element).find($(".productActionVerifiedLabel")).prop("id", "ProductActionVerified-" + index);
+            $(element).find($(".productActionVerifiedLabel")).prop("for", "ProductActionVerified-" + index);
+
             if (index > 0) {
                 setDeleteHandler($(element).find(".deleteAction"));
             }
 
             var pageIdentity = $("#pageIdentity").val();
             if (pageIdentity === "Assess") {
-                $(".verifiedProduct").prop("disabled", true);
+                $(".productActionVerified").prop("disabled", true);
             } else if (pageIdentity === "Verify") {
-                $(".verifiedProduct").prop("disabled", false);
+                $(".productActionVerified").prop("disabled", false);
             }
 
         });
@@ -61,14 +60,12 @@
 
     function setCreateHandler() {
         $("#btnAddImpact").on("click", function (e) {
-            id += 1; // TODO: Temporary solution for ADDED Record Product Action
             var currentCount = $(".recordProductAction").length;
             var newThing = $($(".recordProductAction")[0]).clone();
 
-            $(newThing).find(".impactedProduct").val(0);
+            $(newThing).find(".productActionImpactedProduct").val("");
             $(newThing).find(".productActionType").val(0);
-            $(newThing).find(".verifiedProduct").attr('id', 'newImpact-' + id); // TODO: Temporary solution for ADDED Record Product Action
-            $(newThing).find(".verifiedProductLabel").attr('for', 'newImpact-' + id); // TODO: Temporary solution for ADDED Record Product Action
+            $(newThing).find(".productActionVerified").prop('checked', false);
 
             $("#productActions").append(newThing);
             $(newThing).show();
