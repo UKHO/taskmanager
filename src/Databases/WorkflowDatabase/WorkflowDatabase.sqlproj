@@ -75,6 +75,7 @@
     <Build Include="Tables\HpdUser.sql" />
     <Build Include="Tables\ProductActionType.sql" />
     <Build Include="Tables\DbAssessmentAssessData.sql" />
+    <Build Include="Tables\ProductAction.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
