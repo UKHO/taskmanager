@@ -14,6 +14,7 @@ namespace WorkflowDatabase.EF.Models
         [DisplayName("Impacted Product:")]
         public string ImpactedProduct { get; set; }
 
+        [DisplayName("Product Action Type:")]
         public int ProductActionTypeId { get; set; }
 
         [DisplayName("Verified:")]
