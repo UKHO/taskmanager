@@ -7,6 +7,7 @@ using AutoMapper;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
+using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -91,6 +92,13 @@ namespace Portal
 
             var startupSecretConfig = new StartupSecretsConfig();
             Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+            Configuration.GetSection("HpdDbSection").Bind(startupSecretConfig);
+
+            var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretConfig.DataSource,
+                startupSecretConfig.UserId, startupSecretConfig.Password);
+
+            services.AddDbContext<HpdDbContext>((serviceProvider, options) =>
+                options.UseOracle(hpdConnection));
 
             services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));

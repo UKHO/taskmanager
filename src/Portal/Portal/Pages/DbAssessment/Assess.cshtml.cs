@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,6 +22,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly ICommentsHelper _commentsHelper;
         private readonly WorkflowDbContext _dbContext;
+        private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -37,6 +39,7 @@ namespace Portal.Pages.DbAssessment
         public List<string> ValidationErrorMessages { get; set; }
 
         public AssessModel(WorkflowDbContext dbContext,
+            HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
@@ -44,6 +47,7 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper commentsHelper)
         {
             _dbContext = dbContext;
+            _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
@@ -104,9 +108,38 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateRecordProductAction()
         {
-            // TODO: this is set to always error to show the error popup
-            ValidationErrorMessages.Add("Record Product Action: Failed to save Record Product Action");
-            return false;
+            bool isValid = true;
+
+            if (RecordProductAction != null && RecordProductAction.Count > 0)
+            {
+                foreach (var productAction in RecordProductAction)
+                {
+                    // Check for existing impacted products
+                    var isExist = _hpdDbContext.CarisProducts.Any(p =>
+                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (!isExist)
+                    {
+                        ValidationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                        isValid = false;
+
+                    }
+                }
+
+                if (RecordProductAction.GroupBy(p => p.ImpactedProduct)
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key).Any())
+                {
+                    ValidationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    isValid = false;
+                }
+
+
+            }
+
+            return isValid;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
