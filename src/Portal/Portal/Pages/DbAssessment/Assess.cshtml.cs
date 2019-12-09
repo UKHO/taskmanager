@@ -29,7 +29,8 @@ namespace Portal.Pages.DbAssessment
         public int ProcessId { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
         public _EditDatabaseModel EditDatabaseModel { get; set; }
-        public _RecordProductActionModel RecordProductActionModel { get; set; }
+        [BindProperty]
+        public List<ProductAction> RecordProductAction { get; set; }
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
@@ -57,7 +58,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
             EditDatabaseModel = SetEditDatabaseModel();
-            RecordProductActionModel = SetProductActionDummyData();
             await GetOnHoldData(processId);
         }
 
@@ -155,40 +155,6 @@ namespace Portal.Pages.DbAssessment
             };
         }
 
-        private _RecordProductActionModel SetProductActionDummyData()
-        {
-            return new _RecordProductActionModel
-            {
-                Action = true,
-                ProductActions = new List<ProductAction>
-                {
-                    new ProductAction
-                    {
-                        ActionType = "Please select a value...",
-                        ImpactedProduct = "Unknown",
-                        ProcessId = ProcessId,
-                        ProductActionId = 1
-                    }
-                },
-                ImpactedProducts = new SelectList(
-                    new List<ImpactedProduct>
-                    {
-                        new ImpactedProduct {ProductId = 0, Product = "Select..."},
-                        new ImpactedProduct {ProductId = 1, Product = "GB123456"},
-                        new ImpactedProduct {ProductId = 2, Product = "GB111222"},
-                        new ImpactedProduct {ProductId = 3, Product = "GB987651"}
-                    }, "ProductId", "Product"),
-                ProductActionTypes = new SelectList(
-                    new List<ProductActionType>
-                    {
-                        new ProductActionType {ActionTypeId = 0, ActionType = "Select..."},
-                        new ProductActionType {ActionTypeId = 1, ActionType = "CPTS/LTA"},
-                        new ProductActionType {ActionTypeId = 2, ActionType = "CPTS/LTA MCOVER"},
-                        new ProductActionType {ActionTypeId = 3, ActionType = "Product Only"},
-                        new ProductActionType {ActionTypeId = 4, ActionType = "Scale too small"}
-                    }, "ActionTypeId", "ActionType")
-            };
-        }
 
         private async Task GetOnHoldData(int processId)
         {
