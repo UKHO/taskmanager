@@ -7,5 +7,11 @@ namespace HpdDatabase.EF.Models
     {
         [Column("name")]
         public string ProductName { get; set; }
+
+        [Column("product_status")]
+        public string ProductStatus { get; set; }
+
+        [Column("Type_key")]
+        public string TypeKey { get; set; }
     }
 }

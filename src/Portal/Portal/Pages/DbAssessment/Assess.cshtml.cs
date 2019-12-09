@@ -108,6 +108,11 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateRecordProductAction()
         {
+            //var a = _hpdDbContext.CarisProducts.Any(p =>
+            //    p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
+            //    p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
+            //    p.ProductName.Equals("GB104200", StringComparison.InvariantCultureIgnoreCase));
+            var a = _hpdDbContext.CarisProducts.Select(s => s.ProductName).First();
             // TODO: this is set to always error to show the error popup
             ValidationErrorMessages.Add("Record Product Action: Failed to save Record Product Action");
             return false;
