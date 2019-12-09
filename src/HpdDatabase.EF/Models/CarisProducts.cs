@@ -5,13 +5,13 @@ namespace HpdDatabase.EF.Models
     [Table("VECTOR_PRODUCT_VIEW", Schema = "HPDOWNER")]
     public class CarisProducts
     {
-        [Column("name")]
+        [Column("NAME")]
         public string ProductName { get; set; }
 
-        [Column("product_status")]
+        [Column("PRODUCT_STATUS")]
         public string ProductStatus { get; set; }
 
-        [Column("Type_key")]
+        [Column("TYPE_KEY")]
         public string TypeKey { get; set; }
     }
 }
