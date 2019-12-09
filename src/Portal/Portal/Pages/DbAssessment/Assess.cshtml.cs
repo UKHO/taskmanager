@@ -38,7 +38,7 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
-        public AssessModel(WorkflowDbContext dbContext, 
+        public AssessModel(WorkflowDbContext dbContext,
             HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
@@ -108,14 +108,38 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateRecordProductAction()
         {
-            //var a = _hpdDbContext.CarisProducts.Any(p =>
-            //    p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
-            //    p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
-            //    p.ProductName.Equals("GB104200", StringComparison.InvariantCultureIgnoreCase));
-            var a = _hpdDbContext.CarisProducts.Select(s => s.ProductName).First();
-            // TODO: this is set to always error to show the error popup
-            ValidationErrorMessages.Add("Record Product Action: Failed to save Record Product Action");
-            return false;
+            bool isValid = true;
+
+            if (RecordProductAction != null && RecordProductAction.Count > 0)
+            {
+                foreach (var productAction in RecordProductAction)
+                {
+                    // Check for existing impacted products
+                    var isExist = _hpdDbContext.CarisProducts.Any(p =>
+                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (!isExist)
+                    {
+                        ValidationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                        isValid = false;
+
+                    }
+                }
+
+                if (RecordProductAction.GroupBy(p => p.ImpactedProduct)
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key).Any())
+                {
+                    ValidationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    isValid = false;
+                }
+
+
+            }
+
+            return isValid;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
