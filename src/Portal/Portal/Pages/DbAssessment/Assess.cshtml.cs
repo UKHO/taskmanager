@@ -7,9 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Portal.Configuration;
-using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
 using WorkflowDatabase.EF;
@@ -19,13 +16,9 @@ namespace Portal.Pages.DbAssessment
 {
     public class AssessModel : PageModel
     {
-        private readonly IOptions<UriConfig> _uriConfig;
-        private readonly ICommentsHelper _commentsHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
-        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
-        private readonly IEventServiceApiClient _eventServiceApiClient;
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
@@ -40,19 +33,11 @@ namespace Portal.Pages.DbAssessment
 
         public AssessModel(WorkflowDbContext dbContext,
             HpdDbContext hpdDbContext,
-            IDataServiceApiClient dataServiceApiClient,
-            IWorkflowServiceApiClient workflowServiceApiClient,
-            IEventServiceApiClient eventServiceApiClient,
-            IOptions<UriConfig> uriConfig,
-            ICommentsHelper commentsHelper)
+            IDataServiceApiClient dataServiceApiClient)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
-            _workflowServiceApiClient = workflowServiceApiClient;
-            _eventServiceApiClient = eventServiceApiClient;
-            _uriConfig = uriConfig;
-            _commentsHelper = commentsHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -71,7 +56,7 @@ namespace Portal.Pages.DbAssessment
             ValidationErrorMessages.Clear();
 
             // Show error to user, that they've chosen the same usage more than once
-            if (!ValidateRecordProductAction())
+            if (!await ValidateRecordProductAction())
             {
                 validationSucceeded = false;
             }
@@ -106,7 +91,7 @@ namespace Portal.Pages.DbAssessment
             return true;
         }
 
-        private bool ValidateRecordProductAction()
+        private async Task<bool> ValidateRecordProductAction()
         {
             bool isValid = true;
 
@@ -115,7 +100,7 @@ namespace Portal.Pages.DbAssessment
                 foreach (var productAction in RecordProductAction)
                 {
                     // Check for existing impacted products
-                    var isExist = _hpdDbContext.CarisProducts.Any(p =>
+                    var isExist = await _hpdDbContext.CarisProducts.AnyAsync(p =>
                         p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
                         p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
                         p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
@@ -124,7 +109,6 @@ namespace Portal.Pages.DbAssessment
                     {
                         ValidationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
                         isValid = false;
-
                     }
                 }
 
@@ -135,8 +119,6 @@ namespace Portal.Pages.DbAssessment
                     ValidationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
                     isValid = false;
                 }
-
-
             }
 
             return isValid;
