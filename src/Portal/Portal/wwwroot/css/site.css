@@ -467,3 +467,7 @@ body, .sticky-footer-wrapper {
 .dialog.warning h5 {
     color: #ef8123;
 }
+
+#assessDoneErrorMessage > ul {
+    display: inline;
+}

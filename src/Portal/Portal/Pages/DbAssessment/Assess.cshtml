@@ -129,23 +129,21 @@
             <div class="modal-header">
                 <h3>Error while saving data</h3>
             </div>
-            <div class="modal-body pb-0">
-                <div class="row align-items-start align-content-start justify-content-start" style="overflow: hidden;">
-                    <div class="col-1">
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
-                    <div class="col-11 pl-0">
-                        <div id="assessDoneErrorMessage">
-                            @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
-                            {
-                                <ul>
-                                    @foreach (var message in Model.ValidationErrorMessages)
-                                    {
-                                        <li class="pb-1">@message</li>
-                                    }
-                                </ul>
-                            }
-                        </div>
+                    <div id="assessDoneErrorMessage" class="col-11">
+                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var message in Model.ValidationErrorMessages)
+                                {
+                                    <li>@message</li>
+                                }
+                            </ul>
+                        }
                     </div>
                 </div>
             </div>
