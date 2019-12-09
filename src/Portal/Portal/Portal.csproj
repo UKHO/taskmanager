@@ -29,6 +29,7 @@
     <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
     <ProjectReference Include="..\..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\..\DataServices\DataServices.Models\DataServices.Models.csproj" />
+    <ProjectReference Include="..\..\HpdDatabase.EF\HpdDatabase.EF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

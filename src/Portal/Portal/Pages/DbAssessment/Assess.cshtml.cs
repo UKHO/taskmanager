@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,6 +22,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly ICommentsHelper _commentsHelper;
         private readonly WorkflowDbContext _dbContext;
+        private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -36,7 +38,8 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
-        public AssessModel(WorkflowDbContext dbContext,
+        public AssessModel(WorkflowDbContext dbContext, 
+            HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
@@ -44,6 +47,7 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper commentsHelper)
         {
             _dbContext = dbContext;
+            _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
