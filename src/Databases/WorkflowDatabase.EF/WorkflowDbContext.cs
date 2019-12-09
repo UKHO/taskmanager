@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Net.Http.Headers;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF.Models;
@@ -24,6 +25,7 @@ namespace WorkflowDatabase.EF
         public DbSet<AssessmentData> AssessmentData { get; set; }
         public DbSet<Comments> Comment { get; set; }
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
+        public DbSet<DbAssessmentAssessData> DbAssessmentAssessData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<DatabaseDocumentStatus> DatabaseDocumentStatus { get; set; }
@@ -31,6 +33,8 @@ namespace WorkflowDatabase.EF
         public DbSet<OnHold> OnHold { get; set; }
         public DbSet<TaskNote> TaskNote { get; set; }
         public DbSet<HpdUsage> HpdUsage { get; set; }
+        public DbSet<ProductAction> ProductAction { get; set; }
+        public DbSet<ProductActionType> ProductActionType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
 
@@ -68,8 +72,18 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey(p => p.ProcessId)
                 .HasForeignKey(p => p.ProcessId);
 
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.ProductAction)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.DbAssessmentReviewData);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasOne(x => x.DbAssessmentAssessData);
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(p => p.AssessmentData)
@@ -77,11 +91,19 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
 
+
+            modelBuilder.Entity<ProductAction>()
+                .HasOne(p => p.ProductActionType);
+
             modelBuilder.Entity<WorkflowInstance>()
                 .HasOne(x => x.TaskNote);
 
             modelBuilder.Entity<DataImpact>()
                 .HasOne(x => x.HpdUsage);
+
+            modelBuilder.Entity<DbAssessmentReviewData>().HasKey(x => x.DbAssessmentReviewDataId);
+
+            modelBuilder.Entity<DbAssessmentAssessData>().HasKey(x => x.DbAssessmentAssessDataId);
 
             modelBuilder.Entity<Comments>().HasKey(x => x.CommentId);
 
@@ -98,6 +120,8 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<TaskNote>().HasKey(x => x.TaskNoteId);
 
             modelBuilder.Entity<HpdUsage>().HasKey(x => x.HpdUsageId);
+
+            modelBuilder.Entity<ProductActionType>().HasKey(x => x.ProductActionTypeId);
 
             modelBuilder.Entity<DataImpact>().HasKey(x => x.DataImpactId);
 

@@ -1,0 +1,22 @@
+[
+  {
+    "ProductActionTypeId": 1,
+    "Name": "CPTS/IA"
+  },
+  {
+    "ProductActionTypeId": 2,
+    "Name": "CPTS/LTA"
+  },
+  {
+    "ProductActionTypeId": 3,
+    "Name": "CPTS/LTA M_COVR"
+  },
+  {
+    "ProductActionTypeId": 4,
+    "Name": "Product only"
+  },
+  {
+    "ProductActionTypeId": 5,
+    "Name": "Scale too small"
+  }
+]

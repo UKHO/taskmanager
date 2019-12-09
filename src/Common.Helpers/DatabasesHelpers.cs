@@ -38,10 +38,13 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [Comment]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [AssessmentData]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentAssessData]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [PrimaryDocumentStatus]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [OnHold]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [TaskNote]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DatabaseDocumentStatus]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductAction]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductActionType]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DataImpact]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsage]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");

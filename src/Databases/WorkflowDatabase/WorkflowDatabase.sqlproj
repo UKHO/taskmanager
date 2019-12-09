@@ -57,6 +57,8 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Post Deployment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\WorkflowInstance.sql" />
@@ -71,6 +73,9 @@
     <Build Include="Tables\HpdUsage.sql" />
     <Build Include="Tables\DataImpact.sql" />
     <Build Include="Tables\HpdUser.sql" />
+    <Build Include="Tables\ProductActionType.sql" />
+    <Build Include="Tables\DbAssessmentAssessData.sql" />
+    <Build Include="Tables\ProductAction.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
@@ -79,5 +84,8 @@
     <None Include="WorkflowDatabase.LocalDb.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Post Deployment\ProductActionType.sql" />
   </ItemGroup>
 </Project>
