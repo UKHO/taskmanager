@@ -13,31 +13,26 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Graph;
-using Portal.Auth;
+using Microsoft.Extensions.Hosting;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
 using WorkflowDatabase.EF;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Portal.Auth;
 
 namespace Portal
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ILogger<Startup> _logger;
-
-        public Startup(IConfiguration configuration, IHostingEnvironment env, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration)
         {
-            _hostingEnvironment = env;
-            _logger = logger;
             Configuration = configuration;
         }
 
@@ -68,7 +63,8 @@ namespace Portal
                 .Bind(Configuration.GetSection("urls"));
             services.AddOptions<SecretsConfig>()
                 .Bind(Configuration.GetSection("PortalSection"));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddRazorPages().AddRazorRuntimeCompilation();
 
             var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
@@ -144,10 +140,12 @@ namespace Portal
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
+
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -159,16 +157,28 @@ namespace Portal
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
+            // Ordered following rules for maintaining security at:
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0#middleware-order
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles(); // must remain before UseRouting()
+            app.UseRouting();
             app.UseRequestLocalization();
-            app.UseAzureAppConfiguration();
+            // app.UseCors() goes here if and when required
 
             app.UseAuthentication();
+            app.UseAuthorization();
+            // app.UseSession() goes here if we want to maintain user sessions
 
-            app.UseMvc();
+            app.UseCookiePolicy();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapHealthChecks("/health");
+            });
+
+            app.UseAzureAppConfiguration();
         }
     }
 }
