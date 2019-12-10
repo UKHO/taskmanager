@@ -161,4 +161,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ProductActionTypeId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="092693ab-68a0-4299-8f09-01ae29d0bf5d" ChangeDateTime="12/10/2019 12:00:30">
+    <Property Name="ElementName" Value="[dbo].[CachedHpdWorkspaces].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CachedHpdWorkspaces]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CachedHpdWorkspacesId" />
+  </Operation>
 </Operations>
