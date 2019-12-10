@@ -6,4 +6,4 @@
 
 GO
 
-CREATE UNIQUE INDEX [IX_CachedHpdWorkspaces_Name] ON [dbo].[CachedHpdWorkspaces] ([Name])
+CREATE UNIQUE INDEX [IX_CachedHpdWorkspace_Name] ON [dbo].[CachedHpdWorkspace] ([Name])
