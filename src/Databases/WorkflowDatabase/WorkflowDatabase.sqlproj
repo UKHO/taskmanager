@@ -76,7 +76,7 @@
     <Build Include="Tables\ProductActionType.sql" />
     <Build Include="Tables\DbAssessmentAssessData.sql" />
     <Build Include="Tables\ProductAction.sql" />
-    <Build Include="Tables\CachedHpdWorkspaces.sql" />
+    <Build Include="Tables\CachedHpdWorkspace.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />

@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[CachedHpdWorkspaces]
+﻿CREATE TABLE [dbo].[CachedHpdWorkspace]
 (
-	[CachedHpdWorkspacesId] INT NOT NULL PRIMARY KEY IDENTITY, 
+	[CachedHpdWorkspaceId] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Name] NVARCHAR(100) NOT NULL
 )
 
