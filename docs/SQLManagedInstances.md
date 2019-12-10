@@ -40,11 +40,22 @@ go
 ALTER ROLE [db_owner] ADD MEMBER [PortalUITestDev]
 GO`
 
-6). Grant PSCT access to HpdUser table:
+6). Create a database role that will control access to the HpdUser table:
 
-`CREATE USER [PSCT AD GROUP] FOR LOGIN [PSCT AD GROUP]
+`USE [WorkflowDatabase]
+GO
+CREATE ROLE [HPDUser_Role]
+GO
+GRANT DELETE ON [dbo].[HpdUser] TO [HPDUser_Role]
+GO
+GRANT INSERT ON [dbo].[HpdUser] TO [HPDUser_Role]
 go
-GRANT SELECT, INSERT, UPDATE, DELETE ON HpdUser TO [PSCT AD GROUP]`
+GRANT SELECT ON [dbo].[HpdUser] TO [HPDUser_Role]
+go
+GRANT UPDATE ON [dbo].[HpdUser] TO [HPDUser_Role]
+GO`
+
+7). DBA to add DL group in AD that will then be added to this role. The PSCT AD group will then be added to this DL.
 
 ### SQLDatabase (used by NSB)
 
