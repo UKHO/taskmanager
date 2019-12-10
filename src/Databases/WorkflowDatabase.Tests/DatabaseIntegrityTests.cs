@@ -457,6 +457,28 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
+
+
+        [Test]
+        public void Ensure_CachedHpdWorkspace_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace()
+            {
+                Name = "testing workspace"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace()
+                {
+                    Name = "testing workspace"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
 
