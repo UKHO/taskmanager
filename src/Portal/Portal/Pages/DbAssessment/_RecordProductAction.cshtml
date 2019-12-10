@@ -32,7 +32,7 @@
                         <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control productActionImpactedProduct" })</div>
 
                         <div class="row col-8 align-items-center">
-                            <div class="col-2">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label" })</div>
+                            <div class="col-3">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label" })</div>
                             <div class="col-3">@Html.DropDownListFor(model => row.ProductActionTypeId, Model.ProductActionTypes, "", new { @class = "form-control productActionType" })</div>
                             <div class="col-2">@Html.LabelFor(model => row.Verified, new { @class = "col-form-label" })</div>
                             <div class="col-1">
