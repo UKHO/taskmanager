@@ -176,8 +176,6 @@ namespace Portal
                     //TODO: LOG!
                 }
 
-
-                //DatabasesHelpers.PopulateCacheHpdWorkspace(workflowDbContext, hpdDbContext);
             }
         }
 
