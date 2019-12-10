@@ -46,7 +46,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
-            EditDatabaseModel = SetEditDatabaseModel();
+            //EditDatabaseModel = SetEditDatabaseModel();
             await GetOnHoldData(processId);
         }
 
@@ -137,21 +137,21 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private _EditDatabaseModel SetEditDatabaseModel()
-        {
-            return new _EditDatabaseModel
-            {
-                CarisWorkspace = new CarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
-                CarisWorkspaces = new SelectList(
-                    new List<CarisWorkspace>
-                    {
-                        new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
-                        new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
-                        new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
-                    }, "WorkspaceId", "Workspace"),
-                ProjectName = "Testing Project"
-            };
-        }
+        //private _EditDatabaseModel SetEditDatabaseModel()
+        //{
+        //    return new _EditDatabaseModel
+        //    {
+        //        CarisWorkspace = new CarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
+        //        CarisWorkspaces = new SelectList(
+        //            new List<CarisWorkspace>
+        //            {
+        //                new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
+        //                new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
+        //                new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
+        //            }, "WorkspaceId", "Workspace"),
+        //        ProjectName = "Testing Project"
+        //    };
+        //}
 
         private _OperatorsModel SetOperatorsDummyData()
         {

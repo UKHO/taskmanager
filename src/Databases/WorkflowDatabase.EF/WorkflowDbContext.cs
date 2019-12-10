@@ -37,6 +37,7 @@ namespace WorkflowDatabase.EF
         public DbSet<ProductActionType> ProductActionType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
+        public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -126,6 +127,8 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<DataImpact>().HasKey(x => x.DataImpactId);
 
             modelBuilder.Entity<HpdUser>().HasKey(x => x.HpdUserId);
+
+            modelBuilder.Entity<CachedHpdWorkspace>().HasKey(x => x.CachedHpdWorkspaceId);
 
             modelBuilder.Entity<LinkedDocuments>().Ignore(l => l.ContentServiceUri);
 
