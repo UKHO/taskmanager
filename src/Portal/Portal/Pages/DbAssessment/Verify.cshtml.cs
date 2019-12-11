@@ -30,9 +30,6 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
 
         [BindProperty]
-        public _EditDatabaseModel EditDatabaseModel { get; set; }
-
-        [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
 
         public VerifyModel(WorkflowDbContext dbContext,
@@ -54,7 +51,6 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
-            //EditDatabaseModel = SetEditDatabaseModel();
             await GetOnHoldData(processId);
         }
 
@@ -75,22 +71,6 @@ namespace Portal.Pages.DbAssessment
                 //TODO: Log error!
             }
         }
-
-        //private _EditDatabaseModel SetEditDatabaseModel()
-        //{
-        //    return new _EditDatabaseModel
-        //    {
-        //        SelectedCarisWorkspace = new SelectedCarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
-        //        CarisWorkspaces = new SelectList(
-        //            new List<SelectedCarisWorkspace>
-        //            {
-        //                new SelectedCarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
-        //                new SelectedCarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
-        //                new SelectedCarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
-        //            }, "WorkspaceId", "Workspace"),
-        //        ProjectName = "Testing Project"
-        //    };
-        //}
 
         private _OperatorsModel SetOperatorsDummyData()
         {
