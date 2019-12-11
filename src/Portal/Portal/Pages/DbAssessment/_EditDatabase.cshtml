@@ -16,7 +16,9 @@
                         <div class="col-4 align-self-start">@Html.LabelFor(model => model.SelectedCarisWorkspace, new { @class = "col-form-label" })</div>
                         <div class="col-8">
                             <div id="workspacesTypeahead">
-                                <input type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                                <div class="text-input-wrap">
+                                    <input type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                                </div>
                                 <section class="dialog error collapse mt-3" id="workspaceTypeaheadError">
                                     <h5>
                                         <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>

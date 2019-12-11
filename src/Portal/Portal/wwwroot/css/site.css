@@ -481,65 +481,47 @@ body, .sticky-footer-wrapper {
     display: inline;
 }
 
-.bs-example {
-    font-family: sans-serif;
-    position: relative;
-    margin: 100px;
+/* TYPEAHEAD START */
+span.twitter-typeahead {
+    width: 100%;
 }
 
-.typeahead, .tt-query, .tt-hint {
-    border: 2px solid #CCCCCC;
-    border-radius: 8px;
-    font-size: 22px; /* Set input font size */
-    height: 30px;
-    line-height: 30px;
-    outline: medium none;
-    padding: 8px 12px;
-    width: 396px;
+.tt-input.form-text-input {
+    width: 100%;
+    border: 2px solid #03284F;
+    color: #09315B;
+    padding-left: 18px;
+    padding: 0px 20px 0px 14px;
+    outline: none;
+    background-color: #f6f6f6;
+    line-height: 2.3rem;
+    border-radius: unset;
 }
 
-.typeahead {
-    background-color: #FFFFFF;
-}
-
-.typeahead:focus {
-        border: 2px solid #0097CF;
-    }
-
-.tt-query {
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-}
-
-.tt-hint {
-    color: #999999;
+.tt-input.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
 }
 
 .tt-menu {
     background-color: #FFFFFF;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     margin-top: 12px;
-    padding: 8px 0;
-    width: 422px;
-}
-
-.tt-suggestion {
-    font-size: 22px; /* Set suggestion dropdown font size */
-    padding: 3px 20px;
-}
-
-.tt-suggestion:hover {
-        cursor: pointer;
-        background-color: #0097CF;
-        color: #FFFFFF;
-    }
-
-.tt-suggestion p {
-        margin: 0;
-    }
-
-.tt-menu {
+    padding: 8px 4px 8px 4px;
+    width: 100%;
     max-height: 150px;
     overflow-y: auto;
 }
+
+.tt-suggestion {
+    padding: 3px 0px;
+}
+
+.tt-suggestion:hover {
+    cursor: pointer;
+    background-color: #0097CF;
+    color: #FFFFFF;
+}
+/* TYPEAHEAD END */
