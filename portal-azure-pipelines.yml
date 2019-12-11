@@ -123,12 +123,23 @@ jobs:
       downloadType: 'specific'
       downloadPath: '$(System.ArtifactsDirectory)' 
 
-  - task: AzureRmWebAppDeployment@4
-    displayName: 'Azure App Service Deploy'
-    inputs:
-      azureSubscription: 'TM2-Dev'
-      WebAppName: 'taskmanager-dev-web-portal'
-      packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
+- deployment: Deploy Portal Website
+  displayName: deploy Web App
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  # creates an environment if it doesn't exist
+  environment: 'tm2dev'
+  strategy:
+    # default deployment strategy, more coming...
+    runOnce:
+      deploy:
+        steps:
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Azure App Service Deploy'
+          inputs:
+            azureSubscription: 'TM2-Dev'
+            WebAppName: 'taskmanager-dev-web-portal'
+            packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
 
 - job: RunAutomatedTests
   dependsOn: RestoreBuildAndDeploy
