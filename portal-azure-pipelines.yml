@@ -123,7 +123,7 @@ jobs:
       downloadType: 'specific'
       downloadPath: '$(System.ArtifactsDirectory)' 
 
-- deployment: Deploy Portal Website
+- deployment: DeployPortalWebsite
   displayName: deploy Web App
   pool:
     vmImage: 'Ubuntu-16.04'
