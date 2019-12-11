@@ -6,7 +6,7 @@ stages:
         UKHO Windows 2019
       workspace:
           clean: all
-          
+
       steps:
       - task: DotNetCoreCLI@2
         inputs:
@@ -111,7 +111,7 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish specs Artifact'
 
-- stage: Deploy Dev
+- stage: DeployDev
   jobs:    
     - deployment: DeployPortalWebsite
       displayName: deploy Web App
