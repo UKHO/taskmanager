@@ -28,6 +28,8 @@ namespace Portal.Pages.DbAssessment
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
+
+        [BindProperty]
         public _EditDatabaseModel EditDatabaseModel { get; set; }
 
         [BindProperty]
@@ -78,13 +80,13 @@ namespace Portal.Pages.DbAssessment
         //{
         //    return new _EditDatabaseModel
         //    {
-        //        CarisWorkspace = new CarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
+        //        SelectedCarisWorkspace = new SelectedCarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
         //        CarisWorkspaces = new SelectList(
-        //            new List<CarisWorkspace>
+        //            new List<SelectedCarisWorkspace>
         //            {
-        //                new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
-        //                new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
-        //                new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
+        //                new SelectedCarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
+        //                new SelectedCarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
+        //                new SelectedCarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
         //            }, "WorkspaceId", "Workspace"),
         //        ProjectName = "Testing Project"
         //    };

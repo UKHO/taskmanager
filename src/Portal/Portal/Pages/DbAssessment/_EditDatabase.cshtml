@@ -1,4 +1,8 @@
-﻿@model Portal.Pages.DbAssessment._EditDatabaseModel
+﻿@page
+
+@model Portal.Pages.DbAssessment._EditDatabaseModel
+
+@{ Layout = null; }
 
 <div class="card mb-4">
     <h6>
@@ -7,18 +11,21 @@
     <div class="col-12">
         <div class="card-body p-0">
             <div class="row justify-content-between">
-                <div class="col-6">
-                    <div class="form-row align-items-center justify-content-center">
-                        <div class="col-5">@Html.LabelFor(model => model.CarisWorkspace, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.CarisWorkspace, Model.CarisWorkspaces, new { @class = "form-control" })</div>
+                <div class="col-8">
+                    <div class="form-row align-items-center justify-content-start">
+                        <div class="col-4 align-self-start">@Html.LabelFor(model => model.SelectedCarisWorkspace, new { @class = "col-form-label" })</div>
+                        <div class="col-8">
+                            @Html.TextBoxFor(model => model.SelectedCarisWorkspace, new { @class = "form-control" })
+                            <div class="alert alert-danger mt-2" role="alert" @(Model.CachedHpdWorkspaces == null || Model.CachedHpdWorkspaces.Count == 0 ? "" : "hidden")>Failed to load Workspaces from CARIS.</div>
+                        </div>
                     </div>
                     <div class="form-row align-items-center justify-content-center">
-                        <div class="col-5">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control" })</div>
+                        <div class="col-4">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
+                        <div class="col-8">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control" })</div>
                     </div>
                     <div class="row justify-content-start">
-                        <div class="col-5"><button class="btn btn-primary" type="button">Create CARIS Project</button></div>
-                        <div class="col-6 pl-2"><button class="btn btn-primary" type="button">Launch CARIS Source Editor</button></div>
+                        <div class="col-4"><button class="btn btn-primary" type="button">Create CARIS Project</button></div>
+                        <div class="col-8 pl-2"><button class="btn btn-primary" type="button">Launch CARIS Source Editor</button></div>
                     </div>
                 </div>
             </div>
