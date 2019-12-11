@@ -24,33 +24,33 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests    .csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests    .csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
         displayName: 'dotnet build portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests    .csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
         displayName: 'dotnet test portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal    .TestAutomation.Specs.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore portalspecs'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
-          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal    .TestAutomation.Specs.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
         displayName: 'dotnet build portalspecs'
   
       - task: CmdLine@2
@@ -60,7 +60,7 @@ stages:
   
       - task: CmdLine@2
         inputs:
-          script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal    .TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory    )\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager -     Portal" --documentation-format=dhtml'
+          script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
         displayName: Generate Pickles Documentation
   
       - task: PublishBuildArtifacts@1
@@ -92,7 +92,7 @@ stages:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal    .TestAutomation.Specs.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
           zipAfterPublish: false
           arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
         displayName: 'Publish specs-project'
