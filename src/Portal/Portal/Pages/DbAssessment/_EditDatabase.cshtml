@@ -17,9 +17,15 @@
                         <div class="col-8">
                             <div id="gregtest">
                                 <input type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
-
+                                <section class="dialog error collapse mt-3">
+                                    <h5>
+                                        <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                                        <span id="workspaceTypeaheadError">Failed to retrieve list of workspaces from server</span>
+                                    </h5>
+                                </section>
                                 <script type="text/javascript">
                                     $(document).ready(function () {
+                                        $('#workspaceTypeaheadError').collapse("hide");
                                         // Constructing the suggestion engine
                                         var workspace = new Bloodhound({
                                             datumTokenizer: Bloodhound.tokenizers.whitespace,
@@ -32,8 +38,8 @@
                                         });
 
                                         var promise = workspace.initialize();
-                                        promise.fail(function() {
-                                            console.log("BENTEST");
+                                        promise.fail(function () {
+                                            $('#workspaceTypeaheadError').collapse("show");
                                         });
 
                                         // Initializing the typeahead
