@@ -26,19 +26,12 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGetAsync(int processId)
         {
-            SetEditDatabaseModel();
         }
 
         public async Task<JsonResult> OnGetWorkspacesAsync()
         {
             var cachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
             return new JsonResult(cachedHpdWorkspaces);
-        }
-
-        private void SetEditDatabaseModel()
-        {
-            SelectedCarisWorkspace = "testworkspace";
-            ProjectName = "Testing Project";
         }
     }
 }
