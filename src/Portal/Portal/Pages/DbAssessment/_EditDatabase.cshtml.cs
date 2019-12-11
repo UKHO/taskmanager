@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
@@ -18,8 +18,6 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("CARIS Project Name:")]
         public string ProjectName { get; set; }
 
-        public List<string> CachedHpdWorkspaces { get; set; }
-
         public _EditDatabaseModel(WorkflowDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -27,18 +25,18 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGetAsync(int processId)
         {
-            await PopulateHpdWorkspaces();
             SetEditDatabaseModel();
         }
 
-        private async Task PopulateHpdWorkspaces()
+        public async Task<JsonResult> OnGetWorkspacesAsync()
         {
-            CachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
+            var cachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
+            return new JsonResult(cachedHpdWorkspaces);
         }
 
         private void SetEditDatabaseModel()
         {
-            SelectedCarisWorkspace = (CachedHpdWorkspaces == null || CachedHpdWorkspaces.Count == 0) ? "" : CachedHpdWorkspaces.First();
+            SelectedCarisWorkspace = "testworkspace";
             ProjectName = "Testing Project";
         }
     }

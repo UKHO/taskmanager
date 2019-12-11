@@ -20,17 +20,20 @@
 
                                 <script type="text/javascript">
                                     $(document).ready(function () {
-                                        // Defining the local dataset
-                                        var cars = [];
-                                        for (var i = 0; i < 20000; i++) {
-                                            cars[i] = "test_" + i;
-                                        }
-
                                         // Constructing the suggestion engine
-                                        var cars = new Bloodhound({
+                                        var workspace = new Bloodhound({
                                             datumTokenizer: Bloodhound.tokenizers.whitespace,
                                             queryTokenizer: Bloodhound.tokenizers.whitespace,
-                                            local: cars
+                                            prefetch: {
+                                                url: "_EditDatabase/?handler=Workspaces",
+                                                ttl: 600000
+                                            },
+                                            initialize: false
+                                        });
+
+                                        var promise = workspace.initialize();
+                                        promise.fail(function() {
+                                            console.log("BENTEST");
                                         });
 
                                         // Initializing the typeahead
@@ -42,8 +45,8 @@
                                                 3 /* Specify minimum characters required for showing result */
                                         },
                                             {
-                                                name: 'cars',
-                                                source: cars,
+                                                name: 'workspace',
+                                                source: workspace,
                                                 limit: 100,
                                                 templates: {
                                                     notFound: '<div>No results</div>'
@@ -119,7 +122,7 @@
 
                             </div>
                             @*@Html.TextBoxFor(model => model.SelectedCarisWorkspace, new {@class = "form-control"})*@
-                            <div class="alert alert-danger mt-2" role="alert" @(Model.CachedHpdWorkspaces == null || Model.CachedHpdWorkspaces.Count == 0 ? "" : "hidden")>Failed to load Workspaces from CARIS.</div>
+                            @*<div class="alert alert-danger mt-2" role="alert" @(Model.CachedHpdWorkspaces == null || Model.CachedHpdWorkspaces.Count == 0 ? "" : "hidden")>Failed to load Workspaces from CARIS.</div>*@
                         </div>
                     </div>
                     <div class="form-row align-items-center justify-content-center">
