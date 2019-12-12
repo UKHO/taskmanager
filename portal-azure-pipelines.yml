@@ -135,7 +135,7 @@ stages:
                 inputs:
                   azureSubscription: 'TM2-Dev'
                   WebAppName: 'taskmanager-dev-web-portal'
-                  packageForLinux: '$(System.ArtifactsDirectory)/Portal/portal'
+                  packageForLinux: '$(System.ArtifactsDirectory)/portal/portal'
 
     - job: RunAutomatedTests
       dependsOn: DeployPortalWebsite
