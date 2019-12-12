@@ -25,9 +25,6 @@ namespace Portal.Pages.DbAssessment
         public _OperatorsModel OperatorsModel { get; set; }
 
         [BindProperty]
-        public _EditDatabaseModel EditDatabaseModel { get; set; }
-
-        [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
@@ -49,7 +46,6 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
-            //EditDatabaseModel = SetEditDatabaseModel();
             await GetOnHoldData(processId);
         }
 
