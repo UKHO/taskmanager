@@ -504,6 +504,23 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        [Test]
+        public void Ensure_DbAssessmentAssignTask_table_prevents_insert_for_no_ProcessId()
+        {
+            _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
+            {
+                Assessor = "Greg",
+                AssignTaskSourceType = "Type 1",
+                DbAssessmentAssignTaskId = 1,
+                Notes = "A note",
+                Verifier = "Ross",
+                WorkspaceAffected = "Workspace 1"
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
 
