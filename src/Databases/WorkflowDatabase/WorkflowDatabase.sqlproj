@@ -79,6 +79,7 @@
     <Build Include="Tables\CachedHpdWorkspace.sql" />
     <Build Include="Tables\AssignedTaskSourceType.sql" />
     <PostDeploy Include="Scripts\Post Deployment\AssignedTaskSourceType.sql" />
+    <Build Include="Tables\DbAssessmentAssignTask.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />

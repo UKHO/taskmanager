@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Portal.Models;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -19,7 +20,7 @@ namespace Portal.Pages.DbAssessment
         public SelectList Verifiers { get; set; }
 
         [DisplayName("Source Type:")]
-        public AssignedTaskSourceType AssignedTaskSourceType { get; set; }
+        public string AssignedTaskSourceType { get; set; }
         public SelectList AssignedTaskSourceTypes { get; set; }
 
         [DisplayName("Notes:")]
