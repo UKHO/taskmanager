@@ -35,6 +35,8 @@ namespace WorkflowDatabase.EF
         public DbSet<HpdUsage> HpdUsage { get; set; }
         public DbSet<ProductAction> ProductAction { get; set; }
         public DbSet<ProductActionType> ProductActionType { get; set; }
+        public DbSet<DbAssessmentAssignTask> DbAssessmentAssignTask { get; set; }
+        public DbSet<AssignedTaskSourceType> AssignedTaskSourceType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
@@ -51,6 +53,12 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.LinkedDocument)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.DbAssessmentAssignTask)
                 .WithOne()
                 .HasPrincipalKey(p => p.ProcessId)
                 .HasForeignKey(p => p.ProcessId);
@@ -73,7 +81,6 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey(p => p.ProcessId)
                 .HasForeignKey(p => p.ProcessId);
 
-
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.ProductAction)
                 .WithOne()
@@ -91,7 +98,6 @@ namespace WorkflowDatabase.EF
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
-
 
             modelBuilder.Entity<ProductAction>()
                 .HasOne(p => p.ProductActionType);

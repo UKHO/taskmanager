@@ -175,14 +175,6 @@ namespace Portal.Pages.DbAssessment
                         new Assessor {AssessorId = 0, Name = "Brian Stenson"},
                         new Assessor {AssessorId = 1, Name = "Peter Bates"}
                     }, "AssessorId", "Name"),
-                AssignedTaskSourceType = new AssignedTaskSourceType { SourceTypeId = 0, Name = "Simple" },
-                AssignedTaskSourceTypes = new SelectList(
-                    new List<AssignedTaskSourceType>
-                    {
-                        new AssignedTaskSourceType{SourceTypeId = 0, Name = "Simple"},
-                        new AssignedTaskSourceType{SourceTypeId = 1, Name = "LTA (Product only)"},
-                        new AssignedTaskSourceType{SourceTypeId = 2, Name = "LTA"}
-                    }, "SourceTypeId", "Name"),
                 Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(
                     new List<Verifier>
