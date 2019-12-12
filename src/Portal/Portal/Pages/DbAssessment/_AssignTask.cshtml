@@ -27,7 +27,7 @@
                     <div class="col-6">
                         <div class="form-row justify-content-between">
                             <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).AssignedTaskSourceType, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.ElementAt(i).AssignedTaskSourceType, Model.ElementAt(i).AssignedTaskSourceTypes, new { @class = "form-control assignTaskSourceType" })</div>
+                            <div class="col-7">@Html.DropDownListFor(model => model.ElementAt(i).AssignedTaskSourceType.AssignedTaskSourceTypeId, Model.ElementAt(i).AssignedTaskSourceTypes, new { @class = "form-control assignTaskSourceType" })</div>
                         </div>
                         <div class="form-row justify-content-between">
                             <div class="col-5">@Html.LabelFor(model => model.ElementAt(i).WorkspaceAffected, new { @class = "col-form-label" })</div>

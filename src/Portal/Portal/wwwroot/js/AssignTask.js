@@ -9,7 +9,7 @@
             //Set Form Control Names
             $(element).find($(".assignTaskAssessor")).prop("name", "AssignTaskModel[" + index + "].Assessor.AssessorId");
             $(element).find($(".assignTaskVerifier")).prop("name", "AssignTaskModel[" + index + "].Verifier.VerifierId");
-            $(element).find($(".assignTaskSourceType")).prop("name", "AssignTaskModel[" + index + "].AssignedTaskSourceType.SourceTypeId");
+            $(element).find($(".assignTaskSourceType")).prop("name", "AssignTaskModel[" + index + "].AssignedTaskSourceType.AssignedTaskSourceTypeId");
             $(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AssignTaskModel[" + index + "].WorkspaceAffected");
             $(element).find($(".assignTaskNotes")).prop("name", "AssignTaskModel[" + index + "].Notes");
 

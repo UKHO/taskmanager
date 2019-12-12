@@ -29,7 +29,6 @@ namespace Portal.Pages.DbAssessment
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
 
-        [BindProperty]
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
 
         private string _userFullName;
@@ -57,7 +56,7 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
-            AssignTaskModel = SetAssignTaskDummyData(processId);
+            AssignTaskModel = await SetAssignTaskDummyData(processId);
             await GetOnHoldData(processId);
         }
 
@@ -105,7 +104,7 @@ namespace Portal.Pages.DbAssessment
             dbAssessmentReviewData.Verifier = primaryAssignTaskModel.Verifier != null ? primaryAssignTaskModel.Verifier.Name : "";
             dbAssessmentReviewData.Notes = primaryAssignTaskModel.Notes;
             dbAssessmentReviewData.WorkspaceAffected = primaryAssignTaskModel.WorkspaceAffected;
-            dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType;
+            dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType.Name;
 
             await _dbContext.SaveChangesAsync();
 
@@ -175,8 +174,9 @@ namespace Portal.Pages.DbAssessment
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
 
-        private List<_AssignTaskModel> SetAssignTaskDummyData(int processId)
+        private async Task<List<_AssignTaskModel>> SetAssignTaskDummyData(int processId)
         {
+            var assignedTaskSourceType = await _dbContext.AssignedTaskSourceType.ToListAsync();
             return new List<_AssignTaskModel>{new _AssignTaskModel
             {
                 AssignTaskId = 1,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
@@ -196,7 +196,10 @@ namespace Portal.Pages.DbAssessment
                         new Verifier{VerifierId = 0, Name = "Brian Stenson"},
                         new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
                         new Verifier{VerifierId = 2, Name = "Peter Bates"}
-                    }, "VerifierId", "Name")
+                    }, "VerifierId", "Name"),
+                AssignedTaskSourceType = assignedTaskSourceType.FirstOrDefault(a => a.Name == "Simple"),
+                AssignedTaskSourceTypes = new SelectList(
+                    assignedTaskSourceType, "AssignedTaskSourceTypeId", "Name")
             }};
         }
     }
