@@ -479,6 +479,31 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase));
             }
         }
+
+
+
+        [Test]
+        public void Ensure_assignedTaskSourceType_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Offshore Greg Energy"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+                {
+                    AssignedTaskSourceTypeId = 2,
+                    Name = "Offshore Greg Energy"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
 

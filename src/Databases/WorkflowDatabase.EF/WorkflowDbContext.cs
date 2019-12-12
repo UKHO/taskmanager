@@ -35,6 +35,7 @@ namespace WorkflowDatabase.EF
         public DbSet<HpdUsage> HpdUsage { get; set; }
         public DbSet<ProductAction> ProductAction { get; set; }
         public DbSet<ProductActionType> ProductActionType { get; set; }
+        public DbSet<AssignedTaskSourceType> AssignedTaskSourceType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
