@@ -97,6 +97,20 @@ namespace Portal.Pages.DbAssessment
 
             var correlationId = _dbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
 
+            var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
+
+            var dbAssessmentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(at => at.ProcessId == processId);
+
+            dbAssessmentReviewData.Assessor = primaryAssignTaskModel.Assessor != null ? primaryAssignTaskModel.Assessor.Name : "";
+            dbAssessmentReviewData.Verifier = primaryAssignTaskModel.Verifier != null ? primaryAssignTaskModel.Verifier.Name : "";
+            dbAssessmentReviewData.Notes = primaryAssignTaskModel.Notes;
+            dbAssessmentReviewData.WorkspaceAffected = primaryAssignTaskModel.WorkspaceAffected;
+            dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType;
+
+            await _dbContext.SaveChangesAsync();
+
+            //new DbAssessmentAssignTask() { }
+
             for (int i = 1; i < AssignTaskModel.Count; i++)
             {
                 //TODO: Log

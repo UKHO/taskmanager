@@ -40,7 +40,11 @@
       "ion": "Ion",
       "activityCode": "78798",
       "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "verifier": "StensonB",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -134,7 +138,11 @@
       "ion": "Ion",
       "activityCode": "78798",
       "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "verifier": "StensonB",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 123,
@@ -242,7 +250,11 @@
       "ion": "I899",
       "activityCode": "78798",
       "assessor": "BatesP",
-      "verifier": "RigdenT"
+      "verifier": "RigdenT",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 321,
@@ -321,7 +333,11 @@
       "ion": "I229",
       "activityCode": "743543",
       "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "verifier": "StensonB",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -430,7 +446,11 @@
       "ion": "I8766",
       "activityCode": "4881",
       "assessor": "BatesP",
-      "verifier": "BarzeyS"
+      "verifier": "BarzeyS",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -507,7 +527,11 @@
     "dbAssessmentReviewData": {
       "processId": 127,
       "ion": "I8766",
-      "activityCode": "4881"
+      "activityCode": "4881",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "DatabaseDocumentStatus": [
       {

@@ -9,7 +9,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public string Assessor { get; set; }
         public string Verifier { get; set; }
-        public string AssignTaskSourceType { get; set; }
+        public string AssignedTaskSourceType { get; set; }
         public string WorkspaceAffected { get; set; }
         public string Notes { get; set; }
     }
