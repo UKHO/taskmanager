@@ -86,7 +86,7 @@ namespace Portal.Pages.DbAssessment
         }
 
         /// <summary>
-        /// Remove once we are reading users from AD
+        /// TODO - Remove assessor and verifier code retrieval from JSON once we are reading users from AD
         /// </summary>
         private async Task PopulateDropDowns()
         {
