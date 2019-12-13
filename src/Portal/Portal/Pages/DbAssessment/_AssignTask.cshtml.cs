@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -94,18 +93,17 @@ namespace Portal.Pages.DbAssessment
             if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
-            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString);
+            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
+                .Select(u => u.Name)
+                .ToList();
 
-            Assessors = new SelectList(
-                users, "UserId", "Name");
+            Assessors = new SelectList(users);
 
-            Verifiers = new SelectList(
-                users, "UserId", "Name");
+            Verifiers = new SelectList(users);
 
-            var assignedTaskSourceType = await _dbContext.AssignedTaskSourceType.ToListAsync();
+            var assignedTaskSourceTypes = await _dbContext.AssignedTaskSourceType.Select(st => st.Name).ToListAsync();
 
-            AssignedTaskSourceTypes = new SelectList(
-                assignedTaskSourceType, "AssignedTaskSourceTypeId", "Name");
+            AssignedTaskSourceTypes = new SelectList(assignedTaskSourceTypes);
         }
     }
 }
