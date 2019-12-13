@@ -71,7 +71,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (ArgumentNullException e)
             {
-                // Log and throw, as we're unable to get assessment data
+                // Log and throw, as we're unable to get additional assigned tasks
                 e.Data.Add("OurMessage", "Unable to retrieve additional assign tasks");
                 Console.WriteLine(e);
                 throw;
