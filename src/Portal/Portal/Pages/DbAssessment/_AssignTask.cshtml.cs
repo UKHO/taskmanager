@@ -53,7 +53,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException e)
             {
-                // Log and throw, as we're unable to get assessment data
+                // Log and throw, as we're unable to get primary assigned task data
                 e.Data.Add("OurMessage", "Unable to retrieve DbAssessmentReviewData");
                 Console.WriteLine(e);
                 throw;
