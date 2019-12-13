@@ -511,7 +511,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
             {
                 Assessor = "Greg",
-                AssignTaskSourceType = "Type 1",
+                AssignedTaskSourceType = "Type 1",
                 DbAssessmentAssignTaskId = 1,
                 Notes = "A note",
                 Verifier = "Ross",

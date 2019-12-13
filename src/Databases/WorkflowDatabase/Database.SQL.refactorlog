@@ -175,4 +175,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AssignTaskSourceType" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1cd17902-dc4e-4faa-9e68-295aa2e1d97d" ChangeDateTime="12/12/2019 12:18:46">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentAssignTask].[AssignTaskSourceType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentAssignTask]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AssignedTaskSourceType" />
+  </Operation>
 </Operations>
