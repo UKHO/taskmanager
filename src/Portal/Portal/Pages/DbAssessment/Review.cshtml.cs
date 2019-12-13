@@ -34,8 +34,6 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
 
-        public List<_AssignTaskModel> AssignTaskModel { get; set; }
-
         private string _userFullName;
         public string UserFullName
         {
@@ -97,8 +95,11 @@ namespace Portal.Pages.DbAssessment
         {
             // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
             //TODO: Log
+            ProcessId = processId;
 
             var correlationId = _dbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
+            var tmpPrimaryAssignedTask = PrimaryAssignedTask;
+            var tmpAssessmentAssignTasks = AdditionalAssignedTasks.ToList();
 
             //var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
 
@@ -114,18 +115,18 @@ namespace Portal.Pages.DbAssessment
 
             //new DbAssessmentAssignTask() { }
 
-            for (int i = 1; i < AssignTaskModel.Count; i++)
-            {
-                //TODO: Log
-                //TODO: Must validate incoming models
-                var docRetrievalEvent = new StartWorkflowInstanceEvent
-                {
-                    CorrelationId = correlationId,
-                    WorkflowType = WorkflowType.DbAssessment,
-                    ParentProcessId = processId
-                };
-                //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-            }
+            //for (int i = 1; i < AssignTaskModel.Count; i++)
+            //{
+            //    //TODO: Log
+            //    //TODO: Must validate incoming models
+            //    var docRetrievalEvent = new StartWorkflowInstanceEvent
+            //    {
+            //        CorrelationId = correlationId,
+            //        WorkflowType = WorkflowType.DbAssessment,
+            //        ParentProcessId = processId
+            //    };
+            //    //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+            //}
 
             return RedirectToPage("/Index");
         }
