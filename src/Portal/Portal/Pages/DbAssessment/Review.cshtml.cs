@@ -97,9 +97,14 @@ namespace Portal.Pages.DbAssessment
             //TODO: Log
             ProcessId = processId;
 
-            var correlationId = _dbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
-            var tmpPrimaryAssignedTask = PrimaryAssignedTask;
-            var tmpAssessmentAssignTasks = AdditionalAssignedTasks.ToList();
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
+            var correlationId = primaryDocumentStatus.CorrelationId.Value;
+
+            PrimaryAssignedTask.ProcessId = ProcessId;
+
+            await UpdateDbAssessmentReviewData();
+
+            await _dbContext.SaveChangesAsync();
 
             //var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
 
@@ -129,6 +134,16 @@ namespace Portal.Pages.DbAssessment
             //}
 
             return RedirectToPage("/Index");
+        }
+
+        private async Task UpdateDbAssessmentReviewData()
+        {
+            var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == ProcessId);
+            currentReview.Assessor = PrimaryAssignedTask.Assessor;
+            currentReview.Verifier = PrimaryAssignedTask.Verifier;
+            currentReview.AssignedTaskSourceType = PrimaryAssignedTask.AssignedTaskSourceType;
+            currentReview.Notes = PrimaryAssignedTask.Notes;
+            currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
