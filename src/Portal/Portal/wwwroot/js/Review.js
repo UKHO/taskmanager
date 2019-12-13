@@ -1,5 +1,11 @@
 ﻿$(document).ready(function () {
 
+    setReviewDoneHandler();
+
+    if ($("#reviewDoneErrorMessage").html().trim().length > 0) {
+        $("#modalWaitReviewDoneErrors").modal("show");
+    }
+
     $("#btnTerminate").on("click", function () {
         $("#ConfirmTerminate").modal("show");
     });
@@ -17,4 +23,13 @@
         function () {
             $("#txtTerminateComment").focus();
         });
+
+    function setReviewDoneHandler() {
+        $("#btnDone").prop("disabled", false);
+
+        $("#frmReviewPage").on("submit", function (e) {
+            $("#btnDone").prop("disabled", true);
+            $("#modalWaitReviewDone").modal("show");
+        });
+    }
 });

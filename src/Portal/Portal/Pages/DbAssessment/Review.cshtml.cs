@@ -6,12 +6,10 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -34,6 +32,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
 
+        public List<string> ValidationErrorMessages { get; set; }
+
         private string _userFullName;
         public string UserFullName
         {
@@ -54,6 +54,8 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
+
+            ValidationErrorMessages = new List<string>();
         }
 
         public async Task OnGet(int processId)
@@ -95,6 +97,22 @@ namespace Portal.Pages.DbAssessment
         {
             // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
             //TODO: Log
+
+            var validationSucceeded = true;
+            ValidationErrorMessages.Clear();
+
+            // Show error to user, that they've chosen the same usage more than once
+            if (!ValidateSourceType())
+            {
+                validationSucceeded = false;
+            }
+
+            if (!validationSucceeded)
+            {
+                await OnGet(processId);
+                return Page();
+            }
+
             ProcessId = processId;
 
             var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
@@ -103,35 +121,22 @@ namespace Portal.Pages.DbAssessment
             PrimaryAssignedTask.ProcessId = ProcessId;
 
             await UpdateDbAssessmentReviewData();
+            await UpdateAdditionalAssignTasks(processId);
 
             await _dbContext.SaveChangesAsync();
 
-            //var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
-
-            //var dbAssessmentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(at => at.ProcessId == processId);
-
-            //dbAssessmentReviewData.Assessor = primaryAssignTaskModel.Assessor != null ? primaryAssignTaskModel.Assessor.Name : "";
-            //dbAssessmentReviewData.Verifier = primaryAssignTaskModel.Verifier != null ? primaryAssignTaskModel.Verifier.Name : "";
-            //dbAssessmentReviewData.Notes = primaryAssignTaskModel.Notes;
-            //dbAssessmentReviewData.WorkspaceAffected = primaryAssignTaskModel.WorkspaceAffected;
-            //dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType.Name;
-
-            //await _dbContext.SaveChangesAsync();
-
-            //new DbAssessmentAssignTask() { }
-
-            //for (int i = 1; i < AssignTaskModel.Count; i++)
-            //{
-            //    //TODO: Log
-            //    //TODO: Must validate incoming models
-            //    var docRetrievalEvent = new StartWorkflowInstanceEvent
-            //    {
-            //        CorrelationId = correlationId,
-            //        WorkflowType = WorkflowType.DbAssessment,
-            //        ParentProcessId = processId
-            //    };
-            //    //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-            //}
+            for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
+            {
+                //TODO: Log
+                //TODO: Must validate incoming models
+                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                {
+                    CorrelationId = correlationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = processId
+                };
+                //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+            }
 
             return RedirectToPage("/Index");
         }
@@ -144,6 +149,38 @@ namespace Portal.Pages.DbAssessment
             currentReview.AssignedTaskSourceType = PrimaryAssignedTask.AssignedTaskSourceType;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
+        }
+
+        private async Task UpdateAdditionalAssignTasks(int processId)
+        {
+            var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
+
+            foreach (var task in AdditionalAssignedTasks)
+            {
+                task.ProcessId = processId;
+                await _dbContext.DbAssessmentAssignTask.AddAsync(task);
+            }
+        }
+
+        private bool ValidateSourceType()
+        {
+            if (!_dbContext.AssignedTaskSourceType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
+            {
+                ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.AssignedTaskSourceType} does not exist");
+                return false;
+            }
+
+            var sourceTypes = AdditionalAssignedTasks.Select(st => st.AssignedTaskSourceType).ToList();
+            var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskSourceType.Select(st => st.Name));
+            if (erroneousEntries.Any())
+            {
+                var entry = string.Join(',', erroneousEntries);
+                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Source Type - {entry}");
+                return false;
+            }
+
+            return true;
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
