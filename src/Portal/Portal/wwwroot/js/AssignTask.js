@@ -1,8 +1,29 @@
 ﻿$(document).ready(function () {
 
-    setCreateHandler();
+    var processId = Number($("#hdnProcessId").val());
+    getAssignedTasks();
 
-    update();
+    function getAssignedTasks() {
+        $.ajax({
+            type: "GET",
+            url: "_AssignTask",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: { "processId": processId },
+            success: function (result) {
+                $("#assignTasks").html(result);
+
+                setCreateHandler();
+                update();
+            },
+            error: function (error) {
+                $("#assignTasksError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Assign Tasks. Please try again later.</div>");
+            }
+        });
+    }
 
     function update() {
         $(".assignTask").each(function (index, element) {

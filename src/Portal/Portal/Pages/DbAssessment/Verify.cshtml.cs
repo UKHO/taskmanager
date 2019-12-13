@@ -77,15 +77,15 @@ namespace Portal.Pages.DbAssessment
             return new _OperatorsModel
             {
                 WorkManager = "Greg Williams",
-                Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
+                Assessor = new Assessor { UserId = 1, Name = "Peter Bates" },
+                Verifier = new Verifier { UserId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(
                     new List<Verifier>
                     {
-                        new Verifier {VerifierId = 0, Name = "Brian Stenson"},
-                        new Verifier {VerifierId = 1, Name = "Matt Stoodley"},
-                        new Verifier {VerifierId = 2, Name = "Peter Bates"}
-                    }, "VerifierId", "Name")
+                        new Verifier {UserId = 0, Name = "Brian Stenson"},
+                        new Verifier {UserId = 1, Name = "Matt Stoodley"},
+                        new Verifier {UserId = 2, Name = "Peter Bates"}
+                    }, "UserId", "Name")
             };
         }
 

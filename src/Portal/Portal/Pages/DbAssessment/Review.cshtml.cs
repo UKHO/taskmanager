@@ -29,6 +29,11 @@ namespace Portal.Pages.DbAssessment
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
 
+        [BindProperty]
+        public DbAssessmentReviewData PrimaryAssignedTask { get; set; }
+        [BindProperty]
+        public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
+
         public List<_AssignTaskModel> AssignTaskModel { get; set; }
 
         private string _userFullName;
@@ -56,7 +61,6 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
-            AssignTaskModel = await SetAssignTaskDummyData(processId);
             await GetOnHoldData(processId);
         }
 
@@ -96,17 +100,17 @@ namespace Portal.Pages.DbAssessment
 
             var correlationId = _dbContext.PrimaryDocumentStatus.First(d => d.ProcessId == processId).CorrelationId.Value;
 
-            var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
+            //var primaryAssignTaskModel = AssignTaskModel.ElementAt(0);
 
-            var dbAssessmentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(at => at.ProcessId == processId);
+            //var dbAssessmentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(at => at.ProcessId == processId);
 
-            dbAssessmentReviewData.Assessor = primaryAssignTaskModel.Assessor != null ? primaryAssignTaskModel.Assessor.Name : "";
-            dbAssessmentReviewData.Verifier = primaryAssignTaskModel.Verifier != null ? primaryAssignTaskModel.Verifier.Name : "";
-            dbAssessmentReviewData.Notes = primaryAssignTaskModel.Notes;
-            dbAssessmentReviewData.WorkspaceAffected = primaryAssignTaskModel.WorkspaceAffected;
-            dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType.Name;
+            //dbAssessmentReviewData.Assessor = primaryAssignTaskModel.Assessor != null ? primaryAssignTaskModel.Assessor.Name : "";
+            //dbAssessmentReviewData.Verifier = primaryAssignTaskModel.Verifier != null ? primaryAssignTaskModel.Verifier.Name : "";
+            //dbAssessmentReviewData.Notes = primaryAssignTaskModel.Notes;
+            //dbAssessmentReviewData.WorkspaceAffected = primaryAssignTaskModel.WorkspaceAffected;
+            //dbAssessmentReviewData.AssignedTaskSourceType = primaryAssignTaskModel.AssignedTaskSourceType.Name;
 
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
 
             //new DbAssessmentAssignTask() { }
 
@@ -120,7 +124,7 @@ namespace Portal.Pages.DbAssessment
                     WorkflowType = WorkflowType.DbAssessment,
                     ParentProcessId = processId
                 };
-                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
             }
 
             return RedirectToPage("/Index");
@@ -172,35 +176,6 @@ namespace Portal.Pages.DbAssessment
         {
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
-        }
-
-        private async Task<List<_AssignTaskModel>> SetAssignTaskDummyData(int processId)
-        {
-            var assignedTaskSourceType = await _dbContext.AssignedTaskSourceType.ToListAsync();
-            return new List<_AssignTaskModel>{new _AssignTaskModel
-            {
-                AssignTaskId = 1,    // TODO: AssignTaskData.AssignId: Temporary class for testing; Remove once DB is used to get values
-                Ordinal = 1,
-                ProcessId = processId,
-                Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                Assessors = new SelectList(
-                    new List<Assessor>
-                    {
-                        new Assessor {AssessorId = 0, Name = "Brian Stenson"},
-                        new Assessor {AssessorId = 1, Name = "Peter Bates"}
-                    }, "AssessorId", "Name"),
-                Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
-                Verifiers = new SelectList(
-                    new List<Verifier>
-                    {
-                        new Verifier{VerifierId = 0, Name = "Brian Stenson"},
-                        new Verifier{VerifierId = 1, Name = "Matt Stoodley"},
-                        new Verifier{VerifierId = 2, Name = "Peter Bates"}
-                    }, "VerifierId", "Name"),
-                AssignedTaskSourceType = assignedTaskSourceType.FirstOrDefault(a => a.Name == "Simple"),
-                AssignedTaskSourceTypes = new SelectList(
-                    assignedTaskSourceType, "AssignedTaskSourceTypeId", "Name")
-            }};
         }
     }
 }

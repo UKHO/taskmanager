@@ -7,6 +7,7 @@
 <script type="text/javascript" src="~/js/Review.js"></script>
 <script type="text/javascript" src="~/js/TaskInformation.js"></script>
 <script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
+<script type="text/javascript" src="~/js/AssignTask.js"></script>
 <script type="text/javascript" src="~/js/Comments.js"></script>
 
 <div class="row mt-1">
@@ -66,9 +67,7 @@
     <div id="sourceDocuments"></div>
     <div id="sourceDocumentsError"></div>
 
-    <div id="assignTasks">
-        @await Html.PartialAsync("_AssignTask", Model.AssignTaskModel).ConfigureAwait(false)
-    </div>
+    <div id="assignTasks"></div>
     <div id="assignTasksError"></div>
 
     <button id="btnCreateTask" class="btn btn-primary mb-4" type="button"><span style="padding-right: 5px;"></span>Create additional task</button>

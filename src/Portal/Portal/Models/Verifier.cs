@@ -2,7 +2,7 @@
 {
     public class Verifier
     {
-        public int VerifierId { get; set; }
+        public int UserId { get; set; }
         public string Name { get; set; }
     }
 }
