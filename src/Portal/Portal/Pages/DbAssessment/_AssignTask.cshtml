@@ -42,44 +42,47 @@
     </div>
 </div>
 
-@for (var i = 0; i < Model.AdditionalAssignedTasks.Count; i++)
+@if (Model.AdditionalAssignedTasks != null && Model.AdditionalAssignedTasks.Count > 0)
 {
-    <div class="card mb-4 assignTask">
-        <h6>
-            <span>Assign Task @(i + 1)</span>
-            <i class="deleteAssignTask float-right close-x" aria-label="Close" style="@( i == 0 ? "display: none;": "" )">&times;</i>
-        </h6>
-        <div class="col-12">
-            <div class="card-body pb-0 pt-0">
-                <div class="row justify-content-between">
-                    <div class="col-5">
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, Model.Assessors, new { @class = "form-control assignTaskAssessor" })</div>
+    @for (var i = 0; i < Model.AdditionalAssignedTasks.Count; i++)
+    {
+        <div class="card mb-4 assignTask">
+            <h6>
+                <span>Assign Task @(i + 1)</span>
+                <i class="deleteAssignTask float-right close-x" aria-label="Close" style="@(i == 0 ? "display: none;" : "")">&times;</i>
+            </h6>
+            <div class="col-12">
+                <div class="card-body pb-0 pt-0">
+                    <div class="row justify-content-between">
+                        <div class="col-5">
+                            <div class="form-row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, Model.Assessors, new { @class = "form-control assignTaskAssessor" })</div>
+                            </div>
+                            <div class="form-row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier, Model.Verifiers, new { @class = "form-control assignTaskVerifier" })</div>
+                            </div>
                         </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier, Model.Verifiers, new { @class = "form-control assignTaskVerifier" })</div>
+                        <div class="col-6">
+                            <div class="form-row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, Model.AssignedTaskSourceTypes, new { @class = "form-control assignTaskSourceType" })</div>
+                            </div>
+                            <div class="form-row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "form-control assignTaskWorkspaceAffected" })</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, Model.AssignedTaskSourceTypes, new { @class = "form-control assignTaskSourceType" })</div>
+                    <div class="form-row justify-content-start">
+                        <div class="form-group col-12">
+                            <div>@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes)</div>
+                            <div>@Html.TextAreaFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes, htmlAttributes: new { @class = "form-control assignTaskNotes" })</div>
                         </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "form-control assignTaskWorkspaceAffected" })</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row justify-content-start">
-                    <div class="form-group col-12">
-                        <div>@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes)</div>
-                        <div>@Html.TextAreaFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes, htmlAttributes: new { @class = "form-control assignTaskNotes" })</div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 }

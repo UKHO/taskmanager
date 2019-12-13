@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[DbAssessmentAssignTask]
 (
-	[DbAssessmentAssignTaskId] INT NOT NULL PRIMARY KEY,
+	[DbAssessmentAssignTaskId] INT NOT NULL PRIMARY KEY IDENTITY,
 	[ProcessId] INT NOT NULL,
 	[Assessor] NVARCHAR(255) NULL, 
     [Verifier] NVARCHAR(255) NULL, 

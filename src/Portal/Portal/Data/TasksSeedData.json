@@ -139,11 +139,21 @@
       "activityCode": "78798",
       "assessor": "BarzeyS",
       "verifier": "StensonB",
-      "AssignedTaskSourceType": "LTA",
+      "AssignedTaskSourceType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note",
       "TaskComplexity": "Simple"
     },
+    "dbAssessmentAssignTask": [
+      {
+        "processId": 123,
+        "assessor": "Matthew Stoodley",
+        "verifier": "Peter Bates",
+        "AssignedTaskSourceType": "LTA",
+        "WorkspaceAffected": "2054_4",
+        "Notes": "Important note"
+      }
+    ],
     "PrimaryDocumentStatus": {
       "processId": 123,
       "SdocId": 217547,
@@ -533,6 +543,16 @@
       "Notes": "Important note",
       "TaskComplexity": "Simple"
     },
+    "dbAssessmentAssignTask": [
+      {
+        "processId": 127,
+        "assessor": "Matthew Stoodley",
+        "verifier": "Peter Bates",
+        "AssignedTaskSourceType": "LTA",
+        "WorkspaceAffected": "2054_4",
+        "Notes": "Important note"
+      }
+    ],
     "DatabaseDocumentStatus": [
       {
         "processId": 127,

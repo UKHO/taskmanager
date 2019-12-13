@@ -41,6 +41,7 @@ namespace Portal.Pages.DbAssessment
         {
             await PopulateDropDowns();
             await GetPrimaryAssignedTask();
+            await GetAdditionalAssignTasks();
         }
 
         private async Task GetPrimaryAssignedTask()
@@ -55,6 +56,24 @@ namespace Portal.Pages.DbAssessment
             {
                 // Log and throw, as we're unable to get assessment data
                 e.Data.Add("OurMessage", "Unable to retrieve DbAssessmentReviewData");
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private async Task GetAdditionalAssignTasks()
+        {
+            try
+            {
+                AdditionalAssignedTasks = await _dbContext
+                    .DbAssessmentAssignTask
+                    .Where(a => a.ProcessId == ProcessId)
+                    .ToListAsync();
+            }
+            catch (ArgumentNullException e)
+            {
+                // Log and throw, as we're unable to get assessment data
+                e.Data.Add("OurMessage", "Unable to retrieve additional assign tasks");
                 Console.WriteLine(e);
                 throw;
             }
