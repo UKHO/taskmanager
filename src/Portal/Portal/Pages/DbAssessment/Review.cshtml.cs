@@ -98,13 +98,29 @@ namespace Portal.Pages.DbAssessment
         {
             //TODO: Log
             ValidationErrorMessages.Clear();
+            var isValid = true;
 
             // Show error to user where we have an invalid source type
             if (!ValidateSourceType())
             {
+                isValid = false;
+            }
+
+            if (!ValidateWorkspace())
+            {
+                isValid = false;
+            }
+
+            if (!ValidateUsers())
+            {
+                isValid = false;
+            }
+
+            if (!isValid)
+            {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int) HttpStatusCode.BadRequest
                 };
             }
 
@@ -163,6 +179,12 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateSourceType()
         {
+            if (string.IsNullOrEmpty(PrimaryAssignedTask.AssignedTaskSourceType))
+            {
+                ValidationErrorMessages.Add($"Assign Task 1: Source Type is required");
+                return false;
+            }
+
             if (!_dbContext.AssignedTaskSourceType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
             {
                 ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.AssignedTaskSourceType} does not exist");
@@ -170,6 +192,13 @@ namespace Portal.Pages.DbAssessment
             }
 
             var sourceTypes = AdditionalAssignedTasks.Select(st => st.AssignedTaskSourceType).ToList();
+
+            if (sourceTypes.Any(s => string.IsNullOrEmpty(s)))
+            {
+                ValidationErrorMessages.Add($"Additional Assign Task: Source Type is required");
+                return false;
+            }
+
             var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskSourceType.Select(st => st.Name));
             if (erroneousEntries.Any())
             {
@@ -180,6 +209,45 @@ namespace Portal.Pages.DbAssessment
 
             return true;
         }
+
+        private bool ValidateWorkspace()
+        {
+            if (string.IsNullOrEmpty(PrimaryAssignedTask.WorkspaceAffected))
+            {
+                ValidationErrorMessages.Add($"Assign Task 1: Workspace Affected is required");
+                return false;
+            }
+
+            var workspaceAffected = AdditionalAssignedTasks.Select(st => st.WorkspaceAffected).ToList();
+
+            if (workspaceAffected.Any(s => string.IsNullOrEmpty(s)))
+            {
+                ValidationErrorMessages.Add($"Additional Assign Task: Workspace Affected is required");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateUsers()
+        {
+            if (string.IsNullOrEmpty(PrimaryAssignedTask.Assessor))
+            {
+                ValidationErrorMessages.Add($"Assign Task 1: Assessor is required");
+                return false;
+            }
+
+            var assessor = AdditionalAssignedTasks.Select(st => st.Assessor).ToList();
+
+            if (assessor.Any(s => string.IsNullOrEmpty(s)))
+            {
+                ValidationErrorMessages.Add($"Additional Assign Task: Assessor is required");
+                return false;
+            }
+
+            return true;
+        }
+
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
