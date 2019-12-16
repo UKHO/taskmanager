@@ -4,6 +4,7 @@
 
 [AssessmentData](#assessmentdata)  
 [AssignedTaskSourceType](#assignedtasksourcetype)  
+[CachedHpdWorkspace](#CachedHpdWorkspace)  
 [Comment](#comment)  
 [OnHold](#onhold)  
 [TaskNote](#tasknote)  
@@ -48,14 +49,27 @@ The SdocId column has a unique constraint.
 
 The `AssignedTaskSourceType` table is a lookup table that contains the list of Source Types used for Assigned Tasks.
 
-It gets populated via Post Deployment script `AssignedTaskSourceType.sql`.
+It gets populated via Post Deployment script 
+`AssignedTaskSourceType.sql`.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
 |AssignedTaskSourceTypeId   |INT            |No           |The primary key of this table                                                                    |
 |Name             |NVARCHAR(50)            |No           |                                                                                                 |
 
-`AssignedTaskSourceTypeId` column is not an Identity column, this is to allow a better control of that's column values. There is a Unique constraint on `Name`
+`AssignedTaskSourceTypeId` column is not an Identity column, this is to allow a better control of that's column values. There is a Unique constraint on
+
+[Go To Tables](#tables)
+
+### CachedHpdWorkspace
+
+`CachedHpdWorkspace` table caches the Workspaces from CARIS, this done at the `Portal` startup where this table is first emptied then populated from CARIS.
+| Column Name       | Datatype      | Allow nulls | Description                                                                                     |
+|-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|CachedHpdWorkspaceId   |INT            |No           |The primary key of this table                                                                    |
+|Name             |NVARCHAR(100)            |No           |                                                                                                 |
+
+There is a Unique Index for `Name`
 
 [Go To Tables](#tables)
 
