@@ -17,6 +17,7 @@ table.dataTable td.details-control i:before {
     color: #09315B;
     padding-right: 0.35em;
 }
+
 table.dataTable tr.shown td.details-control i:before {
     content: '\f077';
     color: #09315B;
@@ -78,21 +79,21 @@ table.task-list thead tr th {
     border-color: #09315B;
 }
 
-.btn-primary:focus, .btn-primary.focus {
-    box-shadow: unset;
-}
+    .btn-primary:focus, .btn-primary.focus {
+        box-shadow: unset;
+    }
 
-.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
-.show > .btn-primary.dropdown-toggle {
-    color: #09315B;
-    background-color: #ffffff;
-    border-color: #09315B;
-}
+    .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+    .show > .btn-primary.dropdown-toggle {
+        color: #09315B;
+        background-color: #ffffff;
+        border-color: #09315B;
+    }
 
-.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
-.show > .btn-primary.dropdown-toggle:focus {
-    box-shadow: unset;
-}
+        .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+        .show > .btn-primary.dropdown-toggle:focus {
+            box-shadow: unset;
+        }
 
 .btn.btn-danger {
     color: #ffffff;
@@ -410,20 +411,20 @@ body, .sticky-footer-wrapper {
         color: #e20d0d;
     }
 
-        .fa, .modal-dialog h3::before, .modal-dialog.error h3::before, .modal-dialog.success h3::before, .modal-dialog.warning h3::before,
-        .fas,
-        .far,
-        .fal,
-        .fad,
-        .fab {
-            -moz-osx-font-smoothing: grayscale;
-            -webkit-font-smoothing: antialiased;
-            display: inline-block;
-            font-style: normal;
-            font-variant: normal;
-            text-rendering: auto;
-            line-height: 1;
-        }
+    .fa, .modal-dialog h3::before, .modal-dialog.error h3::before, .modal-dialog.success h3::before, .modal-dialog.warning h3::before,
+    .fas,
+    .far,
+    .fal,
+    .fad,
+    .fab {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+    }
 
 .modal-content {
     border-radius: unset;
@@ -441,33 +442,86 @@ body, .sticky-footer-wrapper {
     /* info type is default */
     border-left: 5px solid #0177c1;
 }
-.dialog h5 {
-    color: #0177c1;
-}
-.dialog h5::before, .dialog.warning h5::before, .dialog.success h5::before, .dialog.error h5::before {
-    color: inherit;
-    font-size: 18px;
-    margin: 0 10px 0 0;
-}
-.dialog.error {
-    border-left: 5px solid #e20d0d;
-}
-.dialog.error h5 {
-    color: #e20d0d;
-}
-.dialog.success {
-    border-left: 5px solid #4aab37;
-}
-.dialog.success h5 {
-    color: #4aab37;
-}
-.dialog.warning {
-    border-left: 5px solid #ef8123;
-}
-.dialog.warning h5 {
-    color: #ef8123;
-}
+
+    .dialog h5 {
+        color: #0177c1;
+    }
+
+        .dialog h5::before, .dialog.warning h5::before, .dialog.success h5::before, .dialog.error h5::before {
+            color: inherit;
+            font-size: 18px;
+            margin: 0 10px 0 0;
+        }
+
+    .dialog.error {
+        border-left: 5px solid #e20d0d;
+    }
+
+        .dialog.error h5 {
+            color: #e20d0d;
+        }
+
+    .dialog.success {
+        border-left: 5px solid #4aab37;
+    }
+
+        .dialog.success h5 {
+            color: #4aab37;
+        }
+
+    .dialog.warning {
+        border-left: 5px solid #ef8123;
+    }
+
+        .dialog.warning h5 {
+            color: #ef8123;
+        }
 
 #assessDoneErrorMessage > ul {
     display: inline;
 }
+
+/* TYPEAHEAD START */
+span.twitter-typeahead {
+    width: 100%;
+}
+
+.tt-input.form-text-input {
+    width: 100%;
+    border: 2px solid #03284F;
+    color: #09315B;
+    padding-left: 18px;
+    padding: 0px 20px 0px 14px;
+    outline: none;
+    background-color: #f6f6f6;
+    line-height: 2.3rem;
+    border-radius: unset;
+}
+
+.tt-input.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
+}
+
+.tt-menu {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 12px;
+    padding: 8px 4px 8px 4px;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.tt-suggestion {
+    padding: 3px 0px;
+}
+
+.tt-suggestion:hover {
+    cursor: pointer;
+    background-color: #0097CF;
+    color: #FFFFFF;
+}
+/* TYPEAHEAD END */

@@ -28,7 +28,6 @@ namespace Portal.Pages.DbAssessment
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
-        public _EditDatabaseModel EditDatabaseModel { get; set; }
 
         [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
@@ -52,7 +51,6 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
-            EditDatabaseModel = SetEditDatabaseModel();
             await GetOnHoldData(processId);
         }
 
@@ -74,36 +72,20 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private _EditDatabaseModel SetEditDatabaseModel()
-        {
-            return new _EditDatabaseModel
-            {
-                CarisWorkspace = new CarisWorkspace { Workspace = "Workspace1", WorkspaceId = 1 },
-                CarisWorkspaces = new SelectList(
-                    new List<CarisWorkspace>
-                    {
-                        new CarisWorkspace{Workspace = "Workspace1", WorkspaceId = 1},
-                        new CarisWorkspace{Workspace = "Workspace2", WorkspaceId = 2},
-                        new CarisWorkspace{Workspace = "Workspace3", WorkspaceId = 3}
-                    }, "WorkspaceId", "Workspace"),
-                ProjectName = "Testing Project"
-            };
-        }
-
         private _OperatorsModel SetOperatorsDummyData()
         {
             return new _OperatorsModel
             {
                 WorkManager = "Greg Williams",
-                Assessor = new Assessor { AssessorId = 1, Name = "Peter Bates" },
-                Verifier = new Verifier { VerifierId = 1, Name = "Matt Stoodley" },
+                Assessor = new Assessor { UserId = 1, Name = "Peter Bates" },
+                Verifier = new Verifier { UserId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(
                     new List<Verifier>
                     {
-                        new Verifier {VerifierId = 0, Name = "Brian Stenson"},
-                        new Verifier {VerifierId = 1, Name = "Matt Stoodley"},
-                        new Verifier {VerifierId = 2, Name = "Peter Bates"}
-                    }, "VerifierId", "Name")
+                        new Verifier {UserId = 0, Name = "Brian Stenson"},
+                        new Verifier {UserId = 1, Name = "Matt Stoodley"},
+                        new Verifier {UserId = 2, Name = "Peter Bates"}
+                    }, "UserId", "Name")
             };
         }
 
