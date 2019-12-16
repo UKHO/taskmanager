@@ -94,13 +94,12 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
-            // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
             //TODO: Log
             ValidationErrorMessages.Clear();
 
-            // Show error to user, that they've chosen the same usage more than once
+            // Show error to user where we have an invalid source type
             if (!ValidateSourceType())
             {
                 return new JsonResult(this.ValidationErrorMessages)
@@ -111,9 +110,6 @@ namespace Portal.Pages.DbAssessment
 
             ProcessId = processId;
 
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-            var correlationId = primaryDocumentStatus.CorrelationId.Value;
-
             PrimaryAssignedTask.ProcessId = ProcessId;
 
             await UpdateDbAssessmentReviewData();
@@ -121,17 +117,23 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
+            if (action == "Done")
             {
-                //TODO: Log
-                //TODO: Must validate incoming models
-                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
+                var correlationId = primaryDocumentStatus.CorrelationId.Value;
+
+                for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
                 {
-                    CorrelationId = correlationId,
-                    WorkflowType = WorkflowType.DbAssessment,
-                    ParentProcessId = processId
-                };
-                //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                    //TODO: Log
+                    //TODO: Must validate incoming models
+                    var docRetrievalEvent = new StartWorkflowInstanceEvent
+                    {
+                        CorrelationId = correlationId,
+                        WorkflowType = WorkflowType.DbAssessment,
+                        ParentProcessId = processId
+                    };
+                    //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                }
             }
 
             return StatusCode((int)HttpStatusCode.OK);
