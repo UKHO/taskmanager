@@ -6,6 +6,7 @@
 [AssignedTaskSourceType](#assignedtasksourcetype)  
 [CachedHpdWorkspace](#CachedHpdWorkspace)  
 [Comment](#comment)  
+[DatabaseDocumentStatus](#DatabaseDocumentStatus)  
 [OnHold](#onhold)  
 [TaskNote](#tasknote)  
 [DbAssessmentReviewData](#dbassessmentreviewdata)  
@@ -26,7 +27,7 @@ database assessment workflow for an open assessment.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|AssessmentDataId   |INT            |No           |The primary key of this table                                                                    |
+|AssessmentDataId   |INT            |No           |PRIMARY KEY                                                                    |
 |SdocId             |INT            |No           |                                                                                                 |
 |RsdraNumber        |NVARCHAR(50)   |No           |                                                                                                 |
 |SourceDocumentName |NVARCHAR(255)  |No           |                                                                                                 |
@@ -54,7 +55,7 @@ It gets populated via Post Deployment script
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|AssignedTaskSourceTypeId   |INT            |No           |The primary key of this table                                                                    |
+|AssignedTaskSourceTypeId   |INT            |No           |PRIMARY KEY                                                                    |
 |Name             |NVARCHAR(50)            |No           |                                                                                                 |
 
 `AssignedTaskSourceTypeId` column is not an Identity column, this is to allow a better control of that's column values. There is a Unique constraint on
@@ -66,7 +67,7 @@ It gets populated via Post Deployment script
 `CachedHpdWorkspace` table caches the Workspaces from CARIS, this done at the `Portal` startup where this table is first emptied then populated from CARIS.
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|CachedHpdWorkspaceId   |INT            |No           |The primary key of this table                                                                    |
+|CachedHpdWorkspaceId   |INT            |No           |PRIMARY KEY                                                                    |
 |Name             |NVARCHAR(100)            |No           |                                                                                                 |
 
 There is a Unique Index for `Name`
@@ -79,7 +80,7 @@ The Comment table holds user entered comments for each workflow.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|CommentId          |INT            |No           |The primary key of this table                                                                    |
+|CommentId          |INT            |No           |PRIMARY KEY                                                                    |
 |ProcessId          |INT            |No           |The K2 process instance Id                                                                       |
 |Text               |NVARCHAR(4000) |No           |                                                                                                 |
 |WorkflowInstanceId |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                            |
@@ -90,13 +91,32 @@ There is a foreign key constraint to the WorkflowInstance table, on that table's
 
 [Go To Tables](#tables)
 
+### DatabaseDocumentStatus
+
+This table is responsible for persisting Source Document added from `SDRA Database` using `SDOCID`
+
+| Column Name               | Datatype          | Allow nulls | Description                                                                                     |
+|-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
+|DatabaseDocumentStatusId  |INT |NO  |PRIMARY KEY  
+|ProcessId  |INT  |NO | 
+|SdocId  |INT  |NO  | 
+|SourceDocumentName  |NVARCHAR(255)  |NO  | 
+|SourceDocumentType  |NVARCHAR(4000)  |Yes  |
+|ContentServiceId  |UNIQUEIDENTIFIER  |Yes  | 
+|Status  |NVARCHAR(25)  |NO  |
+|Created  |DATETIME  |NO  | 
+
+`ProcessId` is a foreign key from [WorkflowInstance](#workflowinstance) table
+
+[Go To Tables](#tables)
+
 ### OnHold
 
 The OnHold table records when a task has been put on hold as well as whether it has been taken off hold.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                         |
 |-------------------|---------------|-------------|---------------------------------------------------------------------|
-|OnHoldId           |INT            |No     |The primary key of this table                                              |
+|OnHoldId           |INT            |No     |PRIMARY KEY                                              |
 |WorkflowInstanceId |INT            |No     |The unique Id for the relevant row in the WorkflowInstance table (FK)      |
 |ProcessId          |INT            |No     |The K2 process instance Id                                                 |
 |OnHoldTime         |Date           |No     |The date (not time) when the task was put on hold                          |
@@ -114,7 +134,7 @@ The TaskNote table holds user entered notes for each workflow.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|TaskNoteId             |INT            |No           |The primary key of this table                                                                |
+|TaskNoteId             |INT            |No           |PRIMARY KEY                                                                |
 |ProcessId              |INT            |No           |The K2 process instance Id                                                                   |
 |Text                   |NVARCHAR(MAX)  |No           |                                                                                             |
 |WorkflowInstanceId     |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                        |
@@ -133,7 +153,7 @@ The DbAssessmentReviewData table holds the data that may change on the Review st
 
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------        |---------------|-------------|-------------------------------------------------------------------------------------------------|
-|DbAssessmentReviewDataId   |INT            |No           |The primary key of this table                                                                    |
+|DbAssessmentReviewDataId   |INT            |No           |PRIMARY KEY                                                                    |
 |ProcessId                  |INT            |No           |The K2 process instance Id                                                                       |
 |Ion                        |NVARCHAR(50)   |Yes          |                                                                                                 |
 |ActivityCode               |NVARCHAR(50)   |Yes          |                                                                                                 |
@@ -152,7 +172,7 @@ The DbAssessmentAssessData table holds the data that may change on the Assess st
 
 | Column Name               | Datatype      | Allow nulls | Description                              |
 |---------------------------|---------------|-------------|------------------------------------------|
-|DbAssessmentAssessDataId   |INT            |No           |The primary key of this table             |
+|DbAssessmentAssessDataId   |INT            |No           |PRIMARY KEY             |
 |ProcessId                  |INT            |No           |The K2 process instance Id                |
 |Ion                        |NVARCHAR(50)   |Yes          |                                          |
 |ActivityCode               |NVARCHAR(50)   |Yes          |                                          |
@@ -175,7 +195,7 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------        |---------------|-------------|-------------------------------------------------------------------------------------------------|
-|WorkflowInstanceId         |INT            |No           |The primary key of this table                                                                    |
+|WorkflowInstanceId         |INT            |No           |PRIMARY KEY                                                                    |
 |ProcessId                  |INT            |No           |The K2 process instance Id                                                                       |
 |SerialNumber               |NVARCHAR(255)  |Yes          |                                                                                                 |
 |ParentProcessId            |INT            |Yes          |If a sub workflow, the parent workflow that was used to generate the new instance.               |
@@ -195,7 +215,7 @@ and then update the row with subsequent statuses.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
 |-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
-|PrimaryDocumentStatusId    |INT                |No           |The primary key of this table                                                                    |
+|PrimaryDocumentStatusId    |INT                |No           |PRIMARY KEY                                                                    |
 |ProcessId                  |INT                |No           |The K2 process instance Id                                                                       |
 |SdocId                     |INT                |No           |                                                                                                 |
 |ContentServiceId           |UniqueIdentifier   |Yes          |Once stored in the Content Service, the Content Service unique identifier of the source document.|
@@ -213,7 +233,7 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 
 | Column Name               | Datatype          | Allow nulls | Description                                                                                     |
 |-------------------        |-------------------|-------------|-------------------------------------------------------------------------------------------------|
-|LinkedDocumentId           |INT                |No           |The primary key of this table                                                                    |
+|LinkedDocumentId           |INT                |No           |PRIMARY KEY                                                                    |
 |SdocId                     |INT                |No           |                                                                                                 |
 |RsdraNumber                |NVARCHAR(50)       |No           |                                                                                                 |
 |SourceDocumentName         |NVARCHAR(255)      |No           | |
@@ -237,7 +257,7 @@ The HpdUsage table holds the usages from HPD.
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|HpdUsageId         |INT                |No           |The primary key of this table         |
+|HpdUsageId         |INT                |No           |PRIMARY KEY         |
 |Name               |NVARCHAR(25)       |No           |                                      |
 
 The Name column has a unique constraint.
@@ -251,7 +271,7 @@ The same HpdUsageId should not be used multiple times per ProcessId.
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|DataImpactId       |INT                |No           |The primary key of this table         |
+|DataImpactId       |INT                |No           |PRIMARY KEY         |
 |ProcessId          |INT                |No           |The K2 process instance Id            |
 |HpdUsageId         |INT                |No           |                                      |
 |Edited             |BIT                |No           |                                      |
@@ -269,7 +289,7 @@ The HpdUser table holds mappings for the AD user to the HPD user.
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|HpdUserId          |INT                |No           |The primary key of this table         |
+|HpdUserId          |INT                |No           |PRIMARY KEY         |
 |AdUsername         |NVARCHAR(255)      |No           |                                      |
 |HpdUsername        |NVARCHAR(255)      |No           |                                      |
 
@@ -284,7 +304,7 @@ The ProductAction table holds records of product actions used in the Database As
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|ProductActionId    |INT                |No           |The primary key of this table         |
+|ProductActionId    |INT                |No           |PRIMARY KEY         |
 |ProcessId          |INT                |No           |The K2 process instance Id            |
 |ImpactedProduct    |NVARCHAR(100)      |No           |                                      |
 |ProductActionTypeId|INT                |No           |                                      |
@@ -302,7 +322,7 @@ The ProductActionType table is a lookup table used by ProductAction.
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|ProductActionTypeId|INT                |No           |The primary key of this table         |
+|ProductActionTypeId|INT                |No           |PRIMARY KEY         |
 |Name               |NVARCHAR(255)      |No           |                                      |
 
 The Name column has a unique constraint.
