@@ -2,6 +2,21 @@
 
 ## Tables
 
+[AssessmentData](#assessmentdata)  
+[Comment](#comment)  
+[OnHold](#onhold)  
+[TaskNote](#tasknote)  
+[DbAssessmentReviewData](#dbassessmentreviewdata)  
+[DbAssessmentAssessData](#dbassessmentassessdata)  
+[WorkflowInstance](#workflowinstance)  
+[PrimaryDocumentStatus](#primarydocumentstatus)  
+[LinkedDocument](#linkeddocument)  
+[HpdUsage](#hpdusage)  
+[DataImpact](#dataimpact)  
+[HpdUser](#hpduser)  
+[ProductAction](#productaction)  
+[ProductActionType](#productactiontype)  
+
 ### AssessmentData
 
 The AssessmentData table is responsible for holding the data that comes back from the SDRA view when we need to start a new
@@ -26,6 +41,8 @@ The ProcessId column has a unique constraint.
 There is a foreign key constraint to the WorkflowInstance table, on that table's ProcessId column.
 The SdocId column has a unique constraint.
 
+[Go To Tables](#tables)
+
 ### Comment
 
 The Comment table holds user entered comments for each workflow.
@@ -40,6 +57,8 @@ The Comment table holds user entered comments for each workflow.
 |Created			|DATETIME       |No           |The date and time that the comment was created							                        |
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+[Go To Tables](#tables)
 
 ### OnHold
 
@@ -56,6 +75,8 @@ The OnHold table records when a task has been put on hold as well as whether it 
 |OffHoldUser		|NVARCHAR(255)  |Yes    |The user that took the task off hold                           			|
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+[Go To Tables](#tables)
 
 ### TaskNote
 
@@ -74,6 +95,8 @@ The TaskNote table holds user entered notes for each workflow.
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
+[Go To Tables](#tables)
+
 ### DbAssessmentReviewData
 
 The DbAssessmentReviewData table holds the data that may change on the Review step of a Database Assessment workflow instance.
@@ -90,6 +113,8 @@ The DbAssessmentReviewData table holds the data that may change on the Review st
 |WorkflowInstanceId         |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                            |
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+[Go To Tables](#tables)
 
 ### DbAssessmentAssessData
 
@@ -111,6 +136,8 @@ The DbAssessmentAssessData table holds the data that may change on the Assess st
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
+[Go To Tables](#tables)
+
 ### WorkflowInstance
 
 The WorkflowInstance table will hold the instances of a Database Assessment workflow. The ParentProcessId column will be used when an instance is a
@@ -129,6 +156,8 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 
 The ProcessId column has a unique constraint, to facilitate the foreign key from the AssessmentData table.
 
+[Go To Tables](#tables)
+
 ### PrimaryDocumentStatus
 
 The PrimaryDocumentStatus table holds the status of a source document retrieval operation from SDRA. We will initially set this to Started when we initiate the retrieval,
@@ -145,6 +174,8 @@ and then update the row with subsequent statuses.
 |CorrelationId              |UniqueIdentifier   |Yes          |                                                                                                 |
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
+
+[Go To Tables](#tables)
 
 ### LinkedDocument
 
@@ -168,6 +199,8 @@ The LinkedDocument table holds linked documents from SDRA for open assessments.
 
 The SdocId column has a foreign key constraint to the AssessmentData table.
 
+[Go To Tables](#tables)
+
 ### HpdUsage
 
 The HpdUsage table holds the usages from HPD.
@@ -178,6 +211,8 @@ The HpdUsage table holds the usages from HPD.
 |Name               |NVARCHAR(25)       |No           |                                      |
 
 The Name column has a unique constraint.
+
+[Go To Tables](#tables)
 
 ### DataImpact
 
@@ -196,6 +231,8 @@ The same HpdUsageId should not be used multiple times per ProcessId.
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 The HpdUsageId column has a foreign key constraint to the HpdUsage table.
 
+[Go To Tables](#tables)
+
 ### HpdUser
 
 The HpdUser table holds mappings for the AD user to the HPD user.
@@ -208,6 +245,8 @@ The HpdUser table holds mappings for the AD user to the HPD user.
 
 The AdUsername column has a unique constraint.
 The HpdUsername column has a unique constraint.
+
+[Go To Tables](#tables)
 
 ### ProductAction
 
@@ -224,6 +263,8 @@ The ProductAction table holds records of product actions used in the Database As
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 The ProductActionTypeId column has a foreign key constraint to the ProductActionType table.
 The ProcessId & ProductActionTypeId columns have a unique constraint.
+
+[Go To Tables](#tables)
 
 ### ProductActionType
 
