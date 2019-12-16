@@ -39,8 +39,12 @@
       "processId": 445,
       "ion": "Ion",
       "activityCode": "78798",
-      "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -133,9 +137,23 @@
       "processId": 123,
       "ion": "Ion",
       "activityCode": "78798",
-      "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "AssignedTaskSourceType": "Simple",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
+    "dbAssessmentAssignTask": [
+      {
+        "processId": 123,
+        "assessor": "Matthew Stoodley",
+        "verifier": "Peter Bates",
+        "AssignedTaskSourceType": "LTA",
+        "WorkspaceAffected": "2054_4",
+        "Notes": "Important note"
+      }
+    ],
     "PrimaryDocumentStatus": {
       "processId": 123,
       "SdocId": 217547,
@@ -242,7 +260,11 @@
       "ion": "I899",
       "activityCode": "78798",
       "assessor": "BatesP",
-      "verifier": "RigdenT"
+      "verifier": "RigdenT",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 321,
@@ -320,8 +342,12 @@
       "processId": 125,
       "ion": "I229",
       "activityCode": "743543",
-      "assessor": "BarzeyS",
-      "verifier": "StensonB"
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "AssignedTaskSourceType": "Simple",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -429,8 +455,12 @@
       "processId": 126,
       "ion": "I8766",
       "activityCode": "4881",
-      "assessor": "BatesP",
-      "verifier": "BarzeyS"
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -507,8 +537,22 @@
     "dbAssessmentReviewData": {
       "processId": 127,
       "ion": "I8766",
-      "activityCode": "4881"
+      "activityCode": "4881",
+      "AssignedTaskSourceType": "LTA",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note",
+      "TaskComplexity": "Simple"
     },
+    "dbAssessmentAssignTask": [
+      {
+        "processId": 127,
+        "assessor": "Matthew Stoodley",
+        "verifier": "Peter Bates",
+        "AssignedTaskSourceType": "LTA",
+        "WorkspaceAffected": "2054_4",
+        "Notes": "Important note"
+      }
+    ],
     "DatabaseDocumentStatus": [
       {
         "processId": 127,

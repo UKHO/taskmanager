@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
@@ -27,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal
 {
@@ -150,6 +152,31 @@ namespace Portal
             services.AddSingleton(mapper);
 
             services.AddHealthChecks();
+
+            using (var sp = services.BuildServiceProvider())
+            using (var workflowDbContext = sp.GetRequiredService<WorkflowDbContext>())
+            using (var hpdDbContext = sp.GetRequiredService<HpdDbContext>())
+            {
+                try
+                {
+                    var workspaces = hpdDbContext.CarisWorkspaces
+                        .Select(cw => cw.Name.Trim()) //trim to prevent unique constraint errors
+                        .Distinct()
+                        .Select(cw => new CachedHpdWorkspace { Name = cw })
+                        .OrderBy(cw => cw.Name)
+                        .ToList();
+
+                    workflowDbContext.Database.ExecuteSqlCommand("Truncate Table [CachedHpdWorkspace]");
+
+                    workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
+                    workflowDbContext.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    //TODO: LOG!
+                }
+
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

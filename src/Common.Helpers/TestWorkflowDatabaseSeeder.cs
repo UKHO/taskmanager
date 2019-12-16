@@ -26,6 +26,7 @@ namespace Common.Helpers
             DatabasesHelpers.ClearWorkflowDbTables(_context);
             PopulateHpdUsage();
             PopulateProductActionType();
+            PopulateAssignedTaskSourceType();
             PopulateWorkflowInstance();
 
             return this;
@@ -49,6 +50,16 @@ namespace Common.Helpers
             var productActionType = JsonConvert.DeserializeObject<IEnumerable<ProductActionType>>(jsonString);
 
             _context.ProductActionType.AddRange(productActionType);
+        }
+
+        private void PopulateAssignedTaskSourceType()
+        {
+            if (!File.Exists(@"Data\AssignedTaskSourceType.json")) throw new FileNotFoundException(@"Data\AssignedTaskSourceType.json");
+
+            var jsonString = File.ReadAllText(@"Data\AssignedTaskSourceType.json");
+            var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskSourceType>>(jsonString);
+
+            _context.AssignedTaskSourceType.AddRange(assignedTaskSourceType);
         }
 
         private void PopulateWorkflowInstance()

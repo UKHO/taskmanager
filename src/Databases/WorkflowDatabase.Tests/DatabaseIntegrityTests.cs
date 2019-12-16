@@ -457,6 +457,70 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
+
+
+        [Test]
+        public void Ensure_CachedHpdWorkspace_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace()
+            {
+                Name = "testing workspace"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace()
+                {
+                    Name = "testing workspace"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+
+
+        [Test]
+        public void Ensure_assignedTaskSourceType_table_prevents_duplicate_name_due_to_UQ()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Offshore Greg Energy"
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+                {
+                    AssignedTaskSourceTypeId = 2,
+                    Name = "Offshore Greg Energy"
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        [Test]
+        public void Ensure_DbAssessmentAssignTask_table_prevents_insert_for_no_ProcessId()
+        {
+            _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
+            {
+                Assessor = "Greg",
+                AssignedTaskSourceType = "Type 1",
+                DbAssessmentAssignTaskId = 1,
+                Notes = "A note",
+                Verifier = "Ross",
+                WorkspaceAffected = "Workspace 1"
+            });
+
+            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
 
