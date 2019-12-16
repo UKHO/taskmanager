@@ -2,8 +2,8 @@ stages:
 - stage: Build
   jobs:
     - job: RestoreBuildAndDeploy
-      pool: 
-        UKHO Windows 2019
+      pool:
+        vmImage: 'Ubuntu-16.04'
       workspace:
           clean: all
 
