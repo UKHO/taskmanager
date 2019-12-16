@@ -40,12 +40,67 @@ namespace Portal.UnitTests
         {
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "test invalid type"
+                AssignedTaskSourceType = "test invalid type",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
             };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Assign Task 1: Source Type { _reviewModel.PrimaryAssignedTask.AssignedTaskSourceType} does not exist", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+        [Test]
+        public async Task Test_entering_an_empty_primary_workspaceAffected_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "",
+                Assessor = "Test User"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Assign Task 1: Workspace Affected is required", _reviewModel.ValidationErrorMessages[0]);
+        }
+        
+        [Test]
+        public async Task Test_entering_an_empty_primary_assessor_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "test workspace",
+                Assessor = ""
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Assign Task 1: Assessor is required", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
@@ -60,17 +115,91 @@ namespace Portal.UnitTests
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Test entry"
+                AssignedTaskSourceType = "Test entry",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
-                new DbAssessmentAssignTask {ProcessId = ProcessId, AssignedTaskSourceType = "This is invalid"}
+                new DbAssessmentAssignTask
+                {
+                    ProcessId = ProcessId, 
+                    AssignedTaskSourceType = "This is invalid",
+                    WorkspaceAffected = "Test Workspace",
+                    Assessor = "Test User"
+                }
             };
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].AssignedTaskSourceType}", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+        [Test]
+        public async Task Test_entering_an_empty_additional_workspaceAffected_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
+            {
+                new DbAssessmentAssignTask
+                {
+                    ProcessId = ProcessId,
+                    AssignedTaskSourceType = "Simple",
+                    WorkspaceAffected = "",
+                    Assessor = "Test User"
+                }
+            };
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Additional Assign Task: Workspace Affected is required", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+        [Test]
+        public async Task Test_entering_an_empty_additional_assessor_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
+            {
+                new DbAssessmentAssignTask
+                {
+                    ProcessId = ProcessId,
+                    AssignedTaskSourceType = "Simple",
+                    WorkspaceAffected = "test workspace",
+                    Assessor = ""
+                }
+            };
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Additional Assign Task: Assessor is required", _reviewModel.ValidationErrorMessages[0]);
         }
     }
 }
