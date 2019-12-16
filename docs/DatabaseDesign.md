@@ -162,6 +162,10 @@ This table is responsible for persisting `Additional Assigned Tasks`, the `Prima
 |WorkspaceAffected  |NVARCHAR(100) |Yes  |
 |Notes  |NVARCHAR(4000) |Yes  |
 
+
+`AssignedTaskSourceType`, `WorkspaceAffected`, and `Notes` are used for the `Primary Assigned Task`
+
+
 `ProcessId` is a foreign key from [WorkflowInstance](#workflowinstance) table
 
 [Go To Tables](#tables)
@@ -176,10 +180,13 @@ The DbAssessmentReviewData table holds the data that may change on the Review st
 |ProcessId                  |INT            |No           |The K2 process instance Id                                                                       |
 |Ion                        |NVARCHAR(50)   |Yes          |                                                                                                 |
 |ActivityCode               |NVARCHAR(50)   |Yes          |                                                                                                 |
-|Assessor                   |NVARCHAR(255)  |Yes          |                                                                                                 |
-|Verifier                   |NVARCHAR(255)  |Yes          |                                                                                                 |
 |TaskComplexity             |NVARCHAR(50)   |Yes          |                                                                                                 |
 |WorkflowInstanceId         |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)                            |
+|Assessor                   |NVARCHAR(255)  |Yes          |                                                                                                 |
+|Verifier                   |NVARCHAR(255)  |Yes          |                                                                                                 |
+|AssignedTaskSourceType  |NVARCHAR(50)  |Yes  |
+|WorkspaceAffected  |NVARCHAR(100) |Yes  |
+|Notes  |NVARCHAR(4000) |Yes  |
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
 
