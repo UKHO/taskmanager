@@ -9,6 +9,7 @@
 [DatabaseDocumentStatus](#DatabaseDocumentStatus)  
 [OnHold](#onhold)  
 [TaskNote](#tasknote)  
+[DbAssessmentAssignTask](#DbAssessmentAssignTask)  
 [DbAssessmentReviewData](#dbassessmentreviewdata)  
 [DbAssessmentAssessData](#dbassessmentassessdata)  
 [WorkflowInstance](#workflowinstance)  
@@ -144,6 +145,24 @@ The TaskNote table holds user entered notes for each workflow.
 |LastModifiedByUsername |NVARCHAR(255)  |No           |The user that last modified the Task Note                      								|
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+[Go To Tables](#tables)
+
+### DbAssessmentAssignTask
+
+This table is responsible for persisting `Additional Assigned Tasks`, the `Primary Assigned Tasks` will be stored in [DbAssessmentReviewData](#dbassessmentreviewdata) table.
+
+| Column Name       | Datatype      | Allow nulls | Description                                                                                     |
+|-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|DbAssessmentAssignTaskId |INT  |NO  |PRIMARY KEY
+|ProcessId  |INT  |NO  |
+|Assessor  |NVARCHAR(255)  |Yes | 
+|Verifier  |NVARCHAR(255)  |Yes | 
+|AssignedTaskSourceType  |NVARCHAR(50) |Yes  |
+|WorkspaceAffected  |NVARCHAR(100) |Yes  |
+|Notes  |NVARCHAR(4000) |Yes  |
+
+`ProcessId` is a foreign key from [WorkflowInstance](#workflowinstance) table
 
 [Go To Tables](#tables)
 
