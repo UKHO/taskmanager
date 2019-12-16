@@ -51,13 +51,13 @@
         <div class="col-2">
 
             <input type="hidden" asp-for="ProcessId" />
-            <button id="btnDone" class="btn btn-primary btn-block" type="submit" form="frmReviewPage">Done</button>
+            <button id="btnDone" class="btn btn-primary btn-block" type="button">Done</button>
 
         </div>
     </div>
 </div>
 
-<form id="frmReviewPage" method="post" asp-page-handler="Done">
+<form id="frmReviewPage" method="post">
 
     <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
 
@@ -159,15 +159,6 @@
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
                     <div id="reviewDoneErrorMessage" class="col-11">
-                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
-                        {
-                            <ul>
-                                @foreach (var message in Model.ValidationErrorMessages)
-                                {
-                                    <li>@message</li>
-                                }
-                            </ul>
-                        }
                     </div>
                 </div>
             </div>

@@ -42,7 +42,7 @@ namespace Portal.UnitTests
             {
                 AssignedTaskSourceType = "test invalid type"
             };
-            await _reviewModel.OnPostDoneAsync(ProcessId);
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Assign Task 1: Source Type { _reviewModel.PrimaryAssignedTask.AssignedTaskSourceType} does not exist", _reviewModel.ValidationErrorMessages[0]);
@@ -67,7 +67,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask {ProcessId = ProcessId, AssignedTaskSourceType = "This is invalid"}
             };
 
-            await _reviewModel.OnPostDoneAsync(ProcessId);
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].AssignedTaskSourceType}", _reviewModel.ValidationErrorMessages[0]);
