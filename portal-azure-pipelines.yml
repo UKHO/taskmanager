@@ -3,7 +3,7 @@ stages:
   jobs:
     - job: RestoreBuildAndDeploy
       pool:
-        vmImage: 'Ubuntu-16.04'
+        vmImage: 'windows-2019'
       workspace:
           clean: all
 
@@ -14,7 +14,7 @@ stages:
         inputs:
           packageType: sdk
           version: 3.1.x
-          installationPath: $(Agent.ToolsDirectory)/dotnet
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
           
       - task: DotNetCoreCLI@2
         inputs:
