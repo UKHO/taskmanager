@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Common.Messages.Enums;
 using Common.Messages.Events;
@@ -97,20 +98,15 @@ namespace Portal.Pages.DbAssessment
         {
             // Work out how many additional Assign Task partials we have, and send a StartWorkflowInstanceEvent for each one
             //TODO: Log
-
-            var validationSucceeded = true;
             ValidationErrorMessages.Clear();
 
             // Show error to user, that they've chosen the same usage more than once
             if (!ValidateSourceType())
             {
-                validationSucceeded = false;
-            }
-
-            if (!validationSucceeded)
-            {
-                await OnGet(processId);
-                return Page();
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
             }
 
             ProcessId = processId;
@@ -138,7 +134,7 @@ namespace Portal.Pages.DbAssessment
                 //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
             }
 
-            return RedirectToPage("/Index");
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         private async Task UpdateDbAssessmentReviewData()
