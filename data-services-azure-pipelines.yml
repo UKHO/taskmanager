@@ -6,7 +6,8 @@
 trigger:
 - master
 
-pool: UKHO Windows 2019
+pool:
+  vmImage: 'windows-2019'
 
 steps:
 
