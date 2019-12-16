@@ -3,6 +3,7 @@
 ## Tables
 
 [AssessmentData](#assessmentdata)  
+[AssignedTaskSourceType](#assignedtasksourcetype)  
 [Comment](#comment)  
 [OnHold](#onhold)  
 [TaskNote](#tasknote)  
@@ -40,6 +41,21 @@ database assessment workflow for an open assessment.
 The ProcessId column has a unique constraint.
 There is a foreign key constraint to the WorkflowInstance table, on that table's ProcessId column.
 The SdocId column has a unique constraint.
+
+[Go To Tables](#tables)
+
+### AssignedTaskSourceType
+
+The `AssignedTaskSourceType` table is a lookup table that contains the list of Source Types used for Assigned Tasks.
+
+It gets populated via Post Deployment script `AssignedTaskSourceType.sql`.
+
+| Column Name       | Datatype      | Allow nulls | Description                                                                                     |
+|-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|AssignedTaskSourceTypeId   |INT            |No           |The primary key of this table                                                                    |
+|Name             |NVARCHAR(50)            |No           |                                                                                                 |
+
+`AssignedTaskSourceTypeId` column is not an Identity column, this is to allow a better control of that's column values. There is a Unique constraint on `Name`
 
 [Go To Tables](#tables)
 
@@ -276,3 +292,5 @@ The ProductActionType table is a lookup table used by ProductAction.
 |Name               |NVARCHAR(255)      |No           |                                      |
 
 The Name column has a unique constraint.
+
+[Go To Tables](#tables)
