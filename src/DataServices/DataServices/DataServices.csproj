@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="2.19.30" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc4" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.*" />
