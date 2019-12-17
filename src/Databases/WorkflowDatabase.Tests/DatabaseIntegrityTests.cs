@@ -512,7 +512,6 @@ namespace WorkflowDatabase.Tests
             {
                 Assessor = "Greg",
                 AssignedTaskSourceType = "Type 1",
-                DbAssessmentAssignTaskId = 1,
                 Notes = "A note",
                 Verifier = "Ross",
                 WorkspaceAffected = "Workspace 1"
