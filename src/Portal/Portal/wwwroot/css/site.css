@@ -481,6 +481,10 @@ body, .sticky-footer-wrapper {
     display: inline;
 }
 
+.modal-dialog.error li:not(:last-child) {
+    margin-bottom: 8px;
+}
+
 /* TYPEAHEAD START */
 span.twitter-typeahead {
     width: 100%;
