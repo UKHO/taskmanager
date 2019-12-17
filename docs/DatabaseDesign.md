@@ -66,6 +66,7 @@ It gets populated via Post Deployment script
 ### CachedHpdWorkspace
 
 `CachedHpdWorkspace` table caches the Workspaces from CARIS, this done at the `Portal` startup where this table is first emptied then populated from CARIS.
+
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
 |CachedHpdWorkspaceId   |INT            |No           |PRIMARY KEY                                                                    |
