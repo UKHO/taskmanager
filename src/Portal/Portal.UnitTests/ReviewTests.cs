@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Portal.Auth;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -14,6 +18,8 @@ namespace Portal.UnitTests
         private WorkflowDbContext _dbContext;
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
+        private IUserIdentityService _fakeUserIdentityService;
+
 
         [SetUp]
         public void Setup()
@@ -26,7 +32,22 @@ namespace Portal.UnitTests
 
             ProcessId = 123;
 
-            _reviewModel = new ReviewModel(_dbContext, null, null, null, null, null);
+            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
+            {
+                ProcessId = ProcessId
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            _dbContext.SaveChanges();
+
+            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+
+            _reviewModel = new ReviewModel(_dbContext, null, null, null, null, _fakeUserIdentityService);
         }
 
         [TearDown]
@@ -201,5 +222,69 @@ namespace Portal.UnitTests
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Additional Assign Task: Assessor is required", _reviewModel.ValidationErrorMessages[0]);
         }
+
+        [Test]
+        public async Task Test_when_primary_assign_task_has_note_it_should_be_copied_to_comments()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored)).Returns(Task.FromResult("This Use"));
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var isExist = await _dbContext.Comment.AnyAsync(c =>
+                c.Text.Contains(primaryAssignTaskNote, StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(isExist);
+        }
+
+
+        [Test]
+        public async Task Test_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
+        {
+            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            {
+                AssignedTaskSourceTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                AssignedTaskSourceType = "Simple",
+                WorkspaceAffected = "",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored)).Returns(Task.FromResult("This Use"));
+
+            var currentCommentsCount = await _dbContext.Comment.CountAsync();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var newCommentsCount = await _dbContext.Comment.CountAsync();
+
+            Assert.AreEqual(currentCommentsCount, newCommentsCount);
+        }
     }
+
 }
