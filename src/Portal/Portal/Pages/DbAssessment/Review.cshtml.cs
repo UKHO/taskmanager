@@ -120,7 +120,7 @@ namespace Portal.Pages.DbAssessment
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int) HttpStatusCode.BadRequest
+                    StatusCode = (int)HttpStatusCode.BadRequest
                 };
             }
 
@@ -138,10 +138,14 @@ namespace Portal.Pages.DbAssessment
                 var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
                 var correlationId = primaryDocumentStatus.CorrelationId.Value;
 
+                await CopyPrimaryAssignTaskNoteToComments(processId);
+
                 for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
                 {
                     //TODO: Log
                     //TODO: Must validate incoming models
+                    //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
+                    //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
                     var docRetrievalEvent = new StartWorkflowInstanceEvent
                     {
                         CorrelationId = correlationId,
@@ -153,6 +157,28 @@ namespace Portal.Pages.DbAssessment
             }
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
+        {
+            var primaryAssignTask = await _dbContext.DbAssessmentReviewData
+                .FirstOrDefaultAsync(r => r.ProcessId == processId);
+
+            if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
+            {
+                UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+                await _dbContext.Comment.AddAsync(new Comments()
+                {
+                    ProcessId = processId,
+                    WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,
+                    Text = $"Assign Task: {primaryAssignTask.Notes.Trim()}",
+                    Username = UserFullName,
+                    Created = DateTime.Today
+                });
+
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         private async Task UpdateDbAssessmentReviewData()
