@@ -12,61 +12,27 @@ using System.IO;
 using Common.Helpers;
 using DataServices.Adapters;
 using DataServices.Config;
-using DataServices.Filters;
 using DataServices.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.OpenApi.Models;
 
 namespace DataServices
 {
-    /// <summary>
-    /// Startup
-    /// </summary>
     public class Startup
     {
-        private readonly IHostingEnvironment _hostingEnv;
-
         private IConfiguration Configuration { get; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="env"></param>
-        /// <param name="configuration"></param>
-        public Startup(IHostingEnvironment env, IConfiguration configuration)
+        public Startup(IConfiguration configuration)
         {
-            _hostingEnv = env;
             Configuration = configuration;
         }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
-        /// </summary>
-        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(opts =>
-                {
-                    opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    opts.SerializerSettings.Converters.Add(new StringEnumConverter
-                    {
-                        CamelCaseText = true
-                    });
-                })
-                .AddXmlSerializerFormatters();
-
             services.AddOptions<Settings>().Bind(Configuration.GetSection("urls"));
 
             var startupSecrets = new StartupSecretsConfig();
@@ -78,54 +44,64 @@ namespace DataServices
             services.AddDbContext<SdraDbContext>((serviceProvider, options) =>
                 options.UseOracle(connection));
 
+            services.AddControllers().AddJsonOptions(o =>
+                {
+                    //o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    //o.SerializerSettings.Converters.Add(new StringEnumConverter
+                    //{
+                    //    CamelCaseText = true
+                    //});
+                });
+
             services
                 .AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("1.0.0", new Info
+                    c.SwaggerDoc("1.0.0", new OpenApiInfo
                     {
                         Version = "1.0.0",
                         Title = "SDRA API",
-                        Description = "SDRA API (ASP.NET Core 2.2)",
-                        Contact = new Contact()
-                        {
-                            Name = "Swagger Codegen Contributors",
-                            Url = "https://github.com/swagger-api/swagger-codegen",
-                            Email = ""
-                        },
-                        TermsOfService = ""
+                        Description = "SDRA API (ASP.NET Core 3.1)",
                     });
-                    c.CustomSchemaIds(type => type.FriendlyId(true));
-                    c.DescribeAllEnumsAsStrings();
                     c.IncludeXmlComments(Path.Combine(Directory.GetCurrentDirectory(), "DataServices.xml"));
-                    // Sets the basePath property in the Swagger document generated
-                    c.DocumentFilter<BasePathFilter>("/DataServices/v1/");
 
+                    // TODO fails at runtime
+                    // Sets the basePath property in the Swagger document generated
+                    // c.DocumentFilter<BasePathFilter>("/DataServices/v1/");
+
+                    // TODO fails at runtime
                     // Include DataAnnotation attributes on Controller Action parameters as Swagger validation rules (e.g required, pattern, ..)
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
-                    c.OperationFilter<GeneratePathParamsValidationFilter>();
+                    //c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
 
             services.AddScoped<IAssessmentWebServiceSoapClientAdapter, AssessmentWebServiceSoapClientAdapter>();
             services.AddScoped<IDataAccessWebServiceSoapClientAdapter, DataAccessWebServiceSoapClientAdapter>();
+
+            services.AddHealthChecks();
         }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="env"></param>
-        /// <param name="loggerFactory"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app
-                .UseMvc()
+                .UseHttpsRedirection()
                 .UseDefaultFiles()
                 .UseStaticFiles()
                 .UseSwagger()
-                .UseSwaggerUI(c =>
+                .UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger-original.json", "SDRA API Original"); })
+
+                .UseRouting()
+
+                // .UseCors()
+                // .UseAuthentication()
+                // .UseAuthorization()
+
+                .UseEndpoints(endpoints =>
                 {
-                    c.SwaggerEndpoint("/swagger-original.json", "SDRA API Original");
+                    endpoints.MapHealthChecks("/health");
+                    endpoints.MapControllers();
                 });
+
+
 
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureDevelopment)
             {

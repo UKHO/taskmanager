@@ -9,7 +9,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
@@ -20,7 +19,6 @@ using DataServices.Connected_Services.SDRADataAccessWebService;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace DataServices.Controllers
@@ -74,7 +72,7 @@ namespace DataServices.Controllers
 
             ReturnCode returnCode;
             try
-            {            
+            {
                 var task = await _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode, sdocId.Value, writeableFolderName);
 
                 returnCode = new ReturnCode
@@ -465,7 +463,7 @@ namespace DataServices.Controllers
         public async Task<IActionResult> GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
             if (sdocIds == null || sdocIds.Length == 0)
-                throw  new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
+                throw new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
 
             Document[] result;
 
