@@ -204,6 +204,7 @@ The DbAssessmentAssessData table holds the data that may change on the Assess st
 |ProcessId                  |INT            |No           |The K2 process instance Id                |
 |Ion                        |NVARCHAR(50)   |Yes          |                                          |
 |ActivityCode               |NVARCHAR(50)   |Yes          |                                          |
+|SourceCategory               |NVARCHAR(255)   |Yes          |                                                                                                 |
 |WorkManager                |NVARCHAR(255)  |Yes          |                                          |
 |Assessor                   |NVARCHAR(255)  |Yes          |                                          |
 |Verifier                   |NVARCHAR(255)  |Yes          |                                          |
