@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var processId = Number($("#hdnProcessId").val());z
+    var processId = Number($("#hdnProcessId").val());
 
     getTaskInformation();
 

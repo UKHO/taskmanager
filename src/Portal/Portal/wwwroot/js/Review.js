@@ -3,6 +3,15 @@
     setReviewDoneHandler();
     setReviewSaveHandler();
 
+    var formChanged = false;
+    $("#frmReviewPage").change(function () { formChanged = true; });
+
+    window.onbeforeunload = function() {
+        if (formChanged) {
+            return "Changes detected";
+        }
+    };
+
     if ($("#reviewDoneErrorMessage").html().trim().length > 0) {
         $("#modalWaitReviewDoneErrors").modal("show");
     }
@@ -46,6 +55,7 @@
                 $("#btnSave").prop("disabled", false);
             },
             success: function (result) {
+                formChanged = false;
                 if (action === "Done") {
                     window.location.replace("/Index");
                 }
