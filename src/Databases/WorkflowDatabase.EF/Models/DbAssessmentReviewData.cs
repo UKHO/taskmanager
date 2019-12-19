@@ -1,15 +1,17 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using WorkflowDatabase.EF.Interfaces;
 
 namespace WorkflowDatabase.EF.Models
 {
     [Table("DbAssessmentReviewData")]
-    public class DbAssessmentReviewData
+    public class DbAssessmentReviewData : ITaskData
     {
         public int DbAssessmentReviewDataId { get; set; }
         public int ProcessId { get; set; }
         public string Ion { get; set; }
         public string ActivityCode { get; set; }
+        public string SourceCategory { get; set; }
         public string Assessor { get; set; }
         public string Verifier { get; set; }
         [DisplayName("Source Type:")]

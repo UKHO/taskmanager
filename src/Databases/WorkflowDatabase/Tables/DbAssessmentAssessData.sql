@@ -4,6 +4,7 @@
     [ProcessId] INT NOT NULL, 
     [Ion] NVARCHAR(50) NULL, 
     [ActivityCode] NVARCHAR(50) NULL, 
+    [SourceCategory] NVARCHAR(255) NULL, 
     [WorkManager] NVARCHAR(255) NULL, 
     [Assessor] NVARCHAR(255) NULL, 
     [Verifier] NVARCHAR(255) NULL, 
