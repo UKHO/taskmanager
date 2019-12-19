@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("ProductAction")]
-
     public class ProductAction
     {
         public int ProductActionId { get; set; }
@@ -19,8 +16,7 @@ namespace WorkflowDatabase.EF.Models
 
         [DisplayName("Verified:")]
         public bool Verified { get; set; }
-        
-        public virtual ProductActionType ProductActionType { get; set; }
 
+        public virtual ProductActionType ProductActionType { get; set; }
     }
 }

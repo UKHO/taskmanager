@@ -1,22 +1,21 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Threading.Tasks;
+using AutoMapper;
+using Common.Helpers;
+using Common.Messages.Commands;
+using Common.Messages.Enums;
+using Common.Messages.Events;
+using DataServices.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.Logging;
-using System;
-using System.Linq;
-using AutoMapper;
-using DataServices.Models;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using Task = System.Threading.Tasks.Task;
-using System.Threading.Tasks;
-using Common.Messages.Commands;
-using Common.Messages.Enums;
-using Common.Messages.Events;
 
 namespace WorkflowCoordinator.Sagas
 {
@@ -121,7 +120,7 @@ namespace WorkflowCoordinator.Sagas
 
             // Add assessment data and any comments to DB, after auto mapping it
             var mappedAssessmentData = _mapper.Map<DocumentAssessmentData, AssessmentData>(assessmentData);
-            var mappedComments = _mapper.Map<DocumentAssessmentData, Comments>(assessmentData);
+            var mappedComments = _mapper.Map<DocumentAssessmentData, Comment>(assessmentData);
 
             mappedAssessmentData.ProcessId = message.ProcessId;
             mappedComments.WorkflowInstanceId = message.WorkflowInstanceId;

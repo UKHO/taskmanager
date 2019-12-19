@@ -1,9 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("OnHold")]
     public class OnHold
     {
         public int OnHoldId { get; set; }
@@ -11,7 +9,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public DateTime OnHoldTime { get; set; }
         public DateTime? OffHoldTime { get; set; }
-        public string OnHoldUser{ get; set; }
+        public string OnHoldUser { get; set; }
         public string OffHoldUser { get; set; }
     }
 }

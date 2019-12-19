@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("DbAssessmentAssignTask")]
     public class DbAssessmentAssignTask
     {
         public int DbAssessmentAssignTaskId { get; set; }

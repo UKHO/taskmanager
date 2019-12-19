@@ -22,7 +22,7 @@ namespace WorkflowCoordinator.MappingProfiles
                 .ForMember(destination => destination.RsdraNumber,
                     opts => opts.MapFrom(source => source.SourceName));
 
-            CreateMap<DocumentAssessmentData, Comments>()
+            CreateMap<DocumentAssessmentData, Comment>()
                 .ForMember(destination => destination.Text,
                     opts => opts.MapFrom(source => source.Notes));
         }

@@ -178,7 +178,7 @@ namespace Portal.Pages.DbAssessment
             {
                 UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
-                await _dbContext.Comment.AddAsync(new Comments()
+                await _dbContext.Comment.AddAsync(new Comment()
                 {
                     ProcessId = processId,
                     WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,

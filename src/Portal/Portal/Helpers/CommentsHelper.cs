@@ -16,7 +16,7 @@ namespace Portal.Helpers
 
         public async Task AddComment(string comment, int processId, int workflowInstanceId, string userFullName)
         {
-            await _dbContext.Comment.AddAsync(new Comments
+            await _dbContext.Comment.AddAsync(new Comment
             {
                 ProcessId = processId,
                 WorkflowInstanceId = workflowInstanceId,

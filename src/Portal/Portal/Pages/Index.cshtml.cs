@@ -44,7 +44,7 @@ namespace Portal.Pages
         public async Task OnGetAsync()
         {
             var workflows = await _dbContext.WorkflowInstance
-                .Include(c => c.Comment)
+                .Include(c => c.Comments)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
                 .Include(t => t.TaskNote)

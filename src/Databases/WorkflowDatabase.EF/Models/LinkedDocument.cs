@@ -1,11 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-
-    [Table("LinkedDocument")]
-    public class LinkedDocuments
+    public class LinkedDocument
     {
         public int LinkedDocumentId { get; set; }
         public int ProcessId { get; set; }

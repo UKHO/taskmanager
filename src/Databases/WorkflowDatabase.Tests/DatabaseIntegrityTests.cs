@@ -217,7 +217,7 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_Comments_table_prevents_insert_for_no_WorkflowInstance()
         {
-            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comments()
+            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comment()
             {
                 Created = DateTime.Now,
                 ProcessId = 0,
@@ -233,7 +233,7 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_LinkedDocument_table_prevents_insert_for_no_ProcessId()
         {
-            _dbContext.LinkedDocument.AddAsync(new LinkedDocuments()
+            _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
             {
                 PrimarySdocId = 1234,
                 LinkType = "Forward",
@@ -337,7 +337,7 @@ namespace WorkflowDatabase.Tests
                 ProductActionTypeId = 1,
                 Name = "CPTS/IA"
             });
-            
+
             _dbContext.SaveChanges();
 
             _dbContext.ProductAction.Add(new ProductAction()
@@ -359,7 +359,7 @@ namespace WorkflowDatabase.Tests
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
             Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
         }
-        
+
         [Test]
         public void Ensure_productAction_table_allows_duplicate_productActiontypeId_for_different_processId()
         {
@@ -432,7 +432,7 @@ namespace WorkflowDatabase.Tests
 
             var newProductActionCount = _dbContext.SaveChanges();
 
-            Assert.AreEqual(3,newProductActionCount);
+            Assert.AreEqual(3, newProductActionCount);
         }
 
         [Test]

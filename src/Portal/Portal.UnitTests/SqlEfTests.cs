@@ -29,18 +29,18 @@ namespace Portal.UnitTests
         [Test]
         public void Test_Comment_can_be_added_to_db_using_ef()
         {
-            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comments()
+            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comment()
             {
-               CommentId = 1,
-               Created = DateTime.Now,
+                CommentId = 1,
+                Created = DateTime.Now,
                 ProcessId = 9876,
-               Text = "This is a comment",
-               Username = "Me",
-               WorkflowInstanceId = 555
+                Text = "This is a comment",
+                Username = "Me",
+                WorkflowInstanceId = 555
             });
 
             _dbContext.SaveChanges();
-            
+
             Assert.AreEqual(_dbContext.Comment.FirstAsync(c => c.CommentId == 1).Result.Text, "This is a comment");
         }
 

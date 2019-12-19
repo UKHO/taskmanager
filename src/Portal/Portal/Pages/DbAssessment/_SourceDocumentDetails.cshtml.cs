@@ -1,4 +1,8 @@
-﻿using Common.Factories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using Common.Messages.Events;
@@ -8,13 +12,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.HttpClients;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
-using LinkedDocuments = WorkflowDatabase.EF.Models.LinkedDocuments;
+using LinkedDocument = WorkflowDatabase.EF.Models.LinkedDocument;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -28,8 +28,8 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
-        public IEnumerable<LinkedDocuments> LinkedDocuments { get; set; }
-        public IEnumerable<LinkedDocuments> AttachedLinkedDocuments { get; set; }
+        public IEnumerable<LinkedDocument> LinkedDocuments { get; set; }
+        public IEnumerable<LinkedDocument> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public IEnumerable<DatabaseDocumentStatus> DatabaseDocuments { get; set; }
         public Uri PrimaryDocumentContentServiceUri { get; set; }
@@ -52,7 +52,7 @@ namespace Portal.Pages.DbAssessment
             GetAttachedLinkedDocuments();
             GetDatabaseDocuments();
         }
-        
+
         public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
         {
             DocumentAssessmentData sourceDocumentData = null;
@@ -173,7 +173,7 @@ namespace Portal.Pages.DbAssessment
                 SourceType = SourceType.Linked
             };
 
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent),docRetrievalEvent);
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
 
             return StatusCode(200);
             // TODO: Log!
