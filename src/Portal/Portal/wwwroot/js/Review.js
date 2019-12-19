@@ -3,6 +3,15 @@
     setReviewDoneHandler();
     setReviewSaveHandler();
 
+    var formChanged = false;
+    $("#frmReviewPage").change(function () { formChanged = true; });
+
+    window.onbeforeunload = function() {
+        if (formChanged) {
+            return "Changes detected";
+        }
+    };
+
     if ($("#reviewDoneErrorMessage").html().trim().length > 0) {
         $("#modalWaitReviewDoneErrors").modal("show");
     }
@@ -41,11 +50,16 @@
             },
             data: formData,
             complete: function () {
-                $("#modalWaitReviewDone").modal("hide");
-                $("#btnDone").prop("disabled", false);
-                $("#btnSave").prop("disabled", false);
+                //Add a delay to account for the modalWaitReviewDone modal
+                //not being fully shown, before trying to hide it
+                window.setTimeout(function () {
+                    $("#modalWaitReviewDone").modal("hide");
+                    $("#btnDone").prop("disabled", false);
+                    $("#btnSave").prop("disabled", false);
+                }, 200);
             },
             success: function (result) {
+                formChanged = false;
                 if (action === "Done") {
                     window.location.replace("/Index");
                 }

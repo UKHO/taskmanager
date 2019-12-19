@@ -24,6 +24,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly ITaskDataHelper _taskDataHelper;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -57,7 +58,7 @@ namespace Portal.Pages.DbAssessment
         public string ActivityCode { get; set; }
 
         [DisplayName("Source Category:")]
-        public SourceCategory SourceCategory { get; set; }
+        public string SourceCategory { get; set; }
 
         public SelectList SourceCategories { get; set; }
 
@@ -70,17 +71,19 @@ namespace Portal.Pages.DbAssessment
 
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService)
+            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService,
+            ITaskDataHelper taskDataHelper)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
+            _taskDataHelper = taskDataHelper;
         }
 
         public async Task OnGetAsync()
         {
-            await SetTaskInformationDummyData();
+            await SetTaskInformationData();
         }
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
@@ -108,7 +111,7 @@ namespace Portal.Pages.DbAssessment
                 UserFullName);
 
             // As we're submitting, re-get task info for now
-            await SetTaskInformationDummyData();
+            await SetTaskInformationData();
 
             return Page();
         }
@@ -137,7 +140,7 @@ namespace Portal.Pages.DbAssessment
                     UserFullName);
 
                 // As we're submitting, re-get task info for now
-                await SetTaskInformationDummyData();
+                await SetTaskInformationData();
             }
             catch (InvalidOperationException e)
             {
@@ -149,27 +152,40 @@ namespace Portal.Pages.DbAssessment
             return Page();
         }
 
-        private async Task SetTaskInformationDummyData()
+        private async Task SetTaskInformationData()
         {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+            SetSourceCategories();
 
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
-
-            DmEndDate = DateTime.Now;
-            DmReceiptDate = DateTime.Now;
-            EffectiveReceiptDate = DateTime.Now;
-            ExternalEndDate = DateTime.Now;
-            IsOnHold = IsOnHold;
             OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
-            Ion = "2929";
-            ActivityCode = "1272";
-            SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" };
+
+            var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
+
+            var taskData = await _taskDataHelper.GetTaskData(activityName, ProcessId);
+
+            ActivityCode = taskData?.ActivityCode;
+            Ion = taskData?.Ion;
+            SourceCategory = taskData?.SourceCategory;
+
+            var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
+            if (assessmentData != null)
+            {
+                EffectiveReceiptDate = assessmentData.ReceiptDate;
+                //assessmentData.EffectiveStartDate
+            }
+        }
+
+        private void SetSourceCategories()
+        {
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json"))
+                throw new FileNotFoundException(@"Data\SourceCategories.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString)
+                .Select(sc => sc.Name);
             SourceCategories = new SelectList(
-                sourceCategories, "SourceCategoryId", "Name");
+                sourceCategories);
         }
     }
 }

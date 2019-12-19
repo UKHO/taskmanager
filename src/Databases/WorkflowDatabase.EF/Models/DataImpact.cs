@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WorkflowDatabase.EF.Models
+﻿namespace WorkflowDatabase.EF.Models
 {
     public class DataImpact
     {
