@@ -57,7 +57,7 @@ namespace Portal.Pages.DbAssessment
         public string ActivityCode { get; set; }
 
         [DisplayName("Source Category:")]
-        public SourceCategory SourceCategory { get; set; }
+        public string SourceCategory { get; set; }
 
         public SelectList SourceCategories { get; set; }
 
@@ -154,7 +154,8 @@ namespace Portal.Pages.DbAssessment
             if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
 
             var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString);
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString)
+                .Select(sc => sc.Name);
 
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
@@ -167,9 +168,9 @@ namespace Portal.Pages.DbAssessment
             OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
             Ion = "2929";
             ActivityCode = "1272";
-            SourceCategory = new SourceCategory { SourceCategoryId = 1, Name = "zzzzz" };
+            SourceCategory = "zzzzz";
             SourceCategories = new SelectList(
-                sourceCategories, "SourceCategoryId", "Name");
+                sourceCategories);
         }
     }
 }

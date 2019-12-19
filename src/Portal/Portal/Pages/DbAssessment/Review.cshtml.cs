@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -27,6 +28,15 @@ namespace Portal.Pages.DbAssessment
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
+
+        [BindProperty]
+        public string Ion { get; set; }
+
+        [BindProperty]
+        public string ActivityCode { get; set; }
+
+        [BindProperty]
+        public string SourceCategory { get; set; }
 
         [BindProperty]
         public DbAssessmentReviewData PrimaryAssignedTask { get; set; }
@@ -189,6 +199,9 @@ namespace Portal.Pages.DbAssessment
             currentReview.AssignedTaskSourceType = PrimaryAssignedTask.AssignedTaskSourceType;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
+            currentReview.Ion = Ion;
+            currentReview.ActivityCode = ActivityCode;
+            currentReview.SourceCategory = SourceCategory;
         }
 
         private async Task UpdateAdditionalAssignTasks(int processId)
