@@ -50,9 +50,13 @@
             },
             data: formData,
             complete: function () {
-                $("#modalWaitReviewDone").modal("hide");
-                $("#btnDone").prop("disabled", false);
-                $("#btnSave").prop("disabled", false);
+                //Add a delay to account for the modalWaitReviewDone modal
+                //not being fully shown, before trying to hide it
+                window.setTimeout(function () {
+                    $("#modalWaitReviewDone").modal("hide");
+                    $("#btnDone").prop("disabled", false);
+                    $("#btnSave").prop("disabled", false);
+                }, 200);
             },
             success: function (result) {
                 formChanged = false;
