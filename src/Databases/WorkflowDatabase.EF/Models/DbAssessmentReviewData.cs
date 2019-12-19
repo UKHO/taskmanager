@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using WorkflowDatabase.EF.Interfaces;
 
 namespace WorkflowDatabase.EF.Models
 {
     [Table("DbAssessmentReviewData")]
-    public class DbAssessmentReviewData
+    public class DbAssessmentReviewData : ITaskData
     {
         public int DbAssessmentReviewDataId { get; set; }
         public int ProcessId { get; set; }

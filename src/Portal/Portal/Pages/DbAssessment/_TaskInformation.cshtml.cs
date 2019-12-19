@@ -24,6 +24,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly ITaskDataHelper _taskDataHelper;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -70,12 +71,14 @@ namespace Portal.Pages.DbAssessment
 
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService)
+            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService,
+            ITaskDataHelper taskDataHelper)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
+            _taskDataHelper = taskDataHelper;
         }
 
         public async Task OnGetAsync()
@@ -151,43 +154,19 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SetTaskInformationData()
         {
-            if (!System.IO.File.Exists(@"Data\SourceCategories.json")) throw new FileNotFoundException(@"Data\SourceCategories.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
-            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString)
-                .Select(sc => sc.Name);
-            SourceCategories = new SelectList(
-                sourceCategories);
+            SetSourceCategories();
 
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
             OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
 
-
             var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
 
-            switch (activityName)
-            {
-                case "Review":
-                    var reviewData = await _dbContext.DbAssessmentReviewData
-                        .FirstOrDefaultAsync(r => r.ProcessId == ProcessId);
-                    Ion = reviewData?.Ion;
-                    ActivityCode = reviewData?.ActivityCode;
-                    SourceCategory = reviewData?.SourceCategory;
-                    break;
-                case "Assess":
-                    var assessData = await _dbContext.DbAssessmentAssessData
-                        .FirstOrDefaultAsync(r => r.ProcessId == ProcessId);
-                    Ion = assessData?.Ion;
-                    ActivityCode = assessData?.ActivityCode;
-                    SourceCategory = assessData?.SourceCategory;
-                    break;
-                case "Verify":
-                    //TODO: Add
-                    break;
-                default:
-                    throw new NotImplementedException($"ActivityName not found: {activityName}");
-            }
+            var taskData = await _taskDataHelper.GetTaskData(activityName, ProcessId);
+
+            ActivityCode = taskData.ActivityCode;
+            Ion = taskData.Ion;
+            SourceCategory = taskData.SourceCategory;
 
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
@@ -195,6 +174,18 @@ namespace Portal.Pages.DbAssessment
                 EffectiveReceiptDate = assessmentData.ReceiptDate;
                 //assessmentData.EffectiveStartDate
             }
+        }
+
+        private void SetSourceCategories()
+        {
+            if (!System.IO.File.Exists(@"Data\SourceCategories.json"))
+                throw new FileNotFoundException(@"Data\SourceCategories.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\SourceCategories.json");
+            var sourceCategories = JsonConvert.DeserializeObject<IEnumerable<SourceCategory>>(jsonString)
+                .Select(sc => sc.Name);
+            SourceCategories = new SelectList(
+                sourceCategories);
         }
     }
 }

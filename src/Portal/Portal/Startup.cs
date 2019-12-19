@@ -136,6 +136,7 @@ namespace Portal
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
+            services.AddScoped<ITaskDataHelper, TaskDataHelper>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
