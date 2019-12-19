@@ -1,9 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("TaskNote")]
     public class TaskNote
     {
         public int TaskNoteId { get; set; }

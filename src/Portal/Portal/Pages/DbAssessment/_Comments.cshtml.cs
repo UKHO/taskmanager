@@ -20,7 +20,7 @@ namespace Portal.Pages.DbAssessment
         [BindProperty(SupportsGet = true)]
         public int ProcessId { get; set; }
 
-        public List<Comments> Comments { get; set; }
+        public List<Comment> Comments { get; set; }
 
         private string _userFullName;
         public string UserFullName

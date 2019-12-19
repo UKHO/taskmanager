@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
-    [Table("Comment")]
-    public class Comments
+    public class Comment
     {
         public int CommentId { get; set; }
         public int ProcessId { get; set; }

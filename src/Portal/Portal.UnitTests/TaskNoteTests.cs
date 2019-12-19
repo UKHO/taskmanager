@@ -42,7 +42,7 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 ActivityName = "Review",
                 AssessmentData = new AssessmentData(),
-                Comment = new List<Comments>(),
+                Comments = new List<Comment>(),
                 OnHold = new List<OnHold>(),
                 DbAssessmentReviewData = new DbAssessmentReviewData(),
                 SerialNumber = "123_sn",

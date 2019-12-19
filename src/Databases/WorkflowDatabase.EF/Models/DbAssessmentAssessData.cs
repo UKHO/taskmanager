@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace WorkflowDatabase.EF.Models
+﻿namespace WorkflowDatabase.EF.Models
 {
-    [Table("DbAssessmentAssessData")]
     public class DbAssessmentAssessData
     {
         public int DbAssessmentAssessDataId { get; set; }
