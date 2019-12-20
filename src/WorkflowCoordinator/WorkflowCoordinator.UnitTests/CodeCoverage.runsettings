@@ -3,9 +3,8 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <Format>json,cobertura</Format>
-          <Exclude>[DataServices.*]*</Exclude>
-          <ExcludeByFile></ExcludeByFile>
+            <Format>json,cobertura</Format>
+             <Exclude>[DataServices.*]*</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>
