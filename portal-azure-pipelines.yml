@@ -2,8 +2,8 @@ stages:
 - stage: Build
   jobs:
     - job: RestoreBuildAndDeploy
-      pool:
-        vmImage: 'windows-2019'
+      pool: "UKHO Windows 2019"
+      
       workspace:
           clean: all
 
@@ -123,8 +123,7 @@ stages:
   jobs:    
     - deployment: DeployPortalWebsite
       displayName: deploy Web App
-      pool:
-        vmImage: 'Ubuntu-16.04'
+      pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
       environment: 'tm2dev'
       strategy:
