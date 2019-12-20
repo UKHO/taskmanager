@@ -40,7 +40,7 @@ steps:
   inputs:
     command: 'test'
     projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-    arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true --settings:'$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings'
+    arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings --RunConfiguration.DisableAppDomain=true
   displayName: 'dotnet test workflowcoordinatortests'
 
 - task: DotNetCoreCLI@2
