@@ -4,7 +4,7 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
             <Format>json,cobertura</Format>
-             <Exclude>[DataServices.*]*,[Common.*]*</Exclude>
+             <Exclude>[DataServices.*]*,[Common.*]*,[WorkflowDatabase.EF.*]*</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>
