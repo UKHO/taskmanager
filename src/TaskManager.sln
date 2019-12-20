@@ -63,9 +63,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.IntegrationTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventService", "EventServices\EventService\EventService.csproj", "{894C5FB2-067D-45A3-BA33-F243C6AE15D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Factories", "Common.Factories\Common.Factories.csproj", "{7DEFFBD9-059A-4282-BEEF-90C6BEF20997}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Factories", "Common.Factories\Common.Factories.csproj", "{7DEFFBD9-059A-4282-BEEF-90C6BEF20997}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Factories.Interfaces", "Common.Factories.Interfaces\Common.Factories.Interfaces.csproj", "{2238A74F-C299-4237-9B99-B6FC6E7CF372}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Factories.Interfaces", "Common.Factories.Interfaces\Common.Factories.Interfaces.csproj", "{2238A74F-C299-4237-9B99-B6FC6E7CF372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCNEPortal", "NCNEPortal\NCNEPortal.csproj", "{44CB9B22-96DC-4187-A044-425D6E42BE57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NCNEPortal", "NCNEPortal", "{45E57C57-3AEE-425D-896F-7314EF08CAF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -175,6 +179,10 @@ Global
 		{2238A74F-C299-4237-9B99-B6FC6E7CF372}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2238A74F-C299-4237-9B99-B6FC6E7CF372}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2238A74F-C299-4237-9B99-B6FC6E7CF372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44CB9B22-96DC-4187-A044-425D6E42BE57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44CB9B22-96DC-4187-A044-425D6E42BE57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44CB9B22-96DC-4187-A044-425D6E42BE57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44CB9B22-96DC-4187-A044-425D6E42BE57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -205,6 +213,7 @@ Global
 		{894C5FB2-067D-45A3-BA33-F243C6AE15D8} = {2A105A65-DBE4-4FD2-8D9C-468F70B854B6}
 		{7DEFFBD9-059A-4282-BEEF-90C6BEF20997} = {DB5D8B0D-04B0-4929-A5B8-BE892037D846}
 		{2238A74F-C299-4237-9B99-B6FC6E7CF372} = {DB5D8B0D-04B0-4929-A5B8-BE892037D846}
+		{44CB9B22-96DC-4187-A044-425D6E42BE57} = {45E57C57-3AEE-425D-896F-7314EF08CAF4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}
