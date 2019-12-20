@@ -2,8 +2,8 @@ stages:
 - stage: Build
   jobs:
     - job: RestoreBuildAndDeploy
-      pool:
-        vmImage: 'windows-2019'
+      pool: "UKHO Windows 2019"
+      
       workspace:
           clean: all
 
