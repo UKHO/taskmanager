@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'UKHO Windows 2019'
+  'UKHO Windows 2019'
 
 steps:
 
