@@ -4,7 +4,186 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<script type="text/javascript" src="js/Index.js"></script>
+
+<div class="row pt-1">
+    <div class="col-4">
+        <a asp-page="./Index">
+            <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row mb-2">
+            <div class="col-10">
+                <button id="btnMyTaskList" class="btn btn-primary">My Task List</button>
+                <button id="btnTeamTasks" class="btn btn-primary">Team Tasks</button>
+                <button id="btnStats" class="btn btn-primary">Statistics</button>
+                <button id="btnHistorical" class="btn btn-primary">Historical Tasks</button>
+            </div>
+            <div class="col-2">
+                <button id="btnNewTask" class="btn btn-primary">New Task</button>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6 pr-0">
+                <input id="txtGlobalSearch" type="search" class="form-text-input" />
+            </div>
+            <div class="col-6">
+                <button id="btnRefresh" type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Refresh the list of tasks in both tabs, preserving selected sort options and search criteria."><span class="fas fa-sync-alt"></span></button>
+                <!-- <button class="btn btn-primary dropdown" type="button" id="btnSelectStage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Stage</button>
+                <button class="btn btn-primary dropdown" type="button" id="btnSelectTeam" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Team</button> -->
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<div class="card mb-4 mt-3">
+    <h6>In Flight Tasks</h6>
+    <div class="card-body" style="width: 100%">
+        <table id="inFlightTasks" class="table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th></th> 
+                    <th>Process ID</th>
+                    <th style="min-width: 3.6rem;">Type</th>
+                    <th style="min-width: 5.8rem;">Chart Number</th>
+                    <th style="min-width: 3.9rem;">Status</th>
+                    <th>User</th>
+                    <th>Forms</th>
+                    <th>Commit to Print</th>
+                    <th>CIS</th>
+                    <th>Publication</th>
+                    <th>Country</th>
+                    <th>Workflow Type</th>
+                    <th>Team</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var j = 1; j <= 10; j++)
+                {
+                    <tr>
+                        <td class="details-control"><i class="fa"></i></td> 
+                        <td>
+                            <a asp-page="Workflow/Edit" asp-route-ProcessId="125">125</a>
+                        </td>
+                        <td>
+                            NE
+                        </td>
+                        <td>
+                            45
+                        </td>
+                        <td>
+                            Comp
+                        </td>
+                        <td>
+                            stoodleym
+                        </td>
+                        <td>
+                            24/12/2019
+                        </td>
+                        <td>
+                            08/01/2020
+                        </td>
+                        <td>
+                            23/01/2020
+                        </td>
+                        <td>
+                            29/01/2020
+                        </td>
+                        <td>
+                            UK
+                        </td>
+                        <td>
+                            Primary
+                        </td>
+                        <td>
+                            CPT1
+                        </td>
+                        <td>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item taskNoteItem" data-processid="125" data-tasknote="">
+                                        <i class="far fa-edit">
+                                        </i>
+                                        Edit Task Note
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @j 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            var inFlightTasksTable = $('#inFlightTasks').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [10, 15, 20, 25],
+                'sDom': 'ltipr',
+                'autoWidth': true,
+                'columnDefs': [
+                    {
+                        'targets': [0],
+                        'orderable': false,
+                        'searchable': false
+                    },
+                    {
+                        'targets': [13],
+                        'orderable': false,
+                        'searchable': false
+                    },
+                    {
+                        'targets': [14],
+                        'visible': false,
+                        'searchable': false
+                    }
+                ],
+                "order": [[1, 'dsc']],
+                "scrollX": true,
+                "createdRow": function (row, data, dataIndex) {
+                    if (data[14] === "") {
+                        $("td.details-control", row).removeClass("details-control");
+                        $("td.details-control i", row).removeClass("fa");
+                    }
+                }
+            });
+
+            function format(data) {
+                return '<span class="note-formatting">' + data[14] + '</span>';
+            }
+
+            $('#inFlightTasks tbody').on('click',
+                'td.details-control i',
+                function () {
+
+                    var tr = $(this).closest('tr');
+                    var row = inFlightTasksTable.row(tr);
+
+                    if (row.child.isShown()) {
+                        row.child.hide();
+                        tr.removeClass('shown');
+                    } else {
+                        row.child(format(row.data()), 'no-padding').show();
+                        tr.addClass('shown');
+                    }
+                });
+
+            $('#txtGlobalSearch').keyup(function () {
+                inFlightTasksTable.search($(this).val()).draw();
+            });
+        });
+    </script>
+}
