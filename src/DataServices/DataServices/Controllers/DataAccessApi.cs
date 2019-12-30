@@ -19,6 +19,7 @@ using DataServices.Connected_Services.SDRADataAccessWebService;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Serilog.Context;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace DataServices.Controllers
@@ -67,13 +68,25 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> DeleteDocumentRequestJobFromQueue([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromQuery][Required]string writeableFolderName)
         {
+            LogContext.PushProperty("ApiResource", nameof(DeleteDocumentRequestJobFromQueue));
+            LogContext.PushProperty("CallerCode", callerCode);
+            LogContext.PushProperty("SdocId", sdocId);
+            LogContext.PushProperty("WriteableFolderName", writeableFolderName);
+
+            _logger.LogInformation("{ApiResource} entered with: CallerCode: {CallerCode}; SdocId: {SdocId}; WriteableFolderName: {WriteableFolderName};");
+
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
 
             ReturnCode returnCode;
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 var task = await _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestJobFromQueueAsync(callerCode, sdocId.Value, writeableFolderName);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
 
                 returnCode = new ReturnCode
                 {
@@ -83,12 +96,12 @@ namespace DataServices.Controllers
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error clearing document from queue");
+                _logger.LogError(e, "{ApiResource} Error clearing document from queue");
                 return StatusCode(500, e.Message);
             }
             return new ObjectResult(returnCode);
@@ -118,6 +131,11 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetBackwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetBackwardDocumentLinks));
+            LogContext.PushProperty("SdocId", sdocId);
+
+            _logger.LogInformation("{ApiResource} entered with: SdocId: {SdocId};");
+
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Backward linked document due to invalid parameter", nameof(sdocId));
 
@@ -125,16 +143,21 @@ namespace DataServices.Controllers
 
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetBackwardDocumentLinksAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetBackwardDocumentLinksAsync(sdocId.Value);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error retrieving Backward linked document metadata");
+                _logger.LogError(e, "{ApiResource} Error retrieving Backward linked document metadata");
                 return StatusCode(500, e.Message);
             }
 
@@ -177,29 +200,38 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetDocumentAssessmentData([FromRoute][Required]int? sdocId)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetDocumentAssessmentData));
+            LogContext.PushProperty("SdocId", sdocId);
+
+            _logger.LogInformation("{ApiResource} entered with: SdocId: {SdocId};");
+
             DocumentAssessmentData data;
 
             try
             {
+                _logger.LogInformation("{ApiResource} retrieving AssessmentData");
+
                 var retrievedData = _dbContext.AssessmentData.Where(x => x.SdocId == sdocId.Value).ToList();
                 data = retrievedData.Single();
+
+                _logger.LogInformation("{ApiResource} finished retrieving AssessmentData successfully");
             }
             catch (DbException e)
             {
                 _logger.LogError(e,
-                    $"Error retrieving document assessment data for sdocId: {sdocId} from the database.");
+                    "{ApiResource} Error retrieving document assessment data for SdocId: {SdocId} from the database.");
                 return StatusCode(500, e.Message);
             }
             catch (ArgumentNullException e)
             {
                 _logger.LogError(e,
-                    $"No document assessment data retrieved for sdocId: {sdocId}.");
+                    "{ApiResource} No document assessment data retrieved for SdocId: {SdocId}.");
                 return StatusCode(500, e.Message);
             }
             catch (InvalidOperationException e)
             {
                 _logger.LogError(e,
-                    $"No document assessment data retrieved for sdocId: {sdocId}.");
+                    "{ApiResource} No document assessment data retrieved for SdocId: {SdocId}.");
                 return StatusCode(500, e.Message);
             }
 
@@ -233,11 +265,23 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetDocumentForViewing([FromRoute][Required]string callerCode, [FromRoute][Required]int? sdocId, [FromRoute][Required]bool? imageAsGeoTIFF, [FromQuery][Required]string writeableFolderName)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetDocumentForViewing));
+            LogContext.PushProperty("CallerCode", callerCode);
+            LogContext.PushProperty("SdocId", sdocId);
+            LogContext.PushProperty("ImageAsGeoTIFF", imageAsGeoTIFF);
+            LogContext.PushProperty("WriteableFolderName", writeableFolderName);
+
+            _logger.LogInformation("{ApiResource} entered with: CallerCode: {CallerCode}; SdocId: {SdocId}; ImageAsGeoTIFF: {ImageAsGeoTIFF}; WriteableFolderName: {WriteableFolderName};");
 
             ReturnCode returnCode;
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 var task = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentForViewingAsync(callerCode, sdocId.Value, writeableFolderName, imageAsGeoTIFF.Value);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
 
                 returnCode = new ReturnCode
                 {
@@ -247,12 +291,12 @@ namespace DataServices.Controllers
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error initiating document retrieval");
+                _logger.LogError(e, "{ApiResource} Error initiating document retrieval");
                 return StatusCode(500, e.Message);
             }
             return new ObjectResult(returnCode);
@@ -282,20 +326,29 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetDocumentRequestQueueStatus([FromRoute][Required]string callerCode)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetDocumentRequestQueueStatus));
+            LogContext.PushProperty("CallerCode", callerCode);
+
+            _logger.LogInformation("{ApiResource} entered with: CallerCode: {CallerCode};");
 
             ProcessingStatus[] docStatus;
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 docStatus = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentRequestQueueStatusAsync(callerCode);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error retrieving document status");
+                _logger.LogError(e, "{ApiResource} Error retrieving document status");
                 return StatusCode(500, e.Message);
             }
 
@@ -346,6 +399,11 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetForwardDocumentLinks([FromRoute][Required]int? sdocId)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetForwardDocumentLinks));
+            LogContext.PushProperty("SdocId", sdocId);
+
+            _logger.LogInformation("{ApiResource} entered with: SdocId: {SdocId};");
+
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving Forward linked document due to invalid parameter", nameof(sdocId));
 
@@ -353,16 +411,21 @@ namespace DataServices.Controllers
 
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetForwardDocumentLinksAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetForwardDocumentLinksAsync(sdocId.Value);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error retrieving Forward linked document metadata");
+                _logger.LogError(e, "{ApiResource} Error retrieving Forward linked document metadata");
                 return StatusCode(500, e.Message);
             }
 
@@ -404,6 +467,11 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetSepDocumentLinks([FromRoute][Required]int? sdocId)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetSepDocumentLinks));
+            LogContext.PushProperty("SdocId", sdocId);
+
+            _logger.LogInformation("{ApiResource} entered with: SdocId: {SdocId};");
+            
             if (!sdocId.HasValue || sdocId <= 0)
                 throw new ArgumentException("Error retrieving SEP linked document due to invalid parameter", nameof(sdocId));
 
@@ -411,7 +479,12 @@ namespace DataServices.Controllers
 
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetSEPDocumentLinksAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetSEPDocumentLinksAsync(sdocId.Value);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
@@ -462,6 +535,11 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> GetDocumentsFromList([FromQuery(Name = "sdocIds")][Required]int[] sdocIds)
         {
+            LogContext.PushProperty("ApiResource", nameof(GetDocumentsFromList));
+            LogContext.PushProperty("SdocIds", sdocIds);
+
+            _logger.LogInformation("{ApiResource} entered with: SdocIds: {SdocIds};");
+
             if (sdocIds == null || sdocIds.Length == 0)
                 throw new ArgumentException("Error retrieving linked document metadata due to invalid parameter", nameof(sdocIds));
 
@@ -469,16 +547,21 @@ namespace DataServices.Controllers
 
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 result = await _dataAccessWebServiceSoapClientAdapter.SoapClient.GetDocumentsFromListAsync(sdocIds);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error retrieving linked document metadata");
+                _logger.LogError(e, "{ApiResource} Error retrieving linked document metadata");
                 return StatusCode(500, e.Message);
             }
 
@@ -520,19 +603,29 @@ namespace DataServices.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public async Task<IActionResult> ClearDocumentRequestQueue([FromRoute][Required]string callerCode)
         {
+            LogContext.PushProperty("ApiResource", nameof(ClearDocumentRequestQueue));
+            LogContext.PushProperty("CallerCode", callerCode);
+
+            _logger.LogInformation("{ApiResource} entered with: CallerCode: {CallerCode};");
+
             CallOutcome outcome;
             try
             {
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync));
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource}");
+
                 outcome = await _dataAccessWebServiceSoapClientAdapter.SoapClient.ClearDocumentRequestQueueAsync(callerCode);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
             {
-                _logger.LogError(e, "Endpoint not found");
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
                 return StatusCode(500, e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error clearing document queue");
+                _logger.LogError(e, "{ApiResource} Error clearing document queue");
                 return StatusCode(500, e.Message);
             }
             return new ObjectResult(outcome);
