@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using EventService.Attributes;
 using EventService.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NServiceBus;
+using Serilog.Context;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace EventService.Controllers
@@ -18,10 +20,12 @@ namespace EventService.Controllers
     public class EventController : ControllerBase
     {
         private readonly IMessageSession _messageSession;
+        private readonly ILogger<EventController> _logger;
 
-        public EventController(IMessageSession messageSession)
+        public EventController(IMessageSession messageSession, ILogger<EventController> logger)
         {
             _messageSession = messageSession;
+            _logger = logger;
         }
 
         /// <summary>
@@ -143,6 +147,11 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
         {
+            LogContext.PushProperty("ApiResource", nameof(PostEvent));
+            LogContext.PushProperty("EventName", eventName);
+            LogContext.PushProperty("EventBody", body);
+
+            _logger.LogInformation("{ApiResource} entered with: EventName: {EventName}; EventBody: {EventBody}");
             // Use reflection to discover events, retrieve the correct event by name and 
             // deserialize it via the provided JSON body.
             Assembly assembly = null;
@@ -157,7 +166,7 @@ namespace EventService.Controllers
             }
             catch (Exception e)
             {
-                //TODO: LOG
+                _logger.LogError(e, "{ApiResource} Failed to load assembly Common.Messages");
                 return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
             }
 
@@ -168,7 +177,7 @@ namespace EventService.Controllers
             }
             catch (Exception e)
             {
-                //TODO: LOG
+                _logger.LogError(e, "{ApiResource} Failed to get event type {EventName}");
                 return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
             }
 
@@ -178,7 +187,7 @@ namespace EventService.Controllers
             }
             catch (Exception e)
             {
-                //TODO: LOG
+                _logger.LogError(e, "{ApiResource} Failed to deserialize event {EventName}");
                 return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
             }
 
@@ -189,7 +198,7 @@ namespace EventService.Controllers
             }
             catch (Exception e)
             {
-                //TODO: LOG
+                _logger.LogError(e, "{ApiResource} Failed to publish event {EventName}");
                 return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
             }
 
