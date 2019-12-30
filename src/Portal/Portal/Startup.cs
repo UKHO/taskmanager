@@ -28,6 +28,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
+using Serilog;
+using Serilog.Events;
 using Portal.Calculators;
 using WorkflowDatabase.EF.Models;
 
@@ -45,6 +47,32 @@ namespace Portal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
+            var startupLoggingConfig = new StartupLoggingConfig();
+            Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
+                isLocalDevelopment,
+                isLocalDevelopment ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
+                isLocalDevelopment ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
+            );
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(loggingConnectionString,
+                    "LoggingPortal",
+                    null, //default
+                    LogEventLevel.Verbose, //default
+                    50, //default
+                    null, //default
+                    null, //default
+                    true)
+                .CreateLogger();
+
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
@@ -69,8 +97,6 @@ namespace Portal
                 .Bind(Configuration.GetSection("PortalSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
-
-            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
@@ -186,6 +212,8 @@ namespace Portal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
