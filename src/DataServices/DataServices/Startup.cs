@@ -36,7 +36,7 @@ namespace DataServices
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var isLocalDb = true;
+            var isLocalDb = ConfigHelpers.IsLocalDevelopment;
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
