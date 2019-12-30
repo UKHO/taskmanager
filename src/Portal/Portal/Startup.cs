@@ -19,18 +19,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
-using WorkflowDatabase.EF;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Graph;
-using Portal.Auth;
 using Serilog;
 using Serilog.Events;
+<<<<<<< HEAD
 using Portal.Calculators;
+=======
+using WorkflowDatabase.EF;
+>>>>>>> Replace TODO comments with logging calls
 using WorkflowDatabase.EF.Models;
 
 namespace Portal
@@ -203,7 +205,7 @@ namespace Portal
                 }
                 catch (Exception e)
                 {
-                    //TODO: LOG!
+                    Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
                 }
 
             }

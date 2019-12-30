@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
+using Serilog;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -25,6 +29,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly ILogger<ReviewModel> _logger;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
@@ -57,7 +62,8 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
-            IUserIdentityService userIdentityService)
+            IUserIdentityService userIdentityService,
+            ILogger<ReviewModel> logger)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -65,6 +71,7 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
+            _logger = logger;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -77,21 +84,28 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
         {
-            //TODO: Log!
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("Comment", comment);
+
+            _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             if (string.IsNullOrWhiteSpace(comment))
             {
-                //TODO: Log error!
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
                 throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
             }
 
             if (processId < 1)
             {
-                //TODO: Log error!
+                _logger.LogError("ProcessId is less than 1: {ProcessId}");
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment}; UserFullName: {UserFullName};");
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
             await _commentsHelper.AddComment($"Terminate comment: {comment}",
@@ -101,12 +115,18 @@ namespace Portal.Pages.DbAssessment
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
+            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment}; UserFullName: {UserFullName};");
+
             return RedirectToPage("/Index");
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
-            //TODO: Log
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("Action", action);
+
+            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
+
             ValidationErrorMessages.Clear();
             var isValid = true;
 
@@ -152,7 +172,6 @@ namespace Portal.Pages.DbAssessment
 
                 for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
                 {
-                    //TODO: Log
                     //TODO: Must validate incoming models
                     //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
                     //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
@@ -162,9 +181,13 @@ namespace Portal.Pages.DbAssessment
                         WorkflowType = WorkflowType.DbAssessment,
                         ParentProcessId = processId
                     };
+                    _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
                     //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                    _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
                 }
             }
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -296,7 +319,10 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                //TODO: Log error!
+                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
+                    nameof(_dataServiceApiClient.PutAssessmentCompleted),
+                    workflowInstance.AssessmentData.PrimarySdocId,
+                    comment);
             }
         }
 
@@ -308,7 +334,9 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                //TODO: Log error!
+                _logger.LogError(e, "Failed updating {WorkflowServiceResource} with: SerialNumber: {SerialNumber};",
+                    nameof(_workflowServiceApiClient.TerminateWorkflowInstance),
+                    workflowInstance.SerialNumber);
             }
         }
 
@@ -320,7 +348,7 @@ namespace Portal.Pages.DbAssessment
 
             if (workflowInstance == null)
             {
-                //TODO: Log error!
+                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
                 throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
             }
 

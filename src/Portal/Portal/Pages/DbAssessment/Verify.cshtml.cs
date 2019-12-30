@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -20,6 +21,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly ICommentsHelper _commentsHelper;
+        private readonly ILogger<VerifyModel> _logger;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -37,7 +39,8 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             IOptions<UriConfig> uriConfig,
-            ICommentsHelper commentsHelper)
+            ICommentsHelper commentsHelper,
+            ILogger<VerifyModel> logger)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -45,6 +48,7 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _uriConfig = uriConfig;
             _commentsHelper = commentsHelper;
+            _logger = logger;
         }
 
         public async Task OnGet(int processId)
@@ -68,7 +72,10 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                //TODO: Log error!
+                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
+                    nameof(_dataServiceApiClient.PutAssessmentCompleted),
+                    workflowInstance.AssessmentData.PrimarySdocId,
+                    comment);
             }
         }
 
