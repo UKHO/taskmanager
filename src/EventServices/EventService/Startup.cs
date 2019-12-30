@@ -13,6 +13,8 @@ using NServiceBus;
 using NServiceBus.Extensions.DependencyInjection;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
+using Serilog;
+using Serilog.Events;
 
 namespace EventService
 {
@@ -28,6 +30,32 @@ namespace EventService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var isLocalDb = ConfigHelpers.IsLocalDevelopment;
+            var startupLoggingConfig = new StartupLoggingConfig();
+            Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
+                isLocalDb,
+                isLocalDb ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
+                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
+            );
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(loggingConnectionString,
+                    "LoggingEventServices",
+                    null, //default
+                    LogEventLevel.Verbose, //default
+                    50, //default
+                    null, //default
+                    null, //default
+                    true)
+                .CreateLogger();
+
             services.AddControllers();
             services.AddMvc();
             services.AddHealthChecks();
@@ -138,6 +166,8 @@ namespace EventService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
