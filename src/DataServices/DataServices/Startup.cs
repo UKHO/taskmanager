@@ -18,7 +18,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 
 namespace DataServices
 {
@@ -33,6 +36,32 @@ namespace DataServices
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var isLocalDb = true;
+            var startupLoggingConfig = new StartupLoggingConfig();
+            Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
+                isLocalDb,
+                isLocalDb ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
+                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
+            );
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(loggingConnectionString,
+                    "LoggingDataServices",
+                    null, //default
+                    LogEventLevel.Verbose, //default
+                    50, //default
+                    null, //default
+                    null, //default
+                    true)
+                .CreateLogger();
+
             services.AddOptions<Settings>().Bind(Configuration.GetSection("urls"));
 
             var startupSecrets = new StartupSecretsConfig();
@@ -83,6 +112,7 @@ namespace DataServices
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app
+                .UseSerilogRequestLogging()
                 .UseHttpsRedirection()
                 .UseDefaultFiles()
                 .UseStaticFiles()
