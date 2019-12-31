@@ -110,11 +110,9 @@ namespace SourceDocumentCoordinator
 
                 if (isLocalDebugging)
                 {
-                    using (var sp = services.BuildServiceProvider())
-                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
-                    {
-                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                    }
+                    using var sp = services.BuildServiceProvider();
+                    using var context = sp.GetRequiredService<WorkflowDbContext>();
+                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
 
                 UpdateableServiceProvider container = null;

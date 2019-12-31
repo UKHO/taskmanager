@@ -46,6 +46,7 @@ namespace SourceDocumentCoordinator
             _uriConfig = uriConfig;
 
             _isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+            _isLocalDebugging = false;
             _localDbServer = _generalConfig.Value.LocalDbServer;
 
             if (_isLocalDebugging)
