@@ -59,8 +59,10 @@ namespace Portal
                 isLocalDevelopment ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
             );
 
+            Enum.TryParse(startupLoggingConfig.Level, out LogEventLevel logLevel);
+
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Is(logLevel)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)

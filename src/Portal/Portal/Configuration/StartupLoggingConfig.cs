@@ -8,5 +8,6 @@ namespace Portal.Configuration
         public string WorkflowDbServer { get; set; }
         public string LocalDbServer { get; set; }
         public string LocalDbName { get; set; }
+        public string Level { get; set; }
     }
 }
