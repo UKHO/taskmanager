@@ -63,10 +63,11 @@ namespace Portal
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingPortal",
+                    "LoggingPortal",                    
                     null, //default
                     LogEventLevel.Verbose, //default
                     50, //default
@@ -214,7 +215,23 @@ namespace Portal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(
+                options => 
+                options.GetLevel = (ctx, d, ex) =>
+                {
+                    if (ex == null && ctx.Response.StatusCode <= 499)
+                    {
+                        if (ctx.Request.RouteValues.Any()) //Request is a page
+                        {
+                            return LogEventLevel.Information;
+                        }
+
+                        return LogEventLevel.Verbose;
+                    }
+
+                    return LogEventLevel.Error;
+                }
+            );
 
             if (env.IsDevelopment())
             {
