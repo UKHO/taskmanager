@@ -19,13 +19,11 @@ namespace NCNEPortal.Pages
 {
     public class IndexModel : PageModel
     {
-       
 
-        public IndexModel( )
+
+        public IndexModel()
         {
         }
 
-        
-        
     }
 }

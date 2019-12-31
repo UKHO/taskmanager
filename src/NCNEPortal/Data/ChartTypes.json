@@ -1,0 +1,22 @@
+[
+  {
+    "ChartTypeId": 1,
+    "Name": "NE"
+  },
+  {
+    "ChartTypeId": 2,
+    "Name": "NC"
+  },
+  {
+    "ChartTypeId": 3,
+    "Name": "CME"
+  },
+  {
+    "ChartTypeId": 4,
+    "Name": "UNE"
+  },
+  {
+    "ChartTypeId": 5,
+    "Name": "Refresh"
+  }
+]

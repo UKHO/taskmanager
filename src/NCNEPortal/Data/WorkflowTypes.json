@@ -1,0 +1,18 @@
+[
+  {
+    "WorkflowTypeId": 1,
+    "Name": "Primary"
+  },
+  {
+    "WorkflowTypeId": 2,
+    "Name": "Adoption"
+  },
+  {
+    "WorkflowTypeId": 3,
+    "Name": "Derived"
+  },
+  {
+    "WorkflowTypeId": 4,
+    "Name": "Thematics"
+  }
+]

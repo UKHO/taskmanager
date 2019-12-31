@@ -1,4 +1,5 @@
 ﻿@page
+@using Microsoft.AspNetCore.Components.Web
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -45,7 +46,7 @@
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
                 <tr>
-                    <th></th> 
+                    <th></th>
                     <th>Process ID</th>
                     <th style="min-width: 3.6rem;">Type</th>
                     <th style="min-width: 5.8rem;">Chart Number</th>
@@ -63,10 +64,10 @@
                 </tr>
             </thead>
             <tbody>
-                @for (var j = 1; j <= 10; j++)
+                @for (var j = 1; j <= 20; j++)
                 {
                     <tr>
-                        <td class="details-control"><i class="fa"></i></td> 
+                        <td class="details-control"><i class="fa"></i></td>
                         <td>
                             <a asp-page="Workflow/Edit" asp-route-ProcessId="125">125</a>
                         </td>
@@ -116,7 +117,7 @@
                             </div>
                         </td>
                         <td>
-                            @j 
+                            @j
                         </td>
                     </tr>
                 }

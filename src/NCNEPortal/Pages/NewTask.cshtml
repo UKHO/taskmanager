@@ -1,0 +1,68 @@
+﻿@page
+@model NCNEPortal.NewTaskModel
+@{
+    ViewData["Title"] = "New Chart/New Edition New Task";
+}
+
+
+
+<div class="row pt-1">
+    <div class="col-4">
+        <a asp-page="./Index">
+            <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
+        </a>
+    </div>
+    <div class="col-4">
+        <h1>New Chart/New Edition</h1>
+    </div>
+    <div class="col-4">
+        <h2>New Task</h2>
+    </div>
+    <div class="col-4">
+        <button id="btnClose" class="btn btn-primary">Close</button>
+        <button id="btnDone" class="btn btn-primary">Done</button>
+    </div>
+
+    <!--<div id="taskInformation"></div> -->
+    <div class="table">
+        <div class="card mb-4 mt-3">
+            <h6>Task Information</h6>
+            <div class="col-12">
+                <div class="card-body pb-0">
+
+                    <div class="row justify-content-between">
+                        <div class="col-4">
+                            <div class="form-group row justify-content-between">
+                                <div class="col-7">@Html.LabelFor(model => model.Ion)</div>
+                                <div class="col-4">@Html.DisplayFor(model => model.Ion)</div>
+                            </div>
+                            <div class="form-group row justify-content-between">
+                                <div class="col-7">@Html.LabelFor(model => model.ChartNo)</div>
+                                <div class="col-4">@Html.DisplayFor(model => model.ChartNo)</div>
+                            </div>
+                            <div class="form-group row justify-content-between">
+                                <div class="col-8">@Html.LabelFor(model => model.Country)</div>
+                                <div class="col-4">@Html.DisplayFor(model => model.Country)</div>
+                            </div>
+
+                            <div class="form-group row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { @class = "form-control" })</div>
+                            </div>
+
+                            <div class="form-group row justify-content-between">
+                                <div class="col-5">@Html.LabelFor(model => model.WorkflowType, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new { @class = "form-control" })</div>
+                            </div>
+
+
+                        </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    
+</div>
