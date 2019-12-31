@@ -24,7 +24,6 @@ namespace WorkflowCoordinator
         private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IOptions<UriConfig> _uriConfig;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointConfiguration _endpointConfig;
         private readonly string _localDbServer;
 
@@ -38,12 +37,11 @@ namespace WorkflowCoordinator
 
         public NServiceBusJobHost(IOptionsSnapshot<GeneralConfig> generalConfig,
             IOptionsSnapshot<SecretsConfig> secretsConfig,
-            IHostingEnvironment hostingEnvironment,
-            EndpointConfiguration endpointConfig, IOptions<UriConfig> uriConfig)
+            EndpointConfiguration endpointConfig,
+            IOptions<UriConfig> uriConfig)
         {
             _generalConfig = generalConfig;
             _secretsConfig = secretsConfig;
-            _hostingEnvironment = hostingEnvironment;
             _endpointConfig = endpointConfig;
             _uriConfig = uriConfig;
 

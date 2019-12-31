@@ -1,6 +1,10 @@
-﻿using Common.Helpers;
-
-using Microsoft.Azure.KeyVault;
+﻿using System;
+using System.Data.SqlClient;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
+using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
@@ -10,17 +14,8 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-
-using System;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AutoMapper;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.MappingProfiles;
@@ -32,6 +27,8 @@ namespace WorkflowCoordinator
     {
         private static async Task Main(string[] args)
         {
+            var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+
             var builder = new HostBuilder()
             .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
             .ConfigureWebJobs((context, b) =>
@@ -40,18 +37,11 @@ namespace WorkflowCoordinator
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
                 var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                var tokenProvider = new AzureServiceTokenProvider();
-                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
-
-                config.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
-                {
-                    ConnectionString = azureAppConfConnectionString
-                });
-
-                config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
+                config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager())
+                      .AddAzureAppConfiguration(azureAppConfConnectionString)
+                      .Build(); ;
             })
             .ConfigureLogging((hostingContext, b) =>
             {
@@ -92,11 +82,9 @@ namespace WorkflowCoordinator
 
                 if (isLocalDebugging)
                 {
-                    using (var sp = services.BuildServiceProvider())
-                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
-                    {
-                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                    }
+                    using var sp = services.BuildServiceProvider();
+                    using var context = sp.GetRequiredService<WorkflowDbContext>();
+                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
