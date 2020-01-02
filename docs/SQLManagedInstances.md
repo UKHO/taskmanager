@@ -72,3 +72,14 @@ ALTER ROLE db_ddladmin ADD MEMBER [nsb-app-service-name];
 GO`
 
 3). Deploy the NSB endpoints and ensure the relevant tables are created in the SQL database.
+
+### Logging Database
+
+1). Log in as the account that has DBCreator access.
+
+2). Run the following script:
+
+`CREATE DATABASE [taskmanager-dev-logging]
+GO`
+
+3). Serilog will create the necessary tables via code in each component.
