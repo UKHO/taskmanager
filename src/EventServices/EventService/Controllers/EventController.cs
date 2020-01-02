@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Common.Messages;
 using EventService.Attributes;
 using EventService.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -151,7 +152,7 @@ namespace EventService.Controllers
             LogContext.PushProperty("EventName", eventName);
             LogContext.PushProperty("EventBody", body);
 
-            _logger.LogInformation("{ApiResource} entered with: EventName: {EventName}; EventBody: {EventBody}");
+            _logger.LogInformation("{ApiResource} entered with event {EventName}");
             // Use reflection to discover events, retrieve the correct event by name and 
             // deserialize it via the provided JSON body.
             Assembly assembly = null;
@@ -193,8 +194,26 @@ namespace EventService.Controllers
 
             try
             {
+                LogContext.PushProperty("CorrelationId", ((ICorrelate)populatedEvent).CorrelationId);
+            }
+            catch (InvalidCastException e)
+            {
+                _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
+                return StatusCode(500, $"Failed to cast event using ICorrelate from {eventName}: {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
+                return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}: {e.ToString()}");
+            }
+
+            try
+            {
                 var publishOptions = new PublishOptions();
+
+                _logger.LogInformation("{ApiResource} publishing event {EventName}");
                 await _messageSession.Publish(populatedEvent, publishOptions).ConfigureAwait(false);
+                _logger.LogInformation("{ApiResource} finished publishing event {EventName}");
             }
             catch (Exception e)
             {

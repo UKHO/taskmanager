@@ -30,7 +30,9 @@ namespace EventService
                     new SqlColumn
                         {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "EventBody", DataType = SqlDbType.NVarChar, DataLength = 4000}
+                        {ColumnName = "EventBody", DataType = SqlDbType.NVarChar, DataLength = 4000},
+                    new SqlColumn
+                        {ColumnName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier}
                 }
             };
 
