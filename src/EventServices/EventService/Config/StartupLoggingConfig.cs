@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EventService.Config
+﻿namespace EventService.Config
 {
     public class StartupLoggingConfig
     {
