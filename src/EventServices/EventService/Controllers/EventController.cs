@@ -194,7 +194,14 @@ namespace EventService.Controllers
 
             try
             {
-                LogContext.PushProperty("CorrelationId", ((ICorrelate)populatedEvent).CorrelationId);
+                var correlationId = ((ICorrelate) populatedEvent).CorrelationId;
+
+                if (correlationId.Equals(Guid.Empty))
+                {
+                    throw new InvalidCastException();
+                }
+
+                LogContext.PushProperty("CorrelationId", correlationId);
             }
             catch (InvalidCastException e)
             {
