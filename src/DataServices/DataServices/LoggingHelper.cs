@@ -28,11 +28,11 @@ namespace DataServices
                     new SqlColumn
                         {ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "ApiResource", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "EventBody", DataType = SqlDbType.NVarChar, DataLength = 4000},
+                        {ColumnName = "SdocId", DataType = SqlDbType.Int},
                     new SqlColumn
-                        {ColumnName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier}
+                        {ColumnName = "CallerCode", DataType = SqlDbType.NVarChar, DataLength = 100}
                 }
             };
 
