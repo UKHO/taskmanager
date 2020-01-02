@@ -14,7 +14,6 @@ using NServiceBus.Extensions.DependencyInjection;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
 using Serilog;
-using Serilog.Events;
 
 namespace EventService
 {
@@ -34,29 +33,7 @@ namespace EventService
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
-            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
-                isLocalDb,
-                isLocalDb ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
-                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
-            );
-
-            Enum.TryParse(startupLoggingConfig.Level, out LogEventLevel logLevel);
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingEventServices",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true)
-                .CreateLogger();
+            LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig);
 
             services.AddControllers();
             services.AddMvc();
