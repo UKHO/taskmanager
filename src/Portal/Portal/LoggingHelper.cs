@@ -1,0 +1,58 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Data;
+using Common.Helpers;
+using Portal.Configuration;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+
+namespace Portal
+{
+    public class LoggingHelper
+    {
+        public static void SetupLogging(bool isLocalDb, StartupLoggingConfig startupLoggingConfig)
+        {
+            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
+                isLocalDb,
+                isLocalDb ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
+                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
+            );
+
+            Enum.TryParse(startupLoggingConfig.Level, out LogEventLevel logLevel);
+
+            var columnOptions = new ColumnOptions
+            {
+                AdditionalColumns = new Collection<SqlColumn>
+                {
+                    new SqlColumn
+                        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                    new SqlColumn
+                        {ColumnName = "ProcessId", DataType = SqlDbType.Int},
+                    new SqlColumn
+                        {ColumnName = "ActivityName", DataType = SqlDbType.NVarChar, DataLength = 100},
+                    new SqlColumn
+                        {ColumnName = "PortalResource", DataType = SqlDbType.NVarChar, DataLength = 255}
+                }
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Is(logLevel)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(loggingConnectionString,
+                    "LoggingPortal",
+                    null, //default
+                    LogEventLevel.Verbose, //default
+                    50, //default
+                    null, //default
+                    null, //default
+                    true,
+                    columnOptions)
+                .CreateLogger();
+        }
+    }
+}

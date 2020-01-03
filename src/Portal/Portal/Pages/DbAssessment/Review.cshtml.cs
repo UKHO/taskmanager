@@ -84,7 +84,9 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
         {
+            LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostReviewTerminateAsync));
             LogContext.PushProperty("Comment", comment);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
@@ -105,7 +107,7 @@ namespace Portal.Pages.DbAssessment
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
-            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment}; UserFullName: {UserFullName};");
+            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
             await _commentsHelper.AddComment($"Terminate comment: {comment}",
@@ -115,14 +117,16 @@ namespace Portal.Pages.DbAssessment
             await UpdateK2WorkflowAsTerminated(workflowInstance);
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
-            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment}; UserFullName: {UserFullName};");
+            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             return RedirectToPage("/Index");
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
+            LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");

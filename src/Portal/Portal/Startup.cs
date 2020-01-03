@@ -53,31 +53,8 @@ namespace Portal
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
-            var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
-                isLocalDevelopment,
-                isLocalDevelopment ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
-                isLocalDevelopment ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
-            );
-
-            Enum.TryParse(startupLoggingConfig.Level, out LogEventLevel logLevel);
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingPortal",                    
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true)
-                .CreateLogger();
-
+            LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig);
+            
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
