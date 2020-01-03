@@ -1,0 +1,14 @@
+[
+  {
+    "AssignedTaskSourceTypeId": 1,
+    "Name": "Simple"
+  },
+  {
+    "AssignedTaskSourceTypeId": 2,
+    "Name": "LTA (Product only)"
+  },
+  {
+    "AssignedTaskSourceTypeId": 3,
+    "Name": "LTA"
+  }
+]

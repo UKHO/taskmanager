@@ -1,0 +1,70 @@
+[
+  {
+    "SourceCategoryId": 1,
+    "Name": "Correspondence"
+  },
+  {
+    "SourceCategoryId": 2,
+    "Name": "FG Chart"
+  },
+  {
+    "SourceCategoryId": 3,
+    "Name": "H-notes"
+  },
+  {
+    "SourceCategoryId": 4,
+    "Name": "Local NMs (Ex Vietnam)"
+  },
+  {
+    "SourceCategoryId": 5,
+    "Name": "Photoplots"
+  },
+  {
+    "SourceCategoryId": 6,
+    "Name": "Survey-Correspondence"
+  },
+  {
+    "SourceCategoryId": 7,
+    "Name": "Engineering Drawings"
+  },
+  {
+    "SourceCategoryId": 8,
+    "Name": "Engineering Drawings"
+  },
+  {
+    "SourceCategoryId": 9,
+    "Name": "Survey-HI_CHP"
+  },
+  {
+    "SourceCategoryId": 10,
+    "Name": "Survey-HI_CME"
+  },
+  {
+    "SourceCategoryId": 11,
+    "Name": "Survey-Overseas Territory"
+  },
+  {
+    "SourceCategoryId": 12,
+    "Name": "Survey-Overseas Territory"
+  },
+  {
+    "SourceCategoryId": 13,
+    "Name": "Surveys-Port Authority (analogue)"
+  },
+  {
+    "SourceCategoryId": 14,
+    "Name": "Surveys-Port Authority (digital)"
+  },
+  {
+    "SourceCategoryId": 15,
+    "Name": "Vietnam North"
+  },
+  {
+    "SourceCategoryId": 16,
+    "Name": "Vietnam South"
+  },
+  {
+    "SourceCategoryId": 17,
+    "Name": "Other"
+  }
+]

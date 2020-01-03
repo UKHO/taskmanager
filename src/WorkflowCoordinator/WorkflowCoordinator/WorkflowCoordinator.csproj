@@ -5,13 +5,43 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
  <ItemGroup>
+   <None Remove="Data\AssignedTaskSourceType.json" />
+   <None Remove="Data\HpdUsages.json" />
+   <None Remove="Data\ProductActionType.json" />
+   <None Remove="Data\SourceCategories.json" />
    <None Remove="Data\TasksSeedData.json" />
+   <None Remove="Data\Users.json" />
  </ItemGroup>
  <ItemGroup>
+   <Content Include="Data\AssignedTaskSourceType.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
+   <Content Include="Data\HpdUsages.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
+   <Content Include="Data\ProductActionType.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
+   <Content Include="Data\SourceCategories.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
    <Content Include="Data\TasksSeedData.json">
      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+   </Content>
+   <Content Include="Data\Users.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
    </Content>
  </ItemGroup>
   
