@@ -21,6 +21,7 @@ namespace Portal.Pages
 
         private readonly IMapper _mapper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly IDmEndDateCalculator _dmEndDateCalculator;
 
         private string _userFullName;
         public string UserFullName
@@ -34,11 +35,13 @@ namespace Portal.Pages
 
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
-            IUserIdentityService userIdentityService)
+            IUserIdentityService userIdentityService,
+            IDmEndDateCalculator dmEndDateCalculator)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _userIdentityService = userIdentityService;
+            _dmEndDateCalculator = dmEndDateCalculator;
         }
 
         public async Task OnGetAsync()
@@ -54,6 +57,12 @@ namespace Portal.Pages
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
+
+            foreach (var instance in workflows)
+            {
+                var task = Tasks.First(t => t.ProcessId == instance.ProcessId);
+                task.DmEndDate = _dmEndDateCalculator.CalculateDmEndDate(instance.AssessmentData.EffectiveStartDate.Value);
+            }
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)

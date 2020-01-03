@@ -21,6 +21,7 @@ namespace Portal.UnitTests
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private IMapper _fakeMapper;
         private IUserIdentityService _fakeUserIdentityService;
+        private IDmEndDateCalculator _fakeDmEndDateCalculator;
 
         [SetUp]
         public async Task Setup()
@@ -34,6 +35,7 @@ namespace Portal.UnitTests
             _fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
             _fakeMapper = A.Fake<IMapper>();
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeDmEndDateCalculator = A.Fake<IDmEndDateCalculator>();
 
             ProcessId = 123;
 
@@ -75,7 +77,8 @@ namespace Portal.UnitTests
             };
             var indexModel = new IndexModel(_dbContext,
                 _fakeMapper,
-                _fakeUserIdentityService);
+                _fakeUserIdentityService,
+                _fakeDmEndDateCalculator);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -98,7 +101,8 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _fakeMapper,
-                _fakeUserIdentityService);
+                _fakeUserIdentityService,
+                _fakeDmEndDateCalculator);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -133,7 +137,8 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _fakeMapper,
-                _fakeUserIdentityService);
+                _fakeUserIdentityService,
+                _fakeDmEndDateCalculator);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
@@ -169,7 +174,8 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _fakeMapper,
-                _fakeUserIdentityService);
+                _fakeUserIdentityService,
+                _fakeDmEndDateCalculator);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
