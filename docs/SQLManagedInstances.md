@@ -84,6 +84,14 @@ TaskManager users Serilog with a SQL Server sink for logging. To set this up, we
 `CREATE DATABASE [taskmanager-dev-logging]
 GO`
 
-3). Serilog will create the necessary tables via C# code that exists in each component.
+3). Grant the relevant app services access to the new logging database so they can write log entries, e.g:
+
+`CREATE USER [portal-appservice-name] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [portal-appservice-name];
+ALTER ROLE db_datawriter ADD MEMBER [portal-appservice-name];
+ALTER ROLE db_ddladmin ADD MEMBER [portal-appservice-name];
+GO`
+
+4). Serilog will create the necessary tables via C# code that exists in each component upon startup.
 
 N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
