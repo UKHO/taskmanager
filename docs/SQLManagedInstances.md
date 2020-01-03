@@ -72,3 +72,35 @@ ALTER ROLE db_ddladmin ADD MEMBER [nsb-app-service-name];
 GO`
 
 3). Deploy the NSB endpoints and ensure the relevant tables are created in the SQL database.
+
+### Logging Database
+
+TaskManager users Serilog with a SQL Server sink for logging. To set this up, we need to create the logging database that all components will have a table within.
+
+1). Log in as the account that has DBCreator access.
+
+2). Run the following script:
+
+`CREATE DATABASE [taskmanager-dev-logging]
+GO`
+
+3). Grant the relevant app services access to the new logging database so they can write log entries, e.g:
+
+`CREATE USER [portal-appservice-name] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [portal-appservice-name];
+ALTER ROLE db_datawriter ADD MEMBER [portal-appservice-name];
+ALTER ROLE db_ddladmin ADD MEMBER [portal-appservice-name];
+GO`
+
+4). Serilog will create the necessary tables via C# code that exists in each component upon startup.
+
+5). Grant OSET ADUsers db_owner permission against the logging database so Tamatoa devs can access:
+
+`USE [taskmanager-dev-logging]
+GO
+CREATE USER [OSET ADUsers] FOR LOGIN [OSET ADUsers]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [OSET ADUsers]
+GO`
+
+N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
