@@ -103,4 +103,14 @@ GO
 ALTER ROLE [db_owner] ADD MEMBER [OSET ADUsers]
 GO`
 
+6). SQL DBA to create the TMLoggingDev account for use by the TM components as part of the Serilog connection string:
+
+7). Once created, grant this login access to the logging database:
+
+`CREATE USER [TMLoggingDev] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [TMLoggingDev];
+ALTER ROLE db_datawriter ADD MEMBER [TMLoggingDev];
+ALTER ROLE db_ddladmin ADD MEMBER [TMLoggingDev];
+GO`
+
 N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
