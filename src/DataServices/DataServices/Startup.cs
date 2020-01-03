@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using Common.Helpers;
 using DataServices.Adapters;
 using DataServices.Config;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Events;
 
 namespace DataServices
 {
@@ -80,7 +82,23 @@ namespace DataServices
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app
-                .UseSerilogRequestLogging()
+                .UseSerilogRequestLogging(
+                    options =>
+                        options.GetLevel = (ctx, d, ex) =>
+                        {
+                            if (ex == null && ctx.Response.StatusCode <= 499)
+                            {
+                                if (ctx.Request.RouteValues.Any()) //Request is a page
+                                {
+                                    return LogEventLevel.Information;
+                                }
+
+                                return LogEventLevel.Verbose;
+                            }
+
+                            return LogEventLevel.Error;
+                        }
+                )
                 .UseHttpsRedirection()
                 .UseDefaultFiles()
                 .UseStaticFiles()
