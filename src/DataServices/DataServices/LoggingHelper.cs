@@ -30,9 +30,7 @@ namespace DataServices
                     new SqlColumn
                         {ColumnName = "ApiResource", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "SdocId", DataType = SqlDbType.Int},
-                    new SqlColumn
-                        {ColumnName = "CallerCode", DataType = SqlDbType.NVarChar, DataLength = 100}
+                        {ColumnName = "SdocId", DataType = SqlDbType.Int}
                 }
             };
 
