@@ -94,4 +94,13 @@ GO`
 
 4). Serilog will create the necessary tables via C# code that exists in each component upon startup.
 
+5). Grant OSET ADUsers db_owner permission against the logging database so Tamatoa devs can access:
+
+`USE [taskmanager-dev-logging]
+GO
+CREATE USER [OSET ADUsers] FOR LOGIN [OSET ADUsers]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [OSET ADUsers]
+GO`
+
 N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
