@@ -75,6 +75,8 @@ GO`
 
 ### Logging Database
 
+TaskManager users Serilog with a SQL Server sink for logging. To set this up, we need to create the logging database that all components will have a table within.
+
 1). Log in as the account that has DBCreator access.
 
 2). Run the following script:
@@ -82,4 +84,6 @@ GO`
 `CREATE DATABASE [taskmanager-dev-logging]
 GO`
 
-3). Serilog will create the necessary tables via code in each component.
+3). Serilog will create the necessary tables via C# code that exists in each component.
+
+N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
