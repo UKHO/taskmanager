@@ -140,6 +140,7 @@ namespace EventService
 
             endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
             endpointConfiguration.EnableInstallers();
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             services.AddNServiceBus(endpointConfiguration);
         }

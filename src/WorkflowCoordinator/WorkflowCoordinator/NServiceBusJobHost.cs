@@ -53,9 +53,9 @@ namespace WorkflowCoordinator
             if (_isLocalDebugging)
             {
                 _connectionString = DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer, _secretsConfig.Value.NsbInitialCatalog);
-                DatabasesHelpers.ReCreateLocalDb(_localDbServer, 
-                    _secretsConfig.Value.NsbInitialCatalog, 
-                    DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer), 
+                DatabasesHelpers.ReCreateLocalDb(_localDbServer,
+                    _secretsConfig.Value.NsbInitialCatalog,
+                    DatabasesHelpers.BuildSqlConnectionString(_isLocalDebugging, _localDbServer),
                     _isLocalDebugging);
                 var recoverability = _endpointConfig.Recoverability();
                 recoverability.Immediate(
@@ -154,7 +154,9 @@ namespace WorkflowCoordinator
                 ;
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
-                _endpoint = await Endpoint.Start(endpointConfiguration);
+                endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+                _endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
 
                 Guid pollingSagaGuid = _generalConfig.Value.AssessmentPollingSagaCorrelationGuid;
                 await _endpoint.SendLocal(new StartAssessmentPollingCommand(pollingSagaGuid)).ConfigureAwait(false);
