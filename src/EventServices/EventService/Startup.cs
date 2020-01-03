@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlClient;
+using System.Linq;
 using Common.Helpers;
 using EventService.Config;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,7 @@ using NServiceBus.Extensions.DependencyInjection;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
 using Serilog;
+using Serilog.Events;
 
 namespace EventService
 {
@@ -145,7 +147,23 @@ namespace EventService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(
+                options =>
+                    options.GetLevel = (ctx, d, ex) =>
+                    {
+                        if (ex == null && ctx.Response.StatusCode <= 499)
+                        {
+                            if (ctx.Request.RouteValues.Any()) //Request is a page
+                            {
+                                return LogEventLevel.Information;
+                            }
+
+                            return LogEventLevel.Verbose;
+                        }
+
+                        return LogEventLevel.Error;
+                    }
+            );
 
             if (env.IsDevelopment())
             {
