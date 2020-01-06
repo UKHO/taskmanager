@@ -335,6 +335,9 @@ ASALocalRun/
 # Portal wwwroot lib
 **/Portal/wwwroot/lib/*
 
+# NCNE Portal wwwroot lib
+**/NCNEPortal/wwwroot/lib/*
+
 # Java
 **/DataServices.ApiTests/.idea
 **/DataServices.ApiTests/.classpath
