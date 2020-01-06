@@ -63,9 +63,11 @@ namespace Portal.Pages
             foreach (var instance in workflows)
             {
                 var task = Tasks.First(t => t.ProcessId == instance.ProcessId);
-                task.DmEndDate = _indexFacade.CalculateDmEndDate(instance.AssessmentData.EffectiveStartDate.Value,
-                    instance.OnHold);
-                task.DaysToDmEndDate = _indexFacade.CalculateDaysToDmEndDate(DateTime.Now, task.DmEndDate);
+                var result = _indexFacade.CalculateDmEndDate(
+                                                                            instance.AssessmentData.EffectiveStartDate.Value,
+                                                                            instance.OnHold);
+                task.DmEndDate = result.dmEndDate;
+                task.DaysToDmEndDate = result.daysToDmEndDate;
             }
         }
 

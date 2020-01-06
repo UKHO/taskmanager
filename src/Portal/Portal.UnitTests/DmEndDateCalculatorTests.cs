@@ -10,21 +10,27 @@ namespace Portal.UnitTests
     public class DmEndDateCalculatorTests
     {
         private DmEndDateCalculator _dmEndDateCalculator;
+        private IOptionsSnapshot<GeneralConfig> _generalConfig;
 
         [SetUp]
         public void SetUp()
         {
-            var generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            generalConfig.Value.DmEndDateDays = 14;
+            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            _generalConfig.Value.DmEndDateDays = 14;
 
-            _dmEndDateCalculator = new DmEndDateCalculator(generalConfig);
+            _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
         }
 
         [Test]
         public void Test_DmEndDateCalculator_Returns_Correct_DmEndDate()
         {
-            Assert.AreEqual(new DateTime(2020, 01, 15), 
-                _dmEndDateCalculator.CalculateDmEndDate(new DateTime(2020, 1, 1)));
+            var effectiveDate = DateTime.Today;
+            var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveDate);
+
+
+            Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDays), result.dmEndDate);
+            Assert.AreEqual(_generalConfig.Value.DmEndDateDays, result.daysToDmEndDate);
+
         }
     }
 }

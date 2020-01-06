@@ -42,9 +42,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th style="min-width: 3.6rem;">DM End</th>
+                    <th style="min-width: 3.6rem;">Days to DM End Date</th>
                     <th style="min-width: 5.8rem;">DM End Date</th>
-                    <th style="min-width: 3.9rem;">On Hold</th>
+                    <th style="min-width: 3.9rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
@@ -114,9 +114,9 @@
                 <tr>
                     <th></th>
                     <th>ID</th>
-                    <th style="min-width: 3.6rem;">DM End</th>
+                    <th style="min-width: 3.6rem;">Days to DM End Date</th>
                     <th style="min-width: 5.8rem;">DM End Date</th>
-                    <th style="min-width: 3.9rem;">On Hold</th>
+                    <th style="min-width: 3.9rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
@@ -138,13 +138,13 @@
                             <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            @task.DaysToDmEndDate Days
+                            @task.DaysToDmEndDate
                         </td>
                         <td>
                             @task.DmEndDate.ToShortDateString()
                         </td>
                         <td>
-                            @task.DaysOnHold Days
+                            @task.DaysOnHold
                         </td>
                         <td>
                             @task.AssessmentDataRsdraNumber
