@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.Helpers;
+using Portal.MappingProfiles;
 using Portal.Pages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -19,8 +21,9 @@ namespace Portal.UnitTests
         private WorkflowDbContext _dbContext;
         private int ProcessId { get; set; }
         private IHttpContextAccessor _fakeHttpContextAccessor;
-        private IMapper _fakeMapper;
+        private IMapper _mapper;
         private IUserIdentityService _fakeUserIdentityService;
+        private IIndexFacade _fakeIndexFacade;
 
         [SetUp]
         public async Task Setup()
@@ -32,8 +35,12 @@ namespace Portal.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             _fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
-            _fakeMapper = A.Fake<IMapper>();
+
+            var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
+            _mapper = mappingConfig.CreateMapper();
+
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeIndexFacade = A.Fake<IIndexFacade>();
 
             ProcessId = 123;
 
@@ -48,7 +55,30 @@ namespace Portal.UnitTests
                 SerialNumber = "123_sn",
                 StartedAt = DateTime.Now.AddDays(-3),
                 Status = WorkflowStatus.Started.ToString(),
-                WorkflowType = "DbAssessment"
+                WorkflowType = "DbAssessment",
+                TaskNote = new TaskNote(),
+                DataImpact = new List<DataImpact>(),
+                DatabaseDocumentStatus = new List<DatabaseDocumentStatus>(),
+                DbAssessmentAssessData = new DbAssessmentAssessData(),
+                DbAssessmentAssignTask = new List<DbAssessmentAssignTask>(),
+                LinkedDocument = new List<LinkedDocument>(),
+                PrimaryDocumentStatus = new PrimaryDocumentStatus(),
+                ProductAction = new List<ProductAction>(),
+                ParentProcessId = null
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData
+            {
+                ProcessId = ProcessId,
+                SourceDocumentName = "TestName",
+                ReceiptDate = DateTime.Now,
+                SourceDocumentType = "Primary",
+                RsdraNumber = "RSDRA1234567",
+                EffectiveStartDate = DateTime.Now,
+                Datum = "12345",
+                TeamDistributedTo = "HW",
+                PrimarySdocId = 12345,
+                SourceNature = "Outside"
             });
 
             await _dbContext.SaveChangesAsync();
@@ -74,8 +104,9 @@ namespace Portal.UnitTests
                 LastModifiedByUsername = "Tests"
             };
             var indexModel = new IndexModel(_dbContext,
-                _fakeMapper,
-                _fakeUserIdentityService);
+                _mapper,
+                _fakeUserIdentityService,
+                _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -97,8 +128,9 @@ namespace Portal.UnitTests
             };
 
             var indexModel = new IndexModel(_dbContext,
-                _fakeMapper,
-                _fakeUserIdentityService);
+                _mapper,
+                _fakeUserIdentityService,
+                _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -132,8 +164,9 @@ namespace Portal.UnitTests
             await _dbContext.SaveChangesAsync();
 
             var indexModel = new IndexModel(_dbContext,
-                _fakeMapper,
-                _fakeUserIdentityService);
+                _mapper,
+                _fakeUserIdentityService,
+                _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
@@ -168,8 +201,9 @@ namespace Portal.UnitTests
             await _dbContext.SaveChangesAsync();
 
             var indexModel = new IndexModel(_dbContext,
-                _fakeMapper,
-                _fakeUserIdentityService);
+                _mapper,
+                _fakeUserIdentityService,
+                _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 

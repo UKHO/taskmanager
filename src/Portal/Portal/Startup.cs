@@ -28,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
+using Portal.Calculators;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal
@@ -135,6 +136,8 @@ namespace Portal
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
+            services.AddScoped<IDmEndDateCalculator, DmEndDateCalculator>();
+            services.AddScoped<IIndexFacade, IndexFacade>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
             services.AddScoped<ITaskDataHelper, TaskDataHelper>();
 

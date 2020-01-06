@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using WorkflowDatabase.EF.Models;
 
-namespace Portal
+namespace Portal.Calculators
 {
     public interface IOnHoldCalculator
     {
