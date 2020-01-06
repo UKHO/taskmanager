@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -69,6 +68,8 @@ namespace SourceDocumentCoordinator
 
                 var startupSecretConfig = new StartupSecretsConfig();
                 hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretConfig);
+                hostingContext.Configuration.GetSection("subscription").Bind(startupSecretConfig);
+
 
                 services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
 
@@ -90,14 +91,8 @@ namespace SourceDocumentCoordinator
                 var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
                     isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
-                var connection = new SqlConnection(workflowDbConnectionString)
-                {
-                    AccessToken = isLocalDebugging ?
-                        null :
-                        new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-                };
                 services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                    options.UseSqlServer(connection));
+                    options.UseSqlServer(workflowDbConnectionString));
 
                 if (isLocalDebugging)
                 {
