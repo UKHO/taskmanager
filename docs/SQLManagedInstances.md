@@ -79,7 +79,7 @@ TaskManager users Serilog with a SQL Server sink for logging. To set this up, we
 
 1). Log in as the account that has DBCreator access.
 
-2). Run the following script:
+2). Run the following script (here and in subsequent snippets, be sure to change the environment from dev):
 
 `CREATE DATABASE [taskmanager-dev-logging]
 GO`
@@ -107,7 +107,10 @@ GO`
 
 7). Once created, grant this login access to the logging database:
 
-`CREATE USER [TMLoggingDev] FROM EXTERNAL PROVIDER;
+`USE [taskmanager-dev-logging]
+GO
+CREATE USER [TMLoggingDev] FOR LOGIN [TMLoggingDev]
+GO
 ALTER ROLE db_datareader ADD MEMBER [TMLoggingDev];
 ALTER ROLE db_datawriter ADD MEMBER [TMLoggingDev];
 ALTER ROLE db_ddladmin ADD MEMBER [TMLoggingDev];
