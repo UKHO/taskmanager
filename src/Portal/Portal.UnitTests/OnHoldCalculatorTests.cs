@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Portal.Calculators;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests

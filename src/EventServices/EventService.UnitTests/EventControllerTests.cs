@@ -2,6 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Common.Messages.Enums;
 using Common.Messages.Events;
+using EventService.Controllers;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NServiceBus.Testing;
 using NUnit.Framework;
 
@@ -9,9 +12,12 @@ namespace EventService.UnitTests
 {
     public class EventControllerTests
     {
+        private ILogger<EventController> _fakeLogger;
+
         [SetUp]
         public void Setup()
         {
+            _fakeLogger = A.Dummy<ILogger<EventController>>();
         }
 
         [Test]
@@ -19,7 +25,7 @@ namespace EventService.UnitTests
         {
             var testableSession = new TestableMessageSession();
 
-            var eventController = new Controllers.EventController(testableSession);
+            var eventController = new Controllers.EventController(testableSession, _fakeLogger);
 
             var theEvent = new InitiateSourceDocumentRetrievalEvent
             {

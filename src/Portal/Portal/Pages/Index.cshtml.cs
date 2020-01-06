@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
+using Portal.Helpers;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -21,6 +22,7 @@ namespace Portal.Pages
 
         private readonly IMapper _mapper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly IIndexFacade _indexFacade;
 
         private string _userFullName;
         public string UserFullName
@@ -34,11 +36,13 @@ namespace Portal.Pages
 
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
-            IUserIdentityService userIdentityService)
+            IUserIdentityService userIdentityService,
+            IIndexFacade indexFacade)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _userIdentityService = userIdentityService;
+            _indexFacade = indexFacade;
         }
 
         public async Task OnGetAsync()
@@ -48,12 +52,23 @@ namespace Portal.Pages
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
                 .Include(t => t.TaskNote)
+                .Include(o => o.OnHold)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .ToListAsync();
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
-            this.Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
+            Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
+
+            foreach (var instance in workflows)
+            {
+                var task = Tasks.First(t => t.ProcessId == instance.ProcessId);
+                var result = _indexFacade.CalculateDmEndDate(
+                                                                            instance.AssessmentData.EffectiveStartDate.Value,
+                                                                            instance.OnHold);
+                task.DmEndDate = result.dmEndDate;
+                task.DaysToDmEndDate = result.daysToDmEndDate;
+            }
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)

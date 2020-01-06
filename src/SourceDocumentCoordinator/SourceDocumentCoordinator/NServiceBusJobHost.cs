@@ -137,7 +137,9 @@ namespace SourceDocumentCoordinator
 
                 endpointConfiguration.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
                 endpointConfiguration.EnableInstallers();
-                _endpoint = await Endpoint.Start(endpointConfiguration);
+                endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+                _endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
 
                 await _endpoint.Subscribe<InitiateSourceDocumentRetrievalEvent>()
                     .ConfigureAwait(false);
