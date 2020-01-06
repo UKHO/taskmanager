@@ -65,6 +65,7 @@ namespace Portal.Pages
                 var task = Tasks.First(t => t.ProcessId == instance.ProcessId);
                 task.DmEndDate = _indexFacade.CalculateDmEndDate(instance.AssessmentData.EffectiveStartDate.Value,
                     instance.OnHold);
+                task.DaysToDmEndDate = _indexFacade.CalculateDaysToDmEndDate(DateTime.Now, task.DmEndDate);
             }
         }
 

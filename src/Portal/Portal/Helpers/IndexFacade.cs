@@ -29,5 +29,10 @@ namespace Portal.Helpers
 
             return result;
         }
+
+        public short CalculateDaysToDmEndDate(DateTime sourceDate, DateTime dmEndDate)
+        {
+            return _dmEndDateCalculator.CalculateDaysToDmEndDate(sourceDate, dmEndDate);
+        }
     }
 }
