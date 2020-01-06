@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 
-namespace Portal
+namespace Portal.Calculators
 {
     public class DmEndDateCalculator : IDmEndDateCalculator
     {

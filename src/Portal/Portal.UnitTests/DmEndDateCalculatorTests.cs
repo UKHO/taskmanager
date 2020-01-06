@@ -2,6 +2,7 @@
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Portal.Calculators;
 using Portal.Configuration;
 
 namespace Portal.UnitTests

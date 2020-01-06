@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Portal.Calculators;
 using Portal.Helpers;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;

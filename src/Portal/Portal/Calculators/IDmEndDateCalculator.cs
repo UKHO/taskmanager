@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Portal
+namespace Portal.Calculators
 {
     public interface IDmEndDateCalculator
     {
