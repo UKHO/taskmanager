@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
-using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
 using WorkflowDatabase.EF;
@@ -38,15 +36,11 @@ namespace SourceDocumentCoordinator
             })
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
-
                 var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                config.AddAzureAppConfiguration(azureAppConfConnectionString);
+                config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager())
+                      .AddAzureAppConfiguration(azureAppConfConnectionString)
+                      .Build();
             })
             .ConfigureLogging((hostingContext, b) =>
             {
@@ -60,9 +54,6 @@ namespace SourceDocumentCoordinator
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
                 hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
                 hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
-
-                var endpointConfiguration = new EndpointConfiguration(startupConfig.SourceDocumentCoordinatorName);
-                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
 
                 services.AddOptions<UriConfig>()
                     .Bind(hostingContext.Configuration.GetSection("urls"));
@@ -114,20 +105,42 @@ namespace SourceDocumentCoordinator
                     using var context = sp.GetRequiredService<WorkflowDbContext>();
                     TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
+            })
+            .UseNServiceBus(hostBuilderContext =>
+            {
+                var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
-                UpdateableServiceProvider container = null;
+                var nsbConfig = new NsbConfig();
+                hostBuilderContext.Configuration.GetSection("nsb").Bind(nsbConfig);
+                hostBuilderContext.Configuration.GetSection("urls").Bind(nsbConfig);
+                hostBuilderContext.Configuration.GetSection("databases").Bind(nsbConfig);
+                nsbConfig.IsLocalDevelopment = isLocalDebugging;
 
-                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+                var nsbSecretsConfig = new NsbSecretsConfig();
+                hostBuilderContext.Configuration.GetSection("NsbDbSection").Bind(nsbSecretsConfig);
+
+                var endpointConfiguration = new SourceDocumentCoordinatorConfig(nsbConfig, nsbSecretsConfig);
+
+                if (isLocalDebugging)
                 {
-                    customizations.ExistingServices(services);
-                    customizations.ServiceProviderFactory(sc =>
-                    {
-                        container = new UpdateableServiceProvider(sc);
-                        return container;
-                    });
-                });
+                    var localDbServer = nsbConfig.LocalDbServer;
 
-                services.AddScoped<IJobHost, NServiceBusJobHost>();
+                    nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(true, localDbServer, nsbSecretsConfig.NsbInitialCatalog);
+                    DatabasesHelpers.ReCreateLocalDb(localDbServer,
+                        nsbSecretsConfig.NsbInitialCatalog,
+                        DatabasesHelpers.BuildSqlConnectionString(true, localDbServer),
+                        ConfigHelpers.IsLocalDevelopment);
+                }
+                else
+                {
+                    nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false, nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
+
+                    var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                    var azureDbTokenUrl = nsbConfig.AzureDbTokenUrl;
+                    nsbSecretsConfig.AzureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                }
+
+                return endpointConfiguration;
             })
             .UseConsoleLifetime();
 
