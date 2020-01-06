@@ -107,7 +107,10 @@ GO`
 
 7). Once created, grant this login access to the logging database:
 
-`CREATE USER [TMLoggingDev] FROM EXTERNAL PROVIDER;
+`USE [taskmanager-dev-logging]
+GO
+CREATE USER [TMLoggingDev] FOR LOGIN [TMLoggingDev]
+GO
 ALTER ROLE db_datareader ADD MEMBER [TMLoggingDev];
 ALTER ROLE db_datawriter ADD MEMBER [TMLoggingDev];
 ALTER ROLE db_ddladmin ADD MEMBER [TMLoggingDev];
