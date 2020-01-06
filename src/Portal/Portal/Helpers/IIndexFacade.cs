@@ -6,6 +6,6 @@ namespace Portal.Helpers
 {
     public interface IIndexFacade
     {
-        DateTime CalculateDmEndDate(DateTime effectiveStartDate, IEnumerable<OnHold> onHoldRows);
+        (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, IEnumerable<OnHold> onHoldRows);
     }
 }

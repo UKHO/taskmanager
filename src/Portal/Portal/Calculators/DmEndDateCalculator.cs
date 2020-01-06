@@ -13,9 +13,12 @@ namespace Portal.Calculators
             _generalConfig = generalConfig;
         }
 
-        public DateTime CalculateDmEndDate(DateTime effectiveStartDate)
+        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate)
         {
-            return effectiveStartDate.AddDays(_generalConfig.Value.DmEndDateDays);
+            var dmEndDate = effectiveStartDate.AddDays(_generalConfig.Value.DmEndDateDays);
+            var daysToDmEndDate = (short)dmEndDate.Date.Subtract(DateTime.Today).Days;
+
+            return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);
         }
     }
 }

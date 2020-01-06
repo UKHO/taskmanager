@@ -17,17 +17,21 @@ namespace Portal.Helpers
             _onHoldCalculator = onHoldCalculator;
         }
 
-        public DateTime CalculateDmEndDate(DateTime effectiveStartDate, IEnumerable<OnHold> onHoldRows)
+        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, IEnumerable<OnHold> onHoldRows)
         {
             var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveStartDate);
+            var dmEndDate = result.dmEndDate.Date;
+            var daysToDmEndDate = result.daysToDmEndDate;
 
             if (onHoldRows != null && onHoldRows.Any())
             {
-                var onHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now);
-                result = result.AddDays(onHoldDays);
+                var onHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
+                dmEndDate = dmEndDate.AddDays(onHoldDays);
+                daysToDmEndDate += (short)onHoldDays;
             }
 
-            return result;
+            return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);
         }
+
     }
 }

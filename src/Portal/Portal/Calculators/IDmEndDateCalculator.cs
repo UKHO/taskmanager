@@ -4,6 +4,6 @@ namespace Portal.Calculators
 {
     public interface IDmEndDateCalculator
     {
-        DateTime CalculateDmEndDate(DateTime effectiveStartDate);
+        (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate);
     }
 }
