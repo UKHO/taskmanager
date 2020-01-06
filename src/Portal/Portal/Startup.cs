@@ -136,6 +136,7 @@ namespace Portal
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
             services.AddScoped<IDmEndDateCalculator, DmEndDateCalculator>();
+            services.AddScoped<IIndexFacade, IndexFacade>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
             services.AddScoped<ITaskDataHelper, TaskDataHelper>();
 
