@@ -11,12 +11,13 @@ namespace DataServices
 {
     public class LoggingHelper
     {
-        public static void SetupLogging(bool isLocalDb, StartupLoggingConfig startupLoggingConfig)
+        public static void SetupLogging(bool isLocalDb, StartupLoggingConfig startupLoggingConfig, StartupSecretsConfig startupSecretsConfig)
         {
             var loggingConnectionString = DatabasesHelpers.BuildSqlConnectionString(
                 isLocalDb,
                 isLocalDb ? startupLoggingConfig.LocalDbServer : startupLoggingConfig.WorkflowDbServer,
-                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName
+                isLocalDb ? startupLoggingConfig.LocalDbName : startupLoggingConfig.WorkflowDbName,
+                startupSecretsConfig.SqlLoggingUsername, startupSecretsConfig.SqlLoggingPassword
             );
 
             Enum.TryParse(startupLoggingConfig.Level, out LogEventLevel logLevel);
