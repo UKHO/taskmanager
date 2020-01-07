@@ -245,6 +245,20 @@ table > tbody > tr > th {
     width: 68px;
 }
 
+.alertText {
+    border-radius: .25rem;
+    padding: .25rem .50rem;
+    color: white;
+}
+
+.alertText.red {
+    background-color: red;
+}
+
+.alertText.amber {
+    background-color: #ffbf00;
+}
+
 /* Footer start */
 footer {
     bottom: 0;
