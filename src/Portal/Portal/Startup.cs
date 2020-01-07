@@ -22,17 +22,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
+using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
 using Serilog;
 using Serilog.Events;
-<<<<<<< HEAD
-using Portal.Calculators;
-=======
 using WorkflowDatabase.EF;
->>>>>>> Replace TODO comments with logging calls
 using WorkflowDatabase.EF.Models;
 
 namespace Portal
