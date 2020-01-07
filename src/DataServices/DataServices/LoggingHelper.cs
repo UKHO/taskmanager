@@ -26,7 +26,7 @@ namespace DataServices
                 AdditionalColumns = new Collection<SqlColumn>
                 {
                     new SqlColumn
-                        {ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ApiResource", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn

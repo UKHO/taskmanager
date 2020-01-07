@@ -19,16 +19,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Portal.Configuration;
-using Portal.Helpers;
-using Portal.HttpClients;
-using Portal.MappingProfiles;
-using WorkflowDatabase.EF;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
 using Portal.Calculators;
+using Portal.Configuration;
+using Portal.Helpers;
+using Portal.HttpClients;
+using Portal.MappingProfiles;
+using Serilog;
+using Serilog.Events;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal
@@ -45,6 +46,12 @@ namespace Portal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
+            var startupLoggingConfig = new StartupLoggingConfig();
+            Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+            LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig);
+            
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
@@ -69,8 +76,6 @@ namespace Portal
                 .Bind(Configuration.GetSection("PortalSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
-
-            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
@@ -177,7 +182,7 @@ namespace Portal
                 }
                 catch (Exception e)
                 {
-                    //TODO: LOG!
+                    Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
                 }
 
             }
@@ -186,6 +191,24 @@ namespace Portal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging(
+                options => 
+                options.GetLevel = (ctx, d, ex) =>
+                {
+                    if (ex == null && ctx.Response.StatusCode <= 499)
+                    {
+                        if (ctx.Request.RouteValues.Any()) //Request is a page
+                        {
+                            return LogEventLevel.Information;
+                        }
+
+                        return LogEventLevel.Verbose;
+                    }
+
+                    return LogEventLevel.Error;
+                }
+            );
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

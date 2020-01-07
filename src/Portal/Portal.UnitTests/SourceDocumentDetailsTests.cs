@@ -6,6 +6,7 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Configuration;
 using Portal.HttpClients;
@@ -22,6 +23,7 @@ namespace Portal.UnitTests
         private DocumentStatusFactory _documentStatusFactory;
         private _SourceDocumentDetailsModel _sourceDocumentDetailsModel;
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private ILogger<_SourceDocumentDetailsModel> _fakeLogger;
 
         private int ProcessId { get; set; }
         private int SdocId { get; set; }
@@ -38,12 +40,13 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _documentStatusFactory = new DocumentStatusFactory(_dbContext);
+            _fakeLogger = A.Dummy<ILogger<_SourceDocumentDetailsModel>>();
 
             ProcessId = 123;
             SdocId = 123456;
             CorrelationId = Guid.NewGuid();
 
-            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, new OptionsSnapshotWrapper<UriConfig>(new UriConfig()), _fakeEventServiceApiClient, _fakeDataServiceApiClient, _documentStatusFactory);
+            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, new OptionsSnapshotWrapper<UriConfig>(new UriConfig()), _fakeEventServiceApiClient, _fakeDataServiceApiClient, _documentStatusFactory, _fakeLogger);
         }
 
         [TearDown]
@@ -67,7 +70,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null);
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null, _fakeLogger);
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sourceDocumentDetailsModel.OnGet());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
@@ -100,7 +103,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null) { ProcessId = ProcessId };
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null, _fakeLogger) { ProcessId = ProcessId };
             Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
 

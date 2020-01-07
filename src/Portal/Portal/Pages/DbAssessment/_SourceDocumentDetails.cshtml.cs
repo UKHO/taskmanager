@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
+using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.HttpClients;
@@ -25,6 +27,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IDocumentStatusFactory _documentStatusFactory;
+        private readonly ILogger<_SourceDocumentDetailsModel> _logger;
 
         [BindProperty(SupportsGet = true)] public int ProcessId { get; set; }
         public AssessmentData Assessment { get; set; }
@@ -35,13 +38,16 @@ namespace Portal.Pages.DbAssessment
         public Uri PrimaryDocumentContentServiceUri { get; set; }
 
         public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
-            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient, IDataServiceApiClient dataServiceApiClient, IDocumentStatusFactory documentStatusFactory)
+            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient,
+            IDataServiceApiClient dataServiceApiClient, IDocumentStatusFactory documentStatusFactory,
+            ILogger<_SourceDocumentDetailsModel> logger)
         {
             _dbContext = dbContext;
             _uriConfig = uriConfig;
             _eventServiceApiClient = eventServiceApiClient;
             _dataServiceApiClient = dataServiceApiClient;
             _documentStatusFactory = documentStatusFactory;
+            _logger = logger;
         }
 
         public void OnGet()
@@ -62,7 +68,9 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                //TODO: Log error!
+                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: SdocId: {SdocId};",
+                    nameof(_dataServiceApiClient.GetAssessmentData),
+                    sdocId);
             }
 
             return new JsonResult(sourceDocumentData);
@@ -173,10 +181,11 @@ namespace Portal.Pages.DbAssessment
                 SourceType = SourceType.Linked
             };
 
+            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
 
             return StatusCode(200);
-            // TODO: Log!
         }
 
         /// <summary>
@@ -213,10 +222,11 @@ namespace Portal.Pages.DbAssessment
                 SourceType = SourceType.Database
             };
 
+            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
 
             return StatusCode(200);
-            // TODO: Log!
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Portal.HttpClients;
 using Portal.Models;
 using WorkflowDatabase.EF;
@@ -19,6 +20,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly ILogger<AssessModel> _logger;
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
@@ -33,11 +35,13 @@ namespace Portal.Pages.DbAssessment
 
         public AssessModel(WorkflowDbContext dbContext,
             HpdDbContext hpdDbContext,
-            IDataServiceApiClient dataServiceApiClient)
+            IDataServiceApiClient dataServiceApiClient,
+            ILogger<AssessModel> logger)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
+            _logger = logger;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -132,7 +136,10 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                //TODO: Log error!
+                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
+                    nameof(_dataServiceApiClient.PutAssessmentCompleted),
+                    workflowInstance.AssessmentData.PrimarySdocId,
+                    comment);
             }
         }
 

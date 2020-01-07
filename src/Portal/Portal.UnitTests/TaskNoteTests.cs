@@ -6,6 +6,7 @@ using AutoMapper;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Auth;
 using Portal.Helpers;
@@ -23,6 +24,7 @@ namespace Portal.UnitTests
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private IMapper _mapper;
         private IUserIdentityService _fakeUserIdentityService;
+        private ILogger<IndexModel> _fakeLogger;
         private IIndexFacade _fakeIndexFacade;
 
         [SetUp]
@@ -40,6 +42,7 @@ namespace Portal.UnitTests
             _mapper = mappingConfig.CreateMapper();
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeLogger = A.Dummy<ILogger<IndexModel>>();
             _fakeIndexFacade = A.Fake<IIndexFacade>();
 
             ProcessId = 123;
@@ -105,7 +108,7 @@ namespace Portal.UnitTests
             };
             var indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService,
+                _fakeUserIdentityService, _fakeLogger,
                 _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
@@ -129,7 +132,7 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService,
+                _fakeUserIdentityService, _fakeLogger,
                 _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
@@ -165,7 +168,7 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService,
+                _fakeUserIdentityService, _fakeLogger,
                 _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
@@ -202,7 +205,7 @@ namespace Portal.UnitTests
 
             var indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService,
+                _fakeUserIdentityService, _fakeLogger,
                 _fakeIndexFacade);
 
             await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);

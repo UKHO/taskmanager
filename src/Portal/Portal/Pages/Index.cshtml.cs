@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.ViewModels;
@@ -22,6 +23,7 @@ namespace Portal.Pages
 
         private readonly IMapper _mapper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly ILogger<IndexModel> _logger;
         private readonly IIndexFacade _indexFacade;
 
         private string _userFullName;
@@ -37,11 +39,13 @@ namespace Portal.Pages
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
             IUserIdentityService userIdentityService,
+            ILogger<IndexModel> logger,
             IIndexFacade indexFacade)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _userIdentityService = userIdentityService;
+            _logger = logger;
             _indexFacade = indexFacade;
         }
 

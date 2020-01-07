@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Auth;
 using Portal.Pages.DbAssessment;
@@ -19,6 +20,7 @@ namespace Portal.UnitTests
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
         private IUserIdentityService _fakeUserIdentityService;
+        private ILogger<ReviewModel> _fakeLogger;
 
 
         [SetUp]
@@ -47,7 +49,9 @@ namespace Portal.UnitTests
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
-            _reviewModel = new ReviewModel(_dbContext, null, null, null, null, _fakeUserIdentityService);
+            _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
+
+            _reviewModel = new ReviewModel(_dbContext, null, null, null, null, _fakeUserIdentityService, _fakeLogger);
         }
 
         [TearDown]

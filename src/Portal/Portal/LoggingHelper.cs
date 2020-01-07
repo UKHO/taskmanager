@@ -2,12 +2,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using Common.Helpers;
-using EventService.Config;
+using Portal.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 
-namespace EventService
+namespace Portal
 {
     public class LoggingHelper
     {
@@ -28,11 +28,11 @@ namespace EventService
                     new SqlColumn
                         {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "ProcessId", DataType = SqlDbType.Int},
                     new SqlColumn
-                        {ColumnName = "EventBody", DataType = SqlDbType.NVarChar, DataLength = 4000},
+                        {ColumnName = "ActivityName", DataType = SqlDbType.NVarChar, DataLength = 100},
                     new SqlColumn
-                        {ColumnName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier}
+                        {ColumnName = "PortalResource", DataType = SqlDbType.NVarChar, DataLength = 255}
                 }
             };
 
@@ -40,10 +40,11 @@ namespace EventService
                 .MinimumLevel.Is(logLevel)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingEventServices",
+                    "LoggingPortal",
                     null, //default
                     LogEventLevel.Verbose, //default
                     50, //default
