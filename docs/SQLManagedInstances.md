@@ -116,4 +116,10 @@ ALTER ROLE db_datawriter ADD MEMBER [TMLoggingDev];
 ALTER ROLE db_ddladmin ADD MEMBER [TMLoggingDev];
 GO`
 
+8). Give the TMLoggingDev account the CREATE TABLE permission:
+
+`USE [taskmanager-dev-logging]
+GRANT CREATE TABLE TO TMLoggingDev;
+GO`
+
 N.B. If a new custom column is added via code to an *existing* logging table, it is necessary to delete the table, whereby upon the component starting up again, the database table will be created anew with the new structure. Adding a column in code and running the component will not change the relevant table definition.
