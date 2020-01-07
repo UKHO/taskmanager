@@ -35,7 +35,11 @@ namespace EventService
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
-            LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig);
+            var startupSecretsConfig = new StartupSecretsConfig();
+            Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
+            Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+
+            LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig, startupSecretsConfig);
 
             services.AddControllers();
             services.AddMvc();
@@ -56,9 +60,6 @@ namespace EventService
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
             Configuration.GetSection("nsb").Bind(startupConfig);
-
-            var startupSecretsConfig = new StartupSecretsConfig();
-            Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
 
             string connectionString = null;
 
