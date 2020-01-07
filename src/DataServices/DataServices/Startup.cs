@@ -30,12 +30,13 @@ namespace DataServices
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
-            LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig);
-
             services.AddOptions<Settings>().Bind(Configuration.GetSection("urls"));
 
             var startupSecrets = new StartupSecretsConfig();
             Configuration.GetSection("SdraDbSection").Bind(startupSecrets);
+            Configuration.GetSection("LoggingDbSection").Bind(startupSecrets);
+
+            LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig, startupSecrets);
 
             var connection = Common.Helpers.DatabasesHelpers.BuildOracleConnectionString(startupSecrets.DataSource,
                 startupSecrets.UserId, startupSecrets.Password);
