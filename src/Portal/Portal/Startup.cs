@@ -50,8 +50,12 @@ namespace Portal
             var startupLoggingConfig = new StartupLoggingConfig();
             Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
-            LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig);
-            
+            var startupSecretsConfig = new StartupSecretsConfig();
+            Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
+            Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+
+            LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig, startupSecretsConfig);
+
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
