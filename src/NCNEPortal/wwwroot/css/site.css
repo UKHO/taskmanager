@@ -529,3 +529,7 @@ span.twitter-typeahead {
     color: #FFFFFF;
 }
 /* TYPEAHEAD END */
+
+label{margin-left:20px}
+#datepicker{ width: 180px;margin: 0 20px 20px 20px;}
+#datepicker > span:hover{ cursor: pointer;}
