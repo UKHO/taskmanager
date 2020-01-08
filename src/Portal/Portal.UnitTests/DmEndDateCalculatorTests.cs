@@ -17,6 +17,8 @@ namespace Portal.UnitTests
         {
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.DmEndDateDays = 14;
+            _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc = 0;
+            _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc = 2;
 
             _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
         }

@@ -6,9 +6,6 @@ namespace Portal.Calculators
 {
     public class DmEndDateCalculator : IDmEndDateCalculator
     {
-        private const int DAYS_TO_DM_END_DATE_RED_ALERT_UPPER_INC = 0; //TODO: CONFIG
-        private const int DAYS_TO_DM_END_DATE_AMBER_ALERT_UPPER_INC = 2; //TODO: CONFIG
-
         private readonly IOptions<GeneralConfig> _generalConfig;
 
         public DmEndDateCalculator(IOptions<GeneralConfig> generalConfig)
@@ -26,8 +23,8 @@ namespace Portal.Calculators
 
         public (bool redAlert, bool amberAlert) DetermineDaysToDmEndDateAlerts(short daysToDmEndDate)
         {
-            var redAlert = daysToDmEndDate <= DAYS_TO_DM_END_DATE_RED_ALERT_UPPER_INC; 
-            var amberAlert = !redAlert && daysToDmEndDate <= DAYS_TO_DM_END_DATE_AMBER_ALERT_UPPER_INC;
+            var redAlert = daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc; 
+            var amberAlert = !redAlert && daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc;
 
             return (redAlert: redAlert, amberAlert: amberAlert);
         }
