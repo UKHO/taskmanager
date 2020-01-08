@@ -1,14 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-
 using Newtonsoft.Json;
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Models;
 
@@ -111,6 +106,33 @@ namespace WorkflowCoordinator.HttpClients
                                                    $"\n Url='{fullUri}'");
             }
 
+        }
+
+        public async Task ProgressWorkflowInstance(string serialNo, string action)
+        {
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNo}" + "/actions/" + $"/{action}");
+
+            var data = "";
+
+            using (var response = await _httpClient.PostAsync(fullUri, null))
+            {
+                data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            if (!int.TryParse(data, out var workflowInstanceId))
+            {
+                throw new ApplicationException($"Failed to get WorkflowInstanceId" +
+                                               $"\nData= '{data}'," +
+                                               $"\n Url='{fullUri}'");
+
+            }
+
+            //return workflowInstanceId;
         }
     }
 }
