@@ -35,28 +35,31 @@ namespace Portal.UnitTests
 
         }
 
-        [Test]
-        public void Test_DetermineDaysToDmEndDateAlerts_Returns_No_Alerts()
+        [TestCase(3)]
+        [TestCase(short.MaxValue)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_No_Alerts(short daysToDmEndDate)
         {
-            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(3);
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
 
             Assert.AreEqual(false, result.amberAlert);
             Assert.AreEqual(false, result.redAlert);
         }
 
-        [Test]
-        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Amber_Alert_Only()
+        [TestCase(2)]
+        [TestCase(1)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Amber_Alert_Only(short daysToDmEndDate)
         { 
-            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(2);
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
 
             Assert.AreEqual(true, result.amberAlert);
             Assert.AreEqual(false, result.redAlert);
         }
 
-        [Test]
-        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Red_Alert_Only()
+        [TestCase(0)]
+        [TestCase(short.MinValue)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Red_Alert_Only(short daysToDmEndDate)
         { 
-            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(0);
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
 
             Assert.AreEqual(true, result.redAlert);
             Assert.AreEqual(false, result.amberAlert);
