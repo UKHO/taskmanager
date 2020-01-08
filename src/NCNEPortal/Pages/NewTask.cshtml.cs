@@ -16,57 +16,57 @@ namespace NCNEPortal
 {
     public class NewTaskModel : PageModel
     {
-        [DisplayName("ION")] public string Ion { get; set; }
+        [DisplayName("ION:")] public string Ion { get; set; }
 
-        [DisplayName("Chart No.")] public string ChartNo { get; set; }
+        [DisplayName("Chart No.:")] public string ChartNo { get; set; }
 
-        [DisplayName("Country")] public string Country { get; set; }
+        [DisplayName("Country:")] public string Country { get; set; }
 
-        [DisplayName("Chart Type")] public string ChartType { get; set; }
+        [DisplayName("Chart Type:")] public string ChartType { get; set; }
 
         public SelectList ChartTypes { get; set; }
 
-        [DisplayName("Workflow Type")] public string WorkflowType { get; set; }
+        [DisplayName("Workflow Type:")] public string WorkflowType { get; set; }
 
         public SelectList WorkflowTypes { get; set; }
 
-        [DisplayName("Dating")] public string Dating { get; set; }
+        [DisplayName("Dating:")] public string Dating { get; set; }
 
         public SelectList DatingList { get; set; }
 
-        [DisplayName("Publication Date")]
+        [DisplayName("Publication Date:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime PublicationDate { get; set; }
 
-        [DisplayName("H Forms/Announce")]
+        [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime AnnounceDate { get; set; }
 
-        [DisplayName("Commit to Print")]
+        [DisplayName("Commit to Print:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime CommitToPrintDate { get; set; }
 
-        [DisplayName("CIS")]
+        [DisplayName("CIS:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime CISDate { get; set; }
 
-        [DisplayName("Compiler")]
+        [DisplayName("Compiler:")]
         public string Compiler { get; set; }
 
         public SelectList CompilerList { get; set; }
 
-        [DisplayName("Verifier 1")]
+        [DisplayName("Verifier 1:")]
         public  string Verifier1 { get; set; }
 
         public  SelectList VerifierList1 { get; set; }
 
-        [DisplayName("Verifier 2")]
+        [DisplayName("Verifier 2:")]
         public  string Verifier2 { get; set; }
 
         public SelectList VerifierList2 { get; set; }
 
 
-        [DisplayName("Publication")]
+        [DisplayName("Publication:")]
         public string Publisher { get; set; }
 
         public SelectList PublisherList { get; set; }
