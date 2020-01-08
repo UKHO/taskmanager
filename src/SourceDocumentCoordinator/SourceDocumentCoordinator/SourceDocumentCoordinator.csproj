@@ -60,10 +60,6 @@
     <PackageReference Include="NServiceBus.SqlServer" Version="4.3.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
-    <PackageReference Include="NServiceBus.Persistence.Sql" Version="4.6.1" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.3.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
   </ItemGroup>
   
   <ItemGroup>
