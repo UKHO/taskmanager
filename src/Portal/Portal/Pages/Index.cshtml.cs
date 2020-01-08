@@ -72,6 +72,10 @@ namespace Portal.Pages
                                                                             instance.OnHold);
                 task.DmEndDate = result.dmEndDate;
                 task.DaysToDmEndDate = result.daysToDmEndDate;
+
+                var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate);
+                task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
+                task.DaysToDmEndDateRedAlert = alerts.redAlert;
             }
         }
 

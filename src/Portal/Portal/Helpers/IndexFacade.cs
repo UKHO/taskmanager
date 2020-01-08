@@ -33,5 +33,10 @@ namespace Portal.Helpers
             return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);
         }
 
+        public (bool redAlert, bool amberAlert) DetermineDaysToDmEndDateAlerts(short daysToDmEndDate)
+        {
+            return _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
+        }
+
     }
 }

@@ -32,5 +32,32 @@ namespace Portal.UnitTests
             Assert.AreEqual(_generalConfig.Value.DmEndDateDays, result.daysToDmEndDate);
 
         }
+
+        [Test]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_No_Alerts()
+        {
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(3);
+
+            Assert.AreEqual(false, result.amberAlert);
+            Assert.AreEqual(false, result.redAlert);
+        }
+
+        [Test]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Amber_Alert_Only()
+        { 
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(2);
+
+            Assert.AreEqual(true, result.amberAlert);
+            Assert.AreEqual(false, result.redAlert);
+        }
+
+        [Test]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Red_Alert_Only()
+        { 
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(0);
+
+            Assert.AreEqual(true, result.redAlert);
+            Assert.AreEqual(false, result.amberAlert);
+        }
     }
 }
