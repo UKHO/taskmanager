@@ -110,7 +110,7 @@ namespace WorkflowCoordinator.HttpClients
 
         public async Task ProgressWorkflowInstance(string serialNo, string action)
         {
-            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNo}" + "/actions/" + $"/{action}");
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNo}/actions/{action}");
 
             var data = "";
 

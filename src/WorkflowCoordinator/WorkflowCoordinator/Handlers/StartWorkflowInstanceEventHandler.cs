@@ -32,7 +32,7 @@ namespace WorkflowCoordinator.Handlers
         {
             var dbAssessmentWorkflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
 
-            // Guessing that we get the Process Id back...
+            // We get the Process Id back...
             var instanceId = await _workflowServiceApiClient.CreateWorkflowInstance(dbAssessmentWorkflowId);
 
             // Get the instance serial no
@@ -73,6 +73,8 @@ namespace WorkflowCoordinator.Handlers
 
             // Progress this new instance onto Assess
             await _workflowServiceApiClient.ProgressWorkflowInstance(sn, "Assess");
+
+
         }
     }
 }
