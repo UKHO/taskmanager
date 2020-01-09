@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Common.Messages.Commands;
 using Common.Messages.Enums;
 using Common.Messages.Events;
+using Microsoft.EntityFrameworkCore;
 using NServiceBus;
 using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
@@ -11,7 +12,8 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class StartWorkflowInstanceEventHandler : IHandleMessages<StartWorkflowInstanceEvent>
+    public class StartWorkflowInstanceEventHandler : IHandleMessages<StartWorkflowInstanceEvent>,
+        IHandleMessages<PersistChildWorkflowDataCommand>
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
@@ -38,17 +40,40 @@ namespace WorkflowCoordinator.Handlers
             // Get the instance serial no
             var sn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(instanceId);
 
+            // Progress this new instance onto Assess
+            await _workflowServiceApiClient.ProgressWorkflowInstance(sn);
+
+            var persistChildData = new PersistChildWorkflowDataCommand
+            {
+                CorrelationId = message.CorrelationId,
+                ParentProcessId = message.ParentProcessId,
+                ChildProcessId = instanceId,
+                ChildProcessSerialNumber = sn
+            };
+
+            await context.SendLocal(persistChildData).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Persist the relevant information about the new child task in the db
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public async Task Handle(PersistChildWorkflowDataCommand command, IMessageHandlerContext context)
+        {
             // Get the parent's assessment data...
-            var parentData = _dbContext.AssessmentData.First(d => d.ProcessId == message.ParentProcessId);
+            var parentData = await _dbContext.AssessmentData.FirstAsync(d => d.ProcessId == command.ParentProcessId);
+            var primarySourceData = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == command.ParentProcessId);
 
             // ...and create for the new child
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
-                ProcessId = instanceId,
+                ProcessId = command.ChildProcessId,
                 Comments = new List<Comment>(),
                 ActivityName = "Assess", // It isn't actually at Assess yet...
-                ParentProcessId = message.ParentProcessId,
-                SerialNumber = sn,
+                ParentProcessId = command.ParentProcessId,
+                SerialNumber = command.ChildProcessSerialNumber,
                 StartedAt = DateTime.Today,
                 Status = WorkflowStatus.Started.ToString(),
                 WorkflowType = WorkflowType.DbAssessment.ToString()
@@ -61,7 +86,7 @@ namespace WorkflowCoordinator.Handlers
                 PrimarySdocId = parentData.PrimarySdocId,
                 ReceiptDate = parentData.ReceiptDate,
                 RsdraNumber = parentData.RsdraNumber,
-                ProcessId = instanceId,
+                ProcessId = command.ChildProcessId,
                 SourceDocumentName = parentData.SourceDocumentName,
                 SourceDocumentType = parentData.SourceDocumentType,
                 TeamDistributedTo = parentData.TeamDistributedTo,
@@ -69,12 +94,17 @@ namespace WorkflowCoordinator.Handlers
                 ToSdoDate = parentData.ToSdoDate
             });
 
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus
+            {
+                ProcessId = command.ChildProcessId,
+                CorrelationId = command.CorrelationId,
+                SdocId = parentData.PrimarySdocId,
+                Status = primarySourceData.Status,
+                StartedAt = primarySourceData.StartedAt,
+                ContentServiceId = primarySourceData.ContentServiceId
+            });
+
             await _dbContext.SaveChangesAsync();
-
-            // Progress this new instance onto Assess
-            await _workflowServiceApiClient.ProgressWorkflowInstance(sn, "Assess");
-
-
         }
     }
 }
