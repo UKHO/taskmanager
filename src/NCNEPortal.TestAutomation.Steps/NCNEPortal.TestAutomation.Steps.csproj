@@ -15,4 +15,8 @@
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.74" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NCNEPortal.TestAutomation.Framework\NCNEPortal.TestAutomation.Framework.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using NCNEPortal.TestAutomation.Framework;
 using TechTalk.SpecFlow;
 
 namespace NCNEPortal.TestAutomation.Steps
@@ -9,14 +6,23 @@ namespace NCNEPortal.TestAutomation.Steps
     [Binding]
     public sealed class LandingPageSteps
     {
-        // For additional details on SpecFlow step definitions see https://go.specflow.org/doc-stepdef
+        private readonly LandingPage _landingPage;
 
-        private readonly ScenarioContext context;
-
-        public LandingPageSteps(ScenarioContext injectedContext)
+        public LandingPageSteps(LandingPage landingPage)
         {
-            context = injectedContext;
+            _landingPage = landingPage;
         }
 
+        [Given(@"I navigate to the landing page")]
+        public void GivenINavigateToTheLandingPage()
+        {
+            _landingPage.NavigateTo();
+        }
+
+        [Then(@"The landing page has loaded")]
+        public void ThenTheLandingPageHasLoaded()
+        {
+            _landingPage.HasLoaded();
+        }
     }
 }
