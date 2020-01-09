@@ -5,8 +5,6 @@
     ViewData["Title"] = "Home page";
 }
 
-<script type="text/javascript" src="js/Index.js"></script>
-
 <div class="row pt-1">
     <div class="col-4">
         <a asp-page="./Index">
@@ -185,6 +183,8 @@
             $('#txtGlobalSearch').keyup(function () {
                 inFlightTasksTable.search($(this).val()).draw();
             });
+
+            $("#btnNewTask").click(function() { window.location.href = '/NewTask'; });
         });
     </script>
 }
