@@ -21,7 +21,7 @@
                 <button id="btnHistorical" class="btn btn-primary">Historical Tasks</button>
             </div>
             <div class="col-2">
-                <button id="btnNewTask" class="btn btn-primary" onclick="window.location.href = '/NewTask'">New Task</button>
+                <button id="btnNewTask" class="btn btn-primary">New Task</button>
             </div>
         </div>
         <div class="row mb-3">
@@ -183,6 +183,8 @@
             $('#txtGlobalSearch').keyup(function () {
                 inFlightTasksTable.search($(this).val()).draw();
             });
+
+            $("#btnNewTask").click(function() { window.location.href = '/NewTask'; });
         });
     </script>
 }

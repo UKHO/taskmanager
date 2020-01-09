@@ -6,6 +6,8 @@
         format: 'dd/mm/yyyy'
     }).datepicker('update', new Date());
 
-
+    $("#btnClose").click(function() {
+        window.location.href = '/Index';
+    });
 
 });
