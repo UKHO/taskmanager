@@ -17,6 +17,8 @@ namespace Portal.UnitTests
         {
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.DmEndDateDays = 14;
+            _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc = 0;
+            _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc = 2;
 
             _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
         }
@@ -31,6 +33,36 @@ namespace Portal.UnitTests
             Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDays), result.dmEndDate);
             Assert.AreEqual(_generalConfig.Value.DmEndDateDays, result.daysToDmEndDate);
 
+        }
+
+        [TestCase(3)]
+        [TestCase(short.MaxValue)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_No_Alerts(short daysToDmEndDate)
+        {
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
+
+            Assert.AreEqual(false, result.amberAlert);
+            Assert.AreEqual(false, result.redAlert);
+        }
+
+        [TestCase(2)]
+        [TestCase(1)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Amber_Alert_Only(short daysToDmEndDate)
+        { 
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
+
+            Assert.AreEqual(true, result.amberAlert);
+            Assert.AreEqual(false, result.redAlert);
+        }
+
+        [TestCase(0)]
+        [TestCase(short.MinValue)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Red_Alert_Only(short daysToDmEndDate)
+        { 
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
+
+            Assert.AreEqual(true, result.redAlert);
+            Assert.AreEqual(false, result.amberAlert);
         }
     }
 }

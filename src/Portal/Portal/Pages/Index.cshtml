@@ -65,7 +65,9 @@
                             <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            @task.DaysToDmEndDate
+                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                @task.DaysToDmEndDate
+                            </span>
                         </td>
                         <td>
                             @task.DmEndDate.ToShortDateString()
@@ -138,7 +140,9 @@
                             <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            @task.DaysToDmEndDate
+                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                @task.DaysToDmEndDate
+                            </span>
                         </td>
                         <td>
                             @task.DmEndDate.ToShortDateString()

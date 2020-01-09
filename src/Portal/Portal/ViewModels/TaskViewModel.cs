@@ -8,8 +8,10 @@ namespace Portal.ViewModels
     {
         public int WorkflowInstanceId { get; set; }
         public int ProcessId { get; set; }
-        public short DaysToDmEndDate { get; set; }
         public DateTime DmEndDate { get; set; }
+        public short DaysToDmEndDate { get; set; }
+        public bool DaysToDmEndDateAmberAlert { get; set; }
+        public bool DaysToDmEndDateRedAlert { get; set; }
         public short DaysOnHold { get; set; }
         public string AssessmentDataRsdraNumber { get; set; }
         public string AssessmentDataSourceDocumentName { get; set; }

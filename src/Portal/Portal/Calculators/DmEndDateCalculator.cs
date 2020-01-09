@@ -20,5 +20,13 @@ namespace Portal.Calculators
 
             return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);
         }
+
+        public (bool redAlert, bool amberAlert) DetermineDaysToDmEndDateAlerts(short daysToDmEndDate)
+        {
+            var redAlert = daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc; 
+            var amberAlert = !redAlert && daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc;
+
+            return (redAlert: redAlert, amberAlert: amberAlert);
+        }
     }
 }

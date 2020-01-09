@@ -7,5 +7,7 @@ namespace Portal.Configuration
         public string AzureAdClientId { get; set; }
         public string TenantId { get; set; }
         public int DmEndDateDays { get; set; }
+        public int DaysToDmEndDateRedAlertUpperInc { get; set; }
+        public int DaysToDmEndDateAmberAlertUpperInc { get; set; }
     }
 }
