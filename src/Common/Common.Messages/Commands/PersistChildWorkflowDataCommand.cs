@@ -8,5 +8,6 @@ namespace Common.Messages.Commands
         public int ChildProcessId { get;set; }
         public string ChildProcessSerialNumber { get; set; }
         public int ParentProcessId { get; set; }
+        public int AssignedTaskId { get; set; }
     }
 }
