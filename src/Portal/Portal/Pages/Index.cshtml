@@ -138,7 +138,7 @@
                             <a asp-page="DbAssessment/Review" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            <span class="alertText @(task.DaysToDmEndDateAmberAlert ? "amber" : "") @(task.DaysToDmEndDateRedAlert ? "red" : "")">
+                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
                                 @task.DaysToDmEndDate
                             </span>
                         </td>
