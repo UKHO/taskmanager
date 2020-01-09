@@ -64,14 +64,20 @@ namespace WorkflowCoordinator.Handlers
         /// <returns></returns>
         public async Task Handle(PersistChildWorkflowDataCommand command, IMessageHandlerContext context)
         {
-            // Get the parent's assessment data...
+            // Get the parent's data... 
+            var reviewData =
+                await _dbContext.DbAssessmentReviewData.FirstAsync(d => d.ProcessId == command.ParentProcessId);
+            var additionalAssignedTaskData =
+                await _dbContext.DbAssessmentAssignTask.FirstAsync(d => d.DbAssessmentAssignTaskId == command.AssignedTaskId);
             var parentData = await _dbContext.AssessmentData.FirstAsync(d => d.ProcessId == command.ParentProcessId);
             var primarySourceData = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == command.ParentProcessId);
 
             // ...and create for the new child
+            WorkflowInstance newWorkflowInstance = null;
+
             if (!_dbContext.WorkflowInstance.Any(w => w.ProcessId == command.ChildProcessId))
             {
-                _dbContext.WorkflowInstance.Add(new WorkflowInstance
+                newWorkflowInstance = new WorkflowInstance
                 {
                     ProcessId = command.ChildProcessId,
                     Comments = new List<Comment>(),
@@ -81,7 +87,9 @@ namespace WorkflowCoordinator.Handlers
                     StartedAt = DateTime.Today,
                     Status = WorkflowStatus.Started.ToString(),
                     WorkflowType = WorkflowType.DbAssessment.ToString()
-                });
+                };
+
+                _dbContext.WorkflowInstance.Add(newWorkflowInstance);
 
             }
 
@@ -122,6 +130,29 @@ namespace WorkflowCoordinator.Handlers
 
             await _dbContext.SaveChangesAsync();
 
+            if (!_dbContext.DbAssessmentAssessData.Any(d => d.ProcessId == command.ChildProcessId))
+            {
+
+                _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
+                {
+                    ProcessId = command.ChildProcessId,
+                    WorkflowInstanceId = newWorkflowInstance.WorkflowInstanceId,
+
+                    ActivityCode = reviewData.ActivityCode,
+                    Ion = reviewData.Ion,
+                    SourceCategory = reviewData.SourceCategory,
+                    TaskComplexity = reviewData.TaskComplexity,
+
+                    Assessor = additionalAssignedTaskData.Assessor,
+                    Verifier = additionalAssignedTaskData.Verifier,
+                    WorkManager = "TBC, Ask Matt"
+                });
+
+
+                await _dbContext.SaveChangesAsync();
+
+                // TODO: Copy additionalAssignedTaskData Notes to Comments; See 'CopyPrimaryAssignTaskNoteToComments' in Review.cshtml.cs
+            }
         }
     }
 }
