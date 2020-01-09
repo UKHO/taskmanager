@@ -7,7 +7,7 @@ using TechTalk.SpecFlow;
 namespace NCNEPortal.TestAutomation.Framework
 {
     [Binding]
-    internal sealed class WebDriverSupport
+    public sealed class WebDriverSupport : IDisposable
     {
         private readonly IObjectContainer _objectContainer;
         private IWebDriver _webDriver;
@@ -17,6 +17,11 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer = objectContainer;
         }
 
+        public void Dispose()
+        {
+            DisposeWebdriver();
+        }
+
         [BeforeScenario(Order = 0)]
         public void InitializeWebDriver()
         {
@@ -24,9 +29,11 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer.RegisterInstanceAs(_webDriver);
         }
 
-        ~WebDriverSupport()
+        [AfterScenario]
+        public void DisposeWebdriver()
         {
             _webDriver?.Quit();
+            _webDriver?.Dispose();
             _webDriver = null;
         }
     }

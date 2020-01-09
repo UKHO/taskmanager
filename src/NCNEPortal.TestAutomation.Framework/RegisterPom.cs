@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using BoDi;
+﻿using BoDi;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 
 namespace NCNEPortal.TestAutomation.Framework
 {
-    class RegisterPom
+    [Binding]
+    public class RegisterPom
     {
         private readonly IObjectContainer _objectContainer;
 

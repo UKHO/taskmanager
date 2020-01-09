@@ -9,6 +9,9 @@
   "stepAssemblies": [
     {
       "assembly": "NCNEPortal.TestAutomation.Steps"
+    },
+    {
+      "assembly": "NCNEPortal.TestAutomation.Framework"
     }
   ]
 }
