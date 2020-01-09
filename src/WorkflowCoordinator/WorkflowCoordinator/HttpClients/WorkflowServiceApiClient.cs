@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Models;
 
@@ -108,15 +108,13 @@ namespace WorkflowCoordinator.HttpClients
 
         }
 
-        public async Task ProgressWorkflowInstance(string serialNo)
+        public async Task<string> ProgressWorkflowInstance(int workflowInstanceId, string serialNo)
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNo}/actions/Approve");
 
-            var data = "";
-
             using (var response = await _httpClient.PostAsync(fullUri, null))
             {
-                data = await response.Content.ReadAsStringAsync();
+                var data = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
@@ -124,15 +122,7 @@ namespace WorkflowCoordinator.HttpClients
                                                    $"\n Url='{fullUri}'");
             }
 
-            if (!int.TryParse(data, out var workflowInstanceId))
-            {
-                throw new ApplicationException($"Failed to get WorkflowInstanceId" +
-                                               $"\nData= '{data}'," +
-                                               $"\n Url='{fullUri}'");
-
-            }
-
-            //return workflowInstanceId;
+            return await GetWorkflowInstanceSerialNumber(workflowInstanceId);
         }
     }
 }
