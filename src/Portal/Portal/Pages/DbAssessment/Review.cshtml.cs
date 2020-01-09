@@ -163,37 +163,52 @@ namespace Portal.Pages.DbAssessment
             PrimaryAssignedTask.ProcessId = ProcessId;
 
             await UpdateDbAssessmentReviewData();
-            await UpdateAdditionalAssignTasks(processId);
 
             await _dbContext.SaveChangesAsync();
 
             if (action == "Done")
             {
-                var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-                var correlationId = primaryDocumentStatus.CorrelationId.Value;
-
                 await CopyPrimaryAssignTaskNoteToComments(processId);
-
-                for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
-                {
-                    //TODO: Must validate incoming models
-                    //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
-                    //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
-                    var docRetrievalEvent = new StartWorkflowInstanceEvent
-                    {
-                        CorrelationId = correlationId,
-                        WorkflowType = WorkflowType.DbAssessment,
-                        ParentProcessId = processId
-                    };
-                    _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
-                    //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-                    _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
-                }
+                await ProcessAdditionalTasks(processId);
             }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task ProcessAdditionalTasks(int processId)
+        {
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
+            var correlationId = primaryDocumentStatus.CorrelationId.Value;
+
+            var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
+
+            foreach (var task in AdditionalAssignedTasks)
+            {
+
+                task.ProcessId = processId;
+                await _dbContext.DbAssessmentAssignTask.AddAsync(task);
+                await _dbContext.SaveChangesAsync();
+
+                //TODO: Must validate incoming models
+                //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
+                //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
+                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                {
+                    CorrelationId = correlationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = processId,
+                    AssignedTaskId = task.DbAssessmentAssignTaskId
+                };
+
+                _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
+                    docRetrievalEvent.ToJSONSerializedString());
+                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
+                    docRetrievalEvent.ToJSONSerializedString());
+            }
         }
 
         private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
@@ -229,18 +244,6 @@ namespace Portal.Pages.DbAssessment
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
-        }
-
-        private async Task UpdateAdditionalAssignTasks(int processId)
-        {
-            var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
-            _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
-
-            foreach (var task in AdditionalAssignedTasks)
-            {
-                task.ProcessId = processId;
-                await _dbContext.DbAssessmentAssignTask.AddAsync(task);
-            }
         }
 
         private bool ValidateSourceType()
