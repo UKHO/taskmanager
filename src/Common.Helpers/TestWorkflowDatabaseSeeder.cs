@@ -54,9 +54,9 @@ namespace Common.Helpers
 
         private void PopulateAssignedTaskSourceType()
         {
-            if (!File.Exists(@"Data\TaskType.json")) throw new FileNotFoundException(@"Data\TaskType.json");
+            if (!File.Exists(@"Data\AssignedTaskType.json")) throw new FileNotFoundException(@"Data\AssignedTaskType.json");
 
-            var jsonString = File.ReadAllText(@"Data\TaskType.json");
+            var jsonString = File.ReadAllText(@"Data\AssignedTaskType.json");
             var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskType>>(jsonString);
 
             _context.AssignedTaskType.AddRange(assignedTaskSourceType);
