@@ -6,7 +6,7 @@ namespace WorkflowDatabase.EF.Models
     {
         public int AssignedTaskTypeId { get; set; }
 
-        [DisplayName("Source Type:")]
+        [DisplayName("Task Type:")]
         public string Name { get; set; }
     }
 }

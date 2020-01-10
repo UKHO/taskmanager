@@ -49,8 +49,7 @@ namespace WorkflowDatabase.Tests
                 Assessor = "Me",
                 WorkflowInstanceId = 1,
                 Verifier = "Someone",
-                ActivityCode = "Act666",
-                TaskComplexity = "Simples"
+                ActivityCode = "Act666"
             });
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
@@ -58,8 +57,7 @@ namespace WorkflowDatabase.Tests
                 Assessor = "Me",
                 WorkflowInstanceId = 1,
                 Verifier = "You",
-                ActivityCode = "Act111",
-                TaskComplexity = "Simples"
+                ActivityCode = "Act111"
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());

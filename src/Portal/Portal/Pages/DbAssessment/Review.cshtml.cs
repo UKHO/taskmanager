@@ -238,7 +238,7 @@ namespace Portal.Pages.DbAssessment
             var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == ProcessId);
             currentReview.Assessor = PrimaryAssignedTask.Assessor;
             currentReview.Verifier = PrimaryAssignedTask.Verifier;
-            currentReview.AssignedTaskSourceType = PrimaryAssignedTask.AssignedTaskSourceType;
+            currentReview.TaskType = PrimaryAssignedTask.TaskType;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
@@ -248,15 +248,15 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateSourceType()
         {
-            if (string.IsNullOrEmpty(PrimaryAssignedTask.AssignedTaskSourceType))
+            if (string.IsNullOrEmpty(PrimaryAssignedTask.TaskType))
             {
                 ValidationErrorMessages.Add($"Assign Task 1: Source Type is required");
                 return false;
             }
 
-            if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
+            if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.TaskType))
             {
-                ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.AssignedTaskSourceType} does not exist");
+                ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.TaskType} does not exist");
                 return false;
             }
 
