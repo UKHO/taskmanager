@@ -6,7 +6,6 @@ namespace Common.Messages.Commands
     {
         public Guid CorrelationId { get; set; }
         public int ChildProcessId { get;set; }
-        public string ChildProcessSerialNumber { get; set; }
         public int ParentProcessId { get; set; }
         public int AssignedTaskId { get; set; }
     }

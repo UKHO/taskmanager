@@ -44,15 +44,12 @@ namespace WorkflowCoordinator.Handlers
             // Progress this new instance onto Assess
             await _workflowServiceApiClient.ProgressWorkflowInstance(instanceId, sn);
 
-            var newSn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(instanceId);
-
             var persistChildData = new PersistChildWorkflowDataCommand
             {
                 AssignedTaskId = message.AssignedTaskId,
                 CorrelationId = message.CorrelationId,
                 ParentProcessId = message.ParentProcessId,
-                ChildProcessId = instanceId,
-                ChildProcessSerialNumber = newSn
+                ChildProcessId = instanceId
             };
 
             await context.SendLocal(persistChildData).ConfigureAwait(false);
@@ -74,6 +71,8 @@ namespace WorkflowCoordinator.Handlers
             var parentData = await _dbContext.AssessmentData.FirstAsync(d => d.ProcessId == command.ParentProcessId);
             var primarySourceData = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == command.ParentProcessId);
 
+            var newSn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(command.ChildProcessId);
+
             // ...and create for the new child
             WorkflowInstance newWorkflowInstance = null;
 
@@ -83,9 +82,9 @@ namespace WorkflowCoordinator.Handlers
                 {
                     ProcessId = command.ChildProcessId,
                     Comments = new List<Comment>(),
-                    ActivityName = "Assess", // It isn't actually at Assess yet...
+                    ActivityName = "Assess",
                     ParentProcessId = command.ParentProcessId,
-                    SerialNumber = command.ChildProcessSerialNumber,
+                    SerialNumber = newSn,
                     StartedAt = DateTime.Today,
                     Status = WorkflowStatus.Started.ToString(),
                     WorkflowType = WorkflowType.DbAssessment.ToString()
@@ -97,7 +96,6 @@ namespace WorkflowCoordinator.Handlers
 
             if (!_dbContext.AssessmentData.Any(a => a.ProcessId == command.ChildProcessId))
             {
-
                 _dbContext.AssessmentData.Add(new AssessmentData
                 {
                     Datum = parentData.Datum,
@@ -112,12 +110,10 @@ namespace WorkflowCoordinator.Handlers
                     SourceNature = parentData.SourceNature,
                     ToSdoDate = parentData.ToSdoDate
                 });
-
             }
 
             if (!_dbContext.PrimaryDocumentStatus.Any(p => p.ProcessId == command.ChildProcessId))
             {
-
                 _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus
                 {
                     ProcessId = command.ChildProcessId,
@@ -127,7 +123,6 @@ namespace WorkflowCoordinator.Handlers
                     StartedAt = primarySourceData.StartedAt,
                     ContentServiceId = primarySourceData.ContentServiceId
                 });
-
             }
 
             await _dbContext.SaveChangesAsync();
@@ -148,7 +143,6 @@ namespace WorkflowCoordinator.Handlers
                     Verifier = additionalAssignedTaskData.Verifier,
                     TaskType = additionalAssignedTaskData.TaskType
                 });
-
 
                 await _dbContext.SaveChangesAsync();
 
