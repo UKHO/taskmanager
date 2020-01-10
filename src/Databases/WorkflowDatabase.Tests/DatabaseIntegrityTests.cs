@@ -481,7 +481,7 @@ namespace WorkflowDatabase.Tests
 
 
         [Test]
-        public void Ensure_assignedTaskSourceType_table_prevents_duplicate_name_due_to_UQ()
+        public void Ensure_assignedTaskType_table_prevents_duplicate_name_due_to_UQ()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType()
             {
