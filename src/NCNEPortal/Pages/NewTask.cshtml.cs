@@ -10,12 +10,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using NCNEPortal.Models;
+using NCNEWorkflowDatabase.EF;
 
 
 namespace NCNEPortal
 {
     public class NewTaskModel : PageModel
     {
+        private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         [DisplayName("ION:")] public string Ion { get; set; }
 
         [DisplayName("Chart No.:")] public string ChartNo { get; set; }
@@ -72,8 +74,9 @@ namespace NCNEPortal
         public SelectList PublisherList { get; set; }
 
 
-        public NewTaskModel()
+        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext)
         {
+            _ncneWorkflowDbContext = ncneWorkflowDbContext;
 
             Ion = "DC0892322";
             ChartNo = "192";

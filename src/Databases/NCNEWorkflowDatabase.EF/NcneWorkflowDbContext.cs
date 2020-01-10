@@ -1,13 +1,14 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
+using System;
+using System.Data.SqlClient;
 
 namespace NCNEWorkflowDatabase.EF
 {
-    public class NcnfWorkflowDbContext : DbContext
+    public class NcneWorkflowDbContext : DbContext
     {
-        public NcnfWorkflowDbContext(DbContextOptions<NcnfWorkflowDbContext> options)
+        public NcneWorkflowDbContext(DbContextOptions<NcneWorkflowDbContext> options)
             : base(options)
         {
             var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
@@ -16,11 +17,11 @@ namespace NCNEWorkflowDatabase.EF
 
             if (!isLocalDevelopment && !azureDevOpsBuild)
             {
-               // (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+                (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
             }
         }
 
-        public DbSet<NcneTaskInfo> NcneTaskData { get; set; }
-       
+        public DbSet<NcneTaskInfo> NcneTaskInfo { get; set; }
+
     }
 }
