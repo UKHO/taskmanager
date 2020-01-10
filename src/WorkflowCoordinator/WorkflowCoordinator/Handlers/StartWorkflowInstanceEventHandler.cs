@@ -145,7 +145,7 @@ namespace WorkflowCoordinator.Handlers
                     Assessor = additionalAssignedTaskData.Assessor,
                     Verifier = additionalAssignedTaskData.Verifier,
                     TaskType = additionalAssignedTaskData.TaskType,
-                    WorkManager = "TBC, Ask Matt"
+                    Reviewer = "TBC, Ask Matt"
                 });
 
 
