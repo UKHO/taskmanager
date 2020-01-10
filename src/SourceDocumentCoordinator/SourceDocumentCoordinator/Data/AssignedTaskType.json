@@ -1,0 +1,14 @@
+[
+  {
+    "AssignedTaskTypeId": 1,
+    "Name": "Simple"
+  },
+  {
+    "AssignedTaskTypeId": 2,
+    "Name": "LTA (Product only)"
+  },
+  {
+    "AssignedTaskTypeId": 3,
+    "Name": "LTA"
+  }
+]

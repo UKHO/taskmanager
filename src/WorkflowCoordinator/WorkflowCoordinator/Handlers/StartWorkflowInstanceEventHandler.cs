@@ -6,7 +6,6 @@ using Common.Messages.Commands;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using NServiceBus;
 using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
@@ -43,10 +42,13 @@ namespace WorkflowCoordinator.Handlers
             var sn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(instanceId);
 
             // Progress this new instance onto Assess
-           var newSn =  await _workflowServiceApiClient.ProgressWorkflowInstance(instanceId, sn);
+            await _workflowServiceApiClient.ProgressWorkflowInstance(instanceId, sn);
+
+            var newSn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(instanceId);
 
             var persistChildData = new PersistChildWorkflowDataCommand
             {
+                AssignedTaskId = message.AssignedTaskId,
                 CorrelationId = message.CorrelationId,
                 ParentProcessId = message.ParentProcessId,
                 ChildProcessId = instanceId,
@@ -132,7 +134,6 @@ namespace WorkflowCoordinator.Handlers
 
             if (!_dbContext.DbAssessmentAssessData.Any(d => d.ProcessId == command.ChildProcessId))
             {
-
                 _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
                 {
                     ProcessId = command.ChildProcessId,
@@ -141,11 +142,11 @@ namespace WorkflowCoordinator.Handlers
                     ActivityCode = reviewData.ActivityCode,
                     Ion = reviewData.Ion,
                     SourceCategory = reviewData.SourceCategory,
+                    Reviewer = reviewData.Reviewer,
 
                     Assessor = additionalAssignedTaskData.Assessor,
                     Verifier = additionalAssignedTaskData.Verifier,
-                    TaskType = additionalAssignedTaskData.TaskType,
-                    Reviewer = "TBC, Ask Matt"
+                    TaskType = additionalAssignedTaskData.TaskType
                 });
 
 

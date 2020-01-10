@@ -41,10 +41,9 @@
       "activityCode": "78798",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -139,17 +138,16 @@
       "activityCode": "78798",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "Simple",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "dbAssessmentAssignTask": [
       {
         "processId": 123,
         "assessor": "Matthew Stoodley",
         "verifier": "Peter Bates",
-        "AssignedTaskSourceType": "LTA",
+        "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
         "Notes": "Important note"
       }
@@ -261,10 +259,9 @@
       "activityCode": "78798",
       "assessor": "BatesP",
       "verifier": "RigdenT",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 321,
@@ -344,10 +341,9 @@
       "activityCode": "743543",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "Simple",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -457,10 +453,9 @@
       "activityCode": "4881",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -538,17 +533,16 @@
       "processId": 127,
       "ion": "I8766",
       "activityCode": "4881",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "dbAssessmentAssignTask": [
       {
         "processId": 127,
         "assessor": "Matthew Stoodley",
         "verifier": "Peter Bates",
-        "AssignedTaskSourceType": "LTA",
+        "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
         "Notes": "Important note"
       }
