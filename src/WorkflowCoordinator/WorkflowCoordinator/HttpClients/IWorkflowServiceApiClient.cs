@@ -8,5 +8,6 @@ namespace WorkflowCoordinator.HttpClients
         Task<int> GetDBAssessmentWorkflowId();
         Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId);
         Task TerminateWorkflowInstance(string serialNumber);
+        Task<bool> ProgressWorkflowInstance(int workflowInstanceId, string serialNo);
     }
 }

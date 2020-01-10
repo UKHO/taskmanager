@@ -9,17 +9,17 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-merge [dbo].[AssignedTaskSourceType] as target
+merge [dbo].[AssignedTaskType] as target
 using (
 		values 
 				(1,'Simple'),
 				(2, 'LTA (Product only)'),
 				(3, 'LTA')
-) as source ([AssignedTaskSourceTypeId], [Name])
-on (target.[AssignedTaskSourceTypeId] = source.[AssignedTaskSourceTypeId])
+) as source ([AssignedTaskTypeId], [Name])
+on (target.[AssignedTaskTypeId] = source.[AssignedTaskTypeId])
 when matched THEN
 UPDATE SET [Name] = source.[Name]
 WHEN NOT MATCHED BY target THEN
-INSERT     ([AssignedTaskSourceTypeId], [Name])
-     VALUES (source.[AssignedTaskSourceTypeId], source.[Name])
+INSERT     ([AssignedTaskTypeId], [Name])
+     VALUES (source.[AssignedTaskTypeId], source.[Name])
 WHEN NOT MATCHED BY source THEN DELETE;

@@ -49,8 +49,7 @@ namespace WorkflowDatabase.Tests
                 Assessor = "Me",
                 WorkflowInstanceId = 1,
                 Verifier = "Someone",
-                ActivityCode = "Act666",
-                TaskComplexity = "Simples"
+                ActivityCode = "Act666"
             });
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
@@ -58,8 +57,7 @@ namespace WorkflowDatabase.Tests
                 Assessor = "Me",
                 WorkflowInstanceId = 1,
                 Verifier = "You",
-                ActivityCode = "Act111",
-                TaskComplexity = "Simples"
+                ActivityCode = "Act111"
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
@@ -84,7 +82,7 @@ namespace WorkflowDatabase.Tests
                 WorkflowInstanceId = 1,
                 Verifier = "Someone",
                 ActivityCode = "Act666",
-                TaskComplexity = "Simples"
+                TaskType = "Simples"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
@@ -93,7 +91,7 @@ namespace WorkflowDatabase.Tests
                 WorkflowInstanceId = 1,
                 Verifier = "You",
                 ActivityCode = "Act111",
-                TaskComplexity = "Simples"
+                TaskType = "Simples"
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
@@ -483,20 +481,20 @@ namespace WorkflowDatabase.Tests
 
 
         [Test]
-        public void Ensure_assignedTaskSourceType_table_prevents_duplicate_name_due_to_UQ()
+        public void Ensure_assignedTaskType_table_prevents_duplicate_name_due_to_UQ()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType()
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Offshore Greg Energy"
             });
             _dbContext.SaveChanges();
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+                newContext.AssignedTaskType.Add(new AssignedTaskType()
                 {
-                    AssignedTaskSourceTypeId = 2,
+                    AssignedTaskTypeId = 2,
                     Name = "Offshore Greg Energy"
                 });
 
@@ -511,7 +509,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
             {
                 Assessor = "Greg",
-                AssignedTaskSourceType = "Type 1",
+                TaskType = "Type 1",
                 Notes = "A note",
                 Verifier = "Ross",
                 WorkspaceAffected = "Workspace 1"

@@ -32,7 +32,7 @@
             if (index > 0) {            //Set Form Control Names
                 $(element).find($(".assignTaskAssessor")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor");
                 $(element).find($(".assignTaskVerifier")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier");
-                $(element).find($(".assignTaskSourceType")).prop("name", "AdditionalAssignedTasks[" + id + "].AssignedTaskSourceType");
+                $(element).find($(".assignTaskType")).prop("name", "AdditionalAssignedTasks[" + id + "].TaskType");
                 $(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AdditionalAssignedTasks[" + id + "].WorkspaceAffected");
                 $(element).find($(".assignTaskNotes")).prop("name", "AdditionalAssignedTasks[" + id + "].Notes");
 
@@ -52,7 +52,7 @@
 
             $(newThing).find(".assignTaskAssessor").val(0);
             $(newThing).find(".assignTaskVerifier").val(0);
-            $(newThing).find(".assignTaskSourceType").val(0);
+            $(newThing).find(".assignTaskType").val(0);
             $(newThing).find(".assignTaskWorkspaceAffected").val("");
             $(newThing).find(".assignTaskNotes").val("");
 

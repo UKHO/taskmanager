@@ -134,8 +134,8 @@ namespace Portal.Pages.DbAssessment
             ValidationErrorMessages.Clear();
             var isValid = true;
 
-            // Show error to user where we have an invalid source type
-            if (!ValidateSourceType())
+            // Show error to user where we have an invalid task type
+            if (!ValidateTaskType())
             {
                 isValid = false;
             }
@@ -159,41 +159,57 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProcessId = processId;
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
             await UpdateDbAssessmentReviewData();
-            await UpdateAdditionalAssignTasks(processId);
 
             await _dbContext.SaveChangesAsync();
 
             if (action == "Done")
             {
-                var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-                var correlationId = primaryDocumentStatus.CorrelationId.Value;
-
                 await CopyPrimaryAssignTaskNoteToComments(processId);
-
-                for (var i = 1; i < AdditionalAssignedTasks.Count; i++)
-                {
-                    //TODO: Must validate incoming models
-                    //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
-                    //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
-                    var docRetrievalEvent = new StartWorkflowInstanceEvent
-                    {
-                        CorrelationId = correlationId,
-                        WorkflowType = WorkflowType.DbAssessment,
-                        ParentProcessId = processId
-                    };
-                    _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
-                    //await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-                    _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};", docRetrievalEvent.ToJSONSerializedString());
-                }
+                await ProcessAdditionalTasks(processId);
             }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task ProcessAdditionalTasks(int processId)
+        {
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
+            var correlationId = primaryDocumentStatus.CorrelationId.Value;
+
+            var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
+
+            foreach (var task in AdditionalAssignedTasks)
+            {
+
+                task.ProcessId = processId;
+                await _dbContext.DbAssessmentAssignTask.AddAsync(task);
+                await _dbContext.SaveChangesAsync();
+
+                //TODO: Must validate incoming models
+                //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
+                //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
+                var docRetrievalEvent = new StartWorkflowInstanceEvent
+                {
+                    CorrelationId = correlationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = processId,
+                    AssignedTaskId = task.DbAssessmentAssignTaskId
+                };
+
+                _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
+                    docRetrievalEvent.ToJSONSerializedString());
+                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
+                _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
+                    docRetrievalEvent.ToJSONSerializedString());
+            }
         }
 
         private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
@@ -223,53 +239,42 @@ namespace Portal.Pages.DbAssessment
             var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == ProcessId);
             currentReview.Assessor = PrimaryAssignedTask.Assessor;
             currentReview.Verifier = PrimaryAssignedTask.Verifier;
-            currentReview.AssignedTaskSourceType = PrimaryAssignedTask.AssignedTaskSourceType;
+            currentReview.TaskType = PrimaryAssignedTask.TaskType;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
+            currentReview.Reviewer = UserFullName;
         }
 
-        private async Task UpdateAdditionalAssignTasks(int processId)
+        private bool ValidateTaskType()
         {
-            var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
-            _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
-
-            foreach (var task in AdditionalAssignedTasks)
+            if (string.IsNullOrEmpty(PrimaryAssignedTask.TaskType))
             {
-                task.ProcessId = processId;
-                await _dbContext.DbAssessmentAssignTask.AddAsync(task);
-            }
-        }
-
-        private bool ValidateSourceType()
-        {
-            if (string.IsNullOrEmpty(PrimaryAssignedTask.AssignedTaskSourceType))
-            {
-                ValidationErrorMessages.Add($"Assign Task 1: Source Type is required");
+                ValidationErrorMessages.Add($"Assign Task 1: Task Type is required");
                 return false;
             }
 
-            if (!_dbContext.AssignedTaskSourceType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
+            if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.TaskType))
             {
-                ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.AssignedTaskSourceType} does not exist");
+                ValidationErrorMessages.Add($"Assign Task 1: Task Type {PrimaryAssignedTask.TaskType} does not exist");
                 return false;
             }
 
-            var sourceTypes = AdditionalAssignedTasks.Select(st => st.AssignedTaskSourceType).ToList();
+            var taskTypes = AdditionalAssignedTasks.Select(st => st.TaskType).ToList();
 
-            if (sourceTypes.Any(s => string.IsNullOrEmpty(s)))
+            if (taskTypes.Any(s => string.IsNullOrEmpty(s)))
             {
-                ValidationErrorMessages.Add($"Additional Assign Task: Source Type is required");
+                ValidationErrorMessages.Add($"Additional Assign Task: Task Type is required");
                 return false;
             }
 
-            var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskSourceType.Select(st => st.Name));
+            var erroneousEntries = taskTypes.Except(_dbContext.AssignedTaskType.Select(st => st.Name));
             if (erroneousEntries.Any())
             {
                 var entry = string.Join(',', erroneousEntries);
-                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Source Type - {entry}");
+                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Task Type - {entry}");
                 return false;
             }
 

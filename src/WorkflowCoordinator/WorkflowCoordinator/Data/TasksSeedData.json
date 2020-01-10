@@ -5,29 +5,29 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Review",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 445,
         "text": "A comment",
         "username": "Ross",
-        "created": "2019-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 445,
         "text": "A 2nd comment",
         "username": "Ben",
-        "created": "2019-01-03T00:00:00"
+        "created": "2020-01-03T00:00:00"
       }
     ],
     "assessmentData": {
       "PrimarySdocId": 1936906,
       "rsdraNumber": "RSDRA2017000302065",
       "sourceDocumentName": "HUA HIN",
-      "receiptDate": "2001-06-12T00:00:00",
+      "receiptDate": "2020-01-03T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2001-06-12T00:00:00",
+      "effectiveStartDate": "2019-01-03T00:00:00",
       "teamDistributedTo": null,
       "sourceDocumentType": "Chart - Navigational",
       "sourceNature": "Graphical",
@@ -41,17 +41,16 @@
       "activityCode": "78798",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
       "SdocId": 1936906,
       "ContentServiceId": null,
       "Status": "Started",
-      "StartedAt": "2019-06-12T00:00:00",
+      "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
     },
     "DatabaseDocumentStatus": [
@@ -62,7 +61,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   },
@@ -72,29 +71,29 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Review",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 123,
         "text": "A comment",
         "username": "Ross",
-        "created": "2019-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 123,
         "text": "A 2nd comment",
         "username": "Ben",
-        "created": "2019-01-03T00:00:00"
+        "created": "2020-01-03T00:00:00"
       }
     ],
     "assessmentData": {
       "PrimarySdocId": 217547,
       "rsdraNumber": "RSDRA2006000110163",
       "sourceDocumentName": "HUA HIN",
-      "receiptDate": "2001-06-12T00:00:00",
+      "receiptDate": "2020-01-03T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2001-06-12T00:00:00",
+      "effectiveStartDate": "2020-01-03T00:00:00",
       "teamDistributedTo": null,
       "sourceDocumentType": "Chart - Navigational",
       "sourceNature": "Graphical",
@@ -107,7 +106,7 @@
         "PrimarySdocId": 217547,
         "rsdraNumber": "RSDRA2006000169482",
         "sourceDocumentName": "HUA HIN",
-        "receiptDate": "2001-06-12T00:00:00",
+        "receiptDate": "2020-01-03T00:00:00",
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "sourceNature": "Graphical",
         "datum": "Non-WGS84",
@@ -115,7 +114,7 @@
         "linkedSdocId": 332373,
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 123,
@@ -130,7 +129,7 @@
         "linkedSdocId": 1018253,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "dbAssessmentReviewData": {
@@ -139,17 +138,16 @@
       "activityCode": "78798",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "Simple",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "dbAssessmentAssignTask": [
       {
         "processId": 123,
         "assessor": "Matthew Stoodley",
         "verifier": "Peter Bates",
-        "AssignedTaskSourceType": "LTA",
+        "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
         "Notes": "Important note"
       }
@@ -159,20 +157,20 @@
       "SdocId": 217547,
       "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
       "Status": "Complete",
-      "StartedAt": "2019-06-12T00:00:00",
+      "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
     },
     "OnHold": [
       {
         "processId": 123,
-        "OnHoldTime": "2019-11-10",
+        "OnHoldTime": "2020-01-01",
         "OnHoldUser": "Ross"
       },
       {
         "processId": 123,
-        "OnHoldTime": "2019-11-09",
+        "OnHoldTime": "2020-01-01",
         "OnHoldUser": "Ross",
-        "OffHoldTime": "2019-11-10",
+        "OffHoldTime": "2020-01-01",
         "OffHoldUser": "Samir"
       }
     ],
@@ -184,7 +182,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   },
@@ -194,29 +192,29 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Review",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 321,
         "text": "A comment",
         "username": "G",
-        "created": "2019-02-03T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 321,
         "text": "A 2nd comment",
         "username": "Bon",
-        "created": "2019-01-03T00:00:00"
+        "created": "2020-01-03T00:00:00"
       }
     ],
     "assessmentData": {
       "PrimarySdocId": 1101541,
       "rsdraNumber": "RSDRA2008000078062",
       "sourceDocumentName": "NMBK_JAP_38_1323_2008_W14_W/14 - A1_1",
-      "receiptDate": "2008-09-18T00:00:00",
+      "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2008-09-18T00:00:00",
+      "effectiveStartDate": "2020-01-01T00:00:00",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Source NM Block",
       "sourceNature": "Graphical",
@@ -237,14 +235,14 @@
         "linkedSdocId": 320532,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 321,
         "PrimarySdocId": 1101541,
         "rsdraNumber": "RSDRA2008000078061",
         "sourceDocumentName": "NM_JAP_38_1323_2008",
-        "receiptDate": "2008-09-18T00:00:00",
+        "receiptDate": "2020-01-01T00:00:00",
         "sourceDocumentType": "Source NM",
         "sourceNature": "Textual",
         "datum": null,
@@ -252,7 +250,7 @@
         "linkedSdocId": 1101540,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "dbAssessmentReviewData": {
@@ -261,17 +259,16 @@
       "activityCode": "78798",
       "assessor": "BatesP",
       "verifier": "RigdenT",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 321,
       "SdocId": 1101541,
       "ContentServiceId": null,
       "Status": "Started",
-      "StartedAt": "2019-06-12T00:00:00",
+      "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
     },
     "DatabaseDocumentStatus": [
@@ -282,7 +279,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   },
@@ -292,20 +289,20 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Assess",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 125,
         "text": "A comment",
         "username": "Samir",
-        "created": "2019-02-03T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 125,
         "text": "A 2nd comment",
         "username": "GW",
-        "created": "2019-11-03T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "assessmentData": {
@@ -335,7 +332,7 @@
         "linkedSdocId": 606203,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "dbAssessmentReviewData": {
@@ -344,17 +341,16 @@
       "activityCode": "743543",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "Simple",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
       "SdocId": 206733,
       "ContentServiceId": null,
       "Status": "Ready",
-      "StartedAt": "2019-06-12T00:00:00",
+      "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
     },
     "DatabaseDocumentStatus": [
@@ -365,7 +361,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   },
@@ -375,29 +371,29 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Assess",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 126,
         "text": "A comment",
         "username": "Peter",
-        "created": "2019-10-11T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 126,
         "text": "A 2nd comment",
         "username": "Shauno",
-        "created": "2019-06-12T00:00:00"
+        "created": "2020-01-03T00:00:00"
       }
     ],
     "assessmentData": {
       "PrimarySdocId": 938096,
       "rsdraNumber": "RSDRA2006000374923",
       "sourceDocumentName": "NM_DEN_30_235_06",
-      "receiptDate": "2006-08-03T00:00:00",
-      "toSdoDate": "2006-08-10T16:32:35",
-      "effectiveStartDate": "2006-08-03T00:00:00",
+      "receiptDate": "2020-01-01T00:00:00",
+      "toSdoDate": "2020-01-01T16:32:35",
+      "effectiveStartDate": "2020-01-01T00:00:00",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Source NM",
       "sourceNature": "Textual",
@@ -418,14 +414,14 @@
         "linkedSdocId": 306707,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 126,
         "PrimarySdocId": 938096,
         "rsdraNumber": "RSDRA2006000374850",
         "sourceDocumentName": "NMBN_DEN_30_06",
-        "receiptDate": "2006-08-03T00:00:00",
+        "receiptDate": "2020-01-01T00:00:00",
         "sourceDocumentType": "Notices to Mariners - FG Bulletin",
         "sourceNature": "Textual",
         "datum": null,
@@ -433,7 +429,7 @@
         "linkedSdocId": 938037,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 126,
@@ -448,7 +444,7 @@
         "linkedSdocId": 83848,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "dbAssessmentReviewData": {
@@ -457,17 +453,16 @@
       "activityCode": "4881",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
       "SdocId": 938096,
       "ContentServiceId": null,
       "Status": "Ready",
-      "StartedAt": "2019-06-12T00:00:00",
+      "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
     },
     "DatabaseDocumentStatus": [
@@ -478,7 +473,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   },
@@ -488,14 +483,14 @@
     "parentProcessId": null,
     "workflowType": "DbAssessment",
     "activityName": "Assess",
-    "startedAt": "2019-01-01T00:00:00",
+    "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
         "processId": 127,
         "text": "A comment",
         "username": "The Gup",
-        "created": "2019-11-09T00:00:00"
+        "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 127,
@@ -508,9 +503,9 @@
       "PrimarySdocId": 934153,
       "rsdraNumber": "RSDRA2006000369682",
       "sourceDocumentName": "NMBN_GER_27_06",
-      "receiptDate": "2006-07-07T00:00:00",
+      "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2006-07-07T00:00:00",
+      "effectiveStartDate": "2020-01-01T00:00:00",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Notices to Mariners - FG Bulletin",
       "sourceNature": "Textual",
@@ -523,7 +518,7 @@
         "PrimarySdocId": 934153,
         "rsdraNumber": "RSDRA2006000369735",
         "sourceDocumentName": "NM_GER_27_34_06",
-        "receiptDate": "2006-07-07T00:00:00",
+        "receiptDate": "2020-01-01T00:00:00",
         "sourceDocumentType": "Source NM",
         "sourceNature": "Textual",
         "datum": null,
@@ -531,24 +526,23 @@
         "linkedSdocId": 934203,
         "ContentServiceId": null,
         "Status": "NotAttached",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ],
     "dbAssessmentReviewData": {
       "processId": 127,
       "ion": "I8766",
       "activityCode": "4881",
-      "AssignedTaskSourceType": "LTA",
+      "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
-      "Notes": "Important note",
-      "TaskComplexity": "Simple"
+      "Notes": "Important note"
     },
     "dbAssessmentAssignTask": [
       {
         "processId": 127,
         "assessor": "Matthew Stoodley",
         "verifier": "Peter Bates",
-        "AssignedTaskSourceType": "LTA",
+        "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
         "Notes": "Important note"
       }
@@ -561,7 +555,7 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2019-10-15T00:00:00"
+        "created": "2020-01-01T00:00:00"
       }
     ]
   }

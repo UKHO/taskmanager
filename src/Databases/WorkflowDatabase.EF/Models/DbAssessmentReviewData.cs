@@ -12,12 +12,12 @@ namespace WorkflowDatabase.EF.Models
         public string SourceCategory { get; set; }
         public string Assessor { get; set; }
         public string Verifier { get; set; }
-        [DisplayName("Source Type:")]
-        public string AssignedTaskSourceType { get; set; }
+        [DisplayName("Task Type:")]
+        public string TaskType { get; set; }
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
+        public string Reviewer { get; set; }
         public string Notes { get; set; }
-        public string TaskComplexity { get; set; }
         public int WorkflowInstanceId { get; set; }
     }
 }

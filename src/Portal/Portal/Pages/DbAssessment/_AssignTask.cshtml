@@ -24,8 +24,8 @@
                 </div>
                 <div class="col-6">
                     <div class="form-row justify-content-between">
-                        <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.AssignedTaskSourceType, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DropDownListFor(model => model.PrimaryAssignedTask.AssignedTaskSourceType, Model.AssignedTaskSourceTypes,"", new { @class = "form-control assignTaskSourceType" })</div>
+                        <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.TaskType, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.PrimaryAssignedTask.TaskType, Model.AssignedTaskTypes,"", new { @class = "form-control assignTaskType" })</div>
                     </div>
                     <div class="form-row justify-content-between">
                         <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.WorkspaceAffected, new { @class = "col-form-label" })</div>
@@ -67,8 +67,8 @@
                         </div>
                         <div class="col-6">
                             <div class="form-row justify-content-between">
-                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).AssignedTaskSourceType, Model.AssignedTaskSourceTypes,"", new { @class = "form-control assignTaskSourceType" })</div>
+                                <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).TaskType, new { @class = "col-form-label" })</div>
+                                <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).TaskType, Model.AssignedTaskTypes,"", new { @class = "form-control assignTaskType" })</div>
                             </div>
                             <div class="form-row justify-content-between">
                                 <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "col-form-label" })</div>

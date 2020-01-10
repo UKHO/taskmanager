@@ -61,11 +61,11 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_a_primary_sourcetype_that_does_not_exist_results_in_validation_error_message()
+        public async Task Test_entering_a_primary_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "test invalid type",
+                TaskType = "test invalid type",
                 WorkspaceAffected = "Test Workspace",
                 Assessor = "Test User"
             };
@@ -75,22 +75,22 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Assign Task 1: Source Type { _reviewModel.PrimaryAssignedTask.AssignedTaskSourceType} does not exist", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Assign Task 1: Task Type { _reviewModel.PrimaryAssignedTask.TaskType} does not exist", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
         public async Task Test_entering_an_empty_primary_workspaceAffected_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "",
                 Assessor = "Test User"
             };
@@ -106,16 +106,16 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_primary_assessor_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
                 Assessor = ""
             };
@@ -129,18 +129,18 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_additional_sourcetype_that_does_not_exist_results_in_validation_error_message()
+        public async Task Test_entering_an_additional_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Test entry"
             });
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Test entry",
+                TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
                 Assessor = "Test User"
             };
@@ -149,7 +149,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId, 
-                    AssignedTaskSourceType = "This is invalid",
+                    TaskType = "This is invalid",
                     WorkspaceAffected = "Test Workspace",
                     Assessor = "Test User"
                 }
@@ -158,22 +158,22 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].AssignedTaskSourceType}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Additional Assign Task: Invalid Task Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
         public async Task Test_entering_an_empty_additional_workspaceAffected_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
                 Assessor = "Test User"
             };
@@ -182,7 +182,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId,
-                    AssignedTaskSourceType = "Simple",
+                    TaskType = "Simple",
                     WorkspaceAffected = "",
                     Assessor = "Test User"
                 }
@@ -197,16 +197,16 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_additional_assessor_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
                 Assessor = "Test User"
             };
@@ -215,7 +215,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId,
-                    AssignedTaskSourceType = "Simple",
+                    TaskType = "Simple",
                     WorkspaceAffected = "test workspace",
                     Assessor = ""
                 }
@@ -230,9 +230,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_when_primary_assign_task_has_note_it_should_be_copied_to_comments()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -241,7 +241,7 @@ namespace Portal.UnitTests
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
                 Assessor = "Test User",
                 Notes = primaryAssignTaskNote,
@@ -261,9 +261,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -272,7 +272,7 @@ namespace Portal.UnitTests
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
-                AssignedTaskSourceType = "Simple",
+                TaskType = "Simple",
                 WorkspaceAffected = "",
                 Assessor = "Test User",
                 Notes = primaryAssignTaskNote,

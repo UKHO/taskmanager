@@ -1,14 +1,12 @@
 ﻿using System;
-using Common.Messages.Enums;
 
-namespace Common.Messages.Events
+namespace Common.Messages.Commands
 {
-    public class StartWorkflowInstanceEvent : ICorrelate
+    public class PersistChildWorkflowDataCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
-        public WorkflowType WorkflowType { get; set; }
+        public int ChildProcessId { get;set; }
         public int ParentProcessId { get; set; }
         public int AssignedTaskId { get; set; }
     }
 }
-    

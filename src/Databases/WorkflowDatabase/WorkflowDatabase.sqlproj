@@ -77,8 +77,8 @@
     <Build Include="Tables\DbAssessmentAssessData.sql" />
     <Build Include="Tables\ProductAction.sql" />
     <Build Include="Tables\CachedHpdWorkspace.sql" />
-    <Build Include="Tables\AssignedTaskSourceType.sql" />
-    <PostDeploy Include="Scripts\Post Deployment\AssignedTaskSourceType.sql" />
+    <Build Include="Tables\AssignedTaskType.sql" />
+    <PostDeploy Include="Scripts\Post Deployment\AssignedTaskType.sql" />
     <Build Include="Tables\DbAssessmentAssignTask.sql" />
   </ItemGroup>
   <ItemGroup>

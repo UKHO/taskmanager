@@ -8,8 +8,8 @@ namespace Portal.Pages.DbAssessment
     public class _OperatorsModel : PageModel
     {
 
-        [DisplayName("Work Manager:")]
-        public string WorkManager { get; set; }
+        [DisplayName("Reviewer:")]
+        public string Reviewer { get; set; }
 
         [DisplayName("Assessor:")]
         public Assessor Assessor { get; set; }

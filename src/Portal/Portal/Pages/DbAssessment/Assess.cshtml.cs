@@ -147,7 +147,7 @@ namespace Portal.Pages.DbAssessment
         {
             return new _OperatorsModel
             {
-                WorkManager = "Greg Williams",
+                Reviewer = "Greg Williams",
                 Assessor = new Assessor { UserId = 1, Name = "Peter Bates" },
                 Verifier = new Verifier { UserId = 1, Name = "Matt Stoodley" },
                 Verifiers = new SelectList(

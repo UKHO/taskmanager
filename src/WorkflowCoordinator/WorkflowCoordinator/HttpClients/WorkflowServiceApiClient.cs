@@ -1,14 +1,9 @@
-﻿using Microsoft.Extensions.Options;
-
-using Newtonsoft.Json;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.Models;
 
@@ -111,6 +106,23 @@ namespace WorkflowCoordinator.HttpClients
                                                    $"\n Url='{fullUri}'");
             }
 
+        }
+
+        public async Task<bool> ProgressWorkflowInstance(int workflowInstanceId, string serialNo)
+        {
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNo}/actions/Approve");
+
+            using (var response = await _httpClient.PostAsync(fullUri, null))
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+
+            return true;
         }
     }
 }
