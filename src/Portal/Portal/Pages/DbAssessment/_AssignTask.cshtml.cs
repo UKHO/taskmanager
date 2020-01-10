@@ -27,7 +27,7 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList Assessors { get; set; }
         public SelectList Verifiers { get; set; }
-        public SelectList AssignedTaskSourceTypes { get; set; }
+        public SelectList AssignedTaskTypes { get; set; }
         
         public int Ordinal { get; set; }
 
@@ -101,9 +101,9 @@ namespace Portal.Pages.DbAssessment
 
             Verifiers = new SelectList(users);
 
-            var assignedTaskSourceTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
+            var assignedTaskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
 
-            AssignedTaskSourceTypes = new SelectList(assignedTaskSourceTypes);
+            AssignedTaskTypes = new SelectList(assignedTaskTypes);
         }
     }
 }

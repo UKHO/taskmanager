@@ -134,8 +134,8 @@ namespace Portal.Pages.DbAssessment
             ValidationErrorMessages.Clear();
             var isValid = true;
 
-            // Show error to user where we have an invalid source type
-            if (!ValidateSourceType())
+            // Show error to user where we have an invalid task type
+            if (!ValidateTaskType())
             {
                 isValid = false;
             }
@@ -159,6 +159,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProcessId = processId;
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
@@ -244,35 +245,36 @@ namespace Portal.Pages.DbAssessment
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
+            currentReview.Reviewer = UserFullName;
         }
 
-        private bool ValidateSourceType()
+        private bool ValidateTaskType()
         {
             if (string.IsNullOrEmpty(PrimaryAssignedTask.TaskType))
             {
-                ValidationErrorMessages.Add($"Assign Task 1: Source Type is required");
+                ValidationErrorMessages.Add($"Assign Task 1: Task Type is required");
                 return false;
             }
 
             if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.TaskType))
             {
-                ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.TaskType} does not exist");
+                ValidationErrorMessages.Add($"Assign Task 1: Task Type {PrimaryAssignedTask.TaskType} does not exist");
                 return false;
             }
 
-            var sourceTypes = AdditionalAssignedTasks.Select(st => st.TaskType).ToList();
+            var taskTypes = AdditionalAssignedTasks.Select(st => st.TaskType).ToList();
 
-            if (sourceTypes.Any(s => string.IsNullOrEmpty(s)))
+            if (taskTypes.Any(s => string.IsNullOrEmpty(s)))
             {
-                ValidationErrorMessages.Add($"Additional Assign Task: Source Type is required");
+                ValidationErrorMessages.Add($"Additional Assign Task: Task Type is required");
                 return false;
             }
 
-            var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskType.Select(st => st.Name));
+            var erroneousEntries = taskTypes.Except(_dbContext.AssignedTaskType.Select(st => st.Name));
             if (erroneousEntries.Any())
             {
                 var entry = string.Join(',', erroneousEntries);
-                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Source Type - {entry}");
+                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Task Type - {entry}");
                 return false;
             }
 
