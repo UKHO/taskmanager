@@ -61,7 +61,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_a_primary_sourcetype_that_does_not_exist_results_in_validation_error_message()
+        public async Task Test_entering_a_primary_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
@@ -129,7 +129,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_additional_sourcetype_that_does_not_exist_results_in_validation_error_message()
+        public async Task Test_entering_an_additional_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
