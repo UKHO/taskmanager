@@ -75,7 +75,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Assign Task 1: Source Type { _reviewModel.PrimaryAssignedTask.TaskType} does not exist", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Assign Task 1: Task Type { _reviewModel.PrimaryAssignedTask.TaskType} does not exist", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Additional Assign Task: Invalid Task Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
