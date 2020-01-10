@@ -13,7 +13,7 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: '$(Build.SourcesDirectory)\\src\\Databases\\NCNEWorkflowDatabase\\NCNEWorkflowDatabase.sqlproj'
-    msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=NCNEWorkflowDatabase.LocalDb.publish.xml
+    msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=NCNEWorkflowDatabase.publish.xml
   displayName: 'Build NCNE WorkflowDatabase and publish to LocalDb'
 
 - task: DotNetCoreCLI@2
