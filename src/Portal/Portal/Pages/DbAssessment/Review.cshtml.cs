@@ -254,7 +254,7 @@ namespace Portal.Pages.DbAssessment
                 return false;
             }
 
-            if (!_dbContext.AssignedTaskSourceType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
+            if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.AssignedTaskSourceType))
             {
                 ValidationErrorMessages.Add($"Assign Task 1: Source Type {PrimaryAssignedTask.AssignedTaskSourceType} does not exist");
                 return false;
@@ -268,7 +268,7 @@ namespace Portal.Pages.DbAssessment
                 return false;
             }
 
-            var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskSourceType.Select(st => st.Name));
+            var erroneousEntries = sourceTypes.Except(_dbContext.AssignedTaskType.Select(st => st.Name));
             if (erroneousEntries.Any())
             {
                 var entry = string.Join(',', erroneousEntries);

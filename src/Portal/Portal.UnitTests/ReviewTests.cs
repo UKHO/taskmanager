@@ -81,9 +81,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_primary_workspaceAffected_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -106,9 +106,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_primary_assessor_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -131,9 +131,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_additional_sourcetype_that_does_not_exist_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Test entry"
             });
             await _dbContext.SaveChangesAsync();
@@ -164,9 +164,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_additional_workspaceAffected_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -197,9 +197,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_additional_assessor_results_in_validation_error_message()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -230,9 +230,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_when_primary_assign_task_has_note_it_should_be_copied_to_comments()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();
@@ -261,9 +261,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
             await _dbContext.SaveChangesAsync();

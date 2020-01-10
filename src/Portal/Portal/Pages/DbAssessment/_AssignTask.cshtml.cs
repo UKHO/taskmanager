@@ -101,7 +101,7 @@ namespace Portal.Pages.DbAssessment
 
             Verifiers = new SelectList(users);
 
-            var assignedTaskSourceTypes = await _dbContext.AssignedTaskSourceType.Select(st => st.Name).ToListAsync();
+            var assignedTaskSourceTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
 
             AssignedTaskSourceTypes = new SelectList(assignedTaskSourceTypes);
         }

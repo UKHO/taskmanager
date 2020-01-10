@@ -485,18 +485,18 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_assignedTaskSourceType_table_prevents_duplicate_name_due_to_UQ()
         {
-            _dbContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType()
             {
-                AssignedTaskSourceTypeId = 1,
+                AssignedTaskTypeId = 1,
                 Name = "Offshore Greg Energy"
             });
             _dbContext.SaveChanges();
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.AssignedTaskSourceType.Add(new AssignedTaskSourceType()
+                newContext.AssignedTaskType.Add(new AssignedTaskType()
                 {
-                    AssignedTaskSourceTypeId = 2,
+                    AssignedTaskTypeId = 2,
                     Name = "Offshore Greg Energy"
                 });
 

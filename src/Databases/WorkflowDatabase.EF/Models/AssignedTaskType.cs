@@ -2,9 +2,9 @@
 
 namespace WorkflowDatabase.EF.Models
 {
-    public class AssignedTaskSourceType
+    public class AssignedTaskType
     {
-        public int AssignedTaskSourceTypeId { get; set; }
+        public int AssignedTaskTypeId { get; set; }
 
         [DisplayName("Source Type:")]
         public string Name { get; set; }

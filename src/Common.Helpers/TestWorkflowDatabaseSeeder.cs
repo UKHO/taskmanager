@@ -57,9 +57,9 @@ namespace Common.Helpers
             if (!File.Exists(@"Data\TaskType.json")) throw new FileNotFoundException(@"Data\TaskType.json");
 
             var jsonString = File.ReadAllText(@"Data\TaskType.json");
-            var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskSourceType>>(jsonString);
+            var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskType>>(jsonString);
 
-            _context.AssignedTaskSourceType.AddRange(assignedTaskSourceType);
+            _context.AssignedTaskType.AddRange(assignedTaskSourceType);
         }
 
         private void PopulateWorkflowInstance()
