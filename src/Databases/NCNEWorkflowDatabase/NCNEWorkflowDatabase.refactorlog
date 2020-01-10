@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="241c6b7c-cc98-4507-b0f5-cc120758b32c" ChangeDateTime="01/09/2020 13:40:47">
+    <Property Name="ElementName" Value="[dbo].[NcneTaskInfo].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NcneTaskInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProcessId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="57dfcead-0b20-442c-ae1c-f60d99621c37" ChangeDateTime="01/09/2020 13:43:05">
+    <Property Name="ElementName" Value="[dbo].[NcneTaskInfo].[Countr]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NcneTaskInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Country" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ddc4e272-ca38-43bb-baa0-ac41a9010f02" ChangeDateTime="01/09/2020 13:49:45">
+    <Property Name="ElementName" Value="[dbo].[NcneTaskInfo].[Veri]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NcneTaskInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VerifierOne" />
+  </Operation>
+</Operations>
