@@ -182,4 +182,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AssignedTaskSourceType" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2fc81b95-e720-418c-a89c-af7c6dec1aed" ChangeDateTime="01/10/2020 11:09:18">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentAssessData].[TaskComplexity]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentAssessData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TaskType" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7fc9b111-7bcc-4c55-bde9-29142feaf0fc" ChangeDateTime="01/10/2020 11:10:53">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentAssignTask].[AssignedTaskSourceType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentAssignTask]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TaskType" />
+  </Operation>
 </Operations>

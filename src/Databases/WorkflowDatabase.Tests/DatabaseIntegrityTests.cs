@@ -84,7 +84,7 @@ namespace WorkflowDatabase.Tests
                 WorkflowInstanceId = 1,
                 Verifier = "Someone",
                 ActivityCode = "Act666",
-                TaskComplexity = "Simples"
+                TaskType = "Simples"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
@@ -93,7 +93,7 @@ namespace WorkflowDatabase.Tests
                 WorkflowInstanceId = 1,
                 Verifier = "You",
                 ActivityCode = "Act111",
-                TaskComplexity = "Simples"
+                TaskType = "Simples"
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
@@ -511,7 +511,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
             {
                 Assessor = "Greg",
-                AssignedTaskSourceType = "Type 1",
+                TaskType = "Type 1",
                 Notes = "A note",
                 Verifier = "Ross",
                 WorkspaceAffected = "Workspace 1"

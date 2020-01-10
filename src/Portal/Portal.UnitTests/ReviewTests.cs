@@ -149,7 +149,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId, 
-                    AssignedTaskSourceType = "This is invalid",
+                    TaskType = "This is invalid",
                     WorkspaceAffected = "Test Workspace",
                     Assessor = "Test User"
                 }
@@ -158,7 +158,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].AssignedTaskSourceType}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Additional Assign Task: Invalid Source Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}", _reviewModel.ValidationErrorMessages[0]);
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId,
-                    AssignedTaskSourceType = "Simple",
+                    TaskType = "Simple",
                     WorkspaceAffected = "",
                     Assessor = "Test User"
                 }
@@ -215,7 +215,7 @@ namespace Portal.UnitTests
                 new DbAssessmentAssignTask
                 {
                     ProcessId = ProcessId,
-                    AssignedTaskSourceType = "Simple",
+                    TaskType = "Simple",
                     WorkspaceAffected = "test workspace",
                     Assessor = ""
                 }

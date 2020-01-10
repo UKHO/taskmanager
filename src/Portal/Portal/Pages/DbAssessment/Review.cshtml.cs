@@ -260,7 +260,7 @@ namespace Portal.Pages.DbAssessment
                 return false;
             }
 
-            var sourceTypes = AdditionalAssignedTasks.Select(st => st.AssignedTaskSourceType).ToList();
+            var sourceTypes = AdditionalAssignedTasks.Select(st => st.TaskType).ToList();
 
             if (sourceTypes.Any(s => string.IsNullOrEmpty(s)))
             {

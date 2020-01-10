@@ -141,7 +141,6 @@ namespace WorkflowCoordinator.Handlers
                     ActivityCode = reviewData.ActivityCode,
                     Ion = reviewData.Ion,
                     SourceCategory = reviewData.SourceCategory,
-                    TaskComplexity = reviewData.TaskComplexity,
 
                     Assessor = additionalAssignedTaskData.Assessor,
                     Verifier = additionalAssignedTaskData.Verifier,

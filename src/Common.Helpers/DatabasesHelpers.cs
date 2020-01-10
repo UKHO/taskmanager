@@ -45,7 +45,7 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DatabaseDocumentStatus]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductAction]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductActionType]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [AssignedTaskSourceType]");
+            workflowDbContext.Database.ExecuteSqlCommand("delete from [TaskType]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DataImpact]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsage]");
             workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentAssignTask]");

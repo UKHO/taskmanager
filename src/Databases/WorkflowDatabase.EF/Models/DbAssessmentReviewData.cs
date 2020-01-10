@@ -17,7 +17,6 @@ namespace WorkflowDatabase.EF.Models
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
         public string Notes { get; set; }
-        public string TaskComplexity { get; set; }
         public int WorkflowInstanceId { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace WorkflowDatabase.EF.Models
         public string Assessor { get; set; }
         public string Verifier { get; set; }
         [DisplayName("Source Type:")]
-        public string AssignedTaskSourceType { get; set; }
+        public string TaskType { get; set; }
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
         public string Notes { get; set; }

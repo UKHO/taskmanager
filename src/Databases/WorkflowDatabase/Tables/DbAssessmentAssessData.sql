@@ -8,7 +8,7 @@
     [WorkManager] NVARCHAR(255) NULL, 
     [Assessor] NVARCHAR(255) NULL, 
     [Verifier] NVARCHAR(255) NULL, 
-    [TaskComplexity] NVARCHAR(50) NULL, 
+    [TaskType] NVARCHAR(50) NULL, 
     [WorkflowInstanceId] INT NOT NULL, 
     [ProductActioned] BIT NULL, 
     [ProductActionChangeDetails] NVARCHAR(MAX) NULL, 
