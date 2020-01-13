@@ -87,20 +87,20 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("Action", action);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
-
-
+            
             var isValid = true;
             ValidationErrorMessages.Clear();
 
-            // Show error to user, that they've chosen the same usage more than once
             if (!ValidateTaskInformation())
             {
                 isValid = false;
             }
+
             if (!ValidateOperators())
             {
                 isValid = false;
             }
+
             if (!await ValidateRecordProductAction())
             {
                 isValid = false;
@@ -123,9 +123,10 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateProductAction(processId);
 
-            //TODO: Save data impact
+            await UpdateDataImpact(processId);
 
-            // TODO: validate the other partials where required.
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -167,6 +168,8 @@ namespace Portal.Pages.DbAssessment
 
         private bool ValidateDataImpact()
         {
+            // Show error to user, that they've chosen the same usage more than once
+
             if (DataImpacts.GroupBy(x => x.HpdUsageId)
                 .Where(g => g.Count() > 1)
                 .Select(y => y.Key).Any())
@@ -233,6 +236,20 @@ namespace Portal.Pages.DbAssessment
             {
                 productAction.ProcessId = processId;
                 _dbContext.ProductAction.Add(productAction);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateDataImpact(int processId)
+        {
+            var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DataImpact.RemoveRange(toRemove);
+
+            foreach (var dataImpact in DataImpacts)
+            {
+                dataImpact.ProcessId = processId;
+                _dbContext.DataImpact.Add(dataImpact);
             }
 
             await _dbContext.SaveChangesAsync();
