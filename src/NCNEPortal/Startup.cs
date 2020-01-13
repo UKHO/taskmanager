@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
@@ -34,12 +30,12 @@ namespace NCNEPortal
             var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
             services.AddOptions<GeneralConfig>()
-                .Bind(Configuration.GetSection("portal"))
+                .Bind(Configuration.GetSection("ncneportal"))
                 .Bind(Configuration.GetSection("subscription"));
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
             services.AddOptions<SecretsConfig>()
-                .Bind(Configuration.GetSection("PortalSection"));
+                .Bind(Configuration.GetSection("ncnePortalSection"));
 
             services.AddRazorPages();
 
@@ -49,7 +45,7 @@ namespace NCNEPortal
             Configuration.GetSection("urls").Bind(startupConfig);
             Configuration.GetSection("databases").Bind(startupConfig);
             Configuration.GetSection("subscription").Bind(startupConfig);
-            Configuration.GetSection("portal").Bind(startupConfig);
+            Configuration.GetSection("ncneportal").Bind(startupConfig);
 
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from

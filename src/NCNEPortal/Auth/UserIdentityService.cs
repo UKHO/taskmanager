@@ -1,9 +1,8 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
-using Portal.Configuration;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using GeneralConfig = NCNEPortal.Configuration.GeneralConfig;
 using SecretsConfig = NCNEPortal.Configuration.SecretsConfig;
 using UriConfig = NCNEPortal.Configuration.UriConfig;
