@@ -45,6 +45,13 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
+
+        [BindProperty]
+        public bool ProductActioned { get; set; }
+
+        [BindProperty]
+        public string ProductActionChangeDetails { get; set; }
+
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
@@ -99,10 +106,10 @@ namespace Portal.Pages.DbAssessment
                 isValid = false;
             }
 
-            if (!ValidateDataImpact())
-            {
-                isValid = false;
-            }
+            //if (!ValidateDataImpact())
+            //{
+            //    isValid = false;
+            //}
 
             if (!isValid)
             {
@@ -112,11 +119,9 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
-            //TODO: Save Task information
+            await UpdateTaskInformation(processId);
 
-            //TODO: Save operators
-
-            //TODO: Save record product action
+            await UpdateProductAction(processId);
 
             //TODO: Save data impact
 
@@ -124,6 +129,8 @@ namespace Portal.Pages.DbAssessment
 
             return StatusCode((int)HttpStatusCode.OK);
         }
+
+       
 
         private bool ValidateTaskInformation()
         {
@@ -202,6 +209,32 @@ namespace Portal.Pages.DbAssessment
             }
 
             return isValid;
+        }
+
+        private async Task UpdateTaskInformation(int processId)
+        {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            currentAssess.Verifier = Verifier;
+            currentAssess.Ion = Ion;
+            currentAssess.ActivityCode = ActivityCode;
+            currentAssess.SourceCategory = SourceCategory;
+        }
+
+        private async Task UpdateProductAction(int processId)
+        {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == ProcessId);
+            currentAssess.ProductActioned = ProductActioned;
+            currentAssess.ProductActionChangeDetails = ProductActionChangeDetails;
+
+            var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.ProductAction.RemoveRange(toRemove);
+
+            foreach (var productAction in RecordProductAction)
+            {
+                _dbContext.ProductAction.Add(productAction);
+            }
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)

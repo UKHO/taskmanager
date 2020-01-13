@@ -16,7 +16,6 @@ namespace Portal.Pages.DbAssessment
 
         [DisplayName("Verifier:")]
         public string Verifier { get; set; }
-        public SelectList Verifiers { get; set; }
 
         public void OnGet()
         {
