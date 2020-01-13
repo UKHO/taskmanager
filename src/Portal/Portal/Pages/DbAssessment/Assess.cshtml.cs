@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Portal.HttpClients;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -53,32 +55,56 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
-            bool validationSucceeded = true;
+            LogContext.PushProperty("ActivityName", "Assess");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
+            LogContext.PushProperty("Action", action);
+
+            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+
+            var isValid = true;
             ValidationErrorMessages.Clear();
 
             // Show error to user, that they've chosen the same usage more than once
+            //TODO: Validate task information
+
+            //TODO: Validate operators
+
+            
+            
+            
             if (!await ValidateRecordProductAction())
             {
-                validationSucceeded = false;
+                isValid = false;
             }
 
             if (!ValidateDataImpact())
             {
-                validationSucceeded = false;
+                isValid = false;
             }
 
+            if (!isValid)
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
+
+            //TODO: Save Task information
+
+            //TODO: Save operators
+
+            //TODO: Save record product action
+
+            //TODO: Save data impact
+
             // TODO: validate the other partials where required.
-            if (validationSucceeded)
-            {
-                return RedirectToPage("/Index");
-            }
-            else
-            {
-                await OnGet(processId);
-                return Page();
-            }
+
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         private bool ValidateDataImpact()
