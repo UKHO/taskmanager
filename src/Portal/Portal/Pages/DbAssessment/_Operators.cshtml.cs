@@ -12,10 +12,10 @@ namespace Portal.Pages.DbAssessment
         public string Reviewer { get; set; }
 
         [DisplayName("Assessor:")]
-        public Assessor Assessor { get; set; }
+        public string Assessor { get; set; }
 
         [DisplayName("Verifier:")]
-        public Verifier Verifier { get; set; }
+        public string Verifier { get; set; }
         public SelectList Verifiers { get; set; }
 
         public void OnGet()
