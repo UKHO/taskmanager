@@ -106,10 +106,10 @@ namespace Portal.Pages.DbAssessment
                 isValid = false;
             }
 
-            //if (!ValidateDataImpact())
-            //{
-            //    isValid = false;
-            //}
+            if (!ValidateDataImpact())
+            {
+                isValid = false;
+            }
 
             if (!isValid)
             {
@@ -231,6 +231,7 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var productAction in RecordProductAction)
             {
+                productAction.ProcessId = processId;
                 _dbContext.ProductAction.Add(productAction);
             }
 
