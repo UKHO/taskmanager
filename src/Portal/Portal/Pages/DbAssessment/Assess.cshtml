@@ -51,8 +51,6 @@
         <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
         <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
         <div class="col-2">
-
-            <input type="hidden" asp-for="ProcessId" />
             <button id="btnDone" class="btn btn-primary btn-block" type="button">Done</button>
 
         </div>
@@ -61,6 +59,7 @@
 <form id="frmAssessPage" method="post" asp-page-handler="Done">
 
     <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+    <input type="hidden" asp-for="ProcessId" />
     <input type="hidden" id="pageIdentity" value="Assess" />
 
     <div id="taskInformation"></div>
