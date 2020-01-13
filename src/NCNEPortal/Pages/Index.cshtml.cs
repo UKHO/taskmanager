@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
-using Portal.ViewModels;
-using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
+using System.Threading.Tasks;
 
 
 namespace NCNEPortal.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly IUserIdentityService _userIdentityService;
@@ -38,8 +27,8 @@ namespace NCNEPortal.Pages
         public async Task OnGetAsync()
         {
 
-           // UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-            
+             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
         }
 
     }
