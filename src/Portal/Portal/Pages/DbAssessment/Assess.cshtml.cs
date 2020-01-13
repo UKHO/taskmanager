@@ -222,7 +222,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateProductAction(int processId)
         {
-            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == ProcessId);
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             currentAssess.ProductActioned = ProductActioned;
             currentAssess.ProductActionChangeDetails = ProductActionChangeDetails;
 
