@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +10,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Portal.HttpClients;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -24,10 +28,30 @@ namespace Portal.Pages.DbAssessment
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
+
+        [BindProperty]
+        public string Ion { get; set; }
+
+        [BindProperty]
+        public string ActivityCode { get; set; }
+
+        [BindProperty]
+        public string SourceCategory { get; set; }
+
+        [BindProperty]
+        public string Verifier { get; set; }
+
         public _OperatorsModel OperatorsModel { get; set; }
 
         [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
+
+        [BindProperty]
+        public bool ProductActioned { get; set; }
+
+        [BindProperty]
+        public string ProductActionChangeDetails { get; set; }
+
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
@@ -48,41 +72,104 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGet(int processId)
         {
+            //TODO: Read operators from DB
+
             ProcessId = processId;
             OperatorsModel = SetOperatorsDummyData();
             await GetOnHoldData(processId);
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
-            bool validationSucceeded = true;
+            LogContext.PushProperty("ActivityName", "Assess");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
+            LogContext.PushProperty("Action", action);
+
+            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
+            
+            var isValid = true;
             ValidationErrorMessages.Clear();
 
-            // Show error to user, that they've chosen the same usage more than once
+            if (!ValidateTaskInformation())
+            {
+                isValid = false;
+            }
+
+            if (!ValidateOperators())
+            {
+                isValid = false;
+            }
+
             if (!await ValidateRecordProductAction())
             {
-                validationSucceeded = false;
+                isValid = false;
             }
 
             if (!ValidateDataImpact())
             {
-                validationSucceeded = false;
+                isValid = false;
             }
 
-            // TODO: validate the other partials where required.
-            if (validationSucceeded)
+            if (!isValid)
             {
-                return RedirectToPage("/Index");
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
             }
-            else
+
+            await UpdateTaskInformation(processId);
+
+            await UpdateProductAction(processId);
+
+            await UpdateDataImpact(processId);
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+       
+
+        private bool ValidateTaskInformation()
+        {
+            var isValid = true;
+
+            if (string.IsNullOrWhiteSpace(Ion))
             {
-                await OnGet(processId);
-                return Page();
+                ValidationErrorMessages.Add("Task Information: Ion cannot be empty");
+                isValid = false;
             }
+            if (string.IsNullOrWhiteSpace(ActivityCode))
+            {
+                ValidationErrorMessages.Add("Task Information: Activity code cannot be empty");
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(SourceCategory))
+            {
+                ValidationErrorMessages.Add("Task Information: Source category cannot be empty");
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        private bool ValidateOperators()
+        {
+            if (string.IsNullOrWhiteSpace(Verifier))
+            {
+                ValidationErrorMessages.Add("Operators: Verifier cannot be empty");
+                return false;
+            }
+            return true;
         }
 
         private bool ValidateDataImpact()
         {
+            // Show error to user, that they've chosen the same usage more than once
+
             if (DataImpacts.GroupBy(x => x.HpdUsageId)
                 .Where(g => g.Count() > 1)
                 .Select(y => y.Key).Any())
@@ -127,6 +214,47 @@ namespace Portal.Pages.DbAssessment
             return isValid;
         }
 
+        private async Task UpdateTaskInformation(int processId)
+        {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            currentAssess.Verifier = Verifier;
+            currentAssess.Ion = Ion;
+            currentAssess.ActivityCode = ActivityCode;
+            currentAssess.SourceCategory = SourceCategory;
+        }
+
+        private async Task UpdateProductAction(int processId)
+        {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            currentAssess.ProductActioned = ProductActioned;
+            currentAssess.ProductActionChangeDetails = ProductActionChangeDetails;
+
+            var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.ProductAction.RemoveRange(toRemove);
+
+            foreach (var productAction in RecordProductAction)
+            {
+                productAction.ProcessId = processId;
+                _dbContext.ProductAction.Add(productAction);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateDataImpact(int processId)
+        {
+            var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DataImpact.RemoveRange(toRemove);
+
+            foreach (var dataImpact in DataImpacts)
+            {
+                dataImpact.ProcessId = processId;
+                _dbContext.DataImpact.Add(dataImpact);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
             try
@@ -145,18 +273,19 @@ namespace Portal.Pages.DbAssessment
 
         private _OperatorsModel SetOperatorsDummyData()
         {
+            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
+            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
+                .Select(u => u.Name)
+                .ToList();
+
             return new _OperatorsModel
             {
                 Reviewer = "Greg Williams",
-                Assessor = new Assessor { UserId = 1, Name = "Peter Bates" },
-                Verifier = new Verifier { UserId = 1, Name = "Matt Stoodley" },
-                Verifiers = new SelectList(
-                    new List<Verifier>
-                    {
-                        new Verifier {UserId = 0, Name = "Brian Stenson"},
-                        new Verifier {UserId = 1, Name = "Matt Stoodley"},
-                        new Verifier {UserId = 2, Name = "Peter Bates"}
-                    }, "UserId", "Name")
+                Assessor = "Peter Bates",
+                Verifier = "Matt Stoodley",
+                Verifiers = new SelectList(users)
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
@@ -81,18 +83,19 @@ namespace Portal.Pages.DbAssessment
 
         private _OperatorsModel SetOperatorsDummyData()
         {
+            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
+            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
+                .Select(u => u.Name)
+                .ToList();
+
             return new _OperatorsModel
             {
                 Reviewer = "Greg Williams",
-                Assessor = new Assessor { UserId = 1, Name = "Peter Bates" },
-                Verifier = new Verifier { UserId = 1, Name = "Matt Stoodley" },
-                Verifiers = new SelectList(
-                    new List<Verifier>
-                    {
-                        new Verifier {UserId = 0, Name = "Brian Stenson"},
-                        new Verifier {UserId = 1, Name = "Matt Stoodley"},
-                        new Verifier {UserId = 2, Name = "Peter Bates"}
-                    }, "UserId", "Name")
+                Assessor = "Peter Bates",
+                Verifier = "Matt Stoodley",
+                Verifiers = new SelectList(users)
             };
         }
 
