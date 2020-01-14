@@ -86,7 +86,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
 
-            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
+            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
             
             var isValid = true;
             ValidationErrorMessages.Clear();
