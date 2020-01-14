@@ -6,9 +6,9 @@ using Common.Factories.Interfaces;
 using Common.Helpers;
 using Common.Messages.Events;
 using DataServices.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
-using NServiceBus.Logging;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
@@ -24,14 +24,15 @@ namespace SourceDocumentCoordinator.Sagas
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDocumentStatusFactory _documentStatusFactory;
-        ILog log = LogManager.GetLogger<SourceDocumentRetrievalSaga>();
+        private readonly ILogger<SourceDocumentRetrievalSaga> _logger;
 
         public SourceDocumentRetrievalSaga(WorkflowDbContext dbContext, IDataServiceApiClient dataServiceApiClient,
-            IOptionsSnapshot<GeneralConfig> generalConfig, IDocumentStatusFactory documentStatusFactory)
+            IOptionsSnapshot<GeneralConfig> generalConfig, IDocumentStatusFactory documentStatusFactory, ILogger<SourceDocumentRetrievalSaga> logger)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _generalConfig = generalConfig;
             _documentStatusFactory = documentStatusFactory;
+            _logger = logger;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SourceDocumentRetrievalSagaData> mapper)
@@ -42,7 +43,7 @@ namespace SourceDocumentCoordinator.Sagas
 
         public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
+            _logger.LogInformation($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
 
             if (!Data.IsStarted)
             {
