@@ -17,13 +17,13 @@
                 <div class="col-4">
                     <div class="row align-items-center">
                         <div class="col-4">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
-                        <div class="col-7">@Html.DisplayFor(model => model.Assessor.Name)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.Assessor)</div>
                     </div>
                 </div>
                 <div class="col-4">
                     <div class="row align-items-center">
                         <div class="col-4">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
-                        <div class="col-8">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, new { @class = "form-control" })</div>
+                        <div class="col-8">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, "", new { @class = "form-control" })</div>
                     </div>
                 </div>
 

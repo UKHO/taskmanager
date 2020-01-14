@@ -45,6 +45,18 @@
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },
+    "dbAssessmentAssessData": {
+      "processId": 445,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
+    },
     "PrimaryDocumentStatus": {
       "processId": 445,
       "SdocId": 1936906,
@@ -141,6 +153,18 @@
       "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 123,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "dbAssessmentAssignTask": [
       {
@@ -263,6 +287,18 @@
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },
+    "dbAssessmentAssessData": {
+      "processId": 321,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
+    },
     "PrimaryDocumentStatus": {
       "processId": 321,
       "SdocId": 1101541,
@@ -344,6 +380,18 @@
       "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 125,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -457,6 +505,18 @@
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },
+    "dbAssessmentAssessData": {
+      "processId": 126,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
+    },
     "PrimaryDocumentStatus": {
       "processId": 126,
       "SdocId": 938096,
@@ -536,6 +596,18 @@
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 127,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "dbAssessmentAssignTask": [
       {
