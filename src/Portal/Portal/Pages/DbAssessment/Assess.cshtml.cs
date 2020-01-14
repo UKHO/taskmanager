@@ -75,7 +75,7 @@ namespace Portal.Pages.DbAssessment
             //TODO: Read operators from DB
 
             ProcessId = processId;
-            OperatorsModel = SetOperatorsDummyData();
+            OperatorsModel = await GetOperatorsData(processId);
             await GetOnHoldData(processId);
         }
 
@@ -271,7 +271,7 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private _OperatorsModel SetOperatorsDummyData()
+        private async Task<_OperatorsModel> GetOperatorsData(int processId)
         {
             if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
 
@@ -280,15 +280,17 @@ namespace Portal.Pages.DbAssessment
                 .Select(u => u.Name)
                 .ToList();
 
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+
             return new _OperatorsModel
             {
-                Reviewer = "Greg Williams",
-                Assessor = "Peter Bates",
-                Verifier = "Matt Stoodley",
+                Reviewer = currentAssess.Reviewer ?? "",
+                Assessor = currentAssess.Assessor ?? "",
+                Verifier = currentAssess.Verifier ?? "",
                 Verifiers = new SelectList(users)
             };
         }
-
 
         private async Task GetOnHoldData(int processId)
         {
