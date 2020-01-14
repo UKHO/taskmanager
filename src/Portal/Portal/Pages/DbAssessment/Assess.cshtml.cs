@@ -285,8 +285,8 @@ namespace Portal.Pages.DbAssessment
 
             return new _OperatorsModel
             {
-                Reviewer = currentAssess.Reviewer ?? "",
-                Assessor = currentAssess.Assessor ?? "",
+                Reviewer = currentAssess.Reviewer ?? "Unknown",
+                Assessor = currentAssess.Assessor ?? "Unknown",
                 Verifier = currentAssess.Verifier ?? "",
                 Verifiers = new SelectList(users)
             };
