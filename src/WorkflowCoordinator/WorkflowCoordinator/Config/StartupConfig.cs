@@ -9,5 +9,7 @@ namespace WorkflowCoordinator.Config
         public string WorkflowDbServer { get; set; }
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
+        public Guid AssessmentPollingSagaCorrelationGuid { get; set; }
+
     }
 }
