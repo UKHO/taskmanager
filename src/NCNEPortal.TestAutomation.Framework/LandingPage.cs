@@ -21,11 +21,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(SeleniumTimeoutSeconds));
             
-          //  var configRoot = AzureAppConfigConfigurationRoot.Instance;
-
-         //   configRoot.GetSection("urls").Bind(_config); //TODO - check what this should be
-
-         //The line below is temporary!!!!!
+            // TODO: replace with NCNE URI from config
             _config = new LandingPageConfig{LandingPageUrl = new Uri("https://www.google.co.uk"), LocalDevLandingPageUrl = new Uri("https://localhost:44329/") };
 
             _landingPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.LandingPageUrl : _config.LocalDevLandingPageUrl;
