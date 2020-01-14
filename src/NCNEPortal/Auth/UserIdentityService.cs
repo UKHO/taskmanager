@@ -14,14 +14,15 @@ namespace NCNEPortal.Auth
         public UserIdentityService(IOptions<SecretsConfig> secretsConfig,
             IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
-            var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
-                $"{uriConfig.Value.LandingPageUrl}/signin-oidc";
+            //RS 14-Jan-2020 Commenting this code becuase the website works without this config
+            /*var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
+                $"{uriConfig.Value.LandingPageUrl}/signin-oidc"; */
 
             var authenticationProvider =
                 new NCNEPortal.Auth.MsalAuthenticationProvider(generalConfig.Value.AzureAdClientId,
                     secretsConfig.Value.ClientAzureAdSecret,
                     generalConfig.Value.TenantId,
-                    redirectUri);
+                    "");
 
             GraphClient = new GraphServiceClient(authenticationProvider, httpProvider);
         }
