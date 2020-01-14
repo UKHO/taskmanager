@@ -13,13 +13,12 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NServiceBus;
+using Serilog;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.MappingProfiles;
 using WorkflowDatabase.EF;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace WorkflowCoordinator
 {
@@ -31,6 +30,7 @@ namespace WorkflowCoordinator
 
             var builder = new HostBuilder()
                 .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
+                .UseSerilog()
                 .ConfigureWebJobs((context, b) => { b.AddAzureStorageCoreServices(); })
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -41,10 +41,18 @@ namespace WorkflowCoordinator
                         .AddAzureAppConfiguration(azureAppConfConnectionString)
                         .Build();
                 })
-                .ConfigureLogging((hostingContext, b) => { b.SetMinimumLevel(LogLevel.Debug); })
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+
+                    var startupLoggingConfig = new StartupLoggingConfig();
+                    hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+                    var startupSecretsConfig = new StartupSecretsConfig();
+                    hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretsConfig);
+                    hostingContext.Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+
+                    LoggingHelper.SetupLogging(isLocalDebugging, startupLoggingConfig, startupSecretsConfig);
 
                     var startupConfig = new StartupConfig();
                     hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
@@ -62,9 +70,6 @@ namespace WorkflowCoordinator
 
                     services.AddOptions<UriConfig>()
                         .Bind(hostingContext.Configuration.GetSection("urls"));
-
-                    var startupSecretConfig = new StartupSecretsConfig();
-                    hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
 
                     var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
                         isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer,
@@ -106,8 +111,8 @@ namespace WorkflowCoordinator
                         .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                         {
                             ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                            Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername,
-                                startupSecretConfig.K2RestApiPassword)
+                            Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername,
+                                startupSecretsConfig.K2RestApiPassword)
                         });
                 })
                 .UseNServiceBus(hostBuilderContext =>
@@ -124,6 +129,10 @@ namespace WorkflowCoordinator
                     hostBuilderContext.Configuration.GetSection("NsbDbSection").Bind(nsbSecretsConfig);
 
                     var endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
+
+                    var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
+                    serilogTracing.EnableSagaTracing();
+                    serilogTracing.EnableMessageTracing();
 
                     if (isLocalDebugging)
                     {
@@ -156,7 +165,18 @@ namespace WorkflowCoordinator
 
             using (host)
             {
-                await host.WorkflowCoordinatorRunAsync();
+                try
+                {
+                    await host.WorkflowCoordinatorRunAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Fatal(ex, "Host terminated unexpectedly");
+                }
+                finally
+                {
+                    Log.CloseAndFlush();
+                }
             }
         }
     }
