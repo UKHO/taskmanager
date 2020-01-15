@@ -1,24 +1,19 @@
-using AutoMapper;
-
-using FakeItEasy;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-
-using NServiceBus.Testing;
-
-using NUnit.Framework;
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common.Messages.Commands;
 using Common.Messages.Events;
+using FakeItEasy;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NServiceBus.Testing;
+using NUnit.Framework;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Sagas;
-
 using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.UnitTests
@@ -31,6 +26,7 @@ namespace WorkflowCoordinator.UnitTests
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
         private IMapper _fakeMapper;
+        private ILogger<StartDbAssessmentSaga> _fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -48,12 +44,14 @@ namespace WorkflowCoordinator.UnitTests
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeMapper = A.Fake<IMapper>();
+            _fakeLogger = A.Dummy<ILogger<StartDbAssessmentSaga>>();
 
             _saga = new StartDbAssessmentSaga(generalConfigOptionsSnapshot,
                 _fakeDataServiceApiClient,
                 _fakeWorkflowServiceApiClient,
                 _dbContext,
-                _fakeMapper)
+                _fakeMapper,
+                _fakeLogger)
             { Data = new StartDbAssessmentSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
         }

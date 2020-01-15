@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Messages.Commands;
+using DataServices.Models;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
-using DataServices.Models;
 using WorkflowCoordinator.Sagas;
 using WorkflowDatabase.EF;
 
@@ -21,6 +21,7 @@ namespace WorkflowCoordinator.UnitTests
     {
         private AssessmentPollingSaga _saga;
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private ILogger<AssessmentPollingSaga> _fakeLogger;
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
 
@@ -38,8 +39,11 @@ namespace WorkflowCoordinator.UnitTests
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakeLogger = A.Dummy<ILogger<AssessmentPollingSaga>>();
             _saga = new AssessmentPollingSaga(generalConfigOptionsSnapshot,
-                _fakeDataServiceApiClient, _dbContext)
+                _fakeDataServiceApiClient,
+                _dbContext,
+                _fakeLogger)
             { Data = new AssessmentPollingSagaData() };
             _handlerContext = new TestableMessageHandlerContext();
         }
