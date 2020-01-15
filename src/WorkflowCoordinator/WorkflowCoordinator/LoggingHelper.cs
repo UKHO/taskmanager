@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Data;
 using Common.Helpers;
 using Serilog;
 using Serilog.Events;
@@ -22,17 +24,17 @@ namespace WorkflowCoordinator
 
             var columnOptions = new ColumnOptions
             {
-                //AdditionalColumns = new Collection<SqlColumn>
-                //{
-                //    new SqlColumn
-                //        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
-                //    new SqlColumn
-                //        {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
-                //    new SqlColumn
-                //        {ColumnName = "EventBody", DataType = SqlDbType.NVarChar, DataLength = 4000},
-                //    new SqlColumn
-                //        {ColumnName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier}
-                //}
+                AdditionalColumns = new Collection<SqlColumn>
+                {
+                    new SqlColumn
+                        {ColumnName = "MessageId", DataType = SqlDbType.NVarChar, DataLength = 255},
+                    new SqlColumn
+                        {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                    new SqlColumn
+                        {ColumnName = "CorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
+                    new SqlColumn
+                        {ColumnName = "ProcessId", DataType = SqlDbType.Int}
+                }
             };
 
             Log.Logger = new LoggerConfiguration()

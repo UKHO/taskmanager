@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common.Messages.Events;
 using DataServices.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
+using Serilog.Context;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -54,6 +56,12 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Timeout(ExecuteAssessmentPollingTask state, IMessageHandlerContext context)
         {
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("CorrelationId", "");
+            LogContext.PushProperty("EventName", nameof(ExecuteAssessmentPollingTask));
+            LogContext.PushProperty("ProcessId", 0);
+
+
             _logger.LogInformation($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
 
             var assessment = await GetAssessmentNotInWorkflowDatabase();
