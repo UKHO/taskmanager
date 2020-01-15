@@ -77,11 +77,9 @@ namespace NCNEPortal
             });
 
 
-            //var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
-            //    isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
-                    isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, "NCNEWorkflowDatabase");
+                    isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.NcneWorkflowDbName);
 
             services.AddDbContext<NcneWorkflowDbContext>((serviceProvider, options) =>
                 options.UseSqlServer(workflowDbConnectionString));
