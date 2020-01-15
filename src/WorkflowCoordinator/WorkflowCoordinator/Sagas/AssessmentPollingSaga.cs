@@ -1,20 +1,16 @@
-﻿using DataServices.Models;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-
-using NServiceBus;
-using NServiceBus.Logging;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
-
+using Common.Messages.Events;
+using DataServices.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NServiceBus;
+using Serilog.Context;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
-
 using WorkflowDatabase.EF;
-
 using Task = System.Threading.Tasks.Task;
 
 namespace WorkflowCoordinator.Sagas
@@ -26,15 +22,16 @@ namespace WorkflowCoordinator.Sagas
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
-
-        ILog log = LogManager.GetLogger<AssessmentPollingSaga>();
+        private readonly ILogger<AssessmentPollingSaga> _logger;
 
         public AssessmentPollingSaga(IOptionsSnapshot<GeneralConfig> generalConfig,
-            IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext)
+            IDataServiceApiClient dataServiceApiClient, WorkflowDbContext dbContext,
+            ILogger<AssessmentPollingSaga> logger)
         {
             _generalConfig = generalConfig;
             _dataServiceApiClient = dataServiceApiClient;
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AssessmentPollingSagaData> mapper)
@@ -45,7 +42,7 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartAssessmentPollingCommand message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(StartAssessmentPollingCommand)}");
+            _logger.LogInformation($"Handling {nameof(StartAssessmentPollingCommand)}");
 
             Data.CorrelationId = message.CorrelationId;
             if (!Data.IsTaskAlreadyScheduled)
@@ -59,7 +56,13 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Timeout(ExecuteAssessmentPollingTask state, IMessageHandlerContext context)
         {
-            log.Debug($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("CorrelationId", "");
+            LogContext.PushProperty("EventName", nameof(ExecuteAssessmentPollingTask));
+            LogContext.PushProperty("ProcessId", 0);
+
+
+            _logger.LogInformation($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
 
             var assessment = await GetAssessmentNotInWorkflowDatabase();
 

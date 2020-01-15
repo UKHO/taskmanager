@@ -18,7 +18,7 @@ using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Logging;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -36,6 +36,7 @@ namespace WorkflowCoordinator.IntegrationTests
         private WorkflowServiceApiClient _workflowServiceApiClient;
         private WorkflowDbContext _dbContext;
         private IMapper _fakeMapper;
+        private ILogger<StartDbAssessmentSaga> _fakeLogger;
         private int _processId;
 
         [SetUp]
@@ -68,13 +69,15 @@ namespace WorkflowCoordinator.IntegrationTests
 
             _dbContext = WorkflowDbContext(connection);
             _fakeMapper = A.Fake<IMapper>();
+            _fakeLogger = A.Dummy<ILogger<StartDbAssessmentSaga>>();
 
             _startDbAssessmentSaga = new StartDbAssessmentSaga(
                                                                 generalConfigOptions, 
                                                                 _fakeDataServiceApiClient, 
                                                                 _workflowServiceApiClient, 
                                                                 _dbContext,
-                                                                _fakeMapper);
+                                                                _fakeMapper,
+                                                                _fakeLogger);
         }
 
         [Test]

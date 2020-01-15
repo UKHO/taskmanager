@@ -7,9 +7,9 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
-using NServiceBus.Logging;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -28,19 +28,20 @@ namespace WorkflowCoordinator.Sagas
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
         private readonly IMapper _mapper;
-
-        ILog log = LogManager.GetLogger<StartDbAssessmentSaga>();
+        private readonly ILogger<StartDbAssessmentSaga> _logger;
 
         public StartDbAssessmentSaga(IOptionsSnapshot<GeneralConfig> generalConfig,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
-            WorkflowDbContext dbContext, IMapper mapper)
+            WorkflowDbContext dbContext, IMapper mapper,
+            ILogger<StartDbAssessmentSaga> logger)
         {
             _generalConfig = generalConfig;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _dbContext = dbContext;
             _mapper = mapper;
+            _logger = logger;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<StartDbAssessmentSagaData> mapper)
@@ -54,7 +55,7 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartDbAssessmentCommand message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(StartDbAssessmentCommand)}: {message.ToJSONSerializedString()}");
+            _logger.LogInformation($"Handling {nameof(StartDbAssessmentCommand)}: {message.ToJSONSerializedString()}");
 
             if (!Data.IsStarted)
             {
@@ -62,7 +63,7 @@ namespace WorkflowCoordinator.Sagas
                 Data.CorrelationId = message.CorrelationId;
                 Data.SourceDocumentId = message.SourceDocumentId;
 
-                log.Debug($"Saved {Data.ToJSONSerializedString()} " +
+                _logger.LogInformation($"Saved {Data.ToJSONSerializedString()} " +
                           $"to {nameof(StartDbAssessmentSagaData)}");
             }
 
@@ -76,7 +77,7 @@ namespace WorkflowCoordinator.Sagas
 
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
 
-            log.Debug($"Sending {nameof(RetrieveAssessmentDataCommand)}");
+            _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.SendLocal(new RetrieveAssessmentDataCommand
             {
                 CorrelationId = Data.CorrelationId,
@@ -85,7 +86,7 @@ namespace WorkflowCoordinator.Sagas
                 WorkflowInstanceId = workflowInstanceId.Value
             });
 
-            log.Debug($"Sending {nameof(InitiateSourceDocumentRetrievalEvent)}");
+            _logger.LogInformation($"Sending {nameof(InitiateSourceDocumentRetrievalEvent)}");
 
             var initiateRetrievalEvent = new InitiateSourceDocumentRetrievalEvent()
             {
@@ -100,7 +101,7 @@ namespace WorkflowCoordinator.Sagas
 
             ConstructAndSendLinkedDocumentRetrievalCommands(context);
 
-            log.Debug($"Finished handling {nameof(StartDbAssessmentCommand)}");
+            _logger.LogInformation($"Finished handling {nameof(StartDbAssessmentCommand)}");
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace WorkflowCoordinator.Sagas
         /// <returns></returns>
         public async Task Handle(RetrieveAssessmentDataCommand message, IMessageHandlerContext context)
         {
-            log.Debug($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
+            _logger.LogInformation($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
 
             // Call DataServices to get the assessment data for the given sdoc Id
             var assessmentData =
