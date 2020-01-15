@@ -93,8 +93,6 @@ namespace NCNEPortal
                     NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -132,8 +130,6 @@ namespace NCNEPortal
             });
 
             app.UseAzureAppConfiguration();
-
-
         }
     }
 }
