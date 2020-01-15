@@ -1,7 +1,8 @@
-﻿using System;
-using System.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
+using System;
+using System.Data.SqlClient;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -54,6 +55,8 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlCommand("Truncate Table [CachedHpdWorkspace]");
         }
 
+
+
         public static void ReCreateLocalDb(string localDbServer, string dbName, string connectionString, bool isLocalDebugging)
         {
             var connectionStringObject = new SqlConnectionStringBuilder(connectionString);
@@ -85,6 +88,11 @@ namespace Common.Helpers
                 }
 
             }
+        }
+
+        public static void ClearNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
+        {
+            dbContext.Database.ExecuteSqlCommand("Truncate Table [NcneTaskInfo]");
         }
     }
 }

@@ -1,0 +1,36 @@
+[
+  {
+    
+    "ion": 232,
+    "country": "UK",
+    "chartNumber": 23, 
+    "chartType": "NE",
+    "workflowType": "Adoption",
+    "dating": "2 Weeks",
+    "publicationDate": "2020-01-10T00:00:00",
+    "announceDate": "2020-01-10T00:00:00",
+    "commitDate": "2020-01-10T00:00:00",
+    "cisDateTime": "2020-01-10T00:00:00",
+    "compiler": "StoodleyM",
+    "verifierOne": "StoodleyM",
+    "verifierTwo": "StoodleyM",
+    "publisher": "StoodleyM"
+  },
+  {
+
+    "ion": 232,
+    "country": "UK",
+    "chartNumber": 26,
+    "chartType": "NE",
+    "workflowType": "Derived",
+    "dating": "3 Weeks",
+    "publicationDate": "2020-01-10T00:00:00",
+    "announceDate": "2020-01-10T00:00:00",
+    "commitDate": "2020-01-10T00:00:00",
+    "cisDateTime": "2020-01-10T00:00:00",
+    "compiler": "StoodleyM",
+    "verifierOne": "StoodleyM",
+    "verifierTwo": "StoodleyM",
+    "publisher": "StoodleyM"
+  }
+]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NCNEPortal.Auth;
+using NCNEWorkflowDatabase.EF;
 using System.Threading.Tasks;
 
 
@@ -10,6 +11,7 @@ namespace NCNEPortal.Pages
     public class IndexModel : PageModel
     {
         private readonly IUserIdentityService _userIdentityService;
+        private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
 
         private string _userFullName;
         public string UserFullName
@@ -19,9 +21,11 @@ namespace NCNEPortal.Pages
         }
 
 
-        public IndexModel(IUserIdentityService userIdentityService)
+        public IndexModel(IUserIdentityService userIdentityService, NcneWorkflowDbContext ncneWorkflowDbContext
+                         )
         {
             _userIdentityService = userIdentityService;
+            _ncneWorkflowDbContext = ncneWorkflowDbContext;
         }
 
         public async Task OnGetAsync()

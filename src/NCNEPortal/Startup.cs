@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using NCNEPortal.Auth;
 using NCNEPortal.Configuration;
+using NCNEWorkflowDatabase.EF;
 
 
 namespace NCNEPortal
@@ -76,6 +78,21 @@ namespace NCNEPortal
 
 
 
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
+                    isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.NcneWorkflowDbName);
+
+            services.AddDbContext<NcneWorkflowDbContext>((serviceProvider, options) =>
+                options.UseSqlServer(workflowDbConnectionString));
+
+
+            if (isLocalDevelopment)
+            {
+                using (var sp = services.BuildServiceProvider())
+                using (var context = sp.GetRequiredService<NcneWorkflowDbContext>())
+                {
+                    NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                }
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

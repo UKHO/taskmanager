@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -41,7 +41,7 @@ namespace Common.Helpers
 
             _context.HpdUsage.AddRange(hpdUsages);
         }
-        
+
         private void PopulateProductActionType()
         {
             if (!File.Exists(@"Data\ProductActionType.json")) throw new FileNotFoundException(@"Data\ProductActionType.json");
@@ -78,13 +78,4 @@ namespace Common.Helpers
         }
     }
 
-    public interface ICanSaveChanges
-    {
-        void SaveChanges();
-    }
-
-    public interface ICanPopulateTables
-    {
-        ICanSaveChanges PopulateTables();
-    }
 }
