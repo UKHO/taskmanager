@@ -10,6 +10,7 @@ using FakeItEasy;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus.Testing;
 using NUnit.Framework;
@@ -30,6 +31,7 @@ namespace SourceDocumentCoordinator.UnitTests
         private WorkflowDbContext _dbContext;
         private SourceDocumentRetrievalSaga _sourceDocumentRetrievalSaga;
         private DocumentStatusFactory _documentStatusFactory;
+        private ILogger<SourceDocumentRetrievalSaga> _fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -47,10 +49,13 @@ namespace SourceDocumentCoordinator.UnitTests
 
             _documentStatusFactory = new DocumentStatusFactory(_dbContext);
 
+            _fakeLogger = A.Dummy<ILogger<SourceDocumentRetrievalSaga>>();
+
             _sourceDocumentRetrievalSaga = new SourceDocumentRetrievalSaga(_dbContext,
                 _fakeDataServiceApiClient,
                 generalConfig,
-                _documentStatusFactory);
+                _documentStatusFactory,
+                _fakeLogger);
         }
 
         [TearDown]

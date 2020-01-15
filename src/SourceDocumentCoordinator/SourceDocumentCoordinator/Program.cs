@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
+using Serilog;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
 using WorkflowDatabase.EF;
@@ -29,6 +30,7 @@ namespace SourceDocumentCoordinator
 
             var builder = new HostBuilder()
             .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
+            .UseSerilog()
             .ConfigureWebJobs(b =>
             {
                 b.AddAzureStorageCoreServices();
@@ -41,13 +43,19 @@ namespace SourceDocumentCoordinator
                       .AddAzureAppConfiguration(azureAppConfConnectionString)
                       .Build();
             })
-            .ConfigureLogging((hostingContext, b) =>
-            {
-                b.SetMinimumLevel(LogLevel.Debug);
-            })
             .ConfigureServices((hostingContext, services) =>
             {
                 var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+
+                var startupLoggingConfig = new StartupLoggingConfig();
+                hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+                var startupSecretsConfig = new StartupSecretsConfig();
+                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretsConfig);
+                hostingContext.Configuration.GetSection("subscription").Bind(startupSecretsConfig);
+                hostingContext.Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+
+                LoggingHelper.SetupLogging(isLocalDebugging, startupLoggingConfig, startupSecretsConfig);
 
                 var startupConfig = new StartupConfig();
                 hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
@@ -66,11 +74,6 @@ namespace SourceDocumentCoordinator
                 services.AddOptions<SecretsConfig>()
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-                var startupSecretConfig = new StartupSecretsConfig();
-                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretConfig);
-                hostingContext.Configuration.GetSection("subscription").Bind(startupSecretConfig);
-
-
                 services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
@@ -81,9 +84,9 @@ namespace SourceDocumentCoordinator
                     {
                         Credentials = new NetworkCredential
                         {
-                            UserName = startupSecretConfig.ContentServiceUsername,
-                            Password = startupSecretConfig.ContentServicePassword,
-                            Domain = startupSecretConfig.ContentServiceDomain
+                            UserName = startupSecretsConfig.ContentServiceUsername,
+                            Password = startupSecretsConfig.ContentServicePassword,
+                            Domain = startupSecretsConfig.ContentServiceDomain
                         }
                     })
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
@@ -116,6 +119,10 @@ namespace SourceDocumentCoordinator
 
                 var endpointConfiguration = new SourceDocumentCoordinatorConfig(nsbConfig, nsbSecretsConfig);
 
+                var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
+                serilogTracing.EnableSagaTracing();
+                serilogTracing.EnableMessageTracing();
+
                 if (isLocalDebugging)
                 {
                     var localDbServer = nsbConfig.LocalDbServer;
@@ -143,7 +150,18 @@ namespace SourceDocumentCoordinator
 
             using (host)
             {
-                await host.RunAsync();
+                try
+                {
+                    await host.RunAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Fatal(ex, "Host terminated unexpectedly");
+                }
+                finally
+                {
+                    Log.CloseAndFlush();
+                }
             }
         }
     }
