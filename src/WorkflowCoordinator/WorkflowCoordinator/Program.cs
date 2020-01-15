@@ -1,6 +1,10 @@
-﻿using Common.Helpers;
-
-using Microsoft.Azure.KeyVault;
+﻿using System;
+using System.Data.SqlClient;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
+using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
@@ -10,21 +14,12 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using NServiceBus;
-using NServiceBus.ObjectBuilder.MSDependencyInjection;
-
-using System;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AutoMapper;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.MappingProfiles;
 using WorkflowDatabase.EF;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace WorkflowCoordinator
 {
@@ -32,116 +27,136 @@ namespace WorkflowCoordinator
     {
         private static async Task Main(string[] args)
         {
+            var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+
             var builder = new HostBuilder()
-            .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
-            .ConfigureWebJobs((context, b) =>
-            {
-                b.AddAzureStorageCoreServices();
-            })
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
-                var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
-
-                var tokenProvider = new AzureServiceTokenProvider();
-                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
-
-                config.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
+                .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
+                .ConfigureWebJobs((context, b) => { b.AddAzureStorageCoreServices(); })
+                .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    ConnectionString = azureAppConfConnectionString
-                });
+                    var azureAppConfConnectionString =
+                        Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
-            })
-            .ConfigureLogging((hostingContext, b) =>
-            {
-                b.SetMinimumLevel(LogLevel.Debug);
-            })
-            .ConfigureServices((hostingContext, services) =>
-            {
-                var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
-
-                var startupConfig = new StartupConfig();
-                hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
-                hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
-                hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
-
-                var endpointConfiguration = new EndpointConfiguration(startupConfig.WorkflowCoordinatorName);
-                services.AddSingleton<EndpointConfiguration>(endpointConfiguration);
-
-                services.AddOptions<GeneralConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("nsb"))
-                    .Bind(hostingContext.Configuration.GetSection("apis"))
-                    .Bind(hostingContext.Configuration.GetSection("databases"))
-                    .Bind(hostingContext.Configuration.GetSection("k2"));
-
-                services.AddOptions<UriConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("urls"));
-
-                var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
-                    isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
-
-                var connection = new SqlConnection(workflowDbConnectionString)
+                    config.AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager())
+                        .AddAzureAppConfiguration(azureAppConfConnectionString)
+                        .Build();
+                })
+                .ConfigureLogging((hostingContext, b) => { b.SetMinimumLevel(LogLevel.Debug); })
+                .ConfigureServices((hostingContext, services) =>
                 {
-                    AccessToken = isLocalDebugging ?
-                        null :
-                        new AzureServiceTokenProvider().GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-                };
-                services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                    options.UseSqlServer(connection));
+                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
-                if (isLocalDebugging)
-                {
-                    using (var sp = services.BuildServiceProvider())
-                    using (var context = sp.GetRequiredService<WorkflowDbContext>())
+                    var startupConfig = new StartupConfig();
+                    hostingContext.Configuration.GetSection("nsb").Bind(startupConfig);
+                    hostingContext.Configuration.GetSection("urls").Bind(startupConfig);
+                    hostingContext.Configuration.GetSection("databases").Bind(startupConfig);
+
+                    services.AddOptions<StartupConfig>()
+                        .Bind(hostingContext.Configuration.GetSection("nsb"));
+
+                    services.AddOptions<GeneralConfig>()
+                        .Bind(hostingContext.Configuration.GetSection("nsb"))
+                        .Bind(hostingContext.Configuration.GetSection("apis"))
+                        .Bind(hostingContext.Configuration.GetSection("databases"))
+                        .Bind(hostingContext.Configuration.GetSection("k2"));
+
+                    services.AddOptions<UriConfig>()
+                        .Bind(hostingContext.Configuration.GetSection("urls"));
+
+                    var startupSecretConfig = new StartupSecretsConfig();
+                    hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+
+                    var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging,
+                        isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer,
+                        startupConfig.WorkflowDbName);
+
+                    var connection = new SqlConnection(workflowDbConnectionString)
                     {
+                        AccessToken = isLocalDebugging
+                            ? null
+                            : new AzureServiceTokenProvider()
+                                .GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
+                    };
+                    services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+                        options.UseSqlServer(connection));
+
+                    if (isLocalDebugging)
+                    {
+                        using var sp = services.BuildServiceProvider();
+                        using var context = sp.GetRequiredService<WorkflowDbContext>();
                         TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                     }
-                }
 
-                services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
-                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                    services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
-                services.AddOptions<SecretsConfig>()
-                    .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
+                    services.AddOptions<SecretsConfig>()
+                        .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
-                // Auto mapper config
-                var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new AssessmentDataMappingProfile()); });
-                var mapper = mappingConfig.CreateMapper();
-                services.AddSingleton(mapper);
-
-                var startupSecretConfig = new StartupSecretsConfig();
-                hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
-
-                services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
-                    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                    // Auto mapper config
+                    var mappingConfig = new MapperConfiguration(mc =>
                     {
-                        ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                        Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
+                        mc.AddProfile(new AssessmentDataMappingProfile());
                     });
+                    var mapper = mappingConfig.CreateMapper();
+                    services.AddSingleton(mapper);
 
-                UpdateableServiceProvider container = null;
-
-                endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+                    services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
+                            Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername,
+                                startupSecretConfig.K2RestApiPassword)
+                        });
+                })
+                .UseNServiceBus(hostBuilderContext =>
                 {
-                    customizations.ExistingServices(services);
-                    customizations.ServiceProviderFactory(sc =>
-                    {
-                        container = new UpdateableServiceProvider(sc);
-                        return container;
-                    });
-                });
+                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
-                services.AddScoped<IJobHost, NServiceBusJobHost>();
-            })
-            .UseConsoleLifetime();
+                    var nsbConfig = new NsbConfig();
+                    hostBuilderContext.Configuration.GetSection("nsb").Bind(nsbConfig);
+                    hostBuilderContext.Configuration.GetSection("urls").Bind(nsbConfig);
+                    hostBuilderContext.Configuration.GetSection("databases").Bind(nsbConfig);
+                    nsbConfig.IsLocalDevelopment = isLocalDebugging;
+
+                    var nsbSecretsConfig = new NsbSecretsConfig();
+                    hostBuilderContext.Configuration.GetSection("NsbDbSection").Bind(nsbSecretsConfig);
+
+                    var endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
+
+                    if (isLocalDebugging)
+                    {
+                        var localDbServer = nsbConfig.LocalDbServer;
+
+                        nsbSecretsConfig.NsbDbConnectionString =
+                            DatabasesHelpers.BuildSqlConnectionString(true, localDbServer,
+                                nsbSecretsConfig.NsbInitialCatalog);
+                        DatabasesHelpers.ReCreateLocalDb(localDbServer,
+                            nsbSecretsConfig.NsbInitialCatalog,
+                            DatabasesHelpers.BuildSqlConnectionString(true, localDbServer),
+                            ConfigHelpers.IsLocalDevelopment);
+                    }
+                    else
+                    {
+                        nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false,
+                            nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
+
+                        var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                        var azureDbTokenUrl = nsbConfig.AzureDbTokenUrl;
+                        nsbSecretsConfig.AzureAccessToken = azureServiceTokenProvider
+                            .GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                    }
+
+                    return endpointConfiguration;
+                })
+                .UseConsoleLifetime();
 
             var host = builder.Build();
 
             using (host)
             {
-                await host.RunAsync();
+                await host.WorkflowCoordinatorRunAsync();
             }
         }
     }
