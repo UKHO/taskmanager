@@ -22,7 +22,6 @@ namespace Common.Helpers
 
         public ICanSaveChanges PopulateTables()
         {
-
             DatabasesHelpers.ClearNcneWorkflowDbTables(_context);
             PopulateTaskInfo();
 
@@ -38,8 +37,6 @@ namespace Common.Helpers
 
             _context.NcneTaskInfo.AddRange(taskInfo);
         }
-
-
 
         public void SaveChanges()
         {

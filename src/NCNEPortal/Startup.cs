@@ -76,10 +76,6 @@ namespace NCNEPortal
                 options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
             });
 
-
-            //var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
-            //    isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
-
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                     isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, "NCNEWorkflowDatabase");
 
@@ -95,8 +91,6 @@ namespace NCNEPortal
                     NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -134,8 +128,6 @@ namespace NCNEPortal
             });
 
             app.UseAzureAppConfiguration();
-
-
         }
     }
 }

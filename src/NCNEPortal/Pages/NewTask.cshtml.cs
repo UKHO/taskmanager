@@ -4,8 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -58,21 +56,19 @@ namespace NCNEPortal
         public SelectList CompilerList { get; set; }
 
         [DisplayName("Verifier 1:")]
-        public  string Verifier1 { get; set; }
+        public string Verifier1 { get; set; }
 
-        public  SelectList VerifierList1 { get; set; }
+        public SelectList VerifierList1 { get; set; }
 
         [DisplayName("Verifier 2:")]
-        public  string Verifier2 { get; set; }
+        public string Verifier2 { get; set; }
 
         public SelectList VerifierList2 { get; set; }
-
 
         [DisplayName("Publication:")]
         public string Publisher { get; set; }
 
         public SelectList PublisherList { get; set; }
-
 
         public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext)
         {
@@ -91,8 +87,6 @@ namespace NCNEPortal
             AnnounceDate = DateTime.Today.AddDays(7);
             CommitToPrintDate = AnnounceDate.AddDays(7);
             CISDate = CommitToPrintDate.AddDays(7);
-
-
         }
 
         public void OnGet()
@@ -100,8 +94,8 @@ namespace NCNEPortal
 
         }
 
-        private void SetChartTypes( ){
-
+        private void SetChartTypes()
+        {
             if (!System.IO.File.Exists(@"Data\ChartTypes.json"))
                 throw new FileNotFoundException(@"Data\ChartTypes.json");
 
@@ -111,7 +105,6 @@ namespace NCNEPortal
             var chartTypes = JsonConvert.DeserializeObject<IEnumerable<ChartType>>(jsonString).Select(sc => sc.Name);
 
             ChartTypes = new SelectList(chartTypes);
-
         }
 
         private void SetWorkflowTypes()
@@ -137,14 +130,12 @@ namespace NCNEPortal
             var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
 
             var users = JsonConvert.DeserializeObject<IEnumerable<User>>(jsonString)
-                .Select(sc=>sc.Name);
+                .Select(sc => sc.Name);
 
             CompilerList = new SelectList(users);
             VerifierList1 = new SelectList(users);
             VerifierList2 = new SelectList(users);
             PublisherList = new SelectList(users);
-
-
         }
     }
 }
