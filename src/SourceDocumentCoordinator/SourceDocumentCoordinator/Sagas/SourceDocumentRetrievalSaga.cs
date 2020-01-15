@@ -9,6 +9,7 @@ using DataServices.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
+using Serilog.Context;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
@@ -43,6 +44,11 @@ namespace SourceDocumentCoordinator.Sagas
 
         public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
         {
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("CorrelationId", message.CorrelationId);
+            LogContext.PushProperty("EventName", message.GetType().ToString());
+            LogContext.PushProperty("ProcessId", "n/a");
+
             _logger.LogInformation($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
 
             if (!Data.IsStarted)
