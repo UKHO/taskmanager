@@ -58,6 +58,7 @@ namespace Portal.Pages
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
+                .OrderBy(wi => wi.ProcessId)
                 .ToListAsync();
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
