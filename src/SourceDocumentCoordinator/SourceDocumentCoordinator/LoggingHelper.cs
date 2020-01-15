@@ -27,11 +27,11 @@ namespace SourceDocumentCoordinator
                 AdditionalColumns = new Collection<SqlColumn>
                 {
                     new SqlColumn
-                        {ColumnName = "MessageId", DataType = SqlDbType.UniqueIdentifier},
+                        {ColumnName = "MessageId", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier},
+                        {ColumnName = "CorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ProcessId", DataType = SqlDbType.Int}
                 }

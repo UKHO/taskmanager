@@ -46,10 +46,10 @@ namespace SourceDocumentCoordinator.Sagas
         {
             LogContext.PushProperty("MessageId", context.MessageId);
             LogContext.PushProperty("CorrelationId", message.CorrelationId);
-            LogContext.PushProperty("EventName", message.GetType().ToString());
-            LogContext.PushProperty("ProcessId", "n/a");
+            LogContext.PushProperty("EventName", nameof(InitiateSourceDocumentRetrievalEvent));
+            LogContext.PushProperty("ProcessId", 0);
 
-            _logger.LogInformation($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}");
+            _logger.LogInformation($"Handling {nameof(InitiateSourceDocumentRetrievalEvent)}: {message.ToJSONSerializedString()}; ");
 
             if (!Data.IsStarted)
             {
