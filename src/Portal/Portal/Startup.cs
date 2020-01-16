@@ -158,6 +158,12 @@ namespace Portal
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
                 s.GetService<HttpProvider>()));
+            services.AddScoped<IDirectoryService,
+                DirectoryService>(s => new DirectoryService(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(),
+                s.GetService<IOptions<UriConfig>>(),
+                isLocalDevelopment,
+                s.GetService<HttpProvider>()));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
