@@ -10,11 +10,20 @@
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
-    "cisDateTime": "2020-01-10T00:00:00",
+    "cisDate": "2020-01-10T00:00:00",
     "compiler": "StoodleyM",
     "verifierOne": "StoodleyM",
     "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM"
+    "publisher": "StoodleyM",
+    "NcneTaskNote": 
+      {
+        "Text": "Important note on first task",
+        "Created": "2020-01-10T00:00:00",
+        "CreatedByUsername": "StoodleyM",
+        "LastModified": "2020-01-10T00:00:00",
+        "LastModifiedByUsername": "StoodleyM"
+      }
+    
   },
   {
 
@@ -27,7 +36,7 @@
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
-    "cisDateTime": "2020-01-10T00:00:00",
+    "cisDate": "2020-01-10T00:00:00",
     "compiler": "StoodleyM",
     "verifierOne": "StoodleyM",
     "verifierTwo": "StoodleyM",

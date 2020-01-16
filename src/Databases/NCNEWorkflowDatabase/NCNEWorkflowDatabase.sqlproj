@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\NcneTaskInfo.sql" />
+    <Build Include="Tables\NcneTaskNote.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="NCNEWorkflowDatabase.refactorlog" />
