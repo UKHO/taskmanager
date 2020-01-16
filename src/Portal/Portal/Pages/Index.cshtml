@@ -237,7 +237,17 @@
             </div>
             <div class="modal-body">
                 <div id="assignTaskModal-body">
-                    <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                    <div id="assignTaskTypeahead">
+                        <div class="text-input-wrap">
+                            <input type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                        </div>
+                        <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
+                            <h5>
+                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                                <span>Failed to look up users</span>
+                            </h5>
+                        </section>
+                    </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <br />
                     <div id="AssignTaskError"></div>

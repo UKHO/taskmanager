@@ -119,5 +119,11 @@ namespace Portal.Pages
             await OnGetAsync();
             return Page();
         }
+
+        public async Task<JsonResult> OnGetUsersAsync()
+        {
+            var cachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
+            return new JsonResult(cachedHpdWorkspaces);
+        }
     }
 }
