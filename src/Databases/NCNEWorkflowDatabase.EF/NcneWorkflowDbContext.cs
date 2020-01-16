@@ -22,6 +22,7 @@ namespace NCNEWorkflowDatabase.EF
         }
 
         public DbSet<NcneTaskInfo> NcneTaskInfo { get; set; }
+        public DbSet<NcneTaskNote> NcneTaskNote { get; set; }
 
     }
 }

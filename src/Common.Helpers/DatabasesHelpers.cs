@@ -92,7 +92,9 @@ namespace Common.Helpers
 
         public static void ClearNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
         {
-            dbContext.Database.ExecuteSqlCommand("Truncate Table [NcneTaskInfo]");
+            dbContext.Database.ExecuteSqlCommand("delete from [NcneTaskNote]");
+            dbContext.Database.ExecuteSqlCommand("delete from [NcneTaskInfo]");
+
         }
     }
 }
