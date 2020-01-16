@@ -123,10 +123,28 @@ namespace Portal.Pages
             return Page();
         }
 
-        public async Task OnPostAssignTaskToUserAsync(int processId, string userName)
+        public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
         {
-            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
-            instance.AssignedTo = userName;
+            switch (taskStage)
+            {
+                case "Review":
+                    var review = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+                    review.Reviewer = userName;
+                    break;
+                case "Assess":
+                    var assess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+                    assess.Assessor = userName;
+                    break;
+                case "Verify":
+                    throw new NotImplementedException($"'{taskStage}' not implemented");
+                    // TODO: implement Verify Data
+                    //var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+                    //verify.Verifier = userName;
+                    break;
+                default:
+                    throw new NotImplementedException($"'{taskStage}' not implemented");
+            }
+
             await _dbContext.SaveChangesAsync();
         }
 

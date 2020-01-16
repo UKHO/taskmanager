@@ -39,6 +39,9 @@
             var processId = $(this).data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
 
+            var taskStage = $(this).data("taskstage");
+            $("#hdnAssignTaskStage").val(taskStage);
+
             $("#assignTaskModal").modal("show");
         });
 
@@ -47,6 +50,7 @@
 
         var processId = $("#hdnAssignTaskProcessId").val();
         var userName = $("#txtUsername").val();
+        var taskStage = $("#hdnAssignTaskStage").val();
 
         $.ajax({
             type: "POST",
@@ -56,7 +60,8 @@
             },
             data: {
                 "processId": processId,
-                "userName": userName
+                "userName": userName,
+                "taskStage": taskStage
             },
             success: function (result) {
                 $("#assignTaskModal").modal("hide");

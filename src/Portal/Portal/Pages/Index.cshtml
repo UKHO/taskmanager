@@ -58,7 +58,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.DbAssessmentReviewDataAssessor) && string.IsNullOrEmpty(t.DbAssessmentReviewDataVerifier)))
+                @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.DbAssessmentReviewDataReviewer) ))
                 {
                     <tr>
                         <td>
@@ -132,7 +132,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.DbAssessmentReviewDataAssessor) || !string.IsNullOrEmpty(t.DbAssessmentReviewDataVerifier)))
+                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.DbAssessmentReviewDataReviewer) ))
                 {
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>
@@ -183,7 +183,7 @@
                                         </i>
                                         Edit Task Note
                                     </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
                                         <i class="far fa-user">
                                         </i>
                                         Assign Task
@@ -249,6 +249,7 @@
                         </section>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
+                    <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
                     <br />
                     <div id="AssignTaskError"></div>
                 </div>
