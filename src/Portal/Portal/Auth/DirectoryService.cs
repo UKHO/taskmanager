@@ -11,17 +11,20 @@ namespace Portal.Auth
 {
     public class DirectoryService : IDirectoryService
     {
+        private readonly IOptions<SecretsConfig> _secretsConfig;
         private GraphServiceClient GraphClient { get; }
+
 
         public DirectoryService(IOptions<SecretsConfig> secretsConfig,
             IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
+            _secretsConfig = secretsConfig;
             var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
                 $"{uriConfig.Value.LandingPageUrl}/signin-oidc";
 
             var authenticationProvider =
                 new MsalAuthenticationProvider(generalConfig.Value.AzureAdClientId,
-                    secretsConfig.Value.ClientAzureAdSecret,
+                    _secretsConfig.Value.ClientAzureAdSecret,
                     generalConfig.Value.TenantId,
                     redirectUri);
 
@@ -30,20 +33,16 @@ namespace Portal.Auth
 
         public async Task<IEnumerable<string>> GetGroupMembers()
         {
-            var groupName = "Hydrographic Data Team"; //TODO: URL encode?
+            var groupId = _secretsConfig.Value.HDTGuid;
 
             try
             {
-                
-                var groups = await GraphClient.Groups.Request().Expand("members").Filter($"displayName eq '{groupName}'").GetAsync();
-
-                //TODO: Choose correct group
-                var group = groups[0];
+                var group = await GraphClient.Groups[groupId.ToString()].Request().Expand("members").GetAsync();
 
                 if (group.Members == null || !group.Members.Any())
                 {
                     //TODO: Log!
-                    throw new ApplicationException($"Unable to get members of group {groupName}");
+                    throw new ApplicationException($"Unable to get members of group.");
                 }
 
                 //TODO: Log count

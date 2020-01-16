@@ -74,10 +74,13 @@ namespace Portal
                 .Bind(Configuration.GetSection("apis"))
                 .Bind(Configuration.GetSection("subscription"))
                 .Bind(Configuration.GetSection("K2"));
+
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
+
             services.AddOptions<SecretsConfig>()
-                .Bind(Configuration.GetSection("PortalSection"));
+                .Bind(Configuration.GetSection("PortalSection"))
+                .Bind(Configuration.GetSection("ActiveDirectory"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
