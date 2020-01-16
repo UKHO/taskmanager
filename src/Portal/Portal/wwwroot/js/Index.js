@@ -15,6 +15,19 @@
             $("#editTaskNoteModal").modal("show");
         });
 
+    $(".assignTaskItem").on("click",
+        function () {
+
+            $("#btnAssignTaskToUser").prop("disabled", false);
+            $("#AssignTaskError").html("");
+
+            var processId = $(this).data("processid");
+            $("#hdnAssignTaskProcessId").val(processId);
+
+            $("#assignTaskModal").modal("show");
+        });
+
+
     $("#editTaskNoteModal").on("shown.bs.modal",
         function () {
             $("#txtNote").focus();
