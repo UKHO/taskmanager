@@ -74,10 +74,13 @@ namespace Portal
                 .Bind(Configuration.GetSection("apis"))
                 .Bind(Configuration.GetSection("subscription"))
                 .Bind(Configuration.GetSection("K2"));
+
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
+
             services.AddOptions<SecretsConfig>()
-                .Bind(Configuration.GetSection("PortalSection"));
+                .Bind(Configuration.GetSection("PortalSection"))
+                .Bind(Configuration.GetSection("ActiveDirectory"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -154,6 +157,12 @@ namespace Portal
             services.AddSingleton<IHttpProvider, HttpProvider>();
             services.AddScoped<IUserIdentityService,
                 UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(),
+                s.GetService<IOptions<UriConfig>>(),
+                isLocalDevelopment,
+                s.GetService<HttpProvider>()));
+            services.AddScoped<IDirectoryService,
+                DirectoryService>(s => new DirectoryService(s.GetService<IOptions<SecretsConfig>>(),
                 s.GetService<IOptions<GeneralConfig>>(),
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,

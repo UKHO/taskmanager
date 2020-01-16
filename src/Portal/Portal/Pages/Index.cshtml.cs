@@ -23,6 +23,7 @@ namespace Portal.Pages
 
         private readonly IMapper _mapper;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly IDirectoryService _directoryService;
         private readonly ILogger<IndexModel> _logger;
         private readonly IIndexFacade _indexFacade;
 
@@ -39,12 +40,14 @@ namespace Portal.Pages
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
             IUserIdentityService userIdentityService,
+            IDirectoryService directoryService,
             ILogger<IndexModel> logger,
             IIndexFacade indexFacade)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _userIdentityService = userIdentityService;
+            _directoryService = directoryService;
             _logger = logger;
             _indexFacade = indexFacade;
         }
@@ -122,8 +125,7 @@ namespace Portal.Pages
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            var cachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
-            return new JsonResult(cachedHpdWorkspaces);
+            return new JsonResult(await _directoryService.GetGroupMembers());
         }
     }
 }
