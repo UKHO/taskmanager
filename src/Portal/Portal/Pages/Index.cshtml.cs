@@ -123,6 +123,13 @@ namespace Portal.Pages
             return Page();
         }
 
+        public async Task OnPostAssignTaskToUserAsync(int processId, string userName)
+        {
+            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+            instance.AssignedTo = userName;
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<JsonResult> OnGetUsersAsync()
         {
             return new JsonResult(await _directoryService.GetGroupMembers());

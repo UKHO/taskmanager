@@ -42,6 +42,40 @@
             $("#assignTaskModal").modal("show");
         });
 
+    $("#btnAssignTaskToUser").on("click", function () {
+        $("#btnAssignTaskToUser").prop("disabled", true);
+
+        var processId = $("#hdnAssignTaskProcessId").val();
+        var userName = $("#txtUsername").val();
+
+        $.ajax({
+            type: "POST",
+            url: "Index/?handler=AssignTaskToUser",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "userName": userName
+            },
+            success: function (result) {
+                $("#assignTaskModal").modal("hide");
+                $("body").removeClass("modal-open");
+                $(".modal-backdrop").remove();
+                //getComments();
+            },
+            error: function (error) {
+                console.log(error);
+
+                //$("#AddCommentError")
+                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+
+                //$("#btnPostComment").prop("disabled", false);
+            }
+        });
+
+    });
+
     initialiseAssignTaskTypeahead();
 
     function initialiseAssignTaskTypeahead() {
