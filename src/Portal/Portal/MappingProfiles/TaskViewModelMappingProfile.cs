@@ -9,8 +9,6 @@ namespace Portal.MappingProfiles
         public TaskViewModelMappingProfile()
         {
             CreateMap<WorkflowInstance, TaskViewModel>()
-                .ForMember(destination => destination.TaskType,
-                    opts => opts.MapFrom(source => source.WorkflowType))
                 .ForMember(destination => destination.TaskStage,
                     opts => opts.MapFrom(source => source.ActivityName));
 
