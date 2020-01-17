@@ -40,7 +40,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review"
             });
 
@@ -72,7 +71,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Assess"
             });
 
@@ -106,7 +104,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = WorkflowConstants.WorkflowType,
                 ActivityName = WorkflowConstants.ActivityName,
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
@@ -120,7 +117,6 @@ namespace WorkflowDatabase.Tests
                     ProcessId = 1,
                     SerialNumber = "2_sn",
                     ParentProcessId = null,
-                    WorkflowType = WorkflowConstants.WorkflowType,
                     ActivityName = WorkflowConstants.ActivityName,
                     Status = WorkflowStatus.Started.ToString(),
                     StartedAt = DateTime.Now
@@ -139,7 +135,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review",
                 StartedAt = DateTime.Now,
                 Status = WorkflowStatus.Started.ToString()
@@ -179,7 +174,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "2_sn",
                 ParentProcessId = null,
-                WorkflowType = WorkflowConstants.WorkflowType,
                 ActivityName = WorkflowConstants.ActivityName,
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
@@ -323,7 +317,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 123,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review",
                 StartedAt = DateTime.Today,
                 Status = "Started"
@@ -366,7 +359,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 123,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review",
                 StartedAt = DateTime.Today,
                 Status = "Started"
@@ -378,7 +370,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 124,
                 SerialNumber = "2_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review",
                 StartedAt = DateTime.Today,
                 Status = "Started"
@@ -390,7 +381,6 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 125,
                 SerialNumber = "3_sn",
                 ParentProcessId = null,
-                WorkflowType = "DbAssessment",
                 ActivityName = "Review",
                 StartedAt = DateTime.Today,
                 Status = "Started"

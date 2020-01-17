@@ -5,8 +5,8 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Data\ProcessesSeedData.json"/>
-    <None Remove="Data\TasksSeedData.json"/>
+    <None Remove="Data\ProcessesSeedData.json" />
+    <None Remove="Data\TasksSeedData.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\ProcessesSeedData.json">
@@ -15,20 +15,21 @@
     <Content Include="Data\TasksSeedData.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="5.1.1"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.11"/>
-    <PackageReference Include="NServiceBus.Testing" Version="7.1.0"/>
-    <PackageReference Include="nunit" Version="3.11.0"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0"/>
-    <PackageReference Include="coverlet.collector" Version="1.1.0"/>
+    <PackageReference Include="FakeItEasy" Version="5.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.11" />
+    <PackageReference Include="NServiceBus.Testing" Version="7.1.0" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="coverlet.collector" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj"/>
-    <ProjectReference Include="..\..\DataServices\DataServices.Models\DataServices.Models.csproj"/>
-    <ProjectReference Include="..\WorkflowCoordinator\WorkflowCoordinator.csproj"/>
+    <ProjectReference Include="..\..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\..\DataServices\DataServices.Models\DataServices.Models.csproj" />
+    <ProjectReference Include="..\WorkflowCoordinator\WorkflowCoordinator.csproj" />
   </ItemGroup>
 </Project>
