@@ -39,8 +39,56 @@
             var processId = $(this).data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
 
+            var taskStage = $(this).data("taskstage");
+            $("#hdnAssignTaskStage").val(taskStage);
+
             $("#assignTaskModal").modal("show");
         });
+
+    $("#assignTaskModal").on("shown.bs.modal",
+        function () {
+            $("#txtUsername").focus();
+            $('.typeahead').typeahead('val', "");
+            $('.typeahead').typeahead('close');
+        });
+
+    $("#btnAssignTaskToUser").on("click", function () {
+        $("#btnAssignTaskToUser").prop("disabled", true);
+
+        var processId = $("#hdnAssignTaskProcessId").val();
+        var userName = $("#txtUsername").val();
+        var taskStage = $("#hdnAssignTaskStage").val();
+
+        $.ajax({
+            type: "POST",
+            url: "Index/?handler=AssignTaskToUser",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "userName": userName,
+                "taskStage": taskStage
+            },
+            success: function (result) {
+                $("#assignTaskModal").modal("hide");
+                $("body").removeClass("modal-open");
+                $(".modal-backdrop").remove();
+
+                window.location.reload();
+                //getComments();
+            },
+            error: function (error) {
+                console.log(error);
+
+                //$("#AddCommentError")
+                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+
+                //$("#btnPostComment").prop("disabled", false);
+            }
+        });
+
+    });
 
     initialiseAssignTaskTypeahead();
 

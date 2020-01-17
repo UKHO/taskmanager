@@ -18,8 +18,9 @@ namespace Portal.ViewModels
         public string Workspace { get; set; }
         public string TaskType { get; set; }
         public string TaskStage { get; set; }
-        public string DbAssessmentReviewDataAssessor { get; set; }
-        public string DbAssessmentReviewDataVerifier { get; set; }
+        public string Reviewer { get; set; }
+        public string Assessor { get; set; }
+        public string Verifier { get; set; }
         public string Team { get; set; }
         public string TaskNoteText { get; set; }
         public List<Comment> Comment { get; set; }

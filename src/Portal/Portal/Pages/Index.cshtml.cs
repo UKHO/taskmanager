@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.ViewModels;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -58,6 +59,7 @@ namespace Portal.Pages
                 .Include(c => c.Comments)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
+                .Include(ad => ad.DbAssessmentAssessData)
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
@@ -80,6 +82,8 @@ namespace Portal.Pages
                 var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate);
                 task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
                 task.DaysToDmEndDateRedAlert = alerts.redAlert;
+
+                SetUsersOnTask(instance, task);
             }
         }
 
@@ -123,9 +127,63 @@ namespace Portal.Pages
             return Page();
         }
 
+        public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
+        {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("ActivityName", taskStage);
+
+            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+
+            if (instance.ActivityName != taskStage)
+            {
+                _logger.LogInformation("Attempted to assign task with ProcessId: {ProcessId} to a user but the task being assigned is no longer at the expected step of {ActivityName}.");
+                return;
+            }
+
+            switch (taskStage)
+            {
+                case "Review":
+                    var review = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+                    review.Reviewer = userName;
+                    break;
+                case "Assess":
+                    var assess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+                    assess.Assessor = userName;
+                    break;
+                case "Verify":
+                    throw new NotImplementedException($"'{taskStage}' not implemented");
+                    // TODO: implement Verify Data
+                    //var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+                    //verify.Verifier = userName;
+                    break;
+                default:
+                    throw new NotImplementedException($"'{taskStage}' not implemented");
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<JsonResult> OnGetUsersAsync()
         {
             return new JsonResult(await _directoryService.GetGroupMembers());
+        }
+
+        private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)
+        {
+            task.Reviewer = instance.DbAssessmentReviewData.Reviewer;
+
+            switch (task.TaskStage)
+            {
+                case "Assess":
+                    task.Assessor = instance.DbAssessmentAssessData.Assessor;
+                    task.Verifier = instance.DbAssessmentAssessData.Verifier;
+                    break;
+                case "Verify":
+                    //TODO: set verifier once we have the table task.Verifier = instance.DbAssessmentVerifyData.Assessor;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

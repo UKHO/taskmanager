@@ -39,11 +39,24 @@
       "processId": 445,
       "ion": "Ion",
       "activityCode": "78798",
+      "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 445,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -93,7 +106,7 @@
       "sourceDocumentName": "HUA HIN",
       "receiptDate": "2020-01-03T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2020-01-03T00:00:00",
+      "effectiveStartDate": "2019-12-18T00:00:00",
       "teamDistributedTo": null,
       "sourceDocumentType": "Chart - Navigational",
       "sourceNature": "Graphical",
@@ -136,11 +149,24 @@
       "processId": 123,
       "ion": "Ion",
       "activityCode": "78798",
+      "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
       "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 123,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "dbAssessmentAssignTask": [
       {
@@ -257,11 +283,24 @@
       "processId": 321,
       "ion": "I899",
       "activityCode": "78798",
+      "reviewer": "Stu Barzey",
       "assessor": "BatesP",
       "verifier": "RigdenT",
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 321,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
       "processId": 321,
@@ -339,11 +378,24 @@
       "processId": 125,
       "ion": "I229",
       "activityCode": "743543",
+      "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
       "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 125,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -393,7 +445,7 @@
       "sourceDocumentName": "NM_DEN_30_235_06",
       "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": "2020-01-01T16:32:35",
-      "effectiveStartDate": "2020-01-01T00:00:00",
+      "effectiveStartDate": "2019-12-28T00:00:00",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Source NM",
       "sourceNature": "Textual",
@@ -451,11 +503,24 @@
       "processId": 126,
       "ion": "I8766",
       "activityCode": "4881",
+      "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 126,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -505,7 +570,7 @@
       "sourceDocumentName": "NMBN_GER_27_06",
       "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": null,
-      "effectiveStartDate": "2020-01-01T00:00:00",
+      "effectiveStartDate": "2019-12-28T00:00:00",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Notices to Mariners - FG Bulletin",
       "sourceNature": "Textual",
@@ -536,6 +601,18 @@
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 127,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stu Barzey",
+      "assessor": "Stu Barzey",
+      "verifier": "Stu Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null
     },
     "dbAssessmentAssignTask": [
       {
