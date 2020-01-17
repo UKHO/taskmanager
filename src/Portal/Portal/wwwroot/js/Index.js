@@ -74,6 +74,8 @@
                 $("#assignTaskModal").modal("hide");
                 $("body").removeClass("modal-open");
                 $(".modal-backdrop").remove();
+
+                window.location.reload();
                 //getComments();
             },
             error: function (error) {

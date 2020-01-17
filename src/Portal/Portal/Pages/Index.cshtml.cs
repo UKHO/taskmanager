@@ -58,6 +58,7 @@ namespace Portal.Pages
                 .Include(c => c.Comments)
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
+                .Include(ad => ad.DbAssessmentAssessData)
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
@@ -80,6 +81,8 @@ namespace Portal.Pages
                 var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate);
                 task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
                 task.DaysToDmEndDateRedAlert = alerts.redAlert;
+
+                SetUsersOnTask(instance, task);
             }
         }
 
@@ -151,6 +154,24 @@ namespace Portal.Pages
         public async Task<JsonResult> OnGetUsersAsync()
         {
             return new JsonResult(await _directoryService.GetGroupMembers());
+        }
+
+        private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)
+        {
+            task.Reviewer = instance.DbAssessmentReviewData.Reviewer;
+
+            switch (task.TaskStage)
+            {
+                case "Assess":
+                    task.Assessor = instance.DbAssessmentAssessData.Assessor;
+                    task.Verifier = instance.DbAssessmentAssessData.Verifier;
+                    break;
+                case "Verify":
+                    //TODO: set verifier once we have the table task.Verifier = instance.DbAssessmentVerifyData.Assessor;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
