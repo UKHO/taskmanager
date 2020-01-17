@@ -23,5 +23,8 @@ namespace NCNEWorkflowDatabase.EF.Models
         public string VerifierOne { get; set; }
         public string VerifierTwo { get; set; }
         public string Publisher { get; set; }
+
+        public virtual NcneTaskNote NcneTaskNote { get; set; }
+
     }
 }

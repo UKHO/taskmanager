@@ -4,6 +4,8 @@
     ViewData["Title"] = "Home page";
 }
 
+<script type="text/javascript" src="~/js/Index.js"></script>
+
 <div class="row pt-1">
     <div class="col-4">
         <a asp-page="./Index">
@@ -62,42 +64,42 @@
                 </tr>
             </thead>
             <tbody>
-                @for (var j = 1; j <= 20; j++)
+                @foreach (var task in Model.NcneTasks)
                 {
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>
                         <td>
-                            <a asp-page="Workflow/Edit" asp-route-ProcessId="125">125</a>
+                            <a asp-page="Workflow/Edit" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            NE
+                            @task.ChartType
                         </td>
                         <td>
-                            45
+                            @task.ChartNumber
                         </td>
                         <td>
                             Comp
                         </td>
                         <td>
-                            stoodleym
+                            @task.Compiler
                         </td>
                         <td>
-                            24/12/2019
+                            @task.AnnounceDate.ToShortDateString()
                         </td>
                         <td>
-                            08/01/2020
+                            @task.CommitDate.ToShortDateString()
                         </td>
                         <td>
-                            23/01/2020
+                            @task.CisDate.ToShortDateString()
                         </td>
                         <td>
-                            29/01/2020
+                            @task.PublicationDate.ToShortDateString()
                         </td>
                         <td>
-                            UK
+                            @task.Country
                         </td>
                         <td>
-                            Primary
+                            @task.WorkflowType
                         </td>
                         <td>
                             CPT1
@@ -106,7 +108,7 @@
                             <div class="dropdown" style="cursor: pointer;">
                                 <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="125" data-tasknote="">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.NcneTaskNote?.Text">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
@@ -115,7 +117,7 @@
                             </div>
                         </td>
                         <td>
-                            @j
+                            @task.NcneTaskNote?.Text
                         </td>
                     </tr>
                 }
@@ -123,6 +125,33 @@
         </table>
     </div>
 </div>
+
+@* Modal Edit task note *@
+<div class="modal fade" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskNote" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="frmTaskNote" asp-page-handler="TaskNote">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Task Note</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-body">
+                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                        <input type="hidden" id="hdnProcessId" name="processId" />
+                        <br />
+                        <div id="editTaskNoteError"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClearTaskNote" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                    <button type="button" id="btnCancelTaskNote" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                    <button type="submit" form="frmTaskNote" id="btnPostTaskNote" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
 
@@ -150,7 +179,7 @@
                         'searchable': false
                     }
                 ],
-                "order": [[1, 'dsc']],
+                "order": [[1, 'asc']],
                 "scrollX": true,
                 "createdRow": function (row, data, dataIndex) {
                     if (data[14] === "") {
@@ -184,7 +213,7 @@
                 inFlightTasksTable.search($(this).val()).draw();
             });
 
-            $("#btnNewTask").click(function() { window.location.href = '/NewTask'; });
+            $("#btnNewTask").click(function () { window.location.href = '/NewTask'; });
         });
     </script>
 }
