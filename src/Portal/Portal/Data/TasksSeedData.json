@@ -547,7 +547,7 @@
     "serialNumber": "126_sn",
     "parentProcessId": null,
     "workflowType": "DbAssessment",
-    "activityName": "Assess",
+    "activityName": "Review",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
@@ -601,18 +601,6 @@
       "TaskType": "LTA",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 127,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stu Barzey",
-      "assessor": "Stu Barzey",
-      "verifier": "Stu Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null
     },
     "dbAssessmentAssignTask": [
       {
