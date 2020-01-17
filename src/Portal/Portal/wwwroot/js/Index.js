@@ -45,6 +45,13 @@
             $("#assignTaskModal").modal("show");
         });
 
+    $("#assignTaskModal").on("shown.bs.modal",
+        function () {
+            $("#txtUsername").focus();
+            $('.typeahead').typeahead('val', "");
+            $('.typeahead').typeahead('close');
+        });
+
     $("#btnAssignTaskToUser").on("click", function () {
         $("#btnAssignTaskToUser").prop("disabled", true);
 
