@@ -96,7 +96,16 @@
                             @task.Team
                         </td>
                         <td>
-                            <i class="fas fa-cog black"></i>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                        <i class="far fa-user">
+                                        </i>
+                                        Assign Task
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             @task.TaskNoteText
