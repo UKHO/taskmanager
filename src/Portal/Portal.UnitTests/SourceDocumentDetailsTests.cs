@@ -64,8 +64,7 @@ namespace Portal.UnitTests
                 ActivityName = "ActName",
                 AssessmentData = null,
                 SerialNumber = "123_sn",
-                Status = "Started",
-                WorkflowType = "DbAssessment"
+                Status = "Started"
             });
 
             _dbContext.SaveChanges();
@@ -85,8 +84,7 @@ namespace Portal.UnitTests
                 ActivityName = "AnActName",
                 AssessmentData = null,
                 SerialNumber = "123_sn",
-                Status = "Started",
-                WorkflowType = "DbAssessment"
+                Status = "Started"
             });
             _dbContext.AssessmentData.Add(new AssessmentData
             {

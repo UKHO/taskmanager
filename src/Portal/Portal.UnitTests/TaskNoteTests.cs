@@ -60,7 +60,6 @@ namespace Portal.UnitTests
                 SerialNumber = "123_sn",
                 StartedAt = DateTime.Now.AddDays(-3),
                 Status = WorkflowStatus.Started.ToString(),
-                WorkflowType = "DbAssessment",
                 TaskNote = new TaskNote(),
                 DataImpact = new List<DataImpact>(),
                 DatabaseDocumentStatus = new List<DatabaseDocumentStatus>(),

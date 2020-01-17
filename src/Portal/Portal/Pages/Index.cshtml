@@ -28,7 +28,6 @@
             </div>
             <div class="col-6">
                 <button id="btnRefresh" type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Refresh the list of tasks in both tabs, preserving selected sort options and search criteria."><span class="fas fa-sync-alt"></span></button>
-                <button class="btn btn-primary dropdown" type="button" id="btnSelectStage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Stage</button>
                 <button class="btn btn-primary dropdown" type="button" id="btnSelectTeam" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Team</button>
             </div>
         </div>
@@ -48,7 +47,6 @@
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
-                    <th>Task Type</th>
                     <th>Stage</th>
                     <th>Assessor</th>
                     <th>Verifier</th>
@@ -83,9 +81,6 @@
                         </td>
                         <td>
                             @task.Workspace
-                        </td>
-                        <td>
-                            @task.TaskType
                         </td>
                         <td>
                             @task.TaskStage
@@ -131,7 +126,6 @@
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
-                    <th>Task Type</th>
                     <th>Stage</th>
                     <th>Assessor</th>
                     <th>Verifier</th>
@@ -167,9 +161,6 @@
                         </td>
                         <td>
                             @task.Workspace
-                        </td>
-                        <td>
-                            @task.TaskType
                         </td>
                         <td>
                             @task.TaskStage
@@ -281,12 +272,12 @@
                 "lengthMenu": [5, 10, 25, 50],
                 'columnDefs': [
                     {
-                        'targets': [12],
+                        'targets': [11],
                         'orderable': false,
                         'searchable': false
                     },
                     {
-                        'targets': [13],
+                        'targets': [12],
                         'visible': false,
                         'searchable': false
                     }
@@ -307,12 +298,12 @@
                         'searchable': false
                     },
                     {
-                        'targets': [13],
+                        'targets': [12],
                         'orderable': false,
                         'searchable': false
                     },
                     {
-                        'targets': [14],
+                        'targets': [13],
                         'visible': false,
                         'searchable': false
                     }
@@ -320,7 +311,7 @@
                 "order": [[2, 'asc']],
                 "scrollX": true,
                 "createdRow": function (row, data, dataIndex) {
-                    if (data[14] === "") {
+                    if (data[13] === "") {
                         $("td.details-control", row).removeClass("details-control");
                         $("td.details-control i", row).removeClass("fa");
                     }
@@ -328,7 +319,7 @@
             });
 
             function format(data) {
-                return '<span class="note-formatting">' + data[14] + '</span>';
+                return '<span class="note-formatting">' + data[13] + '</span>';
             }
 
             $('#inFlightTasks tbody').on('click',

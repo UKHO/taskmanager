@@ -16,7 +16,6 @@ namespace Portal.ViewModels
         public string AssessmentDataRsdraNumber { get; set; }
         public string AssessmentDataSourceDocumentName { get; set; }
         public string Workspace { get; set; }
-        public string TaskType { get; set; }
         public string TaskStage { get; set; }
         public string Reviewer { get; set; }
         public string Assessor { get; set; }
