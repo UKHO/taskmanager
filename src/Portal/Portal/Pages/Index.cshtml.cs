@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.ViewModels;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -128,6 +129,17 @@ namespace Portal.Pages
 
         public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("ActivityName", taskStage);
+
+            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+
+            if (instance.ActivityName != taskStage)
+            {
+                _logger.LogInformation("Attempted to assign task with ProcessId: {ProcessId} to a user but the task being assigned is no longer at the expected step of {ActivityName}.");
+                return;
+            }
+
             switch (taskStage)
             {
                 case "Review":
