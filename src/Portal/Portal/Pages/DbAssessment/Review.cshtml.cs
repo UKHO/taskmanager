@@ -171,24 +171,28 @@ namespace Portal.Pages.DbAssessment
             {
                 // TODO: Get current process task stage
                 var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(w => w.ProcessId == processId);
+                workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
                 var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Review", "Assess");
 
                 if (success)
                 {
+                    // TODO: Fire event PersistWorkflowInstanceDataEvent for Primary task
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
 
-                    var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
+                    // TODO: Move to the new Event PersistWorkflowInstanceDataEvent
+                    //var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
 
-                    if (k2Task.ActivityName != "Assess")
-                    {
-                        _logger.LogError("K2Task at stage {K2Stage} is not at Assess", k2Task.ActivityName);
-                        throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at Assess");
-                    }
+                    //if (k2Task.ActivityName != "Assess")
+                    //{
+                    //    _logger.LogError("K2Task at stage {K2Stage} is not at Assess", k2Task.ActivityName);
+                    //    throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at Assess");
+                    //}
 
-                    workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    workflowInstance.ActivityName = k2Task.ActivityName;
-                    await _dbContext.SaveChangesAsync();
+                    //workflowInstance.SerialNumber = k2Task.SerialNumber;
+                    //workflowInstance.ActivityName = k2Task.ActivityName;
+                    //await _dbContext.SaveChangesAsync();
                 }
             }
 
