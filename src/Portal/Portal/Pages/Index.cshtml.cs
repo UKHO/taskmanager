@@ -174,7 +174,7 @@ namespace Portal.Pages
 
         private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)
         {
-            task.Reviewer = instance.DbAssessmentReviewData.Reviewer;
+            task.Reviewer = instance.DbAssessmentReviewData?.Reviewer;
 
             switch (task.TaskStage)
             {
