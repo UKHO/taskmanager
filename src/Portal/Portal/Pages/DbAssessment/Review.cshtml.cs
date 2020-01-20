@@ -178,10 +178,16 @@ namespace Portal.Pages.DbAssessment
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
 
-                    var sn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(processId);
+                    var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
 
-                    workflowInstance.SerialNumber = sn;
-                    workflowInstance.ActivityName = "Assess";
+                    if (k2Task.ActivityName != "Assess")
+                    {
+                        _logger.LogError("K2Task at stage {K2Stage} is not at Assess", k2Task.ActivityName);
+                        throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at Assess");
+                    }
+
+                    workflowInstance.SerialNumber = k2Task.SerialNumber;
+                    workflowInstance.ActivityName = k2Task.ActivityName;
                     await _dbContext.SaveChangesAsync();
                 }
             }

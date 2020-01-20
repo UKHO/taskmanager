@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Extensions.Logging;
@@ -142,10 +143,12 @@ namespace Portal.HttpClients
             return true;
         }
 
-        public async Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId)
+        public async Task<K2Task> GetWorkflowInstanceData(int workflowInstanceId)
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri);
             string data;
+
+            Thread.Sleep(5000);
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {
@@ -159,9 +162,7 @@ namespace Portal.HttpClients
             }
 
             var tasks = JsonConvert.DeserializeObject<K2Tasks>(data);
-            var task = tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
-
-            return task.SerialNumber;
+            return tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
         }
     }
 }
