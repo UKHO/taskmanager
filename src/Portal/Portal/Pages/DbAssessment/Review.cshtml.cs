@@ -170,7 +170,9 @@ namespace Portal.Pages.DbAssessment
             if (action == "Done")
             {
                 // TODO: Get current process task stage
-                var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(w => w.ProcessId == processId);
+                var workflowInstance = await _dbContext.WorkflowInstance
+                                                                .Include(w => w.PrimaryDocumentStatus)
+                                                                .FirstAsync(w => w.ProcessId == processId);
                 workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
                 var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Review", "Assess");
@@ -178,6 +180,8 @@ namespace Portal.Pages.DbAssessment
                 if (success)
                 {
                     // TODO: Fire event PersistWorkflowInstanceDataEvent for Primary task
+
+                    await PersistPrimaryTask(processId, workflowInstance);
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
 
@@ -199,6 +203,26 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task PersistPrimaryTask(int processId, WorkflowInstance workflowInstance)
+        {
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivityName = "Review",
+                ToActivityName = "Assess"
+            };
+
+            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
+                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
+            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
         private async Task ProcessAdditionalTasks(int processId)
