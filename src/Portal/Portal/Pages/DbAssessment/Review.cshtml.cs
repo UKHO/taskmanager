@@ -169,6 +169,9 @@ namespace Portal.Pages.DbAssessment
 
             if (action == "Done")
             {
+                // TODO: Get current process task stage
+                var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(w => w.ProcessId == processId);
+                var success = _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.SerialNumber, "Review", "Assess");
                 await CopyPrimaryAssignTaskNoteToComments(processId);
                 await ProcessAdditionalTasks(processId);
             }

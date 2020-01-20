@@ -6,5 +6,7 @@ namespace Portal.HttpClients
     {
         Task TerminateWorkflowInstance(string serialNumber);
         Task<bool> CheckK2Connection();
+        Task<string> GetTaskCurrentStage(string serialNumber);
+        Task<bool> ProgressWorkflowInstance(int processId,string serialNumber, string currentTaskStage, string progressToTaskStage);
     }
 }

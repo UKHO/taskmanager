@@ -1,9 +1,8 @@
 ﻿namespace Portal.Models
 {
-    internal class K2TaskData
+    public class K2Task
     {
-        public int WorkflowInstanceID { get; set; }
-        
         public string SerialNumber { get; set; }
+        public string ActivityName { get; set; }
     }
 }
