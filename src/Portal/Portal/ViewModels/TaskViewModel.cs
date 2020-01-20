@@ -12,7 +12,8 @@ namespace Portal.ViewModels
         public short DaysToDmEndDate { get; set; }
         public bool DaysToDmEndDateAmberAlert { get; set; }
         public bool DaysToDmEndDateRedAlert { get; set; }
-        public short DaysOnHold { get; set; }
+        public bool IsOnHold { get; set; }
+        public int OnHoldDays { get; set; }
         public string AssessmentDataRsdraNumber { get; set; }
         public string AssessmentDataSourceDocumentName { get; set; }
         public string Workspace { get; set; }

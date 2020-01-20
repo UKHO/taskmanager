@@ -71,7 +71,11 @@
                             @task.DmEndDate.ToShortDateString()
                         </td>
                         <td>
-                            @task.DaysOnHold
+                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                            @if (task.IsOnHold)
+                            {
+                                <i class="fa fa-pause-circle"></i>
+                            }
                         </td>
                         <td>
                             @task.AssessmentDataRsdraNumber
@@ -151,7 +155,11 @@
                             @task.DmEndDate.ToShortDateString()
                         </td>
                         <td>
-                            @task.DaysOnHold
+                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                            @if (task.IsOnHold)
+                            {
+                                <i class="fa fa-pause-circle"></i>
+                            }
                         </td>
                         <td>
                             @task.AssessmentDataRsdraNumber

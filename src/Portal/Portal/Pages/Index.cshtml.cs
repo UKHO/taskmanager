@@ -73,6 +73,10 @@ namespace Portal.Pages
             foreach (var instance in workflows)
             {
                 var task = Tasks.First(t => t.ProcessId == instance.ProcessId);
+
+                task.IsOnHold = instance.OnHold.Any(r => r.OffHoldTime == null);
+                task.OnHoldDays = _indexFacade.CalculateOnHoldDays(instance.OnHold);
+
                 var result = _indexFacade.CalculateDmEndDate(
                                                                             instance.AssessmentData.EffectiveStartDate.Value,
                                                                             instance.OnHold);
