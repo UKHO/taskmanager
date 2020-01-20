@@ -4,5 +4,6 @@
     {
         public string SerialNumber { get; set; }
         public string ActivityName { get; set; }
+        public int WorkflowInstanceID { get; set; }
     }
 }
