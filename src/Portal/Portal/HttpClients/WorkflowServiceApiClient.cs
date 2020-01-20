@@ -148,8 +148,6 @@ namespace Portal.HttpClients
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri);
             string data;
 
-            Thread.Sleep(5000);
-
             using (var response = await _httpClient.GetAsync(fullUri))
             {
                 data = await response.Content.ReadAsStringAsync();
