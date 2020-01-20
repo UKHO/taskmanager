@@ -80,7 +80,7 @@ namespace Portal.HttpClients
 
         public async Task<bool> ProgressWorkflowInstance(int processId,string serialNumber, string currentTaskStage, string progressToTaskStage)
         {
-            var taskStageInK2 = GetTaskCurrentStage(serialNumber);
+            var taskStageInK2 = await GetTaskCurrentStage(serialNumber);
 
             if (taskStageInK2.Equals(progressToTaskStage))
                 return true;
