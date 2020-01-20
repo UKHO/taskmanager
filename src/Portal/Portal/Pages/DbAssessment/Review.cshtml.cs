@@ -179,24 +179,9 @@ namespace Portal.Pages.DbAssessment
 
                 if (success)
                 {
-                    // TODO: Fire event PersistWorkflowInstanceDataEvent for Primary task
-
                     await PersistPrimaryTask(processId, workflowInstance);
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
-
-                    // TODO: Move to the new Event PersistWorkflowInstanceDataEvent
-                    //var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
-
-                    //if (k2Task.ActivityName != "Assess")
-                    //{
-                    //    _logger.LogError("K2Task at stage {K2Stage} is not at Assess", k2Task.ActivityName);
-                    //    throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at Assess");
-                    //}
-
-                    //workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    //workflowInstance.ActivityName = k2Task.ActivityName;
-                    //await _dbContext.SaveChangesAsync();
                 }
             }
 

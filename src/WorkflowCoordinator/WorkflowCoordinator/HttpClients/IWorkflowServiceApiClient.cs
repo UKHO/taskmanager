@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using WorkflowCoordinator.Models;
 
 namespace WorkflowCoordinator.HttpClients
 {
@@ -9,5 +10,6 @@ namespace WorkflowCoordinator.HttpClients
         Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId);
         Task TerminateWorkflowInstance(string serialNumber);
         Task<bool> ProgressWorkflowInstance(int workflowInstanceId, string serialNo);
+        Task<K2TaskData> GetWorkflowInstanceData(int workflowInstanceId);
     }
 }
