@@ -10,10 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -23,6 +25,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly ICommentsHelper _commentsHelper;
+        private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
@@ -36,12 +39,20 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
 
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             IOptions<UriConfig> uriConfig,
             ICommentsHelper commentsHelper,
+            IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger)
         {
             _dbContext = dbContext;
@@ -50,6 +61,7 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _uriConfig = uriConfig;
             _commentsHelper = commentsHelper;
+            _userIdentityService = userIdentityService;
             _logger = logger;
         }
 
@@ -62,6 +74,49 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
         {
+            return RedirectToPage("/Index");
+        }
+
+
+        public async Task<IActionResult> OnPostRejectVerifyAsync(string comment, int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Verify");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
+            LogContext.PushProperty("Comment", comment);
+
+            _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
+                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+            }
+
+            if (processId < 1)
+            {
+                _logger.LogError("ProcessId is less than 1: {ProcessId}");
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+
+            // TODO: Update K2 and persist
+            //var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
+            //await _commentsHelper.AddComment($"Terminate comment: {comment}",
+            //    processId,
+            //    workflowInstance.WorkflowInstanceId,
+            //    UserFullName);
+            //await UpdateK2WorkflowAsTerminated(workflowInstance);
+            //await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
+            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+
             return RedirectToPage("/Index");
         }
 
