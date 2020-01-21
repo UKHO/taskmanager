@@ -205,16 +205,11 @@ namespace Portal
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSerilogRequestLogging(
-                options => 
+                options =>
                 options.GetLevel = (ctx, d, ex) =>
                 {
                     if (ex == null && ctx.Response.StatusCode <= 499)
                     {
-                        if (ctx.Request.RouteValues.Any()) //Request is a page
-                        {
-                            return LogEventLevel.Information;
-                        }
-
                         return LogEventLevel.Verbose;
                     }
 
