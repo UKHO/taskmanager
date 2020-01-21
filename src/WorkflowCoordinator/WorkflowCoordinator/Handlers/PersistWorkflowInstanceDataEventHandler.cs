@@ -28,12 +28,14 @@ namespace WorkflowCoordinator.Handlers
         public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
             LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
             LogContext.PushProperty("CorrelationId", message.CorrelationId);
             LogContext.PushProperty("ProcessId", message.ProcessId);
             LogContext.PushProperty("FromActivityName", message.FromActivityName);
             LogContext.PushProperty("ToActivityName", message.ToActivityName);
-            _logger.LogInformation("Entering {EventName} handler with: {Message}", message.ToJSONSerializedString());
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
@@ -50,6 +52,9 @@ namespace WorkflowCoordinator.Handlers
             workflowInstance.Status = WorkflowStatus.Started.ToString();
 
             await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
+
         }
     }
 }
