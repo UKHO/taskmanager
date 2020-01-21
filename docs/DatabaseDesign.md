@@ -224,11 +224,10 @@ sub workflow, and will hold the ProcessId of the parent workflow that the sub wa
 
 | Column Name               | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------        |---------------|-------------|-------------------------------------------------------------------------------------------------|
-|WorkflowInstanceId         |INT            |No           |PRIMARY KEY                                                                    |
+|WorkflowInstanceId         |INT            |No           |PRIMARY KEY                                                                                      |
 |ProcessId                  |INT            |No           |The K2 process instance Id                                                                       |
 |SerialNumber               |NVARCHAR(255)  |Yes          |                                                                                                 |
 |ParentProcessId            |INT            |Yes          |If a sub workflow, the parent workflow that was used to generate the new instance.               |
-|WorkflowType               |NVARCHAR(50)   |Yes          |                                                                                                 |
 |ActivityName               |NVARCHAR(50)   |Yes          |                                                                                                 |
 |StartedAt                  |DATETIME       |No           |                                                                                                 |
 |Status                     |NVARCHAR(25)   |No           |                                                                                                 |
