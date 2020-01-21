@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Portal.Auth;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;

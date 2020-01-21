@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
+using WorkflowDatabase.EF;
 
 namespace WorkflowCoordinator.Handlers
 {
@@ -13,12 +15,14 @@ namespace WorkflowCoordinator.Handlers
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly ILogger<PersistWorkflowInstanceDataEventHandler> _logger;
+        private readonly WorkflowDbContext _dbContext;
 
         public PersistWorkflowInstanceDataEventHandler(IWorkflowServiceApiClient workflowServiceApiClient, 
-            ILogger<PersistWorkflowInstanceDataEventHandler> logger)
+            ILogger<PersistWorkflowInstanceDataEventHandler> logger, WorkflowDbContext dbContext)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
@@ -36,12 +40,16 @@ namespace WorkflowCoordinator.Handlers
             if (k2Task.ActivityName != message.ToActivityName)
             {
                 _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}", k2Task.ActivityName);
-                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at Assess");
+                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivityName}");
             }
 
-            //workflowInstance.SerialNumber = k2Task.SerialNumber;
-            //workflowInstance.ActivityName = k2Task.ActivityName;
-            //await _dbContext.SaveChangesAsync();
+            var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == message.ProcessId);
+
+            workflowInstance.SerialNumber = k2Task.SerialNumber;
+            workflowInstance.ActivityName = k2Task.ActivityName;
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

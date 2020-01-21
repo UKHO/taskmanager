@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Helpers;
-using Common.Messages.Enums;
 using Common.Messages.Events;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;

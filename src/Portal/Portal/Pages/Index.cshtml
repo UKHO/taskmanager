@@ -140,7 +140,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer) && t.Status != WorkflowStatus.Updating))
+                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
                 {
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>

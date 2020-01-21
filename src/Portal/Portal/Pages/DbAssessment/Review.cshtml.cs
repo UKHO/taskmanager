@@ -169,7 +169,6 @@ namespace Portal.Pages.DbAssessment
 
             if (action == "Done")
             {
-                // TODO: Get current process task stage
                 var workflowInstance = await _dbContext.WorkflowInstance
                                                                 .Include(w => w.PrimaryDocumentStatus)
                                                                 .FirstAsync(w => w.ProcessId == processId);
@@ -179,9 +178,9 @@ namespace Portal.Pages.DbAssessment
 
                 if (success)
                 {
-                    await PersistPrimaryTask(processId, workflowInstance);
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
+                    await PersistPrimaryTask(processId, workflowInstance);
                 }
             }
 
