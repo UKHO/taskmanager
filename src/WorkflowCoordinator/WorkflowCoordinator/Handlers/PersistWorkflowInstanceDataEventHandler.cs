@@ -41,7 +41,8 @@ namespace WorkflowCoordinator.Handlers
 
             if (k2Task.ActivityName != message.ToActivityName)
             {
-                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}", k2Task.ActivityName);
+                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
+                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}");
                 throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivityName}");
             }
 
