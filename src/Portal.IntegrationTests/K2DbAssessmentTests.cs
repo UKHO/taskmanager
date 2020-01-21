@@ -16,7 +16,8 @@ using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using WorkflowDatabase.EF;
 
 namespace Portal.IntegrationTests
@@ -24,6 +25,7 @@ namespace Portal.IntegrationTests
     public class K2DbAssessmentTests
     {
         private WorkflowServiceApiClient _workflowServiceApiClient;
+        private ILogger<WorkflowServiceApiClient> _fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -40,7 +42,7 @@ namespace Portal.IntegrationTests
 
             _workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
 
-
+            _fakeLogger = A.Dummy<ILogger<WorkflowServiceApiClient>>();
         }
 
         [Test]
@@ -86,7 +88,7 @@ namespace Portal.IntegrationTests
                         ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
                         Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername, startupSecretsConfig.K2RestApiPassword)
                     }
-                ), generalConfigOptions, uriConfig);
+                ), uriConfig, _fakeLogger);
         }
 
         private StartupSecretsConfig GetSecretsConfigs(IConfigurationRoot keyVaultConfigRoot)

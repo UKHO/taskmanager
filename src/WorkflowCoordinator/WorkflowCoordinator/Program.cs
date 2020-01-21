@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;

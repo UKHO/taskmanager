@@ -4,6 +4,7 @@
     {
         Unknown,
         Started,
+        Updating,
         Completed,
         Terminated
     }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -21,7 +22,8 @@ namespace Portal.UnitTests
         private int ProcessId { get; set; }
         private IUserIdentityService _fakeUserIdentityService;
         private ILogger<ReviewModel> _fakeLogger;
-
+        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
+        private IEventServiceApiClient _fakeEventServiceApiClient;
 
         [SetUp]
         public void Setup()
@@ -32,7 +34,20 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
+            _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
+            _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
+
             ProcessId = 123;
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance
+            {
+                ProcessId = 123,
+                ActivityName = "Review",
+                AssessmentData = new AssessmentData(),
+                SerialNumber = "123_sn",
+                Status = "Started",
+                StartedAt = DateTime.Now
+            });
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
@@ -51,7 +66,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _reviewModel = new ReviewModel(_dbContext, null, null, null, null, _fakeUserIdentityService, _fakeLogger);
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, null, _fakeUserIdentityService, _fakeLogger);
         }
 
         [TearDown]
@@ -249,6 +264,7 @@ namespace Portal.UnitTests
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored)).Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess")).Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
