@@ -5,6 +5,7 @@ using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -20,7 +21,8 @@ namespace Portal.UnitTests
         private AssessModel _assessModel;
         private int ProcessId { get; set; }
         private ILogger<AssessModel> _fakeLogger;
-
+        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
+        private IEventServiceApiClient _fakeEventServiceApiClient;
 
         [SetUp]
         public void Setup()
@@ -30,6 +32,10 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+
+
+            _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
+            _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
 
             ProcessId = 123;
 
@@ -49,7 +55,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeLogger);
+            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger);
         }
 
         [TearDown]

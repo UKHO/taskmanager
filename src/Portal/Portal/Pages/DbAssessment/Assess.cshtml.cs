@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common.Helpers;
+using Common.Messages.Events;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,6 +26,8 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
+        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
+        private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
 
         public bool IsOnHold { get; set; }
@@ -60,11 +64,15 @@ namespace Portal.Pages.DbAssessment
         public AssessModel(WorkflowDbContext dbContext,
             HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
+            IWorkflowServiceApiClient workflowServiceApiClient,
+            IEventServiceApiClient eventServiceApiClient,
             ILogger<AssessModel> logger)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
+            _workflowServiceApiClient = workflowServiceApiClient;
+            _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
 
             ValidationErrorMessages = new List<string>();
@@ -125,13 +133,51 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateDataImpact(processId);
 
+            if (action == "Done")
+            {
+                var workflowInstance = await _dbContext.WorkflowInstance
+                    .Include(w => w.PrimaryDocumentStatus)
+                    .FirstAsync(w => w.ProcessId == processId);
+                
+                workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+                await _dbContext.SaveChangesAsync();
+
+
+                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Assess", "Verify");
+
+                if (success)
+                {
+                    await PersistCompletedAssess(processId, workflowInstance);
+                }
+            }
+            
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
 
             return StatusCode((int)HttpStatusCode.OK);
         }
 
-       
+        private async Task PersistCompletedAssess(int processId, WorkflowInstance workflowInstance)
+        {
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivityName = "Assess",
+                ToActivityName = "Verify"
+            };
+
+            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
+                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
+            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+        }
+
 
         private bool ValidateTaskInformation()
         {
