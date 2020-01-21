@@ -48,6 +48,7 @@
     $("#assignTaskModal").on("shown.bs.modal",
         function () {
             $("#assignTaskTypeaheadError").hide();
+            $("#assignTaskErrorMsg").text("");
             $("#txtUsername").focus();
             $('.typeahead').typeahead('val', "");
             $('.typeahead').typeahead('close');
