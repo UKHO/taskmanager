@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers;
+using Common.Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -103,21 +105,53 @@ namespace Portal.Pages.DbAssessment
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
-            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
-
+            _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
 
             // TODO: Update K2 and persist
-            //var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
-            //await _commentsHelper.AddComment($"Terminate comment: {comment}",
-            //    processId,
-            //    workflowInstance.WorkflowInstanceId,
-            //    UserFullName);
-            //await UpdateK2WorkflowAsTerminated(workflowInstance);
-            //await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+            var workflowInstance = await _dbContext.WorkflowInstance
+                                                        .Include(p => p.PrimaryDocumentStatus)
+                                                        .FirstAsync(w => w.ProcessId == processId);
+
+            await _commentsHelper.AddComment($"Reject comment: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
+
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+
+            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Assess");
+
+            if (success)
+            {
+                await PersistRejectedVerify(processId, workflowInstance);
+            }
 
             _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             return RedirectToPage("/Index");
+        }
+
+        private async Task PersistRejectedVerify(int processId, WorkflowInstance workflowInstance)
+        {
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivityName = "Verify",
+                ToActivityName = "Assess"
+            };
+
+            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
+                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
+            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)

@@ -538,21 +538,21 @@
     ]
   },
   {
-    "processId": 589,
-    "serialNumber": "589_38",
+    "processId": 588,
+    "serialNumber": "588_38",
     "parentProcessId": null,
     "activityName": "Assess",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
     "comment": [
       {
-        "processId": 589,
+        "processId": 588,
         "text": "A comment",
         "username": "Samir",
         "created": "2020-01-01T00:00:00"
       },
       {
-        "processId": 589,
+        "processId": 588,
         "text": "A 2nd comment",
         "username": "GW",
         "created": "2020-01-01T00:00:00"
@@ -569,11 +569,11 @@
       "sourceDocumentType": "Photographic Sortie",
       "sourceNature": "Graphical",
       "datum": null,
-      "processId": 589
+      "processId": 588
     },
     "linkedDocument": [
       {
-        "processId": 589,
+        "processId": 588,
         "PrimarySdocId": 206733,
         "rsdraNumber": "RSDRA2006000267725",
         "sourceDocumentName": "BANGOR",
@@ -589,7 +589,7 @@
       }
     ],
     "dbAssessmentReviewData": {
-      "processId": 589,
+      "processId": 588,
       "ion": "I229",
       "activityCode": "743543",
       "reviewer": "Stu Barzey",
@@ -600,7 +600,7 @@
       "Notes": "Important note"
     },
     "dbAssessmentAssessData": {
-      "processId": 589,
+      "processId": 588,
       "ion": "Ion",
       "activityCode": "78798",
       "sourceCategory": "Engineering Drawings",
@@ -612,7 +612,7 @@
       "productActionChangeDetails": null
     },
     "PrimaryDocumentStatus": {
-      "processId": 589,
+      "processId": 588,
       "SdocId": 206733,
       "ContentServiceId": null,
       "Status": "Ready",
@@ -621,7 +621,7 @@
     },
     "DatabaseDocumentStatus": [
       {
-        "processId": 589,
+        "processId": 588,
         "SdocId": 206733,
         "sourceDocumentName": "HUA HIN",
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
