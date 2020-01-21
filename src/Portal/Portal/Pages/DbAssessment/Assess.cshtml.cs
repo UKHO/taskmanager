@@ -138,7 +138,11 @@ namespace Portal.Pages.DbAssessment
                 var workflowInstance = await _dbContext.WorkflowInstance
                     .Include(w => w.PrimaryDocumentStatus)
                     .FirstAsync(w => w.ProcessId == processId);
+                
                 workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+                await _dbContext.SaveChangesAsync();
+
 
                 var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Assess", "Verify");
 
@@ -147,9 +151,7 @@ namespace Portal.Pages.DbAssessment
                     await PersistCompletedAssess(processId, workflowInstance);
                 }
             }
-
-
-
+            
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
 
