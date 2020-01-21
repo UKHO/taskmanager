@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.ViewModels
@@ -23,6 +24,7 @@ namespace Portal.ViewModels
         public string Verifier { get; set; }
         public string Team { get; set; }
         public string TaskNoteText { get; set; }
+        public WorkflowStatus Status { get; set; }
         public List<Comment> Comment { get; set; }
     }
 }
