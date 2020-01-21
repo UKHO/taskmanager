@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\Common\Common.Messages\Common.Messages.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>
