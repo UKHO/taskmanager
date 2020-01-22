@@ -181,6 +181,8 @@ namespace Portal.Pages.DbAssessment
                     await CopyPrimaryAssignTaskNoteToComments(processId);
                     await ProcessAdditionalTasks(processId);
                     await PersistPrimaryTask(processId, workflowInstance);
+
+                    _logger.LogInformation("Successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
                 }
             }
 
