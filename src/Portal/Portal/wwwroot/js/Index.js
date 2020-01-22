@@ -47,12 +47,21 @@
 
     $("#assignTaskModal").on("shown.bs.modal",
         function () {
+            $("#assignTaskTypeaheadError").hide();
+            $("#assignTaskErrorMsg").text("");
             $("#txtUsername").focus();
             $('.typeahead').typeahead('val', "");
             $('.typeahead').typeahead('close');
         });
 
     $("#btnAssignTaskToUser").on("click", function () {
+
+        if ($("#txtUsername").val() === "") {
+            $("#assignTaskTypeaheadError").show();
+            $("#assignTaskErrorMsg").text("Please enter a user.");
+            return;
+        }
+
         $("#btnAssignTaskToUser").prop("disabled", true);
 
         var processId = $("#hdnAssignTaskProcessId").val();
