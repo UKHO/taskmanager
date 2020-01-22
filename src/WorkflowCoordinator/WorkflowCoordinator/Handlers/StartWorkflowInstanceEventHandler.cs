@@ -35,20 +35,27 @@ namespace WorkflowCoordinator.Handlers
             var dbAssessmentWorkflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
 
             // We get the Process Id back...
-            var instanceId = await _workflowServiceApiClient.CreateWorkflowInstance(dbAssessmentWorkflowId);
+            var processId = await _workflowServiceApiClient.CreateWorkflowInstance(dbAssessmentWorkflowId);
 
             // Get the instance serial no
-            var sn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(instanceId);
+            var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(processId);
+
+            if (string.IsNullOrEmpty(serialNumber))
+            {
+                // TODO: Log
+                // _logger.LogError("Failed to get data for K2 Task with ProcessId {ProcessId}");
+                throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {processId}");
+            }
 
             // Progress this new instance onto Assess
-            await _workflowServiceApiClient.ProgressWorkflowInstance(instanceId, sn);
+            await _workflowServiceApiClient.ProgressWorkflowInstance(processId, serialNumber);
 
             var persistChildData = new PersistChildWorkflowDataCommand
             {
                 AssignedTaskId = message.AssignedTaskId,
                 CorrelationId = message.CorrelationId,
                 ParentProcessId = message.ParentProcessId,
-                ChildProcessId = instanceId
+                ChildProcessId = processId
             };
 
             await context.SendLocal(persistChildData).ConfigureAwait(false);
