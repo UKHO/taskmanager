@@ -2,20 +2,25 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using NUnit.Framework;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Models;
 
 namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
 {
     public class WorkflowEndToEndTests
     {
         private WorkflowServiceApiClient _workflowServiceApiClient;
-        private int _processId;
+        
 
         [SetUp]
         public void Setup()
@@ -29,6 +34,29 @@ namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
             IOptionsSnapshot<UriConfig> uriConfigOptions = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
 
             _workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
+        }
+
+        [Test]
+        public async Task Test()
+        {
+            var workflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
+            var processId = await _workflowServiceApiClient.CreateWorkflowInstance(workflowId);
+            var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(processId);
+
+            serialNumber = await ProgressAndValidate(processId, serialNumber, "Review", "Assess");
+            serialNumber = await ProgressAndValidate(processId, serialNumber, "Assess", "Verify");
+            await ProgressAndValidate(processId, serialNumber, "Verify", "Complete");
+            
+        }
+        private async Task<string> ProgressAndValidate(int processId, string serialNumber, string fromTask, string toTask)
+        {
+            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(processId, serialNumber);
+            Assert.IsTrue(success, $"Task has not moved from {fromTask} to {toTask}.");
+            
+            var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
+            Assert.IsTrue(k2Task.ActivityName.Equals(toTask, StringComparison.OrdinalIgnoreCase));
+
+            return k2Task.SerialNumber;
         }
 
         private WorkflowServiceApiClient SetupWorkflowServiceApiClient(StartupSecretsConfig startupSecretsConfig,
@@ -61,8 +89,8 @@ namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
             appConfigurationConfigRoot.GetSection("apis").Bind(generalConfig);
 
             return generalConfig;
-
         }
+
         private UriConfig GetUriConfigs(IConfigurationRoot appConfigurationConfigRoot)
         {
             var uriConfig = new UriConfig();
