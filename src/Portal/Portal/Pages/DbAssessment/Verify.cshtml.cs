@@ -87,7 +87,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
 
-            _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             if (string.IsNullOrWhiteSpace(comment))
             {
@@ -129,7 +129,7 @@ namespace Portal.Pages.DbAssessment
                 await PersistRejectedVerify(processId, workflowInstance);
             }
 
-            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation("Rejected successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             return RedirectToPage("/Index");
         }
@@ -140,7 +140,7 @@ namespace Portal.Pages.DbAssessment
 
             var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
             {
-                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                CorrelationId = correlationId ?? Guid.NewGuid(),
                 ProcessId = processId,
                 FromActivityName = "Verify",
                 ToActivityName = "Assess"
