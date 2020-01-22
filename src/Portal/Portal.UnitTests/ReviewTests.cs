@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
@@ -24,6 +25,7 @@ namespace Portal.UnitTests
         private ILogger<ReviewModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
+        private ICommentsHelper _fakeCommentsHelper;
 
         [SetUp]
         public void Setup()
@@ -36,6 +38,7 @@ namespace Portal.UnitTests
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
+            _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
             ProcessId = 123;
 
@@ -66,7 +69,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, null, _fakeUserIdentityService, _fakeLogger);
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger);
         }
 
         [TearDown]
@@ -296,6 +299,7 @@ namespace Portal.UnitTests
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored)).Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess")).Returns(true);
 
             var currentCommentsCount = await _dbContext.Comment.CountAsync();
 

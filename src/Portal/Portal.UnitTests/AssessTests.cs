@@ -5,6 +5,8 @@ using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Portal.Auth;
+using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
@@ -23,6 +25,8 @@ namespace Portal.UnitTests
         private ILogger<AssessModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
+        private IUserIdentityService _fakeUserIdentityService;
+        private ICommentsHelper _fakeCommentsHelper;
 
         [SetUp]
         public void Setup()
@@ -32,7 +36,6 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
-
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
@@ -52,10 +55,13 @@ namespace Portal.UnitTests
 
             _hpDbContext = new HpdDbContext(hpdDbContextOptions);
 
+            _fakeCommentsHelper = A.Fake<ICommentsHelper>();
+
+            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger);
+            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService);
         }
 
         [TearDown]

@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Portal.Auth;
+using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
 using Serilog.Context;
@@ -29,6 +31,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
+        private readonly ICommentsHelper _commentsHelper;
+        private readonly IUserIdentityService _userIdentityService;
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
@@ -61,12 +65,21 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+
         public AssessModel(WorkflowDbContext dbContext,
             HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
-            ILogger<AssessModel> logger)
+            ILogger<AssessModel> logger,
+            ICommentsHelper commentsHelper,
+            IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
@@ -74,6 +87,8 @@ namespace Portal.Pages.DbAssessment
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
+            _commentsHelper = commentsHelper;
+            _userIdentityService = userIdentityService;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -143,12 +158,36 @@ namespace Portal.Pages.DbAssessment
 
                 await _dbContext.SaveChangesAsync();
 
-
                 var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Assess", "Verify");
 
                 if (success)
                 {
                     await PersistCompletedAssess(processId, workflowInstance);
+
+                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+                    LogContext.PushProperty("UserFullName", UserFullName);
+
+                    _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Verify on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                    await _commentsHelper.AddComment($"Assess step completed",
+                        processId,
+                        workflowInstance.WorkflowInstanceId,
+                        UserFullName);
+                }
+                else
+                {
+                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    await _dbContext.SaveChangesAsync();
+
+                    _logger.LogInformation("Unable to progress task {ProcessId} from Assess to Verify.");
+
+                    ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
+
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
                 }
             }
             
