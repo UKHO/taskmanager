@@ -121,15 +121,29 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-
             var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Assess");
 
             if (success)
             {
                 await PersistRejectedVerify(processId, workflowInstance);
-            }
 
-            _logger.LogInformation("Rejected successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+                _logger.LogInformation("Rejected successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+            }
+            else
+            {
+                workflowInstance.Status = WorkflowStatus.Started.ToString();
+                await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation("Unable to reject task {ProcessId} from Verify to Assess.");
+
+                // TODO - add validation error message code later
+                //ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
+
+                //return new JsonResult(this.ValidationErrorMessages)
+                //{
+                //    StatusCode = (int)HttpStatusCode.InternalServerError
+                //};
+            }
 
             return RedirectToPage("/Index");
         }
