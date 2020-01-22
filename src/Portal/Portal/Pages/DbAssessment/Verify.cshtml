@@ -4,6 +4,7 @@
     ViewData["Title"] = "Verify";
 }
 
+<script type="text/javascript" src="~/js/Verify.js"></script>
 <script type="text/javascript" src="~/js/TaskInformation.js"></script>
 <script type="text/javascript" src="~/js/_SourceDocumentDetails.js"></script>
 <script type="text/javascript" src="~/js/EditDatabase.js"></script>
@@ -39,27 +40,30 @@
 
 <input type="hidden" id="pageIdentity" value="Verify" />
 <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-<form method="post" asp-page-handler="Done">
-    <div class="col-12">
-        <div class="row justify-content-end btn-size">
-            <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
-                <button id="btnPutOnHold" type="button" class="btn btn-primary btn-block">Put On Hold</button>
-            </div>
-            <div id="takeOffHold" class="col-2" @(Model.IsOnHold ? "" : "hidden")>
-                <button id="btnTakeOffHold" type="button" class="btn btn-primary btn-block">Take Off Hold</button>
-            </div>
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
 
-            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
-            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
-            <div class="col-2">
+        <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
+            <button id="btnPutOnHold" type="button" class="btn btn-primary btn-block">Put On Hold</button>
+        </div>
+        <div id="takeOffHold" class="col-2" @(Model.IsOnHold ? "" : "hidden")>
+            <button id="btnTakeOffHold" type="button" class="btn btn-primary btn-block">Take Off Hold</button>
+        </div>
 
-                <input type="hidden" asp-for="ProcessId" />
-                <button id="btnSignOff" class="btn btn-primary btn-block" type="submit">Sign Off</button>
+        <div class="col-2"><button id="btnReject" class="btn btn-primary btn-block">Reject</button></div>
 
-            </div>
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+        <div class="col-2">
+
+            <input type="hidden" asp-for="ProcessId" />
+            <button id="btnSignOff" class="btn btn-primary btn-block" type="button">Sign Off</button>
+
         </div>
     </div>
+</div>
 
+<form method="post" asp-page-handler="Done">
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>
 
@@ -99,6 +103,35 @@
                 <div class="modal-footer">
                     <div class="row col-11 justify-content-end">
                         <div class="col-5 pr-1"><button type="button" id="btnOnHoldErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="On Hold Error">Ok</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@* Modal Add Rejection comment *@
+<div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-labelledby="ConfirmReject" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="rejectingVerify" asp-page-handler="RejectVerify" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Reject DB Assessment</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Provide a reason for rejecting this DB Assessment?</p>
+                    <div id="modal-body">
+                        <input type="hidden" asp-for="ProcessId" />
+                        <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control"></textarea>
+                        <br />
+                        <div id="ConfirmRejectError"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
                     </div>
                 </div>
             </form>
