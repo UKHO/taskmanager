@@ -182,7 +182,30 @@ namespace Portal.Pages.DbAssessment
                     await ProcessAdditionalTasks(processId);
                     await PersistPrimaryTask(processId, workflowInstance);
 
-                    _logger.LogInformation("Successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+                    LogContext.PushProperty("UserFullName", UserFullName);
+
+                    _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                    await _commentsHelper.AddComment($"Review step completed",
+                        processId,
+                        workflowInstance.WorkflowInstanceId,
+                        UserFullName);
+                }
+                else
+                {
+                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    await _dbContext.SaveChangesAsync();
+
+                    _logger.LogInformation("Unable to progress task {ProcessId} from Review to Assess.");
+
+                    ValidationErrorMessages.Add("Unable to progress task from Review to Assess. Please retry later.");
+
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
                 }
             }
 
