@@ -32,7 +32,7 @@ namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
         }
 
         [Test]
-        public async Task Test()
+        public async Task Testing_Task_Progression_In_K2_Workflow()
         {
             var workflowId = await _workflowServiceApiClient.GetDBAssessmentWorkflowId();
             var processId = await _workflowServiceApiClient.CreateWorkflowInstance(workflowId);
