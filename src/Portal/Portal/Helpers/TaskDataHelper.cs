@@ -26,8 +26,8 @@ namespace Portal.Helpers
                     return await _dbContext.DbAssessmentAssessData
                         .FirstOrDefaultAsync(r => r.ProcessId == processId);
                 case "Verify":
-                    //TODO: Add
-                    return null;
+                    return await _dbContext.DbAssessmentVerifyData
+                        .FirstOrDefaultAsync(r => r.ProcessId == processId);
                 default:
                     throw new NotImplementedException($"ActivityName not found: {activityName}");
             }
