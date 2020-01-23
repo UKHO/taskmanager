@@ -82,6 +82,7 @@ namespace WorkflowCoordinator.Sagas
             }
 
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
+            await UpdateDbAssessmentReviewTable(Data.ProcessId, workflowInstanceId);
 
             _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.SendLocal(new RetrieveAssessmentDataCommand
@@ -89,7 +90,7 @@ namespace WorkflowCoordinator.Sagas
                 CorrelationId = Data.CorrelationId,
                 ProcessId = Data.ProcessId,
                 SourceDocumentId = Data.SourceDocumentId,
-                WorkflowInstanceId = workflowInstanceId.Value
+                WorkflowInstanceId = workflowInstanceId
             });
 
             _logger.LogInformation($"Sending {nameof(InitiateSourceDocumentRetrievalEvent)}");
@@ -151,7 +152,7 @@ namespace WorkflowCoordinator.Sagas
             MarkAsComplete();
         }
 
-        private async Task<int?> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
+        private async Task<int> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
         {
             var existingInstance = await _dbContext.WorkflowInstance.FirstOrDefaultAsync(w => w.ProcessId == processId);
 
@@ -171,6 +172,22 @@ namespace WorkflowCoordinator.Sagas
 
             var newId = workflowInstance.WorkflowInstanceId;
             return newId;
+        }
+
+        private async Task UpdateDbAssessmentReviewTable(int processId, int workflowInstanceId)
+        {
+            var existingReviewData = await _dbContext.DbAssessmentReviewData.FirstOrDefaultAsync(w => w.ProcessId == processId);
+
+            if (existingReviewData != null) return;
+
+            var reviewData = new DbAssessmentReviewData
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId
+            };
+
+            await _dbContext.DbAssessmentReviewData.AddAsync(reviewData);
+            await _dbContext.SaveChangesAsync();
         }
 
         private async void ConstructAndSendLinkedDocumentRetrievalCommands(IMessageHandlerContext context)
