@@ -17,6 +17,7 @@ namespace NCNEPortal.Pages
     {
         private readonly IUserIdentityService _userIdentityService;
         private readonly NcneWorkflowDbContext _dbContext;
+        private readonly IDirectoryService _directoryService;
 
 
         private string _userFullName;
@@ -30,10 +31,11 @@ namespace NCNEPortal.Pages
         public List<NcneTaskInfo> NcneTasks { get; set; }
 
         public IndexModel(IUserIdentityService userIdentityService, NcneWorkflowDbContext ncneWorkflowDbContext
-                         )
+                         , IDirectoryService directoryService)
         {
             _userIdentityService = userIdentityService;
             _dbContext = ncneWorkflowDbContext;
+            _directoryService = directoryService;
         }
 
         public async Task OnGetAsync()
@@ -86,6 +88,26 @@ namespace NCNEPortal.Pages
             await OnGetAsync();
             return Page();
 
+        }
+
+
+        public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
+        {
+            //LogContext.PushProperty("ProcessId", processId);
+            //LogContext.PushProperty("ActivityName", taskStage);
+
+            var instance = await _dbContext.NcneTaskInfo.FirstAsync(t => t.ProcessId == processId);
+
+            instance.Compiler = userName;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+
+        public async Task<JsonResult> OnGetUsersAsync()
+        {
+            return new JsonResult(await _directoryService.GetGroupMembers());
         }
 
     }
