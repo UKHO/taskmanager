@@ -33,5 +33,12 @@ namespace NCNEPortal.Auth
             var graphResult = await GraphClient.Users[graphUser.ObjectId].Request().GetAsync();
             return graphResult.DisplayName;
         }
+
+        public async Task<bool> ValidateUser(string username)
+        {
+            var graphUser = await GraphClient.Users.Request().Filter($"DisplayName eq '{username}'").GetAsync();
+
+            return (graphUser?.Count > 0);
+        }
     }
 }
