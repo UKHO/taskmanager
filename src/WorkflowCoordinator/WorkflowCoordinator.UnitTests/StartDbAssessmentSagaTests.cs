@@ -45,6 +45,8 @@ namespace WorkflowCoordinator.UnitTests
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeMapper = A.Fake<IMapper>();
             _fakeLogger = A.Dummy<ILogger<StartDbAssessmentSaga>>();
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns("1234");
+
 
             _saga = new StartDbAssessmentSaga(generalConfigOptionsSnapshot,
                 _fakeDataServiceApiClient,
@@ -70,6 +72,7 @@ namespace WorkflowCoordinator.UnitTests
             var sourceDocumentId = 99;
 
             //When
+            A.CallTo(()=> _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns("1234");
             await _saga.Handle(new StartDbAssessmentCommand
             {
                 CorrelationId = correlationId,

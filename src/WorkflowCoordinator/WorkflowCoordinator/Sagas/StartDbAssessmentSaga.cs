@@ -75,6 +75,12 @@ namespace WorkflowCoordinator.Sagas
 
             var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(Data.ProcessId);
 
+            if (string.IsNullOrEmpty(serialNumber))
+            {
+                _logger.LogError($"Failed to get data for K2 Task with ProcessId {Data.ProcessId}");
+                throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {Data.ProcessId}");
+            }
+
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
 
             _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");

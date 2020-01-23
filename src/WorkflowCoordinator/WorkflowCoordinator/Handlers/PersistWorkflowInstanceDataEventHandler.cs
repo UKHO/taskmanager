@@ -39,6 +39,12 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
+            if (k2Task == null)
+            {
+                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
+                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
+            }
+
             if (k2Task.ActivityName != message.ToActivityName)
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);

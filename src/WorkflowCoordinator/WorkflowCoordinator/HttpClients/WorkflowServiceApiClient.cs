@@ -87,6 +87,12 @@ namespace WorkflowCoordinator.HttpClients
             }
 
             var tasks = JsonConvert.DeserializeObject<K2Tasks>(data);
+            
+            if (tasks == null || tasks.ItemCount == 0 || tasks.Tasks == null || !tasks.Tasks.Any())
+            {
+                return null;
+            }
+
             var task = tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
 
             return task.SerialNumber;
@@ -142,6 +148,12 @@ namespace WorkflowCoordinator.HttpClients
             }
 
             var tasks = JsonConvert.DeserializeObject<K2Tasks>(data);
+
+            if (tasks == null || tasks.ItemCount == 0 || tasks.Tasks == null || !tasks.Tasks.Any())
+            {
+                return null;
+            }
+
             return tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
         }
     }
