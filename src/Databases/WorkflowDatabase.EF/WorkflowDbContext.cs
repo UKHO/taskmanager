@@ -25,6 +25,7 @@ namespace WorkflowDatabase.EF
         public DbSet<Comment> Comment { get; set; }
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
         public DbSet<DbAssessmentAssessData> DbAssessmentAssessData { get; set; }
+        public DbSet<DbAssessmentVerifyData> DbAssessmentVerifyData { get; set; }
         public DbSet<WorkflowInstance> WorkflowInstance { get; set; }
         public DbSet<PrimaryDocumentStatus> PrimaryDocumentStatus { get; set; }
         public DbSet<DatabaseDocumentStatus> DatabaseDocumentStatus { get; set; }

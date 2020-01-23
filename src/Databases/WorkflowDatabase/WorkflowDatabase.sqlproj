@@ -80,6 +80,7 @@
     <Build Include="Tables\AssignedTaskType.sql" />
     <PostDeploy Include="Scripts\Post Deployment\AssignedTaskType.sql" />
     <Build Include="Tables\DbAssessmentAssignTask.sql" />
+    <Build Include="Tables\DbAssessmentVerifyData.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
