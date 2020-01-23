@@ -96,11 +96,14 @@ namespace NCNEPortal.Pages
             //LogContext.PushProperty("ProcessId", processId);
             //LogContext.PushProperty("ActivityName", taskStage);
 
-            var instance = await _dbContext.NcneTaskInfo.FirstAsync(t => t.ProcessId == processId);
+            if (await _userIdentityService.ValidateUser(userName))
+            {
+                var instance = await _dbContext.NcneTaskInfo.FirstAsync(t => t.ProcessId == processId);
 
-            instance.Compiler = userName;
+                instance.Compiler = userName;
 
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
 
