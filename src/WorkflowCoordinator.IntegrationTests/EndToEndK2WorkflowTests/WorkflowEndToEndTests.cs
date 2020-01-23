@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 using NUnit.Framework;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Models;
@@ -65,7 +59,7 @@ namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
             if (!toTask.Equals("Complete", StringComparison.OrdinalIgnoreCase))
             {
                 K2TaskData k2Task = null;
-                // there is a delay between progressing task in K2 and when it is ready; hence added this do--lopp
+                // there is a delay between progressing task in K2 and when it is ready; hence added this do--loop
                 do
                 {
                     k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(processId);
