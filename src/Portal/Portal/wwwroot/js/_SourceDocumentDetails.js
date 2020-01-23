@@ -103,8 +103,10 @@
                 $("#addSourceErrorMessage").text("");
             },
             error: function () {
-                $("#sourceDocumentsError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Source Documents. Please try again later.</div>");
+                $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                $("#addSourceErrorMessage").text("Failed to connect to SDRA. Please try again later.");
+                $("#addDatabaseSourceDocument .dialog.error").collapse("show");
             }
         });
     }
