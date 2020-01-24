@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Portal.Helpers;
 using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -15,6 +16,7 @@ namespace Portal.Pages.DbAssessment
     public class _RecordProductActionModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
+        private readonly ITaskDataHelper _taskDataHelper;
 
         [BindProperty(SupportsGet = true)]
         public int ProcessId { get; set; }
@@ -31,18 +33,21 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList ProductActionTypes { get; set; }
 
-        public _RecordProductActionModel(WorkflowDbContext dbContext)
+        public _RecordProductActionModel(WorkflowDbContext dbContext, ITaskDataHelper taskDataHelper)
         {
             _dbContext = dbContext;
+            _taskDataHelper = taskDataHelper;
         }
 
 
-        public async Task OnGetAsync(int processId)
+        public async Task OnGetAsync(int processId, string taskStage)
         {
+            ProcessId = processId;
+
             SetHpdProducts();
             await PopulateProductActionTypes();
             await SetProductActionFromDb();
-            await SetActionedDummyData();
+            await SetProductActionDataFromDb(taskStage);
         }
 
         private async Task PopulateProductActionTypes()
@@ -53,6 +58,8 @@ namespace Portal.Pages.DbAssessment
 
         private void SetHpdProducts()
         {
+            //TODO: Change to read from real data.
+
             ImpactedProducts = new SelectList(
                 new List<ImpactedProduct>
                 {
@@ -66,8 +73,6 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SetProductActionFromDb()
         {
-            //var productActionTypes = await _dbContext.ProductActionType.ToListAsync();
-
             ProductActions = await _dbContext.ProductAction
                 .Include(p => p.ProductActionType)
                 .Where(pa => pa.ProcessId == ProcessId)
@@ -75,17 +80,21 @@ namespace Portal.Pages.DbAssessment
 
         }
 
-        private async Task SetActionedDummyData()
+        private async Task SetProductActionDataFromDb(string taskStage)
         {
-            var dbAssessmentAssessData = await _dbContext.DbAssessmentAssessData.FirstOrDefaultAsync(p => p.ProcessId == ProcessId);
+            var dbAssessmentData = await _taskDataHelper.GetProductActionData(taskStage, ProcessId);
 
-            if (dbAssessmentAssessData != null)
+            if (dbAssessmentData != null)
             {
-                ProductActioned = dbAssessmentAssessData.ProductActioned;
-                ProductActionChangeDetails = dbAssessmentAssessData.ProductActionChangeDetails;
+                ProductActioned = dbAssessmentData.ProductActioned;
+                ProductActionChangeDetails = dbAssessmentData.ProductActionChangeDetails;
             }
 
         }
+
+
+
+         
 
     }
 }

@@ -42,9 +42,8 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SetDataImpactFromDb()
         {
-            var usages = await _dbContext.HpdUsage.ToListAsync();
 
-            DataImpacts = _dbContext.DataImpact.Where(di => di.ProcessId == ProcessId).ToList();
+            DataImpacts = await _dbContext.DataImpact.Where(di => di.ProcessId == ProcessId).ToListAsync();
         }
     }
 }
