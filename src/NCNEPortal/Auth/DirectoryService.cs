@@ -18,8 +18,8 @@ namespace NCNEPortal.Auth
             IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
         {
             _secretsConfig = secretsConfig;
-            var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
-                $"{uriConfig.Value.LandingPageUrl}/signin-oidc";
+            var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.NcneLocalDevLandingPageHttpsUrl}signin-oidc" :
+                $"{uriConfig.Value.NcneLandingPageUrl}/signin-oidc";
 
             var authenticationProvider =
                 new MsalAuthenticationProvider(generalConfig.Value.AzureAdClientId,
@@ -65,7 +65,7 @@ namespace NCNEPortal.Auth
             catch (Exception e)
             {
                 //TODO: Log!
-                throw new ApplicationException(e.Message);
+                throw new ApplicationException("Failed to retrieve group members", e);
             }
         }
     }
