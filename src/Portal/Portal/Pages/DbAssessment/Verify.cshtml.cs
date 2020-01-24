@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
@@ -74,9 +75,99 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
-            return RedirectToPage("/Index");
+            LogContext.PushProperty("ActivityName", "Verify");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
+            LogContext.PushProperty("Action", action);
+
+            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
+            
+            //var isValid = true;
+            //ValidationErrorMessages.Clear();
+
+            //if (!ValidateTaskInformation())
+            //{
+            //    isValid = false;
+            //}
+
+            //if (!ValidateOperators())
+            //{
+            //    isValid = false;
+            //}
+
+            //if (!await ValidateRecordProductAction())
+            //{
+            //    isValid = false;
+            //}
+
+            //if (!ValidateDataImpact())
+            //{
+            //    isValid = false;
+            //}
+
+            //if (!isValid)
+            //{
+            //    return new JsonResult(this.ValidationErrorMessages)
+            //    {
+            //        StatusCode = (int)HttpStatusCode.BadRequest
+            //    };
+            //}
+
+            //await UpdateTaskInformation(processId);
+
+            //await UpdateProductAction(processId);
+
+            //await UpdateDataImpact(processId);
+
+            //if (action == "Done")
+            //{
+            //    var workflowInstance = await _dbContext.WorkflowInstance
+            //        .Include(w => w.PrimaryDocumentStatus)
+            //        .FirstAsync(w => w.ProcessId == processId);
+                
+            //    workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            //    await _dbContext.SaveChangesAsync();
+
+            //    var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Complete");
+
+            //    if (success)
+            //    {
+            //        await PersistCompletedVerify(processId, workflowInstance);
+
+            //        UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            //        LogContext.PushProperty("UserFullName", UserFullName);
+
+            //        _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+            //        await _commentsHelper.AddComment($"Verify step completed",
+            //            processId,
+            //            workflowInstance.WorkflowInstanceId,
+            //            UserFullName);
+            //    }
+            //    else
+            //    {
+            //        workflowInstance.Status = WorkflowStatus.Started.ToString();
+            //        await _dbContext.SaveChangesAsync();
+
+            //        _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
+
+            //        ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
+
+            //        return new JsonResult(this.ValidationErrorMessages)
+            //        {
+            //            StatusCode = (int)HttpStatusCode.InternalServerError
+            //        };
+            //    }
+            //}
+            
+            //_logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
 
