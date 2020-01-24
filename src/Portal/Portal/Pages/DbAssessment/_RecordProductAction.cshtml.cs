@@ -41,7 +41,7 @@ namespace Portal.Pages.DbAssessment
         {
             SetHpdProducts();
             await PopulateProductActionTypes();
-            await SetProductActionDummyData();
+            await SetProductActionFromDb();
             await SetActionedDummyData();
         }
 
@@ -63,34 +63,17 @@ namespace Portal.Pages.DbAssessment
                 }, "ProductId", "Product");
 
         }
-        private async Task SetProductActionDummyData()
+
+        private async Task SetProductActionFromDb()
         {
-            var productActionTypes = await _dbContext.ProductActionType.ToListAsync();
+            //var productActionTypes = await _dbContext.ProductActionType.ToListAsync();
 
-            ProductActions = new List<ProductAction>
-            {
-                new ProductAction()
-                {
-                    ProductActionId = 1,
-                    ProcessId = ProcessId,
-                    ImpactedProduct = "GB1234",
-                    ProductActionTypeId = 1,
-                    ProductActionType = productActionTypes.FirstOrDefault(p => p.ProductActionTypeId == 1),
-                    Verified = false
-                },
+            ProductActions = await _dbContext.ProductAction
+                .Include(p => p.ProductActionType)
+                .Where(pa => pa.ProcessId == ProcessId)
+                .ToListAsync();
 
-                new ProductAction()
-                {
-                    ProductActionId = 2,
-                    ImpactedProduct = "GB5678",
-                    ProductActionTypeId = 2,
-                    ProductActionType = productActionTypes.FirstOrDefault(p => p.ProductActionTypeId == 2),
-                    ProcessId = ProcessId,
-                    Verified = false
-                }
-            };
         }
-
 
         private async Task SetActionedDummyData()
         {

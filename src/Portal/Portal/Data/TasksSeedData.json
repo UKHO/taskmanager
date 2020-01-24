@@ -535,6 +535,20 @@
         "Status": "Started",
         "created": "2020-01-01T00:00:00"
       }
+    ],
+    "ProductAction": [
+      {
+        "ProcessId": 126,
+        "ImpactedProduct": "GB1234",
+        "ProductActionTypeId": 1,
+        "Verified": false
+      },
+      {
+        "ProcessId": 126,
+        "ImpactedProduct": "GB5678",
+        "ProductActionTypeId": 2,
+        "Verified": false
+      }
     ]
   },
   {
