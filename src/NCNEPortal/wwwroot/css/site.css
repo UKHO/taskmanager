@@ -69,11 +69,24 @@ table.task-list thead tr th {
 .deleteAssignTask {
 }
 
+/*Set outline for focus to override Bootstrap 4*/
+.btn:focus, .btn.focus,
+.switch > input:focus + span, .switch > input.focus + span,
+.checkbox-wrapper > input:focus + label::before, .checkbox-wrapper > input.focus + label::before {
+    outline: rgb(77, 144, 254) auto 1px;
+    outline-color: rgb(77, 144, 254);
+    outline-style: auto;
+    outline-width: 1px;
+}
+
 .btn-size > div {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
     max-width: 8.8rem;
 }
+
+
+/*Start primary button*/
 
 .btn-primary {
     color: #fff;
@@ -81,23 +94,25 @@ table.task-list thead tr th {
     border-color: #09315B;
 }
 
-    .btn-primary:focus, .btn-primary.focus {
-        box-shadow: unset;
-    }
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: unset;
+}
 
-    .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
-    .show > .btn-primary.dropdown-toggle {
-        color: #09315B;
-        background-color: #ffffff;
-        border-color: #09315B;
-    }
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
 
-        .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
-        .show > .btn-primary.dropdown-toggle:focus {
-            box-shadow: unset;
-        }
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: unset;
+}
 
+/*End primary button*/
 
+/*Start secondary button*/
 
 .btn-secondary {
     color: #05284e;
@@ -109,12 +124,12 @@ table.task-list thead tr th {
     box-shadow: unset;
 }
 
-    .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
-    .show > .btn-secondary.dropdown-toggle {
-        color: #fff;
-        background-color: #05284e;
-        border-color: #05284e;
-    }
+.btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: #05284e;
+    border-color: #05284e;
+}
 
 .btn-secondary:not(:disabled):not(.disabled):active:focus, .btn-secondary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-secondary.dropdown-toggle:focus {
@@ -127,6 +142,9 @@ table.task-list thead tr th {
     border-color: #05284e;
 }
 
+/*End secondary button*/
+
+/*Start danger button*/
 
 .btn.btn-danger {
     color: #ffffff;
@@ -134,9 +152,9 @@ table.task-list thead tr th {
     border-color: #e20d0d;
 }
 
-    .btn.btn-danger:hover, .btn.btn-danger.hover {
-        background-color: #e20d34;
-    }
+.btn.btn-danger:hover, .btn.btn-danger.hover {
+    background-color: #e20d34;
+}
 
 .btn-danger:focus, .btn-danger.focus {
     box-shadow: unset;
@@ -149,37 +167,12 @@ table.task-list thead tr th {
     border-color: #e20d0d;
 }
 
-    .btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
-    .show > .btn-danger.dropdown-toggle:focus {
-        box-shadow: unset;
-    }
-
-.btn.btn-danger {
-    color: #ffffff;
-    background-color: #e20d0d;
-    border-color: #e20d0d;
-}
-
-    .btn.btn-danger:hover, .btn.btn-danger.hover {
-        background-color: #e20d34;
-    }
-
-.btn-danger:focus, .btn-danger.focus {
+.btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
+.show > .btn-danger.dropdown-toggle:focus {
     box-shadow: unset;
 }
 
-.btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
-.show > .btn-danger.dropdown-toggle {
-    color: #e20d0d;
-    background-color: #ffffff;
-    border-color: #e20d0d;
-}
-
-    .btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
-    .show > .btn-danger.dropdown-toggle:focus {
-        box-shadow: unset;
-    }
-
+/*End danger button*/
 
 /*Start mark complete button*/
 
@@ -189,12 +182,12 @@ table.task-list thead tr th {
     border-color: #4AAB37;
 }
 
-    .btn.btn-complete:hover, .btn.btn-complete.hover {
-        background-color: #4AA130;
-        border-color: #4AA130;
-    }
+.btn.btn-complete:hover, .btn.btn-complete.hover {
+    background-color: #4AA130;
+    border-color: #4AA130;
+}
 
-.btn-danger:focus, .btn-danger.focus {
+.btn.btn-complete:focus, .btn.btn-complete.focus {
     box-shadow: unset;
 }
 
@@ -205,10 +198,10 @@ table.task-list thead tr th {
     border-color: #4AAB37;
 }
 
-    .btn-complete:not(:disabled):not(.disabled):active:focus, .btn-complete:not(:disabled):not(.disabled).active:focus,
-    .show > .btn-complete.dropdown-toggle:focus {
-        box-shadow: unset;
-    }
+.btn-complete:not(:disabled):not(.disabled):active:focus, .btn-complete:not(:disabled):not(.disabled).active:focus,
+.show > .btn-complete.dropdown-toggle:focus {
+    box-shadow: unset;
+}
 
 /*End mark complete button*/
 
@@ -639,17 +632,7 @@ span.twitter-typeahead {
 #datepicker > span:hover{ cursor: pointer;}
 
 
-.speech.count {
-    position: relative;
-    bottom: 25px;
-    left: 10px;
-    color: white;
-}
 
-.speech.bubble > i {
-    color: #09315B;
-    font-size: 30px;
-}
 
 .bottom {
     border-color: #c8c8c8 transparent transparent transparent;
@@ -742,14 +725,6 @@ input:checked + .slider:before {
 
 /* End switch */
 
-.show-comments span {
-    font-weight: 300;
-}
-
-table#workflow-table th {
-    padding: 0.4rem 0rem;
-}
-
 /* CHECKBOX START */
 
 .checkbox-wrapper input[type=checkbox] {
@@ -803,13 +778,42 @@ table#workflow-table th {
 
 /* CHECKBOX END */
 
+/* WORKFLOW PAGE START */
 
-/* WORKFLOW GENERIC COMMENTS START */
+.speech.count {
+    position: relative;
+    bottom: 25px;
+    left: 2px;
+    color: white;
+    text-align: center;
+    width: 26px;
+}
+
+.speech.bubble > i {
+    color: #09315B;
+    font-size: 30px;
+}
+
+table#workflow-table th {
+    padding: 0.4rem 0rem;
+}
+
+table#workflow-table tr.shaded {
+    background-color: #EEF3F4;
+}
+
+.show-comments span {
+    font-weight: 300;
+}
+
+.status.inProgress {
+    color: #EF8123;
+}
 
 #generic-comments-table td {
     border-right: none;
     font-weight: 300;
 }
 
-/* WORKFLOW GENERIC COMMENTS END */
+/* WORKFLOW PAGE END */
 

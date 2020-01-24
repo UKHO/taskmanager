@@ -6,13 +6,13 @@
     ViewData["Title"] = "New Chart / New Edition";
 }
 
-<div class="row pt-1 pb-1">
-    <div class="col-4">
+<div class="row pt-1 pb-1 align-items-center">
+    <div class="col-4 col-lg-3">
         <a asp-page="./Index">
             <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
         </a>
     </div>
-    <div class="col-4">
+    <div class="col-7 offset-1">
         <h1>New Chart/New Edition</h1>
     </div>
 </div>
@@ -54,7 +54,7 @@
     <span class="wf-status wf-status-inprogress"><span class="fa fa-clock mr-1"></span>In Progress</span>
     <span class="wf-status wf-status-complete"><span class="fa fa-check-circle mr-1"></span>Completed</span>
     <div>
-        <table class="table" id="workflow-table" style="border-width: medium">
+        <table class="table" id="workflow-table">
             <thead class="mt-2">
                 <tr>
                     <th scope="col"></th>
@@ -80,8 +80,10 @@
                 <tr class="workflow-row">
                     <td><h4>Compile Chart</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -116,11 +118,13 @@
                 </tr>
 
                 @*--- START WORKFLOW TABLE: V1 ---*@
-                <tr style="background-color: #EEF3F4">
+                <tr class="shaded">
                     <td><h4>V1</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -134,8 +138,10 @@
                 <tr>
                     <td><h4>V1 rework</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -146,11 +152,13 @@
                 </tr>
 
                 @*--- START WORKFLOW TABLE: V2 ---*@
-                <tr style="background-color: #EEF3F4">
+                <tr class="shaded">
                     <td><h4>V2</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -164,8 +172,10 @@
                 <tr>
                     <td><h4>V2 Rework</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -176,11 +186,13 @@
                 </tr>
 
                 @*--- START WORKFLOW TABLE: FORMS ---*@
-                <tr style="background-color: #EEF3F4">
+                <tr class="shaded">
                     <td><h4>Forms</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -194,8 +206,10 @@
                 <tr>
                     <td><h4>Final updating</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -206,11 +220,13 @@
                 </tr>
 
                 @*--- START WORKFLOW TABLE: 100% CHECK ---*@
-                <tr style="background-color: #EEF3F4">
+                <tr class="shaded">
                     <td><h4>100% check</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -224,8 +240,10 @@
                 <tr>
                     <td><h4>Commit to print</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -236,11 +254,13 @@
                 </tr>
 
                 @*--- START WORKFLOW TABLE: CIS ---*@
-                <tr style="background-color: #EEF3F4">
+                <tr class="shaded">
                     <td><h4>CIS</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -254,8 +274,10 @@
                 <tr>
                     <td><h4>Publication</h4></td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -267,8 +289,10 @@
                 <tr>
                     <td>Publish chart</td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -288,8 +312,10 @@
                 <tr>
                     <td>Clear vector from<br />new minor version</td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -309,8 +335,10 @@
                 <tr>
                     <td>Retire old minor version</td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -329,8 +357,10 @@
                 <tr>
                     <td>Action withdrawn charts</td>
                     <td>
-                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                        <span style="color:#ef8123">In Progress</span>
+                        <div class="status inProgress">
+                            <span class="fa fa-edit"> </span>
+                            <span>In Progress</span>
+                        </div>
                     </td>
                     <td>stoodleym</td>
                     <td />
@@ -485,7 +515,7 @@
                     <a href="#">Edit this section </a>
                 </div>
                 <div class="col-2">
-                    <span class="fa fa-comment"></span>
+                    <span class="fas fa-comment-alt"></span>
                     <a href="#">Add a comment</a>
                 </div>
             </div>
