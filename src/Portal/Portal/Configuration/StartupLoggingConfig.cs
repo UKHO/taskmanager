@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Portal.Configuration
+﻿namespace Portal.Configuration
 {
     public class StartupLoggingConfig
     {

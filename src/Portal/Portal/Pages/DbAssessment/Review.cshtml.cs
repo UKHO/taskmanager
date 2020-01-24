@@ -13,8 +13,6 @@ using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
-using Serilog;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;

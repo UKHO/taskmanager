@@ -2,6 +2,19 @@
 
     setVerifySaveHandler();
 
+    var formChanged = false;
+    $("#frmVerifyPage").change(function () { formChanged = true; });
+
+    window.onbeforeunload = function () {
+        if (formChanged) {
+            return "Changes detected";
+        }
+    };
+
+    if ($("#verifyDoneErrorMessage").html().trim().length > 0) {
+        $("#modalWaitVerifyDoneErrors").modal("show");
+    }
+
     $("#btnReject").on("click", function () {
         $("#ConfirmReject").modal("show");
     });
@@ -22,10 +35,10 @@
 
 
     function completeVerify(action) {
-        //$("#assessDoneErrorMessage").html("");
-        //$("#btnDone").prop("disabled", true);
-        //$("#btnSave").prop("disabled", true);
-        //$("#modalWaitAssessDone").modal("show");
+        $("#verifyDoneErrorMessage").html("");
+        $("#btnDone").prop("disabled", true);
+        $("#btnSave").prop("disabled", true);
+        $("#modalWaitVerifyDone").modal("show");
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -39,37 +52,35 @@
             complete: function () {
                 //Add a delay to account for the modalWaitReviewDone modal
                 //not being fully shown, before trying to hide it
-                //window.setTimeout(function () {
-                //    $("#modalWaitAssessDone").modal("hide");
-                //    $("#btnDone").prop("disabled", false);
-                //    $("#btnSave").prop("disabled", false);
-                //}, 200);
+                window.setTimeout(function () {
+                    $("#modalWaitVerifyDone").modal("hide");
+                    $("#btnDone").prop("disabled", false);
+                    $("#btnSave").prop("disabled", false);
+                }, 200);
             },
             success: function (result) {
-                //formChanged = false;
-                //if (action === "Done") {
-                //    window.location.replace("/Index");
-                //}
+                formChanged = false;
+                if (action === "Done") {
+                    window.location.replace("/Index");
+                }
                 console.log("success");
             },
             error: function (error) {
-                //var responseJson = error.responseJSON;
+                var responseJson = error.responseJSON;
 
-                //if (responseJson != null) {
-                //    $("#assessDoneErrorMessage").append("<ul/>");
-                //    var unOrderedList = $("#assessDoneErrorMessage ul");
+                if (responseJson != null) {
+                    $("#verifyDoneErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#verifyDoneErrorMessage ul");
 
-                //    responseJson.forEach(function (item) {
-                //        unOrderedList.append("<li>" + item + "</li>");
-                //    });
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
 
-                //    $("#modalWaitAssessDoneErrors").modal("show");
-                //}
-
+                    $("#modalWaitVerifyDoneErrors").modal("show");
+                }
             }
         });
     }
-
 
     function setVerifySaveHandler() {
         $("#btnSave").prop("disabled", false);

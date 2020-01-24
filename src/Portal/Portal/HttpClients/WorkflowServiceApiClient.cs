@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.KeyVault;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Configuration;
 using Portal.Models;
-using Portal.Pages.DbAssessment;
 using Serilog.Context;
 
 namespace Portal.HttpClients

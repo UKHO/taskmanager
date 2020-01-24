@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
+using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -30,6 +31,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
+        private readonly HpdDbContext _hpdDbContext;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -49,6 +51,29 @@ namespace Portal.Pages.DbAssessment
             private set => _userFullName = value;
         }
 
+        public List<string> ValidationErrorMessages { get; set; }
+
+        [BindProperty]
+        public string Ion { get; set; }
+
+        [BindProperty]
+        public string ActivityCode { get; set; }
+
+        [BindProperty]
+        public string SourceCategory { get; set; }
+
+        [BindProperty]
+        public string Verifier { get; set; }
+
+        [BindProperty]
+        public List<DataImpact> DataImpacts { get; set; }
+
+        [BindProperty]
+        public bool ProductActioned { get; set; }
+
+        [BindProperty]
+        public string ProductActionChangeDetails { get; set; }
+
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
@@ -56,7 +81,8 @@ namespace Portal.Pages.DbAssessment
             IOptions<UriConfig> uriConfig,
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
-            ILogger<VerifyModel> logger)
+            ILogger<VerifyModel> logger,
+            HpdDbContext hpdDbContext)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -66,6 +92,9 @@ namespace Portal.Pages.DbAssessment
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _logger = logger;
+            _hpdDbContext = hpdDbContext;
+
+            ValidationErrorMessages = new List<string>();
         }
 
         public async Task OnGet(int processId)
@@ -83,93 +112,112 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("Action", action);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
-            
-            //var isValid = true;
-            //ValidationErrorMessages.Clear();
 
-            //if (!ValidateTaskInformation())
-            //{
-            //    isValid = false;
-            //}
+            var isValid = true;
+            ValidationErrorMessages.Clear();
 
-            //if (!ValidateOperators())
-            //{
-            //    isValid = false;
-            //}
+            if (!ValidateTaskInformation())
+            {
+                isValid = false;
+            }
 
-            //if (!await ValidateRecordProductAction())
-            //{
-            //    isValid = false;
-            //}
+            if (!ValidateOperators())
+            {
+                isValid = false;
+            }
 
-            //if (!ValidateDataImpact())
-            //{
-            //    isValid = false;
-            //}
+            if (!await ValidateRecordProductAction())
+            {
+                isValid = false;
+            }
 
-            //if (!isValid)
-            //{
-            //    return new JsonResult(this.ValidationErrorMessages)
-            //    {
-            //        StatusCode = (int)HttpStatusCode.BadRequest
-            //    };
-            //}
+            if (!ValidateDataImpact())
+            {
+                isValid = false;
+            }
 
-            //await UpdateTaskInformation(processId);
+            if (!isValid)
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
 
-            //await UpdateProductAction(processId);
+            await UpdateTaskInformation(processId);
 
-            //await UpdateDataImpact(processId);
+            await UpdateProductAction(processId);
 
-            //if (action == "Done")
-            //{
-            //    var workflowInstance = await _dbContext.WorkflowInstance
-            //        .Include(w => w.PrimaryDocumentStatus)
-            //        .FirstAsync(w => w.ProcessId == processId);
-                
-            //    workflowInstance.Status = WorkflowStatus.Updating.ToString();
+            await UpdateDataImpact(processId);
 
-            //    await _dbContext.SaveChangesAsync();
+            if (action == "Done")
+            {
+                var workflowInstance = await _dbContext.WorkflowInstance
+                    .Include(w => w.PrimaryDocumentStatus)
+                    .FirstAsync(w => w.ProcessId == processId);
 
-            //    var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Complete");
+                workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
-            //    if (success)
-            //    {
-            //        await PersistCompletedVerify(processId, workflowInstance);
+                await _dbContext.SaveChangesAsync();
 
-            //        UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Complete");
 
-            //        LogContext.PushProperty("UserFullName", UserFullName);
+                if (success)
+                {
+                    await PersistCompletedVerify(processId, workflowInstance);
 
-            //        _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
-            //        await _commentsHelper.AddComment($"Verify step completed",
-            //            processId,
-            //            workflowInstance.WorkflowInstanceId,
-            //            UserFullName);
-            //    }
-            //    else
-            //    {
-            //        workflowInstance.Status = WorkflowStatus.Started.ToString();
-            //        await _dbContext.SaveChangesAsync();
+                    LogContext.PushProperty("UserFullName", UserFullName);
 
-            //        _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
+                    _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
 
-            //        ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
+                    await _commentsHelper.AddComment($"Verify step completed",
+                        processId,
+                        workflowInstance.WorkflowInstanceId,
+                        UserFullName);
+                }
+                else
+                {
+                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    await _dbContext.SaveChangesAsync();
 
-            //        return new JsonResult(this.ValidationErrorMessages)
-            //        {
-            //            StatusCode = (int)HttpStatusCode.InternalServerError
-            //        };
-            //    }
-            //}
-            
-            //_logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+                    _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
+
+                    ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
+
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+            }
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
 
             return StatusCode((int)HttpStatusCode.OK);
         }
 
+        private async Task PersistCompletedVerify(int processId, WorkflowInstance workflowInstance)
+        {
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivityName = "Verify",
+                ToActivityName = "Completed"
+            };
+
+            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
+                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
+            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+        }
 
         public async Task<IActionResult> OnPostRejectVerifyAsync(string comment, int processId)
         {
@@ -297,6 +345,127 @@ namespace Portal.Pages.DbAssessment
         {
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
+        }
+
+        private bool ValidateTaskInformation()
+        {
+            var isValid = true;
+
+            if (string.IsNullOrWhiteSpace(Ion))
+            {
+                ValidationErrorMessages.Add("Task Information: Ion cannot be empty");
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(ActivityCode))
+            {
+                ValidationErrorMessages.Add("Task Information: Activity code cannot be empty");
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(SourceCategory))
+            {
+                ValidationErrorMessages.Add("Task Information: Source category cannot be empty");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        private bool ValidateOperators()
+        {
+            if (string.IsNullOrWhiteSpace(Verifier))
+            {
+                ValidationErrorMessages.Add("Operators: Verifier cannot be empty");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> ValidateRecordProductAction()
+        {
+            bool isValid = true;
+
+            if (RecordProductAction != null && RecordProductAction.Count > 0)
+            {
+                foreach (var productAction in RecordProductAction)
+                {
+                    // Check for existing impacted products
+                    var isExist = await _hpdDbContext.CarisProducts.AnyAsync(p =>
+                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
+                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (!isExist)
+                    {
+                        ValidationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                        isValid = false;
+                    }
+                }
+
+                if (RecordProductAction.GroupBy(p => p.ImpactedProduct)
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key).Any())
+                {
+                    ValidationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        private bool ValidateDataImpact()
+        {
+            // Show error to user that they've chosen the same usage more than once
+            if (DataImpacts.GroupBy(x => x.HpdUsageId)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key).Any())
+            {
+                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task UpdateTaskInformation(int processId)
+        {
+            var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+            currentVerify.Verifier = Verifier;
+            currentVerify.Ion = Ion;
+            currentVerify.ActivityCode = ActivityCode;
+            currentVerify.SourceCategory = SourceCategory;
+        }
+
+        private async Task UpdateProductAction(int processId)
+        {
+            var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+            currentVerify.ProductActioned = ProductActioned;
+            currentVerify.ProductActionChangeDetails = ProductActionChangeDetails;
+
+            var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.ProductAction.RemoveRange(toRemove);
+
+            foreach (var productAction in RecordProductAction)
+            {
+                productAction.ProcessId = processId;
+                _dbContext.ProductAction.Add(productAction);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateDataImpact(int processId)
+        {
+            var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
+            _dbContext.DataImpact.RemoveRange(toRemove);
+
+            foreach (var dataImpact in DataImpacts)
+            {
+                dataImpact.ProcessId = processId;
+                _dbContext.DataImpact.Add(dataImpact);
+            }
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
