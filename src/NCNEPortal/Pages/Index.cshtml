@@ -41,7 +41,7 @@
 
 
 <div class="card mb-4 mt-3">
-    <h6>In Flight Tasks</h6>
+    <h3>In Flight Tasks</h3>
     <div class="card-body" style="width: 100%">
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
@@ -69,7 +69,7 @@
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>
                         <td>
-                            <a asp-page="Workflow/Edit" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                            <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
                             @task.ChartType
@@ -136,7 +136,7 @@
                 </div>
                 <div class="modal-body">
                     <div id="modal-body">
-                        <textarea style="height: 100px;" maxlength="4000" id="txtNote" name="taskNote" class="form-control"></textarea>
+                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
                         <input type="hidden" id="hdnProcessId" name="processId" />
                         <br />
                         <div id="editTaskNoteError"></div>
