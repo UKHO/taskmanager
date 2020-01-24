@@ -32,5 +32,20 @@ namespace Portal.Helpers
                     throw new NotImplementedException($"ActivityName not found: {activityName}");
             }
         }
+
+        public async Task<IProductActionData> GetProductActionData(string activityName, int processId)
+        {
+            switch (activityName)
+            {
+                case "Assess":
+                    return await _dbContext.DbAssessmentAssessData
+                        .FirstOrDefaultAsync(r => r.ProcessId == processId);
+                case "Verify":
+                    return await _dbContext.DbAssessmentVerifyData
+                        .FirstOrDefaultAsync(r => r.ProcessId == processId);
+                default:
+                    throw new NotImplementedException($"ActivityName not found: {activityName}");
+            }
+        }
     }
 }
