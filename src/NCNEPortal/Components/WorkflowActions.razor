@@ -1,4 +1,6 @@
-﻿<div class="d-flex justify-content-end align-items-center">
+﻿@namespace NCNEPortal.Components
+
+<div class="d-flex justify-content-end align-items-center">
     <div class="mr-4">
         <span>Comments</span>
         <label class="switch ml-1 mb-auto">
@@ -12,9 +14,9 @@
 <div class="d-flex justify-content-end">
     @if (Rework)
     {
-    <div class="mt-3 mr-3">
-        <button id="btn@(WorkflowStep)Rework" class="btn btn-block btn-secondary">Rework</button>
-    </div>
+        <div class="mt-3 mr-3">
+            <button id="btn@(WorkflowStep)Rework" class="btn btn-block btn-secondary">Rework</button>
+        </div>
     }
     <div class="mt-3">
         <button id="btn@(WorkflowStep)Complete" class="btn btn-block btn-complete" style="min-width: 139px;">Mark Complete</button>
