@@ -73,7 +73,7 @@ namespace EventService.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
-           
+
             throw new NotImplementedException();
         }
 
@@ -146,6 +146,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
+        [SwaggerResponse(statusCode: 503, type: typeof(DefaultErrorResponse), description: "Service Unavailable.")]
         public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
         {
             LogContext.PushProperty("ApiResource", nameof(PostEvent));
@@ -161,14 +162,14 @@ namespace EventService.Controllers
 
             try
             {
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\","");
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\", "");
                 var assemblyPath = Path.Combine(path, "Common.Messages.dll");
                 assembly = Assembly.LoadFrom(assemblyPath);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to load assembly Common.Messages");
-                return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
+                return StatusCode(500);
             }
 
             try
@@ -179,7 +180,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to get event type {EventName}");
-                return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to get event type {eventName}");
             }
 
             try
@@ -189,12 +190,12 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to deserialize event {EventName}");
-                return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to deserialize event {eventName}");
             }
 
             try
             {
-                var correlationId = ((ICorrelate) populatedEvent).CorrelationId;
+                var correlationId = ((ICorrelate)populatedEvent).CorrelationId;
 
                 if (correlationId.Equals(Guid.Empty))
                 {
@@ -206,12 +207,12 @@ namespace EventService.Controllers
             catch (InvalidCastException e)
             {
                 _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
-                return StatusCode(500, $"Failed to cast event using ICorrelate from {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to cast event using ICorrelate from {eventName}");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
-                return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}");
             }
 
             try
@@ -225,7 +226,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to publish event {EventName}");
-                return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
+                return StatusCode(503, $"Failed to publish event {eventName}. Please try again later.");
             }
 
             return new ObjectResult(HttpStatusCode.OK);
