@@ -11,6 +11,7 @@ using EventService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
+using Polly;
 using Serilog.Context;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -73,7 +74,7 @@ namespace EventService.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
-           
+
             throw new NotImplementedException();
         }
 
@@ -161,7 +162,7 @@ namespace EventService.Controllers
 
             try
             {
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\","");
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\", "");
                 var assemblyPath = Path.Combine(path, "Common.Messages.dll");
                 assembly = Assembly.LoadFrom(assemblyPath);
             }
@@ -194,7 +195,7 @@ namespace EventService.Controllers
 
             try
             {
-                var correlationId = ((ICorrelate) populatedEvent).CorrelationId;
+                var correlationId = ((ICorrelate)populatedEvent).CorrelationId;
 
                 if (correlationId.Equals(Guid.Empty))
                 {
@@ -214,19 +215,24 @@ namespace EventService.Controllers
                 return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}: {e.ToString()}");
             }
 
-            try
-            {
-                var publishOptions = new PublishOptions();
+            _logger.LogInformation("{ApiResource} publishing event {EventName}");
 
-                _logger.LogInformation("{ApiResource} publishing event {EventName}");
-                await _messageSession.Publish(populatedEvent, publishOptions).ConfigureAwait(false);
-                _logger.LogInformation("{ApiResource} finished publishing event {EventName}");
-            }
-            catch (Exception e)
+            // Retries 3 times at 2, 4 and 6 seconds
+            var result = await Policy.Handle<Exception>()
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2),
+                    (exception, timeSpan, retryAttempt, context) =>
+                    {
+                        _logger.LogError(exception, $"Failed to publish event {eventName}, attempting retry: {retryAttempt}");
+                    })
+                .ExecuteAndCaptureAsync(() => _messageSession.Publish(populatedEvent, new PublishOptions()));
+
+            if (result.Outcome == OutcomeType.Failure)
             {
-                _logger.LogError(e, "{ApiResource} Failed to publish event {EventName}");
-                return StatusCode(500, $"Failed to publish event {eventName}: {e.ToString()}");
+                _logger.LogError(result.FinalException, "{ApiResource} Failed to publish event {EventName}");
+                return StatusCode(503, $"Failed to publish event {eventName}. Please try again later.");
             }
+
+            _logger.LogInformation("{ApiResource} finished publishing event {EventName}");
 
             return new ObjectResult(HttpStatusCode.OK);
         }
