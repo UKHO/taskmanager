@@ -16,7 +16,7 @@ namespace NCNEWorkflowDatabase.Tests
         {
             _dbContextOptions = new DbContextOptionsBuilder<NcneWorkflowDbContext>()
                 .UseSqlServer(
-                    @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=NCNEWorkflowDatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
+                    @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=taskmanager-dev-ncneworkflowdatabase;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False")
                 .Options;
 
             _dbContext = new NcneWorkflowDbContext(_dbContextOptions);
