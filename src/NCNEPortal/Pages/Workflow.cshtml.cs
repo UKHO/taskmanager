@@ -80,7 +80,7 @@ namespace NCNEPortal
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime ActualReturnDate3ps { get; set; }
 
-        public List<TaskComment> taskComments { get; set; }
+        public List<TaskComment> TaskComments { get; set; }
 
         [DisplayName("CARIS Workspace")]
         public string CarisWorkspace { get; set; }
@@ -120,7 +120,7 @@ namespace NCNEPortal
                 "Wregilliamsville"
             });
 
-            taskComments = new List<TaskComment>
+            TaskComments = new List<TaskComment>
             {
                 new TaskComment()
                 {
