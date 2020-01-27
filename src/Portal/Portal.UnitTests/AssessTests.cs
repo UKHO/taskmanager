@@ -27,7 +27,7 @@ namespace Portal.UnitTests
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IUserIdentityService _fakeUserIdentityService;
         private ICommentsHelper _fakeCommentsHelper;
-        private IRecordProductActionHelper _recordProductActionHelper;
+        private IPageValidationHelper _pageValidationHelper;
 
         [SetUp]
         public void Setup()
@@ -62,9 +62,9 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _recordProductActionHelper = new RecordProductActionHelper(_hpDbContext);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext);
 
-            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _recordProductActionHelper);
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _pageValidationHelper);
         }
 
         [TearDown]
@@ -115,10 +115,15 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCatagory";
 
             _assessModel.Verifier = "TestUser";
+            var hpdUsage = new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "HpdUsageName"
+            };
             _assessModel.DataImpacts = new List<DataImpact>()
             {
-                new DataImpact() { DataImpactId = 1, HpdUsageId = 1, ProcessId = 123},
-                new DataImpact() {DataImpactId = 2, HpdUsageId = 1, ProcessId = 123}
+                new DataImpact() { DataImpactId = 1, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123},
+                new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");

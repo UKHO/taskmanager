@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,7 +25,6 @@ namespace Portal.Pages.DbAssessment
     public class AssessModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -74,7 +72,6 @@ namespace Portal.Pages.DbAssessment
         }
 
         public AssessModel(WorkflowDbContext dbContext,
-            HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
@@ -84,7 +81,6 @@ namespace Portal.Pages.DbAssessment
             IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
-            _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
@@ -114,7 +110,6 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
-            var isValid = true;
             ValidationErrorMessages.Clear();
 
             if (!await _pageValidationHelper.ValidatePage(

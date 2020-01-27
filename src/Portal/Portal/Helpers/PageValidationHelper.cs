@@ -44,6 +44,11 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
+            if (!ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
             return isValid;
         }
 

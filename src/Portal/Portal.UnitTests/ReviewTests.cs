@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -19,6 +20,7 @@ namespace Portal.UnitTests
     public class ReviewTests
     {
         private WorkflowDbContext _dbContext;
+        private HpdDbContext _hpDbContext;
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
         private IUserIdentityService _fakeUserIdentityService;
@@ -26,6 +28,7 @@ namespace Portal.UnitTests
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private ICommentsHelper _fakeCommentsHelper;
+        private IPageValidationHelper _pageValidationHelper;
 
         [SetUp]
         public void Setup()
@@ -65,11 +68,19 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
+            var hpdDbContextOptions = new DbContextOptionsBuilder<HpdDbContext>()
+                .UseInMemoryDatabase(databaseName: "inmemory")
+                .Options;
+
+            _hpDbContext = new HpdDbContext(hpdDbContextOptions);
+
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext);
+
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper);
         }
 
         [TearDown]

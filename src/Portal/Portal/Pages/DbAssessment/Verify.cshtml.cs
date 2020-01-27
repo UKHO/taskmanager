@@ -12,10 +12,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Auth;
-using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
@@ -30,7 +28,6 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
-        private readonly HpdDbContext _hpdDbContext;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
@@ -81,7 +78,6 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger,
-            HpdDbContext hpdDbContext,
             IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
@@ -91,7 +87,6 @@ namespace Portal.Pages.DbAssessment
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _logger = logger;
-            _hpdDbContext = hpdDbContext;
             _pageValidationHelper = pageValidationHelper;
 
             ValidationErrorMessages = new List<string>();
@@ -113,11 +108,10 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
-            var isValid = true;
             ValidationErrorMessages.Clear();
 
             if (!await _pageValidationHelper.ValidatePage(
-                "Assess",
+                "Verify",
                 Ion,
                 ActivityCode,
                 SourceCategory,
