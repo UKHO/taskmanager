@@ -73,9 +73,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NCNEPortal", "NCNEPortal", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEPortal.TestAutomation.Framework", "NCNEPortal.TestAutomation.Framework\NCNEPortal.TestAutomation.Framework.csproj", "{C196D665-2AEF-4B1A-A84C-13F8928696DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCNEPortal.TestAutomation.Specs", "NCNEPortal.TestAutomation.Specs\NCNEPortal.TestAutomation.Specs.csproj", "{87FF91E4-4B7E-4E7D-9C2D-D2D1C36ACB7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEPortal.TestAutomation.Specs", "NCNEPortal.TestAutomation.Specs\NCNEPortal.TestAutomation.Specs.csproj", "{87FF91E4-4B7E-4E7D-9C2D-D2D1C36ACB7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCNEPortal.TestAutomation.Steps", "NCNEPortal.TestAutomation.Steps\NCNEPortal.TestAutomation.Steps.csproj", "{9AC626D9-C807-4605-8DAC-17701659D539}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEPortal.TestAutomation.Steps", "NCNEPortal.TestAutomation.Steps\NCNEPortal.TestAutomation.Steps.csproj", "{9AC626D9-C807-4605-8DAC-17701659D539}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "NCNEWorkflowDatabase", "Databases\NCNEWorkflowDatabase\NCNEWorkflowDatabase.sqlproj", "{49D8F51B-9D01-44F0-B2B9-761441874C79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEWorkflowDatabase.EF", "Databases\NCNEWorkflowDatabase.EF\NCNEWorkflowDatabase.EF.csproj", "{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEWorkflowDatabase.Tests", "Databases\NCNEWorkflowDatabase.Tests\NCNEWorkflowDatabase.Tests.csproj", "{04FDC056-F682-4ED5-8E3A-42D12609934E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -201,6 +207,20 @@ Global
 		{9AC626D9-C807-4605-8DAC-17701659D539}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AC626D9-C807-4605-8DAC-17701659D539}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AC626D9-C807-4605-8DAC-17701659D539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49D8F51B-9D01-44F0-B2B9-761441874C79}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04FDC056-F682-4ED5-8E3A-42D12609934E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04FDC056-F682-4ED5-8E3A-42D12609934E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04FDC056-F682-4ED5-8E3A-42D12609934E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04FDC056-F682-4ED5-8E3A-42D12609934E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -235,6 +255,9 @@ Global
 		{C196D665-2AEF-4B1A-A84C-13F8928696DA} = {45E57C57-3AEE-425D-896F-7314EF08CAF4}
 		{87FF91E4-4B7E-4E7D-9C2D-D2D1C36ACB7F} = {45E57C57-3AEE-425D-896F-7314EF08CAF4}
 		{9AC626D9-C807-4605-8DAC-17701659D539} = {45E57C57-3AEE-425D-896F-7314EF08CAF4}
+		{49D8F51B-9D01-44F0-B2B9-761441874C79} = {1EAB5545-7539-44E4-8025-1580F2878997}
+		{BB0DB563-AA21-4ADD-8B84-AD45E2CF1EAD} = {1EAB5545-7539-44E4-8025-1580F2878997}
+		{04FDC056-F682-4ED5-8E3A-42D12609934E} = {1EAB5545-7539-44E4-8025-1580F2878997}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}
