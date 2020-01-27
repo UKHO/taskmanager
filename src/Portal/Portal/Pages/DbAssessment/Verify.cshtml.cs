@@ -363,8 +363,11 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var dataImpact in DataImpacts)
             {
-                dataImpact.ProcessId = processId;
-                _dbContext.DataImpact.Add(dataImpact);
+                if (dataImpact.HpdUsage != null)
+                {
+                    dataImpact.ProcessId = processId;
+                    _dbContext.DataImpact.Add(dataImpact);
+                }
             }
 
             await _dbContext.SaveChangesAsync();
