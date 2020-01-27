@@ -1,5 +1,6 @@
 ﻿using System;
 using Common.Helpers;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
@@ -17,14 +18,13 @@ namespace NCNEPortal.TestAutomation.Framework
 
         public LandingPage(IWebDriver driver)
         {
+            var configRoot = AzureAppConfigConfigurationRoot.Instance;
+            configRoot.GetSection("urls").Bind(_config);
+
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(SeleniumTimeoutSeconds));
-            
-            // TODO: replace with NCNE URI from config
-            _config = new LandingPageConfig{LandingPageUrl = new Uri("https://www.google.co.uk"), LocalDevLandingPageUrl = new Uri("https://localhost:44329/") };
 
-            _landingPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.LandingPageUrl : _config.LocalDevLandingPageUrl;
-
+            _landingPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.NcneLandingPageUrl : _config.NcneLocalDevLandingPageUrl;
         }
 
         public void NavigateTo()
