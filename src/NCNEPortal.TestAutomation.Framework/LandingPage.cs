@@ -1,6 +1,5 @@
 ﻿using System;
 using Common.Helpers;
-using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 

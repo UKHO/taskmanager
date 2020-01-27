@@ -6,6 +6,5 @@ namespace NCNEPortal.TestAutomation.Framework
     {
         public Uri LandingPageUrl { get; set; }
         public Uri LocalDevLandingPageUrl { get; set; }
-
     }
 }
