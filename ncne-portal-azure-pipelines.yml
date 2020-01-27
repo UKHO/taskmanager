@@ -6,7 +6,7 @@ trigger:
   paths:
     include:
     - src/NCNEPortal/*
-    - src/Datases/NCNEWorkflowDatabase.EF/*
+    - src/Databases/NCNEWorkflowDatabase.EF/*
 
 stages:
 - stage: Build
