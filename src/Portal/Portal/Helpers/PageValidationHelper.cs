@@ -8,11 +8,11 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal.Helpers
 {
-    public class RecordProductActionHelper : IRecordProductActionHelper
+    public class PageValidationHelper : IPageValidationHelper
     {
         private readonly HpdDbContext _hpdDbContext;
 
-        public RecordProductActionHelper(HpdDbContext hpdDbContext)
+        public PageValidationHelper(HpdDbContext hpdDbContext)
         {
             _hpdDbContext = hpdDbContext;
         }
@@ -57,6 +57,21 @@ namespace Portal.Helpers
 
             return isValid;
         }
+
+        public bool ValidateDataImpact()
+        {
+            // Show error to user that they've chosen the same usage more than once
+            if (DataImpacts.GroupBy(x => x.HpdUsageId)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key).Any())
+            {
+                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
+                return false;
+            }
+
+            return true;
+        }
+
 
     }
 }

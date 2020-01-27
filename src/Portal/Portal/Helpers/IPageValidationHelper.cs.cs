@@ -4,8 +4,9 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal.Helpers
 {
-    public interface IRecordProductActionHelper
+    public interface IPageValidationHelper
     {
         Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, List<string> validationErrorMessages);
+        bool ValidateDataImpact();
     }
 }
