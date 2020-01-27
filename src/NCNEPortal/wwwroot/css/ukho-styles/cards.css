@@ -59,19 +59,37 @@
     flex-direction: column;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
 }
-.card > h6 {
+.card > h3 {
     height: 60px;
     line-height: 60px;
     border: 1px solid #09315B;
     color: #ffffff;
     background-color: #09315B;
     margin: 0;
-    padding: 0 30px;
+    padding: 0 15px;
+    font-size: 1rem;
+}
+
+.card .wf-status {
+    line-height: 25px;
+    font-size: 0.85rem;
+    padding: 0 15px;
+    font-weight: 400;
+    color: #ffffff;
+}
+
+.card .wf-status.wf-status-inprogress {
+    background-color: #EF8123;
+}
+
+.card .wf-status.wf-status-complete {
+    background-color: #4AAB37;
 }
 
 
+
 @media (max-width: 1023px) {
-    .card > h6 {
+    .card > h3 {
         padding: 0px 18px;
         height: 48px;
         line-height: 48px;

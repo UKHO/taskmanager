@@ -8,6 +8,8 @@ body {
     font-weight: 300;
 }
 
+
+
 /* Start chevron for notes on landing page */
 table.dataTable td.details-control i:before {
     content: '\f078';
@@ -67,11 +69,24 @@ table.task-list thead tr th {
 .deleteAssignTask {
 }
 
+/*Set outline for focus to override Bootstrap 4*/
+.btn:focus, .btn.focus,
+.switch > input:focus + span, .switch > input.focus + span,
+.checkbox-wrapper > input:focus + label::before, .checkbox-wrapper > input.focus + label::before {
+    outline: rgb(77, 144, 254) auto 1px;
+    outline-color: rgb(77, 144, 254);
+    outline-style: auto;
+    outline-width: 1px;
+}
+
 .btn-size > div {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
     max-width: 8.8rem;
 }
+
+
+/*Start primary button*/
 
 .btn-primary {
     color: #fff;
@@ -79,21 +94,57 @@ table.task-list thead tr th {
     border-color: #09315B;
 }
 
-    .btn-primary:focus, .btn-primary.focus {
-        box-shadow: unset;
-    }
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: unset;
+}
 
-    .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
-    .show > .btn-primary.dropdown-toggle {
-        color: #09315B;
-        background-color: #ffffff;
-        border-color: #09315B;
-    }
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
 
-        .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
-        .show > .btn-primary.dropdown-toggle:focus {
-            box-shadow: unset;
-        }
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+/*End primary button*/
+
+/*Start secondary button*/
+
+.btn-secondary {
+    color: #05284e;
+    background-color: #fff;
+    border-color: #05284e;
+}
+
+.btn-secondary:focus, .btn-secondary.focus {
+    box-shadow: unset;
+}
+
+.btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: #05284e;
+    border-color: #05284e;
+}
+
+.btn-secondary:not(:disabled):not(.disabled):active:focus, .btn-secondary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-secondary.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+.btn.btn-secondary:hover, .btn.btn-secondary.hover {
+    color: #05284e;
+    background-color: #eee;
+    border-color: #05284e;
+}
+
+/*End secondary button*/
+
+/*Start danger button*/
 
 .btn.btn-danger {
     color: #ffffff;
@@ -101,9 +152,9 @@ table.task-list thead tr th {
     border-color: #e20d0d;
 }
 
-    .btn.btn-danger:hover, .btn.btn-danger.hover {
-        background-color: #e20d34;
-    }
+.btn.btn-danger:hover, .btn.btn-danger.hover {
+    background-color: #e20d34;
+}
 
 .btn-danger:focus, .btn-danger.focus {
     box-shadow: unset;
@@ -116,13 +167,49 @@ table.task-list thead tr th {
     border-color: #e20d0d;
 }
 
-    .btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
-    .show > .btn-danger.dropdown-toggle:focus {
-        box-shadow: unset;
-    }
+.btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
+.show > .btn-danger.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+/*End danger button*/
+
+/*Start mark complete button*/
+
+.btn.btn-complete {
+    color: #ffffff;
+    background-color: #4AAB37;
+    border-color: #4AAB37;
+}
+
+.btn.btn-complete:hover, .btn.btn-complete.hover {
+    background-color: #4AA130;
+    border-color: #4AA130;
+}
+
+.btn.btn-complete:focus, .btn.btn-complete.focus {
+    box-shadow: unset;
+}
+
+.btn-complete:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
+.show > .btn-complete.dropdown-toggle {
+    color: #4AAB37;
+    background-color: #ffffff;
+    border-color: #4AAB37;
+}
+
+.btn-complete:not(:disabled):not(.disabled):active:focus, .btn-complete:not(:disabled):not(.disabled).active:focus,
+.show > .btn-complete.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+/*End mark complete button*/
+
+
+
 
 label {
-    font-weight: 500;
+    font-weight: 300;
 }
 
 .navbar-header {
@@ -143,15 +230,19 @@ h2, .h2 {
     font-size: 1.6rem;
 }
 
+h4, .h4 {
+    font-size: 1.4rem;
+    color: #09315B;
+}
+
 .card .close-x {
     font-size: 2rem;
     cursor: pointer;
 }
 
-.card > h6 {
+.card > h3 {
     height: 45px;
     line-height: 45px;
-    padding: 0 15px;
 }
 
 /* DataTables tweaked for UKHO design system */
@@ -213,9 +304,9 @@ table > tbody > tr > th {
 }
 
 /* For checkbox sitting on right of text on assess page */
-.custom-control-label::before, .custom-control-label::after {
+/*.custom-control-label::before, .custom-control-label::after {
     right: 0;
-}
+}*/
 
 /* TODO is this actually being used? */
 /*label span {
@@ -233,12 +324,18 @@ table > tbody > tr > th {
     background-color: #f6f6f6;
     line-height: 2.3rem;
     border-radius: unset;
+    box-shadow: unset;
 }
 
-    .form-text-input:focus {
-        border-color: #0177c1;
-        color: #0177c1;
-        background-color: #ffffff;
+.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
+    box-shadow: unset;
+}
+    .form-text-input:-webkit-input-placeholder {
+        color: #09315B;
+        overflow: visible;
     }
 
 .attachLinkedDocumentSpinnerContainer {
@@ -530,6 +627,193 @@ span.twitter-typeahead {
 }
 /* TYPEAHEAD END */
 
-label{margin-left:20px}
+/*label{margin-left:20px}*/
 #datepicker{ width: 180px;margin: 0 20px 20px 20px;}
 #datepicker > span:hover{ cursor: pointer;}
+
+
+
+
+.bottom {
+    border-color: #c8c8c8 transparent transparent transparent;
+    border-width: 4px 4px 0px 4px;
+    bottom: -4px;
+}
+
+tbody.workflow-row td {
+    padding: 10px 10px;
+    border-top: 1px;
+    border-bottom: 1px;
+    border-style: solid;
+    border-color: #d8d8d8;
+}
+
+    tbody.workflow-row td:not(:first-child):not(:last-child) {
+        border-left: 1px;
+        border-right: 1px;
+        border-top: 1px;
+        border-bottom: 1px;
+        border-style: solid;
+        border-color: #d8d8d8;
+    }
+
+    tbody.workflow-row td:first-child,
+    tbody.workflow-row td:last-child {
+        border-left: 0px;
+        border-right: 0px;
+    }
+
+/* Show comments switch */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    min-width: 28px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    border: #adb5bd solid 1px;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 16px;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 12px;
+        width: 12px;
+        left: 1px;
+        bottom: 1px;
+        background-color: #adb5bd;
+        -webkit-transition: .1s;
+        transition: .1s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #0177C1;
+    border: #0177C1 solid 1px;
+}
+
+input:focus + .slider {
+    box-shadow: none;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(12px);
+    -ms-transform: translateX(12px);
+    transform: translateX(12px);
+    background-color: #fff;
+    border: #fff solid 1px;
+}
+
+/* End switch */
+
+/* CHECKBOX START */
+
+.checkbox-wrapper input[type=checkbox] {
+    opacity: 0;
+    position: absolute;
+    left: -9999px;
+}
+
+.checkbox-wrapper label {
+    position: relative;
+    display: inline-block;
+    padding-left: 35px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 24px;
+}
+
+.checkbox-wrapper label::before,
+.checkbox-wrapper label::after {
+    position: absolute;
+    content: "";
+    display: inline-block;
+}
+
+.checkbox-wrapper label::before {
+    height: 22px;
+    width: 22px;
+    border: 2px solid #03284F;
+    left: 0;
+    top: 0;
+}
+
+.checkbox-wrapper label::after {
+    height: 6px;
+    width: 13px;
+    border-left: 3px solid;
+    border-bottom: 3px solid;
+    transform: rotate(-45deg);
+    left: 5px;
+    top: 7px;
+}
+
+.checkbox-wrapper input[type=checkbox] + label::after {
+    content: none;
+}
+
+.checkbox-wrapper input[type=checkbox]:checked + label::after {
+    content: "";
+}
+
+/* CHECKBOX END */
+
+/* WORKFLOW PAGE START */
+
+.speech.count {
+    position: relative;
+    bottom: 25px;
+    left: 2px;
+    color: white;
+    text-align: center;
+    width: 26px;
+}
+
+.speech.bubble > i {
+    color: #09315B;
+    font-size: 30px;
+}
+
+table#workflow-table th {
+    padding: 0.4rem 0rem;
+}
+
+table#workflow-table tr.shaded {
+    background-color: #EEF3F4;
+}
+
+.show-comments span {
+    font-weight: 300;
+}
+
+.status.inProgress {
+    color: #EF8123;
+}
+
+#generic-comments-table td {
+    border-right: none;
+    font-weight: 300;
+}
+
+/* WORKFLOW PAGE END */
+

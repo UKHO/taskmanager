@@ -39,7 +39,7 @@ namespace NCNEPortal
             services.AddOptions<SecretsConfig>()
                 .Bind(Configuration.GetSection("ncnePortalSection"));
 
-            services.AddRazorPages();
+            services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddHealthChecks();
 
