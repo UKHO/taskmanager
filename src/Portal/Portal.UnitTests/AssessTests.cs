@@ -27,6 +27,7 @@ namespace Portal.UnitTests
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IUserIdentityService _fakeUserIdentityService;
         private ICommentsHelper _fakeCommentsHelper;
+        private IRecordProductActionHelper _recordProductActionHelper;
 
         [SetUp]
         public void Setup()
@@ -61,7 +62,9 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService);
+            _recordProductActionHelper = new RecordProductActionHelper(_hpDbContext);
+
+            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _recordProductActionHelper);
         }
 
         [TearDown]
