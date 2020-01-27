@@ -31,7 +31,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
         private readonly HpdDbContext _hpdDbContext;
-        private readonly IRecordProductActionHelper _recordProductActionHelper;
+        private readonly IPageValidationHelper _pageValidationHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -82,7 +82,7 @@ namespace Portal.Pages.DbAssessment
             IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger,
             HpdDbContext hpdDbContext,
-            IRecordProductActionHelper recordProductActionHelper)
+            IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -92,7 +92,7 @@ namespace Portal.Pages.DbAssessment
             _userIdentityService = userIdentityService;
             _logger = logger;
             _hpdDbContext = hpdDbContext;
-            _recordProductActionHelper = recordProductActionHelper;
+            _pageValidationHelper = pageValidationHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -116,27 +116,15 @@ namespace Portal.Pages.DbAssessment
             var isValid = true;
             ValidationErrorMessages.Clear();
 
-            if (!ValidateTaskInformation())
-            {
-                isValid = false;
-            }
-
-            if (!ValidateOperators())
-            {
-                isValid = false;
-            }
-
-            if (!await _recordProductActionHelper.ValidateRecordProductAction(RecordProductAction, ValidationErrorMessages))
-            {
-                isValid = false;
-            }
-
-            if (!ValidateDataImpact())
-            {
-                isValid = false;
-            }
-
-            if (!isValid)
+            if (!await _pageValidationHelper.ValidatePage(
+                "Assess",
+                Ion,
+                ActivityCode,
+                SourceCategory,
+                Verifier,
+                RecordProductAction,
+                DataImpacts,
+                ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -345,53 +333,6 @@ namespace Portal.Pages.DbAssessment
         {
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
-        }
-
-        private bool ValidateTaskInformation()
-        {
-            var isValid = true;
-
-            if (string.IsNullOrWhiteSpace(Ion))
-            {
-                ValidationErrorMessages.Add("Task Information: Ion cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(ActivityCode))
-            {
-                ValidationErrorMessages.Add("Task Information: Activity code cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(SourceCategory))
-            {
-                ValidationErrorMessages.Add("Task Information: Source category cannot be empty");
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        private bool ValidateOperators()
-        {
-            if (string.IsNullOrWhiteSpace(Verifier))
-            {
-                ValidationErrorMessages.Add("Operators: Verifier cannot be empty");
-                return false;
-            }
-            return true;
-        }
-
-        private bool ValidateDataImpact()
-        {
-            // Show error to user that they've chosen the same usage more than once
-            if (DataImpacts.GroupBy(x => x.HpdUsageId)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key).Any())
-            {
-                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
-                return false;
-            }
-
-            return true;
         }
 
         private async Task UpdateTaskInformation(int processId)
