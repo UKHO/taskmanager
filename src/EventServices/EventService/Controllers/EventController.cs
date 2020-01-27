@@ -147,6 +147,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
+        [SwaggerResponse(statusCode: 503, type: typeof(DefaultErrorResponse), description: "Service Unavailable.")]
         public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
         {
             LogContext.PushProperty("ApiResource", nameof(PostEvent));
@@ -169,7 +170,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to load assembly Common.Messages");
-                return StatusCode(500, $"Failed to load assembly Common.Messages: {e.ToString()}");
+                return StatusCode(500);
             }
 
             try
@@ -180,7 +181,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to get event type {EventName}");
-                return StatusCode(500, $"Failed to get event type {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to get event type {eventName}");
             }
 
             try
@@ -190,7 +191,7 @@ namespace EventService.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Failed to deserialize event {EventName}");
-                return StatusCode(500, $"Failed to deserialize event {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to deserialize event {eventName}");
             }
 
             try
@@ -207,12 +208,12 @@ namespace EventService.Controllers
             catch (InvalidCastException e)
             {
                 _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
-                return StatusCode(500, $"Failed to cast event using ICorrelate from {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to cast event using ICorrelate from {eventName}");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "{ApiResource} Could not get CorrelationId from {EventName}");
-                return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}: {e.ToString()}");
+                return StatusCode(500, $"Failed to interpret CorrelationId from {eventName}");
             }
 
             _logger.LogInformation("{ApiResource} publishing event {EventName}");
