@@ -15,15 +15,16 @@ using WorkflowDatabase.EF.Models;
 namespace Portal.UnitTests
 {
     [TestFixture]
-    public class AssessTests
+    public class VerifyTests
     {
 
         private WorkflowDbContext _dbContext;
         private HpdDbContext _hpDbContext;
-        private AssessModel _assessModel;
+        private VerifyModel _verifyModel;
         private int ProcessId { get; set; }
-        private ILogger<AssessModel> _fakeLogger;
+        private ILogger<VerifyModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
+        private IDataServiceApiClient _fakeDataServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IUserIdentityService _fakeUserIdentityService;
         private ICommentsHelper _fakeCommentsHelper;
@@ -40,10 +41,11 @@ namespace Portal.UnitTests
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
+            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             ProcessId = 123;
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
             {
                 ProcessId = ProcessId
             });
@@ -60,11 +62,12 @@ namespace Portal.UnitTests
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
-            _fakeLogger = A.Dummy<ILogger<AssessModel>>();
+            _fakeLogger = A.Dummy<ILogger<VerifyModel>>();
 
             _recordProductActionHelper = new RecordProductActionHelper(_hpDbContext);
 
-            _assessModel = new AssessModel(_dbContext, _hpDbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _recordProductActionHelper);
+            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _hpDbContext, _recordProductActionHelper);
         }
 
         [TearDown]
@@ -76,55 +79,55 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message()
         {
-            _assessModel.Ion = "";
-            _assessModel.ActivityCode = "";
-            _assessModel.SourceCategory = "";
+            _verifyModel.Ion = "";
+            _verifyModel.ActivityCode = "";
+            _verifyModel.SourceCategory = "";
 
-            _assessModel.Verifier = "TestUser";
-            _assessModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.DataImpacts = new List<DataImpact>();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(3, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages[0]);
-            Assert.AreEqual($"Task Information: Activity code cannot be empty", _assessModel.ValidationErrorMessages[1]);
-            Assert.AreEqual($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages[2]);
+            Assert.AreEqual(3, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Task Information: Activity code cannot be empty", _verifyModel.ValidationErrorMessages[1]);
+            Assert.AreEqual($"Task Information: Source category cannot be empty", _verifyModel.ValidationErrorMessages[2]);
         }
 
         [Test]
         public async Task Test_entering_an_empty_Verifier_results_in_validation_error_message()
         {
-            _assessModel.Ion = "Ion";
-            _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCatagory";
 
-            _assessModel.Verifier = "";
-            _assessModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.Verifier = "";
+            _verifyModel.DataImpacts = new List<DataImpact>();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages[0]);
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages[0]);
         }
         
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
-            _assessModel.Ion = "Ion";
-            _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCatagory";
 
-            _assessModel.Verifier = "TestUser";
-            _assessModel.DataImpacts = new List<DataImpact>()
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.DataImpacts = new List<DataImpact>()
             {
                 new DataImpact() { DataImpactId = 1, HpdUsageId = 1, ProcessId = 123},
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, ProcessId = 123}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages[0]);
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages[0]);
         }
 
         [Test]
@@ -135,21 +138,21 @@ namespace Portal.UnitTests
                 {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
             await _hpDbContext.SaveChangesAsync();
 
-            _assessModel.Ion = "Ion";
-            _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCatagory";
 
-            _assessModel.Verifier = "TestUser";
-            _assessModel.DataImpacts = new List<DataImpact>();
-            _assessModel.RecordProductAction = new List<ProductAction>()
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678"}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages[0]);
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages[0]);
         }
 
 
@@ -161,22 +164,22 @@ namespace Portal.UnitTests
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
-            _assessModel.Ion = "Ion";
-            _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCatagory";
 
-            _assessModel.Verifier = "TestUser";
-            _assessModel.DataImpacts = new List<DataImpact>();
-            _assessModel.RecordProductAction = new List<ProductAction>()
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234"},
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234"}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages[0]);
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages[0]);
         }
     }
 }

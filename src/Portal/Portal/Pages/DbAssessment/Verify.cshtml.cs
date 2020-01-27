@@ -27,7 +27,6 @@ namespace Portal.Pages.DbAssessment
 {
     public class VerifyModel : PageModel
     {
-        private readonly IOptions<UriConfig> _uriConfig;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
@@ -79,7 +78,6 @@ namespace Portal.Pages.DbAssessment
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
-            IOptions<UriConfig> uriConfig,
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger,
@@ -90,7 +88,6 @@ namespace Portal.Pages.DbAssessment
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
-            _uriConfig = uriConfig;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _logger = logger;
