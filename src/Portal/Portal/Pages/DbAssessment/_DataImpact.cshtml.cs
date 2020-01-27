@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +31,7 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             await PopulateUsages();
-            await SetDataImpactModelDummyData();
+            await SetDataImpactFromDb();
         }
 
         private async Task PopulateUsages()
@@ -41,34 +40,18 @@ namespace Portal.Pages.DbAssessment
             Usages = new SelectList(usages, nameof(HpdUsage.HpdUsageId), nameof(HpdUsage.Name));
         }
 
-        private async Task SetDataImpactModelDummyData()
+        private async Task SetDataImpactFromDb()
         {
-            var usages = await _dbContext.HpdUsage.ToListAsync();
 
-            DataImpacts = new List<DataImpact>
+            DataImpacts = await _dbContext.DataImpact.Where(di => di.ProcessId == ProcessId).ToListAsync();
+
+            if (DataImpacts == null || DataImpacts.Count == 0)
             {
-                new DataImpact()
+                DataImpacts = new List<DataImpact>()
                 {
-                    DataImpactId = 1,
-                    Comments = "Test1", 
-                    HpdUsageId = 1,  
-                    HpdUsage = usages.FirstOrDefault(h =>h.HpdUsageId == 1), 
-                    Edited = false,
-                    ProcessId = ProcessId, 
-                    Verified = true
-                },
-
-                new DataImpact()
-                {
-                    DataImpactId = 2,
-                    Comments = "Test2",
-                    HpdUsageId = 2,
-                    HpdUsage = usages.FirstOrDefault(h =>h.HpdUsageId == 2),
-                    Edited = true,
-                    ProcessId = ProcessId,
-                    Verified = false
-                }
-            };
+                    new DataImpact()
+                };
+            }
         }
     }
 }

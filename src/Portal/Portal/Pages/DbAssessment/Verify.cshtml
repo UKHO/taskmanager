@@ -38,8 +38,7 @@
 
 <hr />
 
-<input type="hidden" id="pageIdentity" value="Verify" />
-<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+
 <div class="col-12">
     <div class="row justify-content-end btn-size">
 
@@ -63,7 +62,12 @@
     </div>
 </div>
 
-<form method="post" asp-page-handler="Done">
+<form id="frmVerifyPage" method="post" asp-page-handler="Done">
+
+    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId"/>
+    <input type="hidden" asp-for="ProcessId"/>
+    <input type="hidden" id="pageIdentity" value="Verify"/>
+
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>
 
@@ -135,6 +139,39 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalWaitVerifyDoneErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyDoneErrors" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error while saving data</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div id="verifyDoneErrorMessage" class="col-11">
+                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var message in Model.ValidationErrorMessages)
+                                {
+                                    <li>@message</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnVerifyDoneErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -71,6 +71,8 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: SdocId: {SdocId};",
                     nameof(_dataServiceApiClient.GetAssessmentData),
                     sdocId);
+
+                throw;
             }
 
             return new JsonResult(sourceDocumentData);

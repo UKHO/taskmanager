@@ -56,7 +56,8 @@ namespace WorkflowCoordinator.Handlers
 
             workflowInstance.SerialNumber = k2Task.SerialNumber;
             workflowInstance.ActivityName = k2Task.ActivityName;
-            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            workflowInstance.Status = message.ToActivityName == "Completed" ? WorkflowStatus.Completed.ToString() : WorkflowStatus.Started.ToString();
 
             await _dbContext.SaveChangesAsync();
 

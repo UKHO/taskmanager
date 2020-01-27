@@ -152,6 +152,7 @@ namespace Portal
             services.AddScoped<IIndexFacade, IndexFacade>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
             services.AddScoped<ITaskDataHelper, TaskDataHelper>();
+            services.AddScoped<IRecordProductActionHelper, RecordProductActionHelper>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();

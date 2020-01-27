@@ -60,6 +60,7 @@ namespace Portal.Pages
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
                 .Include(ad => ad.DbAssessmentAssessData)
+                .Include(vd => vd.DbAssessmentVerifyData)
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())

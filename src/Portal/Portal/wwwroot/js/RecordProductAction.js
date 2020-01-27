@@ -2,7 +2,10 @@
     getProductActions();
 
     function getProductActions() {
-        var processId = { "processId": Number($("#hdnProcessId").val()) };
+        var data = {
+            "processId": Number($("#hdnProcessId").val()),
+            "taskStage": $("#pageIdentity").val()
+        }
 
         $.ajax({
             type: "GET",
@@ -11,7 +14,7 @@
                 xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             contentType: "application/json; charset=utf-8",
-            data: processId,
+            data: data,
             success: function (result) {
                 $("#recordProductAction").html(result);
 
