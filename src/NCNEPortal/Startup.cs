@@ -40,7 +40,7 @@ namespace NCNEPortal
                 .Bind(Configuration.GetSection("NcnePortalSection"))
                 .Bind(Configuration.GetSection("NcneActiveDirectory"));
 
-            services.AddRazorPages();
+            services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddHealthChecks();
 
             var startupConfig = new StartupConfig();
