@@ -1,3 +1,13 @@
+trigger:
+  branches:
+    include:
+    - master
+    - features/*
+  paths:
+    include:
+    - src/NCNEPortal/*
+    - src/Databases/NCNEWorkflowDatabase.EF/*
+
 stages:
 - stage: Build
   jobs:
