@@ -13,7 +13,7 @@ namespace NCNEPortal.TestAutomation.Steps
             _workflowPage = workflowPage;
         }
 
-        [Given(@"I navagate to the NCNE Workflow page")]
+        [Given(@"I navigate to the NCNE Workflow page")]
         public void GivenINavagateToTheNCNEWorkflowPage()
         {
             _workflowPage.NavigateTo();
