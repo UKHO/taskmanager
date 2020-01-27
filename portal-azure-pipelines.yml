@@ -95,14 +95,14 @@ stages:
           publishLocation: 'Container'
         displayName: Publish Pickles Artifact
   
-      - task: AzureFileCopy@3
-        inputs:
-          SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
-          azureSubscription: 'TestEngineering-Live'
-          Destination: 'AzureBlob'
-          storage: '$(AzureStorageAccount)'
-          ContainerName: '$web/$(Build.Repository.Name)'
-        displayName: Publish Pickles Artifact to Azure Blob Storage
+      # - task: AzureFileCopy@3
+      #   inputs:
+      #     SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+      #     azureSubscription: 'TestEngineering-Live'
+      #     Destination: 'AzureBlob'
+      #     storage: '$(AzureStorageAccount)'
+      #     ContainerName: '$web/$(Build.Repository.Name)'
+      #   displayName: Publish Pickles Artifact to Azure Blob Storage
   
       - task: DotNetCoreCLI@2
         inputs:
