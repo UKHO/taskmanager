@@ -44,6 +44,14 @@ namespace Portal.Pages.DbAssessment
         {
 
             DataImpacts = await _dbContext.DataImpact.Where(di => di.ProcessId == ProcessId).ToListAsync();
+
+            if (DataImpacts == null || DataImpacts.Count == 0)
+            {
+                DataImpacts = new List<DataImpact>()
+                {
+                    new DataImpact()
+                };
+            }
         }
     }
 }

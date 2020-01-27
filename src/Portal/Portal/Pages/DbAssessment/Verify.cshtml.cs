@@ -32,6 +32,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
         private readonly HpdDbContext _hpdDbContext;
+        private readonly IRecordProductActionHelper _recordProductActionHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -82,7 +83,8 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger,
-            HpdDbContext hpdDbContext)
+            HpdDbContext hpdDbContext,
+            IRecordProductActionHelper recordProductActionHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -93,6 +95,7 @@ namespace Portal.Pages.DbAssessment
             _userIdentityService = userIdentityService;
             _logger = logger;
             _hpdDbContext = hpdDbContext;
+            _recordProductActionHelper = recordProductActionHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -126,7 +129,7 @@ namespace Portal.Pages.DbAssessment
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction())
+            if (!await _recordProductActionHelper.ValidateRecordProductAction(RecordProductAction, ValidationErrorMessages))
             {
                 isValid = false;
             }
@@ -378,39 +381,6 @@ namespace Portal.Pages.DbAssessment
                 return false;
             }
             return true;
-        }
-
-        private async Task<bool> ValidateRecordProductAction()
-        {
-            bool isValid = true;
-
-            if (RecordProductAction != null && RecordProductAction.Count > 0)
-            {
-                foreach (var productAction in RecordProductAction)
-                {
-                    // Check for existing impacted products
-                    var isExist = await _hpdDbContext.CarisProducts.AnyAsync(p =>
-                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
-
-                    if (!isExist)
-                    {
-                        ValidationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
-                        isValid = false;
-                    }
-                }
-
-                if (RecordProductAction.GroupBy(p => p.ImpactedProduct)
-                    .Where(g => g.Count() > 1)
-                    .Select(y => y.Key).Any())
-                {
-                    ValidationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
-                    isValid = false;
-                }
-            }
-
-            return isValid;
         }
 
         private bool ValidateDataImpact()

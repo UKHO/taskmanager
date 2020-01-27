@@ -78,6 +78,14 @@ namespace Portal.Pages.DbAssessment
                 .Where(pa => pa.ProcessId == ProcessId)
                 .ToListAsync();
 
+            if (ProductActions == null || ProductActions.Count == 0)
+            {
+                ProductActions = new List<ProductAction>()
+                {
+                    new ProductAction()
+                };
+            }
+
         }
 
         private async Task SetProductActionDataFromDb(string taskStage)
