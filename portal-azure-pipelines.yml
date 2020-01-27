@@ -1,3 +1,15 @@
+trigger:
+  branches:
+    include:
+    - master
+    - features/*
+  paths:
+    include:
+    - src/Portal/*
+    - src/Databases/WorkflowDatabase.EF/*
+    - src/Common*
+    - src/HpdDatabase.EF/*  
+
 stages:
 - stage: Build
   jobs:
