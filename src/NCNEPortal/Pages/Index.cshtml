@@ -113,6 +113,11 @@
                                         </i>
                                         Edit Task Note
                                     </a>
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.ChartType">
+                                        <i class="far fa-user">
+                                        </i>
+                                        Assign Task
+                                    </a>
                                 </div>
                             </div>
                         </td>
@@ -152,7 +157,39 @@
     </div>
 </div>
 
-
+@* Modal Assign task to user *@
+<div class="modal fade" id="assignTaskModal" tabindex="-1" role="dialog" aria-labelledby="AssignTaskToUser" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Assign Task</h4>
+            </div>
+            <div class="modal-body">
+                <div id="assignTaskModal-body">
+                    <div id="assignTaskTypeahead">
+                        <div class="text-input-wrap">
+                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                        </div>
+                        <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
+                            <h5>
+                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                                <span id="assignTaskErrorMsg">Failed to look up users</span>
+                            </h5>
+                        </section>
+                    </div>
+                    <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
+                    <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
+                    <br />
+                    <div id="AssignTaskError"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancelAssignTask" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" id="btnAssignTaskToUser" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Assign to User">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
 
     <script>

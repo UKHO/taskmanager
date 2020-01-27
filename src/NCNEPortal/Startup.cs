@@ -37,10 +37,10 @@ namespace NCNEPortal
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
             services.AddOptions<SecretsConfig>()
-                .Bind(Configuration.GetSection("ncnePortalSection"));
+                .Bind(Configuration.GetSection("NcnePortalSection"))
+                .Bind(Configuration.GetSection("NcneActiveDirectory"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
-
             services.AddHealthChecks();
 
             var startupConfig = new StartupConfig();
@@ -48,12 +48,19 @@ namespace NCNEPortal
             Configuration.GetSection("databases").Bind(startupConfig);
             Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("ncneportal").Bind(startupConfig);
+            
 
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
             services.AddScoped<IUserIdentityService,
                 UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
+                s.GetService<IOptions<GeneralConfig>>(),
+                s.GetService<IOptions<UriConfig>>(),
+                isLocalDevelopment,
+                s.GetService<HttpProvider>()));
+            services.AddScoped<IDirectoryService,
+                DirectoryService>(s => new DirectoryService(s.GetService<IOptions<SecretsConfig>>(),
                 s.GetService<IOptions<GeneralConfig>>(),
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,

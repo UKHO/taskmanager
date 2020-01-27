@@ -5,8 +5,8 @@ namespace NCNEPortal.Configuration
     public class UriConfig
     {
 
-        public Uri LocalDevLandingPageHttpsUrl { get; set; }
-        public Uri LandingPageUrl { get; set; }
+        public Uri NcneLocalDevLandingPageHttpsUrl { get; set; }
+        public Uri NcneLandingPageUrl { get; set; }
 
     }
 }
