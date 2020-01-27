@@ -6,16 +6,23 @@ namespace NCNEPortal.TestAutomation.Steps
     [Binding]
     public sealed class WorkflowPageSteps
     {
+
+        private readonly WorkflowPage _workflowPage;
+        public WorkflowPageSteps(WorkflowPage workflowPage)
+        {
+            _workflowPage = workflowPage;
+        }
+
         [Given(@"I navagate to the NCNE Workflow page")]
         public void GivenINavagateToTheNCNEWorkflowPage()
         {
-            ScenarioContext.Current.Pending();
+            _workflowPage.NavigateTo();
         }
 
         [Then(@"The NCNE Workflow page has loaded")]
         public void ThenTheNCNEWorkflowPageHasLoaded()
         {
-            ScenarioContext.Current.Pending();
+            _workflowPage.HasLoaded();
         }
 
     }
