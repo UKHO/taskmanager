@@ -1,5 +1,6 @@
 ﻿using System;
 using Common.Helpers;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
@@ -17,19 +18,15 @@ namespace NCNEPortal.TestAutomation.Framework
 
         public WorkflowPage(IWebDriver driver)
         {
+            var configRoot = AzureAppConfigConfigurationRoot.Instance;
+            configRoot.GetSection("urls").Bind(_config);
+
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(SeleniumTimeoutSeconds));
 
-            // TODO: replace with NCNE URI from config
-            _config = new WorkflowPageConfig
-            {
-                WorkflowPageUrl = new Uri("https://www.google.co.uk/"),
-                LocalDevWorkflowPageUrl = new Uri("https://taskmanager-dev-web-ncneportal.azurewebsites.net/Workflow?ProcessId=2")
-            };
-
             _workflowPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? _config.WorkflowPageUrl
-                : _config.LocalDevWorkflowPageUrl;
+                ? _config.NcneWorkflowPageUrl
+                : _config.NcneLocalDevWorkflowPageUrl;
 
         }
 
