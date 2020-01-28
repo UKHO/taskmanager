@@ -263,8 +263,7 @@ namespace Portal.Helpers
                 // Check at least one entry populated
                 if (recordProductAction.Any(r =>
                     string.IsNullOrWhiteSpace(r.ImpactedProduct)
-                    || r.ProductActionType == null
-                    || string.IsNullOrWhiteSpace(r.ProductActionType.Name)))
+                    || r.ProductActionTypeId == 0))
                 {
                     validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
                     return false;
@@ -307,8 +306,7 @@ namespace Portal.Helpers
         {
             if (dataImpacts == null || dataImpacts.Count == 0) return true;
 
-            if (dataImpacts.Any(d =>
-                d.HpdUsage == null || string.IsNullOrWhiteSpace(d.HpdUsage.Name)))
+            if (dataImpacts.Any(d => d.HpdUsageId == 0))
             {
                 return true;
             }
