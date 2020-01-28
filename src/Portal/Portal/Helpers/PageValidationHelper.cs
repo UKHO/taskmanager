@@ -106,7 +106,6 @@ namespace Portal.Helpers
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-
         public bool ValidateTaskType(
                                         DbAssessmentReviewData primaryAssignedTask,
                                         List<DbAssessmentAssignTask> additionalAssignedTasks,
