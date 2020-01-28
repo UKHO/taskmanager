@@ -82,7 +82,8 @@ namespace Portal
                 .Bind(Configuration.GetSection("PortalSection"))
                 .Bind(Configuration.GetSection("ActiveDirectory"));
 
-            services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddRazorPages();
+            //.AddRazorRuntimeCompilation();
 
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
