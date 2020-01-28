@@ -18,5 +18,9 @@
   {
     "ChartTypeId": 5,
     "Name": "Refresh"
+  },
+  {
+    "ChartTypeId": 6,
+    "Name": "Fleet"
   }
 ]

@@ -16,9 +16,9 @@ namespace NCNEPortal
     public class NewTaskModel : PageModel
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
-        [DisplayName("ION:")] public string Ion { get; set; }
+        [DisplayName("ION")] public string Ion { get; set; }
 
-        [DisplayName("Chart No.:")] public string ChartNo { get; set; }
+        [DisplayName("Chart number")] public string ChartNo { get; set; }
 
         [DisplayName("Country:")] public string Country { get; set; }
 

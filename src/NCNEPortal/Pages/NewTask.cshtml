@@ -38,14 +38,16 @@
         <div class="col-12">
             <div class="card-body pb-0">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-md-3">
                         <div class="row">
-                            <div class="col-5 col-md-3">
+                            <div class="col">
+                                @Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
                                 @Html.TextBoxFor(model => model.Ion, "",
                                     new { placeholder = "ION", @class = "form-control form-text-input" })
-                            </div>
-                            <div class="col">
-                                <button id="btnAddIon" class="btn btn-primary" style="min-width: 9em;">Add ION</button>
                             </div>
                         </div>
                     </div>
@@ -55,12 +57,30 @@
                     <div class="col-12 col-md-3">
                         <div class="row">
                             <div class="col">
+                                @Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                @Html.TextBoxFor(model => model.ChartNo, "",
+                                    new { placeholder = "Chart Number", @class = "form-control form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="row">
+                            <div class="col">
                                 @Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                @Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { @class = "form-control" })
+                                <div class="design-custom-select">
+                                    <div class="arrow-icon-wrap">
+                                        <span class="fa fa-chevron-down arrow-icon"></span>
+                                    </div>
+                                    @Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { })
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -72,7 +92,12 @@
                         </div>
                         <div class="row">
                             <div class="col">
-                                @Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new { @class = "form-control" })
+                                <div class="design-custom-select">
+                                    <div class="arrow-icon-wrap">
+                                        <span class="fa fa-chevron-down arrow-icon"></span>
+                                    </div>
+                                    @Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new {  })
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -90,12 +115,17 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.DropDownList("Dating", new List<SelectListItem>
-                                        {
-                                            new SelectListItem("2 Week", "1"),
-                                            new SelectListItem("3 Week", "0")
-                                        }
-                                            , "", new { @class = "form-control" })
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownList("Dating", new List<SelectListItem>
+                                            {
+                                                new SelectListItem("2 Week", "1"),
+                                                new SelectListItem("3 Week", "0")
+                                            }
+                                                , "", new { })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +137,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control" })
+                                        @Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control form-text-input" })
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +157,12 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.DropDownListFor(model => model.Compiler, Model.CompilerList, "", new { @class = "form-control" })
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Compiler, Model.CompilerList, "", new { })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +174,12 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.DropDownListFor(model => model.Verifier1, Model.VerifierList1, "", new { @class = "form-control" })
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Verifier1, Model.VerifierList1, "", new { })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -151,7 +191,12 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.DropDownListFor(model => model.Verifier2, Model.VerifierList2, "", new { @class = "form-control" })
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Verifier2, Model.VerifierList2, "", new { })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -163,7 +208,12 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        @Html.DropDownListFor(model => model.Publisher, Model.PublisherList, "", new { @class = "form-control" })
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Publisher, Model.PublisherList, "", new {  })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -188,6 +238,8 @@
 </div>
 
 @section Scripts {
+    <script src="js/DesignCustomSelect.js">
+    </script>
     <script src="js/NewTask.js">
     </script>
 }
