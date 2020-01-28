@@ -263,7 +263,8 @@ namespace Portal.Helpers
                 // Check at least one entry populated
                 if (recordProductAction.Any(r =>
                     string.IsNullOrWhiteSpace(r.ImpactedProduct)
-                    && (r.ProductActionType == null || string.IsNullOrWhiteSpace(r.ProductActionType.Name))))
+                    || r.ProductActionType == null
+                    || string.IsNullOrWhiteSpace(r.ProductActionType.Name)))
                 {
                     validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
                     return false;
