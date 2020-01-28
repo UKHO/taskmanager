@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,14 +25,13 @@ namespace Portal.Pages.DbAssessment
     public class AssessModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly HpdDbContext _hpdDbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
-        private readonly IRecordProductActionHelper _recordProductActionHelper;
+        private readonly IPageValidationHelper _pageValidationHelper;
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
@@ -74,24 +72,22 @@ namespace Portal.Pages.DbAssessment
         }
 
         public AssessModel(WorkflowDbContext dbContext,
-            HpdDbContext hpdDbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ILogger<AssessModel> logger,
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
-            IRecordProductActionHelper recordProductActionHelper)
+            IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
-            _hpdDbContext = hpdDbContext;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
-            _recordProductActionHelper = recordProductActionHelper;
+            _pageValidationHelper = pageValidationHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -113,31 +109,18 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("Action", action);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
-            
-            var isValid = true;
+
             ValidationErrorMessages.Clear();
 
-            if (!ValidateTaskInformation())
-            {
-                isValid = false;
-            }
-
-            if (!ValidateOperators())
-            {
-                isValid = false;
-            }
-
-            if (!await _recordProductActionHelper.ValidateRecordProductAction(RecordProductAction, ValidationErrorMessages))
-            {
-                isValid = false;
-            }
-
-            if (!ValidateDataImpact())
-            {
-                isValid = false;
-            }
-
-            if (!isValid)
+            if (!await _pageValidationHelper.ValidatePage(
+                                        "Assess",
+                                                    Ion,
+                                            ActivityCode,
+                                            SourceCategory,
+                                            Verifier,
+                                            RecordProductAction,
+                                            DataImpacts,
+                                            ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -156,7 +139,7 @@ namespace Portal.Pages.DbAssessment
                 var workflowInstance = await _dbContext.WorkflowInstance
                     .Include(w => w.PrimaryDocumentStatus)
                     .FirstAsync(w => w.ProcessId == processId);
-                
+
                 workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
                 await _dbContext.SaveChangesAsync();
@@ -193,7 +176,7 @@ namespace Portal.Pages.DbAssessment
                     };
                 }
             }
-            
+
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
 
@@ -218,55 +201,6 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
             await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
             _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
-        }
-
-
-        private bool ValidateTaskInformation()
-        {
-            var isValid = true;
-
-            if (string.IsNullOrWhiteSpace(Ion))
-            {
-                ValidationErrorMessages.Add("Task Information: Ion cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(ActivityCode))
-            {
-                ValidationErrorMessages.Add("Task Information: Activity code cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(SourceCategory))
-            {
-                ValidationErrorMessages.Add("Task Information: Source category cannot be empty");
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        private bool ValidateOperators()
-        {
-            if (string.IsNullOrWhiteSpace(Verifier))
-            {
-                ValidationErrorMessages.Add("Operators: Verifier cannot be empty");
-                return false;
-            }
-            return true;
-        }
-
-        private bool ValidateDataImpact()
-        {
-            // Show error to user, that they've chosen the same usage more than once
-
-            if (DataImpacts.GroupBy(x => x.HpdUsageId)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key).Any())
-            {
-                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
-                return false;
-            }
-
-            return true;
         }
 
         private async Task UpdateTaskInformation(int processId)
@@ -303,8 +237,11 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var dataImpact in DataImpacts)
             {
-                dataImpact.ProcessId = processId;
-                _dbContext.DataImpact.Add(dataImpact);
+                if (dataImpact.HpdUsage != null)
+                {
+                    dataImpact.ProcessId = processId;
+                    _dbContext.DataImpact.Add(dataImpact);
+                }
             }
 
             await _dbContext.SaveChangesAsync();

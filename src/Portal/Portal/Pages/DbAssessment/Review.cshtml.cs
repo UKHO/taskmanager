@@ -28,6 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<ReviewModel> _logger;
+        private readonly IPageValidationHelper _pageValidationHelper;
 
         public int ProcessId { get; set; }
         public bool IsOnHold { get; set; }
@@ -61,7 +62,8 @@ namespace Portal.Pages.DbAssessment
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
-            ILogger<ReviewModel> logger)
+            ILogger<ReviewModel> logger,
+            IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -70,6 +72,7 @@ namespace Portal.Pages.DbAssessment
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _logger = logger;
+            _pageValidationHelper = pageValidationHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -130,25 +133,11 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             ValidationErrorMessages.Clear();
-            var isValid = true;
 
-            // Show error to user where we have an invalid task type
-            if (!ValidateTaskType())
-            {
-                isValid = false;
-            }
-
-            if (!ValidateWorkspace())
-            {
-                isValid = false;
-            }
-
-            if (!ValidateUsers())
-            {
-                isValid = false;
-            }
-
-            if (!isValid)
+            if (!_pageValidationHelper.ValidatePage(
+                PrimaryAssignedTask,
+                AdditionalAssignedTasks,
+                ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -301,78 +290,6 @@ namespace Portal.Pages.DbAssessment
             currentReview.SourceCategory = SourceCategory;
             currentReview.Reviewer = UserFullName;
         }
-
-        private bool ValidateTaskType()
-        {
-            if (string.IsNullOrEmpty(PrimaryAssignedTask.TaskType))
-            {
-                ValidationErrorMessages.Add($"Assign Task 1: Task Type is required");
-                return false;
-            }
-
-            if (!_dbContext.AssignedTaskType.Any(st => st.Name == PrimaryAssignedTask.TaskType))
-            {
-                ValidationErrorMessages.Add($"Assign Task 1: Task Type {PrimaryAssignedTask.TaskType} does not exist");
-                return false;
-            }
-
-            var taskTypes = AdditionalAssignedTasks.Select(st => st.TaskType).ToList();
-
-            if (taskTypes.Any(s => string.IsNullOrEmpty(s)))
-            {
-                ValidationErrorMessages.Add($"Additional Assign Task: Task Type is required");
-                return false;
-            }
-
-            var erroneousEntries = taskTypes.Except(_dbContext.AssignedTaskType.Select(st => st.Name));
-            if (erroneousEntries.Any())
-            {
-                var entry = string.Join(',', erroneousEntries);
-                ValidationErrorMessages.Add($"Additional Assign Task: Invalid Task Type - {entry}");
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool ValidateWorkspace()
-        {
-            if (string.IsNullOrEmpty(PrimaryAssignedTask.WorkspaceAffected))
-            {
-                ValidationErrorMessages.Add($"Assign Task 1: Workspace Affected is required");
-                return false;
-            }
-
-            var workspaceAffected = AdditionalAssignedTasks.Select(st => st.WorkspaceAffected).ToList();
-
-            if (workspaceAffected.Any(s => string.IsNullOrEmpty(s)))
-            {
-                ValidationErrorMessages.Add($"Additional Assign Task: Workspace Affected is required");
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool ValidateUsers()
-        {
-            if (string.IsNullOrEmpty(PrimaryAssignedTask.Assessor))
-            {
-                ValidationErrorMessages.Add($"Assign Task 1: Assessor is required");
-                return false;
-            }
-
-            var assessor = AdditionalAssignedTasks.Select(st => st.Assessor).ToList();
-
-            if (assessor.Any(s => string.IsNullOrEmpty(s)))
-            {
-                ValidationErrorMessages.Add($"Additional Assign Task: Assessor is required");
-                return false;
-            }
-
-            return true;
-        }
-
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {

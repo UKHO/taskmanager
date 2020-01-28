@@ -12,10 +12,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Auth;
-using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Models;
@@ -30,8 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ILogger<VerifyModel> _logger;
-        private readonly HpdDbContext _hpdDbContext;
-        private readonly IRecordProductActionHelper _recordProductActionHelper;
+        private readonly IPageValidationHelper _pageValidationHelper;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
@@ -81,8 +78,7 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
             ILogger<VerifyModel> logger,
-            HpdDbContext hpdDbContext,
-            IRecordProductActionHelper recordProductActionHelper)
+            IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -91,8 +87,7 @@ namespace Portal.Pages.DbAssessment
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _logger = logger;
-            _hpdDbContext = hpdDbContext;
-            _recordProductActionHelper = recordProductActionHelper;
+            _pageValidationHelper = pageValidationHelper;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -113,30 +108,17 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
-            var isValid = true;
             ValidationErrorMessages.Clear();
 
-            if (!ValidateTaskInformation())
-            {
-                isValid = false;
-            }
-
-            if (!ValidateOperators())
-            {
-                isValid = false;
-            }
-
-            if (!await _recordProductActionHelper.ValidateRecordProductAction(RecordProductAction, ValidationErrorMessages))
-            {
-                isValid = false;
-            }
-
-            if (!ValidateDataImpact())
-            {
-                isValid = false;
-            }
-
-            if (!isValid)
+            if (!await _pageValidationHelper.ValidatePage(
+                "Verify",
+                Ion,
+                ActivityCode,
+                SourceCategory,
+                Verifier,
+                RecordProductAction,
+                DataImpacts,
+                ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -347,53 +329,6 @@ namespace Portal.Pages.DbAssessment
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
 
-        private bool ValidateTaskInformation()
-        {
-            var isValid = true;
-
-            if (string.IsNullOrWhiteSpace(Ion))
-            {
-                ValidationErrorMessages.Add("Task Information: Ion cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(ActivityCode))
-            {
-                ValidationErrorMessages.Add("Task Information: Activity code cannot be empty");
-                isValid = false;
-            }
-            if (string.IsNullOrWhiteSpace(SourceCategory))
-            {
-                ValidationErrorMessages.Add("Task Information: Source category cannot be empty");
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        private bool ValidateOperators()
-        {
-            if (string.IsNullOrWhiteSpace(Verifier))
-            {
-                ValidationErrorMessages.Add("Operators: Verifier cannot be empty");
-                return false;
-            }
-            return true;
-        }
-
-        private bool ValidateDataImpact()
-        {
-            // Show error to user that they've chosen the same usage more than once
-            if (DataImpacts.GroupBy(x => x.HpdUsageId)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key).Any())
-            {
-                ValidationErrorMessages.Add("Data Impact: More than one of the same Usage selected");
-                return false;
-            }
-
-            return true;
-        }
-
         private async Task UpdateTaskInformation(int processId)
         {
             var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
@@ -428,8 +363,11 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var dataImpact in DataImpacts)
             {
-                dataImpact.ProcessId = processId;
-                _dbContext.DataImpact.Add(dataImpact);
+                if (dataImpact.HpdUsage != null)
+                {
+                    dataImpact.ProcessId = processId;
+                    _dbContext.DataImpact.Add(dataImpact);
+                }
             }
 
             await _dbContext.SaveChangesAsync();
