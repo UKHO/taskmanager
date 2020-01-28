@@ -145,8 +145,6 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
-            // Show error to user where we have an invalid task type
-
             ProcessId = processId;
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
