@@ -64,9 +64,9 @@
 
 <form id="frmVerifyPage" method="post" asp-page-handler="Done">
 
-    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId"/>
-    <input type="hidden" asp-for="ProcessId"/>
-    <input type="hidden" id="pageIdentity" value="Verify"/>
+    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+    <input type="hidden" asp-for="ProcessId" />
+    <input type="hidden" id="pageIdentity" value="Verify" />
 
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>
@@ -112,6 +112,24 @@
             </form>
         </div>
     </div>
+</div>
+
+
+<div class="modal fade" id="modalWaitVerifyDone" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Verifying Data...</li>
+                    <li>Saving Data...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
