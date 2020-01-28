@@ -39,6 +39,7 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
+          arguments: -nodereuse:false
         displayName: 'dotnet build portal'
   
       - task: DotNetCoreCLI@2
@@ -52,6 +53,7 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
+          arguments: -nodereuse:false
         displayName: 'dotnet build portaltests'
   
       - task: DotNetCoreCLI@2
