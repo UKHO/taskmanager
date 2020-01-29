@@ -4,13 +4,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="5.1.1"/>
-    <PackageReference Include="nunit" Version="3.11.0"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0"/>
-    <PackageReference Include="coverlet.collector" Version="1.1.0"/>
+    <PackageReference Include="FakeItEasy" Version="6.0.0" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0-preview-20200116-01" />
+    <PackageReference Include="coverlet.collector" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Portal\Portal.csproj"/>
+    <ProjectReference Include="..\Portal\Portal.csproj" />
   </ItemGroup>
 </Project>
