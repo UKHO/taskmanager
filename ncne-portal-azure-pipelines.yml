@@ -7,6 +7,8 @@ trigger:
     include:
     - src/NCNEPortal/*
     - src/Databases/NCNEWorkflowDatabase.EF/*
+    - src/Common*
+    - src/HpdDatabase.EF/*    
 
 stages:
 - stage: Build
