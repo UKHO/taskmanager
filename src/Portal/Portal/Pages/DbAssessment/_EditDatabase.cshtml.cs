@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Portal.Models;
 using WorkflowDatabase.EF;
 
 namespace Portal.Pages.DbAssessment
@@ -36,6 +39,32 @@ namespace Portal.Pages.DbAssessment
         public async Task OnPostLaunchSourceEditorAsync(int processId)
         {
             var something = processId;
+
+            var sessionFile = new SessionFile
+            {
+                CarisWorkspace =
+                {
+                    DataSources = new SessionFile.DataSources(),
+                    Properties = new SessionFile.Properties(),
+                    Version = "My first version"
+                },
+                DataSourceProp =
+                {
+                    SourceParam = new SessionFile.SourceParam(),
+                    SourceString = "My source string",
+                    UserLayers = "Layers prop"
+                },
+                SelectedProjectUsages =
+                {
+                    Value = "Project usage!"
+                }
+            };
+
+            var serializer = new XmlSerializer(typeof(SessionFile));
+
+            await using var fs = new FileStream("apath", FileMode.Create);
+
+            serializer.Serialize(fs, sessionFile);
         }
     }
 }
