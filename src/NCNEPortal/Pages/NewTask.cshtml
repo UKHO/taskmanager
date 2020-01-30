@@ -4,23 +4,30 @@
     ViewData["Title"] = "New Chart/New Edition New Task";
 }
 
-<div class="row pt-1 ">
-    <div class="col-4">
+<div class="row pt-1 pb-1 align-items-center">
+    <div class="col-4 col-lg-3">
         <a asp-page="./Index">
             <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
         </a>
     </div>
-    <div class="col-4">
+    <div class="col-7 offset-1">
         <h1>New Chart/New Edition</h1>
     </div>
-    <div class="col-4">
-        <h1>New Task</h1>
-    </div>
 </div>
-<div class="col-12">
-    <div class="row justify-content-end btn-size">
-        <div class="col-2"><button id="btnClose" class="btn btn-primary btn-block">Close</button></div>
-        <div class="col-2"> <button id="btnDone" class="btn btn-primary btn-block">Done</button> </div>
+<div class="row pt-1 pb-1">
+    <div class="col-12">
+        <div class="row justify-content-between">
+            <div class="col-6">
+                <h2>New Task</h2>
+            </div>
+            <div class="col-6">
+                <div class="row justify-content-end">
+                    <div class="col-auto">
+                        <button id="btnClose" class="btn btn-primary" style="min-width: 9em;">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -30,86 +37,198 @@
         <h3>Task Information</h3>
         <div class="col-12">
             <div class="card-body pb-0">
-
-                <div class="row justify-content-between">
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Ion)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.Ion)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.ChartNo)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.ChartNo)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Country)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.Country)</div>
-                        </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { @class = "form-control" })</div>
-                        </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.WorkflowType, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new { @class = "form-control" })</div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })</div>
-                            <div class="col-6">
-                                @Html.DropDownList("Dating", new List<SelectListItem>
-                                {
-                                    new SelectListItem("2 Week", "1"),
-                                    new SelectListItem("3 Week", "0")
-                                }
-                                   , "", new { @class = "form-control" })
+                <div class="row">
+                    <div class="col-12 col-md-3">
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })
                             </div>
                         </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.PublicationDate)</div>
-                            <div class="col-6">@Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control" })</div>
-                        </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.AnnounceDate)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.AnnounceDate)</div>
-                        </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.CommitToPrintDate)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.CommitToPrintDate)</div>
-                        </div>
-
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.CISDate)</div>
-                            <div class="col-6">@Html.DisplayFor(model => model.CISDate)</div>
+                        <div class="row">
+                            <div class="col">
+                                @Html.TextBoxFor(model => model.Ion, "",
+                                    new { placeholder = "ION", @class = "form-control form-text-input" })
+                            </div>
                         </div>
                     </div>
-
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.Compiler, Model.CompilerList, "", new { @class = "form-control" })</div>
+                </div>
+                <hr class="mt-3 mb-3">
+                <div class="row">
+                    <div class="col-12 col-md-3">
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })
+                            </div>
                         </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.Verifier1, Model.VerifierList1, "", new { @class = "form-control" })</div>
+                        <div class="row">
+                            <div class="col">
+                                @Html.TextBoxFor(model => model.ChartNo, "",
+                                    new { placeholder = "Chart Number", @class = "form-control form-text-input" })
+                            </div>
                         </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.Verifier2, Model.VerifierList2, "", new { @class = "form-control" })</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-6">@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
-                            <div class="col-6">@Html.DropDownListFor(model => model.Publisher, Model.PublisherList, "", new { @class = "form-control" })</div>
-                        </div>
-
                     </div>
-
+                    <div class="col-12 col-md-3">
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="design-custom-select">
+                                    <div class="arrow-icon-wrap">
+                                        <span class="fa fa-chevron-down arrow-icon"></span>
+                                    </div>
+                                    @Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.WorkflowType, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="design-custom-select">
+                                    <div class="arrow-icon-wrap">
+                                        <span class="fa fa-chevron-down arrow-icon"></span>
+                                    </div>
+                                    @Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new {  })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-3 mb-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h4>Dates</h4>
+                        <div class="row">
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownList("Dating", new List<SelectListItem>
+                                            {
+                                                new SelectListItem("2 Week", "1"),
+                                                new SelectListItem("3 Week", "0")
+                                            }
+                                                , "", new { })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.PublicationDate, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control form-text-input" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-3 mb-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h4>Job roles</h4>
+                        <div class="row">
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Compiler, Model.CompilerList, "", new { })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Verifier1, Model.VerifierList1, "", new { })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Verifier2, Model.VerifierList2, "", new { })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="design-custom-select">
+                                            <div class="arrow-icon-wrap">
+                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                            </div>
+                                            @Html.DropDownListFor(model => model.Publisher, Model.PublisherList, "", new {  })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-3 mb-3">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <div class="row justify-content-end ">
+                            <div class="col-auto ">
+                                <button id="btnAddIon" class="btn btn-primary" style="min-width: 9em;">Create New Task</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -119,6 +238,8 @@
 </div>
 
 @section Scripts {
+    <script src="js/DesignCustomSelect.js">
+    </script>
     <script src="js/NewTask.js">
     </script>
 }

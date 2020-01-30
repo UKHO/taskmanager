@@ -10,4 +10,6 @@
         window.location.href = '/Index';
     });
 
+    initDesignCustomSelect();
+
 });
