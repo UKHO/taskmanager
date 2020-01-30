@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
