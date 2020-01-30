@@ -514,10 +514,6 @@
 
                     <a href="#">Edit this section </a>
                 </div>
-                <div class="col-2">
-                    <span class="fas fa-comment-alt"></span>
-                    <a href="#">Add a comment</a>
-                </div>
             </div>
 
         </div>
@@ -567,7 +563,18 @@
 
 @*--- START TASK COMMENTS ---*@
 <div class="card mb-4 mt-3">
-    <h3>Task Comments</h3>
+    <h3>
+        <div class="row">
+            <div class="col">
+                Task Comments
+            </div>
+            <div class="col text-right">
+                <span class="fas fa-comment-alt mr-2"></span>
+                <a href="#" style="color: white;">Add a comment</a>
+            </div>
+        </div>
+    </h3>
+    
     <div class="card-body p-3">
 
         <table class="table table-striped m-2" id="generic-comments-table">
