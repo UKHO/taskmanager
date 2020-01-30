@@ -95,49 +95,66 @@ namespace WorkflowCoordinator.Handlers
                     Status = WorkflowStatus.Started.ToString()
                 };
 
-                _dbContext.WorkflowInstance.Add(newWorkflowInstance);
+                await _dbContext.WorkflowInstance.AddAsync(newWorkflowInstance);
 
             }
 
-            if (!_dbContext.AssessmentData.Any(a => a.ProcessId == command.ChildProcessId))
-            {
-                _dbContext.AssessmentData.Add(new AssessmentData
-                {
-                    Datum = parentData.Datum,
-                    EffectiveStartDate = parentData.EffectiveStartDate,
-                    PrimarySdocId = parentData.PrimarySdocId,
-                    ReceiptDate = parentData.ReceiptDate,
-                    RsdraNumber = parentData.RsdraNumber,
-                    ProcessId = command.ChildProcessId,
-                    SourceDocumentName = parentData.SourceDocumentName,
-                    SourceDocumentType = parentData.SourceDocumentType,
-                    TeamDistributedTo = parentData.TeamDistributedTo,
-                    SourceNature = parentData.SourceNature,
-                    ToSdoDate = parentData.ToSdoDate
-                });
-            }
-
-            if (!_dbContext.PrimaryDocumentStatus.Any(p => p.ProcessId == command.ChildProcessId))
-            {
-                _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus
-                {
-                    ProcessId = command.ChildProcessId,
-                    CorrelationId = command.CorrelationId,
-                    SdocId = parentData.PrimarySdocId,
-                    Status = primarySourceData.Status,
-                    StartedAt = primarySourceData.StartedAt,
-                    ContentServiceId = primarySourceData.ContentServiceId
-                });
-            }
+            await PersistAssessmentDataFromParent(command.ChildProcessId, parentData);
+            await PersistPrimaryDocumentFromParent(
+                                                    command.ChildProcessId,
+                                                    command.CorrelationId,
+                                                    parentData.PrimarySdocId,
+                                                    primarySourceData);
 
             await _dbContext.SaveChangesAsync();
 
-            if (!_dbContext.DbAssessmentAssessData.Any(d => d.ProcessId == command.ChildProcessId))
+            await PersistChildWorkflowDataToAssess(
+                                                    command.ChildProcessId,
+                                                    newWorkflowInstance.WorkflowInstanceId,
+                                                    reviewData, additionalAssignedTaskData);
+
+            await CopyAdditionalAssignTaskNoteToComments(
+                                                            command.ChildProcessId,
+                                                            additionalAssignedTaskData.Notes,
+                                                            newWorkflowInstance.WorkflowInstanceId,
+                                                            reviewData.Reviewer);
+
+            await _dbContext.SaveChangesAsync();
+
+        }
+
+        private async Task CopyAdditionalAssignTaskNoteToComments(int childProcessId, string assignTaskNote, int newWorkflowInstance, string reviewer)
+        {
+            if (!string.IsNullOrEmpty(assignTaskNote))
             {
-                _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
+                if (!await _dbContext.Comment.AnyAsync(c =>
+                                                                        c.ProcessId == childProcessId 
+                                                                        && c.Text.StartsWith("Assign Task:")))
                 {
-                    ProcessId = command.ChildProcessId,
-                    WorkflowInstanceId = newWorkflowInstance.WorkflowInstanceId,
+                    await _dbContext.Comment.AddAsync(new Comment()
+                    {
+                        ProcessId = childProcessId,
+                        WorkflowInstanceId = newWorkflowInstance,
+                        Text = $"Assign Task: {assignTaskNote.Trim()}",
+                        Username = reviewer,
+                        Created = DateTime.Today
+                    });
+                }
+            }
+        }
+
+        private async Task PersistChildWorkflowDataToAssess(
+                                                        int childProcessId,
+                                                        int  newWorkflowInstanceId,
+                                                        DbAssessmentReviewData reviewData,
+                                                        DbAssessmentAssignTask additionalAssignedTaskData)
+        {
+            if (! await _dbContext.DbAssessmentAssessData.AnyAsync(d => d.ProcessId == childProcessId))
+            {
+                await _dbContext.DbAssessmentAssessData.AddAsync(new DbAssessmentAssessData
+                {
+                    ProcessId = childProcessId,
+                    WorkflowInstanceId = newWorkflowInstanceId,
 
                     ActivityCode = reviewData.ActivityCode,
                     Ion = reviewData.Ion,
@@ -148,10 +165,47 @@ namespace WorkflowCoordinator.Handlers
                     Verifier = additionalAssignedTaskData.Verifier,
                     TaskType = additionalAssignedTaskData.TaskType
                 });
+            }
+        }
 
-                await _dbContext.SaveChangesAsync();
+        private async Task PersistPrimaryDocumentFromParent(
+                                                        int childProcessId,
+                                                        Guid correlationId,
+                                                        int primarySdocId,
+            PrimaryDocumentStatus primarySourceData)
+        {
+            if (!await _dbContext.PrimaryDocumentStatus.AnyAsync(p => p.ProcessId == childProcessId))
+            {
+                await _dbContext.PrimaryDocumentStatus.AddAsync(new PrimaryDocumentStatus
+                {
+                    ProcessId = childProcessId,
+                    CorrelationId = correlationId,
+                    SdocId = primarySdocId,
+                    Status = primarySourceData.Status,
+                    StartedAt = primarySourceData.StartedAt,
+                    ContentServiceId = primarySourceData.ContentServiceId
+                });
+            }
+        }
 
-                // TODO: Copy additionalAssignedTaskData Notes to Comments; See 'CopyPrimaryAssignTaskNoteToComments' in Review.cshtml.cs
+        private async Task PersistAssessmentDataFromParent(int childProcessId, AssessmentData parentData)
+        {
+            if (!await _dbContext.AssessmentData.AnyAsync(a => a.ProcessId == childProcessId))
+            {
+                await _dbContext.AssessmentData.AddAsync(new AssessmentData
+                {
+                    Datum = parentData.Datum,
+                    EffectiveStartDate = parentData.EffectiveStartDate,
+                    PrimarySdocId = parentData.PrimarySdocId,
+                    ReceiptDate = parentData.ReceiptDate,
+                    RsdraNumber = parentData.RsdraNumber,
+                    ProcessId = childProcessId,
+                    SourceDocumentName = parentData.SourceDocumentName,
+                    SourceDocumentType = parentData.SourceDocumentType,
+                    TeamDistributedTo = parentData.TeamDistributedTo,
+                    SourceNature = parentData.SourceNature,
+                    ToSdoDate = parentData.ToSdoDate
+                });
             }
         }
     }
