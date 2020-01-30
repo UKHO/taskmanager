@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace Portal.Pages.DbAssessment
             return new JsonResult(cachedHpdWorkspaces);
         }
 
-        public async Task OnPostLaunchSourceEditorAsync(int processId)
+        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId)
         {
             var something = processId;
 
@@ -62,9 +63,15 @@ namespace Portal.Pages.DbAssessment
 
             var serializer = new XmlSerializer(typeof(SessionFile));
 
-            await using var fs = new FileStream("apath", FileMode.Create);
+            byte[] a = new byte[1000000];
+
+            var fs = new MemoryStream(a, true);
 
             serializer.Serialize(fs, sessionFile);
+
+            fs.Position = 0;
+
+            return File(fs, MediaTypeNames.Application.Xml, "blibble.wrk");
         }
     }
 }
