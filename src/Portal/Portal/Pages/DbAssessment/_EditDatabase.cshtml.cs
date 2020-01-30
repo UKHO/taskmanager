@@ -32,5 +32,10 @@ namespace Portal.Pages.DbAssessment
             var cachedHpdWorkspaces = await _dbContext.CachedHpdWorkspace.Select(c => c.Name).ToListAsync();
             return new JsonResult(cachedHpdWorkspaces);
         }
+
+        public async Task OnPostLaunchSourceEditorAsync(int processId)
+        {
+            var something = processId;
+        }
     }
 }
