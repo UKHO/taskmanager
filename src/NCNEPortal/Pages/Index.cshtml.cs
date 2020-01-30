@@ -28,7 +28,7 @@ namespace NCNEPortal.Pages
         }
 
         [BindProperty(SupportsGet = true)]
-        public List<NcneTaskInfo> NcneTasks { get; set; }
+        public List<TaskInfo> NcneTasks { get; set; }
 
         public IndexModel(IUserIdentityService userIdentityService, NcneWorkflowDbContext ncneWorkflowDbContext
                          , IDirectoryService directoryService)
@@ -40,8 +40,8 @@ namespace NCNEPortal.Pages
 
         public async Task OnGetAsync()
         {
-            NcneTasks = await _dbContext.NcneTaskInfo
-                .Include(c => c.NcneTaskNote)
+            NcneTasks = await _dbContext.TaskInfo
+                .Include(c => c.TaskNote)
                 .ToListAsync();
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
@@ -57,13 +57,13 @@ namespace NCNEPortal.Pages
 
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
-            var existingTaskNote = await _dbContext.NcneTaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
+            var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
 
             if (existingTaskNote == null)
             {
                 if (!string.IsNullOrEmpty(taskNote))
                 {
-                    await _dbContext.NcneTaskNote.AddAsync(new NcneTaskNote()
+                    await _dbContext.TaskNote.AddAsync(new TaskNote()
                     {
                         ProcessId = processId,
                         Text = taskNote,
@@ -98,9 +98,10 @@ namespace NCNEPortal.Pages
 
             if (await _userIdentityService.ValidateUser(userName))
             {
-                var instance = await _dbContext.NcneTaskInfo.FirstAsync(t => t.ProcessId == processId);
+                var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
 
-                instance.Compiler = userName;
+                instance.AssignedUser = userName;
+                instance.AssignedDate = DateTime.Now;
 
                 await _dbContext.SaveChangesAsync();
             }

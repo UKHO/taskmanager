@@ -1,0 +1,82 @@
+[
+  {
+    "Name": "Specification",
+    "SequenceNumber": 1,
+    "AllowRework": false
+  },
+  {
+    "Name": "Compile Chart",
+    "SequenceNumber": 2,
+    "AllowRework": false
+  },
+  {
+    "Name": "V1",
+    "SequenceNumber": 3,
+    "AllowRework": true
+  },
+  {
+    "Name": "V1 rework",
+    "SequenceNumber": 4,
+    "AllowRework": false
+  },
+  {
+    "Name": "V2",
+    "SequenceNumber": 5,
+    "AllowRework": true
+  },
+  {
+    "Name": "V2 rework",
+    "SequenceNumber": 6,
+    "AllowRework": false
+  },
+  {
+    "Name": "Forms",
+    "SequenceNumber": 7,
+    "AllowRework": false
+  },
+  {
+    "Name": "Final updating",
+    "SequenceNumber": 8,
+    "AllowRework": false
+  },
+  {
+    "Name": "100% check",
+    "SequenceNumber": 9,
+    "AllowRework": false
+  },
+  {
+    "Name": "Commit to print",
+    "SequenceNumber": 10,
+    "AllowRework": false
+  },
+  {
+    "Name": "CIS",
+    "SequenceNumber": 11,
+    "AllowRework": false
+  },
+  {
+    "Name": "Publication",
+    "SequenceNumber": 12,
+    "AllowRework": false
+  },
+  {
+    "Name": "Publish chart",
+    "SequenceNumber": 13,
+    "AllowRework": false
+  },
+  {
+    "Name": "Clear vector",
+    "SequenceNumber": 14,
+    "AllowRework": false
+  },
+  {
+    "Name": "Retire old minor version",
+    "SequenceNumber": 15,
+    "AllowRework": false
+  },
+  {
+    "Name": "Consider withdrawn charts",
+    "SequenceNumber": 16,
+    "AllowRework": false
+  }
+]

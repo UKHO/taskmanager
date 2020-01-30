@@ -81,7 +81,7 @@
                             Comp
                         </td>
                         <td>
-                            @task.Compiler
+                            @task.AssignedUser
                         </td>
                         <td>
                             @task.AnnounceDate.ToShortDateString()
@@ -108,7 +108,7 @@
                             <div class="dropdown" style="cursor: pointer;">
                                 <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.NcneTaskNote?.Text">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
@@ -122,7 +122,7 @@
                             </div>
                         </td>
                         <td>
-                            @task.NcneTaskNote?.Text
+                            @task.TaskNote?.Text
                         </td>
                     </tr>
                 }

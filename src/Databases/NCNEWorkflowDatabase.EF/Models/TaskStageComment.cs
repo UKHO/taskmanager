@@ -4,16 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NCNEWorkflowDatabase.EF.Models
 {
-    public class NcneTaskNote
+    public class TaskStageComment
     {
         [Key]
         [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
-        public int TaskNoteId { get; set; }
+        public int TaskStageCommentId { get; set; }
+
+        public int TaskStageId { get; set; }
         public int ProcessId { get; set; }
-        public string Text { get; set; }
+        public string Comment { get; set; }
+        public string Username { get; set; }
         public DateTime Created { get; set; }
-        public string CreatedByUsername { get; set; }
-        public DateTime LastModified { get; set; }
-        public string LastModifiedByUsername { get; set; }
+
     }
 }

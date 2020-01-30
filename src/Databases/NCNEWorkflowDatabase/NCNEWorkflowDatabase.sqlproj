@@ -60,8 +60,15 @@
     <Folder Include="Tables" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\NcneTaskInfo.sql" />
-    <Build Include="Tables\NcneTaskNote.sql" />
+    <Build Include="Tables\TaskInfo.sql" />
+    <Build Include="Tables\TaskNote.sql" />
+    <Build Include="Tables\TaskRole.sql" />
+    <Build Include="Tables\TaskStage.sql" />
+    <Build Include="Tables\TaskStageType.sql" />
+    <Build Include="Tables\TaskStageComment.sql" />
+    <Build Include="Tables\TaskComment.sql" />
+    <Build Include="Tables\ChartType.sql" />
+    <Build Include="Tables\WorkflowType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="NCNEWorkflowDatabase.refactorlog" />

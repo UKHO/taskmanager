@@ -1,95 +1,691 @@
 [
   {
-    
+
     "ion": 232,
     "country": "UK",
-    "chartNumber": 23, 
+    "chartNumber": 23,
+    "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Adoption",
-    "dating": "2 Weeks",
+    "Duration": "2 Weeks",
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
     "cisDate": "2020-01-10T00:00:00",
-    "compiler": "StoodleyM",
-    "verifierOne": "StoodleyM",
-    "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM",
-    "NcneTaskNote": 
-    {
+    "AssignedUser": "Amanda Bowery",
+    "AssignedDate": "2020-01-06",
+    "TaskRole": {
+      "compiler": "Amanda Bowery",
+      "verifierOne": "StoodleyM",
+      "verifierTwo": "StoodleyM",
+      "publisher": "StoodleyM"
+    },
+    "TaskNote": {
       "Text": "Important note on first task",
       "Created": "2020-01-10T00:00:00",
       "CreatedByUsername": "StoodleyM",
       "LastModified": "2020-01-10T00:00:00",
       "LastModifiedByUsername": "StoodleyM"
-    }
-    
+    },
+    "TaskComment": [
+      {
+        "Comment": "This is a very important comment that will eventually reach a, not insignificant character count",
+        "Username": "StoodleyM",
+        "Created": "2020-01-28T00:00:00",
+        "ActionIndicator": false,
+        "ActionRole": null
+      },
+      {
+        "Comment": "",
+        "Username": "StoodleyM",
+        "Created": "2020-01-28T00:00:00",
+        "ActionIndicator": true,
+        "ActionRole": "Compiler"
+      }
+    ],
+
+    "TaskStage": [
+      {
+        "TaskStageName": "Specification",
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ] 
+      },
+      {
+        "TaskStageName": "Compile Chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "V1",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V1 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Forms",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "Final updating",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "100% check",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Commit to print",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "CIS",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publication",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publish chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Clear vector",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Retire old minor version",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Consider withdrawn charts",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ] 
+
   },
   {
 
     "ion": 232,
     "country": "UK",
     "chartNumber": 26,
+    "ChartTitle": "New Title",
     "chartType": "NE",
     "workflowType": "Derived",
-    "dating": "3 Weeks",
+    "Duration": "3 Weeks",
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
     "cisDate": "2020-01-10T00:00:00",
-    "compiler": "StoodleyM",
-    "verifierOne": "StoodleyM",
-    "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM"
-  },{
+    "AssignedUser": "Andrew Slater",
+    "AssignedDate": "2020-01-06",
+    "TaskRole": {
+      "compiler": "StoodleyM",
+      "verifierOne": "Andrew Slater",
+      "verifierTwo": "StoodleyM",
+      "publisher": "StoodleyM"
+    },
 
-    "ion": 232,
-    "country": "UK",
-    "chartNumber": 26,
-    "chartType": "NE",
-    "workflowType": "Derived",
-    "dating": "3 Weeks",
-    "publicationDate": "2020-01-10T00:00:00",
-    "announceDate": "2020-01-10T00:00:00",
-    "commitDate": "2020-01-10T00:00:00",
-    "cisDate": "2020-01-10T00:00:00",
-    "compiler": "StoodleyM",
-    "verifierOne": "StoodleyM",
-    "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM"
+    "TaskStage": [
+      {
+        "TaskStageName": "Specification",
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ]
+      },
+      {
+        "TaskStageName": "Compile Chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "V1",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V1 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Forms",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "Final updating",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "100% check",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Commit to print",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "CIS",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publication",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publish chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Clear vector",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Retire old minor version",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Consider withdrawn charts",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ]
   },
   {
 
     "ion": 232,
     "country": "UK",
-    "chartNumber": 26,
+    "chartNumber": 28,
+    "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Derived",
-    "dating": "3 Weeks",
+    "Duration": "3 Weeks",
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
     "cisDate": "2020-01-10T00:00:00",
-    "compiler": "StoodleyM",
-    "verifierOne": "StoodleyM",
-    "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM"
+    "AssignedUser": "Kate Rabey",
+    "AssignedDate": "2020-01-06",
+    "TaskRole": {
+      "compiler": "Kate Rabey",
+      "verifierOne": "StoodleyM",
+      "verifierTwo": "James Gates",
+      "publisher": "StoodleyM"
+    },
+
+    "TaskStage": [
+      {
+        "TaskStageName": "Specification",
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ]
+      },
+      {
+        "TaskStageName": "Compile Chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "V1",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V1 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Forms",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "Final updating",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "100% check",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Commit to print",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "CIS",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publication",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publish chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Clear vector",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Retire old minor version",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Consider withdrawn charts",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ]
   },
   {
 
     "ion": 232,
     "country": "UK",
-    "chartNumber": 26,
+    "chartNumber": 35,
+    "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Derived",
-    "dating": "3 Weeks",
+    "Duration": "3 Weeks",
     "publicationDate": "2020-01-10T00:00:00",
     "announceDate": "2020-01-10T00:00:00",
     "commitDate": "2020-01-10T00:00:00",
     "cisDate": "2020-01-10T00:00:00",
-    "compiler": "StoodleyM",
-    "verifierOne": "StoodleyM",
-    "verifierTwo": "StoodleyM",
-    "publisher": "StoodleyM"
+    "AssignedUser": "Hannah Kent",
+    "AssignedDate": "2020-01-06",
+    "TaskRole": {
+      "compiler": "Hannah Kent",
+      "verifierOne": "StoodleyM",
+      "verifierTwo": "StoodleyM",
+      "publisher": "StoodleyM"
+    },
+
+    "TaskStage": [
+      {
+        "TaskStageName": "Specification",
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ]
+      },
+      {
+        "TaskStageName": "Compile Chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "V1",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V1 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Forms",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "Final updating",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "100% check",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Commit to print",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "CIS",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publication",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publish chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Clear vector",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Retire old minor version",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Consider withdrawn charts",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ]
+  },
+  {
+
+    "ion": 232,
+    "country": "UK",
+    "chartNumber": 45,
+    "ChartTitle": "Hamoaze",
+    "chartType": "NE",
+    "workflowType": "Derived",
+    "Duration": "3 Weeks",
+    "publicationDate": "2020-01-10T00:00:00",
+    "announceDate": "2020-01-10T00:00:00",
+    "commitDate": "2020-01-10T00:00:00",
+    "cisDate": "2020-01-10T00:00:00",
+    "AssignedUser": "Ralph Dyson",
+    "AssignedDate": "2020-01-06",
+    "TaskRole": {
+      "compiler": "StoodleyM",
+      "verifierOne": "StoodleyM",
+      "verifierTwo": null,
+      "publisher": "Ralph Dyson"
+    },
+
+    "TaskStage": [
+      {
+        "TaskStageName": "Specification",
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Specification stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ]
+      },
+      {
+        "TaskStageName": "Compile Chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "V1",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V1 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "V2 rework",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Forms",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageName": "Final updating",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "100% check",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Commit to print",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "CIS",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publication",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Publish chart",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Clear vector",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Retire old minor version",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      },
+      {
+        "TaskStageName": "Consider withdrawn charts",
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ]
   }
 ]

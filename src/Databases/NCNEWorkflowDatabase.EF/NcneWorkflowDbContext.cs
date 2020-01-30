@@ -21,8 +21,21 @@ namespace NCNEWorkflowDatabase.EF
             }
         }
 
-        public DbSet<NcneTaskInfo> NcneTaskInfo { get; set; }
-        public DbSet<NcneTaskNote> NcneTaskNote { get; set; }
+        public DbSet<TaskInfo> TaskInfo { get; set; }
+        public DbSet<TaskNote> TaskNote { get; set; }
+        public DbSet<TaskRole> TaskRole { get; set; }
+        public DbSet<TaskStage> TaskStage { get; set; }
 
+        public DbSet<TaskComment> TaskComment { get; set; }
+        public DbSet<TaskStageComment> TaskStageComment { get; set; }
+        public DbSet<TaskStageType> TaskStageType { get; set; }
+
+        public DbSet<ChartType> ChartType { get; set; }
+        public DbSet<WorkflowType> WorkflowType { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TaskStage>()
+                .HasKey(o => new { o.ProcessId, o.TaskStageId });
+        }
     }
 }
