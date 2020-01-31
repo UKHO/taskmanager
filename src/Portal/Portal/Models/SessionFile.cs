@@ -3,27 +3,39 @@ using System.Xml.Serialization;
 
 namespace Portal.Models
 {
+    // TODO: Ensure node is called CARIS_Workspace version="1.1"
+    [XmlRoot(ElementName = "Caris_Workspace version=1.1")]
     public class SessionFile
     {
-        public SELECTEDPROJECTUSAGES SelectedProjectUsages = new SELECTEDPROJECTUSAGES();
-        public SourceParam SourceParamProp = new SourceParam();
-        public CARIS_Workspace CarisWorkspace = new CARIS_Workspace();
-        public DataSource DataSourceProp = new DataSource();
+        [XmlElement(Order = 1)]
+        public CARIS_WorkspaceNode CarisWorkspace = new CARIS_WorkspaceNode();
 
         public SessionFile()
         {
-            
+
+        }
+
+        public class CARIS_WorkspaceNode
+        {
+            [XmlElement(ElementName = "DataSources")]
+            public DataSourcesNode DataSources { get; set; }
+            [XmlElement(ElementName = "Views")]
+            public ViewsNode Views { get; set; }
+            [XmlElement(ElementName = "Properties")]
+            public PropertiesNode Properties { get; set; }
+            [XmlAttribute(AttributeName = "version")]
+            public string Version { get; set; }
         }
 
         [XmlRoot(ElementName = "SELECTEDPROJECTUSAGES")]
-        public class SELECTEDPROJECTUSAGES
+        public class SelectedProjectUsages
         {
             [XmlElement(ElementName = "value")]
             public string Value { get; set; }
         }
 
         [XmlRoot(ElementName = "SourceParam")]
-        public class SourceParam
+        public class SourceParamNode
         {
             [XmlElement(ElementName = "SERVICENAME")]
             public string SERVICENAME { get; set; }
@@ -50,29 +62,29 @@ namespace Portal.Models
             [XmlElement(ElementName = "_PROJECT_BOUNDARIES")]
             public string _PROJECT_BOUNDARIES { get; set; }
             [XmlElement(ElementName = "SELECTEDPROJECTUSAGES")]
-            public SELECTEDPROJECTUSAGES SELECTEDPROJECTUSAGES { get; set; }
+            public SelectedProjectUsages SELECTEDPROJECTUSAGES { get; set; }
         }
 
         [XmlRoot(ElementName = "DataSource")]
-        public class DataSource
+        public class DataSourceNode
         {
             [XmlElement(ElementName = "SourceString")]
             public string SourceString { get; set; }
             [XmlElement(ElementName = "SourceParam")]
-            public SourceParam SourceParam { get; set; }
+            public SourceParamNode SourceParam { get; set; }
             [XmlElement(ElementName = "UserLayers")]
             public string UserLayers { get; set; }
         }
 
         [XmlRoot(ElementName = "DataSources")]
-        public class DataSources
+        public class DataSourcesNode
         {
             [XmlElement(ElementName = "DataSource")]
-            public DataSource DataSource { get; set; }
+            public DataSourceNode DataSource { get; set; }
         }
 
         [XmlRoot(ElementName = "displayLayer")]
-        public class DisplayLayer
+        public class DisplayLayerNode
         {
             [XmlElement(ElementName = "name")]
             public string Name { get; set; }
@@ -83,28 +95,28 @@ namespace Portal.Models
         }
 
         [XmlRoot(ElementName = "DisplayState")]
-        public class DisplayState
+        public class DisplayStateNode
         {
             [XmlElement(ElementName = "displayLayer")]
-            public DisplayLayer DisplayLayer { get; set; }
+            public DisplayLayerNode DisplayLayer { get; set; }
         }
 
         [XmlRoot(ElementName = "View")]
-        public class View
+        public class ViewNode
         {
             [XmlElement(ElementName = "DisplayState")]
-            public DisplayState DisplayState { get; set; }
+            public DisplayStateNode DisplayState { get; set; }
         }
 
         [XmlRoot(ElementName = "Views")]
-        public class Views
+        public class ViewsNode
         {
             [XmlElement(ElementName = "View")]
-            public View View { get; set; }
+            public ViewNode View { get; set; }
         }
 
         [XmlRoot(ElementName = "Item")]
-        public class Item
+        public class ItemNode
         {
             [XmlAttribute(AttributeName = "name")]
             public string Name { get; set; }
@@ -115,41 +127,27 @@ namespace Portal.Models
         }
 
         [XmlRoot(ElementName = "Property")]
-        public class Property
+        public class PropertyNode
         {
             [XmlElement(ElementName = "Item")]
-            public Item Item { get; set; }
+            public ItemNode Item { get; set; }
             [XmlAttribute(AttributeName = "name")]
             public string Name { get; set; }
             [XmlAttribute(AttributeName = "type")]
             public string Type { get; set; }
-            
+
             [XmlElement(ElementName = "Property")]
-            // TODO: The property name here needs to be "Property", and not "PropertyTest"
-            public Property PropertyTest { get; set; }
+            public PropertyNode Property { get; set; }
 
             [XmlAttribute(AttributeName = "source")]
             public string Source { get; set; }
         }
 
         [XmlRoot(ElementName = "Properties")]
-        public class Properties
+        public class PropertiesNode
         {
             [XmlElement(ElementName = "Property")]
-            public List<Property> Property { get; set; }
-        }
-
-        [XmlRoot(ElementName = "CARIS_Workspace")]
-        public class CARIS_Workspace
-        {
-            [XmlElement(ElementName = "DataSources")]
-            public DataSources DataSources { get; set; }
-            [XmlElement(ElementName = "Views")]
-            public Views Views { get; set; }
-            [XmlElement(ElementName = "Properties")]
-            public Properties Properties { get; set; }
-            [XmlAttribute(AttributeName = "version")]
-            public string Version { get; set; }
+            public List<PropertyNode> Property { get; set; }
         }
     }
 }
