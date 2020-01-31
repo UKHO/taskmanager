@@ -14,6 +14,10 @@
     "cisDate": "2020-01-10T00:00:00",
     "AssignedUser": "Amanda Bowery",
     "AssignedDate": "2020-01-06",
+    "ThreePs": true,
+    "SentDate3Ps": null,
+    "ExpectedDate3Ps": null,
+    "ActualDate3Ps": null,
     "TaskRole": {
       "compiler": "Amanda Bowery",
       "verifierOne": "StoodleyM",
@@ -46,7 +50,7 @@
 
     "TaskStage": [
       {
-        "TaskStageName": "Specification",
+        "TaskStageTypeId": 1,
         "DateExpected": null,
         "DateCompleted": "2020-01-15T00:00:00",
         "Status": "Completed",
@@ -61,99 +65,100 @@
             "Username": "Amanda Bowery",
             "Created": "2020-01-15T12:32:32"
           }
-        ] 
+        ]
+
       },
       {
-        "TaskStageName": "Compile Chart",
+        "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "V1",
+        "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V1 rework",
+        "TaskStageTypeId": 4,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2",
+        "TaskStageTypeId": 5,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2 rework",
+        "TaskStageTypeId": 6,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Forms",
+        "TaskStageTypeId": 7,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "Final updating",
+        "TaskStageTypeId": 8,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "100% check",
+        "TaskStageTypeId": 9,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Commit to print",
+        "TaskStageTypeId": 10,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "CIS",
+        "TaskStageTypeId": 11,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publication",
+        "TaskStageTypeId": 12,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publish chart",
+        "TaskStageTypeId": 13,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Clear vector",
+        "TaskStageTypeId": 14,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Retire old minor version",
+        "TaskStageTypeId": 15,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Consider withdrawn charts",
+        "TaskStageTypeId": 16,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       }
-    ] 
+    ]
 
   },
   {
@@ -180,7 +185,7 @@
 
     "TaskStage": [
       {
-        "TaskStageName": "Specification",
+        "TaskStageTypeId": 1,
         "DateExpected": null,
         "DateCompleted": "2020-01-15T00:00:00",
         "Status": "Completed",
@@ -198,91 +203,91 @@
         ]
       },
       {
-        "TaskStageName": "Compile Chart",
+        "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "V1",
+        "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V1 rework",
+        "TaskStageTypeId": 4,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2",
+        "TaskStageTypeId": 5,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2 rework",
+        "TaskStageTypeId": 6,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Forms",
+        "TaskStageTypeId": 7,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "Final updating",
+        "TaskStageTypeId": 8,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "100% check",
+        "TaskStageTypeId": 9,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Commit to print",
+        "TaskStageTypeId": 10,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "CIS",
+        "TaskStageTypeId": 11,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publication",
+        "TaskStageTypeId": 12,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publish chart",
+        "TaskStageTypeId": 13,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Clear vector",
+        "TaskStageTypeId": 14,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Retire old minor version",
+        "TaskStageTypeId": 15,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Consider withdrawn charts",
+        "TaskStageTypeId": 16,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
@@ -313,7 +318,7 @@
 
     "TaskStage": [
       {
-        "TaskStageName": "Specification",
+        "TaskStageTypeId": 1,
         "DateExpected": null,
         "DateCompleted": "2020-01-15T00:00:00",
         "Status": "Completed",
@@ -331,91 +336,91 @@
         ]
       },
       {
-        "TaskStageName": "Compile Chart",
+        "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "V1",
+        "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V1 rework",
+        "TaskStageTypeId": 4,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2",
+        "TaskStageTypeId": 5,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2 rework",
+        "TaskStageTypeId": 6,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Forms",
+        "TaskStageTypeId": 7,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "Final updating",
+        "TaskStageTypeId": 8,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "100% check",
+        "TaskStageTypeId": 9,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Commit to print",
+        "TaskStageTypeId": 10,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "CIS",
+        "TaskStageTypeId": 11,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publication",
+        "TaskStageTypeId": 12,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publish chart",
+        "TaskStageTypeId": 13,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Clear vector",
+        "TaskStageTypeId": 14,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Retire old minor version",
+        "TaskStageTypeId": 15,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Consider withdrawn charts",
+        "TaskStageTypeId": 16,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
@@ -446,7 +451,7 @@
 
     "TaskStage": [
       {
-        "TaskStageName": "Specification",
+        "TaskStageTypeId": 1,
         "DateExpected": null,
         "DateCompleted": "2020-01-15T00:00:00",
         "Status": "Completed",
@@ -464,91 +469,91 @@
         ]
       },
       {
-        "TaskStageName": "Compile Chart",
+        "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "V1",
+        "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V1 rework",
+        "TaskStageTypeId": 4,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2",
+        "TaskStageTypeId": 5,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2 rework",
+        "TaskStageTypeId": 6,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Forms",
+        "TaskStageTypeId": 7,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "Final updating",
+        "TaskStageTypeId": 8,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "100% check",
+        "TaskStageTypeId": 9,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Commit to print",
+        "TaskStageTypeId": 10,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "CIS",
+        "TaskStageTypeId": 11,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publication",
+        "TaskStageTypeId": 12,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publish chart",
+        "TaskStageTypeId": 13,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Clear vector",
+        "TaskStageTypeId": 14,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Retire old minor version",
+        "TaskStageTypeId": 15,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Consider withdrawn charts",
+        "TaskStageTypeId": 16,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
@@ -579,7 +584,7 @@
 
     "TaskStage": [
       {
-        "TaskStageName": "Specification",
+        "TaskStageTypeId": 1,
         "DateExpected": null,
         "DateCompleted": "2020-01-15T00:00:00",
         "Status": "Completed",
@@ -597,91 +602,91 @@
         ]
       },
       {
-        "TaskStageName": "Compile Chart",
+        "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "V1",
+        "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V1 rework",
+        "TaskStageTypeId": 4,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2",
+        "TaskStageTypeId": 5,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "V2 rework",
+        "TaskStageTypeId": 6,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Forms",
+        "TaskStageTypeId": 7,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "InProgress"
       },
       {
-        "TaskStageName": "Final updating",
+        "TaskStageTypeId": 8,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "100% check",
+        "TaskStageTypeId": 9,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Commit to print",
+        "TaskStageTypeId": 10,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "CIS",
+        "TaskStageTypeId": 11,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publication",
+        "TaskStageTypeId": 12,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Publish chart",
+        "TaskStageTypeId": 13,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Clear vector",
+        "TaskStageTypeId": 14,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Retire old minor version",
+        "TaskStageTypeId": 15,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"
       },
       {
-        "TaskStageName": "Consider withdrawn charts",
+        "TaskStageTypeId": 16,
         "DateExpected": null,
         "DateCompleted": null,
         "Status": "Open"

@@ -36,6 +36,9 @@ namespace NCNEWorkflowDatabase.EF
         {
             modelBuilder.Entity<TaskStage>()
                 .HasKey(o => new { o.ProcessId, o.TaskStageId });
+
+
+            modelBuilder.Entity<TaskRole>().HasIndex(i => i.ProcessId).IsUnique();
         }
     }
 }

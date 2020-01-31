@@ -23,10 +23,10 @@ namespace Common.Helpers
         public ICanSaveChanges PopulateTables()
         {
             DatabasesHelpers.ClearNcneWorkflowDbTables(_context);
-            PopulateTaskInfo();
             PopulateTaskStageType();
             PopulateChartType();
             PopulateWorkflowType();
+            PopulateTaskInfo();
 
             return this;
         }

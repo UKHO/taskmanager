@@ -25,9 +25,9 @@ namespace NCNEWorkflowDatabase.EF.Models
         public bool Sdr { get; set; } = false;
         public bool Geodesy { get; set; } = false;
         public bool ThreePs { get; set; } = false;
-        public DateTime SentDate3Ps { get; set; }
-        public DateTime ExpectedDate3Ps { get; set; }
-        public DateTime ActualDate3Ps { get; set; }
+        public DateTime? SentDate3Ps { get; set; }
+        public DateTime? ExpectedDate3Ps { get; set; }
+        public DateTime? ActualDate3Ps { get; set; }
         public string AssignedUser { get; set; }
         public DateTime AssignedDate { get; set; }
 
