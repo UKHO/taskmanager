@@ -1,14 +1,19 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using NCNEPortal.Models;
+using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
-using NCNEPortal.Models;
-using NCNEWorkflowDatabase.EF;
+using System.Threading.Tasks;
+using ChartType = NCNEPortal.Models.ChartType;
+using WorkflowType = NCNEPortal.Models.WorkflowType;
 
 
 namespace NCNEPortal
@@ -16,24 +21,32 @@ namespace NCNEPortal
     public class NewTaskModel : PageModel
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
+
+        [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
 
-        [DisplayName("Chart number")] public string ChartNo { get; set; }
+        [BindProperty]
+        [DisplayName("Chart number")] public int ChartNo { get; set; }
 
+        [BindProperty]
         [DisplayName("Country:")] public string Country { get; set; }
 
+        [BindProperty]
         [DisplayName("Chart type")] public string ChartType { get; set; }
 
         public SelectList ChartTypes { get; set; }
 
+        [BindProperty]
         [DisplayName("Workflow type")] public string WorkflowType { get; set; }
 
         public SelectList WorkflowTypes { get; set; }
 
+        [BindProperty]
         [DisplayName("Duration")] public string Dating { get; set; }
 
         public SelectList DatingList { get; set; }
 
+        [BindProperty]
         [DisplayName("Publication date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime PublicationDate { get; set; }
@@ -50,21 +63,25 @@ namespace NCNEPortal
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime CISDate { get; set; }
 
+        [BindProperty]
         [DisplayName("Compiler")]
         public string Compiler { get; set; }
 
         public SelectList CompilerList { get; set; }
 
+        [BindProperty]
         [DisplayName("Verifier V1")]
         public string Verifier1 { get; set; }
 
         public SelectList VerifierList1 { get; set; }
 
+        [BindProperty]
         [DisplayName("Verifier V2")]
         public string Verifier2 { get; set; }
 
         public SelectList VerifierList2 { get; set; }
 
+        [BindProperty]
         [DisplayName("Publication")]
         public string Publisher { get; set; }
 
@@ -74,8 +91,9 @@ namespace NCNEPortal
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
 
-            Ion = "DC0892322";
-            ChartNo = "192";
+
+            Ion = "";
+            ChartNo = 0;
             Country = "United Kingdom";
 
             SetChartTypes();
@@ -94,6 +112,41 @@ namespace NCNEPortal
 
         }
 
+        public async Task<IActionResult> OnPost()
+        {
+            AnnounceDate = PublicationDate.AddDays(-7);
+            CommitToPrintDate = PublicationDate.AddDays(-7);
+            CISDate = PublicationDate.AddDays(-7);
+
+            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(new TaskInfo()
+            {
+                Ion = this.Ion,
+                ChartNumber = this.ChartNo,
+                ChartType = this.ChartType,
+                WorkflowType = this.WorkflowType,
+                Duration = this.Dating,
+                PublicationDate = this.PublicationDate,
+                AnnounceDate = this.AnnounceDate,
+                CommitDate = this.CommitToPrintDate,
+                CisDate = this.CISDate,
+                Country = this.Country,
+                AssignedUser = this.Compiler,
+                AssignedDate = DateTime.Now,
+                TaskRole = new TaskRole()
+                {
+                    Compiler = this.Compiler,
+                    VerifierOne = this.Verifier1,
+                    VerifierTwo = this.Verifier2,
+                    Publisher = this.Publisher
+                }
+
+
+            });
+
+            await _ncneWorkflowDbContext.SaveChangesAsync();
+            return RedirectToPage("./Index");
+
+        }
         private void SetChartTypes()
         {
             if (!System.IO.File.Exists(@"Data\ChartTypes.json"))
