@@ -9,5 +9,7 @@ namespace Portal.Configuration
         public int DmEndDateDays { get; set; }
         public int DaysToDmEndDateRedAlertUpperInc { get; set; }
         public int DaysToDmEndDateAmberAlertUpperInc { get; set; }
+        public string SessionFilename { get; set; }
+
     }
 }
