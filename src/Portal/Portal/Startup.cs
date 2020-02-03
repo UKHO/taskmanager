@@ -80,7 +80,8 @@ namespace Portal
 
             services.AddOptions<SecretsConfig>()
                 .Bind(Configuration.GetSection("PortalSection"))
-                .Bind(Configuration.GetSection("ActiveDirectory"));
+                .Bind(Configuration.GetSection("ActiveDirectory"))
+                .Bind(Configuration.GetSection("HpdDbSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
