@@ -118,10 +118,16 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                hpdUser = new HpdUser();
-                //throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}. Please ensure the relevant row has been created in that table there.",
-                //    ex.InnerException);
+                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}. Please ensure the relevant row has been created in that table there.",
+                    ex.InnerException);
             }
+
+
+            //TODO: Select correct DataImpact if more than one
+            var dataImpact = _dbContext.DataImpact.Include(di => di.HpdUsage)
+                .FirstOrDefault(di => di.ProcessId == processId);
+            var hpdUsageName = dataImpact == null ? string.Empty : dataImpact.HpdUsage.Name;
+
 
             var sources = await SetSources(processId);
 
@@ -138,7 +144,7 @@ namespace Portal.Pages.DbAssessment
                                 SERVICENAME=_secretsConfig.Value.HpdServiceName,
                                 USERNAME=hpdUser.HpdUsername,
                                 ASSIGNED_USER = hpdUser.HpdUsername,
-                                USAGE="Nav 15 Large[6000-69999]",
+                                USAGE=hpdUsageName,
                                 WORKSPACE="19_29_SDRA4.1 registration test2",
                                 SecureCredentialPlugin="{guid in here}",
                             SecureCredentialPlugin_UserParam="UserParameter",
