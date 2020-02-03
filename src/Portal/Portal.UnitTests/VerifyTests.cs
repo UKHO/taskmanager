@@ -99,7 +99,7 @@ namespace Portal.UnitTests
         {
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
-            _verifyModel.SourceCategory = "SourceCatagory";
+            _verifyModel.SourceCategory = "SourceCategory";
 
             _verifyModel.Verifier = "";
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -115,7 +115,7 @@ namespace Portal.UnitTests
         {
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
-            _verifyModel.SourceCategory = "SourceCatagory";
+            _verifyModel.SourceCategory = "SourceCategory";
 
             _verifyModel.Verifier = "TestUser";
             var hpdUsage = new HpdUsage()
@@ -145,13 +145,13 @@ namespace Portal.UnitTests
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
-            _verifyModel.SourceCategory = "SourceCatagory";
+            _verifyModel.SourceCategory = "SourceCategory";
 
             _verifyModel.Verifier = "TestUser";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678"}
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
             };
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -171,14 +171,14 @@ namespace Portal.UnitTests
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
-            _verifyModel.SourceCategory = "SourceCatagory";
+            _verifyModel.SourceCategory = "SourceCategory";
 
             _verifyModel.Verifier = "TestUser";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234"},
-                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234"}
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");

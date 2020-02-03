@@ -17,7 +17,6 @@ namespace Portal.UnitTests
     [TestFixture]
     public class AssessTests
     {
-
         private WorkflowDbContext _dbContext;
         private HpdDbContext _hpDbContext;
         private AssessModel _assessModel;
@@ -96,7 +95,7 @@ namespace Portal.UnitTests
         {
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _assessModel.SourceCategory = "SourceCategory";
 
             _assessModel.Verifier = "";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -112,7 +111,7 @@ namespace Portal.UnitTests
         {
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _assessModel.SourceCategory = "SourceCategory";
 
             _assessModel.Verifier = "TestUser";
             var hpdUsage = new HpdUsage()
@@ -142,13 +141,13 @@ namespace Portal.UnitTests
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _assessModel.SourceCategory = "SourceCategory";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
-            _assessModel.RecordProductAction = new List<ProductAction>()
+            _assessModel.RecordProductAction = new List<ProductAction>
             {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678"}
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
             };
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
@@ -161,21 +160,20 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
-
             _hpDbContext.CarisProducts.Add(new CarisProducts()
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCatagory";
+            _assessModel.SourceCategory = "SourceCategory";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
-            _assessModel.RecordProductAction = new List<ProductAction>()
+            _assessModel.RecordProductAction = new List<ProductAction>
             {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234"},
-                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234"}
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
