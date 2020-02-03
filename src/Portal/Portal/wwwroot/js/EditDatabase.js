@@ -1,8 +1,6 @@
 ﻿$(document).ready(function () {
     getEditDatabase();
-    launchSourceEditorHandler();
 });
-
 
 function getEditDatabase() {
 
@@ -18,7 +16,7 @@ function getEditDatabase() {
         data: processId,
         success: function (result) {
             $("#editDatabase").html(result);
-            launchSourceEditorHandler();
+            setLaunchSourceEditorHref(processId.processId);
             initialiseWorkspaceTypeahead();
         },
         error: function (error) {
@@ -28,34 +26,13 @@ function getEditDatabase() {
     });
 }
 
-function launchSourceEditorHandler() {
+function setLaunchSourceEditorHref(processId) {
+    var pageIdentity = $("#pageIdentity").val();
+    var href = "_EditDatabase/?handler=LaunchSourceEditor" +
+        "&processId=" + processId +
+        "&taskStage=" + pageIdentity;
 
-    $("#btnLaunchSourceEditor").on("click", function () {
-        $("#btnLaunchSourceEditor").prop("disabled", true);
-        var processId = Number($("#hdnProcessId").val());
-
-        $.ajax({
-            type: "POST",
-            url: "_EditDatabase/?handler=LaunchSourceEditor",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "processId": processId
-            },
-            success: function (result) {
-                $("#btnLaunchSourceEditor").prop("disabled", false);
-            },
-            error: function (error) {
-                console.log(error);
-
-                $("#launchSourceEditorError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Error launching Source Editor. Please try again later.</div>");
-
-                $("#btnLaunchSourceEditor").prop("disabled", false);
-            }
-        });
-    });
+    $("#launchSourceEditorLink").attr("href", href);
 }
 
 function initialiseWorkspaceTypeahead() {
