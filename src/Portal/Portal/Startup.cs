@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
@@ -170,7 +171,8 @@ namespace Portal
                 s.GetService<IOptions<GeneralConfig>>(),
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
-                s.GetService<HttpProvider>()));
+                s.GetService<HttpProvider>(),
+                s.GetService<ILogger<DirectoryService>>()));
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });

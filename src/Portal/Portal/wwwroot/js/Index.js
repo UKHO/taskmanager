@@ -54,7 +54,16 @@
             $('.typeahead').typeahead('close');
         });
 
+    $("#btnCancelAssignTask").on("click",
+        function() {
+            $("#AssignTaskErrorMessages").collapse("hide");
+            $("#AssignTaskErrorMessages").empty();
+        });
+
     $("#btnAssignTaskToUser").on("click", function () {
+
+        $("#AssignTaskErrorMessages").collapse("hide");
+        $("#AssignTaskErrorMessages").empty();
 
         if ($("#txtUsername").val() === "") {
             $("#assignTaskTypeaheadError").show();
@@ -88,12 +97,20 @@
                 //getComments();
             },
             error: function (error) {
-                console.log(error);
+               // console.log(error);
+               var responseJson = error.responseJSON;
 
-                //$("#AddCommentError")
-                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
-
-                //$("#btnPostComment").prop("disabled", false);
+               if (responseJson != null) {
+                   var unOrderedList = $("#AssignTaskErrorMessages"); 
+                   responseJson.forEach(function(item) {
+                       unOrderedList.append("<p>" + item + "</p>");
+                       console.log(item);
+                   });
+                 
+                   $("#AssignTaskErrorMessages").collapse("show");
+                   $("#btnAssignTaskToUser").prop("disabled", false);
+               }
+               //$("#btnPostComment").prop("disabled", false);
             }
         });
 

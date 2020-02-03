@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.Reviewer) ))
+                @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.Reviewer)))
                 {
                     <tr>
                         <td>
@@ -255,6 +255,7 @@
                                 <span id="assignTaskErrorMsg">Failed to look up users</span>
                             </h5>
                         </section>
+                        <div id="AssignTaskErrorMessages" class="dialog error collapse mt-3 pb-1"></div>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
@@ -269,6 +270,7 @@
         </div>
     </div>
 </div>
+
 
 @section Scripts {
 

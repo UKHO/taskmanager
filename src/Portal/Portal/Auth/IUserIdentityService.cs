@@ -6,5 +6,6 @@ namespace Portal.Auth
     public interface IUserIdentityService
     {
         Task<string> GetFullNameForUser(ClaimsPrincipal user);
+        Task<bool> ValidateUser(string username);
     }
 }

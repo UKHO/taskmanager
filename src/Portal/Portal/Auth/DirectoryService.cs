@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Configuration;
@@ -12,13 +13,18 @@ namespace Portal.Auth
     public class DirectoryService : IDirectoryService
     {
         private readonly IOptions<SecretsConfig> _secretsConfig;
+        private readonly ILogger<DirectoryService> _logger;
         private GraphServiceClient GraphClient { get; }
 
-
         public DirectoryService(IOptions<SecretsConfig> secretsConfig,
-            IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
+            IOptions<GeneralConfig> generalConfig,
+            IOptions<UriConfig> uriConfig,
+            bool isLocalDevelopment,
+            IHttpProvider httpProvider,
+            ILogger<DirectoryService> logger)
         {
             _secretsConfig = secretsConfig;
+            _logger = logger;
             var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.LocalDevLandingPageHttpsUrl}signin-oidc" :
                 $"{uriConfig.Value.LandingPageUrl}/signin-oidc";
 
@@ -33,27 +39,36 @@ namespace Portal.Auth
 
         public async Task<IEnumerable<string>> GetGroupMembers()
         {
-            var groupId = _secretsConfig.Value.HDTGuid;
+            var groups = new List<Guid> { _secretsConfig.Value.HDTGuid }.Where(groupId => groupId != Guid.Empty);
+
+            if (!groups.Any()) throw new ApplicationException($"No GUIDs supplied.");
+
+            var users = new List<DirectoryObject>();
 
             try
             {
-                var group = await GraphClient.Groups[groupId.ToString()].Request().Expand("members").GetAsync();
-
-                if (group.Members == null || !group.Members.Any())
+                foreach (var groupId in groups)
                 {
-                    //TODO: Log!
-                    throw new ApplicationException($"Unable to get members of group.");
+                    var membersPage = await GraphClient.Groups[groupId.ToString()].Members.Request().GetAsync();
+                    do
+                    {
+                        users.AddRange(membersPage?.CurrentPage);
+
+                    } while (membersPage?.NextPageRequest != null &&
+                             (membersPage = await (membersPage?.NextPageRequest.GetAsync())).Count > 0);
                 }
 
-                //TODO: Log count
-                var members = group.Members.Select(o => ((User) o).DisplayName);
+                if (users.Count == 0)
+                {
+                    throw new ApplicationException($"Unable to get members of group(s)");
+                }
 
-                return members;
+                return users.Select(o => ((User)o).DisplayName).OrderBy(s => s);
             }
+
             catch (Exception e)
             {
-                //TODO: Log!
-                throw;
+                throw new ApplicationException("Failed to retrieve group members", e);
             }
         }
     }
