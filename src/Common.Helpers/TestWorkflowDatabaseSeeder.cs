@@ -24,6 +24,7 @@ namespace Common.Helpers
         {
 
             DatabasesHelpers.ClearWorkflowDbTables(_context);
+            PopulateHpdUser();
             PopulateHpdUsage();
             PopulateProductActionType();
             PopulateAssignedTaskSourceType();
@@ -40,6 +41,16 @@ namespace Common.Helpers
             var hpdUsages = JsonConvert.DeserializeObject<IEnumerable<HpdUsage>>(jsonString);
 
             _context.HpdUsage.AddRange(hpdUsages);
+        }
+
+        private void PopulateHpdUser()
+        {
+            if (!File.Exists(@"Data\HpdUsers.json")) throw new FileNotFoundException(@"Data\HpdUsers.json");
+
+            var jsonString = File.ReadAllText(@"Data\HpdUsers.json");
+            var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
+
+            _context.HpdUser.AddRange(hpdUsers);
         }
 
         private void PopulateProductActionType()
