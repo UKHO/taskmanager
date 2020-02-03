@@ -27,6 +27,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
+using Portal.Pages.DbAssessment;
 using Serilog;
 using Serilog.Events;
 using WorkflowDatabase.EF;
@@ -154,6 +155,7 @@ namespace Portal
             services.AddScoped<ICommentsHelper, CommentsHelper>();
             services.AddScoped<ITaskDataHelper, TaskDataHelper>();
             services.AddScoped<IPageValidationHelper, PageValidationHelper>();
+            services.AddScoped<ISessionFileGenerator, SessionFileGenerator>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
