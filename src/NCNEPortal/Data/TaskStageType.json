@@ -1,0 +1,97 @@
+[
+  { "TaskStageTypeId" : 1, 
+    "Name": "Specification",
+    "SequenceNumber": 1,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 2,
+    "Name": "Compile Chart",
+    "SequenceNumber": 2,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 3,
+    "Name": "V1",
+    "SequenceNumber": 3,
+    "AllowRework": true
+  },
+  {
+    "TaskStageTypeId": 4,
+    "Name": "V1 rework",
+    "SequenceNumber": 4,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 5,
+    "Name": "V2",
+    "SequenceNumber": 5,
+    "AllowRework": true
+  },
+  {
+    "TaskStageTypeId": 6,
+    "Name": "V2 rework",
+    "SequenceNumber": 6,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 7,
+    "Name": "Forms",
+    "SequenceNumber": 7,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 8,
+    "Name": "Final updating",
+    "SequenceNumber": 8,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 9,
+    "Name": "100% check",
+    "SequenceNumber": 9,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 10,
+    "Name": "Commit to print",
+    "SequenceNumber": 10,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 11,
+    "Name": "CIS",
+    "SequenceNumber": 11,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 12,
+    "Name": "Publication",
+    "SequenceNumber": 12,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 13,
+    "Name": "Publish chart",
+    "SequenceNumber": 13,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 14,
+    "Name": "Clear vector",
+    "SequenceNumber": 14,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 15,
+    "Name": "Retire old minor version",
+    "SequenceNumber": 15,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 16,
+    "Name": "Consider withdrawn charts",
+    "SequenceNumber": 16,
+    "AllowRework": false
+  }
+]

@@ -93,8 +93,16 @@ namespace Common.Helpers
 
         public static void ClearNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
         {
-            dbContext.Database.ExecuteSqlCommand("delete from [NcneTaskNote]");
-            dbContext.Database.ExecuteSqlCommand("delete from [NcneTaskInfo]");
+
+            dbContext.TaskStageComment.RemoveRange(dbContext.TaskStageComment);
+            dbContext.TaskComment.RemoveRange(dbContext.TaskComment);
+            dbContext.TaskRole.RemoveRange(dbContext.TaskRole);
+            dbContext.TaskStage.RemoveRange(dbContext.TaskStage);
+            dbContext.TaskNote.RemoveRange(dbContext.TaskNote);
+            dbContext.TaskInfo.RemoveRange(dbContext.TaskInfo);
+            dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
+            dbContext.ChartType.RemoveRange(dbContext.ChartType);
+            dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
         }
     }
