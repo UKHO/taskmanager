@@ -1,5 +1,8 @@
 ﻿$(document).ready(function () {
 
+    // Required unless we refactor behaviour around errors
+    var usersFetched = false;
+
     $(".taskNoteItem").on("click",
         function () {
 
@@ -25,16 +28,15 @@
         $("#txtNote").focus();
     });
 
-    $("#btnPostTaskNote").on("submit", function () {
-        $("#btnPostTaskNote").prop("disabled", true);
+    $("#btnPostTaskNote").on("submit",
+        function () {
+            $("#btnPostTaskNote").prop("disabled", true);
 
-    });
+        });
 
     $(".assignTaskItem").on("click",
         function () {
-
-            $("#btnAssignTaskToUser").prop("disabled", false);
-            $("#AssignTaskError").html("");
+            //$("#btnAssignTaskToUser").prop("disabled", false);
 
             var processId = $(this).data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
@@ -55,94 +57,104 @@
         });
 
     $("#btnCancelAssignTask").on("click",
-        function() {
-            $("#AssignTaskErrorMessages").collapse("hide");
-            $("#AssignTaskErrorMessages").empty();
+        function () {
+            if (usersFetched) removeAssignUserErrors();
         });
 
-    $("#btnAssignTaskToUser").on("click", function () {
+    $("#btnAssignTaskToUser").on("click",
+        function () {
 
-        $("#AssignTaskErrorMessages").collapse("hide");
-        $("#AssignTaskErrorMessages").empty();
+            removeAssignUserErrors();            
 
-        if ($("#txtUsername").val() === "") {
-            $("#assignTaskTypeaheadError").show();
-            $("#assignTaskErrorMsg").text("Please enter a user.");
-            return;
-        }
+            if ($("#txtUsername").val() === "") {
+                
+                var errorArray = ["Please enter a user"];
+                displayAssignUserErrors(errorArray);
 
-        $("#btnAssignTaskToUser").prop("disabled", true);
-
-        var processId = $("#hdnAssignTaskProcessId").val();
-        var userName = $("#txtUsername").val();
-        var taskStage = $("#hdnAssignTaskStage").val();
-
-        $.ajax({
-            type: "POST",
-            url: "Index/?handler=AssignTaskToUser",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "processId": processId,
-                "userName": userName,
-                "taskStage": taskStage
-            },
-            success: function (result) {
-                $("#assignTaskModal").modal("hide");
-                $("body").removeClass("modal-open");
-                $(".modal-backdrop").remove();
-
-                window.location.reload();
-                //getComments();
-            },
-            error: function (error) {
-               // console.log(error);
-               var responseJson = error.responseJSON;
-
-               if (responseJson != null) {
-                   var unOrderedList = $("#AssignTaskErrorMessages"); 
-                   responseJson.forEach(function(item) {
-                       unOrderedList.append("<p>" + item + "</p>");
-                       console.log(item);
-                   });
-                 
-                   $("#AssignTaskErrorMessages").collapse("show");
-                   $("#btnAssignTaskToUser").prop("disabled", false);
-               }
-               //$("#btnPostComment").prop("disabled", false);
+                return;
             }
-        });
 
-    });
+            $("#btnAssignTaskToUser").prop("disabled", true);
+
+            var processId = $("#hdnAssignTaskProcessId").val();
+            var userName = $("#txtUsername").val();
+            var taskStage = $("#hdnAssignTaskStage").val();
+
+            $.ajax({
+                type: "POST",
+                url: "Index/?handler=AssignTaskToUser",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "processId": processId,
+                    "userName": userName,
+                    "taskStage": taskStage
+                },
+                success: function (result) {
+                    $("#assignTaskModal").modal("hide");
+                    $("body").removeClass("modal-open");
+                    $(".modal-backdrop").remove();
+
+                    window.location.reload();
+                },
+                error: function (error) {
+                    var responseJson = error.responseJSON;
+
+                    displayAssignUserErrors(responseJson);
+
+                    $("#assignTaskErrorMessages").collapse("show");
+                    $("#btnAssignTaskToUser").prop("disabled", false);
+                }
+            });
+
+        });
 
     initialiseAssignTaskTypeahead();
 
     function initialiseAssignTaskTypeahead() {
-        $('#assignTaskTypeaheadError').collapse("hide");
+
+        $('#assignTaskErrorMessages').collapse("hide");
+
         // Constructing the suggestion engine
         var users = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: "Index/?handler=Users",
-                ttl: 600000
+                ttl: 60000
             },
             initialize: false
         });
 
         var promise = users.initialize();
-        promise.fail(function () {
-            $('#assignTaskTypeaheadError').collapse("show");
-        });
+        promise
+            .done(function () {
+                $("#btnAssignTaskToUser").prop("disabled", false);
+                $("#txtUsername").prop("disabled", false);
+
+                removeAssignUserErrors();
+
+                usersFetched = true;
+            })
+            .fail(function () {
+                $("#btnAssignTaskToUser").prop("disabled", true);
+                $("#txtUsername").prop("disabled", true);
+
+                var errorArray = ["Failed to look up users. Try refreshing the page."];
+                displayAssignUserErrors(errorArray);
+
+                usersFetched = false;
+            });
 
         // Initializing the typeahead
         $('.typeahead').typeahead({
             hint: true,
-            highlight: true, /* Enable substring highlighting */
+            highlight: true,    /* Enable substring highlighting */
 
             minLength:
-                3 /* Specify minimum characters required for showing result */
+                3               /* Specify minimum characters required for showing result */
         },
             {
                 name: 'users',
@@ -154,3 +166,22 @@
             });
     }
 });
+
+function displayAssignUserErrors(errorStringArray) {
+
+    // == to catch undefined and null
+    if (errorStringArray == null) return;
+
+    var orderedList = $("#assignTaskErrorList");
+
+    errorStringArray.forEach(function (item) {
+        orderedList.append("<li>" + item + "</li>");
+    });
+
+    $("#assignTaskErrorMessages").collapse("show");
+}
+
+function removeAssignUserErrors() {
+    $("#assignTaskErrorMessages").collapse("hide");
+    $("#assignTaskErrorList").empty();
+}
