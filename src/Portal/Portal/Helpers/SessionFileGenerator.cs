@@ -127,11 +127,13 @@ namespace Portal.Helpers
                 }));
             }
 
-            var linkedDocs = _dbContext.LinkedDocument.Where(ad => ad.ProcessId == processId);
+            var attachedLinkedDocs = _dbContext.LinkedDocument.Where(ad => 
+                                                            ad.ProcessId == processId 
+                                                            && !ad.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(), StringComparison.OrdinalIgnoreCase));
 
-            if (await linkedDocs.AnyAsync())
+            if (await attachedLinkedDocs.AnyAsync())
             {
-                sources.AddRange(linkedDocs.Select(ld => new SessionFile.PropertyNode
+                sources.AddRange(attachedLinkedDocs.Select(ld => new SessionFile.PropertyNode
                 {
                     Name = ld.SourceDocumentName,
                     Type = "Source",
