@@ -104,7 +104,6 @@
 
                     displayAssignUserErrors(responseJson);
 
-                    $("#assignTaskErrorMessages").collapse("show");
                     $("#btnAssignTaskToUser").prop("disabled", false);
                 }
             });
