@@ -17,12 +17,14 @@ function getEditDatabase() {
         success: function (result) {
             $("#editDatabase").html(result);
             launchSourceEditorDownloadHandler();
-            //setLaunchSourceEditorHref(processId.processId);
             initialiseWorkspaceTypeahead();
         },
         error: function (error) {
+
+            var errorMessage = error.getResponseHeader("Error");
+
             $("#editDatabaseError")
-                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database.</div>");
+                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database. " + errorMessage + "</div>");
         }
     });
 }
@@ -61,7 +63,7 @@ function launchSourceEditorDownloadHandler() {
                 var errorMessage = error.getResponseHeader("Error");
 
                 $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File." + errorMessage + "</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File. " + errorMessage + "</div>");
             },
             complete: function() {
 
@@ -72,16 +74,6 @@ function launchSourceEditorDownloadHandler() {
         });
 
     });
-}
-
-//function setLaunchSourceEditorHref(processId) {
-//    var pageIdentity = $("#pageIdentity").val();
-//    var href = "_EditDatabase/?handler=LaunchSourceEditor" +
-//        "&processId=" + processId +
-//        "&taskStage=" + pageIdentity;
-
-//    $("#launchSourceEditorLink").attr("href", href);
-//}
 
 function initialiseWorkspaceTypeahead() {
     $('#workspaceTypeaheadError').collapse("hide");
