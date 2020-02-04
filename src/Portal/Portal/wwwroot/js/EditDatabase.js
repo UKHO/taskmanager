@@ -24,7 +24,9 @@ function getEditDatabase() {
             var errorMessage = error.getResponseHeader("Error");
 
             $("#editDatabaseError")
-                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database. " + errorMessage + "</div>");
+                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database. "
+                    + errorMessage
+                    + "</div>");
         }
     });
 }
@@ -63,9 +65,11 @@ function launchSourceEditorDownloadHandler() {
                 var errorMessage = error.getResponseHeader("Error");
 
                 $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File. " + errorMessage + "</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File. "
+                        + errorMessage
+                        + "</div>");
             },
-            complete: function() {
+            complete: function () {
 
                 $("#btnLaunchSourceEditorDownload").prop("disabled", false);
                 $("#hdnDownloadLink").removeAttr("href");
@@ -74,6 +78,7 @@ function launchSourceEditorDownloadHandler() {
         });
 
     });
+}
 
 function initialiseWorkspaceTypeahead() {
     $('#workspaceTypeaheadError').collapse("hide");
