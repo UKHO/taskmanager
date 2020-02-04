@@ -31,7 +31,7 @@ namespace Portal.Helpers
 
             if (userFullName == "Unknown")
             {
-                throw new ArgumentNullException(nameof(userFullName), "Unable to get username from Active Directory. Please ensure user exists in AD group.");
+                throw new ArgumentNullException(nameof(userFullName), "Unable to get username from Active Directory.");
             }
 
             try
@@ -41,7 +41,7 @@ namespace Portal.Helpers
             }
             catch (InvalidOperationException ex)
             {
-                throw new InvalidOperationException($"Unable to find HPD username for {userFullName}. Please ensure the relevant row has been created in that table there.",
+                throw new InvalidOperationException($"Unable to find HPD username for {userFullName}.",
                     ex.InnerException);
             }
 
