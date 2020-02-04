@@ -39,7 +39,11 @@ namespace Portal.Auth
 
         public async Task<IEnumerable<string>> GetGroupMembers()
         {
-            var groups = new List<Guid> { _secretsConfig.Value.HDTGuid }.Where(groupId => groupId != Guid.Empty);
+            var groups = new List<Guid>
+            {
+                _secretsConfig.Value.HDTGuid,
+                _secretsConfig.Value.HDCGuid
+            }.Where(groupId => groupId != Guid.Empty);
 
             if (!groups.Any()) throw new ApplicationException($"No GUIDs supplied.");
 
