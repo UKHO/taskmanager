@@ -1,9 +1,9 @@
 [
   {
 
-    "ion": 232,
+    "ion": "232",
     "country": "UK",
-    "chartNumber": 23,
+    "chartNumber": "23",
     "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Adoption",
@@ -163,9 +163,9 @@
   },
   {
 
-    "ion": 232,
+    "ion": "232",
     "country": "UK",
-    "chartNumber": 26,
+    "chartNumber": "26",
     "ChartTitle": "New Title",
     "chartType": "NE",
     "workflowType": "Derived",
@@ -296,9 +296,9 @@
   },
   {
 
-    "ion": 232,
+    "ion": "232",
     "country": "UK",
-    "chartNumber": 28,
+    "chartNumber": "28",
     "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Derived",
@@ -429,9 +429,9 @@
   },
   {
 
-    "ion": 232,
+    "ion": "232",
     "country": "UK",
-    "chartNumber": 35,
+    "chartNumber": "35",
     "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Derived",
@@ -564,7 +564,7 @@
 
     "ion": 232,
     "country": "UK",
-    "chartNumber": 45,
+    "chartNumber": "45",
     "ChartTitle": "Hamoaze",
     "chartType": "NE",
     "workflowType": "Derived",

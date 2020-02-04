@@ -4,7 +4,7 @@
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update', new Date());
+    }).datepicker('update');
 
     $("#btnClose").click(function() {
         window.location.href = '/Index';
