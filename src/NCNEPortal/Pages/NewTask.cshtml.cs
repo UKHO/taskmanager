@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NCNEPortal.Models;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
@@ -13,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ChartType = NCNEPortal.Models.ChartType;
+using User = NCNEPortal.Models.User;
 using WorkflowType = NCNEPortal.Models.WorkflowType;
 
 
@@ -26,7 +26,7 @@ namespace NCNEPortal
         [DisplayName("ION")] public string Ion { get; set; }
 
         [BindProperty]
-        [DisplayName("Chart number")] public int ChartNo { get; set; }
+        [DisplayName("Chart number")] public string ChartNo { get; set; }
 
         [BindProperty]
         [DisplayName("Country:")] public string Country { get; set; }
@@ -49,19 +49,19 @@ namespace NCNEPortal
         [BindProperty]
         [DisplayName("Publication date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime PublicationDate { get; set; }
+        public DateTime? PublicationDate { get; set; }
 
         [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime AnnounceDate { get; set; }
+        public DateTime? AnnounceDate { get; set; }
 
         [DisplayName("Commit to Print:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CommitToPrintDate { get; set; }
+        public DateTime? CommitToPrintDate { get; set; }
 
         [DisplayName("CIS:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CISDate { get; set; }
+        public DateTime? CISDate { get; set; }
 
         [BindProperty]
         [DisplayName("Compiler")]
@@ -93,7 +93,7 @@ namespace NCNEPortal
 
 
             Ion = "";
-            ChartNo = 0;
+            ChartNo = "";
             Country = "United Kingdom";
 
             SetChartTypes();
@@ -101,10 +101,10 @@ namespace NCNEPortal
 
             SetUsers();
 
-            PublicationDate = DateTime.Today;
-            AnnounceDate = DateTime.Today.AddDays(7);
+            PublicationDate = null;
+            /*AnnounceDate = DateTime.Today.AddDays(7);
             CommitToPrintDate = AnnounceDate.AddDays(7);
-            CISDate = CommitToPrintDate.AddDays(7);
+            CISDate = CommitToPrintDate.AddDays(7);*/
         }
 
         public void OnGet()
@@ -114,9 +114,10 @@ namespace NCNEPortal
 
         public async Task<IActionResult> OnPost()
         {
-            AnnounceDate = PublicationDate.AddDays(-7);
-            CommitToPrintDate = PublicationDate.AddDays(-7);
-            CISDate = PublicationDate.AddDays(-7);
+
+            AnnounceDate = PublicationDate?.AddDays(-7);
+            CommitToPrintDate = PublicationDate?.AddDays(-7);
+            CISDate = PublicationDate?.AddDays(-7);
 
             var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(new TaskInfo()
             {

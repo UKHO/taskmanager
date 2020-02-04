@@ -84,16 +84,16 @@
                             @task.AssignedUser
                         </td>
                         <td>
-                            @task.AnnounceDate.ToShortDateString()
+                            @task.AnnounceDate?.ToShortDateString()
                         </td>
                         <td>
-                            @task.CommitDate.ToShortDateString()
+                            @task.CommitDate?.ToShortDateString()
                         </td>
                         <td>
-                            @task.CisDate.ToShortDateString()
+                            @task.CisDate?.ToShortDateString()
                         </td>
                         <td>
-                            @task.PublicationDate.ToShortDateString()
+                            @task.PublicationDate?.ToShortDateString()
                         </td>
                         <td>
                             @task.Country

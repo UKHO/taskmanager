@@ -60,7 +60,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -142,7 +142,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -209,7 +209,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -257,7 +257,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -308,7 +308,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -362,7 +362,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 Ion = "232",
                 Country = "UK",
-                ChartNumber = 35,
+                ChartNumber = "35",
                 ChartTitle = "Hamoaze",
                 ChartType = "NE",
                 WorkflowType = "Derived",
@@ -402,66 +402,5 @@ namespace NCNEWorkflowDatabase.Tests
 
         }
 
-        //[Test]
-        //public void Ensure_TaskStage_prevents_duplicate_Stage_with_Same_ProcessId_PK()
-        //{
-        //    //Create a single stage type for testing
-
-        //    _dbContext.Add<TaskStageType>(new TaskStageType()
-        //    { Name = "Specification", TaskStageTypeId = 1, AllowRework = false, SequenceNumber = 1 });
-
-        //    _dbContext.Add<TaskStageType>(new TaskStageType()
-        //    { Name = "Specification", TaskStageTypeId = 2, AllowRework = false, SequenceNumber = 1 });
-
-        //    var taskInfo = _dbContext.Add<TaskInfo>(new TaskInfo()
-        //    {
-        //        Ion = "232",
-        //        Country = "UK",
-        //        ChartNumber = 35,
-        //        ChartTitle = "Hamoaze",
-        //        ChartType = "NE",
-        //        WorkflowType = "Derived",
-        //        Duration = "3 Weeks",
-        //        PublicationDate = DateTime.Now,
-        //        AnnounceDate = DateTime.Now,
-        //        CommitDate = DateTime.Now,
-        //        CisDate = DateTime.Now,
-        //        AssignedUser = "Hannah Kent",
-        //        AssignedDate = DateTime.Now
-        //    });
-
-        //    _dbContext.SaveChanges();
-
-        //    var processId = taskInfo.Entity.ProcessId;
-
-        //    var stage = _dbContext.TaskStage.Add(new TaskStage()
-        //    {
-        //        Status = "InProgress",
-        //        TaskStageTypeId = 1,
-        //        DateCompleted = null,
-        //        DateExpected = null,
-        //        ProcessId = processId
-        //    });
-
-        //    _dbContext.SaveChanges();
-
-        //    var stageId = stage.Entity.TaskStageId;
-
-        //    using var newContext = new NcneWorkflowDbContext(_dbContextOptions);
-        //    newContext.Add<TaskStage>(new TaskStage()
-
-        //    {
-        //        Status = "InProgress",
-        //        TaskStageTypeId = 21,
-        //        DateCompleted = null,
-        //        DateExpected = null,
-        //        ProcessId = processId,
-        //        TaskStageId = stageId
-        //    }
-        //    );
-
-        //    var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
-        //    Assert.That(ex.InnerException != null && ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint ", StringComparison.OrdinalIgnoreCase));
-        //}
     }
 }

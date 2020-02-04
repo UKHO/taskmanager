@@ -4,7 +4,7 @@
     ViewData["Title"] = "New Chart/New Edition New Task";
 }
 
-<form method="post">
+<form method="post" autocomplete="off">
     <div class="row pt-1 pb-1 align-items-center">
         <div class="col-4 col-lg-3">
             <a asp-page="./Index">
@@ -64,7 +64,7 @@
                             <div class="row">
                                 <div class="col">
                                     @Html.TextBoxFor(model => model.ChartNo, "",
-                                        new { placeholder = "Chart Number", @type = "number", onkeypress = "if (this.value.length==9) return false;", @class = "form-control form-text-input" })
+                                        new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
                                 </div>
                             </div>
                         </div>

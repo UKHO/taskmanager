@@ -12,16 +12,16 @@ namespace NCNEWorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
 
         public string Ion { get; set; }
-        public int ChartNumber { get; set; }
+        public string ChartNumber { get; set; }
         public string Country { get; set; }
         public string ChartType { get; set; }
         public string ChartTitle { get; set; }
         public string WorkflowType { get; set; }
         public string Duration { get; set; }
-        public DateTime PublicationDate { get; set; }
-        public DateTime AnnounceDate { get; set; }
-        public DateTime CommitDate { get; set; }
-        public DateTime CisDate { get; set; }
+        public DateTime? PublicationDate { get; set; }
+        public DateTime? AnnounceDate { get; set; }
+        public DateTime? CommitDate { get; set; }
+        public DateTime? CisDate { get; set; }
         public bool Sdr { get; set; } = false;
         public bool Geodesy { get; set; } = false;
         public bool ThreePs { get; set; } = false;
