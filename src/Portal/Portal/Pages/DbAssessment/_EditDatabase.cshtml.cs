@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
 using Portal.Configuration;
+using Portal.Helpers;
 using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
@@ -26,7 +27,6 @@ namespace Portal.Pages.DbAssessment
         private readonly ILogger<_EditDatabaseModel> _logger;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private IUserIdentityService _userIdentityService;
-        private readonly IOptions<SecretsConfig> _secretsConfig;
 
         [DisplayName("Select CARIS Workspace:")]
         public string SelectedCarisWorkspace { get; set; }
@@ -35,22 +35,29 @@ namespace Portal.Pages.DbAssessment
         public string ProjectName { get; set; }
 
         private string _userFullName;
+        private readonly ISessionFileGenerator _sessionFileGenerator;
+
         public string UserFullName
         {
             get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
             private set => _userFullName = value;
         }
 
+        public WorkflowDbContext DbContext
+        {
+            get { return _dbContext; }
+        }
+
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
             IUserIdentityService userIdentityService,
-            IOptions<SecretsConfig> secretsConfig)
+            ISessionFileGenerator sessionFileGenerator)
         {
             _dbContext = dbContext;
             _logger = logger;
             _generalConfig = generalConfig;
             _userIdentityService = userIdentityService;
-            _secretsConfig = secretsConfig;
+            _sessionFileGenerator = sessionFileGenerator;
         }
 
         public async Task OnGetAsync(int processId)
@@ -71,7 +78,8 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
-            var sessionFile = await PopulateSessionFile(processId);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(processId, UserFullName);
 
             var serializer = new XmlSerializer(typeof(SessionFile));
 
@@ -97,126 +105,6 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(ex, "Failed to generate session file.");
                 return StatusCode(500);
             }
-        }
-
-        private async Task<SessionFile> PopulateSessionFile(int processId)
-        {
-            // TODO: Get data from db to populate session file
-
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-            HpdUser hpdUser;
-
-            if (UserFullName == "Unknown")
-            {
-                throw new ArgumentNullException(nameof(UserFullName), "Unable to get username from Active Directory. Please ensure user exists in AD group.");
-            }
-
-            try
-            {
-                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
-                     StringComparison.CurrentCultureIgnoreCase));
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}. Please ensure the relevant row has been created in that table there.",
-                    ex.InnerException);
-            }
-
-
-            //TODO: Select correct DataImpact if more than one
-            var dataImpact = _dbContext.DataImpact.Include(di => di.HpdUsage)
-                .FirstOrDefault(di => di.ProcessId == processId);
-            var hpdUsageName = dataImpact == null ? string.Empty : dataImpact.HpdUsage.Name;
-
-
-            var sources = await SetSources(processId);
-
-            return new SessionFile
-            {
-                CarisWorkspace =
-                {
-                    DataSources = new SessionFile.DataSourcesNode
-                    {
-                        DataSource = new SessionFile.DataSourceNode
-                        {
-                            SourceParam = new SessionFile.SourceParamNode
-                            {
-                                SERVICENAME=_secretsConfig.Value.HpdServiceName,
-                                USERNAME=hpdUser.HpdUsername,
-                                ASSIGNED_USER = hpdUser.HpdUsername,
-                                USAGE=hpdUsageName,
-                                WORKSPACE="19_29_SDRA4.1 registration test2",
-                                SecureCredentialPlugin="{guid in here}",
-                            SecureCredentialPlugin_UserParam="UserParameter",
-                            HAS_BOUNDARY="true",
-                            OPENED_BY_PROJECT="true",
-                            PROJECT="19_29_SDRA4.1 registration test2",
-                            PROJECT_ID="53756"
-                            },
-                            SourceString = "HPD:Project:19_29",
-                            UserLayers = ""
-                        }
-                    },
-                    Views = new SessionFile.ViewsNode
-                    {
-                        View = new SessionFile.ViewNode
-                        {
-                            DisplayState = new SessionFile.DisplayStateNode
-                            {
-                                DisplayLayer = new SessionFile.DisplayLayerNode
-                                {
-                                    Visible = "true",
-                                    Expanded = "false",
-                                    Name = "registration test2:Nav 15"
-                                }
-                            }
-                        }
-                    },
-                    Properties = new SessionFile.PropertiesNode
-                    {
-                        Property = sources
-                    }
-                }
-            };
-        }
-
-        private async Task<List<SessionFile.PropertyNode>> SetSources(int processId)
-        {
-            var sources = new List<SessionFile.PropertyNode>();
-
-            sources.AddRange(_dbContext.AssessmentData.Where(ad => ad.ProcessId == processId)
-                .Select(ad => new SessionFile.PropertyNode()
-                {
-                    Name = ad.SourceDocumentName,
-                    Type = "Source",
-                    Source = ""
-                }));
-
-            var ddsRows = _dbContext.DatabaseDocumentStatus.Where(ad => ad.ProcessId == processId);
-
-            if (await ddsRows.AnyAsync())
-            {
-                sources.AddRange(ddsRows.Select(dds => new SessionFile.PropertyNode
-                {
-                    Name = dds.SourceDocumentName,
-                    Type = "Source",
-                    Source = ""
-                }));
-            }
-
-            var linkedDocs = _dbContext.LinkedDocument.Where(ad => ad.ProcessId == processId);
-
-            if (await linkedDocs.AnyAsync())
-            {
-                sources.AddRange(linkedDocs.Select(ld => new SessionFile.PropertyNode
-                {
-                    Name = ld.SourceDocumentName,
-                    Type = "Source",
-                    Source = ""
-                }));
-            }
-
-            return sources;
         }
     }
 }
