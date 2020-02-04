@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -18,6 +19,7 @@ using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
+using Newtonsoft.Json;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -72,6 +74,7 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage)
         {
+            return StatusCode(500, "Failed Testing");
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
@@ -90,7 +93,7 @@ namespace Portal.Pages.DbAssessment
 
                 fs.Position = 0;
 
-                return File(fs, MediaTypeNames.Application.Xml, _generalConfig.Value.SessionFilename);
+                return File(fs, MediaTypeNames.Application.Octet, _generalConfig.Value.SessionFilename);
             }
             catch (InvalidOperationException ex)
             {

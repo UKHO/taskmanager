@@ -16,7 +16,8 @@ function getEditDatabase() {
         data: processId,
         success: function (result) {
             $("#editDatabase").html(result);
-            setLaunchSourceEditorHref(processId.processId);
+            launchSourceEditorDownloadHandler();
+            //setLaunchSourceEditorHref(processId.processId);
             initialiseWorkspaceTypeahead();
         },
         error: function (error) {
@@ -26,14 +27,61 @@ function getEditDatabase() {
     });
 }
 
-function setLaunchSourceEditorHref(processId) {
-    var pageIdentity = $("#pageIdentity").val();
-    var href = "_EditDatabase/?handler=LaunchSourceEditor" +
-        "&processId=" + processId +
-        "&taskStage=" + pageIdentity;
+function launchSourceEditorDownloadHandler() {
+    $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
-    $("#launchSourceEditorLink").attr("href", href);
+        var processId = Number($("#hdnProcessId").val());
+        var pageIdentity = $("#pageIdentity").val();
+
+        $.ajax({
+            type: "GET",
+            xhrFields: {
+                responseType: 'blob'
+            },
+            url: "_EditDatabase/?handler=LaunchSourceEditor",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: {
+                "processId": processId,
+                "taskStage": pageIdentity
+            },
+            success: function (data) {
+
+                var a = document.createElement('a');
+                var url = window.URL.createObjectURL(data);
+                a.href = url;
+                a.download = 'myfile.xml';
+                document.body.append(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: function (error, message) {
+                var errorMessage = error.responseJSON;
+                alert('Error - ' + errorMessage);
+                $("#editDatabaseError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database.</div>");
+            },
+            complete: function() {
+
+                $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+            }
+        });
+
+    });
 }
+
+//function setLaunchSourceEditorHref(processId) {
+//    var pageIdentity = $("#pageIdentity").val();
+//    var href = "_EditDatabase/?handler=LaunchSourceEditor" +
+//        "&processId=" + processId +
+//        "&taskStage=" + pageIdentity;
+
+//    $("#launchSourceEditorLink").attr("href", href);
+//}
 
 function initialiseWorkspaceTypeahead() {
     $('#workspaceTypeaheadError').collapse("hide");
