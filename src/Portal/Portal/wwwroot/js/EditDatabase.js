@@ -33,6 +33,7 @@ function launchSourceEditorDownloadHandler() {
 
         var processId = Number($("#hdnProcessId").val());
         var pageIdentity = $("#pageIdentity").val();
+        var sessionFilename = $(this).data("sessionfilename");
 
         $.ajax({
             type: "GET",
@@ -46,28 +47,27 @@ function launchSourceEditorDownloadHandler() {
             contentType: "application/json; charset=utf-8",
             data: {
                 "processId": processId,
-                "taskStage": pageIdentity
+                "taskStage": pageIdentity,
+                "sessionFilename": sessionFilename
             },
             success: function (data) {
 
-                var a = document.createElement('a');
                 var url = window.URL.createObjectURL(data);
-                a.href = url;
-                a.download = 'myfile.xml';
-                document.body.append(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
+                $("#hdnDownloadLink").attr("href", url);
+                $("#hdnDownloadLink").attr("download", sessionFilename);
+                $("#hdnDownloadLink")[0].click();
             },
             error: function (error) {
                 var errorMessage = error.getResponseHeader("Error");
-                alert(errorMessage);
-                $("#editDatabaseError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database.</div>");
+
+                $("#launchSourceEditorDownloadError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File." + errorMessage + "</div>");
             },
             complete: function() {
 
                 $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+                $("#hdnDownloadLink").removeAttr("href");
+                $("#hdnDownloadLink").removeAttr("download");
             }
         });
 

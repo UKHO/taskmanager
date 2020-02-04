@@ -19,12 +19,14 @@ using WorkflowDatabase.EF;
 
 namespace Portal.Pages.DbAssessment
 {
+    [TypeFilter(typeof(JavascriptError))]
     public class _EditDatabaseModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly ILogger<_EditDatabaseModel> _logger;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private IUserIdentityService _userIdentityService;
+        private readonly ISessionFileGenerator _sessionFileGenerator;
 
         [DisplayName("Select CARIS Workspace:")]
         public string SelectedCarisWorkspace { get; set; }
@@ -32,8 +34,9 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("CARIS Project Name:")]
         public string ProjectName { get; set; }
 
+        public string SessionFilename { get; set; } 
+
         private string _userFullName;
-        private readonly ISessionFileGenerator _sessionFileGenerator;
 
         public string UserFullName
         {
@@ -60,6 +63,7 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGetAsync(int processId)
         {
+            SessionFilename = _generalConfig.Value.SessionFilename;
         }
 
         public async Task<JsonResult> OnGetWorkspacesAsync()
@@ -68,10 +72,8 @@ namespace Portal.Pages.DbAssessment
             return new JsonResult(cachedHpdWorkspaces);
         }
 
-        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage)
+        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage, string sessionFilename)
         {
-            //HttpContext.Response.Headers.Add("Error", "dasdasda");
-            //return StatusCode(500);
 
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
@@ -91,20 +93,20 @@ namespace Portal.Pages.DbAssessment
 
                 fs.Position = 0;
 
-                return File(fs, MediaTypeNames.Application.Octet, _generalConfig.Value.SessionFilename);
+                return File(fs, MediaTypeNames.Application.Octet, sessionFilename);
             }
             catch (InvalidOperationException ex)
             {
 
                 fs.Dispose();
                 _logger.LogError(ex, "Failed to serialize Caris session file.");
-                return StatusCode(500);
+                throw;
             }
             catch (Exception ex)
             {
                 fs.Dispose();
                 _logger.LogError(ex, "Failed to generate session file.");
-                return StatusCode(500);
+                throw;
             }
         }
     }
