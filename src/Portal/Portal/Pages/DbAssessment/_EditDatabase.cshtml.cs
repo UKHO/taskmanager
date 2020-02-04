@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -18,8 +16,6 @@ using Portal.Helpers;
 using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
-using Newtonsoft.Json;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -74,7 +70,9 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage)
         {
-            return StatusCode(500, "Failed Testing");
+            //HttpContext.Response.Headers.Add("Error", "dasdasda");
+            //return StatusCode(500);
+
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));

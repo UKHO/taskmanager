@@ -59,9 +59,9 @@ function launchSourceEditorDownloadHandler() {
                 a.remove();
                 window.URL.revokeObjectURL(url);
             },
-            error: function (error, message) {
-                var errorMessage = error.responseJSON;
-                alert('Error - ' + errorMessage);
+            error: function (error) {
+                var errorMessage = error.getResponseHeader("Error");
+                alert(errorMessage);
                 $("#editDatabaseError")
                     .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database.</div>");
             },
