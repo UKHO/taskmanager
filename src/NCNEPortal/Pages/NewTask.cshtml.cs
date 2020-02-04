@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NCNEPortal.Calculators;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ namespace NCNEPortal
     public class NewTaskModel : PageModel
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
+        private readonly IMileStoneCalculator _milestoneCalculator;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -87,9 +89,10 @@ namespace NCNEPortal
 
         public SelectList PublisherList { get; set; }
 
-        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext)
+        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext, IMileStoneCalculator milestoneCalculator)
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
+            _milestoneCalculator = milestoneCalculator;
 
 
             Ion = "";
@@ -102,9 +105,7 @@ namespace NCNEPortal
             SetUsers();
 
             PublicationDate = null;
-            /*AnnounceDate = DateTime.Today.AddDays(7);
-            CommitToPrintDate = AnnounceDate.AddDays(7);
-            CISDate = CommitToPrintDate.AddDays(7);*/
+
         }
 
         public void OnGet()
@@ -115,9 +116,16 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPost()
         {
 
-            AnnounceDate = PublicationDate?.AddDays(-7);
-            CommitToPrintDate = PublicationDate?.AddDays(-7);
-            CISDate = PublicationDate?.AddDays(-7);
+            if ((PublicationDate != null) && (this.Dating == "Two weeks" || this.Dating == "Three weeks"))
+            {
+                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones(Dating, (DateTime)this.PublicationDate);
+
+                this.CommitToPrintDate = commitDate;
+                this.CISDate = cisDate;
+                this.AnnounceDate = formsDate;
+
+
+            }
 
             var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(new TaskInfo()
             {
