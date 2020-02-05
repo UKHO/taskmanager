@@ -5,6 +5,11 @@
 
     function getTaskInformation() {
 
+        var data = {
+            "processId": Number($("#hdnProcessId").val()),
+            "taskStage": $("#pageIdentity").val()
+        };
+
         $.ajax({
             type: "GET",
             url: "_TaskInformation",
@@ -12,9 +17,11 @@
                 xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             contentType: "application/json; charset=utf-8",
-            data: { "processId": processId },
+            data: data,
             success: function (result) {
                 $("#taskInformation").html(result);
+
+                setTaskTypeState();
             },
             error: function (error) {
                 $("#taskInformationError")
@@ -83,5 +90,14 @@
             }
         });
     });
+
+    function setTaskTypeState() {
+        var pageIdentity = $("#pageIdentity").val();
+        if (pageIdentity === "Assess") {
+            $(".taskType").prop("disabled", true);
+        } else if (pageIdentity === "Verify") {
+            $(".productActionVerified").prop("disabled", false);
+        }
+    }
 
 });

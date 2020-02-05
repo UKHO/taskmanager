@@ -86,8 +86,10 @@ namespace Portal.Pages.DbAssessment
             _taskDataHelper = taskDataHelper;
         }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int processId, string taskStage)
         {
+            ProcessId = processId;
+
             await SetTaskInformationData();
 
             var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
