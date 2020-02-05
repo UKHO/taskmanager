@@ -44,7 +44,7 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string SourceCategory { get; set; }
-        
+
         [BindProperty]
         public string TaskType { get; set; }
 
@@ -115,15 +115,16 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!await _pageValidationHelper.ValidatePage(
-                                        "Assess",
+            if (!await _pageValidationHelper.ValidateAssessPage(
+                                            "Assess",
                                                     Ion,
-                                            ActivityCode,
-                                            SourceCategory,
-                                            Verifier,
-                                            RecordProductAction,
-                                            DataImpacts,
-                                            ValidationErrorMessages))
+                                                ActivityCode,
+                                                SourceCategory,
+                                                TaskType,
+                                                Verifier,
+                                                RecordProductAction,
+                                                DataImpacts,
+                                                ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

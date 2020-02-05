@@ -134,7 +134,7 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!_pageValidationHelper.ValidatePage(
+            if (!_pageValidationHelper.ValidateReviewPage(
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
                 ValidationErrorMessages))

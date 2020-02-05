@@ -109,8 +109,8 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!await _pageValidationHelper.ValidatePage(
-                "Verify",
+            if (!await _pageValidationHelper.ValidateVerifyPage(
+            "Verify",
                 Ion,
                 ActivityCode,
                 SourceCategory,
