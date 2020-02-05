@@ -397,7 +397,7 @@ namespace Portal.Helpers
         {
             if (dataImpacts == null || dataImpacts.Count == 0) return true;
 
-            if (dataImpacts.Any(d => d.HpdUsageId == 0))
+            if (dataImpacts.All(d => d.HpdUsageId == 0))
             {
                 return true;
             }
