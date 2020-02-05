@@ -168,14 +168,17 @@
 
 function displayAssignUserErrors(errorStringArray) {
 
-    // == to catch undefined and null
-    if (errorStringArray == null) return;
-
     var orderedList = $("#assignTaskErrorList");
 
-    errorStringArray.forEach(function (item) {
-        orderedList.append("<li>" + item + "</li>");
-    });
+    // == to catch undefined and null
+    if (errorStringArray == null) {
+        orderedList.append("<li>An unknown error has occurred</li>");
+
+    } else {
+        errorStringArray.forEach(function (item) {
+            orderedList.append("<li>" + item + "</li>");
+        });
+    }
 
     $("#assignTaskErrorMessages").collapse("show");
 }
