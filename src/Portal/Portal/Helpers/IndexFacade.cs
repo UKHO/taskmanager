@@ -22,9 +22,9 @@ namespace Portal.Helpers
             return _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
         }
 
-        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, IEnumerable<OnHold> onHoldRows)
+        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, string taskType, string taskStage, IEnumerable<OnHold> onHoldRows)
         {
-            var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveStartDate);
+            var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveStartDate, taskType, taskStage);
             var dmEndDate = result.dmEndDate.Date;
             var daysToDmEndDate = result.daysToDmEndDate;
 
