@@ -55,7 +55,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -164,7 +165,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "dbAssessmentAssignTask": [
       {
@@ -297,7 +299,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 632,
@@ -391,7 +394,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -515,7 +519,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -613,7 +618,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 588,
@@ -707,7 +713,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "dbAssessmentVerifyData": {
       "processId": 688,
@@ -719,7 +726,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 688,

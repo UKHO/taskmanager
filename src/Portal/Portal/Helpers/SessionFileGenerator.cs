@@ -23,10 +23,9 @@ namespace Portal.Helpers
             _secretsConfig = secretsConfig;
         }
 
-        public async Task<SessionFile> PopulateSessionFile(int processId, string userFullName)
+        public async Task<SessionFile> PopulateSessionFile(int processId, string userFullName, string taskStage)
         {
-            // TODO: Get data from db to populate session file
-
+            // User details
             HpdUser hpdUser;
 
             if (userFullName == "Unknown")
@@ -45,12 +44,27 @@ namespace Portal.Helpers
                     ex.InnerException);
             }
 
-
-            //TODO: Select correct DataImpact if more than one
+            // Data impact
             var dataImpact = _dbContext.DataImpact.Include(di => di.HpdUsage)
                 .FirstOrDefault(di => di.ProcessId == processId);
             var hpdUsageName = dataImpact == null ? string.Empty : dataImpact.HpdUsage.Name;
 
+            // TODO: populate Workspace from relevant table
+            string workspaceAffected;
+
+            switch (taskStage)
+            {
+                case "Assess":
+                    var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
+                    workspaceAffected = assessData.WorkspaceAffected;
+                    break;
+                case "Verify":
+                    var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(ad => ad.ProcessId == processId);
+                    workspaceAffected = verifyData.WorkspaceAffected;
+                    break;
+                default:
+                    throw new NotImplementedException($"Unable to establish Caris Workspace as task {processId} is at {taskStage}.");
+            }
 
             var sources = await SetSources(processId);
 
@@ -64,17 +78,17 @@ namespace Portal.Helpers
                         {
                             SourceParam = new SessionFile.SourceParamNode
                             {
-                                SERVICENAME= _secretsConfig.Value.HpdServiceName,
-                                USERNAME=hpdUser.HpdUsername,
+                                SERVICENAME = _secretsConfig.Value.HpdServiceName,
+                                USERNAME = hpdUser.HpdUsername,
                                 ASSIGNED_USER = hpdUser.HpdUsername,
-                                USAGE=hpdUsageName,
-                                WORKSPACE="19_29_SDRA4.1 registration test2",
-                                SecureCredentialPlugin="{guid in here}",
-                                SecureCredentialPlugin_UserParam="UserParameter",
-                                HAS_BOUNDARY="true",
-                                OPENED_BY_PROJECT="true",
-                                PROJECT="19_29_SDRA4.1 registration test2",
-                                PROJECT_ID="53756"
+                                USAGE = hpdUsageName,
+                                WORKSPACE = workspaceAffected,
+                                SecureCredentialPlugin = "{guid in here}",
+                                SecureCredentialPlugin_UserParam = "UserParameter",
+                                HAS_BOUNDARY = "true",
+                                OPENED_BY_PROJECT = "true",
+                                PROJECT = "19_29_SDRA4.1 registration test2",
+                                PROJECT_ID = "53756"
                             },
                             SourceString = "HPD:Project:19_29",
                             UserLayers = ""
@@ -127,8 +141,8 @@ namespace Portal.Helpers
                 }));
             }
 
-            var attachedLinkedDocs = _dbContext.LinkedDocument.Where(ad => 
-                                                            ad.ProcessId == processId 
+            var attachedLinkedDocs = _dbContext.LinkedDocument.Where(ad =>
+                                                            ad.ProcessId == processId
                                                             && !ad.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(), StringComparison.OrdinalIgnoreCase));
 
             if (await attachedLinkedDocs.AnyAsync())

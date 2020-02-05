@@ -210,4 +210,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="TaskType" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b5f7c6c7-0b4e-4c1f-bec5-97cff57b18d9" ChangeDateTime="02/05/2020 08:27:19">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentAssessData].[Workspace]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentAssessData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WorkspaceAffected" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5f2c2866-9b2d-4016-8242-5c0f76837c02" ChangeDateTime="02/05/2020 08:27:43">
+    <Property Name="ElementName" Value="[dbo].[DbAssessmentVerifyData].[Workspace]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DbAssessmentVerifyData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WorkspaceAffected" />
+  </Operation>
 </Operations>

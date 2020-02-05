@@ -36,6 +36,14 @@ namespace Portal.UnitTests
 
             _sessionFileGenerator = new SessionFileGenerator(_dbContext,
                 _secretsConfig);
+
+            var assessData = new DbAssessmentAssessData
+            {
+                ProcessId = 123,
+                WorkspaceAffected = "TestWorkspace"
+            };
+            _dbContext.DbAssessmentAssessData.Add(assessData);
+            await _dbContext.SaveChangesAsync();
         }
 
         [TearDown]
@@ -55,12 +63,14 @@ namespace Portal.UnitTests
                 HpdUsername = "TestUser1-Caris"
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
+
             await _dbContext.SaveChangesAsync();
 
             Assert.ThrowsAsync(typeof(InvalidOperationException),
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
-                    UserFullName)
+                    UserFullName,
+                    "Assess")
             );
         }
 
@@ -80,7 +90,8 @@ namespace Portal.UnitTests
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName);
+                UserFullName,
+                "Assess");
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.CarisWorkspace);

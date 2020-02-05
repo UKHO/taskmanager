@@ -74,7 +74,6 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage, string sessionFilename)
         {
-
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
@@ -82,7 +81,7 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(processId, UserFullName);
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(processId, UserFullName, taskStage);
 
             var serializer = new XmlSerializer(typeof(SessionFile));
 
