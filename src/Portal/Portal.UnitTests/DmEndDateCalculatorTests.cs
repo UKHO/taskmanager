@@ -16,7 +16,7 @@ namespace Portal.UnitTests
         public void SetUp()
         {
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            _generalConfig.Value.DmEndDateDays = 14;
+            _generalConfig.Value.DmEndDateDaysSimple = 14;
             _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc = 0;
             _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc = 2;
 
@@ -24,14 +24,16 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public void Test_DmEndDateCalculator_Returns_Correct_DmEndDate()
+        public void Test_DmEndDateCalculator_Review_Returns_Correct_Simple_DmEndDate()
         {
             var effectiveDate = DateTime.Today;
-            var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveDate);
+            var taskType = "Simple";
+            var taskStage = "Review";
+            var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveDate, taskType, taskStage);
 
 
-            Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDays), result.dmEndDate);
-            Assert.AreEqual(_generalConfig.Value.DmEndDateDays, result.daysToDmEndDate);
+            Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDaysSimple), result.dmEndDate);
+            Assert.AreEqual(_generalConfig.Value.DmEndDateDaysSimple, result.daysToDmEndDate);
 
         }
 
