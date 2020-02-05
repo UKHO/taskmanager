@@ -93,10 +93,18 @@
 
     function setTaskTypeState() {
         var pageIdentity = $("#pageIdentity").val();
-        if (pageIdentity === "Assess") {
-            $(".taskType").prop("disabled", true);
+
+        if (pageIdentity === "Review") {
+            $(".taskTypeLabel").hide();
+            $(".taskTypeDropdown").hide();
+        } else if (pageIdentity === "Assess") {
+            $(".taskTypeLabel").show();
+            $(".taskTypeDropdown").show();
+            $(".taskTypeDropdown").prop("disabled", false);
         } else if (pageIdentity === "Verify") {
-            $(".productActionVerified").prop("disabled", false);
+            $(".taskTypeLabel").show();
+            $(".taskTypeDropdown").show();
+            $(".taskTypeDropdown").prop("disabled", true);
         }
     }
 

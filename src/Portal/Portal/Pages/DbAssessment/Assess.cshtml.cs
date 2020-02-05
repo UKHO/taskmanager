@@ -44,6 +44,9 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string SourceCategory { get; set; }
+        
+        [BindProperty]
+        public string TaskType { get; set; }
 
         [BindProperty]
         public string Verifier { get; set; }
@@ -210,6 +213,7 @@ namespace Portal.Pages.DbAssessment
             currentAssess.Ion = Ion;
             currentAssess.ActivityCode = ActivityCode;
             currentAssess.SourceCategory = SourceCategory;
+            currentAssess.TaskType = TaskType;
         }
 
         private async Task UpdateProductAction(int processId)

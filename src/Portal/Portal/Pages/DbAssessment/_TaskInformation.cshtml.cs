@@ -178,6 +178,7 @@ namespace Portal.Pages.DbAssessment
             ActivityCode = taskData?.ActivityCode;
             Ion = taskData?.Ion;
             SourceCategory = taskData?.SourceCategory;
+            TaskType = taskData?.TaskType;
 
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
