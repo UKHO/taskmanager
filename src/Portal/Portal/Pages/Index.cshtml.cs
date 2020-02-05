@@ -83,8 +83,12 @@ namespace Portal.Pages
                 task.IsOnHold = instance.OnHold.Any(r => r.OffHoldTime == null);
                 task.OnHoldDays = _indexFacade.CalculateOnHoldDays(instance.OnHold);
 
+                var taskType = GetTaskType(instance);
+
                 var result = _indexFacade.CalculateDmEndDate(
                                                                             instance.AssessmentData.EffectiveStartDate.Value,
+                                                                            taskType,
+                                                                            instance.ActivityName,
                                                                             instance.OnHold);
                 task.DmEndDate = result.dmEndDate;
                 task.DaysToDmEndDate = result.daysToDmEndDate;
@@ -95,6 +99,28 @@ namespace Portal.Pages
 
                 SetUsersOnTask(instance, task);
             }
+        }
+
+        private string GetTaskType(WorkflowInstance instance)
+        {
+            string taskType = "";
+
+            switch (instance.ActivityName)
+            {
+                case "Review":
+                    taskType = instance.DbAssessmentReviewData.TaskType;
+                    break;
+                case "Assess":
+                    taskType = instance.DbAssessmentAssessData.TaskType;
+                    break;
+                case "Verify":
+                    taskType = instance.DbAssessmentVerifyData.TaskType;
+                    break;
+                default:
+                    throw new NotImplementedException($"'{instance.ActivityName}' not implemented");
+            }
+
+            return taskType;
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
