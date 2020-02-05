@@ -20,6 +20,7 @@ namespace Portal.UnitTests
         private int ProcessId { get; set; }
         private string UserFullName { get; set; }
         private ILogger<SessionFileGenerator> _logger;
+        public string WorkspaceAffected { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -31,6 +32,7 @@ namespace Portal.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             ProcessId = 123;
+            WorkspaceAffected = "TestWorkspace";
             UserFullName = "TestUser";
 
             _secretsConfig = A.Fake<IOptions<SecretsConfig>>();
@@ -105,6 +107,30 @@ namespace Portal.UnitTests
                 sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
                 sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.SERVICENAME);
+        }
+
+        [Test]
+        public async Task Test_PopulateSessionFile_Returns_Populated_WorkspaceAffected()
+        {
+            UserFullName = "Test User 1";
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUsername = UserFullName,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+            await _dbContext.SaveChangesAsync();
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                "Assess");
+
+            Assert.IsNotNull(sessionFile);
+            Assert.IsNotNull(sessionFile.CarisWorkspace);
+            Assert.AreEqual("TestWorkspace", sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.WORKSPACE);
         }
     }
 }
