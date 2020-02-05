@@ -27,7 +27,7 @@ namespace Portal.Helpers
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        public bool ValidatePage(
+        public bool ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages)
@@ -53,18 +53,19 @@ namespace Portal.Helpers
         }
 
         /// <summary>
-        /// Used in Assess and Verify page
+        /// Used in Assess page
         /// </summary>
         /// <param name="taskStage"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
+        /// <param name="taskType"></param>
         /// <param name="verifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        public async Task<bool> ValidatePage(
+        public async Task<bool> ValidateAssessPage(
                                                 string taskStage,
                                                 string ion,
                                                 string activityCode,
@@ -77,7 +78,54 @@ namespace Portal.Helpers
         {
             var isValid = true;
 
-            if (!ValidateTaskInformation(ion, activityCode, sourceCategory, taskType, validationErrorMessages))
+            if (!ValidateAssessTaskInformation(ion, activityCode, sourceCategory, taskType, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!ValidateOperators(verifier, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!await ValidateRecordProductAction(recordProductAction, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Used in Verify page
+        /// </summary>
+        /// <param name="taskStage"></param>
+        /// <param name="ion"></param>
+        /// <param name="activityCode"></param>
+        /// <param name="sourceCategory"></param>
+        /// <param name="verifier"></param>
+        /// <param name="recordProductAction"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <returns></returns>
+        public async Task<bool> ValidateVerifyPage(
+            string taskStage,
+            string ion,
+            string activityCode,
+            string sourceCategory,
+            string verifier,
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
+            List<string> validationErrorMessages)
+        {
+            var isValid = true;
+
+            if (!ValidateVerifyTaskInformation(ion, activityCode, sourceCategory, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -202,14 +250,14 @@ namespace Portal.Helpers
         }
 
         /// <summary>
-        /// Used in Assess and Verify pages
+        /// Used in Assess pages
         /// </summary>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private bool ValidateTaskInformation(string ion, string activityCode, string sourceCategory, string taskType, List<string> validationErrorMessages)
+        private bool ValidateAssessTaskInformation(string ion, string activityCode, string sourceCategory, string taskType, List<string> validationErrorMessages)
         {
             var isValid = true;
 
@@ -234,6 +282,40 @@ namespace Portal.Helpers
             if (string.IsNullOrWhiteSpace(taskType))
             {
                 validationErrorMessages.Add("Task Information: Task type cannot be empty");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+
+        /// <summary>
+        /// Used in Verify pages
+        /// </summary>
+        /// <param name="ion"></param>
+        /// <param name="activityCode"></param>
+        /// <param name="sourceCategory"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <returns></returns>
+        private bool ValidateVerifyTaskInformation(string ion, string activityCode, string sourceCategory, List<string> validationErrorMessages)
+        {
+            var isValid = true;
+
+            if (string.IsNullOrWhiteSpace(ion))
+            {
+                validationErrorMessages.Add("Task Information: Ion cannot be empty");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(activityCode))
+            {
+                validationErrorMessages.Add("Task Information: Activity code cannot be empty");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(sourceCategory))
+            {
+                validationErrorMessages.Add("Task Information: Source category cannot be empty");
                 isValid = false;
             }
 

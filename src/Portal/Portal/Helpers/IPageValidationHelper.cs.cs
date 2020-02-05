@@ -13,13 +13,13 @@ namespace Portal.Helpers
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        bool ValidatePage(
+        bool ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages);
 
         /// <summary>
-        /// Used in Assess and Verify page
+        /// Used in Assess page
         /// </summary>
         /// <param name="taskStage"></param>
         /// <param name="ion"></param>
@@ -31,7 +31,7 @@ namespace Portal.Helpers
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        Task<bool> ValidatePage(
+        Task<bool> ValidateAssessPage(
             string taskStage,
             string ion, 
             string activityCode, 
@@ -40,6 +40,30 @@ namespace Portal.Helpers
             string verifier,
             List<ProductAction> recordProductAction, 
             List<DataImpact> dataImpacts, 
+            List<string> validationErrorMessages);
+
+
+
+        /// <summary>
+        /// Used in Verify page
+        /// </summary>
+        /// <param name="taskStage"></param>
+        /// <param name="ion"></param>
+        /// <param name="activityCode"></param>
+        /// <param name="sourceCategory"></param>
+        /// <param name="verifier"></param>
+        /// <param name="recordProductAction"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <returns></returns>
+        Task<bool> ValidateVerifyPage(
+            string taskStage,
+            string ion,
+            string activityCode,
+            string sourceCategory,
+            string verifier,
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
             List<string> validationErrorMessages);
     }
 }
