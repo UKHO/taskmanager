@@ -16,23 +16,68 @@ function getEditDatabase() {
         data: processId,
         success: function (result) {
             $("#editDatabase").html(result);
-            setLaunchSourceEditorHref(processId.processId);
+            launchSourceEditorDownloadHandler();
             initialiseWorkspaceTypeahead();
         },
         error: function (error) {
+
+            var errorMessage = error.getResponseHeader("Error");
+
             $("#editDatabaseError")
-                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database.</div>");
+                .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Edit Database. "
+                    + errorMessage
+                    + "</div>");
         }
     });
 }
 
-function setLaunchSourceEditorHref(processId) {
-    var pageIdentity = $("#pageIdentity").val();
-    var href = "_EditDatabase/?handler=LaunchSourceEditor" +
-        "&processId=" + processId +
-        "&taskStage=" + pageIdentity;
+function launchSourceEditorDownloadHandler() {
+    $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
-    $("#launchSourceEditorLink").attr("href", href);
+        var processId = Number($("#hdnProcessId").val());
+        var pageIdentity = $("#pageIdentity").val();
+        var sessionFilename = $(this).data("sessionfilename");
+
+        $.ajax({
+            type: "GET",
+            xhrFields: {
+                responseType: 'blob'
+            },
+            url: "_EditDatabase/?handler=LaunchSourceEditor",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: {
+                "processId": processId,
+                "taskStage": pageIdentity,
+                "sessionFilename": sessionFilename
+            },
+            success: function (data) {
+
+                var url = window.URL.createObjectURL(data);
+                $("#hdnDownloadLink").attr("href", url);
+                $("#hdnDownloadLink").attr("download", sessionFilename);
+                $("#hdnDownloadLink")[0].click();
+            },
+            error: function (error) {
+                var errorMessage = error.getResponseHeader("Error");
+
+                $("#launchSourceEditorDownloadError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File. "
+                        + errorMessage
+                        + "</div>");
+            },
+            complete: function () {
+
+                $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+                $("#hdnDownloadLink").removeAttr("href");
+                $("#hdnDownloadLink").removeAttr("download");
+            }
+        });
+
+    });
 }
 
 function initialiseWorkspaceTypeahead() {

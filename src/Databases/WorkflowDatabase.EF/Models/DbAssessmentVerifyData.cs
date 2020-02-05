@@ -10,11 +10,12 @@ namespace WorkflowDatabase.EF.Models
         public string ActivityCode { get; set; }
         public string SourceCategory { get; set; }
         public string Reviewer { get; set; }
-        public string Assessor { get; set; }    
+        public string Assessor { get; set; }
         public string Verifier { get; set; }
         public string TaskType { get; set; }
         public int WorkflowInstanceId { get; set; }
         public bool ProductActioned { get; set; }
         public string ProductActionChangeDetails { get; set; }
+        public string WorkspaceAffected { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Configuration;
@@ -18,6 +19,8 @@ namespace Portal.UnitTests
         private IOptions<SecretsConfig> _secretsConfig;
         private int ProcessId { get; set; }
         private string UserFullName { get; set; }
+        private ILogger<SessionFileGenerator> _logger;
+        public string WorkspaceAffected { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -29,13 +32,24 @@ namespace Portal.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             ProcessId = 123;
+            WorkspaceAffected = "TestWorkspace";
             UserFullName = "TestUser";
 
             _secretsConfig = A.Fake<IOptions<SecretsConfig>>();
             _secretsConfig.Value.HpdServiceName = "ServiceName";
 
+            _logger = A.Fake<ILogger<SessionFileGenerator>>();
+
             _sessionFileGenerator = new SessionFileGenerator(_dbContext,
-                _secretsConfig);
+                _secretsConfig, _logger);
+
+            var assessData = new DbAssessmentAssessData
+            {
+                ProcessId = 123,
+                WorkspaceAffected = "TestWorkspace"
+            };
+            _dbContext.DbAssessmentAssessData.Add(assessData);
+            await _dbContext.SaveChangesAsync();
         }
 
         [TearDown]
@@ -55,12 +69,14 @@ namespace Portal.UnitTests
                 HpdUsername = "TestUser1-Caris"
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
+
             await _dbContext.SaveChangesAsync();
 
             Assert.ThrowsAsync(typeof(InvalidOperationException),
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
-                    UserFullName)
+                    UserFullName,
+                    "Assess")
             );
         }
 
@@ -80,7 +96,8 @@ namespace Portal.UnitTests
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName);
+                UserFullName,
+                "Assess");
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.CarisWorkspace);
@@ -90,6 +107,30 @@ namespace Portal.UnitTests
                 sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
                 sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.SERVICENAME);
+        }
+
+        [Test]
+        public async Task Test_PopulateSessionFile_Returns_Populated_WorkspaceAffected()
+        {
+            UserFullName = "Test User 1";
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUsername = UserFullName,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+            await _dbContext.SaveChangesAsync();
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                "Assess");
+
+            Assert.IsNotNull(sessionFile);
+            Assert.IsNotNull(sessionFile.CarisWorkspace);
+            Assert.AreEqual("TestWorkspace", sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.WORKSPACE);
         }
     }
 }

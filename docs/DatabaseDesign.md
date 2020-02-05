@@ -211,6 +211,7 @@ The DbAssessmentAssessData table holds the data that may change on the Assess st
 |TaskComplexity             |NVARCHAR(50)   |Yes          |                                          |
 |ProductActioned            |BIT            |Yes          |                                          |
 |ProductActionChangeDetails |NVARCHAR(Max)  |Yes          |                                          |
+|WorkspaceAffected          |NVARCHAR(100)  |Yes          |
 |WorkflowInstanceId         |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)   |
 
 There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.

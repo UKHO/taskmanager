@@ -55,7 +55,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -164,7 +165,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "dbAssessmentAssignTask": [
       {
@@ -297,7 +299,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 632,
@@ -366,7 +369,7 @@
         "linkType": "Forward",
         "linkedSdocId": 606203,
         "ContentServiceId": null,
-        "Status": "NotAttached",
+        "Status": "Started",
         "created": "2020-01-01T00:00:00"
       }
     ],
@@ -391,7 +394,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -515,7 +519,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 126,
@@ -525,17 +530,7 @@
       "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
     },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 126,
-        "SdocId": 938096,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
+    "DatabaseDocumentStatus": [],
     "ProductAction": [
       {
         "ProcessId": 126,
@@ -623,7 +618,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 588,
@@ -717,7 +713,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "dbAssessmentVerifyData": {
       "processId": 688,
@@ -729,7 +726,8 @@
       "verifier": "Stu Barzey",
       "taskType": "Simple",
       "productActioned": false,
-      "productActionChangeDetails": null
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {
       "processId": 688,

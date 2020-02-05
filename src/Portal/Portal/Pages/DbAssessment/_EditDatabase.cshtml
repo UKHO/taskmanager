@@ -32,12 +32,15 @@
                         <div class="col-4">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
                         <div class="col-8">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control form-text-input" })</div>
                     </div>
+                    <div id="launchSourceEditorDownloadError"></div>
                     <div class="row justify-content-start">
                         <div class="col-4"><button class="btn btn-primary" type="button">Create CARIS Project</button></div>
                         <div class="col-8 pl-2">
-                            <a id="launchSourceEditorLink" class="btn btn-primary" download>Launch CARIS Source Editor</a>
+                            <a id="hdnDownloadLink" hidden></a>
+                            <button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary" >Launch CARIS Source Editor</button>
                         </div>
                     </div>
+
                     <div id="launchSourceEditorError"></div>
                 </div>
             </div>
