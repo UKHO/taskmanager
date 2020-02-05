@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,8 @@ namespace Portal.Pages
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
 
+        public List<string> ValidationErrorMessages { get; set; }
+
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
             IUserIdentityService userIdentityService,
@@ -51,6 +54,8 @@ namespace Portal.Pages
             _directoryService = directoryService;
             _logger = logger;
             _indexFacade = indexFacade;
+
+            ValidationErrorMessages = new List<string>();
         }
 
         public async Task OnGetAsync()
@@ -132,17 +137,32 @@ namespace Portal.Pages
             return Page();
         }
 
-        public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
 
-            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
+            ValidationErrorMessages.Clear();
 
+            if (!await _userIdentityService.ValidateUser(userName))
+            {
+                _logger.LogInformation($"Attempted to assign task to unknown user {userName}");
+                ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
+            }
+
+            var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
             if (instance.ActivityName != taskStage)
             {
                 _logger.LogInformation("Attempted to assign task with ProcessId: {ProcessId} to a user but the task being assigned is no longer at the expected step of {ActivityName}.");
-                return;
+                ValidationErrorMessages.Add($"Unable to assign task to {userName} because task with ProcessId: {processId} is not at expected step {taskStage}.");
+            }
+
+            if (ValidationErrorMessages.Any())
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
             switch (taskStage)
@@ -166,6 +186,7 @@ namespace Portal.Pages
             }
 
             await _dbContext.SaveChangesAsync();
+            return StatusCode(200);
         }
 
         public async Task<JsonResult> OnGetUsersAsync()
