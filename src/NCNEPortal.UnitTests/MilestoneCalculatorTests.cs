@@ -1,7 +1,10 @@
+using FakeItEasy;
+using Microsoft.Extensions.Options;
 using NCNEPortal.Calculators;
+using NCNEPortal.Configuration;
+using NCNEPortal.Enums;
 using NUnit.Framework;
 using System;
-using NCNEPortal.Enums;
 
 namespace NCNEPortal.UnitTests
 {
@@ -9,11 +12,17 @@ namespace NCNEPortal.UnitTests
     {
 
         private MilestoneCalculator _milestoneCalculator;
+        private IOptionsSnapshot<GeneralConfig> _generalConfig;
 
         [SetUp]
         public void Setup()
         {
-            _milestoneCalculator = new MilestoneCalculator();
+            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            _generalConfig.Value.FormsDaysFromPubDate = -36;
+            _generalConfig.Value.CisDaysFromPubDate = -6;
+            _generalConfig.Value.Commit2WDaysFromPubDate = -15;
+            _generalConfig.Value.Commit3WDaysFromPubDate = -21;
+            _milestoneCalculator = new MilestoneCalculator(_generalConfig);
         }
 
         [Test]

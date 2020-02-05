@@ -23,7 +23,7 @@ namespace NCNEPortal
     public class NewTaskModel : PageModel
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
-        private readonly IMileStoneCalculator _milestoneCalculator;
+        private readonly IMilestoneCalculator _milestoneCalculator;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -88,7 +88,7 @@ namespace NCNEPortal
 
         public SelectList PublisherList { get; set; }
 
-        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext, IMileStoneCalculator milestoneCalculator)
+        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext, IMilestoneCalculator milestoneCalculator)
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
             _milestoneCalculator = milestoneCalculator;

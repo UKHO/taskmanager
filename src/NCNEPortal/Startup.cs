@@ -66,7 +66,7 @@ namespace NCNEPortal
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
                 s.GetService<HttpProvider>()));
-            services.AddScoped<IMileStoneCalculator, MilestoneCalculator>();
+            services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
