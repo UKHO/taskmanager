@@ -7,7 +7,7 @@ namespace NCNEPortal.TestAutomation.Framework
 
     {
         public Uri NcneNewTaskPageUrl { get; set; }
-        public Uri NcneLocalDevWorkflowPageUrl { get; set; }
+        public Uri NcneLocalDevNewTaskPageUrl { get; set; }
 
 
 

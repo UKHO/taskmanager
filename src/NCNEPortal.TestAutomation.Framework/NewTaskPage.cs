@@ -11,8 +11,8 @@ namespace NCNEPortal.TestAutomation.Framework
         private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
         private const int SeleniumTimeoutSeconds = 5;
-        private readonly Uri _workflowPageUrl;
-        private readonly WorkflowPageConfig _config = new WorkflowPageConfig();
+        private readonly Uri _newtaskPageUrl;
+        private readonly NewTaskPageConfig _config = new NewTaskPageConfig();
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
@@ -24,14 +24,15 @@ namespace NCNEPortal.TestAutomation.Framework
             _driver = driver;
             _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(SeleniumTimeoutSeconds));
 
-            _workflowPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? _config.NcneWorkflowPageUrl
-                : _config.NcneLocalDevWorkflowPageUrl;
+            _newtaskPageUrl = ConfigHelpers.IsAzureDevOpsBuild
+                ? _config.NcneNewTaskPageUrl
+                : _config.NcneLocalDevNewTaskPageUrl;
+              
         }
 
         public void NavigateTo()
         {
-            _driver.Navigate().GoToUrl(_workflowPageUrl);
+            _driver.Navigate().GoToUrl(_newtaskPageUrl);
             _driver.Manage().Window.Maximize();
         }
 
