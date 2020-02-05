@@ -63,6 +63,10 @@ namespace Portal.Pages.DbAssessment
 
         public SelectList SourceCategories { get; set; }
 
+        [DisplayName("Task Type:")]
+        public string TaskType { get; set; }
+        public SelectList TaskTypes { get; set; }
+
         private string _userFullName;
         public string UserFullName
         {
@@ -85,6 +89,10 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGetAsync()
         {
             await SetTaskInformationData();
+
+            var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
+
+            TaskTypes = new SelectList(taskTypes);
         }
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
