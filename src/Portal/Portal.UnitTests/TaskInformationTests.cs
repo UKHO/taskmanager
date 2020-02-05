@@ -62,7 +62,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            await _taskInformationModel.OnGetAsync();
+            await _taskInformationModel.OnGetAsync(ProcessId, "Review");
 
             Assert.AreEqual("TestCode", _taskInformationModel.ActivityCode);
             Assert.AreEqual("123", _taskInformationModel.Ion);
@@ -87,7 +87,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            await _taskInformationModel.OnGetAsync();
+            await _taskInformationModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual("TestCode", _taskInformationModel.ActivityCode);
             Assert.AreEqual("123", _taskInformationModel.Ion);

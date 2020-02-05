@@ -61,6 +61,10 @@
                         <div class="col-5">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, "", new { @class = "form-control" })</div>
                     </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5">@Html.LabelFor(model => model.TaskType, new { @class = "col-form-label taskTypeLabel" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.TaskType, Model.TaskTypes, "", new { @class = "form-control taskTypeDropdown" })</div>
+                    </div>
                 </div>
             </div>
         </div>
