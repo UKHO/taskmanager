@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NCNEPortal.Calculators;
+using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
@@ -44,9 +45,7 @@ namespace NCNEPortal
         public SelectList WorkflowTypes { get; set; }
 
         [BindProperty]
-        [DisplayName("Duration")] public string Dating { get; set; }
-
-        public SelectList DatingList { get; set; }
+        [DisplayName("Duration")] public int Dating { get; set; }
 
         [BindProperty]
         [DisplayName("Publication date")]
@@ -97,7 +96,7 @@ namespace NCNEPortal
 
             Ion = "";
             ChartNo = "";
-            Country = "United Kingdom";
+            Country = "UK";
 
             SetChartTypes();
             SetWorkflowTypes();
@@ -116,9 +115,9 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPost()
         {
 
-            if ((PublicationDate != null) && (this.Dating == "Two weeks" || this.Dating == "Three weeks"))
+            if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
             {
-                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones(Dating, (DateTime)this.PublicationDate);
+                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones((DeadlineEnum)this.Dating, (DateTime)this.PublicationDate);
 
                 this.CommitToPrintDate = commitDate;
                 this.CISDate = cisDate;
@@ -127,13 +126,13 @@ namespace NCNEPortal
 
             }
 
-            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(new TaskInfo()
+            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
             {
                 Ion = this.Ion,
                 ChartNumber = this.ChartNo,
                 ChartType = this.ChartType,
                 WorkflowType = this.WorkflowType,
-                Duration = this.Dating,
+                Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
                 PublicationDate = this.PublicationDate,
                 AnnounceDate = this.AnnounceDate,
                 CommitDate = this.CommitToPrintDate,
