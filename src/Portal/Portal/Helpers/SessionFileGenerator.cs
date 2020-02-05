@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -15,21 +17,28 @@ namespace Portal.Helpers
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<SecretsConfig> _secretsConfig;
+        private readonly ILogger<SessionFileGenerator> _logger;
 
         public SessionFileGenerator(WorkflowDbContext dbContext,
-            IOptions<SecretsConfig> secretsConfig)
+            IOptions<SecretsConfig> secretsConfig,
+            ILogger<SessionFileGenerator> logger)
         {
             _dbContext = dbContext;
             _secretsConfig = secretsConfig;
+            _logger = logger;
         }
 
         public async Task<SessionFile> PopulateSessionFile(int processId, string userFullName, string taskStage)
         {
+            LogContext.PushProperty("PortalResource", nameof(PopulateSessionFile));
+            LogContext.PushProperty("UserFullName", userFullName);
+
             // User details
             HpdUser hpdUser;
 
             if (userFullName == "Unknown")
             {
+                _logger.LogError("ProcessId {ProcessId}: Unable to get username from Active Directory for {UserFullName}");
                 throw new ArgumentNullException(nameof(userFullName), "Unable to get username from Active Directory.");
             }
 
@@ -40,6 +49,7 @@ namespace Portal.Helpers
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
                 throw new InvalidOperationException($"Unable to find HPD username for {userFullName}.",
                     ex.InnerException);
             }
@@ -63,6 +73,7 @@ namespace Portal.Helpers
                     workspaceAffected = verifyData.WorkspaceAffected;
                     break;
                 default:
+                    _logger.LogError($"ProcessId {processId}: Unable to get WorkspaceAffected as task is not at Assess or Verify.");
                     throw new NotImplementedException($"Unable to establish Caris Workspace as task {processId} is at {taskStage}.");
             }
 

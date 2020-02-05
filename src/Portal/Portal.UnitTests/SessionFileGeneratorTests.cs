@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Configuration;
@@ -18,6 +19,7 @@ namespace Portal.UnitTests
         private IOptions<SecretsConfig> _secretsConfig;
         private int ProcessId { get; set; }
         private string UserFullName { get; set; }
+        private ILogger<SessionFileGenerator> _logger;
 
         [SetUp]
         public async Task Setup()
@@ -34,8 +36,10 @@ namespace Portal.UnitTests
             _secretsConfig = A.Fake<IOptions<SecretsConfig>>();
             _secretsConfig.Value.HpdServiceName = "ServiceName";
 
+            _logger = A.Fake<ILogger<SessionFileGenerator>>();
+
             _sessionFileGenerator = new SessionFileGenerator(_dbContext,
-                _secretsConfig);
+                _secretsConfig, _logger);
 
             var assessData = new DbAssessmentAssessData
             {
