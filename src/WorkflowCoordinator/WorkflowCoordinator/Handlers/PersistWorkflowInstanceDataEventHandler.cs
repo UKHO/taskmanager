@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
+using System;
+using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -106,6 +105,7 @@ namespace WorkflowCoordinator.Handlers
                     ActivityCode = reviewData.ActivityCode,
                     Ion = reviewData.Ion,
                     SourceCategory = reviewData.SourceCategory,
+                    WorkspaceAffected = reviewData.WorkspaceAffected,
                     TaskType = reviewData.TaskType,
                     Reviewer = reviewData.Reviewer,
                     Assessor = reviewData.Assessor,
@@ -139,6 +139,7 @@ namespace WorkflowCoordinator.Handlers
                     ActivityCode = assessData.ActivityCode,
                     Ion = assessData.Ion,
                     SourceCategory = assessData.SourceCategory,
+                    WorkspaceAffected = assessData.WorkspaceAffected,
                     TaskType = assessData.TaskType,
                     Reviewer = assessData.Reviewer,
                     Assessor = assessData.Assessor,

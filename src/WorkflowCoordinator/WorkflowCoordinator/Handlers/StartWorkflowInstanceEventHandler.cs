@@ -159,11 +159,11 @@ namespace WorkflowCoordinator.Handlers
                     ActivityCode = reviewData.ActivityCode,
                     Ion = reviewData.Ion,
                     SourceCategory = reviewData.SourceCategory,
+                    WorkspaceAffected = additionalAssignedTaskData.WorkspaceAffected,
+                    TaskType = additionalAssignedTaskData.TaskType,
                     Reviewer = reviewData.Reviewer,
-
                     Assessor = additionalAssignedTaskData.Assessor,
-                    Verifier = additionalAssignedTaskData.Verifier,
-                    TaskType = additionalAssignedTaskData.TaskType
+                    Verifier = additionalAssignedTaskData.Verifier
                 });
             }
         }
