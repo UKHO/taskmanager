@@ -18,7 +18,7 @@ namespace WorkflowCoordinator.Handlers
         private readonly ILogger<PersistWorkflowInstanceDataEventHandler> _logger;
         private readonly WorkflowDbContext _dbContext;
 
-        public PersistWorkflowInstanceDataEventHandler(IWorkflowServiceApiClient workflowServiceApiClient, 
+        public PersistWorkflowInstanceDataEventHandler(IWorkflowServiceApiClient workflowServiceApiClient,
             ILogger<PersistWorkflowInstanceDataEventHandler> logger, WorkflowDbContext dbContext)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
@@ -93,24 +93,33 @@ namespace WorkflowCoordinator.Handlers
 
             var reviewData = await _dbContext.DbAssessmentReviewData.SingleAsync(d => d.ProcessId == processId);
 
-            if (!await _dbContext.DbAssessmentAssessData.AnyAsync(d => d.ProcessId == processId))
+            _logger.LogInformation("Saving primary task data from review to assess for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+            var assessData =
+                await _dbContext.DbAssessmentAssessData.SingleOrDefaultAsync(d => d.ProcessId == processId);
+
+            var isExists = (assessData != null);
+
+            if (!isExists)
             {
-                _logger.LogInformation("Saving primary task data from review to assess for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+                assessData = new DbAssessmentAssessData();
+            }
 
-                await _dbContext.DbAssessmentAssessData.AddAsync(new DbAssessmentAssessData
-                {
-                    ProcessId = processId,
-                    WorkflowInstanceId = workflowInstanceId,
+            assessData.ProcessId = processId;
+            assessData.WorkflowInstanceId = workflowInstanceId;
 
-                    ActivityCode = reviewData.ActivityCode,
-                    Ion = reviewData.Ion,
-                    SourceCategory = reviewData.SourceCategory,
-                    WorkspaceAffected = reviewData.WorkspaceAffected,
-                    TaskType = reviewData.TaskType,
-                    Reviewer = reviewData.Reviewer,
-                    Assessor = reviewData.Assessor,
-                    Verifier = reviewData.Verifier
-                });
+            assessData.ActivityCode = reviewData.ActivityCode;
+            assessData.Ion = reviewData.Ion;
+            assessData.SourceCategory = reviewData.SourceCategory;
+            assessData.WorkspaceAffected = reviewData.WorkspaceAffected;
+            assessData.TaskType = reviewData.TaskType;
+            assessData.Reviewer = reviewData.Reviewer;
+            assessData.Assessor = reviewData.Assessor;
+            assessData.Verifier = reviewData.Verifier;
+
+            if (!isExists)
+            {
+                await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
             }
         }
 
@@ -127,29 +136,35 @@ namespace WorkflowCoordinator.Handlers
 
             var assessData = await _dbContext.DbAssessmentAssessData.SingleAsync(d => d.ProcessId == processId);
 
-            if (!await _dbContext.DbAssessmentVerifyData.AnyAsync(d => d.ProcessId == processId))
+            _logger.LogInformation("Saving task data from assess to verify for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+
+            var verifyData = await _dbContext.DbAssessmentVerifyData.SingleOrDefaultAsync(d => d.ProcessId == processId);
+
+            var isExists = (verifyData != null);
+            if (!isExists)
             {
-                _logger.LogInformation("Saving task data from assess to verify for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+                verifyData = new DbAssessmentVerifyData();
+            }
 
-                await _dbContext.DbAssessmentVerifyData.AddAsync(new DbAssessmentVerifyData
-                {
-                    ProcessId = processId,
-                    WorkflowInstanceId = workflowInstanceId,
+            verifyData.ProcessId = processId;
+            verifyData.WorkflowInstanceId = workflowInstanceId;
 
-                    ActivityCode = assessData.ActivityCode,
-                    Ion = assessData.Ion,
-                    SourceCategory = assessData.SourceCategory,
-                    WorkspaceAffected = assessData.WorkspaceAffected,
-                    TaskType = assessData.TaskType,
-                    Reviewer = assessData.Reviewer,
-                    Assessor = assessData.Assessor,
-                    Verifier = assessData.Verifier
-                });
+            verifyData.ActivityCode = assessData.ActivityCode;
+            verifyData.Ion = assessData.Ion;
+            verifyData.SourceCategory = assessData.SourceCategory;
+            verifyData.WorkspaceAffected = assessData.WorkspaceAffected;
+            verifyData.TaskType = assessData.TaskType;
+            verifyData.ProductActioned = assessData.ProductActioned;
+            verifyData.ProductActionChangeDetails = assessData.ProductActionChangeDetails;
+            verifyData.Reviewer = assessData.Reviewer;
+            verifyData.Assessor = assessData.Assessor;
+            verifyData.Verifier = assessData.Verifier;
+
+            if (!isExists)
+            {
+                await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
             }
         }
-
-
-
-
     }
 }
