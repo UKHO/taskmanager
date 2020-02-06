@@ -9,62 +9,158 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
 
-pool: UKHO Windows 2019
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
 
-steps:
+      workspace:
+          clean: all
 
-- task: UseDotNet@2
-  displayName: 'Use .NET Core 3.1.x SDK'
-  inputs:
-    packageType: sdk
-    version: 3.1.x
-    installationPath: $(Agent.ToolsDirectory)\\dotnet
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore eventservice'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore eventservice'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
-  displayName: 'dotnet build eventservice'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
+        displayName: 'dotnet build eventservice'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore eventservicetests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore eventservicetests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
-  displayName: 'dotnet build eventservicetests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
+        displayName: 'dotnet build eventservicetests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
-  displayName: 'dotnet test eventservicetests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
+        displayName: 'dotnet test eventservicetests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
-    zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice'
-  displayName: 'Publish Solution'
+      - task: Maven@3
+        inputs:
+          mavenPomFile: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservices.apitests\\pom.xml'
+          goals: 'test-compile'
+          publishJUnitResults: false
+          javaHomeOption: 'JDKVersion'
+          mavenVersionOption: 'Default'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
+          sonarQubeRunAnalysis: false
+        displayName: 'mvn test-compile eventservices.apitests'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)\\eventservice'
-    ArtifactName: 'eventservice'
-    publishLocation: 'Container'
-  displayName: 'Publish eventservice Artifact'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice'
+        displayName: 'Publish Solution'
 
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\eventservice'
+          ArtifactName: 'eventservice'
+          publishLocation: 'Container'
+        displayName: 'Publish eventservice Artifact'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservices.apitests\\'
+          ArtifactName: 'eventservices.apitests'
+          publishLocation: 'Container'
+        displayName: 'Publish eventservices.apitests Artifact'
+
+- stage: DeployDev
+  jobs:
+    - deployment: DeployEventService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerDev'
+                  WebAppName: 'TaskManager-Dev-api-Eventservice'
+                  packageForLinux: '$(Pipeline.Workspace)/eventservice/eventservice'
+              - task: Maven@3
+                displayName: 'Run Event Service API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/eventservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/eventservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Event Service API Tests'
+
+- stage: DeployUAT
+  jobs:
+    - deployment: DeployEventService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'TaskManager-UAT-api-Eventservice'
+                  packageForLinux: '$(Pipeline.Workspace)/eventservice/eventservice'
+              - task: Maven@3
+                displayName: 'Run Event Service API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/eventservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/eventservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Event Service API Tests'
+
+- stage: DeployPre
+  jobs:
+    - deployment: DeployEventService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPre-SC'
+                  WebAppName: 'TaskManager-Pre-api-Eventservice'
+                  packageForLinux: '$(Pipeline.Workspace)/eventservice/eventservice'
+              - task: Maven@3
+                displayName: 'Run Event Service API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/eventservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/eventservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Event Service API Tests'
