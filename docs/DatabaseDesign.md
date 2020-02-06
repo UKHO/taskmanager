@@ -3,7 +3,7 @@
 ## Tables
 
 [AssessmentData](#assessmentdata)  
-[AssignedTaskSourceType](#assignedtasksourcetype)  
+[AssignedTaskType](#assignedtasksourcetype)  
 [CachedHpdWorkspace](#CachedHpdWorkspace)  
 [Comment](#comment)  
 [DatabaseDocumentStatus](#DatabaseDocumentStatus)  
@@ -12,6 +12,7 @@
 [DbAssessmentAssignTask](#DbAssessmentAssignTask)  
 [DbAssessmentReviewData](#dbassessmentreviewdata)  
 [DbAssessmentAssessData](#dbassessmentassessdata)  
+[DbAssessmentVerifyData](#dbassessmentverifydata)  
 [WorkflowInstance](#workflowinstance)  
 [PrimaryDocumentStatus](#primarydocumentstatus)  
 [LinkedDocument](#linkeddocument)  
@@ -47,19 +48,19 @@ The SdocId column has a unique constraint.
 
 [Go To Tables](#tables)
 
-### AssignedTaskSourceType
+### AssignedTaskType
 
-The `AssignedTaskSourceType` table is a lookup table that contains the list of Source Types used for Assigned Tasks.
+The `AssignedTaskType` table is a lookup table that contains the list of Source Types used for Assigned Tasks.
 
 It gets populated via Post Deployment script 
-`AssignedTaskSourceType.sql`.
+`AssignedTaskType.sql`.
 
 | Column Name       | Datatype      | Allow nulls | Description                                                                                     |
 |-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
-|AssignedTaskSourceTypeId   |INT            |No           |PRIMARY KEY                                                                    |
+|AssignedTaskTypeId   |INT            |No           |PRIMARY KEY                                                                    |
 |Name             |NVARCHAR(50)            |No           |                                                                                                 |
 
-`AssignedTaskSourceTypeId` column is not an Identity column, this is to allow a better control of that's column values. There is a Unique constraint on
+`AssignedTaskTypeId` column is not an Identity column, this is to allow a better control of that column's values. There is a Unique constraint on the Name column.
 
 [Go To Tables](#tables)
 
@@ -209,6 +210,30 @@ The DbAssessmentAssessData table holds the data that may change on the Assess st
 |Assessor                   |NVARCHAR(255)  |Yes          |                                          |
 |Verifier                   |NVARCHAR(255)  |Yes          |                                          |
 |TaskComplexity             |NVARCHAR(50)   |Yes          |                                          |
+|ProductActioned            |BIT            |Yes          |                                          |
+|ProductActionChangeDetails |NVARCHAR(Max)  |Yes          |                                          |
+|WorkspaceAffected          |NVARCHAR(100)  |Yes          |
+|WorkflowInstanceId         |INT            |No           |The unique Id for the relevant row in the WorkflowInstance table (FK)   |
+
+There is a foreign key constraint to the WorkflowInstance table, on that table's WorkflowInstanceId column.
+
+[Go To Tables](#tables)
+
+### DbAssessmentVerifyData
+
+The DbAssessmentVerifyData table holds the data that may change on the Verify step of a Database Assessment workflow instance.
+
+| Column Name               | Datatype      | Allow nulls | Description                              |
+|---------------------------|---------------|-------------|------------------------------------------|
+|DbAssessmentVerifyDataId   |INT            |No           |PRIMARY KEY             |
+|ProcessId                  |INT            |No           |The K2 process instance Id                |
+|Ion                        |NVARCHAR(50)   |Yes          |                                          |
+|ActivityCode               |NVARCHAR(50)   |Yes          |                                          |
+|SourceCategory             |NVARCHAR(255)   |Yes         |                                                                                                 |
+|Reviewer                   |NVARCHAR(255)  |Yes          |                                          |
+|Assessor                   |NVARCHAR(255)  |Yes          |                                          |
+|Verifier                   |NVARCHAR(255)  |Yes          |                                          |
+|TaskType                   |NVARCHAR(50)   |Yes          |                                          |
 |ProductActioned            |BIT            |Yes          |                                          |
 |ProductActionChangeDetails |NVARCHAR(Max)  |Yes          |                                          |
 |WorkspaceAffected          |NVARCHAR(100)  |Yes          |
