@@ -222,19 +222,25 @@ namespace Portal.Pages
 
         private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)
         {
-            task.Reviewer = instance.DbAssessmentReviewData?.Reviewer;
-
             switch (task.TaskStage)
             {
+                case "Review":
+                    task.Reviewer = instance.DbAssessmentReviewData.Reviewer;
+                    task.Assessor = instance.DbAssessmentReviewData.Assessor;
+                    task.Verifier = instance.DbAssessmentReviewData.Verifier;
+                    break;
                 case "Assess":
+                    task.Reviewer = instance.DbAssessmentAssessData.Reviewer;
                     task.Assessor = instance.DbAssessmentAssessData.Assessor;
                     task.Verifier = instance.DbAssessmentAssessData.Verifier;
                     break;
                 case "Verify":
-                    //TODO: set verifier once we have the table task.Verifier = instance.DbAssessmentVerifyData.Assessor;
+                    task.Reviewer = instance.DbAssessmentVerifyData.Reviewer;
+                    task.Assessor = instance.DbAssessmentVerifyData.Assessor;
+                    task.Verifier = instance.DbAssessmentVerifyData.Verifier;
                     break;
                 default:
-                    break;
+                    throw new NotImplementedException($"{task.TaskStage} is not implemented.");
             }
         }
     }
