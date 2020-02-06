@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NCNEPortal.Calculators;
+using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
@@ -21,6 +23,7 @@ namespace NCNEPortal
     public class NewTaskModel : PageModel
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
+        private readonly IMilestoneCalculator _milestoneCalculator;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -42,9 +45,7 @@ namespace NCNEPortal
         public SelectList WorkflowTypes { get; set; }
 
         [BindProperty]
-        [DisplayName("Duration")] public string Dating { get; set; }
-
-        public SelectList DatingList { get; set; }
+        [DisplayName("Duration")] public int Dating { get; set; }
 
         [BindProperty]
         [DisplayName("Publication date")]
@@ -87,14 +88,15 @@ namespace NCNEPortal
 
         public SelectList PublisherList { get; set; }
 
-        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext)
+        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext, IMilestoneCalculator milestoneCalculator)
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
+            _milestoneCalculator = milestoneCalculator;
 
 
             Ion = "";
             ChartNo = "";
-            Country = "United Kingdom";
+            Country = "UK";
 
             SetChartTypes();
             SetWorkflowTypes();
@@ -102,9 +104,7 @@ namespace NCNEPortal
             SetUsers();
 
             PublicationDate = null;
-            /*AnnounceDate = DateTime.Today.AddDays(7);
-            CommitToPrintDate = AnnounceDate.AddDays(7);
-            CISDate = CommitToPrintDate.AddDays(7);*/
+
         }
 
         public void OnGet()
@@ -115,17 +115,24 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPost()
         {
 
-            AnnounceDate = PublicationDate?.AddDays(-7);
-            CommitToPrintDate = PublicationDate?.AddDays(-7);
-            CISDate = PublicationDate?.AddDays(-7);
+            if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
+            {
+                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones((DeadlineEnum)this.Dating, (DateTime)this.PublicationDate);
 
-            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(new TaskInfo()
+                this.CommitToPrintDate = commitDate;
+                this.CISDate = cisDate;
+                this.AnnounceDate = formsDate;
+
+
+            }
+
+            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
             {
                 Ion = this.Ion,
                 ChartNumber = this.ChartNo,
                 ChartType = this.ChartType,
                 WorkflowType = this.WorkflowType,
-                Duration = this.Dating,
+                Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
                 PublicationDate = this.PublicationDate,
                 AnnounceDate = this.AnnounceDate,
                 CommitDate = this.CommitToPrintDate,

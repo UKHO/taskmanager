@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using NCNEPortal.Auth;
+using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEWorkflowDatabase.EF;
 
@@ -48,7 +49,7 @@ namespace NCNEPortal
             Configuration.GetSection("databases").Bind(startupConfig);
             Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("ncneportal").Bind(startupConfig);
-            
+
 
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
@@ -65,6 +66,7 @@ namespace NCNEPortal
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
                 s.GetService<HttpProvider>()));
+            services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
