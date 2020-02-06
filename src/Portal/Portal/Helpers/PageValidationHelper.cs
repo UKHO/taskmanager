@@ -55,7 +55,6 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess page
         /// </summary>
-        /// <param name="taskStage"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
@@ -66,15 +65,14 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
         public async Task<bool> ValidateAssessPage(
-                                                string taskStage,
-                                                string ion,
-                                                string activityCode,
-                                                string sourceCategory,
-                                                string taskType,
-                                                string verifier,
-                                                List<ProductAction> recordProductAction,
-                                                List<DataImpact> dataImpacts,
-                                                List<string> validationErrorMessages)
+            string ion,
+            string activityCode,
+            string sourceCategory,
+            string taskType,
+            string verifier,
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
+            List<string> validationErrorMessages)
         {
             var isValid = true;
 
@@ -104,7 +102,6 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify page
         /// </summary>
-        /// <param name="taskStage"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
@@ -114,7 +111,6 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
         public async Task<bool> ValidateVerifyPage(
-            string taskStage,
             string ion,
             string activityCode,
             string sourceCategory,

@@ -21,7 +21,6 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess page
         /// </summary>
-        /// <param name="taskStage"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
@@ -32,7 +31,6 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
         Task<bool> ValidateAssessPage(
-            string taskStage,
             string ion, 
             string activityCode, 
             string sourceCategory,
@@ -47,7 +45,6 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify page
         /// </summary>
-        /// <param name="taskStage"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
@@ -57,7 +54,6 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
         Task<bool> ValidateVerifyPage(
-            string taskStage,
             string ion,
             string activityCode,
             string sourceCategory,

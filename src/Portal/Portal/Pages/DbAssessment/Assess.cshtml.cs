@@ -116,8 +116,7 @@ namespace Portal.Pages.DbAssessment
             ValidationErrorMessages.Clear();
 
             if (!await _pageValidationHelper.ValidateAssessPage(
-                                            "Assess",
-                                                    Ion,
+                                                Ion,
                                                 ActivityCode,
                                                 SourceCategory,
                                                 TaskType,
