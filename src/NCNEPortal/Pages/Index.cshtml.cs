@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,6 +19,7 @@ namespace NCNEPortal.Pages
     {
         private readonly IUserIdentityService _userIdentityService;
         private readonly NcneWorkflowDbContext _dbContext;
+        private readonly ILogger<IndexModel> _logger;
         private readonly IDirectoryService _directoryService;
 
 
@@ -30,11 +33,14 @@ namespace NCNEPortal.Pages
         [BindProperty(SupportsGet = true)]
         public List<TaskInfo> NcneTasks { get; set; }
 
-        public IndexModel(IUserIdentityService userIdentityService, NcneWorkflowDbContext ncneWorkflowDbContext
-                         , IDirectoryService directoryService)
+        public IndexModel(IUserIdentityService userIdentityService,
+                          NcneWorkflowDbContext ncneWorkflowDbContext,
+                          ILogger<IndexModel> logger,
+                          IDirectoryService directoryService)
         {
             _userIdentityService = userIdentityService;
             _dbContext = ncneWorkflowDbContext;
+            _logger = logger;
             _directoryService = directoryService;
         }
 
@@ -45,8 +51,6 @@ namespace NCNEPortal.Pages
                 .ToListAsync();
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-
-
 
         }
 
@@ -93,8 +97,8 @@ namespace NCNEPortal.Pages
 
         public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
         {
-            //LogContext.PushProperty("ProcessId", processId);
-            //LogContext.PushProperty("ActivityName", taskStage);
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("ActivityName", "AssignUser");
 
             if (await _userIdentityService.ValidateUser(userName))
             {
@@ -104,6 +108,10 @@ namespace NCNEPortal.Pages
                 instance.AssignedDate = DateTime.Now;
 
                 await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                _logger.LogInformation($"Attempted to assign task to unknown user {userName}");
             }
         }
 

@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using NCNEPortal.Calculators;
 using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,6 +26,7 @@ namespace NCNEPortal
     {
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
+        private readonly ILogger<NewTaskModel> _logger;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -88,10 +91,13 @@ namespace NCNEPortal
 
         public SelectList PublisherList { get; set; }
 
-        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext, IMilestoneCalculator milestoneCalculator)
+        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext,
+                            IMilestoneCalculator milestoneCalculator,
+                            ILogger<NewTaskModel> logger)
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
             _milestoneCalculator = milestoneCalculator;
+            _logger = logger;
 
 
             Ion = "";
@@ -115,45 +121,59 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPost()
         {
 
-            if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
+            LogContext.PushProperty("ActivityName", "NewTask");
+            LogContext.PushProperty("PortalResource", nameof(OnPost));
+            LogContext.PushProperty("Action", "Save");
+
+            try
             {
-                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones((DeadlineEnum)this.Dating, (DateTime)this.PublicationDate);
-
-                this.CommitToPrintDate = commitDate;
-                this.CISDate = cisDate;
-                this.AnnounceDate = formsDate;
-
-
-            }
-
-            var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
-            {
-                Ion = this.Ion,
-                ChartNumber = this.ChartNo,
-                ChartType = this.ChartType,
-                WorkflowType = this.WorkflowType,
-                Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
-                PublicationDate = this.PublicationDate,
-                AnnounceDate = this.AnnounceDate,
-                CommitDate = this.CommitToPrintDate,
-                CisDate = this.CISDate,
-                Country = this.Country,
-                AssignedUser = this.Compiler,
-                AssignedDate = DateTime.Now,
-                TaskRole = new TaskRole()
+                if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
                 {
-                    Compiler = this.Compiler,
-                    VerifierOne = this.Verifier1,
-                    VerifierTwo = this.Verifier2,
-                    Publisher = this.Publisher
+                    var (formsDate, cisDate, commitDate) =
+                        _milestoneCalculator.CalculateMilestones((DeadlineEnum)this.Dating,
+                            (DateTime)this.PublicationDate);
+
+                    this.CommitToPrintDate = commitDate;
+                    this.CISDate = cisDate;
+                    this.AnnounceDate = formsDate;
+
+
                 }
 
+                var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
+                {
+                    Ion = this.Ion,
+                    ChartNumber = this.ChartNo,
+                    ChartType = this.ChartType,
+                    WorkflowType = this.WorkflowType,
+                    Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
+                    PublicationDate = this.PublicationDate,
+                    AnnounceDate = this.AnnounceDate,
+                    CommitDate = this.CommitToPrintDate,
+                    CisDate = this.CISDate,
+                    Country = this.Country,
+                    AssignedUser = this.Compiler,
+                    AssignedDate = DateTime.Now,
+                    TaskRole = new TaskRole()
+                    {
+                        Compiler = this.Compiler,
+                        VerifierOne = this.Verifier1,
+                        VerifierTwo = this.Verifier2,
+                        Publisher = this.Publisher
+                    }
 
-            });
 
-            await _ncneWorkflowDbContext.SaveChangesAsync();
-            return RedirectToPage("./Index");
+                });
 
+                await _ncneWorkflowDbContext.SaveChangesAsync();
+                _logger.LogInformation($"New Task created : {taskInfo.Entity.ProcessId}");
+                return RedirectToPage("./Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving Task Information");
+                return RedirectToPage("./Index");
+            }
         }
         private void SetChartTypes()
         {
