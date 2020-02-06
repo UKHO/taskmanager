@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
@@ -59,10 +61,94 @@ namespace WorkflowCoordinator.Handlers
 
             workflowInstance.Status = message.ToActivityName == "Completed" ? WorkflowStatus.Completed.ToString() : WorkflowStatus.Started.ToString();
 
+            switch (message.ToActivityName)
+            {
+                case "Assess":
+                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId);
+                    break;
+                case "Verify":
+                    await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
+                    break;
+                case "Completed":
+                    _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
+                    break;
+                default:
+                    throw new NotImplementedException($"{message.ToActivityName} has not been implemented for processId: {message.ProcessId}.");
+            }
+
             await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
 
         }
+
+        private async Task PersistWorkflowDataToAssess(
+            int processId,
+            int workflowInstanceId)
+        {
+            LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+            var reviewData = await _dbContext.DbAssessmentReviewData.SingleAsync(d => d.ProcessId == processId);
+
+            if (!await _dbContext.DbAssessmentAssessData.AnyAsync(d => d.ProcessId == processId))
+            {
+                _logger.LogInformation("Saving primary task data from review to assess for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+                await _dbContext.DbAssessmentAssessData.AddAsync(new DbAssessmentAssessData
+                {
+                    ProcessId = processId,
+                    WorkflowInstanceId = workflowInstanceId,
+
+                    ActivityCode = reviewData.ActivityCode,
+                    Ion = reviewData.Ion,
+                    SourceCategory = reviewData.SourceCategory,
+                    TaskType = reviewData.TaskType,
+                    Reviewer = reviewData.Reviewer,
+                    Assessor = reviewData.Assessor,
+                    Verifier = reviewData.Verifier
+                });
+            }
+        }
+
+
+        private async Task PersistWorkflowDataToVerify(
+            int processId,
+            int workflowInstanceId)
+        {
+            LogContext.PushProperty("PersistWorkflowDataToVerify", nameof(PersistWorkflowDataToVerify));
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+
+            _logger.LogInformation("Entering {PersistWorkflowDataToVerify} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+            var assessData = await _dbContext.DbAssessmentAssessData.SingleAsync(d => d.ProcessId == processId);
+
+            if (!await _dbContext.DbAssessmentVerifyData.AnyAsync(d => d.ProcessId == processId))
+            {
+                _logger.LogInformation("Saving task data from assess to verify for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+                await _dbContext.DbAssessmentVerifyData.AddAsync(new DbAssessmentVerifyData
+                {
+                    ProcessId = processId,
+                    WorkflowInstanceId = workflowInstanceId,
+
+                    ActivityCode = assessData.ActivityCode,
+                    Ion = assessData.Ion,
+                    SourceCategory = assessData.SourceCategory,
+                    TaskType = assessData.TaskType,
+                    Reviewer = assessData.Reviewer,
+                    Assessor = assessData.Assessor,
+                    Verifier = assessData.Verifier
+                });
+            }
+        }
+
+
+
+
     }
 }
