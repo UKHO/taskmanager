@@ -12,6 +12,6 @@
 	[WorkflowInstanceId] INT NOT NULL, 
 	[ProductActioned] BIT NULL, 
 	[ProductActionChangeDetails] NVARCHAR(MAX) NULL, 
-	[WorkspaceAffected] NVARCHAR(255) NULL, 
+	[WorkspaceAffected] NVARCHAR(100) NULL, 
 	CONSTRAINT [FK_DbAssessmentAssessData_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId])
 )
