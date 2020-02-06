@@ -41,7 +41,7 @@
       "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "TaskType": "LTA",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },
@@ -285,7 +285,7 @@
       "reviewer": "Stu Barzey",
       "assessor": "BatesP",
       "verifier": "RigdenT",
-      "TaskType": "LTA",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },
@@ -349,7 +349,7 @@
       "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
       "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
       "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+      "effectiveStartDate": "2020-02-05", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Photographic Sortie",
       "sourceNature": "Graphical",
@@ -444,7 +444,7 @@
       "sourceDocumentName": "NM_DEN_30_235_06",
       "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": "2020-01-01T16:32:35",
-      "effectiveStartDate": "2019-12-28T00:00:00",
+      "effectiveStartDate": "2020-02-05",
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Source NM",
       "sourceNature": "Textual",
@@ -517,7 +517,7 @@
       "reviewer": "Stu Barzey",
       "assessor": "Stu Barzey",
       "verifier": "Stu Barzey",
-      "taskType": "Simple",
+      "taskType": "LTA",
       "productActioned": false,
       "productActionChangeDetails": null,
       "workspaceAffected": "1239_0"
@@ -813,7 +813,7 @@
       "processId": 127,
       "ion": "I8766",
       "activityCode": "4881",
-      "TaskType": "LTA",
+      "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
     },

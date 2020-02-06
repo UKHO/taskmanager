@@ -13,9 +13,16 @@ namespace Portal.Calculators
             _generalConfig = generalConfig;
         }
 
-        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate)
+        public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, string taskType, string taskStage)
         {
-            var dmEndDate = effectiveStartDate.AddDays(_generalConfig.Value.DmEndDateDays);
+
+            var isReview = taskStage.Equals("Review", StringComparison.InvariantCultureIgnoreCase);
+            var isSimple = taskType.Equals("Simple", StringComparison.InvariantCultureIgnoreCase);
+            var dmEndDateDays = (isReview || isSimple)
+                                                    ? _generalConfig.Value.DmEndDateDaysSimple
+                                                    : _generalConfig.Value.DmEndDateDaysLTA;
+
+            var dmEndDate = effectiveStartDate.AddDays(dmEndDateDays);
             var daysToDmEndDate = (short)dmEndDate.Date.Subtract(DateTime.Today).Days;
 
             return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);

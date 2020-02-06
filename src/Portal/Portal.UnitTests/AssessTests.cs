@@ -73,21 +73,23 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message()
+        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_tasktype_results_in_validation_error_message()
         {
             _assessModel.Ion = "";
             _assessModel.ActivityCode = "";
             _assessModel.SourceCategory = "";
+            _assessModel.TaskType = "";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(3, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages[0]);
-            Assert.AreEqual($"Task Information: Activity code cannot be empty", _assessModel.ValidationErrorMessages[1]);
-            Assert.AreEqual($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages[2]);
+            Assert.AreEqual(4, _assessModel.ValidationErrorMessages.Count);
+            Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Activity code cannot be empty", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Task type cannot be empty", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -96,6 +98,7 @@ namespace Portal.UnitTests
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
 
             _assessModel.Verifier = "";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -112,6 +115,7 @@ namespace Portal.UnitTests
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
 
             _assessModel.Verifier = "TestUser";
             var hpdUsage = new HpdUsage()
@@ -142,6 +146,7 @@ namespace Portal.UnitTests
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -167,6 +172,7 @@ namespace Portal.UnitTests
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
