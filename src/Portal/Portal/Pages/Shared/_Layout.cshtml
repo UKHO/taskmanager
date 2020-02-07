@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    ViewData["Year"] = DateTime.Now.Year;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -50,7 +53,7 @@
         <div class="container body-content flex-fill">
             @RenderBody()
         </div>
-        <footer>&copy; Crown copyright 2019 UK Hydrographic Office</footer>
+        <footer>&copy; Crown copyright @ViewData["Year"] UK Hydrographic Office</footer>
     </div>
 </body>
 </html>
