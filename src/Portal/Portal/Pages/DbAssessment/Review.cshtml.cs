@@ -151,6 +151,7 @@ namespace Portal.Pages.DbAssessment
             PrimaryAssignedTask.ProcessId = ProcessId;
 
             await UpdateDbAssessmentReviewData();
+            await SaveAdditionalTasks(ProcessId);
 
             await _dbContext.SaveChangesAsync();
 
@@ -221,24 +222,29 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
-        private async Task ProcessAdditionalTasks(int processId)
+
+        private async Task SaveAdditionalTasks(int processId)
         {
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-            var correlationId = primaryDocumentStatus.CorrelationId.Value;
+            _logger.LogInformation("Saving additional task belonging to task with processId: {ProcessId}");
 
             var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
 
             foreach (var task in AdditionalAssignedTasks)
             {
-
                 task.ProcessId = processId;
                 await _dbContext.DbAssessmentAssignTask.AddAsync(task);
                 await _dbContext.SaveChangesAsync();
+            }
+        }
 
-                //TODO: Must validate incoming models
-                //TODO: Copy Additional Assign Task Notes to new child Assess Comments;
-                //TODO:          using the new K2 ProcessId; hence implement it in StartWorkflowInstanceEvent handler
+        private async Task ProcessAdditionalTasks(int processId)
+        {
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
+            var correlationId = primaryDocumentStatus.CorrelationId.Value;
+
+            foreach (var task in AdditionalAssignedTasks)
+            {
                 var docRetrievalEvent = new StartWorkflowInstanceEvent
                 {
                     CorrelationId = correlationId,

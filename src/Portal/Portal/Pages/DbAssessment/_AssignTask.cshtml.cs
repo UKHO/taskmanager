@@ -79,12 +79,6 @@ namespace Portal.Pages.DbAssessment
         }
 
 
-        private async Task<List<_AssignTaskModel>> SetAssignTaskDummyData(int processId)
-        {
-            return null;
-
-        }
-
         /// <summary>
         /// TODO - Remove assessor and verifier code retrieval from JSON once we are reading users from AD
         /// </summary>

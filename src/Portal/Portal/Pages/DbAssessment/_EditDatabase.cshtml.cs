@@ -28,9 +28,11 @@ namespace Portal.Pages.DbAssessment
         private IUserIdentityService _userIdentityService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
 
+        [BindProperty(SupportsGet = true)]
         [DisplayName("Select CARIS Workspace:")]
         public string SelectedCarisWorkspace { get; set; }
 
+        [BindProperty(SupportsGet = true)]
         [DisplayName("CARIS Project Name:")]
         public string ProjectName { get; set; }
 
@@ -61,8 +63,16 @@ namespace Portal.Pages.DbAssessment
             _sessionFileGenerator = sessionFileGenerator;
         }
 
-        public async Task OnGetAsync(int processId)
+        public async Task OnGetAsync(int processId, string taskStage)
         {
+            LogContext.PushProperty("ActivityName", taskStage);
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
+
+            await GetCarisData(processId, taskStage);
+
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
 
@@ -108,5 +118,26 @@ namespace Portal.Pages.DbAssessment
                 throw;
             }
         }
+
+        private async Task GetCarisData(int processId, string taskStage)
+        {
+            switch (taskStage)
+            {
+                case "Assess":
+                    var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
+                    SelectedCarisWorkspace = assessData.WorkspaceAffected;
+                    ProjectName = assessData.CarisProjectName;
+                    break;
+                case "Verify":
+                    var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(vd => vd.ProcessId == processId);
+                    SelectedCarisWorkspace = verifyData.WorkspaceAffected;
+                    ProjectName = verifyData.CarisProjectName;
+                    break;
+                default:
+                    _logger.LogError("{ActivityName} is not implemented for processId: {ProcessId}.");
+                    throw new NotImplementedException($"{taskStage} is not implemented for processId: {processId}.");
+            }
+        }
+
     }
 }

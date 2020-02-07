@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using WorkflowDatabase.EF.Interfaces;
 
 namespace WorkflowDatabase.EF.Models
@@ -16,6 +17,9 @@ namespace WorkflowDatabase.EF.Models
         public int WorkflowInstanceId { get; set; }
         public bool ProductActioned { get; set; }
         public string ProductActionChangeDetails { get; set; }
+        [DisplayName("Caris Workspace:")]
         public string WorkspaceAffected { get; set; }
+        [DisplayName("Caris Project Name:")]
+        public string CarisProjectName { get; set; }
     }
 }

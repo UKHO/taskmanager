@@ -56,7 +56,8 @@
       "taskType": "Simple",
       "productActioned": false,
       "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
+      "workspaceAffected": "123",
+      "CarisProjectName": "Sunrise" 
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -395,7 +396,8 @@
       "taskType": "Simple",
       "productActioned": false,
       "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
+      "workspaceAffected": "123",
+      "CarisProjectName": "Sunrise"
     },
     "PrimaryDocumentStatus": {
       "processId": 125,
@@ -727,7 +729,8 @@
       "taskType": "Simple",
       "productActioned": false,
       "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
+      "workspaceAffected": "999",
+      "CarisProjectName": "Vproj"
     },
     "PrimaryDocumentStatus": {
       "processId": 688,
