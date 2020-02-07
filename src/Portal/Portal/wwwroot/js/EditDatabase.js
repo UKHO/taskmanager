@@ -4,7 +4,8 @@
 
 function getEditDatabase() {
 
-    var processId = { "processId": Number($("#hdnProcessId").val()) };
+    var processId = Number($("#hdnProcessId").val());
+    var pageIdentity = $("#pageIdentity").val();
 
     $.ajax({
         type: "GET",
@@ -13,7 +14,10 @@ function getEditDatabase() {
             xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
         },
         contentType: "application/json; charset=utf-8",
-        data: processId,
+        data: {
+            "processId": processId,
+            "taskStage": pageIdentity
+        }, 
         success: function (result) {
             $("#editDatabase").html(result);
             launchSourceEditorDownloadHandler();
