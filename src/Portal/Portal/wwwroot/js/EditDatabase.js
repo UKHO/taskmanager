@@ -7,6 +7,9 @@ function getEditDatabase() {
     var processId = Number($("#hdnProcessId").val());
     var pageIdentity = $("#pageIdentity").val();
 
+    $('.typeahead').typeahead('val', "");
+    $('.typeahead').typeahead('close');
+
     $.ajax({
         type: "GET",
         url: "_EditDatabase",
