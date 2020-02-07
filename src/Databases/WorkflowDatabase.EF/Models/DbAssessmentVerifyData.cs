@@ -17,5 +17,6 @@ namespace WorkflowDatabase.EF.Models
         public bool ProductActioned { get; set; }
         public string ProductActionChangeDetails { get; set; }
         public string WorkspaceAffected { get; set; }
+        public string CarisProjectName { get; set; }
     }
 }
