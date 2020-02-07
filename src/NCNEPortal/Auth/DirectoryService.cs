@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using NCNEPortal.Configuration;
 using System;
@@ -15,7 +16,8 @@ namespace NCNEPortal.Auth
 
 
         public DirectoryService(IOptions<SecretsConfig> secretsConfig,
-            IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment, IHttpProvider httpProvider)
+            IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig, bool isLocalDevelopment,
+            IHttpProvider httpProvider, ILogger<DirectoryService> getService)
         {
             _secretsConfig = secretsConfig;
             var redirectUri = isLocalDevelopment ? $"{uriConfig.Value.NcneLocalDevLandingPageHttpsUrl}signin-oidc" :

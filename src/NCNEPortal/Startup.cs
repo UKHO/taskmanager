@@ -8,12 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEWorkflowDatabase.EF;
+using Serilog;
+using Serilog.Events;
 
 
 namespace NCNEPortal
@@ -31,6 +34,14 @@ namespace NCNEPortal
         public void ConfigureServices(IServiceCollection services)
         {
             var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
+
+            var startupLoggingConfig = new StartupLoggingConfig();
+            Configuration.GetSection("logging").Bind(startupLoggingConfig);
+
+            var startupSecretsConfig = new StartupSecretsConfig();
+            Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+
+            LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig, startupSecretsConfig);
 
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("ncneportal"))
@@ -65,7 +76,10 @@ namespace NCNEPortal
                 s.GetService<IOptions<GeneralConfig>>(),
                 s.GetService<IOptions<UriConfig>>(),
                 isLocalDevelopment,
-                s.GetService<HttpProvider>()));
+                s.GetService<HttpProvider>(),
+                s.GetService<ILogger<DirectoryService>>()));
+
+
             services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
@@ -108,6 +122,19 @@ namespace NCNEPortal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging(
+                options =>
+                    options.GetLevel = (ctx, d, ex) =>
+                    {
+                        if (ex == null && ctx.Response.StatusCode <= 499)
+                        {
+                            return LogEventLevel.Verbose;
+                        }
+
+                        return LogEventLevel.Error;
+                    }
+            );
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
