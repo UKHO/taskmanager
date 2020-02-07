@@ -10,7 +10,6 @@
     [Verifier] NVARCHAR(255) NULL, 
 	[TaskType] NVARCHAR(50) NULL,
 	[WorkspaceAffected] NVARCHAR(100) NULL,
-	[CarisProjectName] NVARCHAR(100) NULL,
     [Reviewer] NVARCHAR(255) NULL, 
 	[Notes] NVARCHAR(4000) NULL,
     CONSTRAINT [FK_DbAssessmentReviewData_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId])
