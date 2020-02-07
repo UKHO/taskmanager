@@ -153,6 +153,7 @@ namespace WorkflowCoordinator.Handlers
             verifyData.ActivityCode = assessData.ActivityCode;
             verifyData.Ion = assessData.Ion;
             verifyData.SourceCategory = assessData.SourceCategory;
+            verifyData.CarisProjectName = assessData.CarisProjectName;
             verifyData.WorkspaceAffected = assessData.WorkspaceAffected;
             verifyData.TaskType = assessData.TaskType;
             verifyData.ProductActioned = assessData.ProductActioned;
