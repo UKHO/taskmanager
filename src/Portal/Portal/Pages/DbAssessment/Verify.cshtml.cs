@@ -70,6 +70,12 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string ProductActionChangeDetails { get; set; }
 
+        [BindProperty]
+        public string SelectedCarisWorkspace { get; set; }
+
+        [BindProperty]
+        public string ProjectName { get; set; }
+
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
@@ -127,6 +133,8 @@ namespace Portal.Pages.DbAssessment
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
+
+            await UpdateEditDatabase(processId);
 
             await UpdateDataImpact(processId);
 
@@ -334,6 +342,8 @@ namespace Portal.Pages.DbAssessment
             currentVerify.Ion = Ion;
             currentVerify.ActivityCode = ActivityCode;
             currentVerify.SourceCategory = SourceCategory;
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateProductAction(int processId)
@@ -350,6 +360,15 @@ namespace Portal.Pages.DbAssessment
                 productAction.ProcessId = processId;
                 _dbContext.ProductAction.Add(productAction);
             }
+
+            await _dbContext.SaveChangesAsync();
+        }
+        private async Task UpdateEditDatabase(int processId)
+        {
+            var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+
+            currentVerify.CarisProjectName = ProjectName;
+            currentVerify.WorkspaceAffected = SelectedCarisWorkspace;
 
             await _dbContext.SaveChangesAsync();
         }

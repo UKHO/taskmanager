@@ -103,24 +103,17 @@ namespace Portal.Pages
 
         private string GetTaskType(WorkflowInstance instance)
         {
-            string taskType = "";
-
             switch (instance.ActivityName)
             {
                 case "Review":
-                    taskType = instance.DbAssessmentReviewData.TaskType;
-                    break;
+                    return instance.DbAssessmentReviewData.TaskType;
                 case "Assess":
-                    taskType = instance.DbAssessmentAssessData.TaskType;
-                    break;
+                    return instance.DbAssessmentAssessData.TaskType;
                 case "Verify":
-                    taskType = instance.DbAssessmentVerifyData.TaskType;
-                    break;
+                    return instance.DbAssessmentVerifyData.TaskType;
                 default:
                     throw new NotImplementedException($"'{instance.ActivityName}' not implemented");
             }
-
-            return taskType;
         }
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
@@ -206,7 +199,6 @@ namespace Portal.Pages
                     // TODO: implement Verify Data
                     //var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
                     //verify.Verifier = userName;
-                    break;
                 default:
                     throw new NotImplementedException($"'{taskStage}' not implemented");
             }

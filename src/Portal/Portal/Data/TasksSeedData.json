@@ -729,7 +729,8 @@
       "taskType": "Simple",
       "productActioned": false,
       "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
+      "workspaceAffected": "999",
+      "CarisProjectName": "Vproj"
     },
     "PrimaryDocumentStatus": {
       "processId": 688,

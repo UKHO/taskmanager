@@ -63,6 +63,12 @@ namespace Portal.Pages.DbAssessment
         public string ProductActionChangeDetails { get; set; }
 
         [BindProperty]
+        public string SelectedCarisWorkspace { get; set; }
+
+        [BindProperty]
+        public string ProjectName { get; set; }
+
+        [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
         public List<string> ValidationErrorMessages { get; set; }
@@ -131,9 +137,13 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
+
+
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
+
+            await UpdateEditDatabase(processId);
 
             await UpdateDataImpact(processId);
 
@@ -209,16 +219,20 @@ namespace Portal.Pages.DbAssessment
         private async Task UpdateTaskInformation(int processId)
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
             currentAssess.Verifier = Verifier;
             currentAssess.Ion = Ion;
             currentAssess.ActivityCode = ActivityCode;
             currentAssess.SourceCategory = SourceCategory;
             currentAssess.TaskType = TaskType;
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateProductAction(int processId)
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
             currentAssess.ProductActioned = ProductActioned;
             currentAssess.ProductActionChangeDetails = ProductActionChangeDetails;
 
@@ -230,6 +244,16 @@ namespace Portal.Pages.DbAssessment
                 productAction.ProcessId = processId;
                 _dbContext.ProductAction.Add(productAction);
             }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateEditDatabase(int processId)
+        {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+            currentAssess.CarisProjectName = ProjectName;
+            currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
 
             await _dbContext.SaveChangesAsync();
         }
