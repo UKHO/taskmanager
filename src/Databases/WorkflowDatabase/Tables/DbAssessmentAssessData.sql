@@ -13,5 +13,6 @@
 	[ProductActioned] BIT NULL, 
 	[ProductActionChangeDetails] NVARCHAR(MAX) NULL, 
 	[WorkspaceAffected] NVARCHAR(100) NULL, 
-	CONSTRAINT [FK_DbAssessmentAssessData_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId])
+	[CarisProjectName] NVARCHAR(100) NULL, 
+    CONSTRAINT [FK_DbAssessmentAssessData_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId])
 )
