@@ -1,52 +1,96 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
-pool: UKHO Windows 2019
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
 
-steps:
+      workspace:
+          clean: all
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
-    msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=WorkflowDatabase.LocalDb.publish.xml
-  displayName: 'Build WorkflowDatabase and publish to LocalDb'
+      steps:
+      - task: VSBuild@1
+        inputs:
+          solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
+          msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=WorkflowDatabase.LocalDb.publish.xml
+        displayName: 'Build WorkflowDatabase and publish to LocalDb'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
-  displayName: 'dotnet test LocalDb instance of database'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase.Tests\\WorkflowDatabase.Tests.csproj'
+        displayName: 'dotnet test LocalDb instance of database'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
-  displayName: 'Build WorkflowDatabase Dacpac'
+      - task: VSBuild@1
+        inputs:
+          solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
+        displayName: 'Build WorkflowDatabase Dacpac'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\bin\\debug\\WorkflowDatabase.dacpac'
-    ArtifactName: 'workflowdatabase'
-    publishLocation: 'Container'
-  displayName: 'Publish WorkflowDatabase'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\bin\\debug\\WorkflowDatabase.dacpac'
+          ArtifactName: 'workflowdatabase'
+          publishLocation: 'Container'
+        displayName: 'Publish WorkflowDatabase'
 
-# Keep this for when Azure DevOps feature is released shortly
-#
-#environment: 'tm2dev.workflowdatabase'
-#  strategy:
-#    runOnce:
-#      deploy:
-#        steps:
-#        - task: SqlAzureDacpacDeployment@1
-#          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-#          inputs:
-#            azureSubscription: 'TM2 Dev/Test Sub Dev RG'
-#            ServerName: 'taskmanager-dev-sqlserver.database.windows.net'
-#            DatabaseName: 'taskmanager-dev-workflowdatabase'
-#            SqlUsername: '$(SQLUsername)'
-#            SqlPassword: '$(SQLPassword)'
-#            DacpacFile: '$(System.DefaultWorkingDirectory)/WorkflowDatabase/workflowdatabase/WorkflowDatabase.dacpac'
+- stage: DeployDev
+  jobs:
+    - deployment: DeployWorkflowDatabase
+      displayName: Deploy Web App
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNameDev)'
+                  DatabaseName: '$(DatabaseNameDev)'
+                  SqlUsername: '$(SQLUsernameDev)'
+                  SqlPassword: '$(SQLPasswordDev)'
+                  DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
+
+- stage: DeployUAT
+  jobs:
+    - deployment: DeployWorkflowDatabase
+      displayName: Deploy Web App
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNameUAT)'
+                  DatabaseName: '$(DatabaseNameUAT)'
+                  SqlUsername: '$(SQLUsernameUAT)'
+                  SqlPassword: '$(SQLPasswordUAT)'
+                  DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
+
+- stage: DeployPre
+  jobs:
+    - deployment: DeployWorkflowDatabase
+      displayName: Deploy Web App
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNamePre)'
+                  DatabaseName: '$(DatabaseNamePre)'
+                  SqlUsername: '$(SQLUsernamePre)'
+                  SqlPassword: '$(SQLPasswordPre)'
+                  DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
