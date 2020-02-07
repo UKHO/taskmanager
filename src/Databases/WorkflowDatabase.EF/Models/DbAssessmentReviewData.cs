@@ -16,6 +16,8 @@ namespace WorkflowDatabase.EF.Models
         public string TaskType { get; set; }
         [DisplayName("Workspace Affected:")]
         public string WorkspaceAffected { get; set; }
+        [DisplayName("Caris Project Name:")]
+        public string CarisProjectName { get; set; }
         public string Reviewer { get; set; }
         public string Notes { get; set; }
         public int WorkflowInstanceId { get; set; }
