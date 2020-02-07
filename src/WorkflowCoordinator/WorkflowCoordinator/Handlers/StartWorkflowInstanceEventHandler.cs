@@ -114,6 +114,7 @@ namespace WorkflowCoordinator.Handlers
                                                     reviewData, additionalAssignedTaskData);
 
             await CopyAdditionalAssignTaskNoteToComments(
+                                                            command.ParentProcessId, 
                                                             command.ChildProcessId,
                                                             additionalAssignedTaskData.Notes,
                                                             newWorkflowInstance.WorkflowInstanceId,
@@ -123,7 +124,12 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task CopyAdditionalAssignTaskNoteToComments(int childProcessId, string assignTaskNote, int newWorkflowInstance, string reviewer)
+        private async Task CopyAdditionalAssignTaskNoteToComments(
+                                                                    int parentProcessId,
+                                                                    int childProcessId,
+                                                                    string assignTaskNote,
+                                                                    int newWorkflowInstance,
+                                                                    string reviewer)
         {
             if (!string.IsNullOrEmpty(assignTaskNote))
             {
@@ -135,7 +141,7 @@ namespace WorkflowCoordinator.Handlers
                     {
                         ProcessId = childProcessId,
                         WorkflowInstanceId = newWorkflowInstance,
-                        Text = $"Assign Task: {assignTaskNote.Trim()}",
+                        Text = $"Assign Task (Parent processId: {parentProcessId}): {assignTaskNote.Trim()}",
                         Username = reviewer,
                         Created = DateTime.Today
                     });
