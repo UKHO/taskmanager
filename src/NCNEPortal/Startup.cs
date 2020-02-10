@@ -17,6 +17,8 @@ using NCNEPortal.Configuration;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
+using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace NCNEPortal
@@ -42,6 +44,12 @@ namespace NCNEPortal
             Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
 
             LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig, startupSecretsConfig);
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB"), new CultureInfo("en-GB") };
+            });
 
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("ncneportal"))
