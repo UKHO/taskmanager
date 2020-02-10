@@ -18,11 +18,13 @@ namespace NCNEPortal.Calculators
             DateTime publicationDate)
         {
 
-            var dtForms = publicationDate.AddDays(_generalConfig.Value.FormsDaysFromPubDate);
-            var dtCis = publicationDate.AddDays(_generalConfig.Value.CisDaysFromPubDate);
+            var sPubDate = publicationDate.ToLongDateString();
+
+            var dtForms = DateTime.Parse(sPubDate).AddDays(_generalConfig.Value.FormsDaysFromPubDate);
+            var dtCis = DateTime.Parse(sPubDate).AddDays(_generalConfig.Value.CisDaysFromPubDate);
             var dtCommit = (deadline == DeadlineEnum.TwoWeeks ?
-                                  publicationDate.AddDays(_generalConfig.Value.Commit2WDaysFromPubDate) :
-                                  publicationDate.AddDays(_generalConfig.Value.Commit3WDaysFromPubDate));
+                DateTime.Parse(sPubDate).AddDays(_generalConfig.Value.Commit2WDaysFromPubDate) :
+                DateTime.Parse(sPubDate).AddDays(_generalConfig.Value.Commit3WDaysFromPubDate));
 
             return (formsDate: dtForms, cisDate: dtCis, commitDate: dtCommit);
 
