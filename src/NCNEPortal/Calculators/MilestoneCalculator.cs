@@ -2,6 +2,7 @@
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using System;
+using System.Globalization;
 
 namespace NCNEPortal.Calculators
 {
@@ -18,11 +19,12 @@ namespace NCNEPortal.Calculators
             DateTime publicationDate)
         {
 
+
             var dtForms = publicationDate.AddDays(_generalConfig.Value.FormsDaysFromPubDate);
             var dtCis = publicationDate.AddDays(_generalConfig.Value.CisDaysFromPubDate);
             var dtCommit = (deadline == DeadlineEnum.TwoWeeks ?
-                                  publicationDate.AddDays(_generalConfig.Value.Commit2WDaysFromPubDate) :
-                                  publicationDate.AddDays(_generalConfig.Value.Commit3WDaysFromPubDate));
+                publicationDate.AddDays(_generalConfig.Value.Commit2WDaysFromPubDate) :
+                publicationDate.AddDays(_generalConfig.Value.Commit3WDaysFromPubDate));
 
             return (formsDate: dtForms, cisDate: dtCis, commitDate: dtCommit);
 
