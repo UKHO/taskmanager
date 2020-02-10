@@ -7,6 +7,7 @@
  <ItemGroup>
    <None Remove="Data\AssignedTaskSourceType.json" />
    <None Remove="Data\HpdUsages.json" />
+   <None Remove="Data\HpdUsers.json" />
    <None Remove="Data\ProductActionType.json" />
    <None Remove="Data\SourceCategories.json" />
    <None Remove="Data\TasksSeedData.json" />
@@ -19,6 +20,11 @@
      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
    </Content>
    <Content Include="Data\HpdUsages.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
+   <Content Include="Data\HpdUsers.json">
      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
