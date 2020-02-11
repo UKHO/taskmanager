@@ -373,18 +373,25 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
         }
 
+
         private async Task UpdateDataImpact(int processId)
         {
             var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DataImpact.RemoveRange(toRemove);
 
-            foreach (var dataImpact in DataImpacts)
+            if (DataImpacts.Any(a => a.HpdUsageId > 0))
             {
-                dataImpact.ProcessId = processId;
-                _dbContext.DataImpact.Add(dataImpact);
-            }
+                foreach (var dataImpact in DataImpacts)
+                {
+                    if (dataImpact.HpdUsageId > 0)
+                    {
+                        dataImpact.ProcessId = processId;
+                        _dbContext.DataImpact.Add(dataImpact);
+                    }
+                }
 
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }
