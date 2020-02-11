@@ -24,7 +24,8 @@ Portal App Service's `identity` section and the `system assigned` tab should hav
 ### 2. Create an App Registration
 Navigate to AAD App Registrations.  
 Create a new App Registration with:
-* A friendly display `name`
+* A friendly display `name`, ideally `[APP-NAME]-appreg`  
+  **DO NOT USE AN IDENTICAL NAME AS THE APP NAME**
 * `Redirect URI` will be set later and can be left blank
 
 ### 3. Set App Registration details

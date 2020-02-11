@@ -151,27 +151,21 @@ stages:
 - stage: DeployDev
   jobs:    
     - deployment: DeployNCNEPortalWebsite
-      displayName: deploy Web App
+      displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
-      environment: 'tm2dev'
+      environment: 'TaskmanagerDev'
       strategy:
         # default deployment strategy, more coming...
         runOnce:
           deploy:
             steps:
-              - task: DownloadBuildArtifacts@0
-                displayName: 'Download Build Artifacts'
-                inputs:
-                  buildType: 'current'
-                  downloadType: 'specific'
-                  downloadPath: '$(System.ArtifactsDirectory)' 
               - task: AzureRmWebAppDeployment@4
                 displayName: 'Azure App Service Deploy'
                 inputs:
-                  azureSubscription: 'TM2-Dev'
+                  azureSubscription: 'TaskmanagerDev'
                   WebAppName: 'taskmanager-dev-web-ncneportal'
-                  packageForLinux: '$(System.ArtifactsDirectory)/ncneportal/ncneportal'
+                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
     # - job: RunAutomatedTests
     #   dependsOn: DeployPortalWebsite
@@ -203,3 +197,41 @@ stages:
     #       inputs:
     #         testResultsFiles: '**/*.trx'
     #         testResultsFormat: 'VSTest'
+
+- stage: DeployUAT
+  jobs:    
+    - deployment: DeployNCNEPortalWebsite
+      displayName: Deploy Web App
+      pool: "UKHO Ubuntu 1804"
+        # creates an environment if it doesn't exist
+      environment: 'TaskmanagerUAT'
+      strategy:
+        # default deployment strategy, more coming...
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'taskmanager-uat-web-ncneportal'
+                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
+
+- stage: DeployPre
+  jobs:    
+    - deployment: DeployNCNEPortalWebsite
+      displayName: Deploy Web App
+      pool: "UKHO Ubuntu 1804"
+        # creates an environment if it doesn't exist
+      environment: 'TaskmanagerPre'
+      strategy:
+        # default deployment strategy, more coming...
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPre-SC'
+                  WebAppName: 'taskmanager-pre-web-ncneportal'
+                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'

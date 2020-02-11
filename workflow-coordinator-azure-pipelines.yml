@@ -9,99 +9,155 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
 
-pool: UKHO Windows 2019
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
 
-steps:
+      workspace:
+          clean: all
 
-- task: UseDotNet@2
-  displayName: 'Use .NET Core 3.1.x SDK'
-  inputs:
-    packageType: sdk
-    version: 3.1.x
-    installationPath: $(Agent.ToolsDirectory)\\dotnet
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore workflowcoordinator'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore workflowcoordinator'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
-  displayName: 'dotnet build workflowcoordinator'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
+        displayName: 'dotnet build workflowcoordinator'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore workflowcoordinatortests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore workflowcoordinatortests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-  displayName: 'dotnet build workflowcoordinatortests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
+        displayName: 'dotnet build workflowcoordinatortests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-    arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings
-  displayName: 'dotnet test workflowcoordinatortests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
+          arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings
+        displayName: 'dotnet test workflowcoordinatortests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: custom
-    custom: tool
-    arguments: install --tool-path . dotnet-reportgenerator-globaltool
-  displayName: Install ReportGenerator tool
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: custom
+          custom: tool
+          arguments: install --tool-path . dotnet-reportgenerator-globaltool
+        displayName: Install ReportGenerator tool
 
-- script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
-  displayName: Create reports
-  
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish code coverage'
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
+      - script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+        displayName: Create reports
+        
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage'
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
-    zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
-  displayName: 'Publish Solution'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
+        displayName: 'Publish Solution'
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
-  displayName: 'Generate run.cmd'
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: '"dotnet workflowcoordinator.dll" | Out-File run.cmd -Encoding ASCII; $LASTEXITCODE'
+          workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
+        displayName: 'Generate run.cmd'
 
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'License.xml'
-  name: 'nsblicense'
-  displayName: 'Download NSB License from Secure Files'
+      - task: DownloadSecureFile@1
+        inputs:
+          secureFile: 'License.xml'
+        name: 'nsblicense'
+        displayName: 'Download NSB License from Secure Files'
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'copy-item $(nsblicense.secureFilePath) .\\'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
-  displayName: 'Copy NSB License'
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: 'copy-item $(nsblicense.secureFilePath) .\\'
+          workingDirectory: '$(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous\\workflowcoordinator'
+        displayName: 'Copy NSB License'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'workflowcoordinator'
-    publishLocation: 'Container'
-  displayName: 'Publish workflowcoordinator Artifact'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'workflowcoordinator'
+          publishLocation: 'Container'
+        displayName: 'Publish workflowcoordinator Artifact'
 
+- stage: DeployDev
+  jobs:
+    - deployment: DeployWorkflowCoordinator
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerDev'
+                  WebAppName: 'taskmanager-dev-nsb-workflowcoordinator'
+                  packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
+
+- stage: DeployUAT
+  jobs:
+    - deployment: DeployWorkflowCoordinator
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'taskmanager-uat-nsb-workflowcoordinator'
+                  packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
+
+- stage: DeployPre
+  jobs:
+    - deployment: DeployWorkflowCoordinator
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPre-SC'
+                  WebAppName: 'taskmanager-pre-nsb-workflowcoordinator'
+                  packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'

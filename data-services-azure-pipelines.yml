@@ -5,85 +5,162 @@ trigger:
     - features/*
   paths:
     include:
-    - src/dataservices/*
+    - src/DataServices/*
     - src/Databases/WorkflowDatabase.EF/*
-    - src/Common*    
+    - src/Common*
 
-pool:
-  'UKHO Windows 2019'
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
 
-steps:
+      workspace:
+          clean: all
 
-- task: UseDotNet@2
-  displayName: 'Use .NET Core sdk'
-  inputs:
-    packageType: sdk
-    version: 3.1.x
-    installationPath: $(Agent.ToolsDirectory)/dotnet
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore dataservices'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore dataservices'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
-  displayName: 'dotnet build dataservices'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
+        displayName: 'dotnet build dataservices'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
-    feedsToUse: 'select'
-  displayName: 'dotnet restore dataservicestests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore dataservicestests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
-  displayName: 'dotnet build dataservicestests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
+        displayName: 'dotnet build dataservicestests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
-  displayName: 'dotnet test dataservicestests'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
+        displayName: 'dotnet test dataservicestests'
 
-- task: Maven@3
-  inputs:
-    mavenPomFile: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.apitests\\pom.xml'
-    goals: 'test-compile'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    mavenVersionOption: 'Default'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
-  displayName: 'mvn test-compile dataservices.apitests'
+      - task: Maven@3
+        inputs:
+          mavenPomFile: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.apitests\\pom.xml'
+          goals: 'test-compile'
+          publishJUnitResults: false
+          javaHomeOption: 'JDKVersion'
+          mavenVersionOption: 'Default'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
+          sonarQubeRunAnalysis: false
+        displayName: 'mvn test-compile dataservices.apitests'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
-    zipAfterPublish: false
-    arguments: '--output $(Build.ArtifactStagingDirectory)\\dataservices'
-  displayName: 'Publish Solution'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\dataservices'
+        displayName: 'Publish Solution'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)\\dataservices'
-    ArtifactName: 'dataservices'
-    publishLocation: 'Container'
-  displayName: 'Publish dataservices Artifact'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\dataservices'
+          ArtifactName: 'dataservices'
+          publishLocation: 'Container'
+        displayName: 'Publish dataservices Artifact'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.apitests\\'
-    ArtifactName: 'dataservices.apitests'
-    publishLocation: 'Container'
-  displayName: 'Publish dataservices.apitests Artifact'    
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.apitests\\'
+          ArtifactName: 'dataservices.apitests'
+          publishLocation: 'Container'
+        displayName: 'Publish dataservices.apitests Artifact'
+
+- stage: DeployDev
+  jobs:
+    - deployment: DeployDataService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerDev'
+                  WebAppName: 'TaskManager-Dev-api-Dataservice'
+                  packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
+              - task: Maven@3
+                displayName: 'Run Data Services API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Data Services API Tests'
+
+- stage: DeployUAT
+  jobs:
+    - deployment: DeployDataService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'TaskManager-UAT-api-Dataservice'
+                  packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
+              - task: Maven@3
+                displayName: 'Run Data Services API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Data Services API Tests'
+
+- stage: DeployPre
+  jobs:
+    - deployment: DeployDataService
+      displayName: Deploy Web App
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPre-SC'
+                  WebAppName: 'TaskManager-Pre-api-Dataservice'
+                  packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
+              - task: Maven@3
+                displayName: 'Run Data Services API Tests'
+                inputs:
+                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
+                  goals: test
+                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
+                  testRunTitle: 'Data Services API Tests'
