@@ -150,7 +150,7 @@ stages:
 
 - stage: DeployDev
   jobs:    
-    - deployment: DeployPortalWebsite
+    - deployment: DeployPortalWebsiteDev
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerDev'
@@ -166,7 +166,7 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
 
     - job: RunAutomatedTests
-      dependsOn: DeployPortalWebsite
+      dependsOn: DeployPortalWebsiteDev
       pool:
           NautilusBuild
       steps:
