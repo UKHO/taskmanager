@@ -149,6 +149,7 @@ stages:
         displayName: 'Publish specs Artifact'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:    
     - deployment: DeployPortalWebsiteDev
       displayName: Deploy Web App
@@ -197,8 +198,9 @@ stages:
             testResultsFormat: 'VSTest'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:    
-    - deployment: DeployPortalWebsite
+    - deployment: DeployPortalWebsiteUAT
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerUAT'
@@ -214,7 +216,7 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
 
     - job: RunAutomatedTests
-      dependsOn: DeployPortalWebsite
+      dependsOn: DeployPortalWebsiteUAT
       pool:
           NautilusBuild
       steps:
@@ -245,8 +247,9 @@ stages:
             testResultsFormat: 'VSTest'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:    
-    - deployment: DeployPortalWebsite
+    - deployment: DeployPortalWebsitePre
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerPre'
@@ -262,7 +265,7 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
 
     - job: RunAutomatedTests
-      dependsOn: DeployPortalWebsite
+      dependsOn: DeployPortalWebsitePre
       pool:
           NautilusBuild
       steps:
