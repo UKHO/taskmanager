@@ -94,8 +94,9 @@ stages:
         displayName: 'Publish eventservices.apitests Artifact'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:
-    - deployment: DeployEventService
+    - deployment: DeployEventServiceDev
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
@@ -118,8 +119,9 @@ stages:
                   testRunTitle: 'Event Service API Tests'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:
-    - deployment: DeployEventService
+    - deployment: DeployEventServiceUAT
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
@@ -142,8 +144,9 @@ stages:
                   testRunTitle: 'Event Service API Tests'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:
-    - deployment: DeployEventService
+    - deployment: DeployEventServicePre
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
