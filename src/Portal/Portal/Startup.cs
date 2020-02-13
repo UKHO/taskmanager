@@ -75,7 +75,8 @@ namespace Portal
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
                 .Bind(Configuration.GetSection("subscription"))
-                .Bind(Configuration.GetSection("K2"));
+                .Bind(Configuration.GetSection("K2"))
+                .Bind(Configuration.GetSection("caris"));
 
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
