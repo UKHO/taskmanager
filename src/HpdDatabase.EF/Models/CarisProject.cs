@@ -7,5 +7,8 @@ namespace HpdDatabase.EF.Models
     {
         [Column("PJ_ID")]
         public int ProjectId { get; set; }
+
+        [Column("PJ_NAME")]
+        public string ProjectName { get; set; } 
     }
 }
