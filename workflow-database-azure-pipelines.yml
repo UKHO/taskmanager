@@ -36,8 +36,9 @@ stages:
         displayName: 'Publish WorkflowDatabase'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowDatabase
+    - deployment: DeployWorkflowDatabaseDev
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerDev'
@@ -56,8 +57,9 @@ stages:
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowDatabase
+    - deployment: DeployWorkflowDatabaseUAT
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerUAT'
@@ -76,8 +78,9 @@ stages:
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowDatabase
+    - deployment: DeployWorkflowDatabasePre
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerPre'
