@@ -73,8 +73,8 @@ Navigate to the `API permissions` section.
 Add a new `Graph API permission` for `application` **NOT** `delegated` with the name `User.Read.All`.  
 Once the `preparing consent` button has finished loading, click the button to `grant admin consent`.
 There should be five permissions now, all with `green checkmarks` in the `status` column:
-|Permission name | Type | Admin consent |
-|---|---|---|
+| Permission name | Type | Admin consent |
+| :--- | :---: | :---: |
 | Directory.Read.All | Application | Yes |
 | Group.Read.All | Application | Yes |
 | openid | Delegated | no |
