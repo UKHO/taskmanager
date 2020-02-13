@@ -152,7 +152,7 @@ stages:
   dependsOn: Build
   jobs:    
     - deployment: DeployPortalWebsiteDev
-      displayName: Deploy Web App
+      displayName: Deploy portal website
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerDev'
       strategy:
@@ -201,7 +201,7 @@ stages:
   dependsOn: Build
   jobs:    
     - deployment: DeployPortalWebsiteUAT
-      displayName: Deploy Web App
+      displayName: Deploy portal website
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -250,7 +250,7 @@ stages:
   dependsOn: Build
   jobs:    
     - deployment: DeployPortalWebsitePre
-      displayName: Deploy Web App
+      displayName: Deploy portal website
       pool: "UKHO Ubuntu 1804"
       environment: 'TaskmanagerPre'
       strategy:

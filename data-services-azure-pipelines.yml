@@ -97,7 +97,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployDataServiceDev
-      displayName: Deploy Web App
+      displayName: Deploy dataservices Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
       strategy:
@@ -122,7 +122,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployDataServiceUAT
-      displayName: Deploy Web App
+      displayName: Deploy dataservices Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -147,7 +147,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployDataServicePre
-      displayName: Deploy Web App
+      displayName: Deploy dataservices Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
       strategy:
