@@ -115,7 +115,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowCoordinatorDev
-      displayName: Deploy Web App
+      displayName: Deploy Workflowcoordinator NSB Service
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
       strategy:
@@ -133,7 +133,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowCoordinatorUAT
-      displayName: Deploy Web App
+      displayName: Deploy Workflowcoordinator NSB Service
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -151,7 +151,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowCoordinatorPre
-      displayName: Deploy Web App
+      displayName: Deploy Workflowcoordinator NSB Service
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
       strategy:
