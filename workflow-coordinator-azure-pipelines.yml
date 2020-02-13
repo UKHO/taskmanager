@@ -112,8 +112,9 @@ stages:
         displayName: 'Publish workflowcoordinator Artifact'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowCoordinator
+    - deployment: DeployWorkflowCoordinatorDev
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
@@ -129,8 +130,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowCoordinator
+    - deployment: DeployWorkflowCoordinatorUAT
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
@@ -146,8 +148,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:
-    - deployment: DeployWorkflowCoordinator
+    - deployment: DeployWorkflowCoordinatorPre
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
