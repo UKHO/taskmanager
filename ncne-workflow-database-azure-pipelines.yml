@@ -49,8 +49,9 @@ stages:
         displayName: 'Publish NCNE WorkflowDatabase'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:
-    - deployment: DeployNCNEWorkflowDatabase
+    - deployment: DeployNCNEWorkflowDatabaseDev
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerDev'
@@ -69,8 +70,9 @@ stages:
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:
-    - deployment: DeployNCNEWorkflowDatabase
+    - deployment: DeployNCNEWorkflowDatabaseUAT
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerUAT'
@@ -89,8 +91,9 @@ stages:
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:
-    - deployment: DeployNCNEWorkflowDatabase
+    - deployment: DeployNCNEWorkflowDatabasePre
       displayName: Deploy Web App
       pool: "NautilusRelease"
       environment: 'TaskmanagerPre'

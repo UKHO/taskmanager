@@ -149,8 +149,9 @@ stages:
       #   displayName: 'Publish specs Artifact'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:    
-    - deployment: DeployNCNEPortalWebsite
+    - deployment: DeployNCNEPortalWebsiteDev
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
@@ -168,7 +169,7 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
     # - job: RunAutomatedTests
-    #   dependsOn: DeployPortalWebsite
+    #   dependsOn: DeployNCNEPortalWebsiteDev
     #   pool:
     #       NautilusBuild
     #   steps:
@@ -199,8 +200,9 @@ stages:
     #         testResultsFormat: 'VSTest'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:    
-    - deployment: DeployNCNEPortalWebsite
+    - deployment: DeployNCNEPortalWebsiteUAT
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
@@ -218,8 +220,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:    
-    - deployment: DeployNCNEPortalWebsite
+    - deployment: DeployNCNEPortalWebsitePre
       displayName: Deploy Web App
       pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
