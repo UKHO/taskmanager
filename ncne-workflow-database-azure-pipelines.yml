@@ -52,7 +52,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployNCNEWorkflowDatabaseDev
-      displayName: Deploy Web App
+      displayName: Deploy NCNEWorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerDev'
       strategy:
@@ -73,7 +73,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployNCNEWorkflowDatabaseUAT
-      displayName: Deploy Web App
+      displayName: Deploy NCNEWorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -94,7 +94,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployNCNEWorkflowDatabasePre
-      displayName: Deploy Web App
+      displayName: Deploy NCNEWorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerPre'
       strategy:
