@@ -112,8 +112,9 @@ stages:
         displayName: 'Publish sourcedocumentcoordinator Artifact'
 
 - stage: DeployDev
+  dependsOn: Build
   jobs:
-    - deployment: DeploySourceDocumentCoordinator
+    - deployment: DeploySourceDocumentCoordinatorDev
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
@@ -129,8 +130,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/sourcedocumentcoordinator/WebJob'
 
 - stage: DeployUAT
+  dependsOn: Build
   jobs:
-    - deployment: DeploySourceDocumentCoordinator
+    - deployment: DeploySourceDocumentCoordinatorUAT
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
@@ -146,8 +148,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/sourcedocumentcoordinator/WebJob'
 
 - stage: DeployPre
+  dependsOn: Build
   jobs:
-    - deployment: DeploySourceDocumentCoordinator
+    - deployment: DeploySourceDocumentCoordinatorPre
       displayName: Deploy Web App
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
