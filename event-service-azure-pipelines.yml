@@ -97,7 +97,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployEventServiceDev
-      displayName: Deploy Web App
+      displayName: Deploy Eventservice Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerDev'
       strategy:
@@ -122,7 +122,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployEventServiceUAT
-      displayName: Deploy Web App
+      displayName: Deploy Eventservice Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -147,7 +147,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployEventServicePre
-      displayName: Deploy Web App
+      displayName: Deploy Eventservice Api
       pool: "UKHO Windows 2019"
       environment: 'TaskmanagerPre'
       strategy:
