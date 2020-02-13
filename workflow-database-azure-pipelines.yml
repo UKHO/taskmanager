@@ -39,7 +39,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowDatabaseDev
-      displayName: Deploy Web App
+      displayName: Deploy WorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerDev'
       strategy:
@@ -60,7 +60,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowDatabaseUAT
-      displayName: Deploy Web App
+      displayName: Deploy WorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerUAT'
       strategy:
@@ -81,7 +81,7 @@ stages:
   dependsOn: Build
   jobs:
     - deployment: DeployWorkflowDatabasePre
-      displayName: Deploy Web App
+      displayName: Deploy WorkflowDatabase
       pool: "NautilusRelease"
       environment: 'TaskmanagerPre'
       strategy:
