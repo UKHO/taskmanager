@@ -20,7 +20,7 @@ namespace Common.Helpers
             _hpdDbContext = hpdDbContext;
         }
 
-        public async Task<int> CreateCarisProject(string projectName, string creatorHpdUsername,
+        public async Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
             List<string> assignedHpdUsernames, string projectType, string projectStatus, string projectPriority, int carisTimeout)
         {
             var projectId = 0;
@@ -43,13 +43,14 @@ namespace Common.Helpers
             var projectTypeId = await GetCarisProjectTypeId(projectType);
 
             // Get Caris project status Id
-            var carisprojectStatusId = await GetCarisProjectStatusId(projectStatus);
+            var carisProjectStatusId = await GetCarisProjectStatusId(projectStatus);
 
             // Get Caris project priority Id
             var carisProjectPriortyId = await GetCarisProjectPriorityId(projectPriority);
 
             // Create project
-
+            var t = await CreateProject(k2ProcessId, creatorUsernameId, projectName, projectTypeId, carisProjectStatusId,
+                carisProjectPriortyId, carisTimeout);
 
             return projectId;
 
@@ -104,11 +105,11 @@ namespace Common.Helpers
 
         }
 
-        private async Task CreateCarisProject(int userId, int projectId, int projectTypeId,
-    int statusId, int priortyId, int carisTimeout)
+        private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int statusId, int priortyId, int carisTimeout)
         {
             using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
             {
+                var transaction = _hpdDbContext.Database.BeginTransaction(IsolationLevel.Serializable);
 
                 command.CommandTimeout = carisTimeout;
 
@@ -139,26 +140,43 @@ namespace Common.Helpers
                 //                     "v_assigned_users, v_default_usage); " +
                 //                     "END; ";
 
-                command.CommandText = "hpdowner.p_project_manager.addproject";
-                command.Parameters.Add(new OracleParameter("v_project_id", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_created_by", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_project_name", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_work_order", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_start_date", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_process_time", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_type_id", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_status_id", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_priority_id", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_geom", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_external_id", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_assigned_user1", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_assigned_users", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("v_default_usage", OracleDbType.Int32).Value = 123);
-                command.Parameters.Add(new OracleParameter("p_LTSTNM", OracleDbType.Varchar2)).Value = nmNumber;
-                //command.BindByName = true;
-                command.CommandType = CommandType.StoredProcedure;
-                command.ExecuteNonQuery();
 
+                command.CommandText = "hpdowner.p_project_manager.addproject";
+
+                OracleParameter assignedUsers = new OracleParameter();
+                assignedUsers.ParameterName = "v_assignedusers";
+                assignedUsers.OracleDbType = OracleDbType.Int32;
+                assignedUsers.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+                assignedUsers.Value = new Int32[3] { 16, 17, 18  };
+                assignedUsers.Size = 3;
+                command.Parameters.Add(assignedUsers);
+
+                OracleParameter geometery = new OracleParameter();
+                geometery.ParameterName = "v_geom";
+                geometery.Value = null;
+                command.Parameters.Add(geometery);
+
+                var oracleCreator = new OracleParameter("v_created_by", OracleDbType.Int32);
+                oracleCreator.Value = userId;
+                command.Parameters.Add(oracleCreator);
+
+                //command.Parameters.Add(new OracleParameter("v_created_by", OracleDbType.Int32).Value = userId);
+                command.Parameters.Add(new OracleParameter("v_project_name", OracleDbType.Varchar2).Value = projectName);
+                command.Parameters.Add(new OracleParameter("v_work_order", OracleDbType.Varchar2).Value = null);
+                command.Parameters.Add(new OracleParameter("v_start_date", OracleDbType.Date).Value = DateTime.Today);
+                command.Parameters.Add(new OracleParameter("v_process_time", OracleDbType.Varchar2).Value = null);
+                command.Parameters.Add(new OracleParameter("v_type_id", OracleDbType.Int32).Value = projectTypeId);
+                command.Parameters.Add(new OracleParameter("v_status_id", OracleDbType.Int32).Value = statusId);
+                command.Parameters.Add(new OracleParameter("v_priority_id", OracleDbType.Int32).Value = priortyId);
+                //command.Parameters.Add(new OracleParameter("v_geom", OracleDbType.Int32).Value = 123); // sdo_geometry: Cover area of interest for this project.
+                command.Parameters.Add(new OracleParameter("v_external_id", OracleDbType.Int32).Value = k2processId);
+                command.Parameters.Add(new OracleParameter("v_default_usage", OracleDbType.Int32).Value = null);
+                
+                ((OracleCommand)command).BindByName = true; 
+                command.CommandType = CommandType.StoredProcedure;
+                return await command.ExecuteNonQueryAsync();
+
+                transaction.Commit();
 
                 //command.CommandText =
                 //    "SELECT hpdowner.p_project_manager.addproject(213321, 'asds', '', NULL, '12:00', 132123, 13223, 12321, NULL, NULL, NULL, NULL, NULL) FROM dual; ";
