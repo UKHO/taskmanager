@@ -1,9 +1,13 @@
 ﻿@page
+@using System.ComponentModel.DataAnnotations
 @using System.Security.Policy
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.Extensions.Options
 @using NCNEPortal.Enums
 @model NCNEPortal.NewTaskModel
 @{
     ViewData["Title"] = "New Chart/New Edition New Task";
+
 }
 
 <form method="post" autocomplete="off">
@@ -73,23 +77,6 @@
                         <div class="col-12 col-md-3">
                             <div class="row">
                                 <div class="col">
-                                    @Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="design-custom-select">
-                                        <div class="arrow-icon-wrap">
-                                            <span class="fa fa-chevron-down arrow-icon"></span>
-                                        </div>
-                                        @Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <div class="row">
-                                <div class="col">
                                     @Html.LabelFor(model => model.WorkflowType, new { @class = "col-form-label" })
                                 </div>
                             </div>
@@ -100,6 +87,23 @@
                                             <span class="fa fa-chevron-down arrow-icon"></span>
                                         </div>
                                         @Html.DropDownListFor(model => model.WorkflowType, Model.WorkflowTypes, "", new { })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <div class="row">
+                                <div class="col">
+                                    @Html.LabelFor(model => model.ChartType, new { @class = "col-form-label" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="design-custom-select">
+                                        <div class="arrow-icon-wrap">
+                                            <span class="fa fa-chevron-down arrow-icon"></span>
+                                        </div>
+                                        @Html.DropDownListFor(model => model.ChartType, Model.ChartTypes, "", new { })
                                     </div>
                                 </div>
                             </div>
@@ -157,13 +161,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <div class="design-custom-select">
-                                                <div class="arrow-icon-wrap">
-                                                    <span class="fa fa-chevron-down arrow-icon"></span>
-                                                </div>
-                                                @Html.DropDownListFor(model => model.Compiler, Model.CompilerList, "", new { })
-                                            </div>
+                                            @Html.TextBoxFor(model => model.Compiler, "",
+                                                new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3">
@@ -174,13 +175,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <div class="design-custom-select">
-                                                <div class="arrow-icon-wrap">
-                                                    <span class="fa fa-chevron-down arrow-icon"></span>
-                                                </div>
-                                                @Html.DropDownListFor(model => model.Verifier1, Model.VerifierList1, "", new { })
-                                            </div>
+                                            @Html.TextBoxFor(model => model.Verifier1, "",
+                                                new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3">
@@ -191,13 +189,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <div class="design-custom-select">
-                                                <div class="arrow-icon-wrap">
-                                                    <span class="fa fa-chevron-down arrow-icon"></span>
-                                                </div>
-                                                @Html.DropDownListFor(model => model.Verifier2, Model.VerifierList2, "", new { })
-                                            </div>
+                                            @Html.TextBoxFor(model => model.Verifier2, "",
+                                                new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3">
@@ -208,13 +203,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <div class="design-custom-select">
-                                                <div class="arrow-icon-wrap">
-                                                    <span class="fa fa-chevron-down arrow-icon"></span>
-                                                </div>
-                                                @Html.DropDownListFor(model => model.Publisher, Model.PublisherList, "", new { })
-                                            </div>
+                                            @Html.TextBoxFor(model => model.Publisher, "",
+                                                new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -223,10 +215,19 @@
                     <hr class="mt-3 mb-3">
                     <div class="row mb-2">
                         <div class="col-12">
+                            <div id="assignRoleErrorMessages" class="dialog error collapse mt-3 pb-1">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                                    <span>There's a problem</span>
+                                </h5>
+                                <ol id="assignRoleErrorList" class="error-list"></ol>
+                            </div>
+                        </div>
+                        <div class="col-12">
                             <div class="row justify-content-end ">
                                 <div class="col-auto ">
 
-                                    <button id="btnAddIon" type="submit" class="btn btn-primary" style="min-width: 9em;">Create New Task</button>
+                                    <button id="btnCreate" type="button" class="btn btn-primary" style="min-width: 9em;">Create New Task</button>
 
                                 </div>
                             </div>

@@ -1,18 +1,26 @@
 [
   {
     "WorkflowTypeId": 1,
-    "Name": "Primary"
+    "Name": "NE"
   },
   {
     "WorkflowTypeId": 2,
-    "Name": "Adoption"
+    "Name": "NC"
   },
   {
     "WorkflowTypeId": 3,
-    "Name": "Derived"
+    "Name": "CME"
   },
   {
     "WorkflowTypeId": 4,
-    "Name": "Thematics"
+    "Name": "UNE"
+  },
+  {
+    "WorkflowTypeId": 5,
+    "Name": "Refresh"
+  },
+  {
+    "WorkflowTypeId": 6,
+    "Name": "Fleet"
   }
 ]

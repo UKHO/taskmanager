@@ -61,7 +61,7 @@ namespace NCNEPortal.Auth
                     throw new ApplicationException($"Unable to get members of group(s)");
                 }
 
-                return users.Select(o => ((User)o).DisplayName).OrderBy(s => s);
+                return users.Select(o => ((User)o).DisplayName).Distinct().OrderBy(s => s);
             }
 
             catch (Exception e)
