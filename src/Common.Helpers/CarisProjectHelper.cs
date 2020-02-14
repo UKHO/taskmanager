@@ -104,44 +104,65 @@ namespace Common.Helpers
 
         }
 
-        private async Task CreateCarisProject(OracleConnection connection, int userId, int projectId, int projectTypeId,
+        private async Task CreateCarisProject(int userId, int projectId, int projectTypeId,
     int statusId, int priortyId, int carisTimeout)
         {
-            using (var command = connection.CreateCommand())
+            using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
             {
 
                 command.CommandTimeout = carisTimeout;
 
-                var projectCommand = "DECLARE " +
-                                     "v_project_id integer; " +
-                                     $"v_created_by hpdowner.project.created_by%type := {userId}; " +
-                                     $"v_project_name hpdowner.project.pj_name%type := '{projectId}'; " +
-                                     "v_work_order hpdowner.project.pj_work_order%type := ''; " +
-                                     "v_start_date hpdowner.project.pjdate_started%type := sysdate; " +
-                                     "v_process_time hpdowner.project.pj_planned_process_time%type := ''; " +
-                                     $"v_type_id hpdowner.project.pte_project_type_id%type := {projectTypeId}; " +
-                                     $"v_status_id hpdowner.project_certification.project_status_id%type := {statusId}; " +
-                                     $"v_priority_id hpdowner.project.spy_priority_id%type := {priortyId}; " +
-                                     "v_geom hpdowner.project.geom%type := NULL; " +
-                                     "v_external_id hpdowner.project.external_id%type := NULL; " +
-                                     $"v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := {userId}; " +
-                                     "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
-                                     "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
-                                     "BEGIN " +
-                                     "v_assigned_users.extend(1); " +
-                                     "v_assigned_users(1) := hpdowner.hpdnumber$row_type(v_assigned_user1); " +
-                                     "v_project_id := hpdowner.p_project_manager.addproject( " +
-                                     "v_created_by, v_project_name, v_work_order, " +
-                                     "v_start_date, v_process_time, " +
-                                     "v_type_id, v_status_id, " +
-                                     "v_priority_id, v_geom, " +
-                                     "v_external_id, NULL, " +
-                                     "v_assigned_users, v_default_usage); " +
-                                     "END; ";
+                //var projectCommand = "DECLARE " +
+                //                     "v_project_id integer; " +
+                //                     $"v_created_by hpdowner.project.created_by%type := {userId}; " +
+                //                     $"v_project_name hpdowner.project.pj_name%type := '{projectId}'; " +
+                //                     "v_work_order hpdowner.project.pj_work_order%type := ''; " +
+                //                     "v_start_date hpdowner.project.pjdate_started%type := sysdate; " +
+                //                     "v_process_time hpdowner.project.pj_planned_process_time%type := ''; " +
+                //                     $"v_type_id hpdowner.project.pte_project_type_id%type := {projectTypeId}; " +
+                //                     $"v_status_id hpdowner.project_certification.project_status_id%type := {statusId}; " +
+                //                     $"v_priority_id hpdowner.project.spy_priority_id%type := {priortyId}; " +
+                //                     "v_geom hpdowner.project.geom%type := NULL; " +
+                //                     "v_external_id hpdowner.project.external_id%type := NULL; " +
+                //                     $"v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := {userId}; " +
+                //                     "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
+                //                     "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
+                //                     "BEGIN " +
+                //                     "v_assigned_users.extend(1); " +
+                //                     "v_assigned_users(1) := hpdowner.hpdnumber$row_type(v_assigned_user1); " +
+                //                     "v_project_id := hpdowner.p_project_manager.addproject( " +
+                //                     "v_created_by, v_project_name, v_work_order, " +
+                //                     "v_start_date, v_process_time, " +
+                //                     "v_type_id, v_status_id, " +
+                //                     "v_priority_id, v_geom, " +
+                //                     "v_external_id, NULL, " +
+                //                     "v_assigned_users, v_default_usage); " +
+                //                     "END; ";
 
-
-                command.CommandText = projectCommand;
+                command.CommandText = "hpdowner.p_project_manager.addproject";
+                command.Parameters.Add(new OracleParameter("v_project_id", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_created_by", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_project_name", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_work_order", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_start_date", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_process_time", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_type_id", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_status_id", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_priority_id", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_geom", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_external_id", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_assigned_user1", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_assigned_users", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("v_default_usage", OracleDbType.Int32).Value = 123);
+                command.Parameters.Add(new OracleParameter("p_LTSTNM", OracleDbType.Varchar2)).Value = nmNumber;
+                //command.BindByName = true;
+                command.CommandType = CommandType.StoredProcedure;
                 command.ExecuteNonQuery();
+
+
+                //command.CommandText =
+                //    "SELECT hpdowner.p_project_manager.addproject(213321, 'asds', '', NULL, '12:00', 132123, 13223, 12321, NULL, NULL, NULL, NULL, NULL) FROM dual; ";
+                //command.ExecuteNonQuery();
             }
         }
 
