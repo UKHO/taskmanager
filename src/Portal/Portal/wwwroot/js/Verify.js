@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    setVerifyDoneHandler();
     setVerifySaveHandler();
 
     var formChanged = false;
@@ -79,6 +80,15 @@
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
             }
+        });
+    }
+
+    function setVerifyDoneHandler() {
+        $("#btnDone").prop("disabled", false);
+
+
+        $("#btnDone").click(function (e) {
+            completeVerify("Done");
         });
     }
 
