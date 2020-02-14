@@ -10,16 +10,19 @@ namespace HpdDatabase.EF.Models
         }
 
         public DbSet<CarisProject> CarisProjectData { get; set; }
-        public DbSet<CarisProducts> CarisProducts { get; set; } 
+        public DbSet<CarisProduct> CarisProducts { get; set; }
+        public DbSet<CarisProjectType> CarisProjectTypes { get; set; }
         public DbSet<CarisWorkspace> CarisWorkspaces { get; set; }
         public DbSet<CarisUser> CarisUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CarisProject>().HasKey(x => x.ProjectId);
-            modelBuilder.Entity<CarisProducts>().HasKey(x => x.ProductName);
+            modelBuilder.Entity<CarisProjectType>().HasKey(x => x.ProjectTypeId);
+            modelBuilder.Entity<CarisProduct>().HasKey(x => x.ProductName);
             modelBuilder.Entity<CarisWorkspace>().HasKey(x => x.Name);
             modelBuilder.Entity<CarisUser>().HasKey(x => x.UserId);
         }
     }
 }
+    

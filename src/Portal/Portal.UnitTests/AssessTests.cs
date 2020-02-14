@@ -139,7 +139,7 @@ namespace Portal.UnitTests
         public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message()
         {
 
-            _hpDbContext.CarisProducts.Add(new CarisProducts()
+            _hpDbContext.CarisProducts.Add(new CarisProduct()
                 {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
             await _hpDbContext.SaveChangesAsync();
 
@@ -165,7 +165,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
-            _hpDbContext.CarisProducts.Add(new CarisProducts()
+            _hpDbContext.CarisProducts.Add(new CarisProduct()
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 

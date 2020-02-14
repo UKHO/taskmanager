@@ -20,12 +20,15 @@ namespace Common.Helpers
             _hpdDbContext = hpdDbContext;
         }
 
-        public async Task<bool> CreateCarisProject(string projectName, string creatorHpdUsername, List<string> assignedToHpdUsernames, string projectType, string projectStatus, string projectPriority)
+        public async Task<bool> CreateCarisProject(string projectName, string creatorHpdUsername,
+            List<string> assignedHpdUsernames, string projectType, string projectStatus, string projectPriority)
         {
             // Check if project already exists
-            if ( await _hpdDbContext.CarisProjectData.AnyAsync(p => p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase)))
+            if (await _hpdDbContext.CarisProjectData.AnyAsync(p =>
+                p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase)))
             {
-                throw new ArgumentException($"Failed to create Caris project {projectName}, project already exists",nameof(projectName));
+                throw new ArgumentException($"Failed to create Caris project {projectName}, project already exists",
+                    nameof(projectName));
             }
 
             // Get Project Creator Id
@@ -34,25 +37,42 @@ namespace Common.Helpers
 
             if (creator == null)
             {
-                throw new ArgumentException($"Failed to get caris creator username {creatorHpdUsername}, user might not exists in HPD", nameof(creatorHpdUsername));
+                throw new ArgumentException(
+                    $"Failed to get caris creator username {creatorHpdUsername}, user might not exists in HPD",
+                    nameof(creatorHpdUsername));
             }
 
             var creatorId = creator.UserId;
 
-            // Get Assigned To ids
-            var assignedToIds = new List<int>(assignedToHpdUsernames.Count);
-            foreach (var assignedToHpdUsername in assignedToHpdUsernames)
+            // Get Assigned users ids
+            var assignedToIds = new List<int>(assignedHpdUsernames.Count);
+            foreach (var assignedToHpdUsername in assignedHpdUsernames)
             {
                 var user = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
                     u.Username.Equals(assignedToHpdUsername, StringComparison.InvariantCultureIgnoreCase));
 
                 if (user == null)
                 {
-                    throw new ArgumentException($"Failed to get caris assigned to username {assignedToHpdUsername}, user might not exists in HPD", nameof(assignedToHpdUsernames));
+                    throw new ArgumentException(
+                        $"Failed to get caris assigned to username {assignedToHpdUsername}, user might not exists in HPD",
+                        nameof(assignedHpdUsernames));
                 }
 
                 assignedToIds.Add(user.UserId);
             }
+
+            // Get Caris Project Type Id
+            var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
+                p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
+
+            if (carisProjectType == null)
+            {
+                throw new ArgumentException(
+                    $"Failed to get caris project type {projectType}, project type might not exists in HPD",
+                    nameof(projectType));
+            }
+
+            var carisProjectTypeId = carisProjectType.ProjectTypeId;
 
             return true;
 
@@ -107,3 +127,4 @@ namespace Common.Helpers
 
         }
     }
+}
