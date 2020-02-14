@@ -87,6 +87,19 @@ namespace Common.Helpers
             
             var carisProjectStatusId = carisProjectStatus.ProjectStatusId;
 
+            // Get Caris project priority Id
+            var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
+                s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
+
+            if (carisProjectPriority == null)
+            {
+                throw new ArgumentException(
+                    $"Failed to get caris project priority {projectPriority}, project status might not exists in HPD",
+                    nameof(projectPriority));
+            }
+
+            var carisProjectPriorityId = carisProjectPriority.ProjectPriorityId;
+
             return true;
 
             //var creatingProjectResponse = new DbResponse<HpdCreateProjectResponse>
