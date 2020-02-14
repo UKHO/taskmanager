@@ -13,7 +13,8 @@ namespace Portal.Configuration
         public string SessionFilename { get; set; }
         public string CarisNewProjectStatus { get; set; }
         public string CarisNewProjectPriority { get; set; }
-        public string CarisNewProjectType { get; set; } 
+        public string CarisNewProjectType { get; set; }
+        public int CarisProjectTimeoutSeconds { get; set; }
 
     }
 }   
