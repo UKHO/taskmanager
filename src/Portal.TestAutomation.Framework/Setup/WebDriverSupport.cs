@@ -19,7 +19,10 @@ namespace Portal.TestAutomation.Framework.Driver
         [BeforeScenario(Order = 0)]
         public void InitializeWebDriver()
         {
-            var webDriver = new ChromeDriver(Environment.GetEnvironmentVariable("ChromeWebDriver"));
+            var chromeDriverDirectory = Environment.GetEnvironmentVariable("ChromeWebDriver");
+            if (string.IsNullOrEmpty(chromeDriverDirectory)) throw new ApplicationException("Missing environment variable: ChromeWebDriver");
+
+            var webDriver = new ChromeDriver(chromeDriverDirectory);
             _objectContainer.RegisterInstanceAs<IWebDriver>(webDriver);
         }
     }
