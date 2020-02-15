@@ -213,5 +213,35 @@ namespace Portal.UnitTests
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages[0]);
         }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_dataimpacts_then_validation_error_message_is_present()
+        {
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+
+            _verifyModel.Verifier = "TestUser";
+            var hpdUsage1 = new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "HpdUsageName1"
+            };
+            var hpdUsage2 = new HpdUsage()
+            {
+                HpdUsageId = 2,
+                Name = "HpdUsageName2"
+            };
+            _verifyModel.DataImpacts = new List<DataImpact>()
+            {
+                new DataImpact() { DataImpactId = 1, HpdUsageId = 1, HpdUsage = hpdUsage1, ProcessId = 123},
+                new DataImpact() {DataImpactId = 2, HpdUsageId = 2, HpdUsage = hpdUsage2, ProcessId = 123}
+            };
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages[0]);
+        }
     }
 }
