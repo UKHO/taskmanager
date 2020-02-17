@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using HpdDatabase.EF.Models;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +55,7 @@ namespace Common.Helpers
         private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int statusId,
             int priortyId, int carisTimeout, string workspace)
         {
-            int something;
+            int carisProjectId;
 
             using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
             {
@@ -98,15 +94,18 @@ namespace Common.Helpers
                                          "END; ";
 
                     command.CommandText = projectCommand;
-                    something = await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
                     transaction.Commit();
+
+                    carisProjectId = (await _hpdDbContext.CarisProjectData.SingleAsync(p =>
+                        p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase))).ProjectId;
                 }
                 catch (Exception e)
                 {
                     transaction.Rollback();
                     throw e;
                 }
-                return something;
+                return carisProjectId;
             }
         }
 

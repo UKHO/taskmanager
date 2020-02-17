@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Portal.Configuration;
+
 namespace Portal.IntegrationTests
 {
     public class HpdDatabaseTests
