@@ -43,6 +43,8 @@ namespace Portal.Pages.DbAssessment
 
         public CarisProjectDetails CarisProjectDetails { get; set; }
 
+        public bool IsCarisProjectCreated { get; set; } 
+
         private string _userFullName;
 
         public string UserFullName
@@ -80,8 +82,7 @@ namespace Portal.Pages.DbAssessment
 
             await GetCarisData(processId, taskStage);
 
-            CarisProjectDetails = await GetCarisProjectDetails(processId);
-            ProjectName = CarisProjectDetails.ProjectName;
+            await GetCarisProjectDetails(processId);
 
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
@@ -130,40 +131,21 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
         {
-            HpdUser hpdUser;
+
+            await ValidateCarisProjectDetails(projectName, carisWorkspace);
+
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
-            try
-            {
-                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
-                    StringComparison.CurrentCultureIgnoreCase));
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
-                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}.",
-                    ex.InnerException);
-            }
-
-            if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c => c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
-                throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
-            }
-
-            if (string.IsNullOrWhiteSpace(projectName))
-            {
-                throw new ArgumentException("Please provide a Caris Project Name.");
-            }
+            var hpdUser = await GetHpdUser();
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername,
                  null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
                  _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
 
             // If somehow the user has already created a project, remove it and create new row
+            var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
+            _dbContext.CarisProjectDetails.RemoveRange(toRemove);
 
-            _dbContext.CarisProjectDetails.RemoveRange(
-                _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId));
             await _dbContext.SaveChangesAsync();
 
             _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
@@ -178,6 +160,37 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
 
             return StatusCode(200);
+        }
+
+        private async Task ValidateCarisProjectDetails(string projectName, string carisWorkspace)
+        {
+            if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
+                c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
+                throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
+            }
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+        }
+
+        private async Task<HpdUser> GetHpdUser()
+        {
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
+                    StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
+                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}.",
+                    ex.InnerException);
+            }
+
         }
 
         private async Task GetCarisData(int processId, string taskStage)
@@ -198,9 +211,12 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task<CarisProjectDetails> GetCarisProjectDetails(int processId)
+        private async Task GetCarisProjectDetails(int processId)
         {
-            return await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+            CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            IsCarisProjectCreated = CarisProjectDetails != null;
+            ProjectName = CarisProjectDetails != null ? CarisProjectDetails.ProjectName : "";
         }
 
     }

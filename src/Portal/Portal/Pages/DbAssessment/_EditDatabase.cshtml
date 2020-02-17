@@ -35,18 +35,11 @@
                     <div id="launchSourceEditorDownloadError"></div>
                     <div class="row justify-content-start">
                         <div class="col-4">
-                            @if (Model.CarisProjectDetails != null)
-                            {
-                                <button id="btnCreateCarisProject" class="btn btn-primary disabled" type="button">Create CARIS Project</button>
-                            }
-                            else
-                            {
-                                <button id="btnCreateCarisProject" class="btn btn-primary" type="button">Create CARIS Project</button>
-                            }
+                            <button id="btnCreateCarisProject" type="button" class="btn btn-primary"  @(Model.IsCarisProjectCreated ? "disabled" : "")>Create CARIS Project</button>
                         </div>
                         <div class="col-8 pl-2">
                             <a id="hdnDownloadLink" hidden></a>
-                            <button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary" >Launch CARIS Source Editor</button>
+                            <button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary " @(!Model.IsCarisProjectCreated ? "disabled" : "")>Launch CARIS Source Editor</button>
                         </div>
                     </div>
 
