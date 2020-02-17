@@ -252,7 +252,6 @@ namespace Portal.Pages.DbAssessment
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
-            currentAssess.CarisProjectName = ProjectName;
             currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
 
             await _dbContext.SaveChangesAsync();

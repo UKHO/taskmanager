@@ -367,7 +367,6 @@ namespace Portal.Pages.DbAssessment
         {
             var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
 
-            currentVerify.CarisProjectName = ProjectName;
             currentVerify.WorkspaceAffected = SelectedCarisWorkspace;
 
             await _dbContext.SaveChangesAsync();

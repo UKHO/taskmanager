@@ -40,6 +40,8 @@ namespace WorkflowDatabase.EF
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
+        public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

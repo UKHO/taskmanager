@@ -41,6 +41,8 @@ namespace Portal.Pages.DbAssessment
 
         public string SessionFilename { get; set; }
 
+        public CarisProjectDetails CarisProjectDetails { get; set; }
+
         private string _userFullName;
 
         public string UserFullName
@@ -77,6 +79,9 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
             await GetCarisData(processId, taskStage);
+
+            CarisProjectDetails = await GetCarisProjectDetails(processId);
+            ProjectName = CarisProjectDetails.ProjectName;
 
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
@@ -155,6 +160,23 @@ namespace Portal.Pages.DbAssessment
                  null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
                  _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
 
+            // If somehow the user has already created a project, remove it and create new row
+
+            _dbContext.CarisProjectDetails.RemoveRange(
+                _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId));
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
+            {
+                ProcessId = processId,
+                Created = DateTime.Now,
+                CreatedBy = UserFullName,
+                ProjectId = projectId,
+                ProjectName = projectName
+            });
+
+            await _dbContext.SaveChangesAsync();
+
             return StatusCode(200);
         }
 
@@ -165,17 +187,20 @@ namespace Portal.Pages.DbAssessment
                 case "Assess":
                     var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
                     SelectedCarisWorkspace = assessData.WorkspaceAffected;
-                    ProjectName = assessData.CarisProjectName;
                     break;
                 case "Verify":
                     var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(vd => vd.ProcessId == processId);
                     SelectedCarisWorkspace = verifyData.WorkspaceAffected;
-                    ProjectName = verifyData.CarisProjectName;
                     break;
                 default:
                     _logger.LogError("{ActivityName} is not implemented for processId: {ProcessId}.");
                     throw new NotImplementedException($"{taskStage} is not implemented for processId: {processId}.");
             }
+        }
+
+        private async Task<CarisProjectDetails> GetCarisProjectDetails(int processId)
+        {
+            return await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
         }
 
     }

@@ -224,4 +224,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="WorkspaceAffected" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="3659a827-3fb0-4d71-a160-3493314ae3c3" ChangeDateTime="02/17/2020 15:38:04">
+    <Property Name="ElementName" Value="[dbo].[CarisProjectDetails].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CarisProjectDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CarisProjectDetailsId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fe0c3ade-34e1-426a-81f1-f7ff9374d85a" ChangeDateTime="02/17/2020 15:38:52">
+    <Property Name="ElementName" Value="[dbo].[CarisProjectDetails].[WorkspaceAffected]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CarisProjectDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProjectId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8adc0301-98f8-4af7-b961-30d3418959f2" ChangeDateTime="02/17/2020 15:39:36">
+    <Property Name="ElementName" Value="[dbo].[CarisProjectDetails].[WorkspaceAffected]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CarisProjectDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Workspace" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cdc1e55e-ebf6-411e-adaa-c388441a68d7" ChangeDateTime="02/17/2020 15:41:01">
+    <Property Name="ElementName" Value="[dbo].[CarisProjectDetails].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CarisProjectDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedBy" />
+  </Operation>
 </Operations>
