@@ -55,6 +55,7 @@ namespace WorkflowCoordinator.Handlers
             }
 
             var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
+                .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == message.ProcessId);
 
             workflowInstance.SerialNumber = k2Task.SerialNumber;
@@ -101,6 +102,10 @@ namespace WorkflowCoordinator.Handlers
                 foreach (var productAction in workflowInstance.ProductAction)
                 {
                     productAction.Verified = false;
+                }
+                foreach (var dataImpact in workflowInstance.DataImpact)
+                {
+                    dataImpact.Verified = false;
                 }
 
                 return;
