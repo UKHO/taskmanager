@@ -108,15 +108,16 @@ namespace Portal.Helpers
         /// <param name="verifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateVerifyPage(
-            string ion,
+        public async Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
             string sourceCategory,
             string verifier,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
+            string action,
             List<string> validationErrorMessages)
         {
             var isValid = true;
@@ -131,7 +132,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(recordProductAction, validationErrorMessages))
+            if (!await ValidateRecordProductAction(recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -336,11 +337,36 @@ namespace Portal.Helpers
 
 
         /// <summary>
-        /// Used in Assess and Verify pages
+        /// Used in Verify pages
         /// </summary>
         /// <param name="recordProductAction"></param>
+        /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
+        private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        {
+            var isValid = await ValidateRecordProductAction(recordProductAction, validationErrorMessages);
+
+            if (action != "Done")
+            {
+                return isValid;
+            }
+
+            if (recordProductAction != null && recordProductAction.Count > 0)
+            {
+                if (!recordProductAction.All(pa => pa.Verified))
+                {
+                    validationErrorMessages.Add(
+                        $"Record Product Action: All Product Actions must be verified");
+                    isValid = false;
+                }
+
+                
+            }
+
+            return isValid;
+        }
+
         private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
             bool isValid = true;
@@ -353,7 +379,7 @@ namespace Portal.Helpers
                     || r.ProductActionTypeId == 0))
                 {
                     validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
-                    return false;
+                    return isValid;
                 }
 
                 foreach (var productAction in recordProductAction)
@@ -366,7 +392,8 @@ namespace Portal.Helpers
 
                     if (!isExist)
                     {
-                        validationErrorMessages.Add($"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                        validationErrorMessages.Add(
+                            $"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
                         isValid = false;
                     }
                 }

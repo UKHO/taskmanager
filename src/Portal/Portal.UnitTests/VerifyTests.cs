@@ -186,5 +186,32 @@ namespace Portal.UnitTests
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages[0]);
         }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_productactions_then_validation_error_message_is_present()
+        {
+            _hpDbContext.CarisProducts.Add(new CarisProducts()
+                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProducts()
+                { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
+            };
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages[0]);
+        }
     }
 }

@@ -121,7 +121,7 @@ namespace Portal.Pages.DbAssessment
                 SourceCategory,
                 Verifier,
                 RecordProductAction,
-                DataImpacts,
+                DataImpacts, action,
                 ValidationErrorMessages))
             {
                 return new JsonResult(this.ValidationErrorMessages)

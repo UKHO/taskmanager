@@ -41,7 +41,6 @@ namespace Portal.Helpers
             List<string> validationErrorMessages);
 
 
-
         /// <summary>
         /// Used in Verify page
         /// </summary>
@@ -51,15 +50,16 @@ namespace Portal.Helpers
         /// <param name="verifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        Task<bool> ValidateVerifyPage(
-            string ion,
+        Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
             string sourceCategory,
             string verifier,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
+            string action,
             List<string> validationErrorMessages);
     }
 }

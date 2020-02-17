@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
@@ -53,7 +54,8 @@ namespace WorkflowCoordinator.Handlers
                 throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivityName}");
             }
 
-            var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == message.ProcessId);
+            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
+                .FirstAsync(wi => wi.ProcessId == message.ProcessId);
 
             workflowInstance.SerialNumber = k2Task.SerialNumber;
             workflowInstance.ActivityName = k2Task.ActivityName;
@@ -63,7 +65,7 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivityName)
             {
                 case "Assess":
-                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId);
+                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivityName, workflowInstance);
                     break;
                 case "Verify":
                     await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
@@ -81,15 +83,28 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistWorkflowDataToAssess(
-            int processId,
-            int workflowInstanceId)
+        private async Task PersistWorkflowDataToAssess(int processId,
+            int workflowInstanceId, string fromActivityName, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+            LogContext.PushProperty("FromActivityName", fromActivityName);
 
-            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
+                                   "workflowInstanceId: {WorkflowInstanceId}; and fromActivityName: {FromActivityName}.");
+
+            if (fromActivityName == "Verify")
+            {
+                //TODO: Copy data from Verify to Assess
+
+                foreach (var productAction in workflowInstance.ProductAction)
+                {
+                    productAction.Verified = false;
+                }
+
+                return;
+            }
 
             var reviewData = await _dbContext.DbAssessmentReviewData.SingleAsync(d => d.ProcessId == processId);
 
