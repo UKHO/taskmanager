@@ -85,7 +85,7 @@ namespace Common.Helpers
                                          "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
                                          "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
                                          "BEGIN " +
-                                         $"SELECT geom into v_geom FROM hpdowner.hpd_workspaces_vw where ws_name = {workspace}; " +
+                                         $"SELECT geom into v_geom FROM hpdowner.hpd_workspaces_vw where ws_name = '{workspace}'; " +
                                          "v_assigned_users.extend(1); " +
                                          "v_assigned_users(1) := hpdowner.hpdnumber$row_type(v_assigned_user1); " +
                                          "v_project_id := hpdowner.p_project_manager.addproject( " +
