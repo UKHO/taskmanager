@@ -137,7 +137,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
+            if (!ValidateDataImpact(dataImpacts, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -403,6 +403,35 @@ namespace Portal.Helpers
                     .Select(y => y.Key).Any())
                 {
                     validationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Used in Verify pages
+        /// </summary>
+        /// <param name="dataImpacts"></param>
+        /// <param name="action"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <returns></returns>
+        private bool ValidateDataImpact(List<DataImpact> dataImpacts, string action, List<string> validationErrorMessages)
+        {
+            var isValid = ValidateDataImpact(dataImpacts, validationErrorMessages);
+
+            if (action != "Done")
+            {
+                return isValid;
+            }
+
+            if (dataImpacts != null && dataImpacts.Count > 0)
+            {
+                if (!dataImpacts.All(di => di.Verified))
+                {
+                    validationErrorMessages.Add(
+                        $"Data Impact: All Usages must be verified");
                     isValid = false;
                 }
             }
