@@ -7,10 +7,6 @@
     }).datepicker('update');
 
 
-
-   
-
-
     $("#btnClose").click(function() {
         window.location.href = '/Index';
     });
@@ -100,13 +96,11 @@
     });
 
 
-   
     initDesignCustomSelect();
-
+  
     initialiseAssignRoleTypeahead();
 
-
-
+    
     function initialiseAssignRoleTypeahead() {
         $('#assignRoleTypeaheadError').collapse("hide");
         // Constructing the suggestion engine
@@ -198,28 +192,6 @@
                     notFound: '<div>No results</div>'
                 }
             });
-
-    }
-
-
-
-    function getNewTask() {
-        $.ajax({
-            type: "GET",
-            url: "NewTask",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            contentType: "application/json; charset=utf-8",
-            success: function (result) {
-                $("#assignTasks").html(result);
-            },
-            error: function (error) {
-                var responseJson = error.responseJSON;
-                displayAssignRoleErrors(responseJson);
-
-            }
-        });
 
     }
 

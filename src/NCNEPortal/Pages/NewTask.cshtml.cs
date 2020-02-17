@@ -100,38 +100,43 @@ namespace NCNEPortal
                             IUserIdentityService userIdentityService,
                             IDirectoryService directoryService)
         {
-            _directoryService = directoryService;
-            _ncneWorkflowDbContext = ncneWorkflowDbContext;
-            _milestoneCalculator = milestoneCalculator;
-            _logger = logger;
-            _userIdentityService = userIdentityService;
+            try
+            {
+                _directoryService = directoryService;
+                _ncneWorkflowDbContext = ncneWorkflowDbContext;
+                _milestoneCalculator = milestoneCalculator;
+                _logger = logger;
+                _userIdentityService = userIdentityService;
 
 
-            Ion = "";
-            ChartNo = "";
-            Country = "UK";
+                LogContext.PushProperty("ActivityName", "NewTask");
 
-            SetChartTypes();
-            SetWorkflowTypes();
+                Ion = "";
+                ChartNo = "";
+                Country = "UK";
 
-            PublicationDate = null;
+                SetChartTypes();
+                SetWorkflowTypes();
 
-            ValidationErrorMessages = new List<string>();
+                PublicationDate = null;
 
+                ValidationErrorMessages = new List<string>();
+
+                userList = _directoryService.GetGroupMembers().Result.ToList();
+
+            }
+            catch (Exception ex)
+            {
+
+                ValidationErrorMessages.Add(ex.Message);
+                _logger.LogError(ex, "Error while initializing the new task page");
+
+            }
 
         }
 
         public void OnGet()
         {
-            try
-            {
-                if (userList.Count == 0)
-                    userList = _directoryService.GetGroupMembers().Result.ToList();
-            }
-            catch (Exception ex)
-            {
-                ValidationErrorMessages.Add(ex.Message);
-            }
         }
 
         public async Task<IActionResult> OnPost()
@@ -277,18 +282,29 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            if (userList.Count == 0)
+            LogContext.PushProperty("ActivityName", "New Task");
+            LogContext.PushProperty("Action", "GetUsersForTypeAhead");
+
+            try
             {
-                return new JsonResult("Error")
+                if (userList.Count == 0)
+                {
+                    return new JsonResult("Error")
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+                return new JsonResult(userList);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Unable to get the user list");
+                return new JsonResult(ex.Message)
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
             }
-            else
-            {
-                return new JsonResult(userList);
-            }
-
 
         }
 
