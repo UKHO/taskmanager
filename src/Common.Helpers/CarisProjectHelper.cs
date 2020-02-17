@@ -4,6 +4,7 @@ using System.Data;
 using HpdDatabase.EF.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
 
 namespace Common.Helpers
 {
@@ -52,36 +53,86 @@ namespace Common.Helpers
             return projectId;
         }
 
-        private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int statusId,
-            int priortyId, int carisTimeout, string workspace)
+        private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int projectStatusId,
+            int projectPriorityId, int carisTimeout, string workspace)
         {
-            int carisProjectId;
-
             using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
             {
                 var transaction = _hpdDbContext.Database.BeginTransaction(IsolationLevel.Serializable);
+
+                int carisProjectId;
 
                 try
                 {
                     command.CommandTimeout = carisTimeout;
 
+                    command.Parameters.Add(new OracleParameter("userId", OracleDbType.Int32, ParameterDirection.Input)
+                    {
+                        Value = userId
+                    });
+
+                    command.Parameters.Add(new OracleParameter("projectName", OracleDbType.Varchar2, ParameterDirection.Input)
+                    {
+                        Value = projectName
+                    });
+
+                    command.Parameters.Add(new OracleParameter("worksOrder", OracleDbType.Varchar2, ParameterDirection.Input)
+                    {
+                        Value = null
+                    });
+
+                    command.Parameters.Add(new OracleParameter("startedDate", OracleDbType.Date, ParameterDirection.Input)
+                    {
+                        Value = DateTime.Today
+                    });
+
+                    command.Parameters.Add(new OracleParameter("processTime", OracleDbType.Varchar2, ParameterDirection.Input)
+                    {
+                        Value = null
+                    });
+
+                    command.Parameters.Add(new OracleParameter("projectTypeId", OracleDbType.Int32, ParameterDirection.Input)
+                    {
+                        Value = projectTypeId
+                    });
+
+                    command.Parameters.Add(new OracleParameter("projectStatusId", OracleDbType.Int32, ParameterDirection.Input)
+                    {
+                        Value = projectStatusId
+                    });
+
+                    command.Parameters.Add(new OracleParameter("projectPriorityId", OracleDbType.Int32, ParameterDirection.Input)
+                    {
+                        Value = projectPriorityId
+                    });
+
+                    command.Parameters.Add(new OracleParameter("k2processId", OracleDbType.Varchar2, ParameterDirection.Input)
+                    {
+                        Value = k2processId
+                    });
+
+                    command.Parameters.Add(new OracleParameter("workspace", OracleDbType.Varchar2, ParameterDirection.Input)
+                    {
+                        Value = workspace
+                    });
+
                     var projectCommand = "DECLARE " +
                                          "v_project_id integer; " +
-                                         $"v_created_by hpdowner.project.created_by%type := {userId}; " +
-                                         $"v_project_name hpdowner.project.pj_name%type := '{projectName}'; " +
-                                         "v_work_order hpdowner.project.pj_work_order%type := NULL; " +
-                                         "v_start_date hpdowner.project.pjdate_started%type := sysdate; " +
-                                         "v_process_time hpdowner.project.pj_planned_process_time%type := NULL; " +
-                                         $"v_type_id hpdowner.project.pte_project_type_id%type := {projectTypeId}; " +
-                                         $"v_status_id hpdowner.project_certification.project_status_id%type := {statusId}; " +
-                                         $"v_priority_id hpdowner.project.spy_priority_id%type := {priortyId}; " +
+                                         "v_created_by hpdowner.project.created_by%type := :userId; " +
+                                         "v_project_name hpdowner.project.pj_name%type := :projectName; " +
+                                         "v_work_order hpdowner.project.pj_work_order%type := :worksOrder; " +
+                                         "v_start_date hpdowner.project.pjdate_started%type := :startedDate; " +
+                                         "v_process_time hpdowner.project.pj_planned_process_time%type := :processTime; " +
+                                         "v_type_id hpdowner.project.pte_project_type_id%type := :projectTypeId; " +
+                                         "v_status_id hpdowner.project_certification.project_status_id%type := :projectStatusId; " +
+                                         "v_priority_id hpdowner.project.spy_priority_id%type := :projectPriorityId; " +
                                          "v_geom hpdowner.project.geom%type; " +
-                                         $"v_external_id hpdowner.project.external_id%type := {k2processId}; " +
-                                         $"v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := {userId}; " +
+                                         "v_external_id hpdowner.project.external_id%type := :k2processId; " +
+                                         "v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := :userId; " +
                                          "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
                                          "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
                                          "BEGIN " +
-                                         $"SELECT geom into v_geom FROM hpdowner.hpd_workspaces_vw where ws_name = '{workspace}'; " +
+                                         "SELECT geom into v_geom FROM hpdowner.hpd_workspaces_vw where ws_name = :workspace; " +
                                          "v_assigned_users.extend(1); " +
                                          "v_assigned_users(1) := hpdowner.hpdnumber$row_type(v_assigned_user1); " +
                                          "v_project_id := hpdowner.p_project_manager.addproject( " +

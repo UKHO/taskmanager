@@ -40,7 +40,7 @@ namespace Portal.IntegrationTests
             };
             try
             {
-                await helper.CreateCarisProject(7777, "SamirTesting", "WORTHG_CARIS", users, "New Source", "New", "Normal", 300, "2085_0");
+                await helper.CreateCarisProject(7777, $"SamirTesting_{DateTime.Now}", "WORTHG_CARIS", users, "New Source", "New", "Normal", 300, "2085_0");
             }
             catch (Exception e)
             {
