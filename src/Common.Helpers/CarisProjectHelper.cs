@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Common.Helpers
 {
-    public class CarisProjectHelper
+    public class CarisProjectHelper : ICarisProjectHelper
     {
         private readonly HpdDbContext _hpdDbContext;
 

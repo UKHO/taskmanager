@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Common.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<GeneralConfig> _generalConfig;
         private IUserIdentityService _userIdentityService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
+        private readonly ICarisProjectHelper _carisProjectHelper;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Select CARIS Workspace:")]
@@ -36,7 +38,7 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("CARIS Project Name:")]
         public string ProjectName { get; set; }
 
-        public string SessionFilename { get; set; } 
+        public string SessionFilename { get; set; }
 
         private string _userFullName;
 
@@ -54,13 +56,15 @@ namespace Portal.Pages.DbAssessment
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
             IUserIdentityService userIdentityService,
-            ISessionFileGenerator sessionFileGenerator)
+            ISessionFileGenerator sessionFileGenerator,
+            ICarisProjectHelper carisProjectHelper)
         {
             _dbContext = dbContext;
             _logger = logger;
             _generalConfig = generalConfig;
             _userIdentityService = userIdentityService;
             _sessionFileGenerator = sessionFileGenerator;
+            _carisProjectHelper = carisProjectHelper;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -117,6 +121,15 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(ex, "Failed to generate session file.");
                 throw;
             }
+        }
+
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
+        {
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, UserFullName,
+                 null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus, 
+                 _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
+
+            return StatusCode(200);
         }
 
         private async Task GetCarisData(int processId, string taskStage)

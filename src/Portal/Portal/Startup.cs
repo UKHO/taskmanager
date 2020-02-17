@@ -158,6 +158,7 @@ namespace Portal
             services.AddScoped<ITaskDataHelper, TaskDataHelper>();
             services.AddScoped<IPageValidationHelper, PageValidationHelper>();
             services.AddScoped<ISessionFileGenerator, SessionFileGenerator>();
+            services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();

@@ -24,6 +24,7 @@ function getEditDatabase() {
         success: function (result) {
             $("#editDatabase").html(result);
             launchSourceEditorDownloadHandler();
+            createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
         },
         error: function (error) {
@@ -35,6 +36,47 @@ function getEditDatabase() {
                     + errorMessage
                     + "</div>");
         }
+    });
+}
+
+function createCarisProjectHandler() {
+    $("#btnCreateCarisProject").on("click", function () {
+        $("#btnCreateCarisProject").prop("disabled", true);
+
+        var processId = Number($("#hdnProcessId").val());
+        var pageIdentity = $("#pageIdentity").val();
+        var projectName = $("#ProjectName").val();
+        var carisWorkspace = $("#SelectedCarisWorkspace").val();
+
+        $.ajax({
+            type: "POST",
+            url: "_EditDatabase/?handler=CreateCarisProject",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "taskStage": pageIdentity,
+                "projectName": projectName,
+                "carisWorkspace": carisWorkspace
+            },
+            success: function (data) {
+
+            },
+            error: function (error) {
+                var errorMessage = error.getResponseHeader("Error");
+
+                $("#launchSourceEditorDownloadError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create Caris Project. "
+                        + errorMessage
+                        + "</div>");
+            },
+            complete: function () {
+
+                $("#btnCreateCarisProject").prop("disabled", false);
+            }
+        });
+
     });
 }
 
