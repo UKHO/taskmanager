@@ -111,7 +111,6 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-
                 fs.Dispose();
                 _logger.LogError(ex, "Failed to serialize Caris session file.");
                 throw;
@@ -127,6 +126,8 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
         {
             HpdUser hpdUser;
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
             try
             {
                 hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
@@ -139,8 +140,19 @@ namespace Portal.Pages.DbAssessment
                     ex.InnerException);
             }
 
+            if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c => c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
+                throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
+            }
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername,
-                 null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus, 
+                 null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
                  _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
 
             return StatusCode(200);
