@@ -17,6 +17,7 @@ using Portal.Helpers;
 using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -125,7 +126,20 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
         {
-            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, UserFullName,
+            HpdUser hpdUser;
+            try
+            {
+                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
+                    StringComparison.CurrentCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
+                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}.",
+                    ex.InnerException);
+            }
+
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername,
                  null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus, 
                  _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
 
