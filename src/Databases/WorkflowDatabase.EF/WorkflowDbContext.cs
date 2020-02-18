@@ -87,6 +87,12 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
 
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasOne(p => p.CarisProjectDetails)
+                .WithOne()
+                .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
+                .HasForeignKey<CarisProjectDetails>(p => p.ProcessId);
+
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
 
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);

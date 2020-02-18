@@ -26,5 +26,6 @@ namespace WorkflowDatabase.EF.Models
         public virtual List<DataImpact> DataImpact { get; set; }
         public virtual List<ProductAction> ProductAction { get; set; }
         public virtual List<DbAssessmentAssignTask> DbAssessmentAssignTask { get; set; }
+        public virtual CarisProjectDetails CarisProjectDetails { get; set; }
     }
 }
