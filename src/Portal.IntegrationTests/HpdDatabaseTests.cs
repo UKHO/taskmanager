@@ -27,26 +27,6 @@ namespace Portal.IntegrationTests
                 .UseOracle(connection)
                 .Options;
             _dbContext = new HpdDbContext(_dbContextOptions);
-            _dbContext.Database.OpenConnection();
-            var helper = new CarisProjectHelper(_dbContext);
-            var users = new List<string>()
-            {
-                "MILLARDS_CARIS",
-                "PARKERD_CARIS",
-                "TALBOTA_CARIS",
-                "YARDP_CARIS",
-                "ROSSITERA_CARIS",
-                "RIGGK_CARIS"
-            };
-            try
-            {
-                await helper.CreateCarisProject(7777, $"SamirTesting_{DateTime.Now}", "WORTHG_CARIS", "New Source", "New", "Normal", 300, "2085_0");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
         }
         [Test]
         public void Test_Hpd_Db_Connection()
