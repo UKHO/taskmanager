@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
@@ -14,9 +15,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using ChartType = NCNEPortal.Models.ChartType;
-using User = NCNEPortal.Models.User;
 using WorkflowType = NCNEPortal.Models.WorkflowType;
 
 
@@ -24,9 +25,11 @@ namespace NCNEPortal
 {
     public class NewTaskModel : PageModel
     {
+        private readonly IDirectoryService _directoryService;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
         private readonly ILogger<NewTaskModel> _logger;
+        private readonly IUserIdentityService _userIdentityService;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -71,59 +74,77 @@ namespace NCNEPortal
         [DisplayName("Compiler")]
         public string Compiler { get; set; }
 
-        public SelectList CompilerList { get; set; }
 
         [BindProperty]
         [DisplayName("Verifier V1")]
         public string Verifier1 { get; set; }
 
-        public SelectList VerifierList1 { get; set; }
 
         [BindProperty]
         [DisplayName("Verifier V2")]
         public string Verifier2 { get; set; }
 
-        public SelectList VerifierList2 { get; set; }
 
         [BindProperty]
         [DisplayName("Publication")]
         public string Publisher { get; set; }
 
-        public SelectList PublisherList { get; set; }
+
+        public List<string> ValidationErrorMessages { get; set; }
+
+        public List<String> userList = new List<string>();
 
         public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext,
                             IMilestoneCalculator milestoneCalculator,
-                            ILogger<NewTaskModel> logger)
+                            ILogger<NewTaskModel> logger,
+                            IUserIdentityService userIdentityService,
+                            IDirectoryService directoryService)
         {
-            _ncneWorkflowDbContext = ncneWorkflowDbContext;
-            _milestoneCalculator = milestoneCalculator;
-            _logger = logger;
+            try
+            {
+                _directoryService = directoryService;
+                _ncneWorkflowDbContext = ncneWorkflowDbContext;
+                _milestoneCalculator = milestoneCalculator;
+                _logger = logger;
+                _userIdentityService = userIdentityService;
 
 
-            Ion = "";
-            ChartNo = "";
-            Country = "UK";
+                LogContext.PushProperty("NCNEPortalResource", "NewTask");
 
-            SetChartTypes();
-            SetWorkflowTypes();
+                Ion = "";
+                ChartNo = "";
+                Country = "UK";
 
-            SetUsers();
+                SetChartTypes();
+                SetWorkflowTypes();
 
-            PublicationDate = null;
+                PublicationDate = null;
+
+                ValidationErrorMessages = new List<string>();
+
+                userList = _directoryService.GetGroupMembers().Result.ToList();
+
+            }
+            catch (Exception ex)
+            {
+
+                ValidationErrorMessages.Add(ex.Message);
+                _logger.LogError(ex, "Error while initializing the new task page");
+
+            }
 
         }
 
         public void OnGet()
         {
-
         }
 
         public async Task<IActionResult> OnPost()
         {
 
             LogContext.PushProperty("ActivityName", "NewTask");
-            LogContext.PushProperty("PortalResource", nameof(OnPost));
-            LogContext.PushProperty("Action", "Save");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPost));
+            LogContext.PushProperty("Action", "Post");
 
             try
             {
@@ -154,7 +175,7 @@ namespace NCNEPortal
                     Country = this.Country,
                     AssignedUser = this.Compiler,
                     AssignedDate = DateTime.Now,
-                    TaskRole = new TaskRole()
+                    TaskRole = new TaskRole
                     {
                         Compiler = this.Compiler,
                         VerifierOne = this.Verifier1,
@@ -202,21 +223,94 @@ namespace NCNEPortal
             WorkflowTypes = new SelectList(workflowTypes);
         }
 
-        private void SetUsers()
+        public async Task<IActionResult> OnPostAssignRoleToUserAsync(string compiler, string verifierOne, string verifierTwo, string publisher)
         {
-            if (!System.IO.File.Exists(@"Data\Users.json"))
-                throw new FileNotFoundException(@"Data\Users.json");
+
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostAssignRoleToUserAsync));
+
+            ValidationErrorMessages.Clear();
+
+            if (string.IsNullOrEmpty(compiler))
+                ValidationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
+            else
+
+            {
+                if (!userList.Any(a => a == compiler))
+                {
+                    _logger.LogInformation($"Attempted to assign Compiler role to unknown user {compiler}");
+                    ValidationErrorMessages.Add($"Unable to assign Compiler role to unknown user {compiler}");
+                }
+            }
 
 
-            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
+            if (!string.IsNullOrEmpty(verifierOne))
+            {
+                if (!userList.Any(a => a == verifierOne))
+                {
+                    _logger.LogInformation($"Attempted to assign Verifier1 role to unknown user {verifierOne}");
+                    ValidationErrorMessages.Add($"Unable to assign Verifier1 role to unknown user {verifierOne}");
+                }
+            }
 
-            var users = JsonConvert.DeserializeObject<IEnumerable<User>>(jsonString)
-                .Select(sc => sc.Name);
+            if (!string.IsNullOrEmpty(verifierTwo))
+            {
+                if (!userList.Any(a => a == verifierTwo))
+                {
+                    _logger.LogInformation($"Attempted to assign Verifier2 role to unknown user {verifierTwo}");
+                    ValidationErrorMessages.Add($"Unable to assign Verifier2 role to unknown user {verifierTwo}");
+                }
+            }
 
-            CompilerList = new SelectList(users);
-            VerifierList1 = new SelectList(users);
-            VerifierList2 = new SelectList(users);
-            PublisherList = new SelectList(users);
+            if (!string.IsNullOrEmpty(publisher))
+            {
+                if (!userList.Any(a => a == publisher))
+                {
+                    _logger.LogInformation($"Attempted to assign Publisher role to unknown user {publisher}");
+                    ValidationErrorMessages.Add($"Unable to assign Publisher role to unknown user {publisher}");
+                }
+            }
+
+            if (ValidationErrorMessages.Any())
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+
+            return StatusCode(200);
         }
+
+
+
+        public async Task<JsonResult> OnGetUsersAsync()
+        {
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnGetUsersAsync));
+            LogContext.PushProperty("Action", "GetUsersForTypeAhead");
+
+            try
+            {
+                if (userList.Count == 0)
+                {
+                    return new JsonResult("Error")
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+                return new JsonResult(userList);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Unable to get the user list");
+                return new JsonResult(ex.Message)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+        }
+
     }
 }

@@ -1,26 +1,21 @@
 [
+ 
+
   {
     "ChartTypeId": 1,
-    "Name": "NE"
+    "Name": "Primary"
   },
   {
     "ChartTypeId": 2,
-    "Name": "NC"
+    "Name": "Adoption"
   },
   {
     "ChartTypeId": 3,
-    "Name": "CME"
+    "Name": "Derived"
   },
   {
     "ChartTypeId": 4,
-    "Name": "UNE"
-  },
-  {
-    "ChartTypeId": 5,
-    "Name": "Refresh"
-  },
-  {
-    "ChartTypeId": 6,
-    "Name": "Fleet"
+    "Name": "Thematics"
   }
+
 ]
