@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,6 +23,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
+    [Authorize]
     public class VerifyModel : PageModel
     {
         private readonly ICommentsHelper _commentsHelper;
