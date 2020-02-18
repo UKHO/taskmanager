@@ -101,6 +101,19 @@
     });
 
 
+    $("#ChartType").change(function() {
+
+        if (this.value === "Adoption") {
+            $("#RepromatDate").prop("disabled", false);
+            $("#PublicationDate").prop("disabled", true);
+            $("#PublicationDate").val("").datepicker("update");
+        } else {
+            $("#RepromatDate").prop("disabled", true);
+            $("#PublicationDate").prop("disabled", false);
+            $("#RepromatDate").val("").datepicker("update");
+        }
+    });
+
     initDesignCustomSelect();
   
     initialiseAssignRoleTypeahead();
@@ -147,7 +160,9 @@
                 }
             });
 
-        
+
+      
+
     }
 
 });

@@ -173,6 +173,7 @@ namespace NCNEPortal
                     ChartType = this.ChartType,
                     WorkflowType = this.WorkflowType,
                     Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
+                    RepromatDate = this.RepromatDate,
                     PublicationDate = this.PublicationDate,
                     AnnounceDate = this.AnnounceDate,
                     CommitDate = this.CommitToPrintDate,
