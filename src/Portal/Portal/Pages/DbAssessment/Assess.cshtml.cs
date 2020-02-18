@@ -250,11 +250,15 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateEditDatabase(int processId)
         {
+            var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+            var isCarisProjectCreated = carisProjectDetails != null;
+            if (isCarisProjectCreated)
+            {
+                return;
+            }
+
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-
-            currentAssess.CarisProjectName = ProjectName;
             currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
-
             await _dbContext.SaveChangesAsync();
         }
 

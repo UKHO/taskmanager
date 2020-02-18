@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.11" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="2.0.0-preview-009470001-1371" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="3.0.0-preview-011100001-1152" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.1.1" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.31" />
   </ItemGroup>
@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Databases\NCNEWorkflowDatabase.EF\NCNEWorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
+    <ProjectReference Include="..\HpdDatabase.EF\HpdDatabase.EF.csproj" />
   </ItemGroup>
 
 </Project>

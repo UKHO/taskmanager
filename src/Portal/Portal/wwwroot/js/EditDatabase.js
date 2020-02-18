@@ -2,6 +2,20 @@
     getEditDatabase();
 });
 
+function setControlState(enableCarisProject, enableLaunchSource) {
+    $("#editDatabase *").prop("disabled", true);
+
+    if (enableCarisProject) {
+        $("#SelectedCarisWorkspace")
+            .add("#ProjectName")
+            .add("#btnCreateCarisProject")
+            .prop("disabled", false);
+    }
+    if (enableLaunchSource) {
+        $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+    }
+}
+
 function getEditDatabase() {
 
     var processId = Number($("#hdnProcessId").val());
@@ -24,7 +38,14 @@ function getEditDatabase() {
         success: function (result) {
             $("#editDatabase").html(result);
             launchSourceEditorDownloadHandler();
+            createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
+
+            if ($("#IsCarisProjectCreated").val() === "True") {
+                setControlState(false, true);
+            } else {
+                setControlState(true, false);
+            }
         },
         error: function (error) {
 
@@ -38,8 +59,53 @@ function getEditDatabase() {
     });
 }
 
+function createCarisProjectHandler() {
+    $("#btnCreateCarisProject").on("click", function () {
+        $("#launchSourceEditorDownloadError").html();
+        setControlState(false, false);
+        $("#createCarisProjectSpinner").show();
+
+        var processId = Number($("#hdnProcessId").val());
+        var pageIdentity = $("#pageIdentity").val();
+        var projectName = $("#ProjectName").val();
+        var carisWorkspace = $("#SelectedCarisWorkspace").val();
+
+        $.ajax({
+            type: "POST",
+            url: "_EditDatabase/?handler=CreateCarisProject",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "taskStage": pageIdentity,
+                "projectName": projectName,
+                "carisWorkspace": carisWorkspace
+            },
+            success: function (data) {
+                setControlState(false, true);
+            },
+            error: function (error) {
+                setControlState(true, false);
+
+                var errorMessage = error.getResponseHeader("Error");
+
+                $("#launchSourceEditorDownloadError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create Caris Project. "
+                        + errorMessage
+                        + "</div>");
+            },
+            complete: function () {
+                $("#createCarisProjectSpinner").hide();
+            }
+        });
+
+    });
+}
+
 function launchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#launchSourceEditorDownloadError").html();
         $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
         var processId = Number($("#hdnProcessId").val());

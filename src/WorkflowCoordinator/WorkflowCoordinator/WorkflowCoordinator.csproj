@@ -63,7 +63,6 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.5" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Logging" Version="3.0.14" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="2.0.0-preview-009470001-1371" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.0" />
     <PackageReference Include="NServiceBus" Version="7.2.0" />

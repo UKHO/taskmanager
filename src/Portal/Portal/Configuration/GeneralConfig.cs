@@ -11,6 +11,10 @@ namespace Portal.Configuration
         public int DaysToDmEndDateRedAlertUpperInc { get; set; }
         public int DaysToDmEndDateAmberAlertUpperInc { get; set; }
         public string SessionFilename { get; set; }
+        public string CarisNewProjectStatus { get; set; }
+        public string CarisNewProjectPriority { get; set; }
+        public string CarisNewProjectType { get; set; }
+        public int CarisProjectTimeoutSeconds { get; set; }
 
     }
-}
+}   

@@ -3,7 +3,7 @@
 namespace HpdDatabase.EF.Models
 {
     [Table("VECTOR_PRODUCT_VIEW", Schema = "HPDOWNER")]
-    public class CarisProducts
+    public class CarisProduct
     {
         [Column("NAME")]
         public string ProductName { get; set; }

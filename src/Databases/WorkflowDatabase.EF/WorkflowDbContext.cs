@@ -40,6 +40,8 @@ namespace WorkflowDatabase.EF
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
+        public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -84,6 +86,12 @@ namespace WorkflowDatabase.EF
                 .WithOne()
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<AssessmentData>(p => p.ProcessId);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasOne(p => p.CarisProjectDetails)
+                .WithOne()
+                .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
+                .HasForeignKey<CarisProjectDetails>(p => p.ProcessId);
 
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
 

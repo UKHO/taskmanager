@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Common.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using Portal.Helpers;
 using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -27,6 +29,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<GeneralConfig> _generalConfig;
         private IUserIdentityService _userIdentityService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
+        private readonly ICarisProjectHelper _carisProjectHelper;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Select CARIS Workspace:")]
@@ -36,7 +39,11 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("CARIS Project Name:")]
         public string ProjectName { get; set; }
 
-        public string SessionFilename { get; set; } 
+        public string SessionFilename { get; set; }
+
+        public CarisProjectDetails CarisProjectDetails { get; set; }
+
+        public bool IsCarisProjectCreated { get; set; } 
 
         private string _userFullName;
 
@@ -54,13 +61,15 @@ namespace Portal.Pages.DbAssessment
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
             IUserIdentityService userIdentityService,
-            ISessionFileGenerator sessionFileGenerator)
+            ISessionFileGenerator sessionFileGenerator,
+            ICarisProjectHelper carisProjectHelper)
         {
             _dbContext = dbContext;
             _logger = logger;
             _generalConfig = generalConfig;
             _userIdentityService = userIdentityService;
             _sessionFileGenerator = sessionFileGenerator;
+            _carisProjectHelper = carisProjectHelper;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -72,6 +81,8 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
             await GetCarisData(processId, taskStage);
+
+            await GetCarisProjectDetails(processId);
 
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
@@ -106,7 +117,6 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-
                 fs.Dispose();
                 _logger.LogError(ex, "Failed to serialize Caris session file.");
                 throw;
@@ -119,6 +129,80 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
+        {
+            LogContext.PushProperty("ActivityName", taskStage);
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostCreateCarisProjectAsync));
+            LogContext.PushProperty("ProjectName", projectName);
+            LogContext.PushProperty("CarisWorkspace", carisWorkspace);
+
+            _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
+
+            await ValidateCarisProjectDetails(projectName, carisWorkspace);
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            var hpdUser = await GetHpdUser();
+
+            _logger.LogInformation("Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
+
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
+                 _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
+
+            // If somehow the user has already created a project, remove it and create new row
+            var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
+            if (toRemove.Any())
+            {
+                _dbContext.CarisProjectDetails.RemoveRange(toRemove);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
+            {
+                ProcessId = processId,
+                Created = DateTime.Now,
+                CreatedBy = UserFullName,
+                ProjectId = projectId,
+                ProjectName = projectName
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(200);
+        }
+
+        private async Task ValidateCarisProjectDetails(string projectName, string carisWorkspace)
+        {
+            if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
+                c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
+                throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
+            }
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+        }
+
+        private async Task<HpdUser> GetHpdUser()
+        {
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
+                    StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
+                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}.",
+                    ex.InnerException);
+            }
+
+        }
+
         private async Task GetCarisData(int processId, string taskStage)
         {
             switch (taskStage)
@@ -126,17 +210,23 @@ namespace Portal.Pages.DbAssessment
                 case "Assess":
                     var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
                     SelectedCarisWorkspace = assessData.WorkspaceAffected;
-                    ProjectName = assessData.CarisProjectName;
                     break;
                 case "Verify":
                     var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(vd => vd.ProcessId == processId);
                     SelectedCarisWorkspace = verifyData.WorkspaceAffected;
-                    ProjectName = verifyData.CarisProjectName;
                     break;
                 default:
                     _logger.LogError("{ActivityName} is not implemented for processId: {ProcessId}.");
                     throw new NotImplementedException($"{taskStage} is not implemented for processId: {processId}.");
             }
+        }
+
+        private async Task GetCarisProjectDetails(int processId)
+        {
+            CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            IsCarisProjectCreated = CarisProjectDetails != null;
+            ProjectName = CarisProjectDetails != null ? CarisProjectDetails.ProjectName : "";
         }
 
     }

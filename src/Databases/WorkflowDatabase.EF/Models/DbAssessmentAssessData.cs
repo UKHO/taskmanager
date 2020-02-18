@@ -19,7 +19,5 @@ namespace WorkflowDatabase.EF.Models
         public string ProductActionChangeDetails { get; set; }
         [DisplayName("Caris Workspace:")]
         public string WorkspaceAffected { get; set; }
-        [DisplayName("Caris Project Name:")]
-        public string CarisProjectName { get; set; }
     }
 }
