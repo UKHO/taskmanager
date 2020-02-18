@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -30,7 +31,6 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.Dispose();
         }
-
 
         [Test]
         public void Ensure_dbassessmentreviewdata_table_prevents_duplicate_workflowinstanceid_due_to_FK()
@@ -507,6 +507,50 @@ namespace WorkflowDatabase.Tests
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
             Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Test]
+        public async Task Ensure_CarisProjectDetails_table_prevents_duplicate_ProcessId_due_to_UQ()
+        {
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                ParentProcessId = null,
+                ActivityName = "Assess",
+                StartedAt = DateTime.Now,
+                Status = "Started"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.CarisProjectDetails.AddAsync(new CarisProjectDetails
+            {
+                ProcessId = 1,
+                ProjectName = "TestProject",
+                CreatedBy = "TestUser",
+                Created = DateTime.Now,
+                ProjectId = 1
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                await newContext.CarisProjectDetails.AddAsync(new CarisProjectDetails
+                {
+                    ProcessId = 1,
+                    ProjectName = "TestProject2",
+                    CreatedBy = "TestUser2",
+                    Created = DateTime.Now.AddDays(1),
+                    ProjectId = 2
+                });
+
+                var ex = Assert.ThrowsAsync<DbUpdateException>(() => newContext.SaveChangesAsync());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+
+            
         }
     }
 }

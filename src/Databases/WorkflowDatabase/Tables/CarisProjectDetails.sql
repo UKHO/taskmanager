@@ -6,5 +6,6 @@
     [ProjectName] NVARCHAR(100) NOT NULL, 
     [Created] DATETIME NOT NULL, 
     [CreatedBy] NVARCHAR(255) NOT NULL, 
+    CONSTRAINT [AK_CarisProjectDetails_ProcessId] UNIQUE ([ProcessId]), 
     CONSTRAINT [FK_CarisProjectDetails_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]),
 )
