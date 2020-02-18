@@ -38,7 +38,7 @@ namespace NCNEPortal
         [DisplayName("Chart number")] public string ChartNo { get; set; }
 
         [BindProperty]
-        [DisplayName("Country:")] public string Country { get; set; }
+        [DisplayName("Country")] public string Country { get; set; }
 
         [BindProperty]
         [DisplayName("Chart type")] public string ChartType { get; set; }
