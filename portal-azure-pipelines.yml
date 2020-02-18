@@ -90,31 +90,31 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
         displayName: 'dotnet build portalspecs'
   
-      # - task: CmdLine@2
-      #   inputs:
-      #     script: 'choco install pickles'
-      #   displayName: Install Pickles
+      - task: CmdLine@2
+        displayName: Install Pickles
+        inputs:
+          script: 'choco install pickles'
   
-      # - task: CmdLine@2
-      #   inputs:
-      #     script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
-      #   displayName: Generate Pickles Documentation
+      - task: CmdLine@2
+        displayName: Generate Pickles Documentation
+        inputs:
+          script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\src\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
   
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
-      #     ArtifactName: 'drop'
-      #     publishLocation: 'Container'
-      #   displayName: Publish Pickles Artifact
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Pickles Artifact
+        inputs:
+          PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
   
-      # - task: AzureFileCopy@3
-      #   inputs:
-      #     SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
-      #     azureSubscription: 'TestEngineering-Live'
-      #     Destination: 'AzureBlob'
-      #     storage: '$(AzureStorageAccount)'
-      #     ContainerName: '$web/$(Build.Repository.Name)'
-      #   displayName: Publish Pickles Artifact to Azure Blob Storage
+      - task: AzureFileCopy@3
+        displayName: Publish Pickles Artifact to Azure Blob Storage
+        inputs:
+          SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          azureSubscription: 'TestEngineering-Live'
+          Destination: 'AzureBlob'
+          storage: '$(PicklesAzureStorageAccount)'
+          ContainerName: '$web/$(Build.Repository.Name)'
   
       - task: DotNetCoreCLI@2
         inputs:
