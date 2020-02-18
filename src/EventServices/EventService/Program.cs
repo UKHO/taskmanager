@@ -39,10 +39,8 @@ namespace EventService
 
                 var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
 
-                builder.AddAzureAppConfiguration(new AzureAppConfigurationOptions()
-                {
-                    ConnectionString = azureAppConfConnectionString
-                }).AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
+                builder.AddAzureAppConfiguration(azureAppConfConnectionString)
+                    .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
             });
     }
 }
