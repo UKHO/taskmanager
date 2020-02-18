@@ -58,6 +58,11 @@ namespace NCNEPortal
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? PublicationDate { get; set; }
 
+        [BindProperty]
+        [DisplayName("Repromat received date")]
+        [DisplayFormat(DataFormatString = "{0:d}")]
+        public DateTime? RepromatDate { get; set; }
+
         [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? AnnounceDate { get; set; }
@@ -113,7 +118,7 @@ namespace NCNEPortal
 
                 Ion = "";
                 ChartNo = "";
-                Country = "UK";
+                Country = "";
 
                 SetChartTypes();
                 SetWorkflowTypes();

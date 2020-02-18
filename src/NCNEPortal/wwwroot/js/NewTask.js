@@ -6,7 +6,13 @@
         format: 'dd/mm/yyyy'
     }).datepicker('update');
 
+    $("#RepromatDate").datepicker({
+        autoclose: true,
+        todayHighLight: true,
+        format: 'dd/mm/yyyy'
+    }).datepicker('update');
 
+   
     $("#btnClose").click(function() {
         window.location.href = '/Index';
     });
