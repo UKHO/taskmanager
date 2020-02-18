@@ -147,15 +147,16 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
 
-            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername,
-                 null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
                  _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds, carisWorkspace);
 
             // If somehow the user has already created a project, remove it and create new row
             var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
-            _dbContext.CarisProjectDetails.RemoveRange(toRemove);
-
-            await _dbContext.SaveChangesAsync();
+            if (toRemove.Any())
+            {
+                _dbContext.CarisProjectDetails.RemoveRange(toRemove);
+                await _dbContext.SaveChangesAsync();
+            }
 
             _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
             {

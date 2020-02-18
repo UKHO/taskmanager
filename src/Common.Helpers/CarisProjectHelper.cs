@@ -18,7 +18,7 @@ namespace Common.Helpers
         }
 
         public async Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
-            List<string> assignedHpdUsernames, string projectType, string projectStatus, string projectPriority,
+            string projectType, string projectStatus, string projectPriority,
             int carisTimeout, string workspace)
         {
             var projectId = 0;
@@ -34,9 +34,6 @@ namespace Common.Helpers
             // Get Project Creator Id
             var creatorUsernameId = await GetHpdUserId(creatorHpdUsername);
 
-            // Get Assigned users ids
-            var assignedusersId = await GetAssignedUsersId(assignedHpdUsernames);
-
             // Get Caris Project Type Id
             var projectTypeId = await GetCarisProjectTypeId(projectType);
 
@@ -47,7 +44,7 @@ namespace Common.Helpers
             var carisProjectPriortyId = await GetCarisProjectPriorityId(projectPriority);
 
             // Create project
-            var t = await CreateProject(k2ProcessId, creatorUsernameId, projectName, projectTypeId, carisProjectStatusId,
+            projectId = await CreateProject(k2ProcessId, creatorUsernameId, projectName, projectTypeId, carisProjectStatusId,
                 carisProjectPriortyId, carisTimeout, workspace);
 
             return projectId;

@@ -2,6 +2,20 @@
     getEditDatabase();
 });
 
+function setControlState(enableCarisProject, enableLaunchSource) {
+    $("#editDatabase *").prop("disabled", true);
+
+    if (enableCarisProject) {
+        $("#SelectedCarisWorkspace")
+            .add("#ProjectName")
+            .add("#btnCreateCarisProject")
+            .prop("disabled", false);
+    }
+    if (enableLaunchSource) {
+        $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+    }
+}
+
 function getEditDatabase() {
 
     var processId = Number($("#hdnProcessId").val());
@@ -26,6 +40,12 @@ function getEditDatabase() {
             launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
+
+            if ($("#IsCarisProjectCreated").val() === "True") {
+                setControlState(false, true);
+            } else {
+                setControlState(true, false);
+            }
         },
         error: function (error) {
 
@@ -41,7 +61,8 @@ function getEditDatabase() {
 
 function createCarisProjectHandler() {
     $("#btnCreateCarisProject").on("click", function () {
-        $("#btnCreateCarisProject").prop("disabled", true);
+        setControlState(false, false);
+        $("#createCarisProjectSpinner").show();
 
         var processId = Number($("#hdnProcessId").val());
         var pageIdentity = $("#pageIdentity").val();
@@ -61,9 +82,11 @@ function createCarisProjectHandler() {
                 "carisWorkspace": carisWorkspace
             },
             success: function (data) {
-
+                setControlState(false, true);
             },
             error: function (error) {
+                setControlState(true, false);
+
                 var errorMessage = error.getResponseHeader("Error");
 
                 $("#launchSourceEditorDownloadError")
@@ -72,8 +95,7 @@ function createCarisProjectHandler() {
                         + "</div>");
             },
             complete: function () {
-
-                $("#btnCreateCarisProject").prop("disabled", false);
+                $("#createCarisProjectSpinner").hide();
             }
         });
 
