@@ -190,9 +190,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_productactions_then_validation_error_message_is_present()
         {
-            _hpDbContext.CarisProducts.Add(new CarisProducts()
+            _hpDbContext.CarisProducts.Add(new CarisProduct
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProducts()
+            _hpDbContext.CarisProducts.Add(new CarisProduct
                 { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
