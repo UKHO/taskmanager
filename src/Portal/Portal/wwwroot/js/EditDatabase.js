@@ -61,6 +61,7 @@ function getEditDatabase() {
 
 function createCarisProjectHandler() {
     $("#btnCreateCarisProject").on("click", function () {
+        $("#launchSourceEditorDownloadError").html();
         setControlState(false, false);
         $("#createCarisProjectSpinner").show();
 
@@ -104,6 +105,7 @@ function createCarisProjectHandler() {
 
 function launchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#launchSourceEditorDownloadError").html();
         $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
         var processId = Number($("#hdnProcessId").val());
