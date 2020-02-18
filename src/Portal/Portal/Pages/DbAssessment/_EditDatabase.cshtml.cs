@@ -131,12 +131,21 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
         {
+            LogContext.PushProperty("ActivityName", taskStage);
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostCreateCarisProjectAsync));
+            LogContext.PushProperty("ProjectName", projectName);
+            LogContext.PushProperty("CarisWorkspace", carisWorkspace);
+
+            _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
             await ValidateCarisProjectDetails(projectName, carisWorkspace);
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             var hpdUser = await GetHpdUser();
+
+            _logger.LogInformation("Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName, hpdUser.HpdUsername,
                  null, _generalConfig.Value.CarisNewProjectType, _generalConfig.Value.CarisNewProjectStatus,
