@@ -186,16 +186,19 @@ stages:
             downloadPath: '$(System.ArtifactsDirectory)' 
 
         - task: AzureCLI@1
+          displayName: 'Run SpecFlow tests'
           inputs:
             azureSubscription: 'TaskmanagerDev'
             scriptLocation: 'inlineScript'
             inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
-          displayName: 'Run SpecFlow tests'
 
         - task: PublishTestResults@2
+          displayName: 'Publish SpecFlowTestResults'
+          condition: succeededOrFailed()
           inputs:
-            testResultsFiles: '**/*.trx'
             testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'Portal UI tests - $(System.StageName)'
 
 - stage: DeployUAT
   dependsOn: Build
