@@ -44,7 +44,6 @@
 
         });
 
-
     });
 
     function removedAssignRoleErrors() {
@@ -66,7 +65,7 @@
     }
 
 
-    $("#Compiler").focus(function() {
+    $("#Compiler").on('focus', function() {
         if ($(this).val === "") {
             $('.ta_compiler').typeahead('val', "");
             $('.ta_compiler').typeahead('close');
@@ -74,21 +73,21 @@
     });
 
 
-    $("#Verifier1").focus(function() {
+    $("#Verifier1").on('focus', function() {
         if ($(this).val === "") {
             $('.ta_v1').typeahead('val', "");
             $('.ta_v1').typeahead('close');
         }
     });
 
-    $("#Verifier2").focus(function() {
+    $("#Verifier2").on('focus',function() {
         if ($(this).val === "") {
             $('.ta_v2').typeahead('val', "");
             $('.ta_v2').typeahead('close');
         }
     });
 
-    $("#Publisher").focus(function() {
+    $("#Publisher").on('focus',function() {
         if ($(this).val === "") {
             $('.ta_publisher').typeahead('val', "");
             $('.ta_publisher').typeahead('close');
@@ -126,7 +125,7 @@
             });
 
         // Initializing the typeahead
-        $('.ta_compiler').typeahead({
+        $('.ta_compiler').add('.ta_v1').add('.ta_v2').add('.ta_publisher').typeahead({
                 hint: true,
                 highlight: true, /* Enable substring highlighting */
 
@@ -142,57 +141,7 @@
                 }
             });
 
-        // Initializing the typeahead
-        $('.ta_v1').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-
-                minLength:
-                    3 /* Specify minimum characters required for showing result */
-            },
-            {
-                name: 'users',
-                source: users,
-                limit: 100,
-                templates: {
-                    notFound: '<div>No results</div>'
-                }
-            });
-
-        // Initializing the typeahead
-        $('.ta_v2').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-
-                minLength:
-                    3 /* Specify minimum characters required for showing result */
-            },
-            {
-                name: 'users',
-                source: users,
-                limit: 100,
-                templates: {
-                    notFound: '<div>No results</div>'
-                }
-            });
-
-        // Initializing the typeahead
-        $('.ta_publisher').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-
-                minLength:
-                    3 /* Specify minimum characters required for showing result */
-            },
-            {
-                name: 'users',
-                source: users,
-                limit: 100,
-                templates: {
-                    notFound: '<div>No results</div>'
-                }
-            });
-
+        
     }
 
 });

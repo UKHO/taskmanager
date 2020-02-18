@@ -35,7 +35,7 @@ namespace NCNEPortal
                     new SqlColumn
                         {ColumnName = "ActivityName", DataType = SqlDbType.NVarChar, DataLength = 100},
                     new SqlColumn
-                        {ColumnName = "PortalResource", DataType = SqlDbType.NVarChar, DataLength = 255}
+                        {ColumnName = "NCNEPortalResource", DataType = SqlDbType.NVarChar, DataLength = 255}
                 }
             };
 

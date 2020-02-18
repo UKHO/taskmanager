@@ -25,7 +25,7 @@ namespace NCNEPortal
 {
     public class NewTaskModel : PageModel
     {
-        public IDirectoryService _directoryService { get; }
+        private readonly IDirectoryService _directoryService;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
         private readonly ILogger<NewTaskModel> _logger;
@@ -109,7 +109,7 @@ namespace NCNEPortal
                 _userIdentityService = userIdentityService;
 
 
-                LogContext.PushProperty("ActivityName", "NewTask");
+                LogContext.PushProperty("NCNEPortalResource", "NewTask");
 
                 Ion = "";
                 ChartNo = "";
@@ -143,8 +143,8 @@ namespace NCNEPortal
         {
 
             LogContext.PushProperty("ActivityName", "NewTask");
-            LogContext.PushProperty("PortalResource", nameof(OnPost));
-            LogContext.PushProperty("Action", "Save");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPost));
+            LogContext.PushProperty("Action", "Post");
 
             try
             {
@@ -226,11 +226,14 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostAssignRoleToUserAsync(string compiler, string verifierOne, string verifierTwo, string publisher)
         {
 
-            LogContext.PushProperty("ActivityName", "New Task");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostAssignRoleToUserAsync));
 
             ValidationErrorMessages.Clear();
 
-            if (!string.IsNullOrEmpty(compiler))
+            if (string.IsNullOrEmpty(compiler))
+                ValidationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
+            else
+
             {
                 if (!userList.Any(a => a == compiler))
                 {
@@ -238,6 +241,7 @@ namespace NCNEPortal
                     ValidationErrorMessages.Add($"Unable to assign Compiler role to unknown user {compiler}");
                 }
             }
+
 
             if (!string.IsNullOrEmpty(verifierOne))
             {
@@ -282,7 +286,7 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            LogContext.PushProperty("ActivityName", "New Task");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnGetUsersAsync));
             LogContext.PushProperty("Action", "GetUsersForTypeAhead");
 
             try
