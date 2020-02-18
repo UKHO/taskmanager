@@ -47,6 +47,11 @@ namespace Portal.UnitTests
             {
                 Name = "TestWorkspace"
             });
+            _dbContext.HpdUser.Add(new HpdUser
+            {
+                AdUsername = "TestUserAd",
+                HpdUsername = "HpdUser"
+            });
             await _dbContext.SaveChangesAsync();
 
             _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeUserIdentityService, _fakeSessionFileGenerator, _fakeCarisProjectHelper);
@@ -62,7 +67,7 @@ namespace Portal.UnitTests
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_Invalid_Workspace_Provided()
         {
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "RossTest", "InvalidWorkspace"));
+                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "InvalidWorkspace"));
         }
 
         [Test]
@@ -70,6 +75,13 @@ namespace Portal.UnitTests
         {
             Assert.ThrowsAsync<ArgumentException>(() =>
                 _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", null, "TestWorkspace"));
+        }
+
+        [Test]
+        public void Test_CreateCarisProject_Throws_InvalidOperationException_When_No_HpdUser_Found()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace"));
         }
     }
 }
