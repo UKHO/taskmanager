@@ -67,21 +67,24 @@ namespace Portal.UnitTests
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_Invalid_Workspace_Provided()
         {
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "InvalidWorkspace"));
+                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "InvalidWorkspace",
+                    "TestAssessor", "TestVerifier"));
         }
 
         [Test]
         public void Test_CreateCarisProject_Throws_ArgumentException_When_No_ProjectName_Provided()
         {
             Assert.ThrowsAsync<ArgumentException>(() =>
-                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", null, "TestWorkspace"));
+                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", null, "TestWorkspace",
+                    "TestAssessor", "TestVerifier"));
         }
 
         [Test]
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_No_HpdUser_Found()
         {
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace"));
+                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace",
+                    "TestAssessor", "TestVerifier"));
         }
     }
 }

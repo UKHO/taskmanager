@@ -144,7 +144,7 @@ namespace Portal.Pages.DbAssessment
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
-            var hpdUser = await GetHpdUser();
+            var hpdUser = await GetHpdUser(UserFullName);
 
             _logger.LogInformation("Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
 
@@ -178,9 +178,12 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateProject(int projectId, string assessor, string verifier)
         {
+            var hpdAssessor = await GetHpdUser(assessor);
+            var hpdVerifier = await GetHpdUser(verifier);
+
             try
             {
-                await _carisProjectHelper.UpdateCarisProject(projectId, assessor,
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdAssessor.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
             catch (Exception e)
@@ -190,7 +193,7 @@ namespace Portal.Pages.DbAssessment
 
             try
             {
-                await _carisProjectHelper.UpdateCarisProject(projectId, verifier,
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdVerifier.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
             catch (Exception e)
@@ -214,17 +217,17 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task<HpdUser> GetHpdUser()
+        private async Task<HpdUser> GetHpdUser(string username)
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(UserFullName,
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
                     StringComparison.InvariantCultureIgnoreCase));
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
-                throw new InvalidOperationException($"Unable to find HPD username for {UserFullName}.",
+                _logger.LogError("Unable to find HPD Username for {username}.");
+                throw new InvalidOperationException($"Unable to find HPD username for {username}.",
                     ex.InnerException);
             }
 
