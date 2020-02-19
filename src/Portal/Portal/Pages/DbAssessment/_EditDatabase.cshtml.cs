@@ -43,7 +43,7 @@ namespace Portal.Pages.DbAssessment
 
         public CarisProjectDetails CarisProjectDetails { get; set; }
 
-        public bool IsCarisProjectCreated { get; set; } 
+        public bool IsCarisProjectCreated { get; set; }
 
         private string _userFullName;
 
@@ -129,7 +129,8 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName, string carisWorkspace)
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string taskStage, string projectName,
+            string carisWorkspace, string assessor, string verifier)
         {
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
@@ -169,7 +170,33 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
+            // Add assessor and verifier to created project
+            await UpdateProject(projectId, assessor, verifier);
+
             return StatusCode(200);
+        }
+
+        private async Task UpdateProject(int projectId, string assessor, string verifier)
+        {
+            try
+            {
+                await _carisProjectHelper.UpdateCarisProject(projectId, assessor,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to add assessor {assessor} to Caris project: {projectId}.");
+            }
+
+            try
+            {
+                await _carisProjectHelper.UpdateCarisProject(projectId, verifier,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to add verifier {verifier} to Caris project: {projectId}");
+            }
         }
 
         private async Task ValidateCarisProjectDetails(string projectName, string carisWorkspace)

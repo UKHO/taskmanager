@@ -69,6 +69,8 @@ function createCarisProjectHandler() {
         var pageIdentity = $("#pageIdentity").val();
         var projectName = $("#ProjectName").val();
         var carisWorkspace = $("#SelectedCarisWorkspace").val();
+        var assessor = $("#Assessor").val();
+        var verifier = $("#Verifier").val();
 
         $.ajax({
             type: "POST",
@@ -80,7 +82,9 @@ function createCarisProjectHandler() {
                 "processId": processId,
                 "taskStage": pageIdentity,
                 "projectName": projectName,
-                "carisWorkspace": carisWorkspace
+                "carisWorkspace": carisWorkspace,
+                "assessor": assessor,
+                "verifier": verifier
             },
             success: function (data) {
                 setControlState(false, true);
