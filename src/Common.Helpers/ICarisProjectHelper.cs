@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Common.Helpers
 {
@@ -8,5 +7,7 @@ namespace Common.Helpers
         Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
             string projectType, string projectStatus, string projectPriority,
             int carisTimeout, string workspace);
+
+        Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout);
     }
 }
