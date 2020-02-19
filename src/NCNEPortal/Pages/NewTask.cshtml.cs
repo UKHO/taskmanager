@@ -38,7 +38,7 @@ namespace NCNEPortal
         [DisplayName("Chart number")] public string ChartNo { get; set; }
 
         [BindProperty]
-        [DisplayName("Country:")] public string Country { get; set; }
+        [DisplayName("Country")] public string Country { get; set; }
 
         [BindProperty]
         [DisplayName("Chart type")] public string ChartType { get; set; }
@@ -57,6 +57,11 @@ namespace NCNEPortal
         [DisplayName("Publication date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? PublicationDate { get; set; }
+
+        [BindProperty]
+        [DisplayName("Repromat received date")]
+        [DisplayFormat(DataFormatString = "{0:d}")]
+        public DateTime? RepromatDate { get; set; }
 
         [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -113,7 +118,7 @@ namespace NCNEPortal
 
                 Ion = "";
                 ChartNo = "";
-                Country = "UK";
+                Country = "";
 
                 SetChartTypes();
                 SetWorkflowTypes();
@@ -168,6 +173,7 @@ namespace NCNEPortal
                     ChartType = this.ChartType,
                     WorkflowType = this.WorkflowType,
                     Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
+                    RepromatDate = this.RepromatDate,
                     PublicationDate = this.PublicationDate,
                     AnnounceDate = this.AnnounceDate,
                     CommitDate = this.CommitToPrintDate,

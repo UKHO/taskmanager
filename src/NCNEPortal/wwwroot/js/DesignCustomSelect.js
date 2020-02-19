@@ -106,4 +106,9 @@ function clickOption (e) {
     }
     //
     h.click();
+        //Fire Change event
+        var event = new Event('change');
+    selectElement.dispatchEvent(event);
+
+
 }
