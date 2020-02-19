@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using HpdDatabase.EF.Models;
+using System.Linq;
 using System.Threading.Tasks;
+using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 
@@ -48,6 +49,25 @@ namespace Common.Helpers
                 carisProjectPriortyId, carisTimeout, workspace);
 
             return projectId;
+        }
+
+
+        public async Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout)
+        {
+
+            // Check if project already exists
+            if (!await _hpdDbContext.CarisProjectData.AnyAsync(p =>
+                p.ProjectId == projectId))
+            {
+                throw new ArgumentException($"Failed to find Caris project with id {projectId}, project does not exist",
+                    nameof(projectId));
+            }
+
+            // Get Project Creator Id
+            var assignedUserId = await GetHpdUserId(assignedUsername);
+
+            // Create project
+            await UpdateProject(projectId, assignedUserId, carisTimeout);
         }
 
         private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int projectStatusId,
@@ -157,77 +177,177 @@ namespace Common.Helpers
             }
         }
 
+        private async Task UpdateProject(int projectId, int assignedUserId, int carisTimeout)
+        {
+            using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
+            {
+                var transaction = _hpdDbContext.Database.BeginTransaction(IsolationLevel.Serializable);
+
+                try
+                {
+                    command.CommandTimeout = carisTimeout;
+
+                    command.Parameters.Add(
+                        new OracleParameter("projectId", OracleDbType.Int32, ParameterDirection.Input)
+                        {
+                            Value = projectId
+                        });
+
+                    command.Parameters.Add(
+                        new OracleParameter("assignedUserId", OracleDbType.Int32, ParameterDirection.Input)
+                        {
+                            Value = assignedUserId
+                        });
+
+                    var projectCommand = "declare "
+                                         + "in_project_id CONSTANT INTEGER:= :projectId; "
+                                         + "v_assigned_user CONSTANT hpdowner.HYDRODBUSERS.HYDRODBUSERS_ID % TYPE := :assignedUserId; "
+                                         + "v_assigned_users hpdowner.HPDNUMBER$TABLE_TYPE:= hpdowner.hpdnumber$table_type(); "
+                                         + "n integer := 0; "
+                                         + "c integer; "
+                                         + "begin "
+                                         + "select count(*) into c from hpdowner.hpd_projectusers_vw where project_id = in_project_id; "
+                                         + "v_assigned_users.extend(c + 1); "
+                                         + "for user_rec in "
+                                         + "(select assigned_to from hpdowner.hpd_projectusers_vw where project_id = in_project_id) "
+                                         + "loop "
+                                         + "n := n + 1; "
+                                         + "v_assigned_users(n) := hpdowner.hpdnumber$row_type(user_rec.assigned_to); "
+                                         + "end loop; "
+                                         + "v_assigned_users(c + 1):= hpdowner.hpdnumber$row_type(v_assigned_user); "
+                                         + "hpdowner.p_project_manager.updateproject( "
+                                         + "v_project_id => in_project_id, "
+                                         + "v_assignedusers => v_assigned_users "
+                                         + "); "
+                                         + "end;";
+
+                    command.CommandText = projectCommand;
+                    await command.ExecuteNonQueryAsync();
+                    transaction.Commit();
+                }
+                catch (OracleException e)
+                {
+                    transaction.Rollback();
+                    var error = FormatOracleError(e);
+                    if (error != null) throw error;
+
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw e;
+                }
+            }
+        }
+
+        private ApplicationException FormatOracleError(OracleException exception)
+        {
+            var oracleError = exception.Message.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None).FirstOrDefault();
+
+
+            if (oracleError != null)
+            {
+                if (oracleError.Contains("ORA-01013"))
+                {
+                    //Timeout exception
+                    return new ApplicationException(oracleError.Replace(
+                        "ORA-01013: user requested cancel of current operation",
+                        "Unable to set Caris project to complete in the configured time")); //Timeout exception
+                }
+
+
+                if (oracleError.Contains("Project is already complete"))
+                {
+                    // Project already marked complete
+                    return new ApplicationException(
+                        "Unable to change project status, project is already marked as complete");
+                }
+
+                if (oracleError.Contains("NO CHANGES DETECTED"))
+                {
+                    // Project already marked complete
+                    return null;
+                }
+
+                return new ApplicationException(oracleError.Replace("ORA-20030: ",
+                    "")); //All exceptions from completeproject procedure
+
+            }
+
+            return null;
+        }
+
         private async Task<int> GetCarisProjectPriorityId(string projectPriority)
-        {
-            var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
-                s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
-
-            if (carisProjectPriority == null)
             {
-                throw new ArgumentException(
-                    $"Failed to get caris project priority {projectPriority}, project status might not exists in HPD",
-                    nameof(projectPriority));
+                var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
+                    s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
+
+                if (carisProjectPriority == null)
+                {
+                    throw new ArgumentException(
+                        $"Failed to get caris project priority {projectPriority}, project status might not exists in HPD",
+                        nameof(projectPriority));
+                }
+
+                return carisProjectPriority.ProjectPriorityId;
             }
 
-            return carisProjectPriority.ProjectPriorityId;
-        }
-
-        private async Task<int> GetCarisProjectStatusId(string projectStatus)
-        {
-            var carisProjectStatus = await _hpdDbContext.CarisProjectStatuses.SingleOrDefaultAsync(s =>
-                s.ProjectStatusName.Equals(projectStatus, StringComparison.InvariantCultureIgnoreCase));
-
-            if (carisProjectStatus == null)
+            private async Task<int> GetCarisProjectStatusId(string projectStatus)
             {
-                throw new ArgumentException(
-                    $"Failed to get caris project status {projectStatus}, project status might not exists in HPD",
-                    nameof(projectStatus));
+                var carisProjectStatus = await _hpdDbContext.CarisProjectStatuses.SingleOrDefaultAsync(s =>
+                    s.ProjectStatusName.Equals(projectStatus, StringComparison.InvariantCultureIgnoreCase));
+
+                if (carisProjectStatus == null)
+                {
+                    throw new ArgumentException(
+                        $"Failed to get caris project status {projectStatus}, project status might not exists in HPD",
+                        nameof(projectStatus));
+                }
+
+                return carisProjectStatus.ProjectStatusId;
             }
 
-            return carisProjectStatus.ProjectStatusId;
-        }
-
-        private async Task<int> GetCarisProjectTypeId(string projectType)
-        {
-            var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
-                p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
-
-            if (carisProjectType == null)
+            private async Task<int> GetCarisProjectTypeId(string projectType)
             {
-                throw new ArgumentException(
-                    $"Failed to get caris project type {projectType}, project type might not exists in HPD",
-                    nameof(projectType));
+                var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
+                    p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
+
+                if (carisProjectType == null)
+                {
+                    throw new ArgumentException(
+                        $"Failed to get caris project type {projectType}, project type might not exists in HPD",
+                        nameof(projectType));
+                }
+
+                return carisProjectType.ProjectTypeId;
             }
 
-            return carisProjectType.ProjectTypeId;
-        }
-
-        private async Task<List<int>> GetAssignedUsersId(List<string> assignedHpdUsernames)
-        {
-            var assignedUsersIds = new List<int>(assignedHpdUsernames.Count);
-            foreach (var assignedHpdUsername in assignedHpdUsernames)
+            private async Task<List<int>> GetAssignedUsersId(List<string> assignedHpdUsernames)
             {
-                var id = await GetHpdUserId(assignedHpdUsername);
+                var assignedUsersIds = new List<int>(assignedHpdUsernames.Count);
+                foreach (var assignedHpdUsername in assignedHpdUsernames)
+                {
+                    var id = await GetHpdUserId(assignedHpdUsername);
 
-                assignedUsersIds.Add(id);
+                    assignedUsersIds.Add(id);
+                }
+
+                return assignedUsersIds;
             }
 
-            return assignedUsersIds;
-        }
-
-        private async Task<int> GetHpdUserId(string hpdUsername)
-        {
-            var creator = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
-                u.Username.Equals(hpdUsername, StringComparison.InvariantCultureIgnoreCase));
-
-            if (creator == null)
+            private async Task<int> GetHpdUserId(string hpdUsername)
             {
-                throw new ArgumentException(
-                    $"Failed to get caris username {hpdUsername}, user might not exists in HPD",
-                    nameof(hpdUsername));
-            }
+                var creator = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
+                    u.Username.Equals(hpdUsername, StringComparison.InvariantCultureIgnoreCase));
 
-            return creator.UserId;
+                if (creator == null)
+                {
+                    throw new ArgumentException(
+                        $"Failed to get caris username {hpdUsername}, user might not exists in HPD",
+                        nameof(hpdUsername));
+                }
+
+                return creator.UserId;
+            }
         }
     }
-}
