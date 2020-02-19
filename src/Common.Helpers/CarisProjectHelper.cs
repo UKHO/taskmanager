@@ -265,12 +265,12 @@ namespace Common.Helpers
 
                 if (oracleError.Contains("NO CHANGES DETECTED"))
                 {
-                    // Project already marked complete
+                    // Update caris project detected no changes
                     return null;
                 }
 
                 return new ApplicationException(oracleError.Replace("ORA-20030: ",
-                    "")); //All exceptions from completeproject procedure
+                    "")); // Any other exceptions
 
             }
 
