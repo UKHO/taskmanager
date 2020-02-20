@@ -95,7 +95,7 @@ function createCarisProjectHandler() {
                 var errorMessage = error.getResponseHeader("Error");
 
                 $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create Caris Project. "
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to complete Caris Project creation. "
                         + errorMessage
                         + "</div>");
             },

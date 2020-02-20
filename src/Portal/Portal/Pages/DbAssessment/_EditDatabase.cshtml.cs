@@ -53,11 +53,6 @@ namespace Portal.Pages.DbAssessment
             private set => _userFullName = value;
         }
 
-        public WorkflowDbContext DbContext
-        {
-            get { return _dbContext; }
-        }
-
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
             IUserIdentityService userIdentityService,
@@ -102,6 +97,9 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(processId, UserFullName, taskStage);
 
             var serializer = new XmlSerializer(typeof(SessionFile));
@@ -140,9 +138,11 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
-            await ValidateCarisProjectDetails(projectName, carisWorkspace);
-
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
 
             var hpdUser = await GetHpdUser(UserFullName);
 
@@ -202,8 +202,17 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task ValidateCarisProjectDetails(string projectName, string carisWorkspace)
+        private async Task ValidateCarisProjectDetails(int processId, string projectName, string carisWorkspace, string taskStage, string currentLoggedInUser)
         {
+            var userAssignedToTask = await GetUserAssignedToTask(processId, taskStage);
+
+            if (!userAssignedToTask.Equals(currentLoggedInUser, StringComparison.InvariantCultureIgnoreCase))
+            {
+                LogContext.PushProperty("UserAssignedToTask", userAssignedToTask);
+                _logger.LogError("{UserFullName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
+                throw new InvalidOperationException($"{currentLoggedInUser} is not assigned to this task with processId {processId}, {userAssignedToTask} is assigned to this task.");
+            }
+
             if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
                 c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
             {
@@ -214,6 +223,22 @@ namespace Portal.Pages.DbAssessment
             if (string.IsNullOrWhiteSpace(projectName))
             {
                 throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+        }
+
+        private async Task<string> GetUserAssignedToTask(int processId, string taskStage)
+        {
+            switch (taskStage)
+            {
+                case "Assess":
+                    var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
+                    return assessData.Assessor;
+                case "Verify":
+                    var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(vd => vd.ProcessId == processId);
+                    return verifyData.Verifier;
+                default:
+                    _logger.LogError("{ActivityName} is not implemented for processId: {ProcessId}.");
+                    throw new NotImplementedException($"{taskStage} is not implemented for processId: {processId}.");
             }
         }
 
