@@ -12,7 +12,35 @@
         format: 'dd/mm/yyyy'
     }).datepicker('update');
 
-   
+
+    $("#RepromatDate").change(function () {
+        var dtRepromat = $(this).val();
+        if (dtRepromat !== "") {
+            $.ajax({
+                type: "POST",
+                url: "NewTask/?handler=CalcPublishDate",
+
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "dtRepromat": dtRepromat
+                },
+                success: function(result) {
+                    $("#PublicationDate").val(result).datepicker.update();
+                   
+                },
+                error: function(error) {
+                    var responseJson = error.responseJSON;
+                    displayAssignRoleErrors(responseJson);
+                }
+
+
+            });
+        }
+    });
+
     $("#btnClose").click(function() {
         window.location.href = '/Index';
     });
@@ -103,10 +131,11 @@
 
     $("#ChartType").change(function() {
 
-        if (this.value === "Adoption") {
+        if ($(this).val() === "Adoption") {
             $("#RepromatDate").prop("disabled", false);
             $("#PublicationDate").prop("disabled", true);
             $("#PublicationDate").val("").datepicker("update");
+           
         } else {
             $("#RepromatDate").prop("disabled", true);
             $("#PublicationDate").prop("disabled", false);

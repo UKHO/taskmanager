@@ -76,7 +76,7 @@ function closeAllSelect(elmnt) {
     }
 }
 
-function clickOption (e) {
+function clickOption(e) {
     /* When an item is clicked, update the original select box,
       and the selected item: */
     var y, i, k, selectElement, h;
@@ -97,18 +97,32 @@ function clickOption (e) {
     //Set select attribute on option element
     var optionElements = selectElement.getElementsByTagName("option");
 
+    //changed?
+    var changed = true;
     for (i = 0; i < optionElements.length; i++) {
-        optionElements[i].removeAttribute("selected");
-
-        if (this.innerText === optionElements[i].innerText) {
-            optionElements[i].setAttribute("selected", "selected");
+        if (optionElements[i].getAttribute("selected") === "selected") {
+            if (this.innerText === optionElements[i].innerText) {
+                changed = false;
+                break;
+            }
         }
     }
-    //
-    h.click();
+
+    if (changed) {
+        for (i = 0; i < optionElements.length; i++) {
+            optionElements[i].removeAttribute("selected");
+
+            if (this.innerText === optionElements[i].innerText) {
+                optionElements[i].setAttribute("selected", "selected");
+            }
+        }
+
+        h.click();
+
         //Fire Change event
         var event = new Event('change');
-    selectElement.dispatchEvent(event);
-
-
+        selectElement.dispatchEvent(event);
+    } else {
+        h.click();
+    }
 }

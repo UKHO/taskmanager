@@ -9,5 +9,6 @@ namespace NCNEPortal.Configuration
         public int CisDaysFromPubDate { get; set; }
         public int Commit2WDaysFromPubDate { get; set; }
         public int Commit3WDaysFromPubDate { get; set; }
+        public int PublishDaysFromRepromat { get; set; }
     }
 }
