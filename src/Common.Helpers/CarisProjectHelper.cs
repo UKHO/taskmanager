@@ -285,7 +285,7 @@ namespace Common.Helpers
                 if (carisProjectPriority == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project priority {projectPriority}, project status might not exists in HPD",
+                        $"Failed to get caris project priority {projectPriority}, project status might not exist in HPD",
                         nameof(projectPriority));
                 }
 
@@ -300,7 +300,7 @@ namespace Common.Helpers
                 if (carisProjectStatus == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project status {projectStatus}, project status might not exists in HPD",
+                        $"Failed to get caris project status {projectStatus}, project status might not exist in HPD",
                         nameof(projectStatus));
                 }
 
@@ -315,7 +315,7 @@ namespace Common.Helpers
                 if (carisProjectType == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project type {projectType}, project type might not exists in HPD",
+                        $"Failed to get caris project type {projectType}, project type might not exist in HPD",
                         nameof(projectType));
                 }
 
@@ -343,7 +343,7 @@ namespace Common.Helpers
                 if (creator == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris username {hpdUsername}, user might not exists in HPD",
+                        $"Failed to get caris username {hpdUsername}, user might not exist in HPD",
                         nameof(hpdUsername));
                 }
 
