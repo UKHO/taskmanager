@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,7 @@ using WorkflowType = NCNEPortal.Models.WorkflowType;
 
 namespace NCNEPortal
 {
+    [Authorize]
     public class NewTaskModel : PageModel
     {
         private readonly IDirectoryService _directoryService;
@@ -153,6 +155,9 @@ namespace NCNEPortal
 
             try
             {
+                if (RepromatDate != null)
+                    PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
+
                 if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
                 {
                     var (formsDate, cisDate, commitDate) =
@@ -289,6 +294,13 @@ namespace NCNEPortal
         }
 
 
+        public async Task<JsonResult> OnPostCalcPublishDateAsync(DateTime dtRepromat)
+        {
+
+            PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtRepromat);
+
+            return new JsonResult(PublicationDate?.ToShortDateString());
+        }
 
         public async Task<JsonResult> OnGetUsersAsync()
         {

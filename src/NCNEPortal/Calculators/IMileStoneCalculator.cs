@@ -7,5 +7,7 @@ namespace NCNEPortal.Calculators
     {
         (DateTime formsDate, DateTime cisDate, DateTime commitDate) CalculateMilestones(DeadlineEnum deadline,
             DateTime publicationDate);
+
+        DateTime CalculatePublishDate(DateTime repromatDate);
     }
 }

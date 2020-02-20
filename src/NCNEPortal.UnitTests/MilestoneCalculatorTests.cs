@@ -22,6 +22,7 @@ namespace NCNEPortal.UnitTests
             _generalConfig.Value.CisDaysFromPubDate = -6;
             _generalConfig.Value.Commit2WDaysFromPubDate = -15;
             _generalConfig.Value.Commit3WDaysFromPubDate = -21;
+            _generalConfig.Value.PublishDaysFromRepromat = 77;
             _milestoneCalculator = new MilestoneCalculator(_generalConfig);
         }
 
@@ -49,6 +50,17 @@ namespace NCNEPortal.UnitTests
             Assert.AreEqual(result.formsDate.AddDays(36), publicationDate);
             Assert.AreEqual(result.cisDate.AddDays(6), publicationDate);
             Assert.AreEqual(result.commitDate.AddDays(21), publicationDate);
+        }
+
+        [Test]
+        public void Test_MilestoneCalculator_for_PublishDate_from_Repromat()
+        {
+            var repromatDate = DateTime.Today;
+
+            var result = _milestoneCalculator.CalculatePublishDate(repromatDate);
+
+            Assert.AreEqual(repromatDate.AddDays(77), result);
+
         }
     }
 }

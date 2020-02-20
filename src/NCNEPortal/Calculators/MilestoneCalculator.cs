@@ -2,7 +2,6 @@
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using System;
-using System.Globalization;
 
 namespace NCNEPortal.Calculators
 {
@@ -28,6 +27,19 @@ namespace NCNEPortal.Calculators
 
             return (formsDate: dtForms, cisDate: dtCis, commitDate: dtCommit);
 
+        }
+
+        public DateTime CalculatePublishDate(DateTime repromatDate)
+        {
+            var dtPublish = repromatDate.AddDays(_generalConfig.Value.PublishDaysFromRepromat);
+
+            var firstDay = dtPublish.DayOfWeek - DayOfWeek.Thursday;
+
+            if (firstDay < 0) firstDay += 7;
+
+            dtPublish = dtPublish.AddDays(-firstDay);
+
+            return dtPublish;
         }
     }
 }
