@@ -18,5 +18,6 @@
     [ExpectedDate3Ps] DATETIME2 NULL, 
     [ActualDate3Ps] DATETIME2 NULL, 
     [AssignedUser] NVARCHAR(255) NULL, 
-    [AssignedDate] DATETIME2 NULL
+    [AssignedDate] DATETIME2 NULL, 
+    [Status] NVARCHAR(10) NOT NULL
 )

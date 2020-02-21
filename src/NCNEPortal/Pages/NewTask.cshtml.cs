@@ -186,6 +186,7 @@ namespace NCNEPortal
                     Country = this.Country,
                     AssignedUser = this.Compiler,
                     AssignedDate = DateTime.Now,
+                    Status = NcneTaskStatus.InProgress.ToString(),
                     TaskRole = new TaskRole
                     {
                         Compiler = this.Compiler,

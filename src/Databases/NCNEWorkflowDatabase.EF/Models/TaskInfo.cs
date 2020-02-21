@@ -29,6 +29,7 @@ namespace NCNEWorkflowDatabase.EF.Models
         public DateTime? ActualDate3Ps { get; set; }
         public string AssignedUser { get; set; }
         public DateTime AssignedDate { get; set; }
+        public string Status { get; set; }
 
         public virtual TaskNote TaskNote { get; set; }
 

@@ -14,6 +14,7 @@ using Microsoft.Graph;
 using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
+using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
@@ -89,6 +90,7 @@ namespace NCNEPortal
 
 
             services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
+            services.AddScoped<ICommentsHelper, CommentsHelper>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>

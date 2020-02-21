@@ -1,4 +1,5 @@
 ﻿@page
+@using NCNEPortal.Enums
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -64,7 +65,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.NcneTasks)
+                @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()))
                 {
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>

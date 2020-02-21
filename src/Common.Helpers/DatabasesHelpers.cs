@@ -99,12 +99,17 @@ namespace Common.Helpers
             dbContext.TaskComment.RemoveRange(dbContext.TaskComment);
             dbContext.TaskRole.RemoveRange(dbContext.TaskRole);
             dbContext.TaskStage.RemoveRange(dbContext.TaskStage);
+
+            //Enforce the deletion of TaskStage before TaskStageType
+            dbContext.SaveChanges();
+
             dbContext.TaskNote.RemoveRange(dbContext.TaskNote);
             dbContext.TaskInfo.RemoveRange(dbContext.TaskInfo);
             dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
             dbContext.ChartType.RemoveRange(dbContext.ChartType);
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
+            dbContext.SaveChanges();
         }
     }
 }
