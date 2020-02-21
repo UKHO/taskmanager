@@ -314,17 +314,21 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetCarisProjectDetails(int processId)
         {
+            // ProcessId_SourceDocumentName (50chars)
             CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
 
             IsCarisProjectCreated = CarisProjectDetails != null;
-            ProjectName = CarisProjectDetails != null ? CarisProjectDetails.ProjectName : "";
-        }
 
-        private async Task<bool> CheckCarisProjectCreated(int processId)
-        {
-            CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+            var sourceDocumentName = "";
 
-            return CarisProjectDetails != null;
+            if (!IsCarisProjectCreated)
+            {
+                var assessmentData =
+                    await _dbContext.AssessmentData.SingleAsync(ad => ad.ProcessId == processId);
+                sourceDocumentName = assessmentData.SourceDocumentName;
+            }
+
+            ProjectName = CarisProjectDetails != null ? CarisProjectDetails.ProjectName : $"{processId}_{sourceDocumentName}";
         }
 
     }
