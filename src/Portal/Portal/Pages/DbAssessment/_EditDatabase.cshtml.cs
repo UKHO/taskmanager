@@ -314,7 +314,6 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetCarisProjectDetails(int processId)
         {
-            // ProcessId_SourceDocumentName (50chars)
             CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
 
             IsCarisProjectCreated = CarisProjectDetails != null;
