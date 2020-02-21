@@ -61,7 +61,7 @@ function getEditDatabase() {
 
 function createCarisProjectHandler() {
     $("#btnCreateCarisProject").on("click", function () {
-        $("#launchSourceEditorDownloadError").html();
+        $("#launchSourceEditorDownloadError").html("");
         setControlState(false, false);
         $("#createCarisProjectSpinner").show();
 
@@ -91,7 +91,7 @@ function createCarisProjectHandler() {
                 var errorMessage = error.getResponseHeader("Error");
 
                 $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create Caris Project. "
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to complete Caris Project creation. "
                         + errorMessage
                         + "</div>");
             },

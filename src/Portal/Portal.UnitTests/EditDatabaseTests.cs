@@ -71,13 +71,6 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public void Test_CreateCarisProject_Throws_ArgumentException_When_No_ProjectName_Provided()
-        {
-            Assert.ThrowsAsync<ArgumentException>(() =>
-                _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", null, "TestWorkspace"));
-        }
-
-        [Test]
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_No_HpdUser_Found()
         {
             Assert.ThrowsAsync<InvalidOperationException>(() =>
