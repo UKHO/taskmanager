@@ -11,6 +11,23 @@ stages:
           clean: all
 
       steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "Get sqlserver module"
+            Install-Module "sqlserver" -Scope CurrentUser -Repository "PSGallery" -Force
+            Import-Module "sqlserver"
+            
+            Write-Host "Drop localdb"
+            Invoke-Sqlcmd `
+            -Query $("DROP DATABASE [$env:LOCAL_DATABASE_NAME]") `
+            -ServerInstance "(localdb)\MSSQLLocalDB"
+          pwsh: true
+        env:
+          LOCAL_DATABASE_NAME: $(LocalDatabaseName)
+        displayName: 'Drop localdb'
+
       - task: VSBuild@1
         inputs:
           solution: '$(Build.SourcesDirectory)\\src\\Databases\\WorkflowDatabase\\WorkflowDatabase.sqlproj'
