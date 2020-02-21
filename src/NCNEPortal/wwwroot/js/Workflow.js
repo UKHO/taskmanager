@@ -6,15 +6,12 @@
             }
     });
 
-    $("#terminatingTask").submit(function (event) {
+    $("#terminatingTask").submit(function(event) {
         if ($("#txtTerminateComment").val() === "") {
             $("#ConfirmTerminateError")
                 .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
             $("#txtTerminateComment").focus();
             event.preventDefault();
-        } else {
-            
-            window.location.href = '/Index';
         }
     });
 
