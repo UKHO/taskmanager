@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using Common.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Portal.Auth;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.ViewModels;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -28,6 +31,8 @@ namespace Portal.Pages
         private readonly IDirectoryService _directoryService;
         private readonly ILogger<IndexModel> _logger;
         private readonly IIndexFacade _indexFacade;
+        private readonly ICarisProjectHelper _carisProjectHelper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
 
         private string _userFullName;
         public string UserFullName
@@ -46,7 +51,9 @@ namespace Portal.Pages
             IUserIdentityService userIdentityService,
             IDirectoryService directoryService,
             ILogger<IndexModel> logger,
-            IIndexFacade indexFacade)
+            IIndexFacade indexFacade,
+            ICarisProjectHelper carisProjectHelper,
+            IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
             _mapper = mapper;
@@ -54,6 +61,8 @@ namespace Portal.Pages
             _directoryService = directoryService;
             _logger = logger;
             _indexFacade = indexFacade;
+            _carisProjectHelper = carisProjectHelper;
+            _generalConfig = generalConfig;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -160,12 +169,15 @@ namespace Portal.Pages
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("AssignedUser", userName);
 
             ValidationErrorMessages.Clear();
 
             if (!await _userIdentityService.ValidateUser(userName))
             {
-                _logger.LogInformation($"Attempted to assign task to unknown user {userName}");
+                _logger.LogInformation("Attempted to assign task to unknown user {AssignedUser}");
                 ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
             }
 
@@ -184,11 +196,14 @@ namespace Portal.Pages
                 };
             }
 
+            var isUpdateCarisProject = true;
+
             switch (taskStage)
             {
                 case "Review":
                     var review = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
                     review.Reviewer = userName;
+                    isUpdateCarisProject = false;
                     break;
                 case "Assess":
                     var assess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
@@ -204,8 +219,16 @@ namespace Portal.Pages
             }
 
             await _dbContext.SaveChangesAsync();
+
+            if (isUpdateCarisProject)
+            {
+                await UpdateCarisProjectWithAdditionalUser(processId, userName);
+            }
+
+
             return StatusCode(200);
         }
+
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
@@ -235,5 +258,46 @@ namespace Portal.Pages
                     throw new NotImplementedException($"{task.TaskStage} is not implemented.");
             }
         }
+
+        private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
+        {
+            
+
+            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+            var carisProjectDetails =
+                await _dbContext.CarisProjectDetails.SingleOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            LogContext.PushProperty("CarisProjectId", carisProjectDetails.ProjectId);
+            LogContext.PushProperty("HpdUsername", hpdUsername.HpdUsername);
+
+            try
+            {
+                await _carisProjectHelper.UpdateCarisProject(carisProjectDetails.ProjectId, hpdUsername.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Project created but failed to add {AssignedUser} with HPD Username: {HpdUsername} as an Assigned-to user to Caris project: {CarisProjectId}");
+                throw new InvalidOperationException($"Project created but failed to add {userName} with HPD Username: {hpdUsername.HpdUsername} as an Assigned-to user to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+            }
+        }
+
+
+        private async Task<HpdUser> GetHpdUser(string username)
+        {
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
+                    StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
+                    ex.InnerException);
+            }
+
+        }
+
     }
 }
