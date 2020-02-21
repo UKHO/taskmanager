@@ -97,21 +97,24 @@
                 <tr id="compileComment" class="collapse show">
                     <td colspan="6" class="pl-3 pr-3">
                         <div class="container" style="overflow-y: auto; max-height: 150px;">
-                            @foreach (var comment in Model.TaskComments)
+                            @if (Model.TaskComments != null)
                             {
-                                <div class="row m-3">
-                                    <div class="col-2">
-                                        <div>
-                                            @comment.CommentDate.ToLongDateString()
+                                @foreach (var comment in Model.TaskComments)
+                                {
+                                    <div class="row m-3">
+                                        <div class="col-2">
+                                            <div>
+                                                @comment.CommentDate.ToLongDateString()
+                                            </div>
+                                            <div>
+                                                <strong>@comment.Name</strong>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <strong>@comment.Name</strong>
+                                        <div class="col-10">
+                                            @comment.CommentText
                                         </div>
                                     </div>
-                                    <div class="col-10">
-                                        @comment.CommentText
-                                    </div>
-                                </div>
+                                }
                             }
                         </div>
                     </td>
@@ -381,9 +384,20 @@
         </table>
     </div>
 </div>
+
+
+<div class="d-flex justify-content-end">
+
+    <div class="mt-3 mr-3">
+        <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
+    </div>
+
+    <div class="mt-3">
+        <button id="btnComplete" class="btn btn-block btn-secondary disabled" style="min-width: 139px; ">Complete</button>
+    </div>
+</div>
+
 <!-- #endregion -->
-
-
 @*--- START TASK INFORMATION ---*@
 <div class="card mb-4 mt-3">
     <h3>Task Information</h3>
@@ -538,7 +552,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            @Html.TextBoxFor(model => model.CarisProjectName, "", 
+                            @Html.TextBoxFor(model => model.CarisProjectName, "",
                                 new { placeholder = "Source Name_ProcessID", @class = "form-control form-text-input" })
                         </div>
                     </div>
@@ -574,47 +588,82 @@
             </div>
         </div>
     </h3>
-    
+
     <div class="card-body p-3">
 
         <table class="table table-striped m-2" id="generic-comments-table">
             <tbody>
-
-                @foreach (var comment in Model.TaskComments)
+                @if (Model.TaskComments != null)
                 {
-                    <tr>
-                        <td>
-                            <div class="mb-2">
-                                <strong>@comment.Name</strong>
-                            </div>
-                            <div>
-                                @comment.CommentDate.ToShortDateString()
-                            </div>
-                        </td>
-                        <td>
-                            @if (@comment.CommentText == "")
-                            {
-                                <span class="fa fa-edit" style="color: #EF8123"> </span>
-                            }
-                            else
-                            {
-                                <span class="fas fa-comment-alt"></span>
-                            }
-                        </td>
-                        <td>
-                            @if (@comment.CommentText == "")
-                            {
-                                <span style="color: #ef8123">Edited @comment.Role</span>
-                            }
-                            else
-                            {
-                                <div class="d-inline">@comment.CommentText</div>
-                            }
-                        </td>
-                    </tr>
+                    @foreach (var comment in Model.TaskComments)
+                    {
+                        <tr>
+                            <td>
+                                <div class="mb-2">
+                                    <strong>@comment.Name</strong>
+                                </div>
+                                <div>
+                                    @comment.CommentDate.ToShortDateString()
+                                </div>
+                            </td>
+                            <td>
+                                @if (@comment.CommentText == "")
+                                {
+                                    <span class="fa fa-edit" style="color: #EF8123"> </span>
+                                }
+                                else
+                                {
+                                    <span class="fas fa-comment-alt"></span>
+                                }
+                            </td>
+                            <td>
+                                @if (@comment.CommentText == "")
+                                {
+                                    <span style="color: #ef8123">Edited @comment.Role</span>
+                                }
+                                else
+                                {
+                                    <div class="d-inline">@comment.CommentText</div>
+                                }
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
 </div>
 @*--- END TASK COMMENTS ---*@
+
+@* Modal Add Termination comment *@
+<div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="terminatingTask" asp-page-handler="TaskTerminate" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Terminate NCNE Task</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Provide a reason for terminating this task?</p>
+                    <div id="modal-body">
+                        <input type="hidden" asp-for="ProcessId" />
+                        <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
+                        <br />
+                        <div id="ConfirmTerminateError"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="js/Workflow.js">
+    </script>
+}

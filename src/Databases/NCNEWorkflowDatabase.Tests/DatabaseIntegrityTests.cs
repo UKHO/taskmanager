@@ -71,6 +71,7 @@ namespace NCNEWorkflowDatabase.Tests
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
                 AssignedDate = DateTime.Now,
+                Status = "Inprogress",
                 TaskNote = new TaskNote()
                 {
                     Text = "Sample Task Note",
@@ -153,6 +154,7 @@ namespace NCNEWorkflowDatabase.Tests
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
                 AssignedDate = DateTime.Now,
+                Status = "Inprogress",
                 TaskRole = new TaskRole()
                 {
                     Compiler = "Hannah Kent",
@@ -219,7 +221,8 @@ namespace NCNEWorkflowDatabase.Tests
                 CommitDate = DateTime.Now,
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
-                AssignedDate = DateTime.Now
+                AssignedDate = DateTime.Now,
+                Status = "Inprogress"
             });
 
             _dbContext.SaveChanges();
@@ -268,6 +271,7 @@ namespace NCNEWorkflowDatabase.Tests
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
                 AssignedDate = DateTime.Now,
+                Status = "Inprogress",
                 TaskStage = new List<TaskStage>()
                 {
                     new TaskStage()
@@ -319,6 +323,7 @@ namespace NCNEWorkflowDatabase.Tests
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
                 AssignedDate = DateTime.Now,
+                Status = "Inprogress",
                 TaskStage = new List<TaskStage>()
                 {
                     new TaskStage()
@@ -373,6 +378,7 @@ namespace NCNEWorkflowDatabase.Tests
                 CisDate = DateTime.Now,
                 AssignedUser = "Hannah Kent",
                 AssignedDate = DateTime.Now,
+                Status = "Inprogress",
                 TaskStage = new List<TaskStage>()
                 {
                     new TaskStage()

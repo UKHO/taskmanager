@@ -1,15 +1,29 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using NCNEPortal.Auth;
+using NCNEPortal.Enums;
+using NCNEPortal.Helpers;
+using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
+using Serilog.Context;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using NCNEPortal.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using TaskComment = NCNEPortal.Models.TaskComment;
 
 namespace NCNEPortal
 {
     public class WorkflowModel : PageModel
     {
+        private readonly NcneWorkflowDbContext _dbContext;
+        private readonly ILogger _logger;
+        private readonly IUserIdentityService _userIdentityService;
+        private readonly ICommentsHelper _commentsHelper;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] public string Ion { get; set; }
@@ -88,6 +102,78 @@ namespace NCNEPortal
 
         [DisplayName("CARIS Project Name")]
         public string CarisProjectName { get; set; }
+
+
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+
+        public WorkflowModel(NcneWorkflowDbContext dbContext,
+            ILogger<WorkflowModel> logger,
+            IUserIdentityService userIdentityService,
+            ICommentsHelper commentsHelper)
+        {
+            _dbContext = dbContext;
+            _logger = logger;
+            _userIdentityService = userIdentityService;
+            _commentsHelper = commentsHelper;
+        }
+
+        public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostTaskTerminateAsync));
+            LogContext.PushProperty("Comment", comment);
+
+            _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
+                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+            }
+
+            if (processId < 1)
+            {
+                _logger.LogError("ProcessId is less than 1: {ProcessId}");
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            var taskInfo = UpdateTaskAsTerminated(processId);
+
+            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, UserFullName);
+
+            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            return RedirectToPage("/Index");
+
+        }
+
+        private TaskInfo UpdateTaskAsTerminated(int processId)
+        {
+            var taskInfo = _dbContext.TaskInfo.FirstOrDefault(t => t.ProcessId == processId);
+
+            if (taskInfo == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table", ProcessId);
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the TaskInfo table");
+            }
+
+            taskInfo.Status = NcneTaskStatus.Terminated.ToString();
+            _dbContext.SaveChanges();
+
+            return taskInfo;
+        }
 
         public void OnGet(int processId)
         {
