@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    $("#Reviewer").prop("disabled", true);
+
     setVerifyDoneHandler();
     setVerifySaveHandler();
 

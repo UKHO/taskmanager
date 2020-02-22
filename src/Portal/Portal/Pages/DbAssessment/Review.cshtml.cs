@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,11 +10,14 @@ using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -49,6 +53,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
 
+        public _OperatorsModel OperatorsModel { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private string _userFullName;
@@ -82,6 +88,10 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
+
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+
             await GetOnHoldData(processId);
         }
 

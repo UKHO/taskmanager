@@ -108,7 +108,10 @@ namespace Portal.Pages.DbAssessment
             //TODO: Read operators from DB
 
             ProcessId = processId;
-            OperatorsModel = await GetOperatorsData(processId);
+
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+
             await GetOnHoldData(processId);
         }
 
@@ -298,27 +301,6 @@ namespace Portal.Pages.DbAssessment
                     workflowInstance.AssessmentData.PrimarySdocId,
                     comment);
             }
-        }
-
-        private async Task<_OperatorsModel> GetOperatorsData(int processId)
-        {
-            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
-            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
-                .Select(u => u.Name)
-                .ToList();
-
-            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-
-
-            return new _OperatorsModel
-            {
-                Reviewer = currentAssess.Reviewer ?? "Unknown",
-                Assessor = currentAssess.Assessor ?? "Unknown",
-                Verifier = currentAssess.Verifier ?? "",
-                Verifiers = new SelectList(users)
-            };
         }
 
         private async Task GetOnHoldData(int processId)

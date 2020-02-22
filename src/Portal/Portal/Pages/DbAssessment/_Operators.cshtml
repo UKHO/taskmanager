@@ -6,29 +6,53 @@
     <h6>Operators</h6>
 
     <div class="col-12">
-        <div class="card-body p-2">
-            <div class="row justify-content-center align-items-center">
-                <div class="col-4">
-                    <div class="row align-items-center">
-                        <div class="col-5">@Html.LabelFor(model => model.Reviewer, new { @class = "col-form-label" })</div>
-                        <div class="col-5">@Html.DisplayFor(model => model.Reviewer)</div>
+        <div class="card-body p-2" id="operators">
+            <div class="row">
+                <div class="operator col-4">
+                    <div class="row justify-content-start">
+                        <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Reviewer, new { @class = "col-form-label" })</div>
+                        <div class="col-8">
+                            <div class="text-input-wrap">
+                                @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                            </div>
+                            @*<div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                                        <span>There's a problem</span>
+                                    </h5>
+                                    <ol id="assignTaskErrorList" class="error-list"></ol>
+                                </div>*@
+
+
+                        </div>
+
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="row align-items-center">
-                        <div class="col-4">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
-                        <div class="col-7">
-                                <input id="Assessor" type="text" asp-for="Assessor" class="form-text-input" autocomplete="off" spellcheck="false" disabled>
-                            </div>
+                <div class="operator col-4">
+                    <div class="row justify-content-start">
+                        <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
+                        <div class="col-8">
+                            <input id="Assessor" type="text" asp-for="Assessor" class="form-text-input" autocomplete="off" spellcheck="false" disabled>
                         </div>
+                    </div>
                 </div>
-                <div class="col-4">
-                    <div class="row align-items-center">
-                        <div class="col-4">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
+                <div class="operator col-4">
+                    <div class="row justify-content-start">
+                        <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
                         <div class="col-8">@Html.DropDownListFor(model => model.Verifier, Model.Verifiers, "", new { @class = "form-control" })</div>
                     </div>
                 </div>
 
+            </div>
+            <div class="row justify-content-start">
+
+                <div id="operatorsErrorMessages" class="dialog error collapse mt-3 pb-1">
+                    <h5 class="mb-3">
+                        <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                        <span>There's a problem</span>
+                    </h5>
+                    <ol id="operatorsErrorList" class="error-list"></ol>
+                </div>
             </div>
         </div>
     </div>

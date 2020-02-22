@@ -64,6 +64,8 @@
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>
 
+    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
+
     <div id="sourceDocuments"></div>
     <div id="sourceDocumentsError"></div>
 
