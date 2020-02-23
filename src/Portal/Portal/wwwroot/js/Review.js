@@ -122,11 +122,11 @@
         var promise = users.initialize();
         promise
             .done(function () {
-                $("#Reviewer").prop("disabled", false);
+              //  $("#Reviewer").prop("disabled", false);
                 removeOperatorsInitialiseErrors();
             })
             .fail(function () {
-                $('#Reviewer.typeahead, #Assessor.typeahead, #Verifier.typeahead').prop("disabled", true);
+               // $('#Reviewer.typeahead, #Assessor.typeahead, #Verifier.typeahead').prop("disabled", true);
                 var errorArray = ["Failed to look up users. Try refreshing the page."];
                 displayOperatorsInitialiseErrors(errorArray);
             });

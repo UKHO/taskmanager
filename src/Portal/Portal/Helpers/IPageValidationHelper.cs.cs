@@ -13,10 +13,11 @@ namespace Portal.Helpers
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        bool ValidateReviewPage(
+        Task<bool> ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
-            List<string> validationErrorMessages);
+            List<string> validationErrorMessages,
+            string Reviewer);
 
         /// <summary>
         /// Used in Assess page
@@ -31,13 +32,13 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
         Task<bool> ValidateAssessPage(
-            string ion, 
-            string activityCode, 
+            string ion,
+            string activityCode,
             string sourceCategory,
             string taskType,
             string verifier,
-            List<ProductAction> recordProductAction, 
-            List<DataImpact> dataImpacts, 
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
             List<string> validationErrorMessages);
 
 

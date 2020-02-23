@@ -31,7 +31,7 @@ namespace Portal.Pages.DbAssessment
 
         }
 
-        internal static _OperatorsModel GetOperatorsData(DbAssessmentAssessData currentAssessData)
+        internal static _OperatorsModel GetOperatorsData(IOperatorData currentData)
         {
             if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
 
@@ -42,9 +42,9 @@ namespace Portal.Pages.DbAssessment
 
             return new _OperatorsModel
             {
-                Reviewer = currentAssessData.Reviewer ?? "",
-                Assessor = currentAssessData.Assessor ?? "Unknown",
-                Verifier = currentAssessData.Verifier ?? "",
+                Reviewer = currentData.Reviewer ?? "",
+                Assessor = currentData.Assessor ?? "Unknown",
+                Verifier = currentData.Verifier ?? "",
                 Verifiers = new SelectList(users),
                 Reviewers = new SelectList(users)
             };

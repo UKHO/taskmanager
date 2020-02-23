@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,14 +9,11 @@ using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -50,8 +46,12 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public DbAssessmentReviewData PrimaryAssignedTask { get; set; }
+
         [BindProperty]
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
+
+        [BindProperty]
+        public string Reviewer { get; set; }
 
         public _OperatorsModel OperatorsModel { get; set; }
 
@@ -89,8 +89,8 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentReviewData);
 
             await GetOnHoldData(processId);
         }
@@ -146,10 +146,11 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!_pageValidationHelper.ValidateReviewPage(
+            if (!await _pageValidationHelper.ValidateReviewPage(
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
-                ValidationErrorMessages))
+                ValidationErrorMessages,
+                Reviewer))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -164,8 +165,6 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateDbAssessmentReviewData();
             await SaveAdditionalTasks(ProcessId);
-
-            await _dbContext.SaveChangesAsync();
 
             if (action == "Done")
             {
@@ -242,6 +241,8 @@ namespace Portal.Pages.DbAssessment
             var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
 
+            await _dbContext.SaveChangesAsync();
+
             foreach (var task in AdditionalAssignedTasks)
             {
                 task.ProcessId = processId;
@@ -301,12 +302,14 @@ namespace Portal.Pages.DbAssessment
             currentReview.Assessor = PrimaryAssignedTask.Assessor;
             currentReview.Verifier = PrimaryAssignedTask.Verifier;
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
+            currentReview.Reviewer = Reviewer;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
-            currentReview.Reviewer = UserFullName;
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)

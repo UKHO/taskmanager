@@ -13,17 +13,15 @@
                         <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Reviewer, new { @class = "col-form-label" })</div>
                         <div class="col-8">
                             <div class="text-input-wrap">
-                                @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                                @if (string.IsNullOrEmpty(Model.Reviewer))
+                                {
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "typeahead tt-query form-text-input" })
+                                }
                             </div>
-                            @*<div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
-                                    <h5 class="mb-3">
-                                        <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
-                                        <span>There's a problem</span>
-                                    </h5>
-                                    <ol id="assignTaskErrorList" class="error-list"></ol>
-                                </div>*@
-
-
                         </div>
 
                     </div>

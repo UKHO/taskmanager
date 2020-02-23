@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
+using Portal.Auth;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -13,11 +14,13 @@ namespace Portal.Helpers
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
+        private readonly IUserIdentityService _userIdentityService;
 
-        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext)
+        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IUserIdentityService userIdentityService)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
+            _userIdentityService = userIdentityService;
         }
 
         /// <summary>
@@ -26,17 +29,29 @@ namespace Portal.Helpers
         /// <param name="primaryAssignedTask"></param>
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="Reviewer"></param>
         /// <returns></returns>
-        public bool ValidateReviewPage(
+        public async Task<bool> ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
-            List<string> validationErrorMessages)
+            List<string> validationErrorMessages,
+            string Reviewer)
         {
             var isValid = true;
 
             if (!ValidateTaskType(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
             {
                 isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(Reviewer))
+            {
+                validationErrorMessages.Add("Operators: Reviewer cannot be empty");
+            }
+
+            if (!await _userIdentityService.ValidateUser(Reviewer))
+            {
+                validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {Reviewer}");
             }
 
             if (!ValidateWorkspace(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
@@ -361,7 +376,7 @@ namespace Portal.Helpers
                     isValid = false;
                 }
 
-                
+
             }
 
             return isValid;

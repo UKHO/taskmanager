@@ -3,7 +3,7 @@ using WorkflowDatabase.EF.Interfaces;
 
 namespace WorkflowDatabase.EF.Models
 {
-    public class DbAssessmentReviewData : ITaskData
+    public class DbAssessmentReviewData : ITaskData, IOperatorData
     {
         public int DbAssessmentReviewDataId { get; set; }
         public int ProcessId { get; set; }
