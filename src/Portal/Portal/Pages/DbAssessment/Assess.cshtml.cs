@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,11 +8,9 @@ using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -130,6 +127,10 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -296,8 +297,6 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
         }
 
-
-
         private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
         {
 
@@ -315,8 +314,8 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Project created but failed to add {AssignedUser} with HPD Username: {HpdUsername} as an Assigned-to user to Caris project: {CarisProjectId}");
-                throw new InvalidOperationException($"Edit Database: Failed to add {userName} with HPD Username: {hpdUsername.HpdUsername} as an Assigned-to user to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
+                throw new InvalidOperationException($"Edit Database: Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
             }
         }
 
@@ -330,13 +329,12 @@ namespace Portal.Pages.DbAssessment
             catch (InvalidOperationException ex)
             {
                 _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
-                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username}  in our system.",
+                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
                     ex.InnerException);
             }
 
         }
-
-
+        
         private async Task UpdateDataImpact(int processId)
         {
             var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
