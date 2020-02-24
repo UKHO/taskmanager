@@ -33,7 +33,6 @@
                         <div class="col-4">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
                         <div class="col-8">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control form-text-input" })</div>
                     </div>
-                    <div id="launchSourceEditorDownloadError"></div>
                     <div class="row justify-content-start">
                         <div class="col-4">
                             <button id="btnCreateCarisProject" type="button" class="btn btn-primary">
@@ -47,7 +46,34 @@
                         </div>
                     </div>
 
-                    <div id="launchSourceEditorError"></div>
+                    <section id="launchSourceEditorDownloadError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="launchSourceEditorDownloadErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
+
+                    <section id="launchSourceEditorDownloadSuccess" class="dialog success collapse mt-3">
+                        <h5>
+                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                            <span>Successfully generated session file</span>
+                        </h5>
+                    </section>
+
+
+                    <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
+
+                    <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                        <h5>
+                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                            <span>Caris project successfully created</span>
+                        </h5>
+                    </section>
                 </div>
             </div>
         </div>

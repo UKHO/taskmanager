@@ -61,7 +61,7 @@ function getEditDatabase() {
 
 function createCarisProjectHandler() {
     $("#btnCreateCarisProject").on("click", function () {
-        $("#launchSourceEditorDownloadError").html("");
+        hideDialogBoxes();
         setControlState(false, false);
         $("#createCarisProjectSpinner").show();
 
@@ -84,16 +84,15 @@ function createCarisProjectHandler() {
             },
             success: function (data) {
                 setControlState(false, true);
+                $("#createCarisProjectSuccess").collapse("show");
             },
             error: function (error) {
                 setControlState(true, false);
 
                 var errorMessage = error.getResponseHeader("Error");
 
-                $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to complete Caris Project creation. "
-                        + errorMessage
-                        + "</div>");
+                $("#createCarisProjectErrorMessage").text("Failed to complete Caris Project creation. " + errorMessage);
+                $("#createCarisProjectError").collapse("show");
             },
             complete: function () {
                 $("#createCarisProjectSpinner").hide();
@@ -105,7 +104,7 @@ function createCarisProjectHandler() {
 
 function launchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {
-        $("#launchSourceEditorDownloadError").html();
+        hideDialogBoxes();
         $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
         var processId = Number($("#hdnProcessId").val());
@@ -133,14 +132,15 @@ function launchSourceEditorDownloadHandler() {
                 $("#hdnDownloadLink").attr("href", url);
                 $("#hdnDownloadLink").attr("download", sessionFilename);
                 $("#hdnDownloadLink")[0].click();
+
+
+                $("#launchSourceEditorDownloadSuccess").collapse("show");
             },
             error: function (error) {
                 var errorMessage = error.getResponseHeader("Error");
 
-                $("#launchSourceEditorDownloadError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to generate Session File. "
-                        + errorMessage
-                        + "</div>");
+                $("#launchSourceEditorDownloadErrorMessage").text("Failed to generate Session File. " + errorMessage);
+                $("#launchSourceEditorDownloadError").collapse("show");
             },
             complete: function () {
 
@@ -151,6 +151,16 @@ function launchSourceEditorDownloadHandler() {
         });
 
     });
+}
+
+function hideDialogBoxes() {
+
+    $("#createCarisProjectSuccess").collapse("hide");
+    $("#createCarisProjectError").collapse("hide");
+
+    $("#launchSourceEditorDownloadSuccess").collapse("hide");
+    $("#launchSourceEditorDownloadError").collapse("hide");
+
 }
 
 function initialiseWorkspaceTypeahead() {
