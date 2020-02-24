@@ -261,12 +261,15 @@ namespace Portal.Pages
 
         private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
         {
-            
-
-            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
             var carisProjectDetails =
                 await _dbContext.CarisProjectDetails.SingleOrDefaultAsync(cp => cp.ProcessId == processId);
 
+            if (carisProjectDetails == null)
+            {
+                return;
+            }
+
+            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
             LogContext.PushProperty("CarisProjectId", carisProjectDetails.ProjectId);
             LogContext.PushProperty("HpdUsername", hpdUsername.HpdUsername);
 
