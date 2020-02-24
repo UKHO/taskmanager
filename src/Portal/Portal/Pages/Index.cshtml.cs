@@ -280,8 +280,8 @@ namespace Portal.Pages
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Project created but failed to add {AssignedUser} with HPD Username: {HpdUsername} as an Assigned-to user to Caris project: {CarisProjectId}");
-                throw new InvalidOperationException($"Project created but failed to add {userName} with HPD Username: {hpdUsername.HpdUsername} as an Assigned-to user to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
+                throw new InvalidOperationException($"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
             }
         }
 
