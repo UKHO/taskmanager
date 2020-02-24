@@ -7,7 +7,7 @@
     });
 
     $("#terminatingTask").submit(function(event) {
-        if ($("#txtTerminateComment").val() === "") {
+        if ($("#txtTerminateComment").val().trim() === "") {
             $("#ConfirmTerminateError")
                 .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
             $("#txtTerminateComment").focus();
