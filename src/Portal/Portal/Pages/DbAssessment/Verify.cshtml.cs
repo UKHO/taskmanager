@@ -101,6 +101,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            OperatorsModel.ParentPage = WorkflowStage.Verify;
 
             await GetOnHoldData(processId);
         }
