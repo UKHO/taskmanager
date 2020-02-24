@@ -7,7 +7,7 @@
     <TargetConnectionString>Data Source=(localdb)\MSSQLLocalDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
-    <CreateNewDatabase>False</CreateNewDatabase>
+    <CreateNewDatabase>True</CreateNewDatabase>
     <AllowDropBlockingAssemblies>False</AllowDropBlockingAssemblies>
     <BackupDatabaseBeforeChanges>False</BackupDatabaseBeforeChanges>
   </PropertyGroup>
