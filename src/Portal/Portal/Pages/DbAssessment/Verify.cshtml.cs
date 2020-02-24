@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,14 +8,11 @@ using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -75,6 +71,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string SelectedCarisWorkspace { get; set; }
 
+        public WorkflowStage WorkflowStage { get; set; }
+
         [BindProperty]
         public string ProjectName { get; set; }
 
@@ -102,7 +100,11 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
-            OperatorsModel = SetOperatorsDummyData();
+
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
+
             await GetOnHoldData(processId);
         }
 
@@ -311,24 +313,6 @@ namespace Portal.Pages.DbAssessment
                     workflowInstance.AssessmentData.PrimarySdocId,
                     comment);
             }
-        }
-
-        private _OperatorsModel SetOperatorsDummyData()
-        {
-            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
-            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
-                .Select(u => u.Name)
-                .ToList();
-
-            return new _OperatorsModel
-            {
-                Reviewer = "Greg Williams",
-                Assessor = "Peter Bates",
-                Verifier = "Matt Stoodley",
-                Verifiers = new SelectList(users)
-            };
         }
 
         private async Task GetOnHoldData(int processId)

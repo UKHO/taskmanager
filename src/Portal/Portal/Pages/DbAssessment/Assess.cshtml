@@ -60,7 +60,7 @@
 
     <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
     <input type="hidden" asp-for="ProcessId" />
-    <input type="hidden" id="pageIdentity" value="Assess" />
+    <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
 
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>

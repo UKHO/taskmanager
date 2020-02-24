@@ -1,4 +1,5 @@
 ﻿@page
+@using WorkflowDatabase.EF
 @model Portal.Pages.DbAssessment.ReviewModel
 @{
     ViewData["Title"] = "Review";
@@ -59,10 +60,12 @@
 <form id="frmReviewPage" method="post">
 
     <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
-    <input type="hidden" id="pageIdentity" value="Review" />
+    <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
 
     <div id="taskInformation"></div>
     <div id="taskInformationError"></div>
+
+    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
 
     <div id="sourceDocuments"></div>
     <div id="sourceDocumentsError"></div>

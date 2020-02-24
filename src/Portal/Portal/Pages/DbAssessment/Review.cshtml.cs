@@ -46,8 +46,16 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public DbAssessmentReviewData PrimaryAssignedTask { get; set; }
+
         [BindProperty]
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
+
+        [BindProperty]
+        public string Reviewer { get; set; }
+
+        public _OperatorsModel OperatorsModel { get; set; }
+
+        public WorkflowStage WorkflowStage { get; set; }
 
         public List<string> ValidationErrorMessages { get; set; }
 
@@ -82,6 +90,11 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
+
+            var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentReviewData);
+            OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Review;
+
             await GetOnHoldData(processId);
         }
 
@@ -136,10 +149,11 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!_pageValidationHelper.ValidateReviewPage(
+            if (!await _pageValidationHelper.ValidateReviewPage(
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
-                ValidationErrorMessages))
+                ValidationErrorMessages,
+                Reviewer))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -154,8 +168,6 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateDbAssessmentReviewData();
             await SaveAdditionalTasks(ProcessId);
-
-            await _dbContext.SaveChangesAsync();
 
             if (action == "Done")
             {
@@ -232,6 +244,8 @@ namespace Portal.Pages.DbAssessment
             var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
 
+            await _dbContext.SaveChangesAsync();
+
             foreach (var task in AdditionalAssignedTasks)
             {
                 task.ProcessId = processId;
@@ -291,12 +305,14 @@ namespace Portal.Pages.DbAssessment
             currentReview.Assessor = PrimaryAssignedTask.Assessor;
             currentReview.Verifier = PrimaryAssignedTask.Verifier;
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
+            currentReview.Reviewer = Reviewer;
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
-            currentReview.Reviewer = UserFullName;
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
