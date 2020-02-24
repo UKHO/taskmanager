@@ -71,6 +71,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string SelectedCarisWorkspace { get; set; }
 
+        public WorkflowStage WorkflowStage { get; set; }
+
         [BindProperty]
         public string ProjectName { get; set; }
 
@@ -101,7 +103,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
-            OperatorsModel.ParentPage = WorkflowStage.Verify;
+            OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
 
             await GetOnHoldData(processId);
         }

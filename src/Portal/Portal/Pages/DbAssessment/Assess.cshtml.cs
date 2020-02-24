@@ -66,6 +66,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string ProjectName { get; set; }
 
+        public WorkflowStage WorkflowStage { get; set; }
+
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
@@ -107,8 +109,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
-            OperatorsModel.ParentPage = WorkflowStage.Assess;
-
+            OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Assess;
             await GetOnHoldData(processId);
         }
 

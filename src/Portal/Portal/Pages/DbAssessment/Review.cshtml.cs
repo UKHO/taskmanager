@@ -55,6 +55,8 @@ namespace Portal.Pages.DbAssessment
 
         public _OperatorsModel OperatorsModel { get; set; }
 
+        public WorkflowStage WorkflowStage { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private string _userFullName;
@@ -91,7 +93,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentReviewData);
-            OperatorsModel.ParentPage = WorkflowStage.Review;
+            OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Review;
 
             await GetOnHoldData(processId);
         }
