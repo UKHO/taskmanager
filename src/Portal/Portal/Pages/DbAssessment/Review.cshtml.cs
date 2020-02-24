@@ -91,6 +91,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentReviewData);
+            OperatorsModel.ParentPage = WorkflowStage.Review;
 
             await GetOnHoldData(processId);
         }

@@ -1,4 +1,5 @@
-﻿@model Portal.Pages.DbAssessment._OperatorsModel
+﻿@using WorkflowDatabase.EF
+@model Portal.Pages.DbAssessment._OperatorsModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -13,7 +14,8 @@
                         <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Reviewer, new { @class = "col-form-label" })</div>
                         <div class="col-8">
                             <div class="text-input-wrap">
-                                @if (string.IsNullOrEmpty(Model.Reviewer))
+
+                                @if (Model.ParentPage == WorkflowStage.Review)
                                 {
                                     @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
                                 }
