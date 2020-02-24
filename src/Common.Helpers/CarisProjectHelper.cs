@@ -28,8 +28,7 @@ namespace Common.Helpers
             if (await _hpdDbContext.CarisProjectData.AnyAsync(p =>
                 p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase)))
             {
-                throw new ArgumentException($"Failed to create Caris project {projectName}, project already exists",
-                    nameof(projectName));
+                throw new ArgumentException($"Failed to create Caris project {projectName}, project already exists");
             }
 
             // Get Project Creator Id
@@ -59,8 +58,7 @@ namespace Common.Helpers
             if (!await _hpdDbContext.CarisProjectData.AnyAsync(p =>
                 p.ProjectId == projectId))
             {
-                throw new ArgumentException($"Failed to find Caris project with id {projectId}, project does not exist",
-                    nameof(projectId));
+                throw new ArgumentException($"Failed to find Caris project with id {projectId}, project does not exist");
             }
 
             // Get Project Creator Id
@@ -285,8 +283,7 @@ namespace Common.Helpers
                 if (carisProjectPriority == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project priority {projectPriority}, project status might not exist in HPD",
-                        nameof(projectPriority));
+                        $"Failed to get caris project priority {projectPriority}, project status might not exist in HPD");
                 }
 
                 return carisProjectPriority.ProjectPriorityId;
@@ -300,8 +297,7 @@ namespace Common.Helpers
                 if (carisProjectStatus == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project status {projectStatus}, project status might not exist in HPD",
-                        nameof(projectStatus));
+                        $"Failed to get caris project status {projectStatus}, project status might not exist in HPD");
                 }
 
                 return carisProjectStatus.ProjectStatusId;
@@ -315,8 +311,7 @@ namespace Common.Helpers
                 if (carisProjectType == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project type {projectType}, project type might not exist in HPD",
-                        nameof(projectType));
+                        $"Failed to get caris project type {projectType}, project type might not exist in HPD");
                 }
 
                 return carisProjectType.ProjectTypeId;
@@ -343,8 +338,7 @@ namespace Common.Helpers
                 if (creator == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris username {hpdUsername}, user might not exist in HPD",
-                        nameof(hpdUsername));
+                        $"Failed to get caris username {hpdUsername}, user might not exist in HPD");
                 }
 
                 return creator.UserId;
