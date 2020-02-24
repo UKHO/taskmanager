@@ -30,6 +30,7 @@ namespace Portal.UnitTests
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
 
+
         [SetUp]
         public void Setup()
         {
@@ -78,7 +79,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
 
             _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper);
         }
@@ -103,8 +104,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Assign Task 1: Task Type { _reviewModel.PrimaryAssignedTask.TaskType} does not exist", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Task Type { _reviewModel.PrimaryAssignedTask.TaskType} does not exist"));
         }
 
         [Test]
@@ -128,8 +129,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Assign Task 1: Workspace Affected is required", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Workspace Affected is required"));
         }
         
         [Test]
@@ -153,8 +154,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Assign Task 1: Assessor is required", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Assessor is required"));
         }
 
         [Test]
@@ -186,8 +187,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Invalid Task Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Invalid Task Type - { _reviewModel.AdditionalAssignedTasks[0].TaskType}"));
         }
 
         [Test]
@@ -219,8 +220,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Workspace Affected is required", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Workspace Affected is required"));
         }
 
         [Test]
@@ -252,8 +253,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Additional Assign Task: Assessor is required", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Assessor is required"));
         }
 
         [Test]
