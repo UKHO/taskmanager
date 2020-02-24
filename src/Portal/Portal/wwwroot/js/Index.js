@@ -1,5 +1,159 @@
 ﻿$(document).ready(function () {
 
+    var menuItem = 0;
+    var userFullName = $("#userFullName > strong").text();
+
+    var unassignedTasksTable = $('#unassignedTasks').DataTable({
+        "pageLength": 5,
+        'sDom': 'ltipr',
+        "lengthMenu": [5, 10, 25, 50],
+        'columnDefs': [
+            {
+                'targets': [12],
+                'orderable': false,
+                'searchable': false
+            },
+            {
+                'targets': [13],
+                'visible': false,
+                'searchable': false
+            }
+        ],
+        "scrollX": true,
+        "order": [[1, 'asc']],
+        "ordering": true
+    });
+    var inFlightTasksTable = $('#inFlightTasks').DataTable({
+        "pageLength": 10,
+        "lengthMenu": [5, 10, 25, 50],
+        'sDom': 'ltipr',
+        'autoWidth': true,
+        'columnDefs': [
+            {
+                'targets': [0],
+                'orderable': false,
+                'searchable': false
+            },
+            {
+                'targets': [13],
+                'orderable': false,
+                'searchable': false
+            },
+            {
+                'targets': [14],
+                'visible': false,
+                'searchable': false
+            }
+        ],
+        "order": [[2, 'asc']],
+        "scrollX": true,
+        "createdRow": function (row, data, dataIndex) {
+            if (data[14] === "") {
+                $("td.details-control", row).removeClass("details-control");
+                $("td.details-control i", row).removeClass("fa");
+            }
+        }
+    });
+
+    function format(data) {
+        return '<span class="note-formatting">' + data[14] + '</span>';
+    }
+
+    $('#inFlightTasks tbody').on('click',
+        'td.details-control i',
+        function () {
+
+            var tr = $(this).closest('tr');
+            var row = inFlightTasksTable.row(tr);
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                row.child(format(row.data()), 'no-padding').show();
+                tr.addClass('shown');
+            }
+        });
+
+    //Datatables search plugin
+    $.fn.dataTable.ext.search.push(
+        function (settings, searchData, index, rowData, counter) {
+            if (settings.sTableId !== "inFlightTasks" ||
+                menuItem !== 0) {
+                return true;
+            }
+
+            var taskStage = rowData[8];
+
+            switch (taskStage) {
+                case "Review":
+                    var reviewer = rowData[9];
+
+                    if (reviewer !== userFullName) {
+                        return false;
+                    }
+                    break;
+                case "Assess":
+                    var assessor = rowData[10];
+
+                    if (assessor !== userFullName) {
+                        return false;
+                    }
+                    break;
+                case "Verify":
+                    var verifier = rowData[11];
+
+                    if (verifier !== userFullName) {
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+    );
+
+    $("#btnMyTaskList").click(function() {
+        menuItem = 0;
+        setMenuItemSelection();
+
+        $('#txtGlobalSearch').val("");
+        unassignedTasksTable.search("").draw();
+        inFlightTasksTable.search("").draw();
+
+    });
+
+    $("#btnMyTaskList").trigger("click");
+
+    $("#btnTeamTasks").click(function() {
+        menuItem = 1;
+        setMenuItemSelection();
+
+        $('#txtGlobalSearch').val("");
+        unassignedTasksTable.search("").draw();
+        inFlightTasksTable.search("").draw();
+        
+    });
+
+    function setMenuItemSelection() {
+        console.log("hello");
+        $("#menuItemList button").each(function (index) {
+            console.log("hello2");
+            if (index === menuItem) {
+                $(this).addClass("btn-info");
+                $(this).removeClass("btn-primary");
+            } else {
+                $(this).removeClass("btn-info");
+                $(this).addClass("btn-primary");
+            }
+        });
+    }
+
+    $('#txtGlobalSearch').keyup(function () {
+        unassignedTasksTable.search($(this).val()).draw();
+        inFlightTasksTable.search($(this).val()).draw();
+    });
+
+
     // Required unless we refactor behaviour around errors
     var usersFetched = false;
 
