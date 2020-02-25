@@ -122,8 +122,6 @@
 
     });
 
-    $("#btnMyTaskList").trigger("click");
-
     $("#btnTeamTasks").click(function() {
         menuItem = 1;
         setMenuItemSelection();
@@ -318,6 +316,8 @@
                 }
             });
     }
+
+    $("#btnMyTaskList").trigger("click");
 });
 
 function displayAssignUserErrors(errorStringArray) {
