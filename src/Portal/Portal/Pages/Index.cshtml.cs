@@ -223,8 +223,16 @@ namespace Portal.Pages
             if (isUpdateCarisProject)
             {
                 await UpdateCarisProjectWithAdditionalUser(processId, userName);
-            }
 
+                if (ValidationErrorMessages.Any())
+                {
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+
+            }
 
             return StatusCode(200);
         }
@@ -269,7 +277,19 @@ namespace Portal.Pages
                 return;
             }
 
-            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+            HpdUser hpdUsername = null;
+            try
+            {
+                 hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to assign {userName} to Caris project: {carisProjectDetails.ProjectId}");
+                ValidationErrorMessages.Add($"Failed to assign {userName} to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+
+                return;
+            }
             LogContext.PushProperty("CarisProjectId", carisProjectDetails.ProjectId);
             LogContext.PushProperty("HpdUsername", hpdUsername.HpdUsername);
 
@@ -281,7 +301,7 @@ namespace Portal.Pages
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
-                throw new InvalidOperationException($"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                ValidationErrorMessages.Add($"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
             }
         }
 
