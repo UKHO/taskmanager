@@ -394,7 +394,7 @@ namespace Portal.Helpers
                     || r.ProductActionTypeId == 0))
                 {
                     validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
-                    return isValid;
+                    return false;
                 }
 
                 foreach (var productAction in recordProductAction)

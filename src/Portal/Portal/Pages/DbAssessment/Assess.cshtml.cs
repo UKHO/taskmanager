@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Portal.Auth;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
@@ -30,6 +32,8 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly IPageValidationHelper _pageValidationHelper;
+        private readonly ICarisProjectHelper _carisProjectHelper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
 
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
@@ -87,7 +91,9 @@ namespace Portal.Pages.DbAssessment
             ILogger<AssessModel> logger,
             ICommentsHelper commentsHelper,
             IUserIdentityService userIdentityService,
-            IPageValidationHelper pageValidationHelper)
+            IPageValidationHelper pageValidationHelper,
+            ICarisProjectHelper carisProjectHelper,
+            IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
             _dataServiceApiClient = dataServiceApiClient;
@@ -97,6 +103,8 @@ namespace Portal.Pages.DbAssessment
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _pageValidationHelper = pageValidationHelper;
+            _carisProjectHelper = carisProjectHelper;
+            _generalConfig = generalConfig;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -119,6 +127,10 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -146,7 +158,21 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateProductAction(processId);
 
-            await UpdateEditDatabase(processId);
+            try
+            {
+
+                await UpdateEditDatabase(processId);
+
+            }
+            catch (Exception e)
+            {
+                ValidationErrorMessages.Add(e.Message);
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
 
             await UpdateDataImpact(processId);
 
@@ -253,18 +279,62 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateEditDatabase(int processId)
         {
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
             var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
             var isCarisProjectCreated = carisProjectDetails != null;
+
             if (isCarisProjectCreated)
             {
+                // just update Caris project Assigned users
+                await UpdateCarisProjectWithAdditionalUser(processId, currentAssess.Assessor);
+                await UpdateCarisProjectWithAdditionalUser(processId, currentAssess.Verifier);
+
                 return;
             }
 
-            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
             await _dbContext.SaveChangesAsync();
         }
 
+        private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
+        {
+
+            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+            var carisProjectDetails =
+                await _dbContext.CarisProjectDetails.SingleOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            LogContext.PushProperty("CarisProjectId", carisProjectDetails.ProjectId);
+            LogContext.PushProperty("HpdUsername", hpdUsername.HpdUsername);
+
+            try
+            {
+                await _carisProjectHelper.UpdateCarisProject(carisProjectDetails.ProjectId, hpdUsername.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
+                throw new InvalidOperationException($"Edit Database: Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+            }
+        }
+
+        private async Task<HpdUser> GetHpdUser(string username)
+        {
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
+                    StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
+                    ex.InnerException);
+            }
+
+        }
+        
         private async Task UpdateDataImpact(int processId)
         {
             var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();

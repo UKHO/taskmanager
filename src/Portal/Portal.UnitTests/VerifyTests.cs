@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.Helpers;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
@@ -29,6 +32,8 @@ namespace Portal.UnitTests
         private IUserIdentityService _fakeUserIdentityService;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
+        private ICarisProjectHelper _fakeCarisProjectHelper;
+        private IOptions<GeneralConfig> _generalConfig;
 
         [SetUp]
         public void Setup()
@@ -42,6 +47,8 @@ namespace Portal.UnitTests
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+            _generalConfig = A.Fake<IOptions<GeneralConfig>>();
 
             ProcessId = 123;
 
@@ -64,10 +71,10 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<VerifyModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
 
             _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper);
+                _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
         }
 
         [TearDown]

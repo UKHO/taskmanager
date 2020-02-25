@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common.Helpers;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.MappingProfiles;
 using Portal.Pages;
@@ -20,6 +23,7 @@ namespace Portal.UnitTests
     public class TaskNoteTests
     {
         private WorkflowDbContext _dbContext;
+        private IndexModel _indexModel;
         private int ProcessId { get; set; }
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private IMapper _mapper;
@@ -27,6 +31,8 @@ namespace Portal.UnitTests
         private IDirectoryService _fakeDirectoryService;
         private ILogger<IndexModel> _fakeLogger;
         private IIndexFacade _fakeIndexFacade;
+        private ICarisProjectHelper _fakeCarisProjectHelper;
+        private IOptions<GeneralConfig> _generalConfig;
 
         [SetUp]
         public async Task Setup()
@@ -46,6 +52,8 @@ namespace Portal.UnitTests
             _fakeDirectoryService = A.Dummy<IDirectoryService>();
             _fakeLogger = A.Dummy<ILogger<IndexModel>>();
             _fakeIndexFacade = A.Fake<IIndexFacade>();
+            _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+            _generalConfig = A.Fake<IOptions<GeneralConfig>>();
 
             ProcessId = 123;
 
@@ -86,6 +94,15 @@ namespace Portal.UnitTests
             });
 
             await _dbContext.SaveChangesAsync();
+
+            _indexModel = new IndexModel(_dbContext,
+                _mapper,
+                _fakeUserIdentityService,
+                _fakeDirectoryService,
+                _fakeLogger,
+                _fakeIndexFacade,
+                _fakeCarisProjectHelper,
+                _generalConfig);
         }
 
         [TearDown]
@@ -107,14 +124,9 @@ namespace Portal.UnitTests
                 LastModified = DateTime.Now,
                 LastModifiedByUsername = "Tests"
             };
-            var indexModel = new IndexModel(_dbContext,
-                _mapper,
-                _fakeUserIdentityService, 
-                _fakeDirectoryService, 
-                _fakeLogger,
-                _fakeIndexFacade);
+           
 
-            await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
+            await _indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
             Assert.IsNotEmpty(_dbContext.TaskNote.FirstAsync(tn => tn.ProcessId == ProcessId).Result.Text);
         }
@@ -133,14 +145,7 @@ namespace Portal.UnitTests
                 LastModifiedByUsername = "Tests"
             };
 
-            var indexModel = new IndexModel(_dbContext,
-                _mapper,
-                _fakeUserIdentityService, 
-                _fakeDirectoryService, 
-                _fakeLogger,
-                _fakeIndexFacade);
-
-            await indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
+            await _indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
             Assert.AreEqual(null, _dbContext.TaskNote.FirstOrDefault(tn => tn.ProcessId == ProcessId));
         }
@@ -171,14 +176,16 @@ namespace Portal.UnitTests
             await _dbContext.TaskNote.AddAsync(taskNote);
             await _dbContext.SaveChangesAsync();
 
-            var indexModel = new IndexModel(_dbContext,
+            _indexModel = new IndexModel(_dbContext,
                 _mapper,
                 _fakeUserIdentityService, 
                 _fakeDirectoryService, 
                 _fakeLogger,
-                _fakeIndexFacade);
+                _fakeIndexFacade,
+                _fakeCarisProjectHelper,
+                _generalConfig);
 
-            await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
+            await _indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
             Assert.AreSame("Test task note for update",
                 _dbContext.TaskNote.FirstAsync(tn => tn.ProcessId == ProcessId).Result.Text);
@@ -210,14 +217,16 @@ namespace Portal.UnitTests
             await _dbContext.TaskNote.AddAsync(taskNote);
             await _dbContext.SaveChangesAsync();
 
-            var indexModel = new IndexModel(_dbContext,
+            _indexModel = new IndexModel(_dbContext,
                 _mapper,
                 _fakeUserIdentityService, 
                 _fakeDirectoryService, 
                 _fakeLogger,
-                _fakeIndexFacade);
+                _fakeIndexFacade,
+                _fakeCarisProjectHelper,
+                _generalConfig);
 
-            await indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
+            await _indexModel.OnPostTaskNoteAsync(updatedTaskNote.Text, ProcessId);
 
             Assert.AreSame(string.Empty,
                 _dbContext.TaskNote.FirstAsync(tn => tn.ProcessId == ProcessId).Result.Text);
