@@ -283,7 +283,7 @@ namespace Common.Helpers
                 if (carisProjectPriority == null)
                 {
                     throw new ArgumentException(
-                        $"Failed to get caris project priority {projectPriority}, project status might not exist in HPD");
+                        $"Failed to get caris project priority {projectPriority}, project priority might not exist in HPD");
                 }
 
                 return carisProjectPriority.ProjectPriorityId;
