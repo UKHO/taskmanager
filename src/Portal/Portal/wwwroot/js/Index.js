@@ -116,6 +116,7 @@
         menuItem = 0;
         setMenuItemSelection();
 
+        $("#btnSelectTeam").hide();
         $('#txtGlobalSearch').val("");
         unassignedTasksTable.search("").draw();
         inFlightTasksTable.search("").draw();
@@ -126,6 +127,7 @@
         menuItem = 1;
         setMenuItemSelection();
 
+        $("#btnSelectTeam").show();
         $('#txtGlobalSearch').val("");
         unassignedTasksTable.search("").draw();
         inFlightTasksTable.search("").draw();
@@ -133,9 +135,7 @@
     });
 
     function setMenuItemSelection() {
-        console.log("hello");
         $("#menuItemList button").each(function (index) {
-            console.log("hello2");
             if (index === menuItem) {
                 $(this).addClass("btn-info");
                 $(this).removeClass("btn-primary");
