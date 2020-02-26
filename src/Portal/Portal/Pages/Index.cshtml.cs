@@ -44,6 +44,8 @@ namespace Portal.Pages
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
 
+        public List<string> TeamList { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         public IndexModel(WorkflowDbContext dbContext,
@@ -108,6 +110,8 @@ namespace Portal.Pages
 
                 SetUsersOnTask(instance, task);
             }
+
+            TeamList = _generalConfig.Value.GetTeams().ToList();
         }
 
         private string GetTaskType(WorkflowInstance instance)

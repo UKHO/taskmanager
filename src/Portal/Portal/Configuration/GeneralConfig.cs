@@ -24,6 +24,9 @@ namespace Portal.Configuration
 
         public IEnumerable<string> GetTeams()
         {
+            // Teams will be stored in Azure App Config as a CSV:
+            // HDB Master Data,HDBPR1
+
             if (string.IsNullOrWhiteSpace(TeamsAsCsv)) return null;
 
             var teamList = TeamsAsCsv.Split(',');

@@ -112,7 +112,7 @@
         }
     );
 
-    $("#btnMyTaskList").click(function() {
+    $("#btnMyTaskList").click(function () {
         menuItem = 0;
         setMenuItemSelection();
 
@@ -123,7 +123,7 @@
 
     });
 
-    $("#btnTeamTasks").click(function() {
+    $("#btnTeamTasks").click(function () {
         menuItem = 1;
         setMenuItemSelection();
 
@@ -131,7 +131,12 @@
         $('#txtGlobalSearch').val("");
         unassignedTasksTable.search("").draw();
         inFlightTasksTable.search("").draw();
-        
+
+    });
+
+
+    $("#btnSelectTeam").click(function () {
+        $("#selectTeamsModal").modal("show");
     });
 
     function setMenuItemSelection() {
@@ -216,10 +221,10 @@
     $("#btnAssignTaskToUser").on("click",
         function () {
 
-            removeAssignUserErrors();            
+            removeAssignUserErrors();
 
             if ($("#txtUsername").val() === "") {
-                
+
                 var errorArray = ["Please enter a user"];
                 displayAssignUserErrors(errorArray);
 
