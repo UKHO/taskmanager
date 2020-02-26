@@ -48,8 +48,7 @@ namespace Portal.Helpers
             {
                 validationErrorMessages.Add("Operators: Reviewer cannot be empty");
             }
-
-            if (!await _userIdentityService.ValidateUser(Reviewer))
+            else if (!await _userIdentityService.ValidateUser(Reviewer))
             {
                 validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {Reviewer}");
             }
