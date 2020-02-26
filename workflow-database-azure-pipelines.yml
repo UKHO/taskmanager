@@ -49,6 +49,7 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameDev)'
                   DatabaseName: '$(DatabaseNameDev)'
