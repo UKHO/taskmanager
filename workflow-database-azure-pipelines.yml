@@ -49,7 +49,6 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
-                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameDev)'
                   DatabaseName: '$(DatabaseNameDev)'
@@ -71,11 +70,12 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameUAT)'
                   DatabaseName: '$(DatabaseNameUAT)'
-                  SqlUsername: '$(SQL_UsernameBenUAT)'
-                  SqlPassword: '$(SQL_PasswordBenUAT)'
+                  aadSqlUsername: '$(SQL_UsernameBenUAT)'
+                  aadSqlPassword: '$(SQL_PasswordBenUAT)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployPre
