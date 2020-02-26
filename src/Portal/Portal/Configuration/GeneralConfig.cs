@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Graph;
+
 namespace Portal.Configuration
 {
     public class GeneralConfig
@@ -15,6 +19,19 @@ namespace Portal.Configuration
         public string CarisNewProjectPriority { get; set; }
         public string CarisNewProjectType { get; set; }
         public int CarisProjectTimeoutSeconds { get; set; }
+
+        public string TeamsAsCsv { get; set; }
+
+        public IEnumerable<string> GetTeams()
+        {
+            if (string.IsNullOrWhiteSpace(TeamsAsCsv)) return null;
+
+            var teamList = TeamsAsCsv.Split(',');
+
+            if (teamList == null || teamList.Length == 0) return null;
+
+            return teamList.Select(t => t.Trim());
+        }
 
     }
 }   
