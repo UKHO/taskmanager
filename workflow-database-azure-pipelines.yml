@@ -73,8 +73,8 @@ stages:
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameUAT)'
                   DatabaseName: '$(DatabaseNameUAT)'
-                  SqlUsername: '$(SQLUsernameUAT)'
-                  SqlPassword: '$(SQLPasswordUAT)'
+                  SqlUsername: '$(SQL_UsernameBenUAT)'
+                  SqlPassword: '$(SQL_PasswordBenUAT)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployPre
