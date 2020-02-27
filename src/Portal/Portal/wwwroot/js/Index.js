@@ -131,8 +131,8 @@
 
         $("#btnSelectTeam").hide();
         $('#txtGlobalSearch').val("");
-        //unassignedTasksTable.search("").draw();
-        //inFlightTasksTable.search("").draw();
+        unassignedTasksTable.search("").draw();
+        inFlightTasksTable.search("").draw();
 
     });
 
@@ -142,8 +142,8 @@
 
         $("#btnSelectTeam").show();
         $('#txtGlobalSearch').val("");
-        //unassignedTasksTable.search("").draw();
-        //inFlightTasksTable.search("").draw();
+        unassignedTasksTable.search("").draw();
+        inFlightTasksTable.search("").draw();
 
     });
 
