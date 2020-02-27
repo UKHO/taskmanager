@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
 using NCNEPortal.Enums;
@@ -198,6 +199,21 @@ namespace NCNEPortal
             SendDate3ps = DateTime.Now.AddDays(-10);
             ExpectedReturnDate3ps = DateTime.Now.AddDays(-2);
             ActualReturnDate3ps = DateTime.Now.AddDays(-1);
+
+
+            var taskInfo = _dbContext.TaskInfo
+                .Include(task => task.TaskRole)
+                .Include(task => task.TaskStage)
+                .Include(task => task.TaskComment)
+                .FirstOrDefault(t => t.ProcessId == processId);
+
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+            if (carisProject != null)
+                CarisProjectName = carisProject.ProjectName;
+            else
+               if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
+
 
             CarisWorkspaces = new SelectList(new List<string>
             {

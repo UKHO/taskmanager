@@ -108,7 +108,7 @@ namespace Common.Helpers
             dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
             dbContext.ChartType.RemoveRange(dbContext.ChartType);
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
-
+            dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
             dbContext.SaveChanges();
         }
     }

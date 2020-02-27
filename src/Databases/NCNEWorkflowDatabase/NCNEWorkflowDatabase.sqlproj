@@ -69,6 +69,8 @@
     <Build Include="Tables\TaskComment.sql" />
     <Build Include="Tables\ChartType.sql" />
     <Build Include="Tables\WorkflowType.sql" />
+    <Build Include="Tables\CarisProjectDetails.sql" />
+    <Build Include="Tables\HpdUser.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="NCNEWorkflowDatabase.refactorlog" />

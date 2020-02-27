@@ -1,97 +1,110 @@
 [
-  { "TaskStageTypeId" : 1, 
-    "Name": "Specification",
+  {
+    "TaskStageTypeId": 1,
+    "Name": "With SDRA",
     "SequenceNumber": 1,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 2,
-    "Name": "Compile Chart",
+    "Name": "With Geodesy",
     "SequenceNumber": 2,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 3,
-    "Name": "V1",
+    "Name": "Specification",
     "SequenceNumber": 3,
-    "AllowRework": true
+    "AllowRework": false
   },
   {
     "TaskStageTypeId": 4,
-    "Name": "V1 rework",
+    "Name": "Compile Chart",
     "SequenceNumber": 4,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 5,
-    "Name": "V2",
+    "Name": "V1",
     "SequenceNumber": 5,
     "AllowRework": true
   },
   {
     "TaskStageTypeId": 6,
-    "Name": "V2 rework",
+    "Name": "V1 rework",
     "SequenceNumber": 6,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 7,
-    "Name": "Forms",
+    "Name": "V2",
     "SequenceNumber": 7,
-    "AllowRework": false
+    "AllowRework": true
   },
   {
     "TaskStageTypeId": 8,
-    "Name": "Final updating",
+    "Name": "V2 rework",
     "SequenceNumber": 8,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 9,
-    "Name": "100% check",
+    "Name": "Forms",
     "SequenceNumber": 9,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 10,
-    "Name": "Commit to print",
+    "Name": "Final updating",
     "SequenceNumber": 10,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 11,
-    "Name": "CIS",
+    "Name": "100% check",
     "SequenceNumber": 11,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 12,
-    "Name": "Publication",
+    "Name": "Commit to print",
     "SequenceNumber": 12,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 13,
-    "Name": "Publish chart",
+    "Name": "CIS",
     "SequenceNumber": 13,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 14,
-    "Name": "Clear vector",
+    "Name": "Publication",
     "SequenceNumber": 14,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 15,
-    "Name": "Retire old minor version",
+    "Name": "Publish chart",
     "SequenceNumber": 15,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 16,
-    "Name": "Consider withdrawn charts",
+    "Name": "Clear vector",
     "SequenceNumber": 16,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 17,
+    "Name": "Retire old minor version",
+    "SequenceNumber": 17,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 18,
+    "Name": "Consider withdrawn charts",
+    "SequenceNumber": 18,
     "AllowRework": false
   }
 ]
