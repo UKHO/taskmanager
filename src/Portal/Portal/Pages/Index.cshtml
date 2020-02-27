@@ -286,11 +286,13 @@
 
                     @for (var i = 0; i < Model.TeamList.Count; i++)
                     {
-                        <div class="row ml-3 mb-3">
-                            <tr>
-                                <td><input type="checkbox" id="team@(i)" value="@i" /></td>
-                                <td>@Model.TeamList[i]</td>
-                            </tr>
+                        var id = $"team{i}";
+
+                        <div class="ml-3 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input mt-0" id="@(id)">
+                                <label class="form-check-label" for="@(id)">@Model.TeamList[i]</label>
+                            </div>
                         </div>
                     }
                 </div>
@@ -298,13 +300,15 @@
             <div class="modal-footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-6 float-left">
-                            <button type="button" id="btnSelectAllTeams" class="btn btn-default">Select All</button>
-                            <button type="button" id="btnClearAllTeams" class="btn btn-default">Clear All</button>
-                        </div>
-                        <div class="col-6 float-right">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" id="btnFilterTasksByTeam" class="btn btn-primary">OK</button>
+                        <div class="col-12">
+                            <div class="float-left">
+                                <button type="button" id="btnSelectAllTeams" class="btn btn-default">Select All</button>
+                                <button type="button" id="btnClearAllTeams" class="btn btn-default">Clear All</button>
+                            </div>
+                            <div class="float-right">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" id="btnFilterTasksByTeam" class="btn btn-primary">OK</button>
+                            </div>
                         </div>
                     </div>
                 </div>
