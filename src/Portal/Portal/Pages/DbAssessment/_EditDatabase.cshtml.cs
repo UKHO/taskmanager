@@ -144,7 +144,7 @@ namespace Portal.Pages.DbAssessment
 
             await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
 
-            var projectId = await CreateCarisProject(processId, projectName, carisWorkspace);
+            var projectId = await CreateCarisProject(processId, projectName);
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
 
@@ -154,7 +154,7 @@ namespace Portal.Pages.DbAssessment
             return StatusCode(200);
         }
 
-        private async Task<int> CreateCarisProject(int processId, string projectName, string carisWorkspace)
+        private async Task<int> CreateCarisProject(int processId, string projectName)
         {
 
             var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
