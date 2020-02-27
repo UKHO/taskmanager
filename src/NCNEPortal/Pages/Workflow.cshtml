@@ -5,7 +5,8 @@
 @{
     ViewData["Title"] = "New Chart / New Edition";
 }
-
+@Html.HiddenFor(m => m.IsCarisProjectCreated)
+<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
 <div class="row pt-1 pb-1 align-items-center">
     <div class="col-4 col-lg-3">
         <a asp-page="./Index">
@@ -553,7 +554,7 @@
                     <div class="row">
                         <div class="col">
                             @Html.TextBoxFor(model => model.CarisProjectName, "",
-                                new { placeholder = "Source Name_ProcessID", @class = "form-control form-text-input" })
+                                new { id = "txtCarisProject", placeholder = "Source Name_ProcessID", @class = "form-control form-text-input" })
                         </div>
                     </div>
                 </div>
@@ -564,11 +565,29 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button id="btnCreateCarisProject" class="btn btn-block btn-primary">Create CARIS Project</button>
+                            <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                                Create CARIS Project
+                            </button>
                         </div>
                     </div>
                 </div>
+
+
             </div>
+            <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                <h5>
+                    <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                    <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                </h5>
+            </section>
+
+            <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                <h5>
+                    <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                    <span>Caris project successfully created</span>
+                </h5>
+            </section>
         </div>
     </div>
 </div>

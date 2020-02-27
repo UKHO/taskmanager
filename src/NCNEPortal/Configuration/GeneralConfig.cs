@@ -10,5 +10,9 @@ namespace NCNEPortal.Configuration
         public int Commit2WDaysFromPubDate { get; set; }
         public int Commit3WDaysFromPubDate { get; set; }
         public int PublishDaysFromRepromat { get; set; }
+        public string CarisNewProjectStatus { get; set; }
+        public string CarisNewProjectPriority { get; set; }
+        public string CarisNewProjectType { get; set; }
+        public int CarisProjectTimeoutSeconds { get; set; }
     }
 }
