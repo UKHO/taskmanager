@@ -3,77 +3,90 @@
     var menuItem = 0;
     var userFullName = $("#userFullName > strong").text();
 
-    var unassignedTasksTable = $('#unassignedTasks').DataTable({
-        "pageLength": 5,
-        'sDom': 'ltipr',
-        "lengthMenu": [5, 10, 25, 50],
-        'columnDefs': [
-            {
-                'targets': [12],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [13],
-                'visible': false,
-                'searchable': false
+    var unassignedTasksTable = setupUnassignedTasks();
+
+    var inFlightTasksTable = setupInFlightTasks();
+
+    handleDisplayTaskNotes();
+
+    function setupUnassignedTasks() {
+        return $('#unassignedTasks').DataTable({
+            "pageLength": 5,
+            'sDom': 'ltipr',
+            "lengthMenu": [5, 10, 25, 50],
+            'columnDefs': [
+                {
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }
+            ],
+            "scrollX": true,
+            "order": [[1, 'asc']],
+            "ordering": true
+        });
+    }
+
+    function setupInFlightTasks() {
+        return $('#inFlightTasks').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 25, 50],
+            'sDom': 'ltipr',
+            'autoWidth': true,
+            'columnDefs': [
+                {
+                    'targets': [0],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [14],
+                    'visible': false,
+                    'searchable': false
+                }
+            ],
+            "order": [[2, 'asc']],
+            "scrollX": true,
+            "createdRow": function (row, data, dataIndex) {
+                if (data[14] === "") {
+                    $("td.details-control", row).removeClass("details-control");
+                    $("td.details-control i", row).removeClass("fa");
+                }
             }
-        ],
-        "scrollX": true,
-        "order": [[1, 'asc']],
-        "ordering": true
-    });
-    var inFlightTasksTable = $('#inFlightTasks').DataTable({
-        "pageLength": 10,
-        "lengthMenu": [5, 10, 25, 50],
-        'sDom': 'ltipr',
-        'autoWidth': true,
-        'columnDefs': [
-            {
-                'targets': [0],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [13],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [14],
-                'visible': false,
-                'searchable': false
-            }
-        ],
-        "order": [[2, 'asc']],
-        "scrollX": true,
-        "createdRow": function (row, data, dataIndex) {
-            if (data[14] === "") {
-                $("td.details-control", row).removeClass("details-control");
-                $("td.details-control i", row).removeClass("fa");
-            }
-        }
-    });
+        });
+    }
 
     function format(data) {
         return '<span class="note-formatting">' + data[14] + '</span>';
     }
 
-    $('#inFlightTasks tbody').on('click',
-        'td.details-control i',
-        function () {
+    function handleDisplayTaskNotes() {
+        $('#inFlightTasks tbody').on('click',
+            'td.details-control i',
+            function() {
 
-            var tr = $(this).closest('tr');
-            var row = inFlightTasksTable.row(tr);
+                var tr = $(this).closest('tr');
+                var row = inFlightTasksTable.row(tr);
 
-            if (row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-            } else {
-                row.child(format(row.data()), 'no-padding').show();
-                tr.addClass('shown');
-            }
-        });
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    row.child(format(row.data()), 'no-padding').show();
+                    tr.addClass('shown');
+                }
+            });
+    }
 
     //Datatables search plugin
     $.fn.dataTable.ext.search.push(
@@ -118,8 +131,8 @@
 
         $("#btnSelectTeam").hide();
         $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
+        //unassignedTasksTable.search("").draw();
+        //inFlightTasksTable.search("").draw();
 
     });
 
@@ -129,8 +142,8 @@
 
         $("#btnSelectTeam").show();
         $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
+        //unassignedTasksTable.search("").draw();
+        //inFlightTasksTable.search("").draw();
 
     });
 
