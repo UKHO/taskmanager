@@ -20,7 +20,7 @@ namespace Common.Helpers
 
         public async Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
             string projectType, string projectStatus, string projectPriority,
-            int carisTimeout, string workspace)
+            int carisTimeout)
         {
             var projectId = 0;
 
@@ -45,7 +45,7 @@ namespace Common.Helpers
 
             // Create project
             projectId = await CreateProject(k2ProcessId, creatorUsernameId, projectName, projectTypeId, carisProjectStatusId,
-                carisProjectPriortyId, carisTimeout, workspace);
+                carisProjectPriortyId, carisTimeout);
 
             return projectId;
         }
@@ -69,7 +69,7 @@ namespace Common.Helpers
         }
 
         private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int projectStatusId,
-            int projectPriorityId, int carisTimeout, string workspace)
+            int projectPriorityId, int carisTimeout)
         {
             using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
             {
@@ -126,11 +126,6 @@ namespace Common.Helpers
                         Value = k2processId
                     });
 
-                    command.Parameters.Add(new OracleParameter("workspace", OracleDbType.Varchar2, ParameterDirection.Input)
-                    {
-                        Value = workspace
-                    });
-
                     var projectCommand = "DECLARE " +
                                          "v_project_id integer; " +
                                          "v_created_by hpdowner.project.created_by%type := :userId; " +
@@ -141,13 +136,12 @@ namespace Common.Helpers
                                          "v_type_id hpdowner.project.pte_project_type_id%type := :projectTypeId; " +
                                          "v_status_id hpdowner.project_certification.project_status_id%type := :projectStatusId; " +
                                          "v_priority_id hpdowner.project.spy_priority_id%type := :projectPriorityId; " +
-                                         "v_geom hpdowner.project.geom%type; " +
+                                         "v_geom hpdowner.project.geom % type := NULL; " +
                                          "v_external_id hpdowner.project.external_id%type := :k2processId; " +
                                          "v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := :userId; " +
                                          "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
                                          "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
                                          "BEGIN " +
-                                         "SELECT geom into v_geom FROM hpdowner.hpd_workspaces_vw where ws_name = :workspace; " +
                                          "v_assigned_users.extend(1); " +
                                          "v_assigned_users(1) := hpdowner.hpdnumber$row_type(v_assigned_user1); " +
                                          "v_project_id := hpdowner.p_project_manager.addproject( " +

@@ -168,13 +168,12 @@ namespace Portal.Pages.DbAssessment
             var hpdUser = await GetHpdUser(UserFullName);
 
             _logger.LogInformation(
-                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
+                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
                 hpdUser.HpdUsername, _generalConfig.Value.CarisNewProjectType,
                 _generalConfig.Value.CarisNewProjectStatus,
-                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds,
-                carisWorkspace);
+                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 
             return projectId;
         }
