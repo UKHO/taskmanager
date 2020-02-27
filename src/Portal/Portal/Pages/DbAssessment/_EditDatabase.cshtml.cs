@@ -144,7 +144,7 @@ namespace Portal.Pages.DbAssessment
 
             await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
 
-            var projectId = await CreateCarisProject(processId, projectName, carisWorkspace);
+            var projectId = await CreateCarisProject(processId, projectName);
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
 
@@ -154,7 +154,7 @@ namespace Portal.Pages.DbAssessment
             return StatusCode(200);
         }
 
-        private async Task<int> CreateCarisProject(int processId, string projectName, string carisWorkspace)
+        private async Task<int> CreateCarisProject(int processId, string projectName)
         {
 
             var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
@@ -168,13 +168,12 @@ namespace Portal.Pages.DbAssessment
             var hpdUser = await GetHpdUser(UserFullName);
 
             _logger.LogInformation(
-                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}; CarisWorkspace {CarisWorkspace}.");
+                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
                 hpdUser.HpdUsername, _generalConfig.Value.CarisNewProjectType,
                 _generalConfig.Value.CarisNewProjectStatus,
-                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds,
-                carisWorkspace);
+                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 
             return projectId;
         }

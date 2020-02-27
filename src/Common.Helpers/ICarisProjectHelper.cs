@@ -6,8 +6,7 @@ namespace Common.Helpers
     {
         Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
             string projectType, string projectStatus, string projectPriority,
-            int carisTimeout, string workspace);
-
+            int carisTimeout);
         Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout);
     }
 }
