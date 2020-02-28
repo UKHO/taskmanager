@@ -81,8 +81,6 @@
     <None Include="NCNEWorkflowDatabase.publish.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PostDeploy Include="Scripts\Post Deployment\WorkflowType.sql" />
-    <None Include="Scripts\Post Deployment\ChartType.sql" />
-    <None Include="Scripts\Post Deployment\HpdUser.sql" />
+    <PostDeploy Include="Scripts\Post Deployment\NcnePostDeployment.sql" />
   </ItemGroup>
 </Project>
