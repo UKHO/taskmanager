@@ -111,7 +111,7 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish workflowcoordinator Artifact'
 
-- stage: Build
+- stage: DependencyCheck
   dependsOn: Build
   jobs:
     - job: DependencyCheck
