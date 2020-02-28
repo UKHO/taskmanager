@@ -9,6 +9,10 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
 
+variables:
+  - name: projectName
+    value: workflowcoordinator
+
 stages:
 - stage: Build
   jobs:
@@ -124,6 +128,13 @@ stages:
       #     buildType: 'current'
       #     downloadType: 'specific'
       #     downloadPath: '$(System.ArtifactsDirectory)' 
+
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
       - task: DotNetCoreCLI@2
         inputs:
