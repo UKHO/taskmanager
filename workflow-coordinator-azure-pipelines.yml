@@ -159,7 +159,9 @@ stages:
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
 - stage: DeployDev
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - DependencyCheck
   jobs:
     - deployment: DeployWorkflowCoordinatorDev
       displayName: Deploy Workflowcoordinator NSB Service
@@ -177,7 +179,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
 
 - stage: DeployUAT
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - DependencyCheck  
   jobs:
     - deployment: DeployWorkflowCoordinatorUAT
       displayName: Deploy Workflowcoordinator NSB Service
@@ -195,7 +199,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
 
 - stage: DeployPre
-  dependsOn: Build
+  dependsOn:
+    - Build
+    - DependencyCheck
   jobs:
     - deployment: DeployWorkflowCoordinatorPre
       displayName: Deploy Workflowcoordinator NSB Service
