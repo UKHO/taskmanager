@@ -48,26 +48,3 @@ INSERT     ([ChartTypeId], [Name])
      VALUES (source.[ChartTypeId], source.[Name])
 WHEN NOT MATCHED BY source THEN DELETE;
 
-/* HpdUser */
-
-merge [dbo].[HpdUser] as target
-using (
-		values 
-				('Peter Bates','TM_User'),
-                ('Matthew Stoodley','TM_User'),
-                ('Gareth Evans','TM_User'),
-                ('Bonnie Poole','TM_User'),
-                ('Rossall Sandford','TM_User'),
-                ('Ben Hall','TM_User'),
-                ('Samir Hasson','TM_User'),
-                ('Greg Williams','TM_User'),
-                ('Rajan Shunmuga','TM_User'),
-                ('Stuart Barzey','TM_User')
-) as source ([AdUsername], [HpdUsername])
-on (target.[AdUsername] = source.[AdUsername])
-when matched THEN
-UPDATE SET [HpdUsername] = source.[HpdUsername]
-WHEN NOT MATCHED BY target THEN
-INSERT     ([AdUsername], [HpdUsername])
-     VALUES (source.[AdUsername], source.[HpdUsername])
-WHEN NOT MATCHED BY source THEN DELETE;
