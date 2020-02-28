@@ -9,6 +9,47 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+
+/* Workflow Type */
+
+merge [dbo].[WorkflowType] as target
+using (
+		values 
+				(1,'NE'),
+				(2, 'NC'),
+				(3, 'CME'),
+                (4, 'UNE'),
+                (5, 'Refresh'),
+                (6, 'Fleet')
+) as source ([WorkflowTypeId], [Name])
+on (target.[WorkflowTypeId] = source.[WorkflowTypeId])
+when matched THEN
+UPDATE SET [Name] = source.[Name]
+WHEN NOT MATCHED BY target THEN
+INSERT     ([WorkflowTypeId], [Name])
+     VALUES (source.[WorkflowTypeId], source.[Name])
+WHEN NOT MATCHED BY source THEN DELETE;
+
+/* Chart Type */
+
+merge [dbo].[ChartType] as target
+using (
+		values 
+				(1,'Primary'),
+				(2, 'Adoption'),
+				(3, 'Derived'),
+                (4, 'Thematics')
+) as source ([ChartTypeId], [Name])
+on (target.[ChartTypeId] = source.[ChartTypeId])
+when matched THEN
+UPDATE SET [Name] = source.[Name]
+WHEN NOT MATCHED BY target THEN
+INSERT     ([ChartTypeId], [Name])
+     VALUES (source.[ChartTypeId], source.[Name])
+WHEN NOT MATCHED BY source THEN DELETE;
+
+/* HpdUser */
+
 merge [dbo].[HpdUser] as target
 using (
 		values 
