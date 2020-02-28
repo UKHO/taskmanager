@@ -111,7 +111,7 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish workflowcoordinator Artifact'
 
-  - job: DependencyCheck
+    - job: DependencyCheck
       displayName: "Dependency Check"
       pool: NautilusBuild
       steps:
