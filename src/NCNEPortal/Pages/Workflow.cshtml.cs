@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NCNEPortal.Auth;
+using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
@@ -18,12 +22,15 @@ using TaskComment = NCNEPortal.Models.TaskComment;
 
 namespace NCNEPortal
 {
+    [TypeFilter(typeof(JavascriptError))]
     public class WorkflowModel : PageModel
     {
         private readonly NcneWorkflowDbContext _dbContext;
         private readonly ILogger _logger;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ICommentsHelper _commentsHelper;
+        private readonly ICarisProjectHelper _carisProjectHelper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] public string Ion { get; set; }
@@ -103,6 +110,9 @@ namespace NCNEPortal
         [DisplayName("CARIS Project Name")]
         public string CarisProjectName { get; set; }
 
+        public CarisProjectDetails CarisProjectDetails { get; set; }
+        public bool IsCarisProjectCreated { get; set; }
+
 
         private string _userFullName;
         public string UserFullName
@@ -114,12 +124,16 @@ namespace NCNEPortal
         public WorkflowModel(NcneWorkflowDbContext dbContext,
             ILogger<WorkflowModel> logger,
             IUserIdentityService userIdentityService,
-            ICommentsHelper commentsHelper)
+            ICommentsHelper commentsHelper,
+            ICarisProjectHelper carisProjectHelper,
+            IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
             _logger = logger;
             _userIdentityService = userIdentityService;
             _commentsHelper = commentsHelper;
+            _carisProjectHelper = carisProjectHelper;
+            _generalConfig = generalConfig;
         }
 
         public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
@@ -175,7 +189,7 @@ namespace NCNEPortal
             return taskInfo;
         }
 
-        public void OnGet(int processId)
+        public void OnGetAsync(int processId)
         {
             ProcessId = processId;
             Ion = "DC782783923;";
@@ -198,6 +212,23 @@ namespace NCNEPortal
             SendDate3ps = DateTime.Now.AddDays(-10);
             ExpectedReturnDate3ps = DateTime.Now.AddDays(-2);
             ActualReturnDate3ps = DateTime.Now.AddDays(-1);
+
+
+            var taskInfo = _dbContext.TaskInfo
+                .Include(task => task.TaskRole)
+                .Include(task => task.TaskStage)
+                .Include(task => task.TaskComment)
+                .FirstOrDefault(t => t.ProcessId == processId);
+
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+            if (carisProject != null)
+            {
+                CarisProjectName = carisProject.ProjectName;
+                IsCarisProjectCreated = true;
+            }
+            else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
+
 
             CarisWorkspaces = new SelectList(new List<string>
             {
@@ -231,6 +262,98 @@ namespace NCNEPortal
                     CommentText = "Rework required as it isn't right.",Role = "Verifier 2"
                 }
             };
+        }
+
+
+
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
+        {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
+            LogContext.PushProperty("ProjectName", projectName);
+
+            _logger.LogInformation("Entering {PortalResource} for Workflow with: ProcessId: {ProcessId}");
+
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            var projectId = await CreateCarisProject(processId, projectName);
+
+            await UpdateCarisProjectDetails(processId, projectName, projectId);
+
+            return StatusCode(200);
+        }
+
+
+
+        private async Task<int> CreateCarisProject(int processId, string projectName)
+        {
+
+            var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            if (carisProjectDetails != null)
+            {
+                return carisProjectDetails.ProjectId;
+            }
+
+            // which will also implicitly validate if the current user has been mapped to HPD account in our database
+            var hpdUser = await GetHpdUser(UserFullName);
+
+            _logger.LogInformation(
+                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
+
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
+                hpdUser.HpdUsername, _generalConfig.Value.CarisNcneProjectType,
+                _generalConfig.Value.CarisNewProjectStatus,
+                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
+
+            return projectId;
+        }
+
+
+        private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
+        {
+            // If somehow the user has already created a project, remove it and create new row
+            var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
+            if (toRemove.Any())
+            {
+                _dbContext.CarisProjectDetails.RemoveRange(toRemove);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
+            {
+                ProcessId = processId,
+                Created = DateTime.Now,
+                CreatedBy = UserFullName,
+                ProjectId = projectId,
+                ProjectName = projectName
+            });
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<HpdUser> GetHpdUser(string username)
+        {
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
+                    StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
+                    ex.InnerException);
+            }
+
         }
     }
 

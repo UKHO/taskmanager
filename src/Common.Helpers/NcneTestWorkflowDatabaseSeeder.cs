@@ -27,6 +27,7 @@ namespace Common.Helpers
             PopulateChartType();
             PopulateWorkflowType();
             PopulateTaskInfo();
+            PopulateHpdUser();
 
             return this;
         }
@@ -70,6 +71,16 @@ namespace Common.Helpers
             var workflowType = JsonConvert.DeserializeObject<IEnumerable<WorkflowType>>(jsonString);
 
             _context.WorkflowType.AddRange(workflowType);
+        }
+
+        private void PopulateHpdUser()
+        {
+            if (!File.Exists(@"Data\HpdUsers.json")) throw new FileNotFoundException(@"Data\HpdUsers.json");
+
+            var jsonString = File.ReadAllText(@"Data\HpdUsers.json");
+            var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
+
+            _context.HpdUser.AddRange(hpdUsers);
         }
 
         public void SaveChanges()

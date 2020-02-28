@@ -1,4 +1,5 @@
 using Common.Helpers;
+using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -54,7 +55,8 @@ namespace NCNEPortal
 
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("ncneportal"))
-                .Bind(Configuration.GetSection("subscription"));
+                .Bind(Configuration.GetSection("subscription"))
+                .Bind(Configuration.GetSection("caris")); ;
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
             services.AddOptions<SecretsConfig>()
@@ -91,6 +93,7 @@ namespace NCNEPortal
 
             services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
+            services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
@@ -127,6 +130,19 @@ namespace NCNEPortal
                     NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
             }
+
+
+
+            var startupSecretConfig = new StartupSecretsConfig();
+            Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
+            Configuration.GetSection("HpdDbSection").Bind(startupSecretConfig);
+
+            var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretConfig.DataSource,
+                startupSecretConfig.UserId, startupSecretConfig.Password);
+
+            services.AddDbContext<HpdDbContext>((serviceProvider, options) =>
+                options.UseOracle(hpdConnection));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

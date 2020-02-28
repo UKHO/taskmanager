@@ -104,11 +104,13 @@ namespace Common.Helpers
             dbContext.SaveChanges();
 
             dbContext.TaskNote.RemoveRange(dbContext.TaskNote);
+            dbContext.CarisProjectDetails.RemoveRange(dbContext.CarisProjectDetails);
             dbContext.TaskInfo.RemoveRange(dbContext.TaskInfo);
             dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
             dbContext.ChartType.RemoveRange(dbContext.ChartType);
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
+            dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
             dbContext.SaveChanges();
         }
     }

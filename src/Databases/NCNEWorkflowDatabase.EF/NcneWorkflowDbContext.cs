@@ -32,6 +32,10 @@ namespace NCNEWorkflowDatabase.EF
 
         public DbSet<ChartType> ChartType { get; set; }
         public DbSet<WorkflowType> WorkflowType { get; set; }
+        public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
+
+        public DbSet<HpdUser> HpdUser { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TaskStage>()
