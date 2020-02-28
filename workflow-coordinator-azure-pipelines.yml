@@ -118,18 +118,18 @@ stages:
       pool: NautilusBuild
 
       steps:
-      - task: DownloadBuildArtifacts@0
-        displayName: 'Download Build Artifacts'
-        inputs:
-          buildType: 'current'
-          downloadType: 'specific'
-          downloadPath: '$(System.ArtifactsDirectory)' 
+      # - task: DownloadBuildArtifacts@0
+      #   displayName: 'Download Build Artifacts'
+      #   inputs:
+      #     buildType: 'current'
+      #     downloadType: 'specific'
+      #     downloadPath: '$(System.ArtifactsDirectory)' 
 
       - task: DotNetCoreCLI@2
         inputs:
           command: publish
           arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
-          projects: "**/$(projectName).csproj"
+          projects: "**/workflowcoordinator.csproj"
           publishWebProjects: false
           modifyOutputPath: false
           zipAfterPublish: false
