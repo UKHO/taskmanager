@@ -118,6 +118,13 @@ stages:
       pool: NautilusBuild
 
       steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Build Artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'specific'
+          downloadPath: '$(System.ArtifactsDirectory)' 
+
       - task: DotNetCoreCLI@2
         inputs:
           command: publish
@@ -126,6 +133,7 @@ stages:
           publishWebProjects: false
           modifyOutputPath: false
           zipAfterPublish: false
+
       - task: CmdLine@2
         inputs:
           script: 'dependency-check --project "WorkflowCoordinator - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport"'
