@@ -8,10 +8,12 @@ namespace DataServices.Adapters
     public class AssessmentWebServiceSoapClientAdapter : IAssessmentWebServiceSoapClientAdapter
     {
         private readonly IOptionsSnapshot<Settings> _settings;
+        private readonly IOptions<SecretsConfig> _secretsConfig;
 
-        public AssessmentWebServiceSoapClientAdapter(IOptionsSnapshot<Settings> settings)
+        public AssessmentWebServiceSoapClientAdapter(IOptionsSnapshot<Settings> settings, IOptions<SecretsConfig> secretsConfig)
         {
             _settings = settings;
+            _secretsConfig = secretsConfig;
         }
 
         public SDRAExternalInterfaceAssessmentWebServiceSoap SoapClient
@@ -21,12 +23,21 @@ namespace DataServices.Adapters
                 var result = new BasicHttpBinding
                 {
                     MaxBufferSize = int.MaxValue,
-                    MaxReceivedMessageSize = int.MaxValue
+                    MaxReceivedMessageSize = int.MaxValue,
+                    Security =
+                    {
+                        Mode = BasicHttpSecurityMode.TransportCredentialOnly,
+                        Transport = {ClientCredentialType = HttpClientCredentialType.Basic}
+                    }
                 };
+                
+                var client = new SDRAExternalInterfaceAssessmentWebServiceSoapClient(result,
+                    new EndpointAddress(_settings.Value.AssessmentWebServiceUri));
 
-                return new SDRAExternalInterfaceAssessmentWebServiceSoapClient(result,
-                    new EndpointAddress(_settings.Value.AssessmentWebServiceUri)
-                );
+                client.ClientCredentials.UserName.UserName = _secretsConfig.Value.SdraWebserviceUsername;
+                client.ClientCredentials.UserName.Password = _secretsConfig.Value.SdraWebservicePassword;
+
+                return client;
             }
         }
     }

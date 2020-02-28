@@ -36,6 +36,8 @@ namespace DataServices
             Configuration.GetSection("SdraDbSection").Bind(startupSecrets);
             Configuration.GetSection("LoggingDbSection").Bind(startupSecrets);
 
+            services.AddOptions<SecretsConfig>().Bind(Configuration.GetSection("SdraWebservice"));
+
             LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig, startupSecrets);
 
             var connection = Common.Helpers.DatabasesHelpers.BuildOracleConnectionString(startupSecrets.DataSource,
