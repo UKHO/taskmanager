@@ -9,10 +9,6 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
 
-variables:
-  - name: projectName
-    value: workflowcoordinator
-
 stages:
 - stage: Build
   jobs:
@@ -147,7 +143,7 @@ stages:
 
       - task: CmdLine@2
         inputs:
-          script: 'dependency-check --project "WorkflowCoordinator - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport"'
+          script: 'dependency-check --project "WorkflowCoordinator - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
         displayName: "Run NVD Checker"
 
       - task: PublishPipelineArtifact@1
