@@ -126,6 +126,13 @@ stages:
       #     downloadPath: '$(System.ArtifactsDirectory)' 
 
       - task: UseDotNet@2
+        displayName: 'Use .NET Core 2.2.x SDK'
+        inputs:
+          packageType: sdk
+          version: 2.2.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: UseDotNet@2
         displayName: 'Use .NET Core 3.1.x SDK'
         inputs:
           packageType: sdk
