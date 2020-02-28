@@ -274,18 +274,19 @@ namespace NCNEPortal
 
             _logger.LogInformation("Entering {PortalResource} for Workflow with: ProcessId: {ProcessId}");
 
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
+
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
-            //await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
-
             var projectId = await CreateCarisProject(processId, projectName);
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
-
-            // Add assessor and verifier to created project
-            //await UpdateCarisProjectWithAdditionalUser(projectId, processId, taskStage);
 
             return StatusCode(200);
         }
@@ -309,7 +310,7 @@ namespace NCNEPortal
                 "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
-                hpdUser.HpdUsername, _generalConfig.Value.CarisNewProjectType,
+                hpdUser.HpdUsername, _generalConfig.Value.CarisNcneProjectType,
                 _generalConfig.Value.CarisNewProjectStatus,
                 _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 

@@ -12,7 +12,7 @@ namespace NCNEPortal.Configuration
         public int PublishDaysFromRepromat { get; set; }
         public string CarisNewProjectStatus { get; set; }
         public string CarisNewProjectPriority { get; set; }
-        public string CarisNewProjectType { get; set; }
+        public string CarisNcneProjectType { get; set; }
         public int CarisProjectTimeoutSeconds { get; set; }
     }
 }
