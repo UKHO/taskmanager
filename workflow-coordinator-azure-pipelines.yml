@@ -111,6 +111,35 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish workflowcoordinator Artifact'
 
+  - job: DependencyCheck
+      displayName: "Dependency Check"
+      pool: NautilusBuild
+      steps:
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: publish
+            arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+            projects: "**/$(projectName).csproj"
+            publishWebProjects: false
+            modifyOutputPath: false
+            zipAfterPublish: false
+        - task: CmdLine@2
+          inputs:
+            script: 'dependency-check --project "WorkflowCoordinator - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport"'
+          displayName: "Run NVD Checker"
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Build.SourcesDirectory)\DCReport'
+            artifact: "NVD report"
+            publishLocation: "pipeline"
+
+        - task: PowerShell@2
+          displayName: "Fail build if depdency checker has vulnerabilities"
+          inputs:
+            targetType: inline
+            script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+
 - stage: DeployDev
   dependsOn: Build
   jobs:
