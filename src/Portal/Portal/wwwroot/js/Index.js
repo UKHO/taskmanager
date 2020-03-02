@@ -431,15 +431,20 @@
 
     function getTeamSelection() {
         var checkBoxArray = [];
-        $(".teamsCheckbox").each(function (index) {
-            if ($(this).prop('checked')) {
-                if (index === 0) {
+        var loadCheckBoxArray = JSON.parse(sessionStorage.getItem('teams'));
+
+        if (loadCheckBoxArray != null) {
+            $.each(loadCheckBoxArray, function (key, value) {
+                if (value.id === 'team0') {
+
                     checkBoxArray.push("");
                 } else {
-                    checkBoxArray.push($(this).siblings(".teamsCheckboxLabel").text());
+                    checkBoxArray.push(value.name);
                 }
-            }
-        });
+            });
+            
+        }
+
         return checkBoxArray;
     }
 
@@ -465,11 +470,12 @@
 
         if (loadCheckBoxArray != null) {
             $(".teamsCheckbox").each(function () {
-                var t = $.grep(loadCheckBoxArray,
-                    function(n,i) {
-                        return n.id === $(this).attr('id');
+                var checkboxId = $(this).attr('id');
+                var exist = $.grep(loadCheckBoxArray,
+                    function (n, i) {
+                        return n.id === checkboxId;
                     });
-                $(this).prop('checked', ($.inArray($(this).attr('id'), loadCheckBoxArray) !== -1));
+                $(this).prop('checked', (exist.length === 1));
             });
         }
 
