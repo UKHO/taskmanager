@@ -7,7 +7,18 @@
 
     var inFlightTasksTable = setupInFlightTasks();
 
+    setupMyTaskList();
+
     handleDisplayTaskNotes();
+
+
+    initialiseAssignTaskTypeahead();
+
+    handleMyTaskList();
+    handleTeamTasks();
+
+    handleSelectAllTeams();
+    handleClearAllTeams();
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
@@ -88,17 +99,18 @@
             });
     }
 
-    //Datatables search plugin
-    $.fn.dataTable.ext.search.push(
-        function (settings, searchData, index, rowData, counter) {
-            if (settings.sTableId !== "inFlightTasks" ||
-                menuItem !== 0) {
-                return true;
-            }
+    function setupMyTaskList() {
+        //Datatables search plugin
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter) {
+                if (settings.sTableId !== "inFlightTasks" ||
+                    menuItem !== 0) {
+                    return true;
+                }
 
-            var taskStage = rowData[8];
+                var taskStage = rowData[8];
 
-            switch (taskStage) {
+                switch (taskStage) {
                 case "Review":
                     var reviewer = rowData[9];
 
@@ -120,33 +132,37 @@
                         return false;
                     }
                     break;
+                }
+                return true;
             }
-            return true;
-        }
-    );
+        );
+    }
 
-    $("#btnMyTaskList").click(function () {
-        menuItem = 0;
-        setMenuItemSelection();
+    function handleMyTaskList() {
+        $("#btnMyTaskList").click(function() {
+            menuItem = 0;
+            setMenuItemSelection();
 
-        $("#btnSelectTeam").hide();
-        $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
+            $("#btnSelectTeam").hide();
+            $('#txtGlobalSearch').val("");
+            unassignedTasksTable.search("").draw();
+            inFlightTasksTable.search("").draw();
 
-    });
+        });
+    }
 
-    $("#btnTeamTasks").click(function () {
-        menuItem = 1;
-        setMenuItemSelection();
+    function handleTeamTasks() {
+        $("#btnTeamTasks").click(function() {
+            menuItem = 1;
+            setMenuItemSelection();
 
-        $("#btnSelectTeam").show();
-        $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
+            $("#btnSelectTeam").show();
+            $('#txtGlobalSearch').val("");
+            unassignedTasksTable.search("").draw();
+            inFlightTasksTable.search("").draw();
 
-    });
-
+        });
+    }
 
     $("#btnSelectTeam").click(function () {
         $("#selectTeamsModal").modal("show");
@@ -280,8 +296,6 @@
 
         });
 
-    initialiseAssignTaskTypeahead();
-
     function initialiseAssignTaskTypeahead() {
 
         $('#assignTaskErrorMessages').collapse("hide");
@@ -336,6 +350,28 @@
     }
 
     $("#btnMyTaskList").trigger("click");
+
+    function handleSelectAllTeams() {
+
+        $("#btnSelectAllTeams").on('click',
+            function () {
+                $(".teamsCheckbox").each(function (index, item) {
+                    $(item).prop('checked', true);
+                });
+
+            });
+    }
+
+    function handleClearAllTeams() {
+
+        $("#btnClearAllTeams").on('click',
+            function () {
+                $(".teamsCheckbox").each(function (index, item) {
+                    $(item).prop('checked', false);
+                });
+
+            });
+    }
 });
 
 function displayAssignUserErrors(errorStringArray) {
