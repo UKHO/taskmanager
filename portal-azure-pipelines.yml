@@ -165,7 +165,7 @@ stages:
 
       steps:
       - task: UseDotNet@2
-        displayName: 'Use .NET Core 2.2.x SDK'
+        displayName: 'Use .NET Core 2.1.x SDK'
         inputs:
           packageType: sdk
           version: 2.2.x
