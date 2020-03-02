@@ -26,7 +26,7 @@ namespace DataServices.Adapters
                     MaxReceivedMessageSize = int.MaxValue,
                     Security =
                     {
-                        Mode = BasicHttpSecurityMode.TransportCredentialOnly,
+                        Mode = BasicHttpSecurityMode.Transport,
                         Transport = {ClientCredentialType = HttpClientCredentialType.Basic}
                     }
                 };
