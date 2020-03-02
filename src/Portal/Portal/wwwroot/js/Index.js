@@ -383,8 +383,19 @@
     function handleFilterTasksByTeam() {
         $("#btnFilterTasksByTeam").on("click", function () {
             saveTeamSelectionToSessionStorage();
+            var teams = getTeamSelection();
 
         });
+    }
+
+    function getTeamSelection() {
+        var checkBoxArray = [];
+        $(".teamsCheckbox").each(function () {
+            if ($(this).prop('checked')) {
+                checkBoxArray.push($(this).siblings(".teamsCheckboxLabel").text());
+            }
+        });
+        return JSON.stringify(checkBoxArray);
     }
 
     function saveTeamSelectionToSessionStorage() {
