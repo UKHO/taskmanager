@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    
+
     // Required unless we refactor behaviour around errors
     var usersFetched = false;
 
@@ -10,7 +10,7 @@
 
     var inFlightTasksTable = setupInFlightTasks();
 
-    setupMyTaskList();
+    applyDatatableFilter();
 
     handleDisplayTaskNotes();
 
@@ -90,7 +90,7 @@
     function handleDisplayTaskNotes() {
         $('#inFlightTasks tbody').on('click',
             'td.details-control i',
-            function() {
+            function () {
 
                 var tr = $(this).closest('tr');
                 var row = inFlightTasksTable.row(tr);
@@ -105,47 +105,85 @@
             });
     }
 
-    function setupMyTaskList() {
+    function applyDatatableFilter() {
         //Datatables search plugin
         $.fn.dataTable.ext.search.push(
-            function(settings, searchData, index, rowData, counter) {
-                if (settings.sTableId !== "inFlightTasks" ||
-                    menuItem !== 0) {
+            function (settings, searchData, index, rowData, counter) {
+
+                // My Tasks List filter
+                if (menuItem === 0) {
+
+                    if (settings.sTableId === "inFlightTasks") {
+                        return filterMyAssignedTasksList(rowData);
+                    }
+
                     return true;
                 }
 
-                var taskStage = rowData[8];
-
-                switch (taskStage) {
-                case "Review":
-                    var reviewer = rowData[9];
-
-                    if (reviewer !== userFullName) {
-                        return false;
+                // Team tasks list
+                if (menuItem === 1) {
+                    if (settings.sTableId === "unassignedTasks") {
+                        return filterSelectedTeamsList(rowData[11]);
                     }
-                    break;
-                case "Assess":
-                    var assessor = rowData[10];
 
-                    if (assessor !== userFullName) {
-                        return false;
+                    if (settings.sTableId === "inFlightTasks") {
+                        return filterSelectedTeamsList(rowData[12]);
                     }
-                    break;
-                case "Verify":
-                    var verifier = rowData[11];
 
-                    if (verifier !== userFullName) {
-                        return false;
-                    }
-                    break;
+                    return true;
                 }
+
                 return true;
+
             }
         );
     }
 
+    function filterMyAssignedTasksList(rowData) {
+
+        var taskStage = rowData[8];
+
+        switch (taskStage) {
+            case "Review":
+                var reviewer = rowData[9];
+
+                if (reviewer !== userFullName) {
+                    return false;
+                }
+                break;
+            case "Assess":
+                var assessor = rowData[10];
+
+                if (assessor !== userFullName) {
+                    return false;
+                }
+                break;
+            case "Verify":
+                var verifier = rowData[11];
+
+                if (verifier !== userFullName) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+
+    }
+
+    function filterSelectedTeamsList(team) {
+
+        var selectedTeamsArray = getTeamSelection();
+
+        if (selectedTeamsArray.length === 0) {
+            return true;
+        }
+
+        return $.inArray(team, selectedTeamsArray) !== -1;
+
+    }
+
     function handleMyTaskList() {
-        $("#btnMyTaskList").click(function() {
+        $("#btnMyTaskList").click(function () {
             menuItem = 0;
             setMenuItemSelection();
 
@@ -158,7 +196,7 @@
     }
 
     function handleTeamTasks() {
-        $("#btnTeamTasks").click(function() {
+        $("#btnTeamTasks").click(function () {
             menuItem = 1;
             setMenuItemSelection();
 
@@ -248,7 +286,7 @@
 
     function handleAssignTaskToUser() {
         $("#btnAssignTaskToUser").on("click",
-            function() {
+            function () {
 
                 removeAssignUserErrors();
 
@@ -269,7 +307,7 @@
                 $.ajax({
                     type: "POST",
                     url: "Index/?handler=AssignTaskToUser",
-                    beforeSend: function(xhr) {
+                    beforeSend: function (xhr) {
                         xhr.setRequestHeader("RequestVerificationToken",
                             $('input:hidden[name="__RequestVerificationToken"]').val());
                     },
@@ -278,14 +316,14 @@
                         "userName": userName,
                         "taskStage": taskStage
                     },
-                    success: function(result) {
+                    success: function (result) {
                         $("#assignTaskModal").modal("hide");
                         $("body").removeClass("modal-open");
                         $(".modal-backdrop").remove();
 
                         window.location.reload();
                     },
-                    error: function(error) {
+                    error: function (error) {
                         var responseJson = error.responseJSON;
 
                         displayAssignUserErrors(responseJson);
@@ -382,29 +420,43 @@
 
     function handleFilterTasksByTeam() {
         $("#btnFilterTasksByTeam").on("click", function () {
+
+            $("#selectTeamsModal").modal("hide");
             saveTeamSelectionToSessionStorage();
             var teams = getTeamSelection();
-
+            alert(teams);
+            return;
         });
     }
 
     function getTeamSelection() {
         var checkBoxArray = [];
-        $(".teamsCheckbox").each(function () {
+        $(".teamsCheckbox").each(function (index) {
             if ($(this).prop('checked')) {
-                checkBoxArray.push($(this).siblings(".teamsCheckboxLabel").text());
+                if (index === 0) {
+                    checkBoxArray.push("");
+                } else {
+                    checkBoxArray.push($(this).siblings(".teamsCheckboxLabel").text());
+                }
             }
         });
-        return JSON.stringify(checkBoxArray);
+        return checkBoxArray;
     }
 
     function saveTeamSelectionToSessionStorage() {
         var checkBoxArray = [];
+
         $(".teamsCheckbox").each(function () {
             if ($(this).prop('checked')) {
-                checkBoxArray.push($(this).attr('id'));
+
+                var team = {
+                    'id': $(this).attr('id'),
+                    'name': $(this).siblings(".teamsCheckboxLabel").text()
+                }
+                checkBoxArray.push(team);
             }
         });
+
         sessionStorage.setItem('teams', JSON.stringify(checkBoxArray));
     }
 
@@ -413,6 +465,10 @@
 
         if (loadCheckBoxArray != null) {
             $(".teamsCheckbox").each(function () {
+                var t = $.grep(loadCheckBoxArray,
+                    function(n,i) {
+                        return n.id === $(this).attr('id');
+                    });
                 $(this).prop('checked', ($.inArray($(this).attr('id'), loadCheckBoxArray) !== -1));
             });
         }
