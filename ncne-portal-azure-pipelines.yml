@@ -196,7 +196,9 @@ stages:
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
 - stage: DeployDev
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - DependencyCheck
   jobs:    
     - deployment: DeployNCNEPortalWebsiteDev
       displayName: Deploy ncneportal website
@@ -247,7 +249,9 @@ stages:
     #         testResultsFormat: 'VSTest'
 
 - stage: DeployUAT
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - DependencyCheck
   jobs:    
     - deployment: DeployNCNEPortalWebsiteUAT
       displayName: Deploy ncneportal website
@@ -267,7 +271,9 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
 - stage: DeployPre
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - DependencyCheck
   jobs:    
     - deployment: DeployNCNEPortalWebsitePre
       displayName: Deploy ncneportal website
