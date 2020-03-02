@@ -161,7 +161,7 @@ stages:
 #         displayName: 'Use .NET Core 2.2.x SDK'
 #         inputs:
 #           packageType: sdk
-#           version: 2.2.x
+#           version: 2.1.x
 #           installationPath: $(Agent.ToolsDirectory)\\dotnet
 
 #       - task: UseDotNet@2
