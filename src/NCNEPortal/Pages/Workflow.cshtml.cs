@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NCNEPortal.Auth;
+using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
@@ -31,6 +32,7 @@ namespace NCNEPortal
         private readonly ICommentsHelper _commentsHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IMilestoneCalculator _milestoneCalculator;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] public string Ion { get; set; }
@@ -49,25 +51,28 @@ namespace NCNEPortal
 
         public SelectList WorkflowTypes { get; set; }
 
-        [DisplayName("Duration")] public string Dating { get; set; }
+        [DisplayName("Duration")] public int Dating { get; set; }
 
-        public SelectList DatingList { get; set; }
+
+        [DisplayName("Repromat date")]
+        [DisplayFormat(DataFormatString = "{0:d}")]
+        public DateTime? RepromatDate { get; set; }
 
         [DisplayName("Publication date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime PublicationDate { get; set; }
+        public DateTime? PublicationDate { get; set; }
 
         [DisplayName("H Forms")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime AnnounceDate { get; set; }
+        public DateTime? AnnounceDate { get; set; }
 
         [DisplayName("Commit to print:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CommitToPrintDate { get; set; }
+        public DateTime? CommitToPrintDate { get; set; }
 
         [DisplayName("CIS")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CISDate { get; set; }
+        public DateTime? CISDate { get; set; }
 
         [DisplayName("Compiler")]
         public string Compiler { get; set; }
@@ -103,9 +108,6 @@ namespace NCNEPortal
 
         public List<TaskComment> TaskComments { get; set; }
 
-        [DisplayName("CARIS Workspace")]
-        public string CarisWorkspace { get; set; }
-        public SelectList CarisWorkspaces { get; set; }
 
         [DisplayName("CARIS Project Name")]
         public string CarisProjectName { get; set; }
@@ -126,7 +128,8 @@ namespace NCNEPortal
             IUserIdentityService userIdentityService,
             ICommentsHelper commentsHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IMilestoneCalculator milestoneCalculator)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -134,6 +137,7 @@ namespace NCNEPortal
             _commentsHelper = commentsHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
+            _milestoneCalculator = milestoneCalculator;
         }
 
         public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
@@ -192,27 +196,6 @@ namespace NCNEPortal
         public void OnGetAsync(int processId)
         {
             ProcessId = processId;
-            Ion = "DC782783923;";
-            ChartTitle = "Hamoaze";
-            ChartNo = "1902";
-            WorkflowType = "Standard";
-            ChartType = "CME";
-            Country = "United Kingdom";
-            Dating = "2 Weeks";
-            PublicationDate = DateTime.Now.AddDays(30);
-            AnnounceDate = DateTime.Now.AddDays(10);
-            CommitToPrintDate = DateTime.Now.AddDays(15);
-            CISDate = DateTime.Now.AddDays(20);
-
-            Compiler = "BatesP";
-            Verifier1 = "StoodleyM";
-            Verifier2 = "WillisA";
-            Publisher = "AlexanderD";
-
-            SendDate3ps = DateTime.Now.AddDays(-10);
-            ExpectedReturnDate3ps = DateTime.Now.AddDays(-2);
-            ActualReturnDate3ps = DateTime.Now.AddDays(-1);
-
 
             var taskInfo = _dbContext.TaskInfo
                 .Include(task => task.TaskRole)
@@ -220,7 +203,44 @@ namespace NCNEPortal
                 .Include(task => task.TaskComment)
                 .FirstOrDefault(t => t.ProcessId == processId);
 
+
+            Ion = taskInfo.Ion;
+            ChartTitle = taskInfo.ChartTitle;
+            ChartNo = taskInfo.ChartNumber;
+            WorkflowType = taskInfo.WorkflowType;
+            ChartType = taskInfo.ChartType;
+            Country = taskInfo.Country;
+
+            if (taskInfo.Duration == null)
+                Dating = 0;
+            else
+                Dating = (int)Enum.Parse(typeof(DeadlineEnum), taskInfo.Duration);
+
+
+            //if (taskInfo.RepromatDate != null) 
+            RepromatDate = taskInfo.RepromatDate;
+            //if (taskInfo.PublicationDate != null)
+            PublicationDate = taskInfo.PublicationDate;
+            //if (taskInfo.AnnounceDate != null)
+            AnnounceDate = taskInfo.AnnounceDate;
+            //if (taskInfo.CommitDate != null) 
+            CommitToPrintDate = taskInfo.CommitDate;
+            //if (taskInfo.CisDate != null) 
+            CISDate = taskInfo.CisDate;
+
+            if (taskInfo.SentDate3Ps != null) SendDate3ps = (DateTime)taskInfo.SentDate3Ps;
+            if (taskInfo.ExpectedDate3Ps != null) ExpectedReturnDate3ps = (DateTime)taskInfo.ExpectedDate3Ps;
+            if (taskInfo.ActualDate3Ps != null) ActualReturnDate3ps = (DateTime)taskInfo.ActualDate3Ps;
+
+            Compiler = taskInfo.TaskRole.Compiler;
+            Verifier1 = taskInfo.TaskRole.VerifierOne;
+            Verifier2 = taskInfo.TaskRole.VerifierTwo;
+            Publisher = taskInfo.TaskRole.Publisher;
+
+
             var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+
 
             if (carisProject != null)
             {
@@ -228,14 +248,6 @@ namespace NCNEPortal
                 IsCarisProjectCreated = true;
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
-
-
-            CarisWorkspaces = new SelectList(new List<string>
-            {
-                "Henballand",
-                "Sossalrandfordshire",
-                "Wregilliamsville"
-            });
 
             TaskComments = new List<TaskComment>
             {
@@ -355,7 +367,38 @@ namespace NCNEPortal
             }
 
         }
+
+
+        public async Task<JsonResult> OnPostCalcMilestonesAsync(int deadLine, DateTime dtInput, Boolean isPublish)
+        {
+            string[] result;
+            if (isPublish)
+            {
+                var dates = _milestoneCalculator.CalculateMilestones((DeadlineEnum)deadLine, (DateTime)dtInput);
+                result = new[]
+                {
+                    dates.formsDate.ToShortDateString(),
+                    dates.commitDate.ToShortDateString(),
+                    dates.cisDate.ToShortDateString()
+                };
+            }
+            else
+            {
+
+                PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtInput);
+
+                result = new[]
+                {
+                    PublicationDate?.ToShortDateString()
+                };
+            }
+
+            return new JsonResult(result);
+
+        }
     }
-
-
 }
+
+
+
+

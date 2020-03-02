@@ -1,6 +1,7 @@
 ﻿@page
 @using Microsoft.CodeAnalysis.CSharp.Syntax
 @using NCNEPortal.Components;
+@using NCNEPortal.Enums
 @model NCNEPortal.WorkflowModel
 @{
     ViewData["Title"] = "New Chart / New Edition";
@@ -402,8 +403,6 @@
 @*--- START TASK INFORMATION ---*@
 <div class="card mb-4 mt-3">
     <h3>Task Information</h3>
-    <span class="wf-status wf-status-inprogress"><span class="fa fa-clock mr-1"></span>In Progress</span>
-    <span class="wf-status wf-status-complete"><span class="fa fa-check-circle mr-1"></span>Completed</span>
 
     <div class="col-12">
         <div class="card-body pb-0 col-11">
@@ -411,90 +410,150 @@
             <div class="row">
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Ion)</div>
-                        <div>@Html.DisplayFor(model => model.Ion)</div>
-                    </div>
-                    <div class="form-group">
                         <div>@Html.LabelFor(model => model.WorkflowType)</div>
-                        <div>@Html.DisplayFor(model => model.WorkflowType)</div>
+                        <div>
+                            <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
+                        </div>
                     </div>
+
                 </div>
                 <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ChartTitle)</div>
-                        <div>@Html.DisplayFor(model => model.ChartTitle)</div>
-                    </div>
                     <div class="form-group">
                         <div>@Html.LabelFor(model => model.ChartType)</div>
-                        <div>@Html.DisplayFor(model => model.ChartType)</div>
+                        <div>
+                            <h6>@Html.DisplayFor(model => model.ChartType, new { @class = "form-control  form-text " })</h6>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <div>@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Ion, "",
+                                new { placeholder = "ION", @maxlength = 50, @class = "form-control form-text-input" })
+                        </div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ChartNo)</div>
-                        <div>@Html.DisplayFor(model => model.ChartNo)</div>
-                    </div>
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Country)</div>
-                        <div>@Html.DisplayFor(model => model.Country)</div>
+                        <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.ChartNo, "",
+                                new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                        </div>
                     </div>
                 </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <div>@Html.LabelFor(model => model.Country, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Country, "",
+                                new { placeholder = "Country", @maxlength = 75, @class = "form-control form-text-input" })
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <hr class="mt-2 mb-4" />
             <h4>Dates</h4>
             <div class="row">
                 <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Dating)</div>
-                        <div>@Html.DisplayFor(model => model.Dating)</div>
+
+                    <div class="row">
+                        <div class="col">
+                            @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
+                        </div>
                     </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="design-custom-select">
+                                <div class="arrow-icon-wrap">
+                                    <span class="fa fa-chevron-down arrow-icon"></span>
+                                </div>
+                                @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
+                                    , "", new { @class = "form-control" })
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.AnnounceDate)</div>
-                        <div>@Html.DisplayFor(model => model.AnnounceDate)</div>
+                        <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                        <div>@Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control form-text-input" })</div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.PublicationDate)</div>
-                        <div>@Html.DisplayFor(model => model.PublicationDate)</div>
-                    </div>
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.CommitToPrintDate)</div>
-                        <div>@Html.DisplayFor(model => model.CommitToPrintDate)</div>
-                    </div>
-                </div>
-                <div class="col-3 align-self-end">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.CISDate)</div>
-                        <div>@Html.DisplayFor(model => model.CISDate)</div>
+                        <div>@Html.LabelFor(model => model.RepromatDate, new {id = "lblRepDate",  @class = "col-form-label" })</div>
+                        <div>@Html.TextBoxFor(model => model.RepromatDate, new { @class = "form-control form-text-input" })</div>
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
+                        <div>@Html.TextBoxFor(model => model.AnnounceDate, new { @class = "form-control form-text-input" })</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
+                        <div>@Html.TextBoxFor(model => model.CommitToPrintDate, new { @class = "form-control form-text-input" })</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>
+                        <div>@Html.TextBoxFor(model => model.CISDate, new { @class = "form-control form-text-input" })</div>
+                    </div>
+                </div>
+
+            </div>
+
             <hr class="mt-2 mb-4" />
             <h4>Job roles</h4>
             <div class="row">
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Compiler)</div>
-                        <div>@Html.DisplayFor(model => model.Compiler)</div>
+                        <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Compiler, "",
+                            new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                        </div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Verifier1)</div>
-                        <div>@Html.DisplayFor(model => model.Verifier1)</div>
+                        <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Verifier1, "",
+                            new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                        </div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Verifier2)</div>
-                        <div>@Html.DisplayFor(model => model.Verifier2)</div>
+                        <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Verifier2, "",
+                            new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                        </div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Publisher)</div>
-                        <div>@Html.DisplayFor(model => model.Publisher)</div>
+                        <div>@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
+                        <div>
+                            @Html.TextBoxFor(model => model.Publisher, "",
+                            new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
+                        </div>
                     </div>
                 </div>
             </div>
@@ -522,15 +581,6 @@
             </div>
             <hr class="mt-2 mb-4" />
 
-            <div class="row align-items-start">
-                <div class="col-10">
-                    <span class="fa fa-pencil-alt">
-                    </span>
-
-                    <a href="#">Edit this section </a>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
@@ -554,7 +604,7 @@
                     <div class="row">
                         <div class="col">
                             @Html.TextBoxFor(model => model.CarisProjectName, "",
-                                new { id = "txtCarisProject", placeholder = "Source Name_ProcessID", @class = "form-control form-text-input" })
+                                new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
                         </div>
                     </div>
                 </div>
@@ -683,6 +733,8 @@
 </div>
 
 @section Scripts {
+    <script src="js/DesignCustomSelect.js">
+    </script>
     <script src="js/Workflow.js">
     </script>
 }
