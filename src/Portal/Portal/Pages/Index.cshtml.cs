@@ -45,6 +45,7 @@ namespace Portal.Pages
         public IList<TaskViewModel> Tasks { get; set; }
 
         public List<string> TeamList { get; set; }
+        public string TeamsUnassigned { get; set; } 
 
         public List<string> ValidationErrorMessages { get; set; }
 
@@ -112,6 +113,7 @@ namespace Portal.Pages
             }
 
             TeamList = _generalConfig.Value.GetTeams().ToList();
+            TeamsUnassigned = _generalConfig.Value.TeamsUnassigned;
         }
 
         private string GetTaskType(WorkflowInstance instance)

@@ -21,6 +21,7 @@ namespace Portal.Configuration
         public int CarisProjectTimeoutSeconds { get; set; }
 
         public string TeamsAsCsv { get; set; }
+        public string TeamsUnassigned { get; set; }
 
         public IEnumerable<string> GetTeams()
         {

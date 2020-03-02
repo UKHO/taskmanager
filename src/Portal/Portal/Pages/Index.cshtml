@@ -284,9 +284,19 @@
             <div class="modal-body" id="selectTeams-body">
                 <div class="mb-n3" style="overflow: hidden;">
 
+                    @{ var id = "team0"; }
+
+                    <div class="ml-3 mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input mt-0 teamsCheckbox" id="@(id)">
+                            <label class="form-check-label" for="@(id)">@Model.TeamsUnassigned</label>
+                        </div>
+                    </div>
+
+
                     @for (var i = 0; i < Model.TeamList.Count; i++)
                     {
-                        var id = $"team{i}";
+                        id = $"team{i + 1}";
 
                         <div class="ml-3 mb-3">
                             <div class="form-check">

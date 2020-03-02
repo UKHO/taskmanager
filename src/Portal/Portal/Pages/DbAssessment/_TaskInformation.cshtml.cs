@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Portal.Auth;
 using Portal.Calculators;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
 using WorkflowDatabase.EF;
@@ -26,6 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly IUserIdentityService _userIdentityService;
         private readonly ITaskDataHelper _taskDataHelper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -67,6 +70,10 @@ namespace Portal.Pages.DbAssessment
         public string TaskType { get; set; }
         public SelectList TaskTypes { get; set; }
 
+        [DisplayName("Team:")]
+        public string Team { get; set; }
+        public SelectList Teams { get; set; }
+
         private string _userFullName;
         public string UserFullName
         {
@@ -77,13 +84,15 @@ namespace Portal.Pages.DbAssessment
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
             ICommentsHelper commentsHelper, IUserIdentityService userIdentityService,
-            ITaskDataHelper taskDataHelper)
+            ITaskDataHelper taskDataHelper,
+            IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _userIdentityService = userIdentityService;
             _taskDataHelper = taskDataHelper;
+            _generalConfig = generalConfig;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -179,12 +188,13 @@ namespace Portal.Pages.DbAssessment
             Ion = taskData?.Ion;
             SourceCategory = taskData?.SourceCategory;
             TaskType = taskData?.TaskType;
+            Teams = new SelectList(_generalConfig.Value.GetTeams());
 
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
             {
                 EffectiveReceiptDate = assessmentData.ReceiptDate;
-                //assessmentData.EffectiveStartDate
+                Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
             }
         }
 
