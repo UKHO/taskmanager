@@ -131,6 +131,7 @@ namespace WorkflowCoordinator.Sagas
             var mappedComments = _mapper.Map<DocumentAssessmentData, Comment>(assessmentData);
 
             mappedAssessmentData.ProcessId = message.ProcessId;
+            mappedAssessmentData.TeamDistributedTo = null; //Set Team to null because the SDRA value is not guaranteed to be accurate
             mappedComments.WorkflowInstanceId = message.WorkflowInstanceId;
             mappedComments.ProcessId = message.ProcessId;
 
