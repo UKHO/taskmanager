@@ -1,4 +1,7 @@
 ﻿$(document).ready(function () {
+    
+    // Required unless we refactor behaviour around errors
+    var usersFetched = false;
 
     var menuItem = 0;
     var userFullName = $("#userFullName > strong").text();
@@ -17,8 +20,11 @@
     handleMyTaskList();
     handleTeamTasks();
 
+    handleAssignTaskToUser();
+
     handleSelectAllTeams();
     handleClearAllTeams();
+    handleFilterTasksByTeam();
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
@@ -164,10 +170,6 @@
         });
     }
 
-    $("#btnSelectTeam").click(function () {
-        $("#selectTeamsModal").modal("show");
-    });
-
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
             if (index === menuItem) {
@@ -185,9 +187,6 @@
         inFlightTasksTable.search($(this).val()).draw();
     });
 
-
-    // Required unless we refactor behaviour around errors
-    var usersFetched = false;
 
     $(".taskNoteItem").on("click",
         function () {
@@ -247,54 +246,56 @@
             if (usersFetched) removeAssignUserErrors();
         });
 
-    $("#btnAssignTaskToUser").on("click",
-        function () {
+    function handleAssignTaskToUser() {
+        $("#btnAssignTaskToUser").on("click",
+            function() {
 
-            removeAssignUserErrors();
+                removeAssignUserErrors();
 
-            if ($("#txtUsername").val() === "") {
+                if ($("#txtUsername").val() === "") {
 
-                var errorArray = ["Please enter a user"];
-                displayAssignUserErrors(errorArray);
+                    var errorArray = ["Please enter a user"];
+                    displayAssignUserErrors(errorArray);
 
-                return;
-            }
-
-            $("#btnAssignTaskToUser").prop("disabled", true);
-
-            var processId = $("#hdnAssignTaskProcessId").val();
-            var userName = $("#txtUsername").val();
-            var taskStage = $("#hdnAssignTaskStage").val();
-
-            $.ajax({
-                type: "POST",
-                url: "Index/?handler=AssignTaskToUser",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("RequestVerificationToken",
-                        $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                data: {
-                    "processId": processId,
-                    "userName": userName,
-                    "taskStage": taskStage
-                },
-                success: function (result) {
-                    $("#assignTaskModal").modal("hide");
-                    $("body").removeClass("modal-open");
-                    $(".modal-backdrop").remove();
-
-                    window.location.reload();
-                },
-                error: function (error) {
-                    var responseJson = error.responseJSON;
-
-                    displayAssignUserErrors(responseJson);
-
-                    $("#btnAssignTaskToUser").prop("disabled", false);
+                    return;
                 }
-            });
 
-        });
+                $("#btnAssignTaskToUser").prop("disabled", true);
+
+                var processId = $("#hdnAssignTaskProcessId").val();
+                var userName = $("#txtUsername").val();
+                var taskStage = $("#hdnAssignTaskStage").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "Index/?handler=AssignTaskToUser",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        "processId": processId,
+                        "userName": userName,
+                        "taskStage": taskStage
+                    },
+                    success: function(result) {
+                        $("#assignTaskModal").modal("hide");
+                        $("body").removeClass("modal-open");
+                        $(".modal-backdrop").remove();
+
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        var responseJson = error.responseJSON;
+
+                        displayAssignUserErrors(responseJson);
+
+                        $("#btnAssignTaskToUser").prop("disabled", false);
+                    }
+                });
+
+            });
+    }
 
     function initialiseAssignTaskTypeahead() {
 
@@ -351,6 +352,12 @@
 
     $("#btnMyTaskList").trigger("click");
 
+    $("#btnSelectTeam").click(function () {
+        loadTeamSelectionFromSessionStorage();
+
+        $("#selectTeamsModal").modal("show");
+    });
+
     function handleSelectAllTeams() {
 
         $("#btnSelectAllTeams").on('click',
@@ -371,6 +378,34 @@
                 });
 
             });
+    }
+
+    function handleFilterTasksByTeam() {
+        $("#btnFilterTasksByTeam").on("click", function () {
+            saveTeamSelectionToSessionStorage();
+
+        });
+    }
+
+    function saveTeamSelectionToSessionStorage() {
+        var checkBoxArray = [];
+        $(".teamsCheckbox").each(function () {
+            if ($(this).prop('checked')) {
+                checkBoxArray.push($(this).attr('id'));
+            }
+        });
+        sessionStorage.setItem('teams', JSON.stringify(checkBoxArray));
+    }
+
+    function loadTeamSelectionFromSessionStorage() {
+        var loadCheckBoxArray = JSON.parse(sessionStorage.getItem('teams'));
+
+        if (loadCheckBoxArray != null) {
+            $(".teamsCheckbox").each(function () {
+                $(this).prop('checked', ($.inArray($(this).attr('id'), loadCheckBoxArray) !== -1));
+            });
+        }
+
     }
 });
 
