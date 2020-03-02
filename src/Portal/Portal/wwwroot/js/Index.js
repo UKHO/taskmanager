@@ -3,89 +3,114 @@
     var menuItem = 0;
     var userFullName = $("#userFullName > strong").text();
 
-    var unassignedTasksTable = $('#unassignedTasks').DataTable({
-        "pageLength": 5,
-        'sDom': 'ltipr',
-        "lengthMenu": [5, 10, 25, 50],
-        'columnDefs': [
-            {
-                'targets': [12],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [13],
-                'visible': false,
-                'searchable': false
+    var unassignedTasksTable = setupUnassignedTasks();
+
+    var inFlightTasksTable = setupInFlightTasks();
+
+    setupMyTaskList();
+
+    handleDisplayTaskNotes();
+
+
+    initialiseAssignTaskTypeahead();
+
+    handleMyTaskList();
+    handleTeamTasks();
+
+    handleSelectAllTeams();
+    handleClearAllTeams();
+
+    function setupUnassignedTasks() {
+        return $('#unassignedTasks').DataTable({
+            "pageLength": 5,
+            'sDom': 'ltipr',
+            "lengthMenu": [5, 10, 25, 50],
+            'columnDefs': [
+                {
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'visible': false,
+                    'searchable': false
+                }
+            ],
+            "scrollX": true,
+            "order": [[1, 'asc']],
+            "ordering": true
+        });
+    }
+
+    function setupInFlightTasks() {
+        return $('#inFlightTasks').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 25, 50],
+            'sDom': 'ltipr',
+            'autoWidth': true,
+            'columnDefs': [
+                {
+                    'targets': [0],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [13],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [14],
+                    'visible': false,
+                    'searchable': false
+                }
+            ],
+            "order": [[2, 'asc']],
+            "scrollX": true,
+            "createdRow": function (row, data, dataIndex) {
+                if (data[14] === "") {
+                    $("td.details-control", row).removeClass("details-control");
+                    $("td.details-control i", row).removeClass("fa");
+                }
             }
-        ],
-        "scrollX": true,
-        "order": [[1, 'asc']],
-        "ordering": true
-    });
-    var inFlightTasksTable = $('#inFlightTasks').DataTable({
-        "pageLength": 10,
-        "lengthMenu": [5, 10, 25, 50],
-        'sDom': 'ltipr',
-        'autoWidth': true,
-        'columnDefs': [
-            {
-                'targets': [0],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [13],
-                'orderable': false,
-                'searchable': false
-            },
-            {
-                'targets': [14],
-                'visible': false,
-                'searchable': false
-            }
-        ],
-        "order": [[2, 'asc']],
-        "scrollX": true,
-        "createdRow": function (row, data, dataIndex) {
-            if (data[14] === "") {
-                $("td.details-control", row).removeClass("details-control");
-                $("td.details-control i", row).removeClass("fa");
-            }
-        }
-    });
+        });
+    }
 
     function format(data) {
         return '<span class="note-formatting">' + data[14] + '</span>';
     }
 
-    $('#inFlightTasks tbody').on('click',
-        'td.details-control i',
-        function () {
+    function handleDisplayTaskNotes() {
+        $('#inFlightTasks tbody').on('click',
+            'td.details-control i',
+            function() {
 
-            var tr = $(this).closest('tr');
-            var row = inFlightTasksTable.row(tr);
+                var tr = $(this).closest('tr');
+                var row = inFlightTasksTable.row(tr);
 
-            if (row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-            } else {
-                row.child(format(row.data()), 'no-padding').show();
-                tr.addClass('shown');
-            }
-        });
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    row.child(format(row.data()), 'no-padding').show();
+                    tr.addClass('shown');
+                }
+            });
+    }
 
-    //Datatables search plugin
-    $.fn.dataTable.ext.search.push(
-        function (settings, searchData, index, rowData, counter) {
-            if (settings.sTableId !== "inFlightTasks" ||
-                menuItem !== 0) {
-                return true;
-            }
+    function setupMyTaskList() {
+        //Datatables search plugin
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter) {
+                if (settings.sTableId !== "inFlightTasks" ||
+                    menuItem !== 0) {
+                    return true;
+                }
 
-            var taskStage = rowData[8];
+                var taskStage = rowData[8];
 
-            switch (taskStage) {
+                switch (taskStage) {
                 case "Review":
                     var reviewer = rowData[9];
 
@@ -107,35 +132,44 @@
                         return false;
                     }
                     break;
+                }
+                return true;
             }
-            return true;
-        }
-    );
+        );
+    }
 
-    $("#btnMyTaskList").click(function() {
-        menuItem = 0;
-        setMenuItemSelection();
+    function handleMyTaskList() {
+        $("#btnMyTaskList").click(function() {
+            menuItem = 0;
+            setMenuItemSelection();
 
-        $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
+            $("#btnSelectTeam").hide();
+            $('#txtGlobalSearch').val("");
+            unassignedTasksTable.search("").draw();
+            inFlightTasksTable.search("").draw();
 
-    });
+        });
+    }
 
-    $("#btnTeamTasks").click(function() {
-        menuItem = 1;
-        setMenuItemSelection();
+    function handleTeamTasks() {
+        $("#btnTeamTasks").click(function() {
+            menuItem = 1;
+            setMenuItemSelection();
 
-        $('#txtGlobalSearch').val("");
-        unassignedTasksTable.search("").draw();
-        inFlightTasksTable.search("").draw();
-        
+            $("#btnSelectTeam").show();
+            $('#txtGlobalSearch').val("");
+            unassignedTasksTable.search("").draw();
+            inFlightTasksTable.search("").draw();
+
+        });
+    }
+
+    $("#btnSelectTeam").click(function () {
+        $("#selectTeamsModal").modal("show");
     });
 
     function setMenuItemSelection() {
-        console.log("hello");
         $("#menuItemList button").each(function (index) {
-            console.log("hello2");
             if (index === menuItem) {
                 $(this).addClass("btn-info");
                 $(this).removeClass("btn-primary");
@@ -216,10 +250,10 @@
     $("#btnAssignTaskToUser").on("click",
         function () {
 
-            removeAssignUserErrors();            
+            removeAssignUserErrors();
 
             if ($("#txtUsername").val() === "") {
-                
+
                 var errorArray = ["Please enter a user"];
                 displayAssignUserErrors(errorArray);
 
@@ -261,8 +295,6 @@
             });
 
         });
-
-    initialiseAssignTaskTypeahead();
 
     function initialiseAssignTaskTypeahead() {
 
@@ -318,6 +350,28 @@
     }
 
     $("#btnMyTaskList").trigger("click");
+
+    function handleSelectAllTeams() {
+
+        $("#btnSelectAllTeams").on('click',
+            function () {
+                $(".teamsCheckbox").each(function (index, item) {
+                    $(item).prop('checked', true);
+                });
+
+            });
+    }
+
+    function handleClearAllTeams() {
+
+        $("#btnClearAllTeams").on('click',
+            function () {
+                $(".teamsCheckbox").each(function (index, item) {
+                    $(item).prop('checked', false);
+                });
+
+            });
+    }
 });
 
 function displayAssignUserErrors(errorStringArray) {

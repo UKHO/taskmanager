@@ -1,7 +1,10 @@
 ﻿using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
+using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
@@ -33,8 +36,14 @@ namespace Portal.UnitTests
 
             _onHoldCalculator = new OnHoldCalculator();
             _taskDataHelper = new TaskDataHelper(_dbContext);
+
+            var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR" };
+            A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
+
+
             _taskInformationModel =
-                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, null, _taskDataHelper)
+                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, null, _taskDataHelper, generalConfigOptionsSnapshot)
                 { ProcessId = ProcessId };
         }
 

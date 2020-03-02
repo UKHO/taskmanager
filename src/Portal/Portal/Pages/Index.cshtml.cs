@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using Common.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +16,6 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.ViewModels;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -43,6 +43,9 @@ namespace Portal.Pages
 
         [BindProperty(SupportsGet = true)]
         public IList<TaskViewModel> Tasks { get; set; }
+
+        public List<string> TeamList { get; set; }
+        public string TeamsUnassigned { get; set; } 
 
         public List<string> ValidationErrorMessages { get; set; }
 
@@ -108,6 +111,9 @@ namespace Portal.Pages
 
                 SetUsersOnTask(instance, task);
             }
+
+            TeamList = _generalConfig.Value.GetTeams().ToList();
+            TeamsUnassigned = _generalConfig.Value.TeamsUnassigned;
         }
 
         private string GetTaskType(WorkflowInstance instance)
