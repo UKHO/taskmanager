@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress>
+        <notes><![CDATA[
+        file name: Microsoft.VisualStudio.Web.CodeGeneration.Contracts.dll, Microsoft.AspNetCore.dll, dotnet-aspnet-codegenerator-design.dll
+        We are not exposing a SOAP endpoint and are not using MailBee Webmail
+        ]]></notes>
+        <cve>CVE-2005-2224</cve>
+        <cve>CVE-2008-0333</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[
+        file name: Microsoft.AspNetCore.Server.IIS.dll
+        We are locking down access to the Azure resource by using IP restrictions via VNets, and further protecting by ensuring users are against the UKHO AAD.
+        ]]></notes>
+        <cve>CVE-2008-4300</cve>
+        <cve>CVE-2008-4301</cve>
+        <cve>CVE-2013-2566</cve>
+        <cve>CVE-2015-2808</cve>
+     </suppress>
 </suppressions>
