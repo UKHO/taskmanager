@@ -241,7 +241,7 @@
       "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": null,
       "effectiveStartDate": "2020-01-01T00:00:00",
-      "teamDistributedTo": null,
+      "teamDistributedTo": "Primary Responsibility",
       "sourceDocumentType": "Source NM Block",
       "sourceNature": "Graphical",
       "datum": "WGS84",

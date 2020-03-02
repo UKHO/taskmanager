@@ -10,7 +10,9 @@ namespace Portal.MappingProfiles
         {
             CreateMap<WorkflowInstance, TaskViewModel>()
                 .ForMember(destination => destination.TaskStage,
-                    opts => opts.MapFrom(source => source.ActivityName));
+                    opts => opts.MapFrom(source => source.ActivityName))
+                .ForMember(destination => destination.Team,
+                    opts => opts.MapFrom(source => source.AssessmentData.TeamDistributedTo));
 
             CreateMap<AssessmentData, TaskViewModel>();
             CreateMap<DbAssessmentReviewData, TaskViewModel>();
