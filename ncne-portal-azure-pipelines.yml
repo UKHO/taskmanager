@@ -58,9 +58,11 @@ stages:
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
+          # Add back in once Razor component is removed or reworked
           # arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\CodeCoverage.runsettings
         displayName: 'dotnet test ncneportal tests'
 
+      # Add back in once Razor component is removed or reworked 
       # - task: DotNetCoreCLI@2
       #   inputs:
       #     command: custom
@@ -148,57 +150,55 @@ stages:
       #     publishLocation: 'Container'
       #   displayName: 'Publish specs Artifact'
 
-- stage: DependencyCheck
-  dependsOn: Build
-  jobs:
-    - job: DependencyCheck
-      pool: NautilusBuild
+# - stage: DependencyCheck
+#   dependsOn: Build
+#   jobs:
+#     - job: DependencyCheck
+#       pool: NautilusBuild
 
-      steps:
-      - task: UseDotNet@2
-        displayName: 'Use .NET Core 2.2.x SDK'
-        inputs:
-          packageType: sdk
-          version: 2.2.x
-          installationPath: $(Agent.ToolsDirectory)\\dotnet
+#       steps:
+#       - task: UseDotNet@2
+#         displayName: 'Use .NET Core 2.2.x SDK'
+#         inputs:
+#           packageType: sdk
+#           version: 2.2.x
+#           installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-      - task: UseDotNet@2
-        displayName: 'Use .NET Core 3.1.x SDK'
-        inputs:
-          packageType: sdk
-          version: 3.1.x
-          installationPath: $(Agent.ToolsDirectory)\\dotnet
+#       - task: UseDotNet@2
+#         displayName: 'Use .NET Core 3.1.x SDK'
+#         inputs:
+#           packageType: sdk
+#           version: 3.1.x
+#           installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: publish
-          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
-          projects: "**/ncneportal.csproj"
-          publishWebProjects: false
-          modifyOutputPath: false
-          zipAfterPublish: false
+#       - task: DotNetCoreCLI@2
+#         inputs:
+#           command: publish
+#           arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+#           projects: "**/ncneportal.csproj"
+#           publishWebProjects: false
+#           modifyOutputPath: false
+#           zipAfterPublish: false
 
-      - task: CmdLine@2
-        inputs:
-          script: 'dependency-check --project "ncneportal - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
-        displayName: "Run NVD Checker"
+#       - task: CmdLine@2
+#         inputs:
+#           script: 'dependency-check --project "ncneportal - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
+#         displayName: "Run NVD Checker"
 
-      - task: PublishPipelineArtifact@1
-        inputs:
-          targetPath: '$(Build.SourcesDirectory)\DCReport'
-          artifact: "NVD report"
-          publishLocation: "pipeline"
+#       - task: PublishPipelineArtifact@1
+#         inputs:
+#           targetPath: '$(Build.SourcesDirectory)\DCReport'
+#           artifact: "NVD report"
+#           publishLocation: "pipeline"
 
-      - task: PowerShell@2
-        displayName: "Fail build if depdency checker has vulnerabilities"
-        inputs:
-          targetType: inline
-          script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+#       - task: PowerShell@2
+#         displayName: "Fail build if depdency checker has vulnerabilities"
+#         inputs:
+#           targetType: inline
+#           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
 - stage: DeployDev
-  dependsOn: 
-    - Build
-    - DependencyCheck
+  dependsOn: Build
   jobs:    
     - deployment: DeployNCNEPortalWebsiteDev
       displayName: Deploy ncneportal website
@@ -249,9 +249,7 @@ stages:
     #         testResultsFormat: 'VSTest'
 
 - stage: DeployUAT
-  dependsOn: 
-    - Build
-    - DependencyCheck
+  dependsOn: Build
   jobs:    
     - deployment: DeployNCNEPortalWebsiteUAT
       displayName: Deploy ncneportal website
@@ -271,9 +269,7 @@ stages:
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
 - stage: DeployPre
-  dependsOn: 
-    - Build
-    - DependencyCheck
+  dependsOn: Build
   jobs:    
     - deployment: DeployNCNEPortalWebsitePre
       displayName: Deploy ncneportal website
