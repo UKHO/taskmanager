@@ -44,20 +44,20 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.unittests.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
-          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.unittests.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
         displayName: 'dotnet build portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
-          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.unittests.csproj'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
           arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.unittests\\CodeCoverage.runsettings
         displayName: 'dotnet test portaltests'
 
