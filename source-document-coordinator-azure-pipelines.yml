@@ -110,11 +110,12 @@ stages:
           ArtifactName: 'sourcedocumentcoordinator'
           publishLocation: 'Container'
         displayName: 'Publish sourcedocumentcoordinator Artifact'
-
-- stage: DependencyCheck
-  jobs:
+    
     - job: DependencyCheck
       pool: NautilusBuild
+
+      workspace:
+        clean: all
 
       steps:
       - task: UseDotNet@2
