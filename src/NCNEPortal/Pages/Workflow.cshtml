@@ -6,8 +6,7 @@
 @{
     ViewData["Title"] = "New Chart / New Edition";
 }
-@Html.HiddenFor(m => m.IsCarisProjectCreated)
-<input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+
 <div class="row pt-1 pb-1 align-items-center">
     <div class="col-4 col-lg-3">
         <a asp-page="./Index">
@@ -50,659 +49,667 @@
     </div>
 </div>
 
-@*--- START WORKFLOW CARD ---*@
-<div class="card mb-4 mt-3">
-    <h3>Workflow</h3>
-    <span class="wf-status wf-status-inprogress"><span class="fa fa-clock mr-1"></span>In Progress</span>
-    <span class="wf-status wf-status-complete"><span class="fa fa-check-circle mr-1"></span>Completed</span>
-    <div>
-        <table class="table" id="workflow-table">
-            <thead class="mt-2">
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col">Status</th>
-                    <th scope="col">User</th>
-                    <th scope="col">Date expected</th>
-                    <th scope="col">Date completed</th>
-                    <th scope="col">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center show-comments">
-                                <div class="mr-auto">Action</div>
-                                <span>Show all task comments</span>
-                                <label class="switch ml-2 mb-auto">
-                                    <input type="checkbox" class="success">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="workflow-row">
-                <tr class="workflow-row">
-                    <td><h4>Compile Chart</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CompileChart", Rework = false }))
-                    </td>
-                </tr>
+<form id="frmWorkflow" method="post" asp-page-handler="Save">
+    @Html.HiddenFor(m => m.IsCarisProjectCreated)
+    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+    <input type="hidden" asp-for="ProcessId" />
 
-                @*--- START WORKFLOW TABLE: COMPILE CHART ---*@
-                <tr id="compileComment" class="collapse show">
-                    <td colspan="6" class="pl-3 pr-3">
-                        <div class="container" style="overflow-y: auto; max-height: 150px;">
-                            @if (Model.TaskComments != null)
-                            {
-                                @foreach (var comment in Model.TaskComments)
+    @*--- START WORKFLOW CARD ---*@
+    <div class="card mb-4 mt-3">
+        <h3>Workflow</h3>
+        <span class="wf-status wf-status-inprogress"><span class="fa fa-clock mr-1"></span>In Progress</span>
+        <span class="wf-status wf-status-complete"><span class="fa fa-check-circle mr-1"></span>Completed</span>
+        <div>
+            <table class="table" id="workflow-table">
+                <thead class="mt-2">
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Status</th>
+                        <th scope="col">User</th>
+                        <th scope="col">Date expected</th>
+                        <th scope="col">Date completed</th>
+                        <th scope="col">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center show-comments">
+                                    <div class="mr-auto">Action</div>
+                                    <span>Show all task comments</span>
+                                    <label class="switch ml-2 mb-auto">
+                                        <input type="checkbox" class="success">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="workflow-row">
+                    <tr class="workflow-row">
+                        <td><h4>Compile Chart</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CompileChart", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: COMPILE CHART ---*@
+                    <tr id="compileComment" class="collapse show">
+                        <td colspan="6" class="pl-3 pr-3">
+                            <div class="container" style="overflow-y: auto; max-height: 150px;">
+                                @if (Model.TaskComments != null)
                                 {
-                                    <div class="row m-3">
-                                        <div class="col-2">
-                                            <div>
-                                                @comment.CommentDate.ToLongDateString()
+                                    @foreach (var comment in Model.TaskComments)
+                                    {
+                                        <div class="row m-3">
+                                            <div class="col-2">
+                                                <div>
+                                                    @comment.CommentDate.ToLongDateString()
+                                                </div>
+                                                <div>
+                                                    <strong>@comment.Name</strong>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <strong>@comment.Name</strong>
+                                            <div class="col-10">
+                                                @comment.CommentText
                                             </div>
                                         </div>
-                                        <div class="col-10">
-                                            @comment.CommentText
-                                        </div>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: V1 ---*@
+                    <tr class="shaded">
+                        <td><h4>V1</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1", Rework = true }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: V1 REWORK ---*@
+                    <tr>
+                        <td><h4>V1 rework</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1Rework", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: V2 ---*@
+                    <tr class="shaded">
+                        <td><h4>V2</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2", Rework = true }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: V2 REWORK ---*@
+                    <tr>
+                        <td><h4>V2 Rework</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2Rework", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: FORMS ---*@
+                    <tr class="shaded">
+                        <td><h4>Forms</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Forms", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: FINAL UPDATING ---*@
+                    <tr>
+                        <td><h4>Final updating</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "FinalUpdating", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: 100% CHECK ---*@
+                    <tr class="shaded">
+                        <td><h4>100% check</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "HundredPercentCheck", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: COMMIT TO PRINT ---*@
+                    <tr>
+                        <td><h4>Commit to print</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CommitToPrint", Rework = false }))
+                        </td>
+                    </tr>
+
+                    @*--- START WORKFLOW TABLE: CIS ---*@
+                    <tr class="shaded">
+                        <td><h4>CIS</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CIS", Rework = false }))
+                        </td>
+                    </tr>
+
+                    <!-- #region START WORKFLOW TABLE: PUBLICATION -->
+                    <tr>
+                        <td><h4>Publication</h4></td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Publication", Rework = false }))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Publish chart</td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            <div class="row align-items-center">
+                                <div class="col-8"><button id="btnPublishChartPublishInCaris" class="btn btn-block btn-primary">Publish in CARIS</button></div>
+                                <div class="col-2 offset-2">
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="checkbox1">
+                                        <label for="checkbox1"></label>
                                     </div>
-                                }
-                            }
-                        </div>
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V1 ---*@
-                <tr class="shaded">
-                    <td><h4>V1</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1", Rework = true }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V1 REWORK ---*@
-                <tr>
-                    <td><h4>V1 rework</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1Rework", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V2 ---*@
-                <tr class="shaded">
-                    <td><h4>V2</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2", Rework = true }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V2 REWORK ---*@
-                <tr>
-                    <td><h4>V2 Rework</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2Rework", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: FORMS ---*@
-                <tr class="shaded">
-                    <td><h4>Forms</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Forms", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: FINAL UPDATING ---*@
-                <tr>
-                    <td><h4>Final updating</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "FinalUpdating", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: 100% CHECK ---*@
-                <tr class="shaded">
-                    <td><h4>100% check</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "HundredPercentCheck", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: COMMIT TO PRINT ---*@
-                <tr>
-                    <td><h4>Commit to print</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CommitToPrint", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: CIS ---*@
-                <tr class="shaded">
-                    <td><h4>CIS</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CIS", Rework = false }))
-                    </td>
-                </tr>
-
-                <!-- #region START WORKFLOW TABLE: PUBLICATION -->
-                <tr>
-                    <td><h4>Publication</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Publication", Rework = false }))
-                    </td>
-                </tr>
-                <tr>
-                    <td>Publish chart</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-8"><button id="btnPublishChartPublishInCaris" class="btn btn-block btn-primary">Publish in CARIS</button></div>
-                            <div class="col-2 offset-2">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox1">
-                                    <label for="checkbox1"></label>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Clear vector from<br />new minor version</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Clear vector from<br />new minor version</td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            <div class="row align-items-center">
+                                <div class="col-2 offset-10">
 
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox2">
-                                    <label for="checkbox2"></label>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="checkbox2">
+                                        <label for="checkbox2"></label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Retire old minor version</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox3">
-                                    <label for="checkbox3"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Retire old minor version</td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            <div class="row align-items-center">
+                                <div class="col-2 offset-10">
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="checkbox3">
+                                        <label for="checkbox3"></label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Action withdrawn charts</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox4">
-                                    <label for="checkbox4"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Action withdrawn charts</td>
+                        <td>
+                            <div class="status inProgress">
+                                <span class="fa fa-edit"> </span>
+                                <span>In Progress</span>
+                            </div>
+                        </td>
+                        <td>stoodleym</td>
+                        <td />
+                        <td>12/01/2020</td>
+                        <td>
+                            <div class="row align-items-center">
+                                <div class="col-2 offset-10">
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="checkbox4">
+                                        <label for="checkbox4"></label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+                        </td>
+                    </tr>
+                </tbody>
 
-        </table>
-    </div>
-</div>
-
-
-<div class="d-flex justify-content-end">
-
-    <div class="mt-3 mr-3">
-        <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
-    </div>
-
-    <div class="mt-3">
-        <button id="btnComplete" class="btn btn-block btn-secondary disabled" style="min-width: 139px; ">Complete</button>
-    </div>
-</div>
-
-<!-- #endregion -->
-@*--- START TASK INFORMATION ---*@
-<div class="card mb-4 mt-3">
-    <h3>Task Information</h3>
-
-    <div class="col-12">
-        <div class="card-body pb-0 col-11">
-            <h4>Task information</h4>
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.WorkflowType)</div>
-                        <div>
-                            <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ChartType)</div>
-                        <div>
-                            <h6>@Html.DisplayFor(model => model.ChartType, new { @class = "form-control  form-text " })</h6>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Ion, "",
-                                new { placeholder = "ION", @maxlength = 50, @class = "form-control form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.ChartNo, "",
-                                new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Country, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Country, "",
-                                new { placeholder = "Country", @maxlength = 75, @class = "form-control form-text-input" })
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <hr class="mt-2 mb-4" />
-            <h4>Dates</h4>
-            <div class="row">
-                <div class="col-3">
-
-                    <div class="row">
-                        <div class="col">
-                            @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="design-custom-select">
-                                <div class="arrow-icon-wrap">
-                                    <span class="fa fa-chevron-down arrow-icon"></span>
-                                </div>
-                                @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
-                                    , "", new { @class = "form-control" })
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
-                        <div>@Html.TextBoxFor(model => model.PublicationDate, new { @class = "form-control form-text-input" })</div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.RepromatDate, new {id = "lblRepDate",  @class = "col-form-label" })</div>
-                        <div>@Html.TextBoxFor(model => model.RepromatDate, new { @class = "form-control form-text-input" })</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
-                        <div>@Html.TextBoxFor(model => model.AnnounceDate, new { @class = "form-control form-text-input" })</div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
-                        <div>@Html.TextBoxFor(model => model.CommitToPrintDate, new { @class = "form-control form-text-input" })</div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>
-                        <div>@Html.TextBoxFor(model => model.CISDate, new { @class = "form-control form-text-input" })</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr class="mt-2 mb-4" />
-            <h4>Job roles</h4>
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Compiler, "",
-                            new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Verifier1, "",
-                            new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Verifier2, "",
-                            new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
-                        <div>
-                            @Html.TextBoxFor(model => model.Publisher, "",
-                            new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr class="mt-2 mb-4" />
-            <h4>3PS</h4>
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.SendDate3ps)</div>
-                        <div>@Html.DisplayFor(model => model.SendDate3ps)</div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps)</div>
-                        <div>@Html.DisplayFor(model => model.ExpectedReturnDate3ps)</div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <div>@Html.LabelFor(model => model.ActualReturnDate3ps)</div>
-                        <div>@Html.DisplayFor(model => model.ActualReturnDate3ps)</div>
-                    </div>
-                </div>
-            </div>
-            <hr class="mt-2 mb-4" />
-
+            </table>
         </div>
     </div>
-</div>
-@*--- END TASK INFORMATION ---*@
 
 
-@*--- START EDIT DATABASE ---*@
-<div class="card mb-4 mt-3">
-    <h3>Edit Database</h3>
-    <div class="col-12">
-        <div class="card-body pb-2 col-11">
-            <h4>CARIS</h4>
+    <div class="d-flex justify-content-end">
 
-            <div class="row align-items-end">
-                <div class="col-12 mb-2 col-lg-4 mb-lg-0">
-                    <div class="row">
-                        <div class="col">
-                            @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            @Html.TextBoxFor(model => model.CarisProjectName, "",
-                                new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="row">
-                        <div class="col">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
-                                <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
-                                Create CARIS Project
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <div class="mt-3 mr-3">
+            <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
+        </div>
 
-
-            </div>
-            <section id="createCarisProjectError" class="dialog error collapse mt-3">
-                <h5>
-                    <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                    <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
-                </h5>
-            </section>
-
-            <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
-                <h5>
-                    <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
-                    <span>Caris project successfully created</span>
-                </h5>
-            </section>
+        <div class="mt-3">
+            <button id="btnComplete" class="btn btn-block btn-secondary disabled" style="min-width: 139px; ">Complete</button>
         </div>
     </div>
-</div>
-@*--- END EDIT DATABASE ---*@
+
+    <!-- #endregion -->
+    @*--- START TASK INFORMATION ---*@
+    <div class="card mb-4 mt-3">
+        <h3>Task Information</h3>
+
+        <div class="col-12">
+            <div class="card-body pb-0 col-11">
+                <h4>Task information</h4>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.WorkflowType)</div>
+                            <div>
+                                <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.ChartType)</div>
+                            <div>
+                                <span id="chartType">
+                                    <h6>@Html.DisplayFor(model => model.ChartType, new { @class = "form-control  form-text " })</h6>
+                                </span>
+                            </div>
+                        </div>
 
 
-@*--- START TASK COMMENTS ---*@
-<div class="card mb-4 mt-3">
-    <h3>
-        <div class="row">
-            <div class="col">
-                Task Comments
-            </div>
-            <div class="col text-right">
-                <span class="fas fa-comment-alt mr-2"></span>
-                <a href="#" style="color: white;">Add a comment</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Ion, "",
+                                    new { placeholder = "ION", @maxlength = 50, @class = "form-control form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.ChartNo, "",
+                                    new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Country, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Country, "",
+                                    new { placeholder = "Country", @maxlength = 75, @class = "form-control form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <hr class="mt-2 mb-4" />
+                <h4>Dates</h4>
+                <div class="row">
+                    <div class="col-3">
+
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="design-custom-select">
+                                    <div class="arrow-icon-wrap">
+                                        <span class="fa fa-chevron-down arrow-icon"></span>
+                                    </div>
+                                    @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
+                                        , "", new { @class = "form-control" })
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.PublicationDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.AnnounceDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.CommitToPrintDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.CISDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="mt-2 mb-4" />
+                <h4>Job roles</h4>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Compiler, "",
+                                new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Verifier1, "",
+                                new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Verifier2, "",
+                                new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
+                            <div>
+                                @Html.TextBoxFor(model => model.Publisher, "",
+                                new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-2 mb-4" />
+                <h4>3PS</h4>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.SendDate3ps)</div>
+                            <div>@Html.DisplayFor(model => model.SendDate3ps)</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps)</div>
+                            <div>@Html.DisplayFor(model => model.ExpectedReturnDate3ps)</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <div>@Html.LabelFor(model => model.ActualReturnDate3ps)</div>
+                            <div>@Html.DisplayFor(model => model.ActualReturnDate3ps)</div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-2 mb-4" />
+
             </div>
         </div>
-    </h3>
+    </div>
+    @*--- END TASK INFORMATION ---*@
 
-    <div class="card-body p-3">
 
-        <table class="table table-striped m-2" id="generic-comments-table">
-            <tbody>
-                @if (Model.TaskComments != null)
-                {
-                    @foreach (var comment in Model.TaskComments)
+    @*--- START EDIT DATABASE ---*@
+    <div class="card mb-4 mt-3">
+        <h3>Edit Database</h3>
+        <div class="col-12">
+            <div class="card-body pb-2 col-11">
+                <h4>CARIS</h4>
+
+                <div class="row align-items-end">
+                    <div class="col-12 mb-2 col-lg-4 mb-lg-0">
+                        <div class="row">
+                            <div class="col">
+                                @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                @Html.TextBoxFor(model => model.CarisProjectName, "",
+                                    new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="row">
+                            <div class="col">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                    <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                                    Create CARIS Project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                    <h5>
+                        <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                        <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                    </h5>
+                </section>
+
+                <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                    <h5>
+                        <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                        <span>Caris project successfully created</span>
+                    </h5>
+                </section>
+            </div>
+        </div>
+    </div>
+    @*--- END EDIT DATABASE ---*@
+
+
+    @*--- START TASK COMMENTS ---*@
+    <div class="card mb-4 mt-3">
+        <h3>
+            <div class="row">
+                <div class="col">
+                    Task Comments
+                </div>
+                <div class="col text-right">
+                    <span class="fas fa-comment-alt mr-2"></span>
+                    <a href="#" style="color: white;">Add a comment</a>
+                </div>
+            </div>
+        </h3>
+
+        <div class="card-body p-3">
+
+            <table class="table table-striped m-2" id="generic-comments-table">
+                <tbody>
+                    @if (Model.TaskComments != null)
                     {
-                        <tr>
-                            <td>
-                                <div class="mb-2">
-                                    <strong>@comment.Name</strong>
-                                </div>
-                                <div>
-                                    @comment.CommentDate.ToShortDateString()
-                                </div>
-                            </td>
-                            <td>
-                                @if (@comment.CommentText == "")
-                                {
-                                    <span class="fa fa-edit" style="color: #EF8123"> </span>
-                                }
-                                else
-                                {
-                                    <span class="fas fa-comment-alt"></span>
-                                }
-                            </td>
-                            <td>
-                                @if (@comment.CommentText == "")
-                                {
-                                    <span style="color: #ef8123">Edited @comment.Role</span>
-                                }
-                                else
-                                {
-                                    <div class="d-inline">@comment.CommentText</div>
-                                }
-                            </td>
-                        </tr>
+                        @foreach (var comment in Model.TaskComments)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="mb-2">
+                                        <strong>@comment.Name</strong>
+                                    </div>
+                                    <div>
+                                        @comment.CommentDate.ToShortDateString()
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (@comment.CommentText == "")
+                                    {
+                                        <span class="fa fa-edit" style="color: #EF8123"> </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fas fa-comment-alt"></span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (@comment.CommentText == "")
+                                    {
+                                        <span style="color: #ef8123">Edited @comment.Role</span>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-inline">@comment.CommentText</div>
+                                    }
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-@*--- END TASK COMMENTS ---*@
+    @*--- END TASK COMMENTS ---*@
+</form>
 
 @* Modal Add Termination comment *@
 <div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
@@ -728,6 +735,40 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+@*Modal Save Errors*@
+<div class="modal fade" id="modalSaveWorkflowErrors" tabindex="-1" role="dialog" aria-labelledby="SaveWorkflowErrors" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error while saving data</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div id="workflowSaveErrorMessage" class="col-11">
+                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var message in Model.ValidationErrorMessages)
+                                {
+                                    <li>@message</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnSaveWorkflowErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

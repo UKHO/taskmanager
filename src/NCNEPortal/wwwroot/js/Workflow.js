@@ -1,44 +1,59 @@
 ﻿$(document).ready(function () {
 
+
+    var formChanged = false;
+    $("#frmWorkflow").change(function () { formChanged = true; });
+
+    window.onbeforeunload = function () {
+        if (formChanged) {
+            return "Changes detected";
+        }
+    };
+
+
     $("#RepromatDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update', $("#RepromatDate").val());
+    }).datepicker('update');
 
     $("#PublicationDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update' , $("#PublicationDate").val());
+    }).datepicker('update' );
 
     $("#AnnounceDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update', $("#AnnounceDate").val() );
+    }).datepicker('update' );
 
     $("#CommitToPrintDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update', $("#CommitToPrintDate").val());
+    }).datepicker('update' );
 
     $("#CISDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update',  $("#CISDate").val());
+    }).datepicker('update');
 
 
-    if ($("#ChartType").val() !== "Adoption") {
+    var chartType = $("#chartType").text();
+    if (chartType.trim() === "Adoption") {
+        $("#PublicationDate").prop("disabled", true);
+    }
+    else
+    {
 
         $("#RepromatDate").hide();
-        $("#lblRepDate").hide();
-    }
+         $("#lblRepDate").hide();
+     }
 
 
-    
 
 
     $("#Dating").change(function() {
@@ -148,6 +163,58 @@
             }
     });
 
+    $("#btnSave").on("click",
+        function() {
+
+            $("#workflowSaveErrorMessage").html("");
+            $("#btnClose").prop("disabled", true);
+            $("#btnSave").prop("disabled", true);
+
+            var formData = $("#frmWorkflow").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "Workflow/?handler=Save",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: formData,
+                complete: function () {
+                    window.setTimeout(function () {
+                        //$("#modalWaitAssessDone").modal("hide");
+                        $("#btnClose").prop("disabled", false);
+                        $("#btnSave").prop("disabled", false);
+                    }, 200);
+                },
+                success: function (result) {
+                    //formChanged = false;
+                    //if (action === "Done") {
+                    //    window.location.replace("/Index");
+                    //}
+                    formChanged = false;
+                    console.log("success");
+                },
+                error: function (error) {
+                    var responseJson = error.responseJSON;
+
+                    if (responseJson != null) {
+                        $("#workflowSaveErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalSaveWorkflowErrors").modal("show");
+                    }
+
+                }
+            });
+
+
+
+        });
+
     $("#btnClose").on("click",
         function() {
             window.location.href = '/Index';
@@ -239,7 +306,7 @@
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: "NewTask/?handler=Users",
+                url: "Workflow/?handler=Users",
                 ttl: 600000
             },
             initialize: false
