@@ -75,7 +75,21 @@
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
                             @if (task.IsOnHold)
                             {
-                                <i class="fa fa-pause-circle"></i>
+                                @if (task.OnHoldDays < 6)
+                                {
+                                    <i class="fa fa-circle" style="color: green"></i>
+                                }
+                                else if (task.OnHoldDays == 6)
+                                {
+                                    <i class="fa fa-circle" style="color: darkorange"></i>
+                                    <i class="fa fa-circle" style="color: darkorange"></i>
+                                }
+                                else if (task.OnHoldDays > 6)
+                                {
+                                    <i class="fa fa-circle" style="color: red"></i>
+                                    <i class="fa fa-circle" style="color: red"></i>
+                                    <i class="fa fa-circle" style="color: red"></i>
+                                }
                             }
                         </td>
                         <td>
@@ -123,98 +137,118 @@
     <div class="card-body" style="width: 100%">
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
-                <tr>
-                    <th></th>
-                    <th>ID</th>
-                    <th style="min-width: 3.6rem;">Days to DM End Date</th>
-                    <th style="min-width: 5.8rem;">DM End Date</th>
-                    <th style="min-width: 3.9rem;">Days On Hold</th>
-                    <th>RSDRA No.</th>
-                    <th>Source Name</th>
-                    <th>Workspace</th>
-                    <th>Stage</th>
-                    <th>Reviewer</th>
-                    <th>Assessor</th>
-                    <th>Verifier</th>
-                    <th>Team</th>
-                    <th></th>
-                    <th></th>
-                </tr>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th style="min-width: 3.6rem;">Days to DM End Date</th>
+                <th style="min-width: 5.8rem;">DM End Date</th>
+                <th style="min-width: 3.9rem;">Days On Hold</th>
+                <th>RSDRA No.</th>
+                <th>Source Name</th>
+                <th>Workspace</th>
+                <th>Stage</th>
+                <th>Reviewer</th>
+                <th>Assessor</th>
+                <th>Verifier</th>
+                <th>Team</th>
+                <th></th>
+                <th></th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
-                {
-                    <tr>
-                        <td class="details-control"><i class="fa"></i></td>
-                        <td>
-                            <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
-                        </td>
-                        <td>
-                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                                @task.DaysToDmEndDate
-                            </span>
-                        </td>
-                        <td>
-                            @task.DmEndDate.ToShortDateString()
-                        </td>
-                        <td>
-                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                            @if (task.IsOnHold)
+            @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
+            {
+                <tr>
+                    <td class="details-control"><i class="fa"></i></td>
+                    <td>
+                        <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                    </td>
+                    <td>
+                        <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                            @task.DaysToDmEndDate
+                        </span>
+                    </td>
+                    <td>
+                        @task.DmEndDate.ToShortDateString()
+                    </td>
+                    <td>
+                        <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                        @if (task.IsOnHold)
+                        {
+                            @if (task.OnHoldDays < 6)
                             {
-                                <i class="fa fa-pause-circle"></i>
+                                <i class="fa fa-circle" style="color: green"></i>
                             }
-                        </td>
-                        <td>
-                            @task.AssessmentDataRsdraNumber
-                        </td>
-                        <td>
-                            @task.AssessmentDataSourceDocumentName
-                        </td>
-                        <td>
-                            @task.Workspace
-                        </td>
-                        <td>
-                            @task.TaskStage
-                        </td>
-                        <td>
-                            @task.Reviewer
-                        </td>
-                        <td>
-                            @task.Assessor
-                        </td>
-                        <td>
-                            @task.Verifier
-                        </td>
-                        <td>
-                            @task.Team
-                        </td>
-                        <td>
-                            <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
-                                        <i class="far fa-edit">
-                                        </i>
-                                        Edit Task Note
-                                    </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
-                                        <i class="far fa-user">
-                                        </i>
-                                        Assign Task
-                                    </a>
-                                </div>
+                            else if (task.OnHoldDays == 6)
+                            {
+                                <i class="fa fa-circle" style="color: darkorange"></i>
+                                <i class="fa fa-circle" style="color: darkorange"></i>
+                            }
+                            else if (task.OnHoldDays > 6)
+                            {
+                                <i class="fa fa-circle" style="color: red"></i>
+                                <i class="fa fa-circle" style="color: red"></i>
+                                <i class="fa fa-circle" style="color: red"></i>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @task.AssessmentDataRsdraNumber
+                    </td>
+                    <td>
+                        @task.AssessmentDataSourceDocumentName
+                    </td>
+                    <td>
+                        @task.Workspace
+                    </td>
+                    <td>
+                        @task.TaskStage
+                    </td>
+                    <td>
+                        @task.Reviewer
+                    </td>
+                    <td>
+                        @task.Assessor
+                    </td>
+                    <td>
+                        @task.Verifier
+                    </td>
+                    <td>
+                        @task.Team
+                    </td>
+                    <td>
+                        <div class="dropdown" style="cursor: pointer;">
+                            <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
+                                    <i class="far fa-edit">
+                                    </i>
+                                    Edit Task Note
+                                </a>
+                                <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                    <i class="far fa-user">
+                                    </i>
+                                    Assign Task
+                                </a>
                             </div>
-                        </td>
-                        <td>
-                            @task.TaskNoteText
-                        </td>
-                    </tr>
-                }
+                        </div>
+                    </td>
+                    <td>
+                        @task.TaskNoteText
+                    </td>
+                </tr>
+            }
 
             </tbody>
         </table>
     </div>
 </div>
+
+
+<ul>
+    <li class="liOnHold">An option</li>
+    <li class="liOnHold">Another option</li>
+</ul>
 
 @* Modal Edit task note *@
 <div class="modal fade" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskNote" aria-hidden="true">
