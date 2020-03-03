@@ -159,13 +159,6 @@ stages:
                   azureSubscription: 'TaskmanagerDev'
                   WebAppName: 'TaskManager-Dev-api-Dataservice'
                   packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
-              - task: Maven@3
-                displayName: 'Run Data Services API Tests'
-                inputs:
-                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
-                  goals: test
-                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
-                  testRunTitle: 'Data Services API Tests'
 
 - stage: DeployUAT
   dependsOn: 
@@ -186,13 +179,6 @@ stages:
                   azureSubscription: 'TaskmanagerUAT-SC'
                   WebAppName: 'TaskManager-UAT-api-Dataservice'
                   packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
-              - task: Maven@3
-                displayName: 'Run Data Services API Tests'
-                inputs:
-                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
-                  goals: test
-                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
-                  testRunTitle: 'Data Services API Tests'
 
 - stage: DeployPre
   dependsOn: 
@@ -213,10 +199,3 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'TaskManager-Pre-api-Dataservice'
                   packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
-              - task: Maven@3
-                displayName: 'Run Data Services API Tests'
-                inputs:
-                  mavenPomFile: '$(Pipeline.Workspace)/dataservices.apitests/pom.xml'
-                  goals: test
-                  testResultsFiles: '$(Pipeline.Workspace)/dataservices.apitests/target/surefire-reports/TEST-*.xml'
-                  testRunTitle: 'Data Services API Tests'
