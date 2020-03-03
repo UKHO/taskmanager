@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using FakeItEasy;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
+using Portal.Configuration;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
@@ -10,11 +13,13 @@ namespace Portal.UnitTests
     {
         private IList<OnHold> _onHoldRows;
         private OnHoldCalculator _onHoldCalculator;
+        private IOptionsSnapshot<GeneralConfig> _generalConfig;
 
         [SetUp]
         public void SetUp()
         {
-            _onHoldCalculator = new OnHoldCalculator();
+            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            _onHoldCalculator = new OnHoldCalculator(_generalConfig);
         }
 
         [Test]

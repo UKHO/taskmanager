@@ -18,12 +18,15 @@ namespace Portal.UnitTests
         private _TaskInformationModel _taskInformationModel;
         private ITaskDataHelper _taskDataHelper;
         private IOnHoldCalculator _onHoldCalculator;
+        private IOptionsSnapshot<GeneralConfig> _generalConfig;
 
         private int ProcessId { get; set; }
 
         [SetUp]
         public void Setup()
         {
+            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
@@ -34,7 +37,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChangesAsync();
 
-            _onHoldCalculator = new OnHoldCalculator();
+            _onHoldCalculator = new OnHoldCalculator(_generalConfig);
             _taskDataHelper = new TaskDataHelper(_dbContext);
 
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();

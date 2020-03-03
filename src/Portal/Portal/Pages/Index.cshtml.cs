@@ -95,6 +95,11 @@ namespace Portal.Pages
                 task.IsOnHold = instance.OnHold.Any(r => r.OffHoldTime == null);
                 task.OnHoldDays = _indexFacade.CalculateOnHoldDays(instance.OnHold);
 
+                var (greenIcon, amberIcon, redIcon) = _indexFacade.DetermineOnHoldDaysIcons(task.OnHoldDays);
+                task.OnHoldDaysGreen = greenIcon;
+                task.OnHoldDaysAmber = amberIcon;
+                task.OnHoldDaysRed = redIcon;
+
                 var taskType = GetTaskType(instance);
 
                 var result = _indexFacade.CalculateDmEndDate(
