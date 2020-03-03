@@ -259,17 +259,6 @@ table > tbody > tr > th {
     background-color: #ffbf00;
 }
 
-.liOnHold {
-    list-style-type: none;
-}
-
-.liOnHold:before {
-    content: '\00b7';
-    font-size: 100px;
-    line-height: 24px;
-    vertical-align: middle;
-}
-
 /* Footer start */
 footer {
     bottom: 0;
