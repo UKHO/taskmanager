@@ -112,7 +112,6 @@ stages:
         displayName: 'Publish sourcedocumentcoordinator Artifact'
 
 - stage: DependencyCheck
-  dependsOn: Build
   jobs:
     - job: DependencyCheck
       pool: NautilusBuild
