@@ -155,13 +155,13 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
-
+            ProcessId = processId;
 
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
 
-            await UpdateAssessmentData();
+            await UpdateAssessmentData(processId);
 
             try
             {
@@ -263,9 +263,9 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task UpdateAssessmentData()
+        private async Task UpdateAssessmentData(int processId)
         {
-            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == ProcessId);
+            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == processId);
             currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();

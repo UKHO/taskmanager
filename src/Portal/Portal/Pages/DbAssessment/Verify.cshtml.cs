@@ -80,6 +80,9 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string ProjectName { get; set; }
 
+        [BindProperty]
+        public string Team { get; set; }
+
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
@@ -138,7 +141,7 @@ namespace Portal.Pages.DbAssessment
                 Verifier,
                 RecordProductAction,
                 DataImpacts, action,
-                ValidationErrorMessages))
+                ValidationErrorMessages, Team))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -146,9 +149,13 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
+            ProcessId = processId;
+
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
+
+            await UpdateAssessmentData(processId);
 
             try
             {
@@ -355,6 +362,14 @@ namespace Portal.Pages.DbAssessment
             currentVerify.Ion = Ion;
             currentVerify.ActivityCode = ActivityCode;
             currentVerify.SourceCategory = SourceCategory;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateAssessmentData(int processId)
+        {
+            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == processId);
+            currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
         }
