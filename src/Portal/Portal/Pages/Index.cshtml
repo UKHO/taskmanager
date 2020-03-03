@@ -28,7 +28,7 @@
             </div>
             <div class="col-6">
                 <button id="btnRefresh" type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Refresh the list of tasks in both tabs, preserving selected sort options and search criteria."><span class="fas fa-sync-alt"></span></button>
-                <button type="button" id="btnSelectTeam" class="btn btn-primary">Select Team</button>
+                <button type="button" id="btnSelectTeam" class="btn btn-primary"><i class="filterIcon fa fa-filter" aria-hidden="true" style="font-size: 75%"></i> Select Team</button>
             </div>
         </div>
     </div>
@@ -275,6 +275,7 @@
     </div>
 </div>
 
+@* Modal Select Team to filter by *@
 <div class="modal fade" id="selectTeamsModal" tabindex="-1" role="dialog" aria-labelledby="SelectTeams" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -289,7 +290,7 @@
                     <div class="ml-3 mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input mt-0 teamsCheckbox" id="@(id)">
-                            <label class="form-check-label" for="@(id)">@Model.TeamsUnassigned</label>
+                            <label class="form-check-label teamsCheckboxLabel" for="@(id)">@Model.TeamsUnassigned</label>
                         </div>
                     </div>
 
@@ -301,7 +302,7 @@
                         <div class="ml-3 mb-3">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input mt-0 teamsCheckbox" id="@(id)">
-                                <label class="form-check-label" for="@(id)">@Model.TeamList[i]</label>
+                                <label class="form-check-label teamsCheckboxLabel" for="@(id)">@Model.TeamList[i]</label>
                             </div>
                         </div>
                     }

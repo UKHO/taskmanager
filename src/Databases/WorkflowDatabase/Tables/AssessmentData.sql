@@ -7,7 +7,7 @@
 			[ReceiptDate] DATETIME2 NOT NULL,
 			[ToSdoDate] DATETIME2 NULL,
 			[EffectiveStartDate] DATETIME2 NULL,
-			[TeamDistributedTo] NVARCHAR(20) NULL,
+			[TeamDistributedTo] NVARCHAR(50) NULL,
 			[SourceDocumentType] NVARCHAR(4000) NULL,
 			[SourceNature] NVARCHAR(255) NULL,
 			[Datum] NVARCHAR(2000) NULL, 
