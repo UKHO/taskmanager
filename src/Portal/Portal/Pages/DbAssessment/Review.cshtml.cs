@@ -53,6 +53,9 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string Reviewer { get; set; }
 
+        [BindProperty]
+        public string Team { get; set; }
+
         public _OperatorsModel OperatorsModel { get; set; }
 
         public WorkflowStage WorkflowStage { get; set; }
@@ -153,7 +156,7 @@ namespace Portal.Pages.DbAssessment
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
                 ValidationErrorMessages,
-                Reviewer))
+                Reviewer, Team))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -168,6 +171,7 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateDbAssessmentReviewData();
             await SaveAdditionalTasks(ProcessId);
+            await UpdateAssessmentData();
 
             if (action == "Done")
             {
@@ -311,6 +315,14 @@ namespace Portal.Pages.DbAssessment
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateAssessmentData()
+        {
+            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == ProcessId);
+            currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
         }

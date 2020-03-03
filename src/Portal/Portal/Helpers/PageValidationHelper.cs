@@ -35,7 +35,7 @@ namespace Portal.Helpers
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
-            string Reviewer)
+            string Reviewer, string Team)
         {
             var isValid = true;
 
@@ -47,10 +47,12 @@ namespace Portal.Helpers
             if (string.IsNullOrWhiteSpace(Reviewer))
             {
                 validationErrorMessages.Add("Operators: Reviewer cannot be empty");
+                isValid = false;
             }
             else if (!await _userIdentityService.ValidateUser(Reviewer))
             {
                 validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {Reviewer}");
+                isValid = false;
             }
 
             if (!ValidateWorkspace(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
@@ -60,6 +62,12 @@ namespace Portal.Helpers
 
             if (!ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
             {
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(Team))
+            {
+                validationErrorMessages.Add("Task Information: Team cannot be empty");
                 isValid = false;
             }
 
