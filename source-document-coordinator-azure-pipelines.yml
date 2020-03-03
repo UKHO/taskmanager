@@ -161,7 +161,6 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeploySourceDocumentCoordinatorDev
       displayName: Deploy SourceDocumentCoordinator NSB Service
@@ -181,7 +180,6 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeploySourceDocumentCoordinatorUAT
       displayName: Deploy SourceDocumentCoordinator NSB Service
@@ -201,7 +199,6 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeploySourceDocumentCoordinatorPre
       displayName: Deploy SourceDocumentCoordinator NSB Service
