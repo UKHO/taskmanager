@@ -9,6 +9,7 @@
     var unassignedTasksTable = setupUnassignedTasks();
 
     var inFlightTasksTable = setupInFlightTasks();
+    var selectedTeams = getTeamSelection();
 
     applyDatatableFilter();
 
@@ -25,6 +26,7 @@
     handleSelectAllTeams();
     handleClearAllTeams();
     handleFilterTasksByTeam();
+    setupFilterTasksByTeamButtonStyle();
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
@@ -172,13 +174,11 @@
 
     function filterSelectedTeamsList(team) {
 
-        var selectedTeamsArray = getTeamSelection();
-
-        if (selectedTeamsArray.length === 0) {
+        if (selectedTeams.length === 0) {
             return true;
         }
 
-        var exists = $.inArray(team, selectedTeamsArray) !== -1;
+        var exists = $.inArray(team, selectedTeams) !== -1;
         return exists;
 
     }
@@ -203,6 +203,10 @@
 
             $("#btnSelectTeam").show();
             $('#txtGlobalSearch').val("");
+            setupFilterTasksByTeamButtonStyle();
+
+            selectedTeams = getTeamSelection();
+
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
 
@@ -214,11 +218,25 @@
             if (index === menuItem) {
                 $(this).addClass("btn-info");
                 $(this).removeClass("btn-primary");
+
             } else {
                 $(this).removeClass("btn-info");
                 $(this).addClass("btn-primary");
             }
         });
+    }
+
+    function setupFilterTasksByTeamButtonStyle() {
+        var selectedTeamsArray = getTeamSelection();
+
+        if (selectedTeamsArray.length > 0) {
+            $("#btnSelectTeam").removeClass("btn-primary").addClass("btn-success");
+            $(".filterIcon").show();
+        } else {
+
+            $("#btnSelectTeam").removeClass("btn-success").addClass("btn-primary");
+            $(".filterIcon").hide();
+        }
     }
 
     $('#txtGlobalSearch').keyup(function () {
@@ -424,6 +442,10 @@
 
             $("#selectTeamsModal").modal("hide");
             saveTeamSelectionToSessionStorage();
+            setupFilterTasksByTeamButtonStyle();
+
+            selectedTeams = getTeamSelection();
+
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
         });
