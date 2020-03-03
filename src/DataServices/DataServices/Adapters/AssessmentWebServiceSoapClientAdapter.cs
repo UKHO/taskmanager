@@ -1,4 +1,5 @@
 ﻿using System.ServiceModel;
+using System.ServiceModel.Security;
 using DataServices.Config;
 using DataServices.Connected_Services.SDRAAssessmentWebService;
 using Microsoft.Extensions.Options;
@@ -36,6 +37,12 @@ namespace DataServices.Adapters
 
                 client.ClientCredentials.UserName.UserName = _secretsConfig.Value.SdraWebserviceUsername;
                 client.ClientCredentials.UserName.Password = _secretsConfig.Value.SdraWebservicePassword;
+
+                client.ClientCredentials.ServiceCertificate.SslCertificateAuthentication =
+                    new X509ServiceCertificateAuthentication
+                    {
+                        CertificateValidationMode = X509CertificateValidationMode.None
+                    };
 
                 return client;
             }
