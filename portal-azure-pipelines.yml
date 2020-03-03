@@ -157,11 +157,11 @@ stages:
           storage: '$(PicklesAzureStorageAccount)'
           ContainerName: '$web/$(Build.Repository.Name)'
 
-- stage: DependencyCheck
-  dependsOn: Build
-  jobs:
     - job: DependencyCheck
       pool: NautilusBuild
+
+      workspace:
+        clean: all
 
       steps:
       - task: UseDotNet@2
@@ -207,7 +207,6 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:    
     - deployment: DeployPortalWebsiteDev
       displayName: Deploy portal website
@@ -261,7 +260,6 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:    
     - deployment: DeployPortalWebsiteUAT
       displayName: Deploy portal website
@@ -312,7 +310,6 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:    
     - deployment: DeployPortalWebsitePre
       displayName: Deploy portal website
