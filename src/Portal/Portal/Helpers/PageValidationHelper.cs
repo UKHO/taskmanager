@@ -29,13 +29,14 @@ namespace Portal.Helpers
         /// <param name="primaryAssignedTask"></param>
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
-        /// <param name="Reviewer"></param>
+        /// <param name="reviewer"></param>
+        /// <param name="team"></param>
         /// <returns></returns>
         public async Task<bool> ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
-            string Reviewer, string Team)
+            string reviewer, string team)
         {
             var isValid = true;
 
@@ -44,14 +45,14 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (string.IsNullOrWhiteSpace(Reviewer))
+            if (string.IsNullOrWhiteSpace(reviewer))
             {
                 validationErrorMessages.Add("Operators: Reviewer cannot be empty");
                 isValid = false;
             }
-            else if (!await _userIdentityService.ValidateUser(Reviewer))
+            else if (!await _userIdentityService.ValidateUser(reviewer))
             {
-                validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {Reviewer}");
+                validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {reviewer}");
                 isValid = false;
             }
 
@@ -65,7 +66,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (string.IsNullOrWhiteSpace(Team))
+            if (string.IsNullOrWhiteSpace(team))
             {
                 validationErrorMessages.Add("Task Information: Team cannot be empty");
                 isValid = false;
@@ -85,6 +86,7 @@ namespace Portal.Helpers
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="team"></param>
         /// <returns></returns>
         public async Task<bool> ValidateAssessPage(
             string ion,
@@ -94,7 +96,7 @@ namespace Portal.Helpers
             string verifier,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
-            List<string> validationErrorMessages)
+            List<string> validationErrorMessages, string team)
         {
             var isValid = true;
 
@@ -103,7 +105,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateOperators(verifier, validationErrorMessages))
+            if (!await ValidateOperators(verifier, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -115,6 +117,12 @@ namespace Portal.Helpers
 
             if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
             {
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(team))
+            {
+                validationErrorMessages.Add("Task Information: Team cannot be empty");
                 isValid = false;
             }
 
@@ -149,7 +157,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateOperators(verifier, validationErrorMessages))
+            if (!await ValidateOperators(verifier, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -347,11 +355,17 @@ namespace Portal.Helpers
         /// <param name="verifier"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private bool ValidateOperators(string verifier, List<string> validationErrorMessages)
+        private async Task<bool> ValidateOperators(string verifier, List<string> validationErrorMessages)
         {
             if (string.IsNullOrWhiteSpace(verifier))
             {
                 validationErrorMessages.Add("Operators: Verifier cannot be empty");
+                return false;
+            }
+
+            if (!await _userIdentityService.ValidateUser(verifier))
+            {
+                validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {verifier}");
                 return false;
             }
             return true;
