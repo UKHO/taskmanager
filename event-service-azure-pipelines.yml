@@ -93,11 +93,11 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish eventservices.apitests Artifact'
 
-- stage: DependencyCheck
-  dependsOn: Build
-  jobs:
     - job: DependencyCheck
       pool: NautilusBuild
+
+      workspace:
+        clean: all
 
       steps:
       - task: UseDotNet@2
@@ -143,7 +143,6 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeployEventServiceDev
       displayName: Deploy Eventservice Api
@@ -170,7 +169,6 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeployEventServiceUAT
       displayName: Deploy Eventservice Api
@@ -197,7 +195,6 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeployEventServicePre
       displayName: Deploy Eventservice Api

@@ -150,11 +150,11 @@ stages:
       #     publishLocation: 'Container'
       #   displayName: 'Publish specs Artifact'
 
-# - stage: DependencyCheck
-#   dependsOn: Build
-#   jobs:
-#     - job: DependencyCheck
-#       pool: NautilusBuild
+    # - job: DependencyCheck
+    #   pool: NautilusBuild
+
+    #   workspace:
+    #     clean: all
 
 #       steps:
 #       - task: UseDotNet@2

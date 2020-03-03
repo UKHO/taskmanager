@@ -111,11 +111,11 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish workflowcoordinator Artifact'
 
-- stage: DependencyCheck
-  dependsOn: Build
-  jobs:
     - job: DependencyCheck
       pool: NautilusBuild
+
+      workspace:
+        clean: all
 
       steps:
       - task: UseDotNet@2
@@ -161,7 +161,6 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeployWorkflowCoordinatorDev
       displayName: Deploy Workflowcoordinator NSB Service
@@ -181,7 +180,6 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
-    - DependencyCheck  
   jobs:
     - deployment: DeployWorkflowCoordinatorUAT
       displayName: Deploy Workflowcoordinator NSB Service
@@ -201,7 +199,6 @@ stages:
 - stage: DeployPre
   dependsOn:
     - Build
-    - DependencyCheck
   jobs:
     - deployment: DeployWorkflowCoordinatorPre
       displayName: Deploy Workflowcoordinator NSB Service
