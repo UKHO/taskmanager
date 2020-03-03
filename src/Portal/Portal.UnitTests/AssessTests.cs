@@ -228,7 +228,7 @@ namespace Portal.UnitTests
 
 
         [Test]
-        public async Task Test_entering_invalid_uername_for_verifier_results_in_validation_error_message()
+        public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(false);
@@ -245,6 +245,24 @@ namespace Portal.UnitTests
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Unable to set verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages[0]);
+        }
+
+
+        [Test]
+        public async Task Test_entering_empty_username_for_verifier_results_in_validation_error_message()
+        {
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
+
+            _assessModel.Verifier = "";
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
+            Assert.AreEqual("Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages[0]);
         }
 
 

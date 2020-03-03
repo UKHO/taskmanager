@@ -286,6 +286,11 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Team = "Home Waters";
+
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("This Use"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
@@ -355,6 +360,8 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            _reviewModel.Team = "Home Waters";
+
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
@@ -380,6 +387,8 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            _reviewModel.Team = "Home Waters";
+
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
@@ -404,6 +413,8 @@ namespace Portal.UnitTests
             };
             _reviewModel.Reviewer = "";
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            _reviewModel.Team = "Home Waters";
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
@@ -458,6 +469,111 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A.Dummy<string>())).MustNotHaveHappened();
+        }
+
+
+        [Test]
+        public async Task Test_entering_invalid_username_for_reviewer_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(false);
+
+            _reviewModel.Ion = "Ion";
+            _reviewModel.ActivityCode = "ActivityCode";
+            _reviewModel.SourceCategory = "SourceCategory";
+            _reviewModel.Team = "Home Waters";
+
+            _reviewModel.Reviewer = "TestUser";
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Operators: Unable to set reviewer to unknown user {_reviewModel.Reviewer}", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+
+        [Test]
+        public async Task Test_entering_empty_username_for_reviewer_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            _reviewModel.Ion = "Ion";
+            _reviewModel.ActivityCode = "ActivityCode";
+            _reviewModel.SourceCategory = "SourceCategory";
+            _reviewModel.Team = "Home Waters";
+
+            _reviewModel.Reviewer = "";
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual("Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+
+        [Test]
+        public async Task Test_entering_empty_team_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            _reviewModel.Ion = "Ion";
+            _reviewModel.ActivityCode = "ActivityCode";
+            _reviewModel.SourceCategory = "SourceCategory";
+            _reviewModel.Team = "";
+
+            _reviewModel.Reviewer = "TestUser";
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.AreEqual("Task Information: Team cannot be empty", _reviewModel.ValidationErrorMessages[0]);
         }
     }
 }
