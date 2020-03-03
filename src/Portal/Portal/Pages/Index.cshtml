@@ -76,6 +76,8 @@
                             @if (task.IsOnHold)
                             {
                                 <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "color: green" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red": "")"></i>
+                                <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "display:none" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red" : "")"></i>
+                                <i class="fa fa-circle" style="@(task.OnHoldDaysRed ? "color: red": "display: none")"></i>
                             }
                         </td>
                         <td>
