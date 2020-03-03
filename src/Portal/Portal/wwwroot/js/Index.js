@@ -178,7 +178,8 @@
             return true;
         }
 
-        return $.inArray(team, selectedTeamsArray) !== -1;
+        var exists = $.inArray(team, selectedTeamsArray) !== -1;
+        return exists;
 
     }
 
@@ -423,9 +424,8 @@
 
             $("#selectTeamsModal").modal("hide");
             saveTeamSelectionToSessionStorage();
-            var teams = getTeamSelection();
-            alert(teams);
-            return;
+            unassignedTasksTable.search("").draw();
+            inFlightTasksTable.search("").draw();
         });
     }
 
