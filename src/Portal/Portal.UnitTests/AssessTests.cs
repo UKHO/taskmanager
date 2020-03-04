@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using FakeItEasy;
@@ -81,23 +83,37 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_tasktype_results_in_validation_error_message()
+        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_results_in_validation_error_message()
         {
+            _hpDbContext.CarisProducts.Add(new CarisProduct()
+                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _assessModel.Ion = "";
             _assessModel.ActivityCode = "";
             _assessModel.SourceCategory = "";
             _assessModel.TaskType = "";
+            _assessModel.Team = "";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
 
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(4, _assessModel.ValidationErrorMessages.Count);
+            Assert.AreEqual(5, _assessModel.ValidationErrorMessages.Count);
             Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Activity code cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Task type cannot be empty", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Team cannot be empty", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -107,6 +123,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
 
             _assessModel.Verifier = "";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -120,10 +137,14 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
 
             _assessModel.Verifier = "TestUser";
             var hpdUsage = new HpdUsage()
@@ -151,10 +172,15 @@ namespace Portal.UnitTests
                 {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
             await _hpDbContext.SaveChangesAsync();
 
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -177,10 +203,14 @@ namespace Portal.UnitTests
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
 
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -195,5 +225,46 @@ namespace Portal.UnitTests
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages[0]);
         }
+
+
+        [Test]
+        public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(false);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
+
+            _assessModel.Verifier = "TestUser";
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Operators: Unable to set verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages[0]);
+        }
+
+
+        [Test]
+        public async Task Test_entering_empty_username_for_verifier_results_in_validation_error_message()
+        {
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "Home Waters";
+
+            _assessModel.Verifier = "";
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
+            Assert.AreEqual("Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages[0]);
+        }
+
+
     }
 }

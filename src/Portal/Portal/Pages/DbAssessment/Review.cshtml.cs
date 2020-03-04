@@ -53,6 +53,9 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string Reviewer { get; set; }
 
+        [BindProperty]
+        public string Team { get; set; }
+
         public _OperatorsModel OperatorsModel { get; set; }
 
         public WorkflowStage WorkflowStage { get; set; }
@@ -153,7 +156,7 @@ namespace Portal.Pages.DbAssessment
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
                 ValidationErrorMessages,
-                Reviewer))
+                Reviewer, Team))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -166,8 +169,9 @@ namespace Portal.Pages.DbAssessment
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
-            await UpdateDbAssessmentReviewData();
+            await UpdateDbAssessmentReviewData(ProcessId);
             await SaveAdditionalTasks(ProcessId);
+            await UpdateAssessmentData(ProcessId);
 
             if (action == "Done")
             {
@@ -299,9 +303,9 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task UpdateDbAssessmentReviewData()
+        private async Task UpdateDbAssessmentReviewData(int processId)
         {
-            var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == ProcessId);
+            var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             currentReview.Assessor = PrimaryAssignedTask.Assessor;
             currentReview.Verifier = PrimaryAssignedTask.Verifier;
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
@@ -311,6 +315,14 @@ namespace Portal.Pages.DbAssessment
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateAssessmentData(int processId)
+        {
+            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == processId);
+            currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
         }

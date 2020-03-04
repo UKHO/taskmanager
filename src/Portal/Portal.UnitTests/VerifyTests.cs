@@ -86,12 +86,17 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _verifyModel.Ion = "";
             _verifyModel.ActivityCode = "";
             _verifyModel.SourceCategory = "";
 
             _verifyModel.Verifier = "TestUser";
             _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _verifyModel.Team = "Home Waters";
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
@@ -111,15 +116,39 @@ namespace Portal.UnitTests
             _verifyModel.Verifier = "";
             _verifyModel.DataImpacts = new List<DataImpact>();
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages[0]);
         }
-        
+
+        [Test]
+        public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(false);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = "TestUser";
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual($"Operators: Unable to set verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages[0]);
+        }
+
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -136,6 +165,8 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
@@ -145,6 +176,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
                 {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
@@ -161,6 +194,8 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
             };
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
@@ -171,6 +206,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
@@ -188,6 +225,8 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
@@ -197,6 +236,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_productactions_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _hpDbContext.CarisProducts.Add(new CarisProduct
                 { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -215,6 +257,8 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
             };
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
@@ -224,6 +268,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_dataimpacts_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -245,10 +292,32 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 2, HpdUsage = hpdUsage2, ProcessId = 123}
             };
 
+            _verifyModel.Team = "Home Waters";
+
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages[0]);
+        }
+
+
+        [Test]
+        public async Task Test_entering_empty_team_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "";
+
+            _verifyModel.Verifier = "TestUser";
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
+            Assert.AreEqual("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages[0]);
         }
     }
 }

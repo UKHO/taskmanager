@@ -75,6 +75,9 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
 
+        [BindProperty]
+        public string Team { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private string _userFullName;
@@ -144,7 +147,7 @@ namespace Portal.Pages.DbAssessment
                                                 Verifier,
                                                 RecordProductAction,
                                                 DataImpacts,
-                                                ValidationErrorMessages))
+                                                ValidationErrorMessages, Team))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -152,11 +155,13 @@ namespace Portal.Pages.DbAssessment
                 };
             }
 
-
+            ProcessId = processId;
 
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
+
+            await UpdateAssessmentData(processId);
 
             try
             {
@@ -254,6 +259,14 @@ namespace Portal.Pages.DbAssessment
             currentAssess.ActivityCode = ActivityCode;
             currentAssess.SourceCategory = SourceCategory;
             currentAssess.TaskType = TaskType;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateAssessmentData(int processId)
+        {
+            var currentAssessment = await _dbContext.AssessmentData.FirstAsync(r => r.ProcessId == processId);
+            currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
         }

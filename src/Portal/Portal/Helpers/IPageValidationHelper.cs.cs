@@ -12,12 +12,14 @@ namespace Portal.Helpers
         /// <param name="primaryAssignedTask"></param>
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="reviewer"></param>
+        /// <param name="team"></param>
         /// <returns></returns>
         Task<bool> ValidateReviewPage(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
-            string Reviewer);
+            string reviewer, string team);
 
         /// <summary>
         /// Used in Assess page
@@ -30,6 +32,7 @@ namespace Portal.Helpers
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="team"></param>
         /// <returns></returns>
         Task<bool> ValidateAssessPage(
             string ion,
@@ -39,7 +42,8 @@ namespace Portal.Helpers
             string verifier,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
-            List<string> validationErrorMessages);
+            List<string> validationErrorMessages,
+            string team);
 
 
         /// <summary>
@@ -53,6 +57,7 @@ namespace Portal.Helpers
         /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="team"></param>
         /// <returns></returns>
         Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
@@ -61,6 +66,9 @@ namespace Portal.Helpers
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string action,
-            List<string> validationErrorMessages);
+            List<string> validationErrorMessages,
+            string team);
+
+
     }
 }
