@@ -143,13 +143,19 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
+            var currentAssignedAssessor = await GetCurrentAssessor(processId);
+
+
             if (!await _pageValidationHelper.ValidateAssessPage(
+                                                action,
                                                 Ion,
                                                 ActivityCode,
                                                 SourceCategory,
                                                 TaskType,
                                                 Assessor,
                                                 Verifier,
+                                                currentAssignedAssessor,
+                                                UserFullName,
                                                 RecordProductAction,
                                                 DataImpacts,
                                                 ValidationErrorMessages, Team))
@@ -233,6 +239,12 @@ namespace Portal.Pages.DbAssessment
 
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task<string> GetCurrentAssessor(int processId)
+        {
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            return currentAssessData.Assessor;
         }
 
         private async Task PersistCompletedAssess(int processId, WorkflowInstance workflowInstance)
