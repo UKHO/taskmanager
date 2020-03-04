@@ -29,8 +29,8 @@
             }
         });
     }
-
-
+    
+    // TODO - change to hang off the switch changing...
     $("#btnPutOnHold").on("click", function () {
         $("#btnPutOnHold").prop("disabled", true);
 
@@ -43,9 +43,9 @@
             data: { "processId": processId },
             success: function (result) {
 
-                $('#putOnHold').attr("hidden", true);
+                $("#putOnHold").attr("hidden", true);
 
-                $('#takeOffHold').attr("hidden", false);
+                $("#takeOffHold").attr("hidden", false);
                 $("#btnTakeOffHold").prop("disabled", false);
 
                 $("#taskInformation").html(result);
@@ -53,7 +53,7 @@
             },
             error: function (error) {
                 $("#OnHoldErrorMessage").text("Error putting task on hold. Please try again later.");
-                    //.text("Error Putting task on hold. Please try again later");
+                //.text("Error Putting task on hold. Please try again later");
 
                 $("#OnHoldError").modal("show");
                 $("#btnPutOnHold").prop("disabled", false);
@@ -62,6 +62,7 @@
 
     });
 
+    // TODO - change to hang off the switch changing...
     $("#btnTakeOffHold").on("click", function () {
         $("#btnTakeOffHold").prop("disabled", true);
 
@@ -74,9 +75,9 @@
             data: { "processId": processId },
             success: function (result) {
 
-                $('#takeOffHold').attr("hidden", true);
+                $("#takeOffHold").attr("hidden", true);
 
-                $('#putOnHold').attr("hidden", false);
+                $("#putOnHold").attr("hidden", false);
                 $("#btnPutOnHold").prop("disabled", false);
 
                 $("#taskInformation").html(result);
@@ -84,7 +85,7 @@
             },
             error: function (error) {
                 $("#OnHoldErrorMessage").text("Error taking task off hold. Please try again later.");
-                    //.text("Error Taking task off hold. Please try again later");
+                //.text("Error Taking task off hold. Please try again later");
                 $("#OnHoldError").modal("show");
                 $("#btnTakeOffHold").prop("disabled", false);
             }
