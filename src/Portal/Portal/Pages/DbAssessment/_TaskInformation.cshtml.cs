@@ -66,7 +66,6 @@ namespace Portal.Pages.DbAssessment
 
         [DisplayName("Source Category:")]
         public string SourceCategory { get; set; }
-
         public SelectList SourceCategories { get; set; }
 
         [DisplayName("Task Type:")]
@@ -103,10 +102,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             await SetTaskInformationData();
-
-            var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
-
-            TaskTypes = new SelectList(taskTypes);
         }
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
@@ -178,6 +173,9 @@ namespace Portal.Pages.DbAssessment
         private async Task SetTaskInformationData()
         {
             SetSourceCategories();
+
+            var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
+            TaskTypes = new SelectList(taskTypes);
 
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);

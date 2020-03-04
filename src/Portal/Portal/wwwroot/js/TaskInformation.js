@@ -22,6 +22,7 @@
                 $("#taskInformation").html(result);
 
                 setTaskTypeState();
+                applyOnHoldHandler();
             },
             error: function (error) {
                 $("#taskInformationError")
@@ -29,68 +30,54 @@
             }
         });
     }
-    
-    // TODO - change to hang off the switch changing...
-    $("#btnPutOnHold").on("click", function () {
-        $("#btnPutOnHold").prop("disabled", true);
 
-        $.ajax({
-            type: "POST",
-            url: "_TaskInformation/?handler=OnHold",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: { "processId": processId },
-            success: function (result) {
+    function applyOnHoldHandler() {
+        $("#onHoldToggle").on("change",
+            function () {
+                if (this.checked) {
+                    $("#onHoldToggle").prop("disabled", true);
 
-                $("#putOnHold").attr("hidden", true);
+                    $.ajax({
+                        type: "POST",
+                        url: "_TaskInformation/?handler=OnHold",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: { "processId": processId },
+                        success: function (result) {
+                            $("#onHoldToggle").prop("disabled", false);
+                            $("#taskInformation").html(result);
+                        },
+                        error: function (error) {
+                            $("#OnHoldErrorMessage").text("Error putting task on hold. Please try again later.");
+                            $("#OnHoldError").modal("show");
+                            $("#onHoldToggle").prop("disabled", false);
+                        }
+                    });
 
-                $("#takeOffHold").attr("hidden", false);
-                $("#btnTakeOffHold").prop("disabled", false);
+                } else {
+                    $("#onHoldToggle").prop("disabled", true);
 
-                $("#taskInformation").html(result);
-                getComments();
-            },
-            error: function (error) {
-                $("#OnHoldErrorMessage").text("Error putting task on hold. Please try again later.");
-                //.text("Error Putting task on hold. Please try again later");
-
-                $("#OnHoldError").modal("show");
-                $("#btnPutOnHold").prop("disabled", false);
-            }
-        });
-
-    });
-
-    // TODO - change to hang off the switch changing...
-    $("#btnTakeOffHold").on("click", function () {
-        $("#btnTakeOffHold").prop("disabled", true);
-
-        $.ajax({
-            type: "POST",
-            url: "_TaskInformation/?handler=OffHold",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: { "processId": processId },
-            success: function (result) {
-
-                $("#takeOffHold").attr("hidden", true);
-
-                $("#putOnHold").attr("hidden", false);
-                $("#btnPutOnHold").prop("disabled", false);
-
-                $("#taskInformation").html(result);
-                getComments();
-            },
-            error: function (error) {
-                $("#OnHoldErrorMessage").text("Error taking task off hold. Please try again later.");
-                //.text("Error Taking task off hold. Please try again later");
-                $("#OnHoldError").modal("show");
-                $("#btnTakeOffHold").prop("disabled", false);
-            }
-        });
-    });
+                    $.ajax({
+                        type: "POST",
+                        url: "_TaskInformation/?handler=OffHold",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: { "processId": processId },
+                        success: function (result) {
+                            $("#onHoldToggle").prop("disabled", false);
+                            $("#taskInformation").html(result);
+                        },
+                        error: function (error) {
+                            $("#OnHoldErrorMessage").text("Error taking task off hold. Please try again later.");
+                            $("#OnHoldError").modal("show");
+                            $("#onHoldToggle").prop("disabled", false);
+                        }
+                    });
+                }
+            });
+    }
 
     function setTaskTypeState() {
         var pageIdentity = $("#pageIdentity").val();
