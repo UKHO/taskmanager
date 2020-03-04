@@ -2,6 +2,9 @@
 
     $("#Reviewer").prop("disabled", true);
 
+
+    initialiseOperatorsTypeaheads();
+
     setAssessDoneHandler();
     setAssessSaveHandler();
 
@@ -83,6 +86,55 @@
         $("#btnSave").click(function (e) {
             completeAssess("Save");
         });
+    }
+
+
+    function initialiseOperatorsTypeaheads() {
+
+        removeOperatorsInitialiseErrors();
+
+        $('#Reviewer, #Assessor, #Verifier').typeahead('val', "");
+        $('#Reviewer, #Assessor, #Verifier').typeahead('close');
+
+        var users = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            prefetch: {
+                url: "/Index/?handler=Users",
+                ttl: 60000
+            },
+            initialize: false
+        });
+
+        var promise = users.initialize();
+        promise
+            .done(function () {
+                removeOperatorsInitialiseErrors();
+            })
+            .fail(function () {
+                var errorArray = ["Failed to look up users. Try refreshing the page."];
+                displayOperatorsInitialiseErrors(errorArray);
+            });
+
+        $('#Reviewer, #Assessor, #Verifier').typeahead({
+                hint: true,
+                highlight: true,    /* Enable substring highlighting */
+                minLength: 3        /* Specify minimum characters required for showing result */
+            },
+            {
+                name: 'users',
+                source: users,
+                limit: 100,
+                templates: {
+                    notFound: '<div>No results</div>'
+                }
+            });
+    }
+
+
+    function removeOperatorsInitialiseErrors() {
+        $("#operatorsErrorMessages").collapse("hide");
+        $("#operatorsErrorList").empty();
     }
 
 });

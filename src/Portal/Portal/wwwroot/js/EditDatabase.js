@@ -21,8 +21,8 @@ function getEditDatabase() {
     var processId = Number($("#hdnProcessId").val());
     var pageIdentity = $("#pageIdentity").val();
 
-    $('.typeahead').typeahead('val', "");
-    $('.typeahead').typeahead('close');
+    $('#SelectedCarisWorkspace').typeahead('val', "");
+    $('#SelectedCarisWorkspace').typeahead('close');
 
     $.ajax({
         type: "GET",
@@ -182,7 +182,7 @@ function initialiseWorkspaceTypeahead() {
     });
 
     // Initializing the typeahead
-    $('.typeahead').typeahead({
+    $('#SelectedCarisWorkspace').typeahead({
         hint: true,
         highlight: true, /* Enable substring highlighting */
 

@@ -109,6 +109,9 @@
 
         removeOperatorsInitialiseErrors();
 
+        $('#Reviewer, #Assessor, #Verifier').typeahead('val', "");
+        $('#Reviewer, #Assessor, #Verifier').typeahead('close');
+
         var users = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -129,7 +132,7 @@
                 displayOperatorsInitialiseErrors(errorArray);
             });
 
-        $('#Reviewer.typeahead, #Assessor.typeahead, #Verifier.typeahead').typeahead({
+        $('#Reviewer, #Assessor, #Verifier').typeahead({
                 hint: true,
                 highlight: true,    /* Enable substring highlighting */
                 minLength: 3        /* Specify minimum characters required for showing result */
