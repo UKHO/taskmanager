@@ -259,6 +259,7 @@ namespace Portal.Pages.DbAssessment
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
+            currentAssess.Assessor = Assessor;
             currentAssess.Verifier = Verifier;
             currentAssess.Ion = Ion;
             currentAssess.ActivityCode = ActivityCode;
