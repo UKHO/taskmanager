@@ -90,6 +90,9 @@
     <None Include="WorkflowDatabase.LocalDb.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+    <None Include="WorkflowDatabase.pre.LocalDb.publish.xml">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post Deployment\ProductActionType.sql" />
