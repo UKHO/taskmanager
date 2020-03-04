@@ -41,7 +41,9 @@ function getEditDatabase() {
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
 
-            if ($("#IsCarisProjectCreated").val() === "True") {
+            if (pageIdentity === 'Verify') {
+                setControlState(false, true);
+            } else if ($("#IsCarisProjectCreated").val() === "True") {
                 setControlState(false, true);
             } else {
                 setControlState(true, false);
