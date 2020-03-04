@@ -140,7 +140,7 @@ namespace Portal.UnitTests
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages[0]);
         }
 
         [Test]

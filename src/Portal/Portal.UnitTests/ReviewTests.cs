@@ -365,7 +365,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set reviewer to unknown user {_reviewModel.Reviewer}",
+            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
                 _reviewModel.ValidationErrorMessages[0]);
         }
 
@@ -504,7 +504,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set reviewer to unknown user {_reviewModel.Reviewer}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}", _reviewModel.ValidationErrorMessages[0]);
         }
 
 
