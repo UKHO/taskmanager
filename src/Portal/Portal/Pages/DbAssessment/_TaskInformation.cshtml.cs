@@ -51,6 +51,9 @@ namespace Portal.Pages.DbAssessment
         public DateTime ExternalEndDate { get; set; }
 
         public bool IsOnHold { get; set; }
+        public bool OnHoldDaysGreen { get; set; }
+        public bool OnHoldDaysAmber { get; set; }
+        public bool OnHoldDaysRed { get; set; }
 
         [DisplayName("On Hold:")]
         public int OnHoldDays { get; set; }
@@ -179,6 +182,11 @@ namespace Portal.Pages.DbAssessment
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
             OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
+
+            var (greenIcon, amberIcon, redIcon) = _onHoldCalculator.DetermineOnHoldDaysIcons(OnHoldDays);
+            OnHoldDaysGreen = greenIcon;
+            OnHoldDaysAmber = amberIcon;
+            OnHoldDaysRed = redIcon;
 
             var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
 
