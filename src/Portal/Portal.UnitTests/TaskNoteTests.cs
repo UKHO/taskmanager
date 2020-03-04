@@ -55,6 +55,9 @@ namespace Portal.UnitTests
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
 
+            _generalConfig.Value.TeamsAsCsv = "TestTeam";
+            _generalConfig.Value.TeamsUnassigned = "Unassigned";
+
             ProcessId = 123;
 
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
