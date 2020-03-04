@@ -143,7 +143,7 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            var currentAssignedAssessor = await GetCurrentAssessor(processId);
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
 
             if (!await _pageValidationHelper.ValidateAssessPage(
@@ -154,7 +154,7 @@ namespace Portal.Pages.DbAssessment
                                                 TaskType,
                                                 Assessor,
                                                 Verifier,
-                                                currentAssignedAssessor,
+                                                currentAssessData.Assessor,
                                                 UserFullName,
                                                 RecordProductAction,
                                                 DataImpacts,
@@ -233,6 +233,14 @@ namespace Portal.Pages.DbAssessment
                         StatusCode = (int)HttpStatusCode.InternalServerError
                     };
                 }
+            }
+            else
+            {
+                await _commentsHelper.AddComment($"Assess: Changes saved",
+                    processId,
+                    currentAssessData.WorkflowInstanceId,
+                    UserFullName);
+
             }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
