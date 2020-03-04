@@ -28,6 +28,7 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
+        /// <param name="assessor"></param>
         /// <param name="verifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
@@ -39,6 +40,7 @@ namespace Portal.Helpers
             string activityCode,
             string sourceCategory,
             string taskType,
+            string assessor,
             string verifier,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,

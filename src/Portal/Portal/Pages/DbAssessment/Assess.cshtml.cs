@@ -15,6 +15,7 @@ using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -49,6 +50,9 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string TaskType { get; set; }
+
+        [BindProperty]
+        public string Assessor { get; set; }
 
         [BindProperty]
         public string Verifier { get; set; }
@@ -144,6 +148,7 @@ namespace Portal.Pages.DbAssessment
                                                 ActivityCode,
                                                 SourceCategory,
                                                 TaskType,
+                                                Assessor,
                                                 Verifier,
                                                 RecordProductAction,
                                                 DataImpacts,

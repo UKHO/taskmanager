@@ -147,6 +147,10 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
+            
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            
+            LogContext.PushProperty("UserFullName", UserFullName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
 
@@ -165,7 +169,6 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProcessId = processId;
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
