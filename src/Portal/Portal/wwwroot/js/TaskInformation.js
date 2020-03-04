@@ -35,6 +35,7 @@
         $("#onHoldToggle").on("change",
             function () {
                 if (this.checked) {
+                    // Putting task on hold
                     $("#onHoldToggle").prop("disabled", true);
 
                     $.ajax({
@@ -45,8 +46,11 @@
                         },
                         data: { "processId": processId },
                         success: function (result) {
+                            $(".onHoldIcon").show();
                             $("#onHoldToggle").prop("disabled", false);
                             $("#taskInformation").html(result);
+                            setTaskTypeState();
+                            applyOnHoldHandler();
                         },
                         error: function (error) {
                             $("#OnHoldErrorMessage").text("Error putting task on hold. Please try again later.");
@@ -56,6 +60,7 @@
                     });
 
                 } else {
+                    // Taking task off hold
                     $("#onHoldToggle").prop("disabled", true);
 
                     $.ajax({
@@ -66,8 +71,11 @@
                         },
                         data: { "processId": processId },
                         success: function (result) {
+                            $(".onHoldIcon").hide();
                             $("#onHoldToggle").prop("disabled", false);
                             $("#taskInformation").html(result);
+                            setTaskTypeState();
+                            applyOnHoldHandler();
                         },
                         error: function (error) {
                             $("#OnHoldErrorMessage").text("Error taking task off hold. Please try again later.");

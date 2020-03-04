@@ -43,9 +43,9 @@
                             
                             @if (Model.IsOnHold)
                             {
-                                <i class="fa fa-circle" style="@(Model.OnHoldDaysGreen ? "color: green" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red": "")"></i>
-                                <i class="fa fa-circle" style="@(Model.OnHoldDaysGreen ? "display:none" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red" : "")"></i>
-                                <i class="fa fa-circle" style="@(Model.OnHoldDaysRed ? "color: red": "display: none")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "color: green" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red": "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "display:none" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red" : "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysRed ? "color: red": "display: none")"></i>
                             }
                         </div>
                     </div>
