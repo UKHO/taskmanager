@@ -13,6 +13,9 @@ namespace Portal.Configuration
         public int DmEndDateDaysLTA { get; set; }
         public int DaysToDmEndDateRedAlertUpperInc { get; set; }
         public int DaysToDmEndDateAmberAlertUpperInc { get; set; }
+        public int OnHoldDaysAmberIconUpper { get; set; }
+        public int OnHoldDaysGreenIconUpper { get; set; }
+        public int OnHoldDaysRedIconUpper { get; set; }
         public string SessionFilename { get; set; }
         public string CarisNewProjectStatus { get; set; }
         public string CarisNewProjectPriority { get; set; }

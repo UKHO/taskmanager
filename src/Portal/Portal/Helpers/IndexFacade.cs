@@ -22,6 +22,11 @@ namespace Portal.Helpers
             return _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
         }
 
+        public (bool greenIcon, bool amberIcon, bool redIcon) DetermineOnHoldDaysIcons(int onHoldDays)
+        {
+            return _onHoldCalculator.DetermineOnHoldDaysIcons(onHoldDays);
+        }
+
         public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, string taskType, string taskStage, IEnumerable<OnHold> onHoldRows)
         {
             var result = _dmEndDateCalculator.CalculateDmEndDate(effectiveStartDate, taskType, taskStage);

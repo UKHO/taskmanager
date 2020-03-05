@@ -51,6 +51,9 @@ namespace Portal.Pages.DbAssessment
         public DateTime ExternalEndDate { get; set; }
 
         public bool IsOnHold { get; set; }
+        public bool OnHoldDaysGreen { get; set; }
+        public bool OnHoldDaysAmber { get; set; }
+        public bool OnHoldDaysRed { get; set; }
 
         [DisplayName("On Hold:")]
         public int OnHoldDays { get; set; }
@@ -63,7 +66,6 @@ namespace Portal.Pages.DbAssessment
 
         [DisplayName("Source Category:")]
         public string SourceCategory { get; set; }
-
         public SelectList SourceCategories { get; set; }
 
         [DisplayName("Task Type:")]
@@ -100,10 +102,6 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             await SetTaskInformationData();
-
-            var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
-
-            TaskTypes = new SelectList(taskTypes);
         }
 
         public async Task<IActionResult> OnPostOnHoldAsync(int processId)
@@ -176,9 +174,17 @@ namespace Portal.Pages.DbAssessment
         {
             SetSourceCategories();
 
+            var taskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
+            TaskTypes = new SelectList(taskTypes);
+
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == ProcessId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
             OnHoldDays = _onHoldCalculator.CalculateOnHoldDays(onHoldRows, DateTime.Now.Date);
+
+            var (greenIcon, amberIcon, redIcon) = _onHoldCalculator.DetermineOnHoldDaysIcons(OnHoldDays);
+            OnHoldDaysGreen = greenIcon;
+            OnHoldDaysAmber = amberIcon;
+            OnHoldDaysRed = redIcon;
 
             var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
 

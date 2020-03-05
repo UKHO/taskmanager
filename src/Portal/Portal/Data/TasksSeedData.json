@@ -303,6 +303,20 @@
       "productActionChangeDetails": null,
       "workspaceAffected": "1239_0"
     },
+    "OnHold": [
+      {
+        "processId": 632,
+        "OnHoldTime": "2020-02-26",
+        "OnHoldUser": "Ross"
+      },
+      {
+        "processId": 632,
+        "OnHoldTime": "2020-02-26",
+        "OnHoldUser": "Ross",
+        "OffHoldTime": "2020-02-26",
+        "OffHoldUser": "Samir"
+      }
+    ],
     "PrimaryDocumentStatus": {
       "processId": 632,
       "SdocId": 1101541,
@@ -399,6 +413,20 @@
       "workspaceAffected": "123",
       "CarisProjectName": "Sunrise"
     },
+    "OnHold": [
+      {
+        "processId": 125,
+        "OnHoldTime": "2020-02-28",
+        "OnHoldUser": "Ross"
+      },
+      {
+        "processId": 125,
+        "OnHoldTime": "2020-02-28",
+        "OnHoldUser": "Ross",
+        "OffHoldTime": "2020-02-28",
+        "OffHoldUser": "Samir"
+      }
+    ],
     "PrimaryDocumentStatus": {
       "processId": 125,
       "SdocId": 206733,

@@ -154,6 +154,68 @@ h2, .h2 {
     padding: 0 15px;
 }
 
+/* On Hold switch */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    min-width: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    border: #adb5bd solid 1px;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 16px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 1px;
+    bottom: 1px;
+    background-color: #adb5bd;
+    -webkit-transition: .1s;
+    transition: .1s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4aab37;
+    border: #4aab37 solid 1px;
+}
+
+input:focus + .slider {
+    box-shadow: none;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(12px);
+    -ms-transform: translateX(12px);
+    transform: translateX(12px);
+    background-color: #fff;
+    border: #fff solid 1px;
+}
+
+/* End switch */
+
 /* DataTables tweaked for UKHO design system */
 table.dataTable td {
     line-height: 1.8rem;

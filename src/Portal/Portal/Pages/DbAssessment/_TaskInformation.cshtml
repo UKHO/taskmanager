@@ -34,11 +34,18 @@
                     </div>
                     <div class="form-group row justify-content-between">
                         <div class="col-5 p-0">@Html.LabelFor(model => model.OnHoldDays)</div>
-                        <div class="col-7">
+                        <div class="col-7" style="padding-left: 0;">
+                            <label class="switch ml-2 mb-auto">
+                                <input type="checkbox" id="onHoldToggle" class="success" @(Model.IsOnHold ? "checked" : "") value="true">
+                                <span class="slider"></span>
+                            </label>
                             @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
+                            
                             @if (Model.IsOnHold)
                             {
-                                <i class="fa fa-pause-circle"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "color: green" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red": "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "display:none" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red" : "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysRed ? "color: red": "display: none")"></i>
                             }
                         </div>
                     </div>

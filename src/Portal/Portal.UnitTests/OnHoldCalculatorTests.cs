@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using FakeItEasy;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
+using Portal.Configuration;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
@@ -10,11 +13,16 @@ namespace Portal.UnitTests
     {
         private IList<OnHold> _onHoldRows;
         private OnHoldCalculator _onHoldCalculator;
+        private IOptionsSnapshot<GeneralConfig> _generalConfig;
 
         [SetUp]
         public void SetUp()
         {
-            _onHoldCalculator = new OnHoldCalculator();
+            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            _generalConfig.Value.OnHoldDaysGreenIconUpper = 5;
+            _generalConfig.Value.OnHoldDaysAmberIconUpper = 6;
+            _generalConfig.Value.OnHoldDaysRedIconUpper = 7;
+            _onHoldCalculator = new OnHoldCalculator(_generalConfig);
         }
 
         [Test]
@@ -151,6 +159,33 @@ namespace Portal.UnitTests
 
             var amount = _onHoldCalculator.CalculateOnHoldDays(_onHoldRows, DateTime.Now.Date);
             Assert.AreEqual(0, amount);
+        }
+
+        [Test]
+        public void Test_OnHoldCalculator_Returns_GreenIcon_If_Task_Is_Under_Threshold()
+        {
+            var (greenIcon, amberIcon, redIcon) = _onHoldCalculator.DetermineOnHoldDaysIcons(_generalConfig.Value.OnHoldDaysGreenIconUpper);
+            Assert.AreEqual(true, greenIcon);
+            Assert.AreEqual(false, amberIcon);
+            Assert.AreEqual(false, redIcon);
+        }
+
+        [Test]
+        public void Test_OnHoldCalculator_Returns_AmberIcon_If_Task_Is_At_Threshold()
+        {
+            var (greenIcon, amberIcon, redIcon) = _onHoldCalculator.DetermineOnHoldDaysIcons(_generalConfig.Value.OnHoldDaysAmberIconUpper);
+            Assert.AreEqual(false, greenIcon);
+            Assert.AreEqual(true, amberIcon);
+            Assert.AreEqual(false, redIcon);
+        }
+
+        [Test]
+        public void Test_OnHoldCalculator_Returns_RedIcon_If_Task_Is_Above_Threshold()
+        {
+            var (greenIcon, amberIcon, redIcon) = _onHoldCalculator.DetermineOnHoldDaysIcons(_generalConfig.Value.OnHoldDaysRedIconUpper);
+            Assert.AreEqual(false, greenIcon);
+            Assert.AreEqual(false, amberIcon);
+            Assert.AreEqual(true, redIcon);
         }
     }
 }

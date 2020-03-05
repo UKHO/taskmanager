@@ -41,13 +41,6 @@
 
 <div class="col-12">
     <div class="row justify-content-end btn-size">
-        <div id="putOnHold" class="col-2" @(Model.IsOnHold ? "hidden" : "")>
-            <button id="btnPutOnHold" type="button" class="btn btn-primary btn-block">Put On Hold</button>
-        </div>
-        <div id="takeOffHold" class="col-2" @(Model.IsOnHold ? "" : "hidden")>
-            <button id="btnTakeOffHold" type="button" class="btn btn-primary btn-block">Take Off Hold</button>
-        </div>
-
         <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
         <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
         <div class="col-2">

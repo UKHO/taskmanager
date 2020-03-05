@@ -24,7 +24,7 @@ namespace Portal.UnitTests
             _generalConfig.Value.DmEndDateDaysSimple = 14;
 
             _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
-            _onHoldCalculator = new OnHoldCalculator();
+            _onHoldCalculator = new OnHoldCalculator(_generalConfig);
 
             _indexFacade = new IndexFacade(_dmEndDateCalculator, _onHoldCalculator);
         }
