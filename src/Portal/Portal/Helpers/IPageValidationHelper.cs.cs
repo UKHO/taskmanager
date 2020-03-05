@@ -19,7 +19,8 @@ namespace Portal.Helpers
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
-            string reviewer, string team);
+            string reviewer, string team,
+            string currentAssignedReviewer, string currentUsername, string action);
 
         /// <summary>
         /// Used in Assess page

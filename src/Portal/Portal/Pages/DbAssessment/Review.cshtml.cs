@@ -147,20 +147,23 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            
+
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-            
+
             LogContext.PushProperty("UserFullName", UserFullName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             ValidationErrorMessages.Clear();
 
+            var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+
             if (!await _pageValidationHelper.ValidateReviewPage(
                 PrimaryAssignedTask,
                 AdditionalAssignedTasks,
                 ValidationErrorMessages,
-                Reviewer, Team))
+                Reviewer, Team,
+                currentReviewData.Reviewer, UserFullName, action))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -216,6 +219,13 @@ namespace Portal.Pages.DbAssessment
                         StatusCode = (int)HttpStatusCode.InternalServerError
                     };
                 }
+            }
+            else
+            {
+                await _commentsHelper.AddComment($"Review: Changes saved",
+                    processId,
+                    currentReviewData.WorkflowInstanceId,
+                    UserFullName);
             }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");

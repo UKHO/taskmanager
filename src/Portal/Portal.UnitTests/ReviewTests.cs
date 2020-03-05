@@ -29,6 +29,7 @@ namespace Portal.UnitTests
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
+        private IPageValidationHelper _fakepageValidationHelper;
 
 
         [SetUp]
@@ -81,6 +82,8 @@ namespace Portal.UnitTests
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
+
+            _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper);
@@ -277,14 +280,26 @@ namespace Portal.UnitTests
 
             var primaryAssignTaskNote = "Testing primary";
 
-            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient,
+                _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger,
+                _fakepageValidationHelper)
             {
-                TaskType = "Simple",
-                WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
-                Notes = primaryAssignTaskNote,
+                PrimaryAssignedTask = new DbAssessmentReviewData
+                {
+                    TaskType = "Simple",
+                    WorkspaceAffected = "Test Workspace",
+                    Assessor = "Test User",
+                    Notes = primaryAssignTaskNote,
+                    Reviewer = "TestUser"
+                },
+                AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
-            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+
+            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(true);
 
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
