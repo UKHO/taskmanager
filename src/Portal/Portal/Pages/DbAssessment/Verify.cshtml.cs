@@ -112,8 +112,8 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            var currentAssessData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
-            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
 
             await GetOnHoldData(processId);
@@ -121,6 +121,11 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
+            return new JsonResult(new List<string>(){"a","b","c"})
+            {
+                StatusCode = (int)HttpStatusCode.NotAcceptable
+            };
+
             LogContext.PushProperty("ActivityName", "Verify");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
@@ -180,6 +185,27 @@ namespace Portal.Pages.DbAssessment
                 var workflowInstance = await _dbContext.WorkflowInstance
                     .Include(w => w.PrimaryDocumentStatus)
                     .FirstAsync(w => w.ProcessId == processId);
+
+
+                if (workflowInstance.ParentProcessId == null)
+                {
+                    var childProcessIds = await _dbContext.WorkflowInstance
+                        .Where(wi => wi.ParentProcessId == workflowInstance.ProcessId)
+                        .Where(wi => wi.Status == WorkflowStatus.Started.ToString() || wi.Status == WorkflowStatus.Updating.ToString())
+                        .Select(wi => wi.ProcessId)
+                        .ToListAsync();
+
+                    if (childProcessIds.Any())
+                    {
+                        foreach (var item in childProcessIds)
+                        {
+                            ValidationErrorMessages.Add(item.ToString());
+                        }
+
+                        
+                    }
+
+                }
 
                 workflowInstance.Status = WorkflowStatus.Updating.ToString();
 

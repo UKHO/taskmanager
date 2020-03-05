@@ -70,17 +70,34 @@
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
+                var statusCode = error.status;
 
                 if (responseJson != null) {
-                    $("#verifyDoneErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#verifyDoneErrorMessage ul");
+                    if (statusCode === 406) {
+                        $("#childTaskWarningMessages").append("<ul/>");
+                        var unOrderedList = $("#childTaskWarningMessages ul");
 
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
 
+                        $("#modalOpenChildTaskWarning").modal("show");
+                    } else {
+                        $("#verifyDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#verifyDoneErrorMessage ul");
+
+                        responseJson.forEach(function(item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalWaitVerifyDoneErrors").modal("show");
+                    }
+                } else {
+                    $("#verifyDoneErrorMessage").html("<div class=\"alert alert-danger\" role=\"alert\">System error. Please try again later.</div>");
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
+                
+                
             }
         });
     }

@@ -487,7 +487,29 @@ body, .sticky-footer-wrapper {
         color: #e20d0d;
     }
 
-    .fa, .modal-dialog h3::before, .modal-dialog.error h3::before, .modal-dialog.success h3::before, .modal-dialog.warning h3::before,
+/* Start UKHO design system warning dialog stuff*/
+.modal-dialog.warning {
+    border-left: 5px solid #ef8123;
+}
+
+
+
+    .modal-dialog.warning h3 {
+        color: #ef8123;
+    }
+
+    .modal-dialog.warning i.fa.fa-info-circle {
+        color: #ef8123;
+    }
+
+    .fa, .modal-dialog h3::before,
+    .modal-dialog.error h3::before,
+    .modal-dialog.success h3::before,
+    .modal-dialog.warning h3::before,
+    .modal-dialog h6::before,
+    .modal-dialog.error h6::before,
+    .modal-dialog.success h6::before,
+    .modal-dialog.warning h6::before,
     .fas,
     .far,
     .fal,
@@ -561,7 +583,7 @@ body, .sticky-footer-wrapper {
     display: inline;
 }
 
-.modal-dialog.error li:not(:last-child) {
+.modal-dialog.error li:not(:last-child), .modal-dialog.warning li:not(:last-child) {
     margin-bottom: 8px;
 }
 
