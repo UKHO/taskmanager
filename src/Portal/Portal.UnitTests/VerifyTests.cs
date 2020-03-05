@@ -100,10 +100,10 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(3, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages[0]);
-            Assert.AreEqual($"Task Information: Activity code cannot be empty", _verifyModel.ValidationErrorMessages[1]);
-            Assert.AreEqual($"Task Information: Source category cannot be empty", _verifyModel.ValidationErrorMessages[2]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 3);
+            Assert.Contains($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Activity code cannot be empty", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Task Information: Source category cannot be empty", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -120,8 +120,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -139,8 +139,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -169,8 +169,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -198,8 +198,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages);
         }
 
 
@@ -229,8 +229,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -261,8 +261,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -296,8 +296,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages);
         }
 
 
@@ -316,8 +316,8 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _verifyModel.ValidationErrorMessages.Count);
-            Assert.AreEqual("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages);
         }
     }
 }
