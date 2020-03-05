@@ -15,6 +15,7 @@ using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
+using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -49,6 +50,9 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string TaskType { get; set; }
+
+        [BindProperty]
+        public string Assessor { get; set; }
 
         [BindProperty]
         public string Verifier { get; set; }
@@ -139,12 +143,19 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+
             if (!await _pageValidationHelper.ValidateAssessPage(
+                                                action,
                                                 Ion,
                                                 ActivityCode,
                                                 SourceCategory,
                                                 TaskType,
+                                                Assessor,
                                                 Verifier,
+                                                currentAssessData.Assessor,
+                                                UserFullName,
                                                 RecordProductAction,
                                                 DataImpacts,
                                                 ValidationErrorMessages, Team))
@@ -223,11 +234,25 @@ namespace Portal.Pages.DbAssessment
                     };
                 }
             }
+            else
+            {
+                await _commentsHelper.AddComment($"Assess: Changes saved",
+                    processId,
+                    currentAssessData.WorkflowInstanceId,
+                    UserFullName);
+
+            }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
 
 
             return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task<string> GetCurrentAssessor(int processId)
+        {
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+            return currentAssessData.Assessor;
         }
 
         private async Task PersistCompletedAssess(int processId, WorkflowInstance workflowInstance)
@@ -254,6 +279,7 @@ namespace Portal.Pages.DbAssessment
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
+            currentAssess.Assessor = Assessor;
             currentAssess.Verifier = Verifier;
             currentAssess.Ion = Ion;
             currentAssess.ActivityCode = ActivityCode;

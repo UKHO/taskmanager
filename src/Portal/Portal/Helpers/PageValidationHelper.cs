@@ -45,14 +45,8 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (string.IsNullOrWhiteSpace(reviewer))
+            if (!await ValidateOperators(reviewer, "Reviewer", validationErrorMessages))
             {
-                validationErrorMessages.Add("Operators: Reviewer cannot be empty");
-                isValid = false;
-            }
-            else if (!await _userIdentityService.ValidateUser(reviewer))
-            {
-                validationErrorMessages.Add($"Operators: Unable to set reviewer to unknown user {reviewer}");
                 isValid = false;
             }
 
@@ -78,34 +72,56 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
+        /// <param name="assessor"></param>
         /// <param name="verifier"></param>
+        /// <param name="currentAssignedAssessor"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
         /// <returns></returns>
         public async Task<bool> ValidateAssessPage(
+            string action,
             string ion,
             string activityCode,
             string sourceCategory,
             string taskType,
+            string assessor,
             string verifier,
+            string currentAssignedAssessor,
+            string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             List<string> validationErrorMessages, string team)
         {
             var isValid = true;
+            
+            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (!currentUsername.Equals(currentAssignedAssessor, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validationErrorMessages.Add($"Operators: {currentAssignedAssessor} is assigned to this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+            }
 
             if (!ValidateAssessTaskInformation(ion, activityCode, sourceCategory, taskType, validationErrorMessages))
             {
                 isValid = false;
             }
 
-            if (!await ValidateOperators(verifier, validationErrorMessages))
+            if (!await ValidateOperators(assessor,"Assessor", validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!await ValidateOperators(verifier,"Verifier", validationErrorMessages))
             {
                 isValid = false;
             }
@@ -159,7 +175,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateOperators(verifier, validationErrorMessages))
+            if (!await ValidateOperators(verifier,"Verifier", validationErrorMessages))
             {
                 isValid = false;
             }
@@ -360,20 +376,21 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess and Verify pages
         /// </summary>
-        /// <param name="verifier"></param>
+        /// <param name="operatorUsername"></param>
+        /// <param name="userTypeInMessage"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateOperators(string verifier, List<string> validationErrorMessages)
+        private async Task<bool> ValidateOperators(string operatorUsername, string userTypeInMessage, List<string> validationErrorMessages)
         {
-            if (string.IsNullOrWhiteSpace(verifier))
+            if (string.IsNullOrWhiteSpace(operatorUsername))
             {
-                validationErrorMessages.Add("Operators: Verifier cannot be empty");
+                validationErrorMessages.Add($"Operators: {userTypeInMessage} cannot be empty");
                 return false;
             }
 
-            if (!await _userIdentityService.ValidateUser(verifier))
+            if (!await _userIdentityService.ValidateUser(operatorUsername))
             {
-                validationErrorMessages.Add($"Operators: Unable to set verifier to unknown user {verifier}");
+                validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {operatorUsername}");
                 return false;
             }
             return true;

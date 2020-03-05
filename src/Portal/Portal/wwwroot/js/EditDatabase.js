@@ -21,8 +21,8 @@ function getEditDatabase() {
     var processId = Number($("#hdnProcessId").val());
     var pageIdentity = $("#pageIdentity").val();
 
-    $('.typeahead').typeahead('val', "");
-    $('.typeahead').typeahead('close');
+    $('#SelectedCarisWorkspace').typeahead('val', "");
+    $('#SelectedCarisWorkspace').typeahead('close');
 
     $.ajax({
         type: "GET",
@@ -41,7 +41,9 @@ function getEditDatabase() {
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
 
-            if ($("#IsCarisProjectCreated").val() === "True") {
+            if (pageIdentity === 'Verify') {
+                setControlState(false, true);
+            } else if ($("#IsCarisProjectCreated").val() === "True") {
                 setControlState(false, true);
             } else {
                 setControlState(true, false);
@@ -182,7 +184,7 @@ function initialiseWorkspaceTypeahead() {
     });
 
     // Initializing the typeahead
-    $('.typeahead').typeahead({
+    $('#SelectedCarisWorkspace').typeahead({
         hint: true,
         highlight: true, /* Enable substring highlighting */
 

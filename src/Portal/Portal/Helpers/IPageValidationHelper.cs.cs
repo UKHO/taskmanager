@@ -24,22 +24,30 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
+        /// <param name="assessor"></param>
         /// <param name="verifier"></param>
+        /// <param name="currentAssignedAssessor"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
         /// <returns></returns>
         Task<bool> ValidateAssessPage(
+            string action,
             string ion,
             string activityCode,
             string sourceCategory,
             string taskType,
+            string assessor,
             string verifier,
+            string currentAssignedAssessor,
+            string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             List<string> validationErrorMessages,

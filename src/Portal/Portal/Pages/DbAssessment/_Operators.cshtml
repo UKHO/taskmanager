@@ -32,7 +32,17 @@
                     <div class="row justify-content-start">
                         <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
                         <div class="col-8">
-                            <input id="Assessor" type="text" asp-for="Assessor" class="form-text-input" autocomplete="off" spellcheck="false" disabled>
+                            <div class="text-input-wrap">
+
+                                @if (Model.ParentPage == WorkflowStage.Assess)
+                                {
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "typeahead tt-query form-text-input" })
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
