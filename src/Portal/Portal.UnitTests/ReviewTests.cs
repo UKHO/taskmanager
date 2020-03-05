@@ -60,7 +60,8 @@ namespace Portal.UnitTests
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
-                ProcessId = ProcessId
+                ProcessId = ProcessId,
+                Reviewer = "TestUser"
             });
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
@@ -318,7 +319,6 @@ namespace Portal.UnitTests
             Assert.IsTrue(isExist);
         }
 
-
         [Test]
         public async Task Test_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
         {
@@ -519,7 +519,8 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}", _reviewModel.ValidationErrorMessages[0]);
+            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
+                _reviewModel.ValidationErrorMessages[0]);
         }
 
 
@@ -589,6 +590,82 @@ namespace Portal.UnitTests
 
             Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
             Assert.AreEqual("Task Information: Team cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_No_Reviewer_Fails_Validation_On_Done()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Team = "Home Waters";
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_Reviewer_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+                Reviewer = "TestUser"
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Team = "Home Waters";
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
         }
     }
 }
