@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace NCNEPortal.Helpers
 {
-    class PageValidationHelper : IPageValidationHelper
+    public class PageValidationHelper : IPageValidationHelper
     {
         private readonly NcneWorkflowDbContext _dbContext;
         private readonly IUserIdentityService _userIdentityService;
@@ -41,7 +41,7 @@ namespace NCNEPortal.Helpers
 
         }
 
-        private bool ValidateDates(DateTime? publicationDate, DateTime? repromatDate, in int dating, string chartType, List<string> validationErrorMessages)
+        private bool ValidateDates(DateTime? publicationDate, DateTime? repromatDate, int dating, string chartType, List<string> validationErrorMessages)
         {
             bool isValid = true;
 
