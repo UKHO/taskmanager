@@ -53,6 +53,9 @@
     @Html.HiddenFor(m => m.IsCarisProjectCreated)
     <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
     <input type="hidden" asp-for="ProcessId" />
+    <input type="hidden" asp-for="ChartType" />
+  
+
 
     @*--- START WORKFLOW CARD ---*@
     <div class="card mb-4 mt-3">

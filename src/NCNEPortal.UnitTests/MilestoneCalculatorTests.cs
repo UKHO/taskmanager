@@ -52,15 +52,25 @@ namespace NCNEPortal.UnitTests
             Assert.AreEqual(result.commitDate.AddDays(21), publicationDate);
         }
 
-        //[Test]
-        //public void Test_MilestoneCalculator_for_PublishDate_from_Repromat()
-        //{
-        //    var repromatDate = DateTime.Today;
+        [Test]
+        public void Test_MilestoneCalculator_for_PublishDate_from_Repromat()
+        {
+            var repromatDate = DateTime.Today;
 
-        //    var result = _milestoneCalculator.CalculatePublishDate(repromatDate);
 
-        //    Assert.AreEqual(repromatDate.AddDays(77), result);
+            var result = _milestoneCalculator.CalculatePublishDate(repromatDate);
 
-        //}
+            var dtPublish = repromatDate.AddDays(77);
+
+            var firstDay = dtPublish.DayOfWeek - DayOfWeek.Thursday;
+
+            if (firstDay < 0) firstDay += 7;
+
+            dtPublish = dtPublish.AddDays(-firstDay);
+
+
+            Assert.AreEqual(dtPublish, result);
+
+        }
     }
 }

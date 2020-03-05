@@ -644,8 +644,8 @@ tbody.workflow-row td {
     }
 
 input:checked + .slider {
-    background-color: #0177C1;
-    border: #0177C1 solid 1px;
+    background-color: #4aab37;
+    border: #4aab37 solid 1px;
 }
 
 input:focus + .slider {

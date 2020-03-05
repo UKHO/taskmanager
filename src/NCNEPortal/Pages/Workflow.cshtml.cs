@@ -412,7 +412,7 @@ namespace NCNEPortal
         }
 
 
-        public async Task<IActionResult> OnPostSaveAsync(int processId)
+        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {
 
             ValidationErrorMessages.Clear();
@@ -426,7 +426,7 @@ namespace NCNEPortal
                 VerifierTwo = Verifier2,
                 Publisher = Publisher
             };
-            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, ChartType,
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
                 ValidationErrorMessages)))
             {
 
@@ -436,13 +436,13 @@ namespace NCNEPortal
                 };
             }
 
-            await UpdateTaskInformation(processId);
+            await UpdateTaskInformation(processId, chartType);
 
 
             return StatusCode(200);
         }
 
-        private async Task UpdateTaskInformation(int processId)
+        private async Task UpdateTaskInformation(int processId, string chartType)
         {
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole).FirstAsync(t => t.ProcessId == processId);
@@ -450,7 +450,17 @@ namespace NCNEPortal
             task.ChartNumber = ChartNo;
             task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
             task.RepromatDate = RepromatDate;
-            task.PublicationDate = PublicationDate;
+            if (chartType == "Adoption" && RepromatDate != null)
+            {
+                task.PublicationDate = PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
+
+            }
+            else
+            {
+                task.PublicationDate = PublicationDate;
+            }
+
+
             task.AnnounceDate = AnnounceDate;
             task.CommitDate = CommitToPrintDate;
             task.CisDate = CISDate;

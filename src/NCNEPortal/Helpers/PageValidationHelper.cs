@@ -47,7 +47,7 @@ namespace NCNEPortal.Helpers
 
             if (!Enum.IsDefined(typeof(DeadlineEnum), dating))
             {
-                validationErrorMessages.Add("Duration cannot be Empty");
+                validationErrorMessages.Add("Task Information: Duration cannot be empty");
                 isValid = false;
 
             }
@@ -56,7 +56,7 @@ namespace NCNEPortal.Helpers
             {
                 if (repromatDate == null)
                 {
-                    validationErrorMessages.Add("Repromat Date cannot Empty");
+                    validationErrorMessages.Add("Task Information: Repromat Date cannot be empty");
                     isValid = false;
                 }
             }
@@ -64,7 +64,7 @@ namespace NCNEPortal.Helpers
             {
                 if (publicationDate == null)
                 {
-                    validationErrorMessages.Add("Publication Date cannot Empty");
+                    validationErrorMessages.Add("Task Information: Publication Date cannot be empty");
                     isValid = false;
 
                 }
@@ -83,7 +83,7 @@ namespace NCNEPortal.Helpers
 
             if (string.IsNullOrEmpty(taskRole.Compiler))
             {
-                validationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
+                validationErrorMessages.Add("Task Information: Compiler can not be empty");
                 isValid = false;
             }
 
@@ -92,7 +92,7 @@ namespace NCNEPortal.Helpers
             {
                 if (!userList.Any(a => a == taskRole.Compiler))
                 {
-                    validationErrorMessages.Add($"Unable to assign Compiler role to unknown user {taskRole.Compiler}");
+                    validationErrorMessages.Add($"Task Information: Unable to assign Compiler role to unknown user {taskRole.Compiler}");
                     isValid = false;
                 }
             }
@@ -102,7 +102,7 @@ namespace NCNEPortal.Helpers
             {
                 if (!userList.Any(a => a == taskRole.VerifierOne))
                 {
-                    validationErrorMessages.Add($"Unable to assign Verifier1 role to unknown user {taskRole.VerifierOne}");
+                    validationErrorMessages.Add($"Task Information: Unable to assign Verifier1 role to unknown user {taskRole.VerifierOne}");
                     isValid = false;
                 }
             }
@@ -111,7 +111,7 @@ namespace NCNEPortal.Helpers
             {
                 if (!userList.Any(a => a == taskRole.VerifierTwo))
                 {
-                    validationErrorMessages.Add($"Unable to assign Verifier2 role to unknown user {taskRole.VerifierTwo}");
+                    validationErrorMessages.Add($"Task Information: Unable to assign Verifier2 role to unknown user {taskRole.VerifierTwo}");
                     isValid = false;
                 }
             }
@@ -120,7 +120,7 @@ namespace NCNEPortal.Helpers
             {
                 if (!userList.Any(a => a == taskRole.Publisher))
                 {
-                    validationErrorMessages.Add($"Unable to assign Publisher role to unknown user {taskRole.Publisher}");
+                    validationErrorMessages.Add($"Task Information: Unable to assign Publisher role to unknown user {taskRole.Publisher}");
                     isValid = false;
                 }
             }
