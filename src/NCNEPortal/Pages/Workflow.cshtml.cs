@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NCNEPortal.Auth;
+using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
@@ -17,6 +18,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TaskComment = NCNEPortal.Models.TaskComment;
 
@@ -31,6 +33,9 @@ namespace NCNEPortal
         private readonly ICommentsHelper _commentsHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IMilestoneCalculator _milestoneCalculator;
+        private readonly IDirectoryService _directoryService;
+        private readonly IPageValidationHelper _pageValidationHelper;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] public string Ion { get; set; }
@@ -41,50 +46,61 @@ namespace NCNEPortal
 
         [DisplayName("Country")] public string Country { get; set; }
 
-        [DisplayName("Chart type")] public string ChartType { get; set; }
+        [DisplayName("Chart type")]
+        public string ChartType { get; set; }
 
-        public SelectList ChartTypes { get; set; }
+        [DisplayName("Workflow type")]
+        public string WorkflowType { get; set; }
 
-        [DisplayName("Workflow type")] public string WorkflowType { get; set; }
+        [BindProperty]
+        [DisplayName("Duration")] public int Dating { get; set; }
 
-        public SelectList WorkflowTypes { get; set; }
 
-        [DisplayName("Duration")] public string Dating { get; set; }
-
-        public SelectList DatingList { get; set; }
+        [DisplayName("Repromat date")]
+        [DisplayFormat(DataFormatString = "{0:d}")]
+        [BindProperty]
+        public DateTime? RepromatDate { get; set; }
 
         [DisplayName("Publication date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime PublicationDate { get; set; }
+        [BindProperty]
+        public DateTime? PublicationDate { get; set; }
 
         [DisplayName("H Forms")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime AnnounceDate { get; set; }
+        [BindProperty]
+        public DateTime? AnnounceDate { get; set; }
 
         [DisplayName("Commit to print:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CommitToPrintDate { get; set; }
+        [BindProperty]
+        public DateTime? CommitToPrintDate { get; set; }
+
 
         [DisplayName("CIS")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CISDate { get; set; }
+        [BindProperty]
+        public DateTime? CISDate { get; set; }
 
         [DisplayName("Compiler")]
+        [BindProperty]
         public string Compiler { get; set; }
 
         public SelectList CompilerList { get; set; }
 
         [DisplayName("Verifier V1")]
+        [BindProperty]
         public string Verifier1 { get; set; }
 
-        public SelectList VerifierList1 { get; set; }
 
         [DisplayName("Verifier V2")]
+        [BindProperty]
         public string Verifier2 { get; set; }
 
-        public SelectList VerifierList2 { get; set; }
+
 
         [DisplayName("Publication")]
+        [BindProperty]
         public string Publisher { get; set; }
 
         public SelectList PublisherList { get; set; }
@@ -103,9 +119,6 @@ namespace NCNEPortal
 
         public List<TaskComment> TaskComments { get; set; }
 
-        [DisplayName("CARIS Workspace")]
-        public string CarisWorkspace { get; set; }
-        public SelectList CarisWorkspaces { get; set; }
 
         [DisplayName("CARIS Project Name")]
         public string CarisProjectName { get; set; }
@@ -113,6 +126,8 @@ namespace NCNEPortal
         public CarisProjectDetails CarisProjectDetails { get; set; }
         public bool IsCarisProjectCreated { get; set; }
 
+        public List<string> ValidationErrorMessages { get; set; }
+        public List<string> userList = new List<string>();
 
         private string _userFullName;
         public string UserFullName
@@ -126,7 +141,10 @@ namespace NCNEPortal
             IUserIdentityService userIdentityService,
             ICommentsHelper commentsHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IMilestoneCalculator milestoneCalculator,
+            IDirectoryService directoryService,
+            IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -134,6 +152,12 @@ namespace NCNEPortal
             _commentsHelper = commentsHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
+            _milestoneCalculator = milestoneCalculator;
+            _directoryService = directoryService;
+            _pageValidationHelper = pageValidationHelper;
+
+            ValidationErrorMessages = new List<string>();
+            userList = _directoryService.GetGroupMembers().Result.ToList();
         }
 
         public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
@@ -192,27 +216,6 @@ namespace NCNEPortal
         public void OnGetAsync(int processId)
         {
             ProcessId = processId;
-            Ion = "DC782783923;";
-            ChartTitle = "Hamoaze";
-            ChartNo = "1902";
-            WorkflowType = "Standard";
-            ChartType = "CME";
-            Country = "United Kingdom";
-            Dating = "2 Weeks";
-            PublicationDate = DateTime.Now.AddDays(30);
-            AnnounceDate = DateTime.Now.AddDays(10);
-            CommitToPrintDate = DateTime.Now.AddDays(15);
-            CISDate = DateTime.Now.AddDays(20);
-
-            Compiler = "BatesP";
-            Verifier1 = "StoodleyM";
-            Verifier2 = "WillisA";
-            Publisher = "AlexanderD";
-
-            SendDate3ps = DateTime.Now.AddDays(-10);
-            ExpectedReturnDate3ps = DateTime.Now.AddDays(-2);
-            ActualReturnDate3ps = DateTime.Now.AddDays(-1);
-
 
             var taskInfo = _dbContext.TaskInfo
                 .Include(task => task.TaskRole)
@@ -220,7 +223,38 @@ namespace NCNEPortal
                 .Include(task => task.TaskComment)
                 .FirstOrDefault(t => t.ProcessId == processId);
 
+
+            Ion = taskInfo.Ion;
+            ChartTitle = taskInfo.ChartTitle;
+            ChartNo = taskInfo.ChartNumber;
+            WorkflowType = taskInfo.WorkflowType;
+            ChartType = taskInfo.ChartType;
+            Country = taskInfo.Country;
+
+            if (taskInfo.Duration == null)
+                Dating = 0;
+            else
+                Dating = (int)Enum.Parse(typeof(DeadlineEnum), taskInfo.Duration);
+
+            RepromatDate = taskInfo.RepromatDate;
+            PublicationDate = taskInfo.PublicationDate;
+            AnnounceDate = taskInfo.AnnounceDate;
+            CommitToPrintDate = taskInfo.CommitDate;
+            CISDate = taskInfo.CisDate;
+
+            if (taskInfo.SentDate3Ps != null) SendDate3ps = (DateTime)taskInfo.SentDate3Ps;
+            if (taskInfo.ExpectedDate3Ps != null) ExpectedReturnDate3ps = (DateTime)taskInfo.ExpectedDate3Ps;
+            if (taskInfo.ActualDate3Ps != null) ActualReturnDate3ps = (DateTime)taskInfo.ActualDate3Ps;
+
+            Compiler = taskInfo.TaskRole.Compiler;
+            Verifier1 = taskInfo.TaskRole.VerifierOne;
+            Verifier2 = taskInfo.TaskRole.VerifierTwo;
+            Publisher = taskInfo.TaskRole.Publisher;
+
+
             var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+
 
             if (carisProject != null)
             {
@@ -228,14 +262,6 @@ namespace NCNEPortal
                 IsCarisProjectCreated = true;
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
-
-
-            CarisWorkspaces = new SelectList(new List<string>
-            {
-                "Henballand",
-                "Sossalrandfordshire",
-                "Wregilliamsville"
-            });
 
             TaskComments = new List<TaskComment>
             {
@@ -355,7 +381,187 @@ namespace NCNEPortal
             }
 
         }
+
+
+        public async Task<JsonResult> OnPostCalcMilestonesAsync(int deadLine, DateTime dtInput, Boolean isPublish)
+        {
+            string[] result;
+            if (isPublish)
+            {
+                var dates = _milestoneCalculator.CalculateMilestones((DeadlineEnum)deadLine, (DateTime)dtInput);
+                result = new[]
+                {
+                    dates.formsDate.ToShortDateString(),
+                    dates.commitDate.ToShortDateString(),
+                    dates.cisDate.ToShortDateString()
+                };
+            }
+            else
+            {
+
+                PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtInput);
+
+                result = new[]
+                {
+                    PublicationDate?.ToShortDateString()
+                };
+            }
+
+            return new JsonResult(result);
+
+        }
+
+
+        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
+        {
+
+            ValidationErrorMessages.Clear();
+
+            //ValidateUsers(Compiler, Verifier1, Verifier2, Publisher);
+            var role = new TaskRole()
+            {
+                Compiler = Compiler,
+                ProcessId = processId,
+                VerifierOne = Verifier1,
+                VerifierTwo = Verifier2,
+                Publisher = Publisher
+            };
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
+                ValidationErrorMessages)))
+            {
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+            await UpdateTaskInformation(processId, chartType);
+
+
+            return StatusCode(200);
+        }
+
+        private async Task UpdateTaskInformation(int processId, string chartType)
+        {
+            var task =
+                await _dbContext.TaskInfo.Include(t => t.TaskRole).FirstAsync(t => t.ProcessId == processId);
+            task.Ion = Ion;
+            task.ChartNumber = ChartNo;
+            task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
+            task.RepromatDate = RepromatDate;
+            if (chartType == "Adoption" && RepromatDate != null)
+            {
+                task.PublicationDate = PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
+
+            }
+            else
+            {
+                task.PublicationDate = PublicationDate;
+            }
+
+
+            task.AnnounceDate = AnnounceDate;
+            task.CommitDate = CommitToPrintDate;
+            task.CisDate = CISDate;
+            task.Country = Country;
+            task.TaskRole.Compiler = Compiler;
+            task.TaskRole.VerifierOne = Verifier1;
+            task.TaskRole.VerifierTwo = Verifier2;
+            task.TaskRole.Publisher = Publisher;
+
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+        public void ValidateUsers(string compiler, string verifierOne, string verifierTwo, string publisher)
+        {
+
+            LogContext.PushProperty("NCNEPortalResource", nameof(ValidateUsers));
+
+            ValidationErrorMessages.Clear();
+
+            if (string.IsNullOrEmpty(compiler))
+                ValidationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
+            else
+
+            {
+                if (!userList.Any(a => a == compiler))
+                {
+                    _logger.LogInformation($"Attempted to assign Compiler role to unknown user {compiler}");
+                    ValidationErrorMessages.Add($"Unable to assign Compiler role to unknown user {compiler}");
+                }
+            }
+
+
+            if (!string.IsNullOrEmpty(verifierOne))
+            {
+                if (!userList.Any(a => a == verifierOne))
+                {
+                    _logger.LogInformation($"Attempted to assign Verifier1 role to unknown user {verifierOne}");
+                    ValidationErrorMessages.Add($"Unable to assign Verifier1 role to unknown user {verifierOne}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(verifierTwo))
+            {
+                if (!userList.Any(a => a == verifierTwo))
+                {
+                    _logger.LogInformation($"Attempted to assign Verifier2 role to unknown user {verifierTwo}");
+                    ValidationErrorMessages.Add($"Unable to assign Verifier2 role to unknown user {verifierTwo}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(publisher))
+            {
+                if (!userList.Any(a => a == publisher))
+                {
+                    _logger.LogInformation($"Attempted to assign Publisher role to unknown user {publisher}");
+                    ValidationErrorMessages.Add($"Unable to assign Publisher role to unknown user {publisher}");
+                }
+            }
+
+
+        }
+
+        public void ValidateDates(DateTime repromatDate, DateTime publicationDate, DateTime formsDate,
+            DateTime commitDate, DateTime CisDate)
+        {
+
+        }
+
+
+        public async Task<JsonResult> OnGetUsersAsync()
+        {
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnGetUsersAsync));
+            LogContext.PushProperty("Action", "GetUsersForTypeAhead");
+
+            try
+            {
+                if (userList.Count == 0)
+                {
+                    return new JsonResult("Error")
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+                return new JsonResult(userList);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Unable to get the user list");
+                return new JsonResult(ex.Message)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+        }
     }
-
-
 }
+
+
+
+
