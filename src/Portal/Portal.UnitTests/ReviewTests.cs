@@ -613,6 +613,10 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            var row = await _dbContext.DbAssessmentReviewData.FirstAsync();
+            row.Reviewer = "";
+            await _dbContext.SaveChangesAsync();
+
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
