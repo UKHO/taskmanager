@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -49,12 +48,12 @@ namespace Portal.UnitTests
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
 
-
             ProcessId = 123;
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                ProcessId = ProcessId
+                ProcessId = ProcessId,
+                Assessor = "TestUser"
             });
 
             _dbContext.SaveChanges();
@@ -304,5 +303,34 @@ namespace Portal.UnitTests
             Assert.AreEqual($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages[0]);
         }
 
+        [Test]
+        public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("This User"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+
+            var row = await _dbContext.DbAssessmentAssessData.FirstAsync();
+            row.Assessor = "";
+            await _dbContext.SaveChangesAsync();
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+        }
     }
 }

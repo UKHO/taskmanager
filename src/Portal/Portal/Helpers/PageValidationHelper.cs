@@ -36,9 +36,24 @@ namespace Portal.Helpers
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
-            string reviewer, string team)
+            string reviewer, string team,
+            string currentAssignedReviewer, string currentUsername, string action)
         {
             var isValid = true;
+
+            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (string.IsNullOrWhiteSpace(currentAssignedReviewer))
+                {
+                    validationErrorMessages.Add($"Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+                else if (!currentUsername.Equals(currentAssignedReviewer, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validationErrorMessages.Add($"Operators: {currentAssignedReviewer} is assigned to this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+            }
 
             if (!ValidateTaskType(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
             {
@@ -104,7 +119,12 @@ namespace Portal.Helpers
             
             if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (!currentUsername.Equals(currentAssignedAssessor, StringComparison.InvariantCultureIgnoreCase))
+                if (string.IsNullOrWhiteSpace(currentAssignedAssessor))
+                {
+                    validationErrorMessages.Add($"Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+                else if (!currentUsername.Equals(currentAssignedAssessor, StringComparison.InvariantCultureIgnoreCase))
                 {
                     validationErrorMessages.Add($"Operators: {currentAssignedAssessor} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
