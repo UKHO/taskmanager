@@ -52,6 +52,15 @@ namespace Portal.UnitTests
 
             ProcessId = 123;
 
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                WorkflowInstanceId = 321,
+                ProcessId = ProcessId,
+                ActivityName = "Verify",
+                SerialNumber = "123_456"
+                
+            });
+
             _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
             {
                 ProcessId = ProcessId

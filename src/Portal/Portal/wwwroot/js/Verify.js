@@ -4,6 +4,7 @@
 
     setVerifyDoneHandler();
     setVerifySaveHandler();
+    handleContinueChildTaskWarning();
 
     var formChanged = false;
     $("#frmVerifyPage").change(function () { formChanged = true; });
@@ -38,6 +39,7 @@
 
 
     function completeVerify(action) {
+        $("#modalOpenChildTaskWarning").modal("hide");
         $("#verifyDoneErrorMessage").html("");
         $("#childTaskWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
@@ -64,7 +66,7 @@
             },
             success: function (result) {
                 formChanged = false;
-                if (action === "Done") {
+                if (action === "Done" || action === "ConfirmedSignOff") {
                     window.location.replace("/Index");
                 }
                 console.log("success");
@@ -118,6 +120,12 @@
 
         $("#btnSave").click(function (e) {
             completeVerify("Save");
+        });
+    }
+
+    function handleContinueChildTaskWarning() {
+        $("#btnContinueChildTaskWarning").on("click", function(e) {
+            completeVerify("ConfirmedSignOff");
         });
     }
 
