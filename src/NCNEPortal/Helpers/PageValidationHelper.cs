@@ -26,7 +26,9 @@ namespace NCNEPortal.Helpers
 
         public bool ValidateWorkflowPage(TaskRole taskRole, DateTime? publicationDate, DateTime? repromatDate,
             int dating,
-            string chartType, List<string> validationErrorMessages)
+            string chartType,
+            (bool SentTo3Ps, DateTime? SendDate3ps, DateTime? ExpectedReturnDate3ps, DateTime? ActualReturnDate3ps)
+                threePsInfo, List<string> validationErrorMessages)
         {
             bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
 
@@ -35,10 +37,46 @@ namespace NCNEPortal.Helpers
                 isValid = false;
             }
 
-
+            if (threePsInfo.SentTo3Ps == true)
+            {
+                if (!ValidateThreePs(threePsInfo.SendDate3ps, threePsInfo.ExpectedReturnDate3ps,
+                    threePsInfo.ActualReturnDate3ps, validationErrorMessages))
+                {
+                    isValid = false;
+                }
+            }
 
             return isValid;
 
+        }
+
+        private bool ValidateThreePs(DateTime? sendDate3Ps, DateTime? expectedReturnDate3Ps, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+            if ((sendDate3Ps == null) && (expectedReturnDate3Ps != null || actualReturnDate3Ps != null))
+            {
+                validationErrorMessages.Add("3PS : Please enter date sent to 3PS before entering actual and expected return dates");
+                isValid = false;
+            }
+
+            if (sendDate3Ps != null)
+            {
+                if ((expectedReturnDate3Ps != null) && (expectedReturnDate3Ps < sendDate3Ps))
+                {
+                    validationErrorMessages.Add(("3PS : Expected return date cannot be earlier than Sent to 3PS date"));
+                    isValid = false;
+                }
+
+                if ((actualReturnDate3Ps != null) && (actualReturnDate3Ps < sendDate3Ps))
+                {
+                    validationErrorMessages.Add(("3PS : Actual return date cannot be earlier than Sent to 3PS date"));
+                    isValid = false;
+                }
+            }
+
+
+            return isValid;
         }
 
         private bool ValidateDates(DateTime? publicationDate, DateTime? repromatDate, int dating, string chartType, List<string> validationErrorMessages)

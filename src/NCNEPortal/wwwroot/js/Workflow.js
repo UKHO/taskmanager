@@ -9,8 +9,7 @@
             return "Changes detected";
         }
     };
-
-
+    
     $("#RepromatDate").datepicker({
         autoclose: true,
         todayHighLight: true,
@@ -41,6 +40,26 @@
         format: 'dd/mm/yyyy'
     }).datepicker('update');
 
+    $("#SendDate3ps").datepicker({
+        autoclose: true,
+        todayHighLight: true,
+        format: 'dd/mm/yyyy'
+    }).datepicker('update');
+
+    $("#ExpectedReturnDate3ps").datepicker({
+        autoclose: true,
+        todayHighLight: true,
+        format: 'dd/mm/yyyy'
+    }).datepicker('update');
+
+    $("#ActualReturnDate3ps").datepicker({
+        autoclose: true,
+        todayHighLight: true,
+        format: 'dd/mm/yyyy'
+    }).datepicker('update');
+
+
+
 
     var chartType = $("#chartType").text();
     if (chartType.trim() === "Adoption") {
@@ -54,6 +73,34 @@
      }
 
 
+    set3psStatus();
+
+    $("#3psToggle").on("change",
+        function() {
+
+            set3psStatus();
+         
+            
+        });
+
+
+    
+
+    function set3psStatus() {
+        var sentto3ps = $("#3psToggle").prop("checked");
+
+        if (sentto3ps) {
+            $("#SendDate3ps").prop("disabled", false);
+            $("#ExpectedReturnDate3ps").prop("disabled", false);
+            $("#ActualReturnDate3ps").prop("disabled", false);
+        }
+        else {
+            $("#SendDate3ps").prop("disabled", true);
+            $("#ExpectedReturnDate3ps").prop("disabled", true);
+            $("#ActualReturnDate3ps").prop("disabled", true);
+        }
+
+    }
 
 
     $("#Dating").change(function() {
