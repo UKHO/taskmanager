@@ -54,7 +54,7 @@ namespace Portal.UnitTests
 
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
-                WorkflowInstanceId = 321,
+                WorkflowInstanceId = 1,
                 ProcessId = ProcessId,
                 ActivityName = "Verify",
                 SerialNumber = "123_456"
@@ -327,6 +327,52 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_has_active_child_tasks_returns_warning_message()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            var childProcessId = 555;
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = childProcessId,
+                ActivityName = "Verify",
+                SerialNumber = "555_456",
+                ParentProcessId = ProcessId,
+                Status = WorkflowStatus.Started.ToString()
+
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData()
+            {
+                AssessmentDataId = 1,
+                ProcessId = ProcessId
+            });
+
+
+            await _dbContext.SaveChangesAsync();
+
+            
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains(childProcessId.ToString(), _verifyModel.ValidationErrorMessages);
         }
     }
 }
