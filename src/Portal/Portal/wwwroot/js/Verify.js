@@ -39,6 +39,7 @@
 
     function completeVerify(action) {
         $("#verifyDoneErrorMessage").html("");
+        $("#childTaskWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
         $("#btnSave").prop("disabled", true);
         $("#modalWaitVerifyDone").modal("show");
