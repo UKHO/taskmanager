@@ -57,7 +57,7 @@
       "productActioned": false,
       "productActionChangeDetails": null,
       "workspaceAffected": "123",
-      "CarisProjectName": "Sunrise" 
+      "CarisProjectName": "Sunrise"
     },
     "PrimaryDocumentStatus": {
       "processId": 445,
@@ -782,6 +782,124 @@
     "DataImpact": [
       {
         "ProcessId": 688,
+        "HpdUsageId": 1,
+        "Edited": false,
+        "Comments": "Test",
+        "Verified": false
+      }
+    ]
+  },
+  {
+    "processId": 788,
+    "serialNumber": "788_38",
+    "parentProcessId": 688,
+    "activityName": "Verify",
+    "startedAt": "2020-01-01T00:00:00",
+    "status": "Started",
+    "comment": [
+      {
+        "processId": 788,
+        "text": "A comment",
+        "username": "Samir",
+        "created": "2020-01-01T00:00:00"
+      },
+      {
+        "processId": 788,
+        "text": "A 2nd comment",
+        "username": "GW",
+        "created": "2020-01-01T00:00:00"
+      }
+    ],
+    "assessmentData": {
+      "PrimarySdocId": 206733,
+      "rsdraNumber": "RSDRA2006000104322",
+      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+      "toSdoDate": null,
+      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+      "teamDistributedTo": null,
+      "sourceDocumentType": "Photographic Sortie",
+      "sourceNature": "Graphical",
+      "datum": null,
+      "processId": 788
+    },
+    "linkedDocument": [
+      {
+        "processId": 788,
+        "PrimarySdocId": 206733,
+        "rsdraNumber": "RSDRA2006000267725",
+        "sourceDocumentName": "BANGOR",
+        "receiptDate": "1994-08-05T00:00:00",
+        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+        "sourceNature": "Textual",
+        "datum": null,
+        "linkType": "Forward",
+        "linkedSdocId": 606203,
+        "ContentServiceId": null,
+        "Status": "NotAttached",
+        "created": "2020-01-01T00:00:00"
+      }
+    ],
+    "dbAssessmentReviewData": {
+      "processId": 788,
+      "ion": "I229",
+      "activityCode": "743543",
+      "reviewer": "Stuart Barzey",
+      "assessor": "Stuart Barzey",
+      "verifier": "Stuart Barzey",
+      "TaskType": "Simple",
+      "WorkspaceAffected": "2054_4",
+      "Notes": "Important note"
+    },
+    "dbAssessmentAssessData": {
+      "processId": 788,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stuart Barzey",
+      "assessor": "Stuart Barzey",
+      "verifier": "Stuart Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null,
+      "workspaceAffected": "1239_0"
+    },
+    "dbAssessmentVerifyData": {
+      "processId": 788,
+      "ion": "Ion",
+      "activityCode": "78798",
+      "sourceCategory": "Engineering Drawings",
+      "reviewer": "Stuart Barzey",
+      "assessor": "Stuart Barzey",
+      "verifier": "Stuart Barzey",
+      "taskType": "Simple",
+      "productActioned": false,
+      "productActionChangeDetails": null,
+      "workspaceAffected": "999",
+      "CarisProjectName": "Vproj"
+    },
+    "PrimaryDocumentStatus": {
+      "processId": 788,
+      "SdocId": 206733,
+      "ContentServiceId": null,
+      "Status": "Ready",
+      "StartedAt": "2020-01-03T00:00:00",
+      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    },
+    "DatabaseDocumentStatus": [
+      {
+        "processId": 788,
+        "SdocId": 206733,
+        "sourceDocumentName": "HUA HIN",
+        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+        "ContentServiceId": null,
+        "Status": "Started",
+        "created": "2020-01-01T00:00:00"
+      }
+    ],
+    "DataImpact": [
+      {
+        "ProcessId": 788,
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
