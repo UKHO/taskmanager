@@ -27,7 +27,15 @@
         $("#btnSave").prop("disabled", true);
         $("#modalWaitAssessDone").modal("show");
 
-        var formData = $('#frmAssessPage').serialize();
+        var onHold = false;
+
+        if (document.getElementById("onHoldToggle").checked) {
+            onHold = true;
+        }
+
+        var formData = new FormData();
+        formData.append("formData", $("#frmAssessPage").serialize());
+        formData.append("onHold", onHold);
 
         $.ajax({
             type: "POST",
@@ -36,6 +44,8 @@
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: formData,
+            contentType: false,
+            processData: false,
             complete: function () {
                 //Add a delay to account for the modalWaitReviewDone modal
                 //not being fully shown, before trying to hide it

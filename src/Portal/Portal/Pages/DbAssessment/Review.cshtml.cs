@@ -175,6 +175,7 @@ namespace Portal.Pages.DbAssessment
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
+            await UpdateOnHold(ProcessId, onHold);
             await UpdateDbAssessmentReviewData(ProcessId);
             await SaveAdditionalTasks(ProcessId);
             await UpdateAssessmentData(ProcessId);
