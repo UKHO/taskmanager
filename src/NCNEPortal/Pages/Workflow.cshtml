@@ -570,12 +570,14 @@
                     </div>
                 </div>
                 <hr class="mt-2 mb-4" />
-                <h4>3PS</h4>
+                <div class="row" align="center">
+                    <h4>3PS</h4>
 
-                <label class="switch ml-2 mb-auto">
-                    <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
-                    <span class="slider"></span>
-                </label>
+                    <label class="switch ml-2 mb-auto">
+                        <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 <div class="row">
                     <div class="col-3">
                         <div class="form-group">

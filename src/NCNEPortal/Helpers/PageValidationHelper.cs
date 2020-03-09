@@ -60,6 +60,12 @@ namespace NCNEPortal.Helpers
                 isValid = false;
             }
 
+            if ((expectedReturnDate3Ps == null) && (actualReturnDate3Ps != null))
+            {
+                validationErrorMessages.Add("3PS : Please enter expected return date before entering actual return date");
+                isValid = false;
+            }
+
             if (sendDate3Ps != null)
             {
                 if ((expectedReturnDate3Ps != null) && (expectedReturnDate3Ps < sendDate3Ps))

@@ -73,12 +73,15 @@
      }
 
 
-    set3psStatus();
+    var sentto3ps = $("#3psToggle").prop("checked");
+    if (sentto3ps==true)
+        $("#3psToggle").prop("disabled", true);
+    set3psStatus(sentto3ps);
 
     $("#3psToggle").on("change",
         function() {
-
-            set3psStatus();
+            var sentto3ps = $("#3psToggle").prop("checked");
+            set3psStatus(sentto3ps);
          
             
         });
@@ -86,13 +89,14 @@
 
     
 
-    function set3psStatus() {
-        var sentto3ps = $("#3psToggle").prop("checked");
+    function set3psStatus(sentto3ps) {
+    
 
         if (sentto3ps) {
             $("#SendDate3ps").prop("disabled", false);
             $("#ExpectedReturnDate3ps").prop("disabled", false);
             $("#ActualReturnDate3ps").prop("disabled", false);
+            
         }
         else {
             $("#SendDate3ps").prop("disabled", true);
