@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using BoDi;
+using NCNEPortal.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -11,6 +13,7 @@ namespace NCNEPortal.TestAutomation.Framework
     public sealed class WebDriverSupport : IDisposable
     {
         private readonly IObjectContainer _objectContainer;
+        private bool _skipLogin;
         private IWebDriver _webDriver;
 
         public WebDriverSupport(IObjectContainer objectContainer)
@@ -23,7 +26,7 @@ namespace NCNEPortal.TestAutomation.Framework
             DisposeWebdriver();
         }
 
-        [BeforeScenario(Order = 0)]
+        [BeforeScenario(Order = 1)]
         public void InitializeWebDriver()
         {
             var chromeDriverDirectory = Environment.GetEnvironmentVariable("ChromeWebDriver");
@@ -43,12 +46,78 @@ namespace NCNEPortal.TestAutomation.Framework
             }
         }
 
+        [BeforeScenario("skipLogin", Order = 2)]
+        public void SkipLogin()
+        {
+            _skipLogin = true;
+        }
+
+        [BeforeScenario(Order = 3)]
+        public void SetLoginCookies()
+        {
+            if (_skipLogin)
+                return;
+
+            if (CookieStore.Cookies == null)
+                DoLogin();
+            else
+                RestoreCookies();
+
+            _webDriver.Navigate().GoToUrl("data:,");
+        }
+
+        private void RestoreCookies()
+        {
+            //Need to be on the auth page so we are in the same domain as the cookies
+            GoToAuthPage();
+
+            foreach (var cookie in CookieStore.Cookies)
+            {
+                if (cookie.Expiry.HasValue && cookie.Expiry.Value < DateTime.Now.AddMinutes(5))
+                {
+                    DoLogin();
+                    break;
+                }
+
+                _webDriver.Manage().Cookies.AddCookie(cookie);
+            }
+        }
+
+        private void DoLogin()
+        {
+            GoToAuthPage();
+
+            var authPage = _objectContainer.Resolve<MicrosoftAuthPage>();
+            if (authPage.HasLoaded)
+                authPage.Login();
+            else
+                throw new ApplicationException("Could not get to Microsoft authentication page");
+        }
+
+        private void GoToAuthPage()
+        {
+            //Going to the landing page when not logged in will redirect to the auth page
+            var landingPage = _objectContainer.Resolve<LandingPage>();
+            landingPage.NavigateTo();
+        }
+
         [AfterScenario]
         public void DisposeWebdriver()
         {
             _webDriver?.Quit();
             _webDriver?.Dispose();
             _webDriver = null;
+        }
+    }
+
+
+    internal static class CookieStore
+    {
+        public static ReadOnlyCollection<Cookie> Cookies { get; private set; }
+
+        public static void SaveCookies(ICookieJar cookieJar)
+        {
+            Cookies = cookieJar.AllCookies;
         }
     }
 }

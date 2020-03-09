@@ -16,7 +16,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer = objectContainer;
         }
 
-        [BeforeScenario]
+        [BeforeScenario(Order = 0)]
         public void RegisterConfigs()
         {
             var appConfigRoot = AzureAppConfigConfigurationRoot.Instance;

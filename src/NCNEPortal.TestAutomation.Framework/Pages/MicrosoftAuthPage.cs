@@ -8,8 +8,8 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
     public class MicrosoftAuthPage
     {
         private readonly IWebDriver _driver;
-        private readonly WebDriverWait _wait;
         private readonly SecretsConfig _secretsConfig;
+        private readonly WebDriverWait _wait;
 
         public MicrosoftAuthPage(IWebDriver driver, WebDriverWait wait, SecretsConfig secretsConfig)
         {
@@ -53,30 +53,39 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
                 return isMicrosoftAuthPage;
             }
         }
-        
+
         private IWebElement UsernameField => _driver.FindElement(By.Id("i0116"));
         private IWebElement PasswordField => _driver.FindElement(By.Id("i0118"));
-        
+
         public void Login()
         {
             var username = $"{_secretsConfig.LoginAccount}@ukho.gov.uk";
-            EnterTextInField(username, UsernameField);
+            EnterTextInField(username, () => UsernameField);
             UsernameField.SendKeys(Keys.Enter);
 
             var password = _secretsConfig.LoginPassword;
-            EnterTextInField(password, PasswordField);
+            EnterTextInField(password, () => PasswordField);
             PasswordField.Submit();
+
+            CookieStore.SaveCookies(_driver.Manage().Cookies);
         }
 
-        private void EnterTextInField(string textToEnter, IWebElement element)
+        private void EnterTextInField(string textToEnter, Func<IWebElement> elementFunc)
         {
+            IWebElement element = null;
+
             _wait.Until(d =>
             {
                 try
                 {
+                    element = elementFunc.Invoke();
                     return element.Displayed;
                 }
                 catch (NoSuchElementException)
+                {
+                    return false;
+                }
+                catch (StaleElementReferenceException)
                 {
                     return false;
                 }
