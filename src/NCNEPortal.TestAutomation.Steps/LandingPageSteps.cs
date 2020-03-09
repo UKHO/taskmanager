@@ -1,4 +1,5 @@
-﻿using NCNEPortal.TestAutomation.Framework;
+﻿using NCNEPortal.TestAutomation.Framework.Pages;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace NCNEPortal.TestAutomation.Steps
@@ -14,15 +15,17 @@ namespace NCNEPortal.TestAutomation.Steps
         }
 
         [Given(@"I navigate to the landing page")]
+        [When(@"I navigate to the landing page")]
         public void GivenINavigateToTheLandingPage()
         {
             _landingPage.NavigateTo();
         }
 
         [Then(@"The landing page has loaded")]
+        [Then(@"I am redirected to the landing page")]
         public void ThenTheLandingPageHasLoaded()
         {
-            _landingPage.HasLoaded();
+            Assert.IsTrue(_landingPage.HasLoaded());
         }
     }
 }

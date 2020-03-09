@@ -1,4 +1,5 @@
-﻿using NCNEPortal.TestAutomation.Framework;
+﻿using NCNEPortal.TestAutomation.Framework.Pages;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace NCNEPortal.TestAutomation.Steps
@@ -28,7 +29,7 @@ namespace NCNEPortal.TestAutomation.Steps
         public void ThenTheNCNENewTaskPageHasLoaded()
 
         {
-            _newtaskPage.HasLoaded();
+            Assert.IsTrue(_newtaskPage.HasLoaded());
         }
     }
 
