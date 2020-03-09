@@ -570,24 +570,31 @@
                     </div>
                 </div>
                 <hr class="mt-2 mb-4" />
-                <h4>3PS</h4>
+                <div class="row" align="center">
+                    <h4>3PS</h4>
+
+                    <label class="switch ml-2 mb-auto">
+                        <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 <div class="row">
                     <div class="col-3">
                         <div class="form-group">
-                            <div>@Html.LabelFor(model => model.SendDate3ps)</div>
-                            <div>@Html.DisplayFor(model => model.SendDate3ps)</div>
+                            <div>@Html.LabelFor(model => model.SendDate3ps, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.SendDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps)</div>
-                            <div>@Html.DisplayFor(model => model.ExpectedReturnDate3ps)</div>
+                            <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.ExpectedReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ActualReturnDate3ps)</div>
-                            <div>@Html.DisplayFor(model => model.ActualReturnDate3ps)</div>
+                            <div>@Html.LabelFor(model => model.ActualReturnDate3ps, new { @class = "col-form-label" })</div>
+                            <div>@Html.TextBoxFor(model => model.ActualReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                         </div>
                     </div>
                 </div>

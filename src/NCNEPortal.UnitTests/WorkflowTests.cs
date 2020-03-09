@@ -145,6 +145,103 @@ namespace NCNEPortal.UnitTests
 
 
         }
+
+        [Test]
+        public async Task Test_3ps_Expected_date_without_sent_to_date()
+        {
+            _workflowModel.ProcessId = 123;
+            _workflowModel.RepromatDate = DateTime.Now;
+            _workflowModel.ChartType = "Primary";
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Compiler = "Stuart";
+            _workflowModel.Dating = 1;
+            _workflowModel.SentTo3Ps = true;
+            _workflowModel.SendDate3ps = null;
+            _workflowModel.ExpectedReturnDate3ps = DateTime.Now;
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Please enter date sent to 3PS before entering expected return date"));
+        }
+
+
+        [Test]
+        public async Task Test_3ps_Actual_return_date_without_sent_to_date()
+        {
+            _workflowModel.ProcessId = 123;
+            _workflowModel.RepromatDate = DateTime.Now;
+            _workflowModel.ChartType = "Primary";
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Compiler = "Stuart";
+            _workflowModel.Dating = 1;
+            _workflowModel.SentTo3Ps = true;
+            _workflowModel.SendDate3ps = null;
+            _workflowModel.ActualReturnDate3ps = DateTime.Now;
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Please enter date sent to 3PS before entering actual return date"));
+        }
+        [Test]
+        public async Task Test_3ps_Expected_return_date_earlier_than_sent_to_date()
+        {
+            _workflowModel.ProcessId = 123;
+            _workflowModel.RepromatDate = DateTime.Now;
+            _workflowModel.ChartType = "Primary";
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Compiler = "Stuart";
+            _workflowModel.Dating = 1;
+            _workflowModel.SentTo3Ps = true;
+            _workflowModel.SendDate3ps = DateTime.Now;
+            _workflowModel.ExpectedReturnDate3ps = DateTime.Now.AddDays(-2);
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Expected return date cannot be earlier than Sent to 3PS date"));
+        }
+
+        [Test]
+        public async Task Test_3ps_Actual_return_date_earlier_than_sent_to_date()
+        {
+            _workflowModel.ProcessId = 123;
+            _workflowModel.RepromatDate = DateTime.Now;
+            _workflowModel.ChartType = "Primary";
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Compiler = "Stuart";
+            _workflowModel.Dating = 1;
+            _workflowModel.SentTo3Ps = true;
+            _workflowModel.SendDate3ps = DateTime.Now;
+            _workflowModel.ActualReturnDate3ps = DateTime.Now.AddDays(-2);
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Actual return date cannot be earlier than Sent to 3PS date"));
+        }
+
+        [Test]
+        public async Task Test_3ps_Entering_Actual_return_date_without_expected_return_date()
+        {
+            _workflowModel.ProcessId = 123;
+            _workflowModel.RepromatDate = DateTime.Now;
+            _workflowModel.ChartType = "Primary";
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Compiler = "Stuart";
+            _workflowModel.Dating = 1;
+            _workflowModel.SentTo3Ps = true;
+            _workflowModel.SendDate3ps = DateTime.Now;
+            _workflowModel.ActualReturnDate3ps = DateTime.Now;
+            _workflowModel.ExpectedReturnDate3ps = null;
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Please enter expected return date before entering actual return date"));
+        }
+
     }
 
 }

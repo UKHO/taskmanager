@@ -110,19 +110,23 @@ namespace NCNEPortal
         [BindProperty]
         public string Publisher { get; set; }
 
-        public SelectList PublisherList { get; set; }
+        [BindProperty]
+        public bool SentTo3Ps { get; set; }
 
         [DisplayName("Sent to 3PS")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime SendDate3ps { get; set; }
+        [BindProperty]
+        public DateTime? SendDate3ps { get; set; }
 
         [DisplayName("Expected return 3PS")]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime ExpectedReturnDate3ps { get; set; }
+        [BindProperty]
+        public DateTime? ExpectedReturnDate3ps { get; set; }
 
         [DisplayName("Actual return 3PS")]
+        [BindProperty]
         [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime ActualReturnDate3ps { get; set; }
+        public DateTime? ActualReturnDate3ps { get; set; }
 
         public List<TaskComment> TaskComments { get; set; }
 
@@ -249,9 +253,13 @@ namespace NCNEPortal
             CommitToPrintDate = taskInfo.CommitDate;
             CISDate = taskInfo.CisDate;
 
-            if (taskInfo.SentDate3Ps != null) SendDate3ps = (DateTime)taskInfo.SentDate3Ps;
-            if (taskInfo.ExpectedDate3Ps != null) ExpectedReturnDate3ps = (DateTime)taskInfo.ExpectedDate3Ps;
-            if (taskInfo.ActualDate3Ps != null) ActualReturnDate3ps = (DateTime)taskInfo.ActualDate3Ps;
+            SentTo3Ps = taskInfo.ThreePs;
+
+            SendDate3ps = taskInfo.SentDate3Ps;
+            ExpectedReturnDate3ps = taskInfo.ExpectedDate3Ps;
+            ActualReturnDate3ps = taskInfo.ActualDate3Ps;
+
+
 
             Compiler = taskInfo.TaskRole.Compiler;
             Verifier1 = taskInfo.TaskRole.VerifierOne;
@@ -418,6 +426,11 @@ namespace NCNEPortal
 
         }
 
+        //public async Task<IActionResult> OnPostToggle3PSAsync(bool status)
+        //{
+        //    SentTo3Ps = status;
+        //    return StatusCode(200);
+        //}
 
         public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {
@@ -433,7 +446,10 @@ namespace NCNEPortal
                 VerifierTwo = Verifier2,
                 Publisher = Publisher
             };
-            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
+            var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
+
+
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType, ThreePSInfo,
                 ValidationErrorMessages)))
             {
 
@@ -477,66 +493,15 @@ namespace NCNEPortal
             task.TaskRole.VerifierTwo = Verifier2;
             task.TaskRole.Publisher = Publisher;
 
+            task.ThreePs = SentTo3Ps;
+            task.SentDate3Ps = SendDate3ps;
+            task.ExpectedDate3Ps = ExpectedReturnDate3ps;
+            task.ActualDate3Ps = ActualReturnDate3ps;
+
 
             await _dbContext.SaveChangesAsync();
         }
 
-
-        public void ValidateUsers(string compiler, string verifierOne, string verifierTwo, string publisher)
-        {
-
-            LogContext.PushProperty("NCNEPortalResource", nameof(ValidateUsers));
-
-            ValidationErrorMessages.Clear();
-
-            if (string.IsNullOrEmpty(compiler))
-                ValidationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
-            else
-
-            {
-                if (!userList.Any(a => a == compiler))
-                {
-                    _logger.LogInformation($"Attempted to assign Compiler role to unknown user {compiler}");
-                    ValidationErrorMessages.Add($"Unable to assign Compiler role to unknown user {compiler}");
-                }
-            }
-
-
-            if (!string.IsNullOrEmpty(verifierOne))
-            {
-                if (!userList.Any(a => a == verifierOne))
-                {
-                    _logger.LogInformation($"Attempted to assign Verifier1 role to unknown user {verifierOne}");
-                    ValidationErrorMessages.Add($"Unable to assign Verifier1 role to unknown user {verifierOne}");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(verifierTwo))
-            {
-                if (!userList.Any(a => a == verifierTwo))
-                {
-                    _logger.LogInformation($"Attempted to assign Verifier2 role to unknown user {verifierTwo}");
-                    ValidationErrorMessages.Add($"Unable to assign Verifier2 role to unknown user {verifierTwo}");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(publisher))
-            {
-                if (!userList.Any(a => a == publisher))
-                {
-                    _logger.LogInformation($"Attempted to assign Publisher role to unknown user {publisher}");
-                    ValidationErrorMessages.Add($"Unable to assign Publisher role to unknown user {publisher}");
-                }
-            }
-
-
-        }
-
-        public void ValidateDates(DateTime repromatDate, DateTime publicationDate, DateTime formsDate,
-            DateTime commitDate, DateTime CisDate)
-        {
-
-        }
 
 
         public async Task<JsonResult> OnGetUsersAsync()
