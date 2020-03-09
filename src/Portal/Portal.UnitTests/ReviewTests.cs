@@ -119,7 +119,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains(
@@ -145,7 +145,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
@@ -171,7 +171,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Assessor is required"));
@@ -204,7 +204,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains(
@@ -238,7 +238,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
@@ -273,7 +273,7 @@ namespace Portal.UnitTests
                 }
             };
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
@@ -322,7 +322,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var isExist = await _dbContext.Comment.AnyAsync(c =>
                 c.Text.Contains(primaryAssignTaskNote, StringComparison.OrdinalIgnoreCase));
@@ -357,7 +357,7 @@ namespace Portal.UnitTests
 
             var currentCommentsCount = await _dbContext.Comment.CountAsync();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var newCommentsCount = await _dbContext.Comment.CountAsync();
 
@@ -387,7 +387,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Team = "Home Waters";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
@@ -414,7 +414,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Team = "Home Waters";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
@@ -441,7 +441,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Team = "Home Waters";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
@@ -466,7 +466,7 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "";
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A.Dummy<string>())).MustNotHaveHappened();
         }
@@ -491,7 +491,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A.Dummy<string>())).MustNotHaveHappened();
         }
@@ -526,7 +526,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Reviewer = "TestUser";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
@@ -560,7 +560,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Reviewer = "";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
@@ -596,7 +596,7 @@ namespace Portal.UnitTests
 
             _reviewModel.Reviewer = "TestUser";
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Task Information: Team cannot be empty", _reviewModel.ValidationErrorMessages);
@@ -637,7 +637,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
@@ -676,7 +676,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
@@ -705,6 +705,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = true;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -718,7 +719,7 @@ namespace Portal.UnitTests
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
             await _dbContext.SaveChangesAsync();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, true, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -750,6 +751,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -760,7 +762,7 @@ namespace Portal.UnitTests
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -792,6 +794,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = true;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -805,7 +808,7 @@ namespace Portal.UnitTests
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
             await _dbContext.SaveChangesAsync();
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, true, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -837,6 +840,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -847,7 +851,7 @@ namespace Portal.UnitTests
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _reviewModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 

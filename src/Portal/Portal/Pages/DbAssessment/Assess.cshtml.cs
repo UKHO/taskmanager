@@ -36,7 +36,9 @@ namespace Portal.Pages.DbAssessment
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
 
+        [BindProperty]
         public bool IsOnHold { get; set; }
+
         public int ProcessId { get; set; }
 
         [BindProperty]
@@ -128,7 +130,7 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId, bool onHold, [FromQuery] string action)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
             LogContext.PushProperty("ActivityName", "Assess");
             LogContext.PushProperty("ProcessId", processId);
@@ -144,7 +146,6 @@ namespace Portal.Pages.DbAssessment
             ValidationErrorMessages.Clear();
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-
 
             if (!await _pageValidationHelper.ValidateAssessPage(
                                                 action,
@@ -168,7 +169,7 @@ namespace Portal.Pages.DbAssessment
 
             ProcessId = processId;
 
-            await UpdateOnHold(ProcessId, onHold);
+            await UpdateOnHold(ProcessId, IsOnHold);
             await UpdateTaskInformation(processId);
             await UpdateProductAction(processId);
             await UpdateAssessmentData(processId);

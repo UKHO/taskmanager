@@ -33,6 +33,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IPageValidationHelper _pageValidationHelper;
 
         public int ProcessId { get; set; }
+
+        [BindProperty]
         public bool IsOnHold { get; set; }
 
         [BindProperty]
@@ -141,7 +143,7 @@ namespace Portal.Pages.DbAssessment
             return RedirectToPage("/Index");
         }
 
-        public async Task<IActionResult> OnPostDoneAsync(int processId, bool onHold, [FromQuery] string action)
+        public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
@@ -175,7 +177,7 @@ namespace Portal.Pages.DbAssessment
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
-            await UpdateOnHold(ProcessId, onHold);
+            await UpdateOnHold(ProcessId, IsOnHold);
             await UpdateDbAssessmentReviewData(ProcessId);
             await SaveAdditionalTasks(ProcessId);
             await UpdateAssessmentData(ProcessId);

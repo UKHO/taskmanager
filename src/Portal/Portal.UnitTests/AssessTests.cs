@@ -144,7 +144,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 5);
             Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
@@ -171,7 +171,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages);
@@ -193,7 +193,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages);
@@ -225,7 +225,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages);
@@ -258,7 +258,7 @@ namespace Portal.UnitTests
             };
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages);
@@ -289,7 +289,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
@@ -312,7 +312,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "KnownUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages);
@@ -335,7 +335,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "KnownUser";
             _assessModel.Verifier = "TestUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages);
@@ -353,7 +353,7 @@ namespace Portal.UnitTests
             row.Assessor = "";
             await _dbContext.SaveChangesAsync();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
         }
@@ -363,10 +363,10 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
@@ -387,6 +387,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.IsOnHold = true;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -397,7 +398,7 @@ namespace Portal.UnitTests
                     A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, true, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -421,6 +422,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.IsOnHold = false;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -440,7 +442,7 @@ namespace Portal.UnitTests
             });
             await _dbContext.SaveChangesAsync();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -464,6 +466,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.IsOnHold = true;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -474,7 +477,7 @@ namespace Portal.UnitTests
                     A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, true, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -498,6 +501,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.IsOnHold = false;
 
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
@@ -518,7 +522,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 

@@ -35,6 +35,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
 
+        [BindProperty]
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
