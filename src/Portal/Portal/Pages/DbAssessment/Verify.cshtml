@@ -121,7 +121,21 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="modal fade" id="modalWaitVerifyReject" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Rejecting Task...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -129,26 +143,23 @@
 <div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-labelledby="ConfirmReject" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="rejectingVerify" asp-page-handler="RejectVerify" method="post">
-                <div class="modal-header">
-                    <h4 class="modal-title">Reject DB Assessment</h4>
+            <div class="modal-header">
+                <h4 class="modal-title">Reject DB Assessment</h4>
+            </div>
+            <div class="modal-body">
+                <p>Provide a reason for rejecting this DB Assessment?</p>
+                <div id="modal-body">
+                    <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control"></textarea>
+                    <br />
+                    <div id="ConfirmRejectError"></div>
                 </div>
-                <div class="modal-body">
-                    <p>Provide a reason for rejecting this DB Assessment?</p>
-                    <div id="modal-body">
-                        <input type="hidden" asp-for="ProcessId" />
-                        <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control"></textarea>
-                        <br />
-                        <div id="ConfirmRejectError"></div>
-                    </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
+                    <div class="col-5 pl-1 pr-0"><button type="button" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
                 </div>
-                <div class="modal-footer">
-                    <div class="row col-11 justify-content-end">
-                        <div class="col-5 pr-1"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
-                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -207,6 +218,33 @@
                     <div class="row col-11 justify-content-end">
                         <div class="col-5 pr-1"><button type="button" id="btnCancelChildTaskWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
                         <div class="col-5 pl-1 pr-0"><button type="submit" id="btnContinueChildTaskWarning" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal for warning of unsaved form on reject *@
+<div class="modal fade" id="modalUnsavedWarning" tabindex="-1" role="dialog" aria-labelledby="UnsavedWarning" aria-hidden="true">
+    <div class="modal-dialog warning ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Unsaved changes detected.</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div class="col-11">
+                        <ul><li>Continue rejecting task?</li></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCancelUnsavedWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Rejection">Cancel</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnContinueRejection" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue With Rejection">Continue Reject</button></div>
                     </div>
                 </div>
             </div>

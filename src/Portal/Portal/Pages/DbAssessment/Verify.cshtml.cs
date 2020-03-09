@@ -165,7 +165,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    return StatusCode((int) HttpStatusCode.OK);
+                    return StatusCode((int)HttpStatusCode.OK);
                 case "Done":
                     if (!await _pageValidationHelper.ValidateVerifyPage(
                                                                         Ion,
@@ -186,7 +186,7 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int) HttpStatusCode.BadRequest
+                            StatusCode = (int)HttpStatusCode.BadRequest
                         };
                     }
 
@@ -205,7 +205,7 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)HttpStatusCode.InternalServerError
                         };
                     }
-                    
+
                     return StatusCode((int)HttpStatusCode.OK);
                 case "ConfirmedSignOff":
                     if (!await MarkTaskAsComplete(processId, workflowInstance))
@@ -335,19 +335,29 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
-        public async Task<IActionResult> OnPostRejectVerifyAsync(string comment, int processId)
+        public async Task<IActionResult> OnPostRejectVerifyAsync(int processId, string comment)
         {
             LogContext.PushProperty("ActivityName", "Verify");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
 
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            LogContext.PushProperty("UserFullName", UserFullName);
+
             _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            ValidationErrorMessages.Clear();
 
             if (string.IsNullOrWhiteSpace(comment))
             {
                 _logger.LogError("Comment is null, empty or whitespace: {Comment}");
-                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+                ValidationErrorMessages.Add($"Reject comment cannot be empty.");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
             }
 
             if (processId < 1)
@@ -391,7 +401,7 @@ namespace Portal.Pages.DbAssessment
 
                 _logger.LogInformation("Unable to reject task {ProcessId} from Verify to Assess.");
 
-                // TODO - add validation error message code later
+                // TODO - add  error message code later
                 //ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
 
                 //return new JsonResult(this.ValidationErrorMessages)
