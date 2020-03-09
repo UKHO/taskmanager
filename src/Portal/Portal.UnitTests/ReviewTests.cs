@@ -379,9 +379,9 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
-                _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
+                _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -406,8 +406,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -433,8 +433,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -518,9 +518,9 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
-                _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
+                _reviewModel.ValidationErrorMessages);
         }
 
 
@@ -552,8 +552,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual("Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Operators: Reviewer cannot be empty", _reviewModel.ValidationErrorMessages);
         }
 
 
@@ -588,8 +588,8 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
-            Assert.AreEqual("Task Information: Team cannot be empty", _reviewModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Task Information: Team cannot be empty", _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -629,7 +629,7 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
         }
 
@@ -668,7 +668,7 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual(1, _reviewModel.ValidationErrorMessages.Count);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
         }
     }

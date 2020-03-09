@@ -4,6 +4,7 @@
 
     setVerifyDoneHandler();
     setVerifySaveHandler();
+    handleContinueChildTaskWarning();
 
     var formChanged = false;
     $("#frmVerifyPage").change(function () { formChanged = true; });
@@ -38,7 +39,9 @@
 
 
     function completeVerify(action) {
+        $("#modalOpenChildTaskWarning").modal("hide");
         $("#verifyDoneErrorMessage").html("");
+        $("#childTaskWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
         $("#btnSave").prop("disabled", true);
         $("#modalWaitVerifyDone").modal("show");
@@ -63,24 +66,41 @@
             },
             success: function (result) {
                 formChanged = false;
-                if (action === "Done") {
+                if (action === "Done" || action === "ConfirmedSignOff") {
                     window.location.replace("/Index");
                 }
                 console.log("success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
+                var statusCode = error.status;
 
                 if (responseJson != null) {
-                    $("#verifyDoneErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#verifyDoneErrorMessage ul");
+                    if (statusCode === 406) {
+                        $("#childTaskWarningMessages").append("<ul/>");
+                        var unOrderedList = $("#childTaskWarningMessages ul");
 
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
 
+                        $("#modalOpenChildTaskWarning").modal("show");
+                    } else {
+                        $("#verifyDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#verifyDoneErrorMessage ul");
+
+                        responseJson.forEach(function(item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalWaitVerifyDoneErrors").modal("show");
+                    }
+                } else {
+                    $("#verifyDoneErrorMessage").html("<div class=\"alert alert-danger\" role=\"alert\">System error. Please try again later.</div>");
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
+                
+                
             }
         });
     }
@@ -100,6 +120,12 @@
 
         $("#btnSave").click(function (e) {
             completeVerify("Save");
+        });
+    }
+
+    function handleContinueChildTaskWarning() {
+        $("#btnContinueChildTaskWarning").on("click", function(e) {
+            completeVerify("ConfirmedSignOff");
         });
     }
 

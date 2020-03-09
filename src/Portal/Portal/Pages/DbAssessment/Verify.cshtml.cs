@@ -112,8 +112,8 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            var currentAssessData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
-            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+            OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
 
             await GetOnHoldData(processId);
@@ -134,23 +134,166 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (!await _pageValidationHelper.ValidateVerifyPage(
-                Ion,
-                ActivityCode,
-                SourceCategory,
-                Verifier,
-                RecordProductAction,
-                DataImpacts, action,
-                ValidationErrorMessages, Team))
-            {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
-            }
-
             ProcessId = processId;
 
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            switch (action)
+            {
+                case "Save":
+                    if (!await _pageValidationHelper.ValidateVerifyPage(
+                        Ion,
+                        ActivityCode,
+                        SourceCategory,
+                        Verifier,
+                        RecordProductAction,
+                        DataImpacts, action,
+                        ValidationErrorMessages, Team))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.BadRequest
+                        };
+                    }
+                    if (!await SaveTaskData(processId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.BadRequest
+                        };
+                    }
+
+                    return StatusCode((int) HttpStatusCode.OK);
+                case "Done":
+                    if (!await _pageValidationHelper.ValidateVerifyPage(
+                                                                        Ion,
+                                                                        ActivityCode,
+                                                                        SourceCategory,
+                                                                        Verifier,
+                                                                        RecordProductAction,
+                                                                        DataImpacts, action,
+                                                                        ValidationErrorMessages, Team))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.BadRequest
+                        };
+                    }
+
+                    if (!await SaveTaskData(processId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int) HttpStatusCode.BadRequest
+                        };
+                    }
+
+                    if (await HasActiveChildTasks(workflowInstance))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.NotAcceptable
+                        };
+                    }
+
+                    if (!await MarkTaskAsComplete(processId, workflowInstance))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.InternalServerError
+                        };
+                    }
+                    
+                    return StatusCode((int)HttpStatusCode.OK);
+                case "ConfirmedSignOff":
+                    if (!await MarkTaskAsComplete(processId, workflowInstance))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.InternalServerError
+                        };
+                    }
+
+                    return StatusCode((int)HttpStatusCode.OK);
+                default:
+                    _logger.LogError("Action not found {Action}");
+
+                    throw new NotImplementedException($"Action not found {action}");
+            }
+        }
+
+        private async Task<bool> MarkTaskAsComplete(int processId, WorkflowInstance workflowInstance)
+        {
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
+                workflowInstance.SerialNumber, "Verify", "Complete");
+
+            if (success)
+            {
+                await PersistCompletedVerify(processId, workflowInstance);
+
+                UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+                LogContext.PushProperty("UserFullName", UserFullName);
+
+                _logger.LogInformation(
+                    "{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                await _commentsHelper.AddComment($"Verify step completed",
+                    processId,
+                    workflowInstance.WorkflowInstanceId,
+                    UserFullName);
+            }
+            else
+            {
+                workflowInstance.Status = WorkflowStatus.Started.ToString();
+                await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
+
+                ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
+
+                return false;
+            }
+
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return true;
+        }
+
+        private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance)
+        {
+            if (workflowInstance.ParentProcessId == null)
+            {
+                var childProcessIds = await _dbContext.WorkflowInstance
+                    .Where(wi => wi.ParentProcessId == workflowInstance.ProcessId)
+                    .Where(wi =>
+                        wi.Status == WorkflowStatus.Started.ToString() || wi.Status == WorkflowStatus.Updating.ToString())
+                    .Select(wi => wi.ProcessId)
+                    .ToListAsync();
+
+                if (childProcessIds.Any())
+                {
+                    foreach (var item in childProcessIds)
+                    {
+                        ValidationErrorMessages.Add(item.ToString());
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<bool> SaveTaskData(int processId)
+        {
             await UpdateTaskInformation(processId);
 
             await UpdateProductAction(processId);
@@ -159,69 +302,17 @@ namespace Portal.Pages.DbAssessment
 
             try
             {
-
                 await UpdateEditDatabase(processId);
-
             }
             catch (Exception e)
             {
                 ValidationErrorMessages.Add(e.Message);
 
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
+                return false;
             }
 
             await UpdateDataImpact(processId);
-
-            if (action == "Done")
-            {
-                var workflowInstance = await _dbContext.WorkflowInstance
-                    .Include(w => w.PrimaryDocumentStatus)
-                    .FirstAsync(w => w.ProcessId == processId);
-
-                workflowInstance.Status = WorkflowStatus.Updating.ToString();
-
-                await _dbContext.SaveChangesAsync();
-
-                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Complete");
-
-                if (success)
-                {
-                    await PersistCompletedVerify(processId, workflowInstance);
-
-                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-
-                    LogContext.PushProperty("UserFullName", UserFullName);
-
-                    _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
-
-                    await _commentsHelper.AddComment($"Verify step completed",
-                        processId,
-                        workflowInstance.WorkflowInstanceId,
-                        UserFullName);
-                }
-                else
-                {
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
-                    await _dbContext.SaveChangesAsync();
-
-                    _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
-
-                    ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
-
-                    return new JsonResult(this.ValidationErrorMessages)
-                    {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
-                    };
-                }
-            }
-
-            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
-
-
-            return StatusCode((int)HttpStatusCode.OK);
+            return true;
         }
 
         private async Task PersistCompletedVerify(int processId, WorkflowInstance workflowInstance)
@@ -409,7 +500,6 @@ namespace Portal.Pages.DbAssessment
                 return;
             }
 
-            currentVerify.WorkspaceAffected = SelectedCarisWorkspace;
             await _dbContext.SaveChangesAsync();
         }
 
