@@ -62,11 +62,12 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameDev)'
                   DatabaseName: '$(DatabaseNameDev)'
-                  SqlUsername: '$(SQLUsernameDev)'
-                  SqlPassword: '$(SQLPasswordDev)'
+                  aadSqlUsername: '$(SQLUsernameDev)'
+                  aadSqlPassword: '$(SQLPasswordDev)'
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
 
 - stage: DeployUAT
@@ -83,11 +84,12 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNameUAT)'
                   DatabaseName: '$(DatabaseNameUAT)'
-                  SqlUsername: '$(SQLUsernameUAT)'
-                  SqlPassword: '$(SQLPasswordUAT)'
+                  aadSqlUsername: '$(SQLUsernameUAT)'
+                  aadSqlPassword: '$(SQLPasswordUAT)'
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
 
 - stage: DeployPre
@@ -104,9 +106,10 @@ stages:
               - task: SqlAzureDacpacDeployment@1
                 inputs:
                   # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
                   azureSubscription: 'SharedServicesPre'
                   ServerName: '$(ServerNamePre)'
                   DatabaseName: '$(DatabaseNamePre)'
-                  SqlUsername: '$(SQLUsernamePre)'
-                  SqlPassword: '$(SQLPasswordPre)'
+                  aadSqlUsername: '$(SQLUsernamePre)'
+                  aadSqlPassword: '$(SQLPasswordPre)'
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
