@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -29,8 +31,10 @@ namespace Portal.UnitTests
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IUserIdentityService _fakeUserIdentityService;
+        private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
+        private IPageValidationHelper _fakePageValidationHelper;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
 
@@ -50,10 +54,42 @@ namespace Portal.UnitTests
 
             ProcessId = 123;
 
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance
+            {
+                AssessmentData = new AssessmentData(),
+                ProcessId = ProcessId,
+                ActivityName = "",
+                SerialNumber = "123_sn"
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData
+            {
+                ProcessId = ProcessId
+            });
+
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
                 ProcessId = ProcessId,
                 Assessor = "TestUser"
+            });
+
+            _dbContext.ProductAction.Add(new ProductAction
+            {
+                ProcessId = ProcessId,
+                ImpactedProduct = "",
+                ProductActionType = new ProductActionType {Name = "Test"},
+                Verified = false
+            });
+
+            _dbContext.DataImpact.Add(new DataImpact
+            {
+                ProcessId = ProcessId
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
             });
 
             _dbContext.SaveChanges();
@@ -64,6 +100,7 @@ namespace Portal.UnitTests
 
             _hpDbContext = new HpdDbContext(hpdDbContextOptions);
 
+            _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
@@ -71,6 +108,7 @@ namespace Portal.UnitTests
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
+            _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
         }
@@ -106,7 +144,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(5, _assessModel.ValidationErrorMessages.Count);
             Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
@@ -133,7 +171,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages[0]);
@@ -155,7 +193,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages[0]);
@@ -187,7 +225,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages[0]);
@@ -220,7 +258,7 @@ namespace Portal.UnitTests
             };
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages[0]);
@@ -251,7 +289,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages[0]);
@@ -274,7 +312,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "KnownUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages[0]);
@@ -297,7 +335,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "KnownUser";
             _assessModel.Verifier = "TestUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
             Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
             Assert.AreEqual($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages[0]);
@@ -315,7 +353,7 @@ namespace Portal.UnitTests
             row.Assessor = "";
             await _dbContext.SaveChangesAsync();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
 
             Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
         }
@@ -328,9 +366,164 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
 
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
+        {
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, 
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+                .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateAssessPage("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _assessModel.OnPostDoneAsync(ProcessId, true, "Done");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OnHoldTime);
+            Assert.AreEqual(onHoldRow.OnHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
+        {
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService,
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+                .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateAssessPage("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _dbContext.OnHold.AddAsync(new OnHold
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now,
+                OffHoldUser = "TestUser2",
+                WorkflowInstanceId = 1
+            });
+            await _dbContext.SaveChangesAsync();
+
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OffHoldTime);
+            Assert.AreEqual(onHoldRow.OffHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
+        {
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeUserIdentityService,
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
+                .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateAssessPage("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _assessModel.OnPostDoneAsync(ProcessId, true, "Done");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} has been put on hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
+        {
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeUserIdentityService,
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+                .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateAssessPage("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.OnHold.Add(new OnHold()
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now.AddDays(-1),
+                OnHoldUser = "TestUser",
+                WorkflowInstanceId = 1
+            });
+
+            _dbContext.SaveChanges();
+
+            await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

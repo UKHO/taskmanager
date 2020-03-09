@@ -61,7 +61,6 @@
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: formData,
-            cache: false,
             contentType: false,
             processData: false,
             complete: function () {
