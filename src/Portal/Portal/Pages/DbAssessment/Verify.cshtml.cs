@@ -224,47 +224,59 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task<bool> MarkTaskAsComplete(int processId, WorkflowInstance workflowInstance)
+        public async Task<IActionResult> OnPostRejectVerifyAsync(int processId, string comment)
         {
-            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+            LogContext.PushProperty("ActivityName", "Verify");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
+            LogContext.PushProperty("Comment", comment);
 
-            await _dbContext.SaveChangesAsync();
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            LogContext.PushProperty("UserFullName", UserFullName);
 
-            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
-                workflowInstance.SerialNumber, "Verify", "Complete");
+            _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            if (success)
+            ValidationErrorMessages.Clear();
+
+            if (string.IsNullOrWhiteSpace(comment))
             {
-                await PersistCompletedVerify(processId, workflowInstance);
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
+                ValidationErrorMessages.Add($"Reject comment cannot be empty.");
 
-                UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-
-                LogContext.PushProperty("UserFullName", UserFullName);
-
-                _logger.LogInformation(
-                    "{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
-
-                await _commentsHelper.AddComment($"Verify step completed",
-                    processId,
-                    workflowInstance.WorkflowInstanceId,
-                    UserFullName);
-            }
-            else
-            {
-                workflowInstance.Status = WorkflowStatus.Started.ToString();
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
-
-                ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
-
-                return false;
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
             }
 
+            if (processId < 1)
+            {
+                _logger.LogError("ProcessId is less than 1: {ProcessId}");
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
 
-            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+            _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            return true;
+            // TODO: Update K2 and persist
+            var workflowInstance = await _dbContext.WorkflowInstance
+                                                        .Include(p => p.PrimaryDocumentStatus)
+                                                        .FirstAsync(w => w.ProcessId == processId);
+
+            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
+
+            if (!await MarkTaskAsRejected(processId, workflowInstance))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.NotAcceptable
+                };
+
+            }
+
+            return RedirectToPage("/Index");
         }
 
         private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance)
@@ -315,6 +327,76 @@ namespace Portal.Pages.DbAssessment
             return true;
         }
 
+        private async Task<bool> MarkTaskAsComplete(int processId, WorkflowInstance workflowInstance)
+        {
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
+                workflowInstance.SerialNumber, "Verify", "Complete");
+
+            if (success)
+            {
+                await PersistCompletedVerify(processId, workflowInstance);
+
+                _logger.LogInformation(
+                    "{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                await _commentsHelper.AddComment($"Verify step completed",
+                    processId,
+                    workflowInstance.WorkflowInstanceId,
+                    UserFullName);
+            }
+            else
+            {
+                workflowInstance.Status = WorkflowStatus.Started.ToString();
+                await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation("Unable to progress task {ProcessId} from Verify to Completed.");
+
+                ValidationErrorMessages.Add("Unable to progress task from Verify to Completed. Please retry later.");
+
+                return false;
+            }
+
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return true;
+        }
+
+        private async Task<bool> MarkTaskAsRejected(int processId, WorkflowInstance workflowInstance)
+        {
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
+                workflowInstance.SerialNumber, "Verify", "Assess");
+
+            if (success)
+            {
+                _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+                await PersistRejectedVerify(processId, workflowInstance);
+
+                _logger.LogInformation("Finished Reject with: ProcessId: {ProcessId}; Action: {Action};");
+                
+                return true;
+
+            }
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+            await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation("Unable to reject task {ProcessId} from Verify to Assess.");
+
+            ValidationErrorMessages.Add("Unable to reject task from Assess to Verify. Please retry later.");
+
+            return false;
+        }
+        
         private async Task PersistCompletedVerify(int processId, WorkflowInstance workflowInstance)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
@@ -333,80 +415,6 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
             await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
             _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
-        }
-
-        public async Task<IActionResult> OnPostRejectVerifyAsync(int processId, string comment)
-        {
-            LogContext.PushProperty("ActivityName", "Verify");
-            LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
-            LogContext.PushProperty("Comment", comment);
-
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-            LogContext.PushProperty("UserFullName", UserFullName);
-
-            _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
-
-            ValidationErrorMessages.Clear();
-
-            if (string.IsNullOrWhiteSpace(comment))
-            {
-                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
-                ValidationErrorMessages.Add($"Reject comment cannot be empty.");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
-            }
-
-            if (processId < 1)
-            {
-                _logger.LogError("ProcessId is less than 1: {ProcessId}");
-                throw new ArgumentException($"{nameof(processId)} is less than 1");
-            }
-
-            _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
-
-            // TODO: Update K2 and persist
-            var workflowInstance = await _dbContext.WorkflowInstance
-                                                        .Include(p => p.PrimaryDocumentStatus)
-                                                        .FirstAsync(w => w.ProcessId == processId);
-
-            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                UserFullName);
-
-            workflowInstance.Status = WorkflowStatus.Updating.ToString();
-
-            await _dbContext.SaveChangesAsync();
-
-            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Verify", "Assess");
-
-            if (success)
-            {
-                await PersistRejectedVerify(processId, workflowInstance);
-
-                _logger.LogInformation("Rejected successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
-            }
-            else
-            {
-                workflowInstance.Status = WorkflowStatus.Started.ToString();
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("Unable to reject task {ProcessId} from Verify to Assess.");
-
-                // TODO - add  error message code later
-                //ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
-
-                //return new JsonResult(this.ValidationErrorMessages)
-                //{
-                //    StatusCode = (int)HttpStatusCode.InternalServerError
-                //};
-            }
-
-            return RedirectToPage("/Index");
         }
 
         private async Task PersistRejectedVerify(int processId, WorkflowInstance workflowInstance)
@@ -431,6 +439,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
         {
+            // TODO: Mark SDRA Assessment as completed
             try
             {
                 await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId,
