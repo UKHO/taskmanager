@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
@@ -373,6 +375,87 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(childProcessId.ToString(), _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_signOff_must_not_run_validation()
+        {
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            var childProcessId = 555;
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = childProcessId,
+                ActivityName = "Verify",
+                SerialNumber = "555_456",
+                ParentProcessId = ProcessId,
+                Status = WorkflowStatus.Started.ToString()
+
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData()
+            {
+                AssessmentDataId = 1,
+                ProcessId = ProcessId
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            _pageValidationHelper = A.Fake<IPageValidationHelper>();
+
+
+            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "ConfirmedSignOff");
+
+            // Assert
+            A.CallTo(() => _pageValidationHelper.ValidateVerifyPage(
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored, 
+                                                                                A<string>.Ignored, 
+                                                                                A<string>.Ignored, 
+                                                                                A<List<ProductAction>>.Ignored,
+                                                                                A<List<DataImpact>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<string>>.Ignored,
+                                                                                A<string>.Ignored))
+                                                            .MustNotHaveHappened();
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
+                                                                                A<int>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>
+                                                                                    .Ignored))
+                                                            .MustHaveHappened();
+
+            A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
+                                                                                nameof(PersistWorkflowInstanceDataEvent),
+                                                                                A<PersistWorkflowInstanceDataEvent>.Ignored))
+                                                            .MustHaveHappened();
         }
     }
 }
