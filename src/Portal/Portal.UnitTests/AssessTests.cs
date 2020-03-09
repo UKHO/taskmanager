@@ -146,7 +146,7 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(5, _assessModel.ValidationErrorMessages.Count);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 5);
             Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Activity code cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages);
@@ -173,8 +173,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -195,8 +195,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -227,8 +227,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -260,8 +260,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages);
         }
 
 
@@ -291,8 +291,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
         }
         
         [Test]
@@ -314,8 +314,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -337,8 +337,8 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Save");
 
-            Assert.AreEqual(1, _assessModel.ValidationErrorMessages.Count);
-            Assert.AreEqual($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages[0]);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -354,7 +354,7 @@ namespace Portal.UnitTests
             await _dbContext.SaveChangesAsync();
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
-
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
         }
 
@@ -368,6 +368,7 @@ namespace Portal.UnitTests
 
             await _assessModel.OnPostDoneAsync(ProcessId, false, "Done");
 
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
         }
 
