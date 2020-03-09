@@ -38,13 +38,20 @@ namespace NCNEPortal
         private readonly IPageValidationHelper _pageValidationHelper;
         public int ProcessId { get; set; }
 
-        [DisplayName("ION")] public string Ion { get; set; }
+        [DisplayName("ION")]
+        [BindProperty]
+        public string Ion { get; set; }
 
         [DisplayName("Chart title")] public string ChartTitle { get; set; }
 
-        [DisplayName("Chart number")] public string ChartNo { get; set; }
+        [DisplayName("Chart number")]
+        [BindProperty]
+        public string ChartNo { get; set; }
 
-        [DisplayName("Country")] public string Country { get; set; }
+
+        [DisplayName("Country")]
+        [BindProperty]
+        public string Country { get; set; }
 
         [DisplayName("Chart type")]
         public string ChartType { get; set; }
