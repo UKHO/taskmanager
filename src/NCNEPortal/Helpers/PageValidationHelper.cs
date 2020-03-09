@@ -54,19 +54,26 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = true;
 
-            if ((sendDate3Ps == null) && (expectedReturnDate3Ps != null || actualReturnDate3Ps != null))
+            if (sendDate3Ps == null)
             {
-                validationErrorMessages.Add("3PS : Please enter date sent to 3PS before entering actual and expected return dates");
-                isValid = false;
+                if (expectedReturnDate3Ps != null)
+                {
+                    validationErrorMessages.Add(
+                        "3PS : Please enter date sent to 3PS before entering expected return date");
+                    isValid = false;
+                }
+
+                if (actualReturnDate3Ps != null)
+                {
+                    validationErrorMessages.Add(
+                        "3PS : Please enter date sent to 3PS before entering actual return date");
+                    isValid = false;
+
+                }
             }
 
-            if ((expectedReturnDate3Ps == null) && (actualReturnDate3Ps != null))
-            {
-                validationErrorMessages.Add("3PS : Please enter expected return date before entering actual return date");
-                isValid = false;
-            }
+            else
 
-            if (sendDate3Ps != null)
             {
                 if ((expectedReturnDate3Ps != null) && (expectedReturnDate3Ps < sendDate3Ps))
                 {
@@ -81,6 +88,11 @@ namespace NCNEPortal.Helpers
                 }
             }
 
+            if ((expectedReturnDate3Ps == null) && (actualReturnDate3Ps != null))
+            {
+                validationErrorMessages.Add("3PS : Please enter expected return date before entering actual return date");
+                isValid = false;
+            }
 
             return isValid;
         }
