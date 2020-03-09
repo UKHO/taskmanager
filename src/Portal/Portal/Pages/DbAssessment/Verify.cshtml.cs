@@ -366,10 +366,6 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
-
             _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
 
             // TODO: Update K2 and persist
@@ -377,7 +373,7 @@ namespace Portal.Pages.DbAssessment
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
 
-            await _commentsHelper.AddComment($"Reject comment: {comment}",
+            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
                 UserFullName);
