@@ -269,14 +269,10 @@ namespace Portal.Pages.DbAssessment
 
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.NotAcceptable
-                };
-
+                return BadRequest(this.ValidationErrorMessages);
             }
-
-            return RedirectToPage("/Index");
+            
+            return StatusCode(200);
         }
 
         private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance)
@@ -382,7 +378,7 @@ namespace Portal.Pages.DbAssessment
                 await PersistRejectedVerify(processId, workflowInstance);
 
                 _logger.LogInformation("Finished Reject with: ProcessId: {ProcessId}; Action: {Action};");
-                
+
                 return true;
 
             }
@@ -396,7 +392,7 @@ namespace Portal.Pages.DbAssessment
 
             return false;
         }
-        
+
         private async Task PersistCompletedVerify(int processId, WorkflowInstance workflowInstance)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;

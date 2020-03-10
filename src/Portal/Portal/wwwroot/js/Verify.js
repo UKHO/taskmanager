@@ -165,7 +165,6 @@
                 if (action === "Done" || action === "ConfirmedSignOff") {
                     window.location.replace("/Index");
                 }
-                console.log("success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
