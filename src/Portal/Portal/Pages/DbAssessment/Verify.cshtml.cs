@@ -442,6 +442,15 @@ namespace Portal.Pages.DbAssessment
 
             if (onHold)
             {
+                IsOnHold = true;
+
+                var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
+                                                                                                         r.OffHoldTime == null);
+                if (existingOnHoldRecord != null)
+                {
+                    return;
+                }
+
                 var workflowInstance = _dbContext.WorkflowInstance
                     .FirstOrDefault(wi => wi.ProcessId == processId);
 
@@ -456,8 +465,6 @@ namespace Portal.Pages.DbAssessment
                 await _dbContext.OnHold.AddAsync(onHoldRecord);
                 await _dbContext.SaveChangesAsync();
 
-                IsOnHold = true;
-
                 await _commentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
@@ -465,15 +472,19 @@ namespace Portal.Pages.DbAssessment
             }
             else
             {
-                var onHoldRecord = await _dbContext.OnHold.FirstAsync(r => r.ProcessId == processId
-                                                                           && r.OffHoldTime == null);
+                IsOnHold = false;
 
-                onHoldRecord.OffHoldTime = DateTime.Now;
-                onHoldRecord.OffHoldUser = UserFullName;
+                var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
+                                                                                                     r.OffHoldTime == null);
+                if (existingOnHoldRecord == null)
+                {
+                    return;
+                }
+
+                existingOnHoldRecord.OffHoldTime = DateTime.Now;
+                existingOnHoldRecord.OffHoldUser = UserFullName;
 
                 await _dbContext.SaveChangesAsync();
-
-                IsOnHold = false;
 
                 await _commentsHelper.AddComment($"Task {processId} taken off hold",
                     processId,
