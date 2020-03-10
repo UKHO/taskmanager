@@ -1,9 +1,6 @@
 trigger:
 - master
 
-variables:
-- group: msbuildexe
-
 pool: NautilusBuild
 
 steps:
@@ -14,14 +11,14 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '**/*.sln'
+    projects: '$(Build.SourcesDirectory)\src\portal\portal\portal.csproj'
     feedsToUse: 'select'
 - task: synopsys-coverity@1
   inputs:
     coverityService: 'coverity.mgmt.local'
     projectName: 'TaskManager'
     streamName: 'TaskManager-master'
-    coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-    buildCommand: 'dotnet build src\TaskManager.sln'
+    coverityBuildDirectory: '$(Build.SourcesDirectory)'
+    buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\portal\portal\portal.csproj'
     customCommandArgs: true
     covAnalyzeArgs: '--webapp-security'
