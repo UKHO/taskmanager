@@ -1,4 +1,5 @@
 ﻿using System;
+using WorkflowDatabase.EF;
 
 namespace Common.Messages.Events
 {
@@ -6,7 +7,7 @@ namespace Common.Messages.Events
     {
         public Guid CorrelationId { get; set; }
         public int ProcessId { get; set; }
-        public string FromActivityName { get; set; }
-        public string ToActivityName { get; set; }
-    }   
+        public WorkflowStage FromActivity { get; set; }
+        public WorkflowStage ToActivity { get; set; }
+    }
 }

@@ -371,11 +371,11 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
-                workflowInstance.SerialNumber, "Verify", "Assess");
+            //var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
+            //    workflowInstance.SerialNumber, "Verify", "Assess");
 
-            if (success)
-            {
+            //if (success)
+            //{
                 _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
 
                 await PersistRejectedVerify(processId, workflowInstance);
@@ -384,7 +384,7 @@ namespace Portal.Pages.DbAssessment
 
                 return true;
 
-            }
+          //  }
 
             workflowInstance.Status = WorkflowStatus.Started.ToString();
             await _dbContext.SaveChangesAsync();
@@ -404,8 +404,8 @@ namespace Portal.Pages.DbAssessment
             {
                 CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivityName = "Verify",
-                ToActivityName = "Completed"
+                FromActivity = WorkflowStage.Verify,
+                ToActivity = WorkflowStage.Completed
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
@@ -424,8 +424,8 @@ namespace Portal.Pages.DbAssessment
             {
                 CorrelationId = correlationId ?? Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivityName = "Verify",
-                ToActivityName = "Assess"
+                FromActivity = WorkflowStage.Verify,
+                ToActivity = WorkflowStage.Assess
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",

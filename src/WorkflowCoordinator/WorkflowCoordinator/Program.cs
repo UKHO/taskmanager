@@ -8,7 +8,6 @@ using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -84,12 +83,12 @@ namespace WorkflowCoordinator
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                         options.UseSqlServer(connection));
 
-                    if (isLocalDebugging)
-                    {
-                        using var sp = services.BuildServiceProvider();
-                        using var context = sp.GetRequiredService<WorkflowDbContext>();
-                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                    }
+                    //if (isLocalDebugging)
+                    //{
+                    //    using var sp = services.BuildServiceProvider();
+                    //    using var context = sp.GetRequiredService<WorkflowDbContext>();
+                    //    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    //}
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                         .SetHandlerLifetime(TimeSpan.FromMinutes(5));

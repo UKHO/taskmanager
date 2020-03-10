@@ -88,7 +88,7 @@ namespace WorkflowCoordinator.Handlers
                 {
                     ProcessId = command.ChildProcessId,
                     Comments = new List<Comment>(),
-                    ActivityName = "Assess",
+                    ActivityName = WorkflowStage.Assess.ToString(),
                     ParentProcessId = command.ParentProcessId,
                     SerialNumber = newSn,
                     StartedAt = DateTime.Today,

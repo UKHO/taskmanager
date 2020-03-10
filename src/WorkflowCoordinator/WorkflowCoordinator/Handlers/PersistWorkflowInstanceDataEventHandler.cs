@@ -34,8 +34,8 @@ namespace WorkflowCoordinator.Handlers
             LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
             LogContext.PushProperty("CorrelationId", message.CorrelationId);
             LogContext.PushProperty("ProcessId", message.ProcessId);
-            LogContext.PushProperty("FromActivityName", message.FromActivityName);
-            LogContext.PushProperty("ToActivityName", message.ToActivityName);
+            LogContext.PushProperty("FromActivity", message.FromActivity);
+            LogContext.PushProperty("ToActivity", message.ToActivity);
 
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
@@ -49,17 +49,17 @@ namespace WorkflowCoordinator.Handlers
             }
 
 
-            if (k2Task == null && message.ToActivityName != "Completed")
+            if (k2Task == null && message.ToActivity != WorkflowStage.Completed)
             {
                 _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
             }
 
-            if (message.ToActivityName != "Completed" && k2Task.ActivityName != message.ToActivityName)
+            if (message.ToActivity != WorkflowStage.Completed && k2Task.ActivityName != message.ToActivity.ToString())
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);
-                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}");
-                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivityName}");
+                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivity}");
+                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivity}");
             }
 
             var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
@@ -67,17 +67,19 @@ namespace WorkflowCoordinator.Handlers
                 .FirstAsync(wi => wi.ProcessId == message.ProcessId);
 
 
-            switch (message.ToActivityName)
+            //if (message.FromActivity == WorkflowStage.Verify && message.ToActivity == WorkflowStage.Assess)
+
+            switch (message.ToActivity)
             {
-                case "Assess":
+                case WorkflowStage.Assess:
                     workflowInstance.SerialNumber = k2Task.SerialNumber;
                     workflowInstance.ActivityName = k2Task.ActivityName;
 
                     workflowInstance.Status = WorkflowStatus.Started.ToString();
 
-                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivityName, workflowInstance);
+                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
                     break;
-                case "Verify":
+                case WorkflowStage.Verify:
                     workflowInstance.SerialNumber = k2Task.SerialNumber;
                     workflowInstance.ActivityName = k2Task.ActivityName;
 
@@ -85,7 +87,7 @@ namespace WorkflowCoordinator.Handlers
 
                     await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
                     break;
-                case "Completed":
+                case WorkflowStage.Completed:
                     workflowInstance.SerialNumber = "";
                     workflowInstance.ActivityName = WorkflowStatus.Completed.ToString();
 
@@ -94,7 +96,7 @@ namespace WorkflowCoordinator.Handlers
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
                     break;
                 default:
-                    throw new NotImplementedException($"{message.ToActivityName} has not been implemented for processId: {message.ProcessId}.");
+                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
             }
 
             await _dbContext.SaveChangesAsync();
@@ -104,17 +106,17 @@ namespace WorkflowCoordinator.Handlers
         }
 
         private async Task PersistWorkflowDataToAssess(int processId,
-            int workflowInstanceId, string fromActivityName, WorkflowInstance workflowInstance)
+            int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
-            LogContext.PushProperty("FromActivityName", fromActivityName);
+            LogContext.PushProperty("FromActivity", fromActivity);
 
             _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
-                                   "workflowInstanceId: {WorkflowInstanceId}; and fromActivityName: {FromActivityName}.");
+                                   "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
 
-            if (fromActivityName == "Verify")
+            if (fromActivity == WorkflowStage.Verify)
             {
                 //TODO: Copy data from Verify to Assess
 

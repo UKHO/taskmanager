@@ -244,8 +244,8 @@ namespace Portal.Pages.DbAssessment
             {
                 CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivityName = "Review",
-                ToActivityName = "Assess"
+                FromActivity = WorkflowStage.Review,
+                ToActivity = WorkflowStage.Assess
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",

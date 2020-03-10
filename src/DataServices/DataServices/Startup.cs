@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Events;
 
@@ -46,14 +48,14 @@ namespace DataServices
             services.AddDbContext<SdraDbContext>((serviceProvider, options) =>
                 options.UseOracle(connection));
 
-            services.AddControllers().AddJsonOptions(o =>
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.Converters.Add(new StringEnumConverter
                 {
-                    //o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    //o.SerializerSettings.Converters.Add(new StringEnumConverter
-                    //{
-                    //    CamelCaseText = true
-                    //});
+                    CamelCaseText = true
                 });
+            });
 
             services
                 .AddSwaggerGen(c =>

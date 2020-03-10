@@ -10,6 +10,7 @@ using EventService.Attributes;
 using EventService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using NServiceBus;
 using Polly;
 using Serilog.Context;
@@ -186,7 +187,7 @@ namespace EventService.Controllers
 
             try
             {
-                populatedEvent = System.Text.Json.JsonSerializer.Deserialize(body.ToString(), eventType, null);
+                populatedEvent = JsonConvert.DeserializeObject(body.ToString(), eventType);
             }
             catch (Exception e)
             {
