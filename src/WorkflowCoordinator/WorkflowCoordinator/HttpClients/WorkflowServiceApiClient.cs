@@ -154,7 +154,7 @@ namespace WorkflowCoordinator.HttpClients
                 return null;
             }
 
-            return tasks.Tasks.First(w => w.WorkflowInstanceID == workflowInstanceId);
+            return tasks.Tasks.FirstOrDefault(w => w.WorkflowInstanceID == workflowInstanceId);
         }
     }
 }
