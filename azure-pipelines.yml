@@ -22,6 +22,6 @@ steps:
     projectName: 'TaskManager'
     streamName: 'TaskManager-master'
     coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-    buildCommand: 'dotnetcore build src\TaskManager.sln'
+    buildCommand: 'dotnet build src\TaskManager.sln'
     customCommandArgs: true
     covAnalyzeArgs: '--webapp-security'
