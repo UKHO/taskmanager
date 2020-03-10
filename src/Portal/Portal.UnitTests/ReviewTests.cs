@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -27,6 +28,7 @@ namespace Portal.UnitTests
         private ILogger<ReviewModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
+        private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
@@ -43,6 +45,7 @@ namespace Portal.UnitTests
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
+            _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
@@ -68,6 +71,14 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 CorrelationId = Guid.NewGuid()
+            });
+
+            _dbContext.OnHold.Add(new OnHold()
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now.AddDays(-1),
+                OnHoldUser = "TestUser",
+                WorkflowInstanceId = 1
             });
 
             _dbContext.SaveChanges();
@@ -295,7 +306,6 @@ namespace Portal.UnitTests
                 },
                 AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
-
 
             A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
@@ -670,6 +680,184 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
+        {
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakepageValidationHelper);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+                Reviewer = "TestUser"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = true;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
+            await _dbContext.SaveChangesAsync();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OnHoldTime);
+            Assert.AreEqual(onHoldRow.OnHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
+        {
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakepageValidationHelper);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+                Reviewer = "TestUser"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = false;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OffHoldTime);
+            Assert.AreEqual(onHoldRow.OffHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
+        {
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakepageValidationHelper);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+                Reviewer = "TestUser"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = true;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
+            await _dbContext.SaveChangesAsync();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} has been put on hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
+        {
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakepageValidationHelper);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User",
+                Notes = primaryAssignTaskNote,
+                Reviewer = "TestUser"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Team = "Home Waters";
+            _reviewModel.IsOnHold = false;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

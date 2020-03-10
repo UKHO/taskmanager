@@ -27,7 +27,7 @@
         $("#btnSave").prop("disabled", true);
         $("#modalWaitAssessDone").modal("show");
 
-        var formData = $('#frmAssessPage').serialize();
+        var formData = $("#frmAssessPage").serialize();
 
         $.ajax({
             type: "POST",

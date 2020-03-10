@@ -44,7 +44,7 @@
         $("#btnSave").prop("disabled", true);
         $("#modalWaitReviewDone").modal("show");
 
-        var formData = $('#frmReviewPage').serialize();
+        var formData = $("#frmReviewPage").serialize();
 
         $.ajax({
             type: "POST",

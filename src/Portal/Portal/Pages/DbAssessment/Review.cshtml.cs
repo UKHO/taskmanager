@@ -33,6 +33,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IPageValidationHelper _pageValidationHelper;
 
         public int ProcessId { get; set; }
+
+        [BindProperty]
         public bool IsOnHold { get; set; }
 
         [BindProperty]
@@ -175,6 +177,7 @@ namespace Portal.Pages.DbAssessment
 
             PrimaryAssignedTask.ProcessId = ProcessId;
 
+            await UpdateOnHold(ProcessId, IsOnHold);
             await UpdateDbAssessmentReviewData(ProcessId);
             await SaveAdditionalTasks(ProcessId);
             await UpdateAssessmentData(ProcessId);
@@ -352,6 +355,64 @@ namespace Portal.Pages.DbAssessment
                     nameof(_dataServiceApiClient.PutAssessmentCompleted),
                     workflowInstance.AssessmentData.PrimarySdocId,
                     comment);
+            }
+        }
+
+        private async Task UpdateOnHold(int processId, bool onHold)
+        {
+            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+
+            if (onHold)
+            {
+                IsOnHold = true;
+
+                var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
+                                                                                                         r.OffHoldTime == null);
+                if (existingOnHoldRecord != null)
+                {
+                    return;
+                }
+
+                var workflowInstance = _dbContext.WorkflowInstance
+                    .FirstOrDefault(wi => wi.ProcessId == processId);
+
+                var onHoldRecord = new OnHold
+                {
+                    ProcessId = processId,
+                    OnHoldTime = DateTime.Now,
+                    OnHoldUser = UserFullName,
+                    WorkflowInstanceId = workflowInstance.WorkflowInstanceId
+                };
+
+                await _dbContext.OnHold.AddAsync(onHoldRecord);
+                await _dbContext.SaveChangesAsync();
+
+                await _commentsHelper.AddComment($"Task {processId} has been put on hold",
+                    processId,
+                    workflowInstance.WorkflowInstanceId,
+                    UserFullName);
+            }
+            else
+            {
+                IsOnHold = false;
+
+                var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
+                                                                                                     r.OffHoldTime == null);
+                if (existingOnHoldRecord == null)
+                {
+                    return;
+                }
+
+                existingOnHoldRecord.OffHoldTime = DateTime.Now;
+                existingOnHoldRecord.OffHoldUser = UserFullName;
+
+                await _dbContext.SaveChangesAsync();
+
+                await _commentsHelper.AddComment($"Task {processId} taken off hold",
+                    processId,
+                    _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
+                        .WorkflowInstanceId,
+                    UserFullName);
             }
         }
 
