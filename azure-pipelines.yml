@@ -7,6 +7,14 @@ variables:
 pool: NautilusBuild
 
 steps:
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec: '4.x'
+    checkLatest: true
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'    
 - task: synopsys-coverity@1
   inputs:
     coverityService: 'coverity.mgmt.local'
