@@ -7,20 +7,21 @@ variables:
 pool: NautilusBuild
 
 steps:
-- task: NuGetToolInstaller@1
+- task: UseDotNet@2
   inputs:
-    versionSpec: '4.x'
-    checkLatest: true
-- task: NuGetCommand@2
+    packageType: 'sdk'
+    version: '3.0'
+- task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    restoreSolution: '**/*.sln'    
+    projects: '**/*.sln'
+    feedsToUse: 'select'
 - task: synopsys-coverity@1
   inputs:
     coverityService: 'coverity.mgmt.local'
     projectName: 'TaskManager'
     streamName: 'TaskManager-master'
     coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-    buildCommand: '$(msbuild) src\TaskManager.sln'
+    buildCommand: 'dotnet build src\TaskManager.sln'
     customCommandArgs: true
     covAnalyzeArgs: '--webapp-security'
