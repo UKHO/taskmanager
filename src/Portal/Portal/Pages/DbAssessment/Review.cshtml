@@ -53,7 +53,6 @@
 <form id="frmReviewPage" method="post">
 
     <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
-    <input type="hidden" id="hdnOnHold" value="@Model.IsOnHold" name="IsOnHold" />
     <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
 
     <div id="taskInformation"></div>

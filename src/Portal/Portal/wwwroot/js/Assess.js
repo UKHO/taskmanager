@@ -27,12 +27,6 @@
         $("#btnSave").prop("disabled", true);
         $("#modalWaitAssessDone").modal("show");
 
-        if (document.getElementById("onHoldToggle").checked) {
-            $("#hdnOnHold").val(true);
-        } else {
-            $("#hdnOnHold").val(false);
-        }
-
         var formData = $("#frmAssessPage").serialize();
 
         $.ajax({

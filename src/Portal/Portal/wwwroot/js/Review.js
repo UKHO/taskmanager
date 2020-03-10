@@ -44,12 +44,6 @@
         $("#btnSave").prop("disabled", true);
         $("#modalWaitReviewDone").modal("show");
 
-        if (document.getElementById("onHoldToggle").checked) {
-            $("#hdnOnHold").val(true);
-        } else {
-            $("#hdnOnHold").val(false);
-        }
-
         var formData = $("#frmReviewPage").serialize();
 
         $.ajax({

@@ -35,7 +35,7 @@
                             <div class="col-5 p-0">@Html.LabelFor(model => model.OnHoldDays)</div>
                             <div class="col-7" style="padding-left: 0;">
                                 <label class="switch ml-2 mb-auto">
-                                    <input type="checkbox" id="onHoldToggle" class="success" @(Model.IsOnHold ? "checked" : "") value="true">
+                                    <input type="checkbox" id="onHoldToggle" name="IsOnHold" class="success" @(Model.IsOnHold ? "checked" : "") value="true">
                                     <span class="slider"></span>
                                 </label>
                                 @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
