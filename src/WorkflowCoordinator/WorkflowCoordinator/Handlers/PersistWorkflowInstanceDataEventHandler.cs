@@ -41,13 +41,13 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            if (k2Task == null)
+            if (k2Task == null && message.ToActivityName != "Completed")
             {
                 _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
             }
 
-            if (k2Task.ActivityName != message.ToActivityName)
+            if (message.ToActivityName != "Completed" && k2Task.ActivityName != message.ToActivityName)
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);
                 _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}");
@@ -58,20 +58,31 @@ namespace WorkflowCoordinator.Handlers
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == message.ProcessId);
 
-            workflowInstance.SerialNumber = k2Task.SerialNumber;
-            workflowInstance.ActivityName = k2Task.ActivityName;
-
-            workflowInstance.Status = message.ToActivityName == "Completed" ? WorkflowStatus.Completed.ToString() : WorkflowStatus.Started.ToString();
 
             switch (message.ToActivityName)
             {
                 case "Assess":
+                    workflowInstance.SerialNumber = k2Task.SerialNumber;
+                    workflowInstance.ActivityName = k2Task.ActivityName;
+
+                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+
                     await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivityName, workflowInstance);
                     break;
                 case "Verify":
+                    workflowInstance.SerialNumber = k2Task.SerialNumber;
+                    workflowInstance.ActivityName = k2Task.ActivityName;
+
+                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+
                     await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
                     break;
                 case "Completed":
+                    workflowInstance.SerialNumber = "";
+                    workflowInstance.ActivityName = WorkflowStatus.Completed.ToString();
+
+                    workflowInstance.Status = WorkflowStatus.Completed.ToString();
+
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
                     break;
                 default:
