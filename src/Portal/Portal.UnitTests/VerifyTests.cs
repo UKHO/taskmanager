@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Events;
@@ -32,8 +34,10 @@ namespace Portal.UnitTests
         private IDataServiceApiClient _fakeDataServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IUserIdentityService _fakeUserIdentityService;
+        private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
+        private IPageValidationHelper _fakePageValidationHelper;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
 
@@ -50,6 +54,7 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+            _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
 
             ProcessId = 123;
@@ -60,10 +65,27 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 ActivityName = "Verify",
                 SerialNumber = "123_456"
-                
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData
+            {
+                ProcessId = ProcessId
             });
 
             _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
+            {
+                ProcessId = ProcessId
+            });
+
+            _dbContext.ProductAction.Add(new ProductAction
+            {
+                ProcessId = ProcessId,
+                ImpactedProduct = "",
+                ProductActionType = new ProductActionType { Name = "Test" },
+                Verified = false
+            });
+
+            _dbContext.DataImpact.Add(new DataImpact
             {
                 ProcessId = ProcessId
             });
@@ -76,6 +98,7 @@ namespace Portal.UnitTests
 
             _hpDbContext = new HpdDbContext(hpdDbContextOptions);
 
+            _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
@@ -334,6 +357,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_has_active_child_tasks_returns_warning_message()
         {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("This User"));
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
 
@@ -456,6 +481,168 @@ namespace Portal.UnitTests
                                                                                 nameof(PersistWorkflowInstanceDataEvent),
                                                                                 A<PersistWorkflowInstanceDataEvent>.Ignored))
                                                             .MustHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
+        {
+            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.IsOnHold = true;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+            //    .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
+                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(true);
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OnHoldTime);
+            Assert.AreEqual(onHoldRow.OnHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
+        {
+            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.IsOnHold = false;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+            //    .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored,
+                A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(Task.FromResult(true));
+
+            await _dbContext.OnHold.AddAsync(new OnHold
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now,
+                OffHoldUser = "TestUser2",
+                WorkflowInstanceId = 1
+            });
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
+
+            Assert.NotNull(onHoldRow);
+            Assert.NotNull(onHoldRow.OffHoldTime);
+            Assert.AreEqual(onHoldRow.OffHoldUser, "TestUser2");
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
+        {
+            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.IsOnHold = true;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
+            //    .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
+                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(Task.FromResult(true));
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} has been put on hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        [Test]
+        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
+        {
+            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.IsOnHold = false;
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+            //    .Returns(true);
+            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
+                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(Task.FromResult(true));
+
+            _dbContext.OnHold.Add(new OnHold()
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now.AddDays(-1),
+                OnHoldUser = "TestUser",
+                WorkflowInstanceId = 1
+            });
+
+            _dbContext.SaveChanges();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+
+            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+
+            Assert.GreaterOrEqual(comments.Count, 1);
+            Assert.IsTrue(comments.Any(c =>
+                c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
         }
     }
 }
