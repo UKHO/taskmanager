@@ -13,6 +13,6 @@ steps:
     projectName: 'TaskManager'
     streamName: 'TaskManager-master'
     coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-    buildCommand: '$(msbuild) "/src/TaskManager.sln" /build'
+    buildCommand: '$(msbuild) "$(Build.Repository.LocalPath)\src\TaskManager.sln" /build'
     customCommandArgs: true
     covAnalyzeArgs: '--webapp-security'
