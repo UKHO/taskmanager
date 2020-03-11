@@ -60,7 +60,7 @@ namespace WorkflowCoordinator.Handlers
                     }
                     else
                     {
-                        await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
+                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
 
                     }
 
@@ -71,7 +71,7 @@ namespace WorkflowCoordinator.Handlers
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
-                    await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
+                    await PersistWorkflowDataToVerifyFromAssess(message.ProcessId, workflowInstance.WorkflowInstanceId);
 
                     break;
                 case WorkflowStage.Completed:
@@ -136,15 +136,15 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistWorkflowDataToAssess(int processId,
+        private async Task PersistWorkflowDataToAssessFromReview(int processId,
             int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
         {
-            LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
+            LogContext.PushProperty("PersistWorkflowDataToAssessFromReview", nameof(PersistWorkflowDataToAssessFromReview));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
             LogContext.PushProperty("FromActivity", fromActivity);
 
-            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromReview} with processId: {ProcessId}; " +
                                    "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
 
 
@@ -183,12 +183,12 @@ namespace WorkflowCoordinator.Handlers
         private async Task PersistWorkflowDataToAssessFromVerify(int processId,
             int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
         {
-            LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
+            LogContext.PushProperty("PersistWorkflowDataToAssessFromVerify", nameof(PersistWorkflowDataToAssessFromVerify));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
             LogContext.PushProperty("FromActivity", fromActivity);
 
-            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromVerify} with processId: {ProcessId}; " +
                                    "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
 
 
@@ -235,15 +235,15 @@ namespace WorkflowCoordinator.Handlers
         }
 
 
-        private async Task PersistWorkflowDataToVerify(
+        private async Task PersistWorkflowDataToVerifyFromAssess(
             int processId,
             int workflowInstanceId)
         {
-            LogContext.PushProperty("PersistWorkflowDataToVerify", nameof(PersistWorkflowDataToVerify));
+            LogContext.PushProperty("PersistWorkflowDataToVerifyFromAssess", nameof(PersistWorkflowDataToVerifyFromAssess));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
 
-            _logger.LogInformation("Entering {PersistWorkflowDataToVerify} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+            _logger.LogInformation("Entering {PersistWorkflowDataToVerifyFromAssess} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
 
             var assessData = await _dbContext.DbAssessmentAssessData.SingleAsync(d => d.ProcessId == processId);
 
