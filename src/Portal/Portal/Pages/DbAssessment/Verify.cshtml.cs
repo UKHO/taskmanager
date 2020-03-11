@@ -263,16 +263,17 @@ namespace Portal.Pages.DbAssessment
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
 
-            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                UserFullName);
 
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
                 return BadRequest(this.ValidationErrorMessages);
             }
             
+            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
+
             return StatusCode(200);
         }
 
