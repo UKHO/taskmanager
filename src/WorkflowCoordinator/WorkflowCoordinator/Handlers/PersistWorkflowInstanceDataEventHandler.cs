@@ -1,12 +1,11 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
@@ -52,7 +51,18 @@ namespace WorkflowCoordinator.Handlers
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
-                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
+                    var isRejected = message.FromActivity == WorkflowStage.Verify;
+
+                    if (isRejected)
+                    {
+                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
+
+                    }
+                    else
+                    {
+                        await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
+
+                    }
 
                     break;
                 case WorkflowStage.Verify:
@@ -137,22 +147,6 @@ namespace WorkflowCoordinator.Handlers
             _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
                                    "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
 
-            if (fromActivity == WorkflowStage.Verify)
-            {
-                //TODO: Copy data from Verify to Assess
-
-                foreach (var productAction in workflowInstance.ProductAction)
-                {
-                    productAction.Verified = false;
-                }
-                foreach (var dataImpact in workflowInstance.DataImpact)
-                {
-                    dataImpact.Verified = false;
-                }
-
-
-                return;
-            }
 
             var reviewData = await _dbContext.DbAssessmentReviewData.SingleAsync(d => d.ProcessId == processId);
 
@@ -179,6 +173,60 @@ namespace WorkflowCoordinator.Handlers
             assessData.Reviewer = reviewData.Reviewer;
             assessData.Assessor = reviewData.Assessor;
             assessData.Verifier = reviewData.Verifier;
+
+            if (!isExists)
+            {
+                await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
+            }
+        }
+
+        private async Task PersistWorkflowDataToAssessFromVerify(int processId,
+            int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        {
+            LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+            LogContext.PushProperty("FromActivity", fromActivity);
+
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
+                                   "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
+
+
+            foreach (var productAction in workflowInstance.ProductAction)
+            {
+                productAction.Verified = false;
+            }
+
+            foreach (var dataImpact in workflowInstance.DataImpact)
+            {
+                dataImpact.Verified = false;
+            }
+
+            var verifyData = await _dbContext.DbAssessmentVerifyData.SingleAsync(d => d.ProcessId == processId);
+
+            _logger.LogInformation("Saving primary task data from verify to assess for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+            var assessData =
+                await _dbContext.DbAssessmentAssessData.SingleOrDefaultAsync(d => d.ProcessId == processId);
+
+            var isExists = (assessData != null);
+
+            if (!isExists)
+            {
+                assessData = new DbAssessmentAssessData();
+            }
+
+            assessData.ProcessId = processId;
+            assessData.WorkflowInstanceId = workflowInstanceId;
+
+            assessData.ActivityCode = verifyData.ActivityCode;
+            assessData.Ion = verifyData.Ion;
+            assessData.SourceCategory = verifyData.SourceCategory;
+            assessData.WorkspaceAffected = verifyData.WorkspaceAffected;
+            assessData.TaskType = verifyData.TaskType;
+            assessData.Reviewer = verifyData.Reviewer;
+            assessData.Assessor = verifyData.Assessor;
+            assessData.Verifier = verifyData.Verifier;
 
             if (!isExists)
             {

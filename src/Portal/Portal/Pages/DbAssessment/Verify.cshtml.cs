@@ -371,11 +371,11 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            //var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
-            //    workflowInstance.SerialNumber, "Verify", "Assess");
+            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
+                workflowInstance.SerialNumber, "Verify", "Assess");
 
-            //if (success)
-            //{
+            if (success)
+            {
                 _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
 
                 await PersistRejectedVerify(processId, workflowInstance);
@@ -384,7 +384,7 @@ namespace Portal.Pages.DbAssessment
 
                 return true;
 
-          //  }
+            }
 
             workflowInstance.Status = WorkflowStatus.Started.ToString();
             await _dbContext.SaveChangesAsync();
