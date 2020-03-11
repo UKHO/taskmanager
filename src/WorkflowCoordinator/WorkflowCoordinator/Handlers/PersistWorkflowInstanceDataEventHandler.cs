@@ -41,7 +41,7 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            if (message.ToActivityName == "Completed" && k2Task != null)
+            if (message.ToActivity == WorkflowStage.Completed && k2Task != null)
             {
                 // if task as at Completed, then we expect k2Task to be null
                 _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
