@@ -55,13 +55,11 @@ namespace WorkflowCoordinator.Handlers
 
                     if (isRejected)
                     {
-                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
-
+                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
                     }
                     else
                     {
-                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
-
+                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
                     }
 
                     break;
@@ -136,12 +134,11 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistWorkflowDataToAssessFromReview(int processId,
-            int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        private async Task PersistWorkflowDataToAssessFromReview(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssessFromReview", nameof(PersistWorkflowDataToAssessFromReview));
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
             LogContext.PushProperty("FromActivity", fromActivity);
 
             _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromReview} with processId: {ProcessId}; " +
@@ -163,7 +160,7 @@ namespace WorkflowCoordinator.Handlers
             }
 
             assessData.ProcessId = processId;
-            assessData.WorkflowInstanceId = workflowInstanceId;
+            assessData.WorkflowInstanceId = workflowInstance.WorkflowInstanceId;
 
             assessData.ActivityCode = reviewData.ActivityCode;
             assessData.Ion = reviewData.Ion;
@@ -180,12 +177,11 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
-        private async Task PersistWorkflowDataToAssessFromVerify(int processId,
-            int workflowInstanceId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        private async Task PersistWorkflowDataToAssessFromVerify(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssessFromVerify", nameof(PersistWorkflowDataToAssessFromVerify));
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
             LogContext.PushProperty("FromActivity", fromActivity);
 
             _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromVerify} with processId: {ProcessId}; " +
@@ -217,7 +213,7 @@ namespace WorkflowCoordinator.Handlers
             }
 
             assessData.ProcessId = processId;
-            assessData.WorkflowInstanceId = workflowInstanceId;
+            assessData.WorkflowInstanceId = workflowInstance.WorkflowInstanceId;
 
             assessData.ActivityCode = verifyData.ActivityCode;
             assessData.Ion = verifyData.Ion;
