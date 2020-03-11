@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -41,59 +42,36 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            if (message.ToActivity == WorkflowStage.Completed && k2Task != null)
-            {
-                // if task as at Completed, then we expect k2Task to be null
-                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
-            }
-
-
-            if (k2Task == null && message.ToActivity != WorkflowStage.Completed)
-            {
-                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
-            }
-
-            if (message.ToActivity != WorkflowStage.Completed && k2Task.ActivityName != message.ToActivity.ToString())
-            {
-                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
-                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivity}");
-                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivity}");
-            }
-
-            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
-                .Include(wi => wi.DataImpact)
-                .FirstAsync(wi => wi.ProcessId == message.ProcessId);
-
-
-            //if (message.FromActivity == WorkflowStage.Verify && message.ToActivity == WorkflowStage.Assess)
+            WorkflowInstance workflowInstance = null;
 
             switch (message.ToActivity)
             {
                 case WorkflowStage.Assess:
-                    workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    workflowInstance.ActivityName = k2Task.ActivityName;
 
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
+
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
                     await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivity, workflowInstance);
+
                     break;
                 case WorkflowStage.Verify:
-                    workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    workflowInstance.ActivityName = k2Task.ActivityName;
 
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
+
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
                     await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
+
                     break;
                 case WorkflowStage.Completed:
-                    workflowInstance.SerialNumber = "";
-                    workflowInstance.ActivityName = WorkflowStatus.Completed.ToString();
 
-                    workflowInstance.Status = WorkflowStatus.Completed.ToString();
+                    ValidateK2TaskForSignOff(message, k2Task);
+
+                    await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
+
                     break;
                 default:
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
@@ -102,6 +80,49 @@ namespace WorkflowCoordinator.Handlers
             await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
+
+        }
+
+        private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
+        {
+            if (k2Task != null)
+            {
+                // if task as at Completed, then we expect k2Task to be null
+                _logger.LogError("K2 Task is not at expected stage {ToActivity} for ProcessId {ProcessId}; but was at " +
+                                 k2Task.ActivityName);
+                throw new ApplicationException(
+                    $"K2 Task is not at expected stage {message.ToActivity} for ProcessId {message.ProcessId}; but was at {k2Task.ActivityName}");
+            }
+        }
+
+        private void ValidateK2TaskForAssessAndVerify(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
+        {
+            if (k2Task == null)
+            {
+                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
+                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
+            }
+
+            if (k2Task.ActivityName != message.ToActivity.ToString())
+            {
+                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
+                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivity}");
+                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivity}");
+            }
+        }
+
+        private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, WorkflowStage toActivity, K2TaskData k2Task)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
+                .Include(wi => wi.DataImpact)
+                .FirstAsync(wi => wi.ProcessId == processId);
+
+            workflowInstance.SerialNumber = (toActivity == WorkflowStage.Completed) ? "" : k2Task.SerialNumber;
+            workflowInstance.ActivityName = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : k2Task.ActivityName;
+
+            workflowInstance.Status = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : WorkflowStatus.Started.ToString();
+
+            return workflowInstance;
 
         }
 
@@ -128,6 +149,7 @@ namespace WorkflowCoordinator.Handlers
                 {
                     dataImpact.Verified = false;
                 }
+
 
                 return;
             }
