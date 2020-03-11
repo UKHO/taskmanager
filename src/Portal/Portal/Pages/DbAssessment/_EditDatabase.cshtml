@@ -31,7 +31,7 @@
                     </div>
                     <div class="form-row align-items-center justify-content-center">
                         <div class="col-4">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
-                        <div class="col-8">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control form-text-input" })</div>
+                        <div class="col-8">@Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control form-text-input", @disabled = "disabled" })</div>
                     </div>
                     <div class="row justify-content-start">
                         <div class="col-4">
