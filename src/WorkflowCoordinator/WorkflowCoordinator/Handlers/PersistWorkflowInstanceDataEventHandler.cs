@@ -1,13 +1,13 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -34,67 +34,55 @@ namespace WorkflowCoordinator.Handlers
             LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
             LogContext.PushProperty("CorrelationId", message.CorrelationId);
             LogContext.PushProperty("ProcessId", message.ProcessId);
-            LogContext.PushProperty("FromActivityName", message.FromActivityName);
-            LogContext.PushProperty("ToActivityName", message.ToActivityName);
+            LogContext.PushProperty("FromActivity", message.FromActivity);
+            LogContext.PushProperty("ToActivity", message.ToActivity);
 
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            if (message.ToActivityName == "Completed" && k2Task != null)
+            WorkflowInstance workflowInstance = null;
+
+            switch (message.ToActivity)
             {
-                // if task as at Completed, then we expect k2Task to be null
-                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
-            }
+                case WorkflowStage.Assess:
 
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
 
-            if (k2Task == null && message.ToActivityName != "Completed")
-            {
-                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
-            }
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
-            if (message.ToActivityName != "Completed" && k2Task.ActivityName != message.ToActivityName)
-            {
-                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
-                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivityName}");
-                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivityName}");
-            }
+                    var isRejected = message.FromActivity == WorkflowStage.Verify;
 
-            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
-                .Include(wi => wi.DataImpact)
-                .FirstAsync(wi => wi.ProcessId == message.ProcessId);
+                    if (isRejected)
+                    {
+                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
+                    }
+                    else
+                    {
+                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
+                    }
 
-
-            switch (message.ToActivityName)
-            {
-                case "Assess":
-                    workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    workflowInstance.ActivityName = k2Task.ActivityName;
-
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
-
-                    await PersistWorkflowDataToAssess(message.ProcessId, workflowInstance.WorkflowInstanceId, message.FromActivityName, workflowInstance);
                     break;
-                case "Verify":
-                    workflowInstance.SerialNumber = k2Task.SerialNumber;
-                    workflowInstance.ActivityName = k2Task.ActivityName;
+                case WorkflowStage.Verify:
 
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
 
-                    await PersistWorkflowDataToVerify(message.ProcessId, workflowInstance.WorkflowInstanceId);
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
+
+                    await PersistWorkflowDataToVerifyFromAssess(message.ProcessId, workflowInstance.WorkflowInstanceId);
+
                     break;
-                case "Completed":
-                    workflowInstance.SerialNumber = "";
-                    workflowInstance.ActivityName = WorkflowStatus.Completed.ToString();
+                case WorkflowStage.Completed:
 
-                    workflowInstance.Status = WorkflowStatus.Completed.ToString();
+                    ValidateK2TaskForSignOff(message, k2Task);
+
+                    await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
+
                     break;
                 default:
-                    throw new NotImplementedException($"{message.ToActivityName} has not been implemented for processId: {message.ProcessId}.");
+                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
             }
 
             await _dbContext.SaveChangesAsync();
@@ -103,32 +91,59 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistWorkflowDataToAssess(int processId,
-            int workflowInstanceId, string fromActivityName, WorkflowInstance workflowInstance)
+        private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
         {
-            LogContext.PushProperty("PersistWorkflowDataToAssess", nameof(PersistWorkflowDataToAssess));
-            LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
-            LogContext.PushProperty("FromActivityName", fromActivityName);
-
-            _logger.LogInformation("Entering {PersistWorkflowDataToAssess} with processId: {ProcessId}; " +
-                                   "workflowInstanceId: {WorkflowInstanceId}; and fromActivityName: {FromActivityName}.");
-
-            if (fromActivityName == "Verify")
+            if (k2Task != null)
             {
-                //TODO: Copy data from Verify to Assess
-
-                foreach (var productAction in workflowInstance.ProductAction)
-                {
-                    productAction.Verified = false;
-                }
-                foreach (var dataImpact in workflowInstance.DataImpact)
-                {
-                    dataImpact.Verified = false;
-                }
-
-                return;
+                // if task is at Completed, then we expect k2Task to be null
+                _logger.LogError("K2 Task is not at expected stage {ToActivity} for ProcessId {ProcessId}; but was at " +
+                                 k2Task.ActivityName);
+                throw new ApplicationException(
+                    $"K2 Task is not at expected stage {message.ToActivity} for ProcessId {message.ProcessId}; but was at {k2Task.ActivityName}");
             }
+        }
+
+        private void ValidateK2TaskForAssessAndVerify(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
+        {
+            if (k2Task == null)
+            {
+                _logger.LogError("Failed to get data for K2 Task with ProcessId {ProcessId} while moving task from {FromActivity} to {ToActivity}");
+                throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {message.ProcessId} while moving task from {message.FromActivity} to {message.ToActivity}");
+            }
+
+            if (k2Task.ActivityName != message.ToActivity.ToString())
+            {
+                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
+                _logger.LogError("K2Task with ProcessId {ProcessId} is at K2 stage {K2Stage} and not at {ToActivity}, while moving task from {FromActivity}");
+                throw new ApplicationException($"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}");
+            }
+        }
+
+        private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, WorkflowStage toActivity, K2TaskData k2Task)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
+                .Include(wi => wi.DataImpact)
+                .FirstAsync(wi => wi.ProcessId == processId);
+
+            workflowInstance.SerialNumber = (toActivity == WorkflowStage.Completed) ? "" : k2Task.SerialNumber;
+            workflowInstance.ActivityName = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : k2Task.ActivityName;
+
+            workflowInstance.Status = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : WorkflowStatus.Started.ToString();
+
+            return workflowInstance;
+
+        }
+
+        private async Task PersistWorkflowDataToAssessFromReview(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        {
+            LogContext.PushProperty("PersistWorkflowDataToAssessFromReview", nameof(PersistWorkflowDataToAssessFromReview));
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
+            LogContext.PushProperty("FromActivity", fromActivity);
+
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromReview} with processId: {ProcessId}; " +
+                                   "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
+
 
             var reviewData = await _dbContext.DbAssessmentReviewData.SingleAsync(d => d.ProcessId == processId);
 
@@ -145,7 +160,7 @@ namespace WorkflowCoordinator.Handlers
             }
 
             assessData.ProcessId = processId;
-            assessData.WorkflowInstanceId = workflowInstanceId;
+            assessData.WorkflowInstanceId = workflowInstance.WorkflowInstanceId;
 
             assessData.ActivityCode = reviewData.ActivityCode;
             assessData.Ion = reviewData.Ion;
@@ -162,16 +177,69 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
+        private async Task PersistWorkflowDataToAssessFromVerify(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        {
+            LogContext.PushProperty("PersistWorkflowDataToAssessFromVerify", nameof(PersistWorkflowDataToAssessFromVerify));
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
+            LogContext.PushProperty("FromActivity", fromActivity);
 
-        private async Task PersistWorkflowDataToVerify(
+            _logger.LogInformation("Entering {PersistWorkflowDataToAssessFromVerify} with processId: {ProcessId}; " +
+                                   "workflowInstanceId: {WorkflowInstanceId}; and FromActivity: {FromActivity}.");
+
+
+            foreach (var productAction in workflowInstance.ProductAction)
+            {
+                productAction.Verified = false;
+            }
+
+            foreach (var dataImpact in workflowInstance.DataImpact)
+            {
+                dataImpact.Verified = false;
+            }
+
+            var verifyData = await _dbContext.DbAssessmentVerifyData.SingleAsync(d => d.ProcessId == processId);
+
+            _logger.LogInformation("Saving primary task data from verify to assess for processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+
+            var assessData =
+                await _dbContext.DbAssessmentAssessData.SingleOrDefaultAsync(d => d.ProcessId == processId);
+
+            var isExists = (assessData != null);
+
+            if (!isExists)
+            {
+                assessData = new DbAssessmentAssessData();
+            }
+
+            assessData.ProcessId = processId;
+            assessData.WorkflowInstanceId = workflowInstance.WorkflowInstanceId;
+
+            assessData.ActivityCode = verifyData.ActivityCode;
+            assessData.Ion = verifyData.Ion;
+            assessData.SourceCategory = verifyData.SourceCategory;
+            assessData.WorkspaceAffected = verifyData.WorkspaceAffected;
+            assessData.TaskType = verifyData.TaskType;
+            assessData.Reviewer = verifyData.Reviewer;
+            assessData.Assessor = verifyData.Assessor;
+            assessData.Verifier = verifyData.Verifier;
+
+            if (!isExists)
+            {
+                await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
+            }
+        }
+
+
+        private async Task PersistWorkflowDataToVerifyFromAssess(
             int processId,
             int workflowInstanceId)
         {
-            LogContext.PushProperty("PersistWorkflowDataToVerify", nameof(PersistWorkflowDataToVerify));
+            LogContext.PushProperty("PersistWorkflowDataToVerifyFromAssess", nameof(PersistWorkflowDataToVerifyFromAssess));
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("WorkflowInstanceId", workflowInstanceId);
 
-            _logger.LogInformation("Entering {PersistWorkflowDataToVerify} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
+            _logger.LogInformation("Entering {PersistWorkflowDataToVerifyFromAssess} with processId: {ProcessId} and workflowInstanceId: {WorkflowInstanceId}.");
 
             var assessData = await _dbContext.DbAssessmentAssessData.SingleAsync(d => d.ProcessId == processId);
 

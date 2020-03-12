@@ -502,14 +502,14 @@ namespace Portal.Helpers
         {
             var isValid = ValidateDataImpact(dataImpacts, validationErrorMessages);
 
-            if (action != "Done")
+            if (action == "Save")
             {
                 return isValid;
             }
 
             if (dataImpacts != null && dataImpacts.Count > 0)
             {
-                if (!dataImpacts.All(di => di.Verified))
+                if (dataImpacts.Any(di => di.HpdUsageId > 0) && !dataImpacts.All(di => di.Verified))
                 {
                     validationErrorMessages.Add(
                         $"Data Impact: All Usages must be verified");

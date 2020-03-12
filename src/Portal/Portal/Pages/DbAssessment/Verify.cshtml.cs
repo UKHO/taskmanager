@@ -263,16 +263,17 @@ namespace Portal.Pages.DbAssessment
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
 
-            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                UserFullName);
 
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
                 return BadRequest(this.ValidationErrorMessages);
             }
             
+            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                UserFullName);
+
             return StatusCode(200);
         }
 
@@ -404,8 +405,8 @@ namespace Portal.Pages.DbAssessment
             {
                 CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivityName = "Verify",
-                ToActivityName = "Completed"
+                FromActivity = WorkflowStage.Verify,
+                ToActivity = WorkflowStage.Completed
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
@@ -424,8 +425,8 @@ namespace Portal.Pages.DbAssessment
             {
                 CorrelationId = correlationId ?? Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivityName = "Verify",
-                ToActivityName = "Assess"
+                FromActivity = WorkflowStage.Verify,
+                ToActivity = WorkflowStage.Assess
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",

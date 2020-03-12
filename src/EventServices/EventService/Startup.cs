@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using NServiceBus;
 using NServiceBus.Extensions.DependencyInjection;
 using NServiceBus.Persistence.Sql;
@@ -26,6 +27,7 @@ namespace EventService
             Configuration = configuration;
         }
 
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -41,7 +43,10 @@ namespace EventService
 
             LoggingHelper.SetupLogging(isLocalDb, startupLoggingConfig, startupSecretsConfig);
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
             services.AddMvc();
             services.AddHealthChecks();
             services.AddSwaggerGen(c =>

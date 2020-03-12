@@ -8,4 +8,8 @@
     <PackageReference Include="NServiceBus" Version="7.1.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
+  </ItemGroup>
+
 </Project>
