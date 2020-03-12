@@ -74,7 +74,8 @@ namespace Portal.UnitTests
 
             _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
             {
-                ProcessId = ProcessId
+                ProcessId = ProcessId,
+                Verifier = "TestUser"
             });
 
             _dbContext.ProductAction.Add(new ProductAction
@@ -461,7 +462,8 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored, 
                                                                                 A<string>.Ignored, 
-                                                                                A<string>.Ignored, 
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
                                                                                 A<List<DataImpact>>.Ignored,
                                                                                 A<string>.Ignored,
@@ -505,6 +507,7 @@ namespace Portal.UnitTests
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored,
                      A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
                      A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -541,6 +544,7 @@ namespace Portal.UnitTests
             //    .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored,
+                A<string>.Ignored,
                 A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
@@ -586,6 +590,7 @@ namespace Portal.UnitTests
             //    .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
@@ -622,6 +627,7 @@ namespace Portal.UnitTests
             //    .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
@@ -643,6 +649,37 @@ namespace Portal.UnitTests
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
                 c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_No_Verifier_Fails_Validation_On_Reject()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("This User"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
+                .Returns(true);
+
+            var row = await _dbContext.DbAssessmentVerifyData.FirstAsync();
+            row.Verifier = "";
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            Assert.Contains("Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Reject()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+                .Returns(true);
+
+            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
         }
     }
 }

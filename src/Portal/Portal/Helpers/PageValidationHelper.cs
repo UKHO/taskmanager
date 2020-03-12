@@ -195,7 +195,7 @@ namespace Portal.Helpers
             {
                 if (string.IsNullOrWhiteSpace(currentAssignedVerifier))
                 {
-                    validationErrorMessages.Add($"Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
                 else if (!currentUsername.Equals(currentAssignedVerifier, StringComparison.InvariantCultureIgnoreCase))
