@@ -8,8 +8,13 @@ using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
@@ -26,6 +31,7 @@ namespace NCNEPortal.UnitTests
         private IMilestoneCalculator _milestoneCalculator;
         private IDirectoryService _fakeDirectoryService;
         private IPageValidationHelper _pageValidationHelper;
+        private IStageTypeFactory _stageTypeFactory;
         private readonly IOptions<GeneralConfig> _fakeGeneralConfig;
         private int ProcessId { get; set; }
 
@@ -50,9 +56,13 @@ namespace NCNEPortal.UnitTests
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeUserIdentityService, _fakeDirectoryService);
 
+            _stageTypeFactory = new StageTypeFactory(_dbContext);
 
             _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeUserIdentityService, _fakecommentsHelper, _carisProjectHelper,
                                   _fakeGeneralConfig, _milestoneCalculator, _fakeDirectoryService, _pageValidationHelper);
+
+
+            AddStageTypes(_dbContext);
 
         }
 
@@ -240,6 +250,41 @@ namespace NCNEPortal.UnitTests
 
             Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("3PS : Please enter expected return date before entering actual return date"));
+        }
+
+        [Test]
+        public async Task Test_StageType_Factory_For_Adoption_ChartType()
+        {
+            var stagetypes = _stageTypeFactory.GeTaskStages("Adoption");
+
+            var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
+
+            Assert.AreEqual(stagetypes.Count, 18);
+            Assert.AreEqual(Sdra.Count(), 1);
+        }
+
+
+        [Test]
+        public async Task Test_StageType_Factory_For_Primary_ChartType()
+        {
+            var stagetypes = _stageTypeFactory.GeTaskStages("Primary");
+
+            var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
+
+            Assert.AreEqual(stagetypes.Count, 16);
+            Assert.AreEqual(Sdra.Count(), 0);
+        }
+
+        private void AddStageTypes(NcneWorkflowDbContext dbContext)
+        {
+            if (!File.Exists(@"Data\TaskStageType.json")) throw new FileNotFoundException(@"Data\TaskStageType.json");
+
+            var jsonString = File.ReadAllText(@"Data\TaskStageType.json");
+            var stageType = JsonConvert.DeserializeObject<IEnumerable<TaskStageType>>(jsonString);
+
+            dbContext.TaskStageType.AddRange(stageType);
+
+            _dbContext.SaveChanges();
         }
 
     }

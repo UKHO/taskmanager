@@ -48,3 +48,43 @@ INSERT     ([ChartTypeId], [Name])
      VALUES (source.[ChartTypeId], source.[Name])
 WHEN NOT MATCHED BY source THEN DELETE;
 
+
+/* Task Stage Type */
+
+merge [dbo].[TaskStageType] as target
+using (
+  values
+       
+         (1, 'With SDRA', 1, false),
+         (2, 'With Geodesy', 2, false),
+         (3, 'Specification', 3, false),
+         (4, 'Compile Chart', 4, false),
+         (5, 'V1', 5, false),
+         (6, 'V1 rework', 6, false),
+         (7, 'V2', 7, false),
+         (8, 'V2 rework', 8, false),
+         (9, 'Forms', 9, false),
+         (10, 'Final updating', 10, false),
+         (11, '100% check', 11, false),
+         (12, 'Commit to print', 12, false),
+         (13, 'CIS', 13, false),
+         (14, 'Publication', 14, false),
+         (15, 'Publish chart', 15, false),
+         (16, 'Clear vector', 16, false),
+         (17, 'Retire old minor version', 17, false),
+         (18, 'Consider withdrawn charts', 18, false)
+
+) as source ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
+on (target.[TaskStageTypeId] = source.[TaskStageTypeId])
+WHEN matched THEN
+UPDATE SET [Name] = source.[Name],
+           [SequenceNumber] = source.[SequenceNumber],
+           [AllowRework] = source.[AllowRework]
+WHEN NOT MATCHED BY target THEN
+INSERT ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
+      VALUES (source.[TaskStageTypeId], source.[Name], source.[SequenceNumber], source.[AllowRework])
+WHEN NOT MATCHED BY source THEN DELETE;
+  
+
+
+

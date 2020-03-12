@@ -11,6 +11,8 @@ namespace NCNEWorkflowDatabase.EF.Models
         public int TaskStageId { get; set; }
         public int ProcessId { get; set; }
         public int TaskStageTypeId { get; set; }
+
+        public string AssignedUser { get; set; }
         public DateTime? DateExpected { get; set; }
 
         public DateTime? DateCompleted { get; set; }
