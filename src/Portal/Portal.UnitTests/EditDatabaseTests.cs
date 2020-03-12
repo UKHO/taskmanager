@@ -24,6 +24,7 @@ namespace Portal.UnitTests
         private IUserIdentityService _fakeUserIdentityService;
         private ISessionFileGenerator _fakeSessionFileGenerator;
         private ICarisProjectHelper _fakeCarisProjectHelper;
+        private ICarisProjectNameGenerator _fakeCarisProjectNameGenerator;
         public int ProcessId { get; set; }
 
         [SetUp]
@@ -40,6 +41,7 @@ namespace Portal.UnitTests
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
             _fakeSessionFileGenerator = A.Fake<ISessionFileGenerator>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+            _fakeCarisProjectNameGenerator = A.Fake<ICarisProjectNameGenerator>();
 
             ProcessId = 123;
 
@@ -54,7 +56,8 @@ namespace Portal.UnitTests
             });
             await _dbContext.SaveChangesAsync();
 
-            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeUserIdentityService, _fakeSessionFileGenerator, _fakeCarisProjectHelper);
+            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeUserIdentityService,
+                                                        _fakeSessionFileGenerator, _fakeCarisProjectHelper, _fakeCarisProjectNameGenerator);
         }
 
         [TearDown]

@@ -30,6 +30,7 @@ namespace Portal.Pages.DbAssessment
         private IUserIdentityService _userIdentityService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
         private readonly ICarisProjectHelper _carisProjectHelper;
+        private readonly ICarisProjectNameGenerator _carisProjectNameGenerator;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Select CARIS Workspace:")]
@@ -45,6 +46,8 @@ namespace Portal.Pages.DbAssessment
 
         public bool IsCarisProjectCreated { get; set; }
 
+        public int CarisProjectNameCharacterLimit { get; set; }
+
         private string _userFullName;
 
         public string UserFullName
@@ -57,7 +60,8 @@ namespace Portal.Pages.DbAssessment
             IOptions<GeneralConfig> generalConfig,
             IUserIdentityService userIdentityService,
             ISessionFileGenerator sessionFileGenerator,
-            ICarisProjectHelper carisProjectHelper)
+            ICarisProjectHelper carisProjectHelper,
+            ICarisProjectNameGenerator carisProjectNameGenerator)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -65,6 +69,7 @@ namespace Portal.Pages.DbAssessment
             _userIdentityService = userIdentityService;
             _sessionFileGenerator = sessionFileGenerator;
             _carisProjectHelper = carisProjectHelper;
+            _carisProjectNameGenerator = carisProjectNameGenerator;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -79,6 +84,7 @@ namespace Portal.Pages.DbAssessment
 
             await GetCarisProjectDetails(processId);
 
+            CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
 
@@ -317,17 +323,19 @@ namespace Portal.Pages.DbAssessment
 
             IsCarisProjectCreated = CarisProjectDetails != null;
 
-            var sourceDocumentName = "";
-
             if (!IsCarisProjectCreated)
             {
+
                 var assessmentData =
                     await _dbContext.AssessmentData.SingleAsync(ad => ad.ProcessId == processId);
-                sourceDocumentName = assessmentData.SourceDocumentName;
+                var parsedRsdraNumber = assessmentData.ParsedRsdraNumber;
+                var sourceDocumentName = assessmentData.SourceDocumentName;
+                
+                ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
+                return;
             }
 
-            ProjectName = CarisProjectDetails != null ? CarisProjectDetails.ProjectName : $"{processId}_{sourceDocumentName}";
+            ProjectName = CarisProjectDetails.ProjectName;
         }
-
     }
 }
