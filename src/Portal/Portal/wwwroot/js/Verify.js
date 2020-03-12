@@ -73,6 +73,7 @@
 
         $("#ConfirmReject").modal("hide");
         $("#ConfirmRejectError").html("");
+        $("#verifyDoneErrorMessage").html("");
         $("#modalWaitVerifyReject").modal("show");
 
         var processId = Number($("#ProcessId").val());
