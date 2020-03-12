@@ -46,6 +46,8 @@ namespace Portal.Pages.DbAssessment
 
         public bool IsCarisProjectCreated { get; set; }
 
+        public int CarisProjectNameCharacterLimit { get; set; }
+
         private string _userFullName;
 
         public string UserFullName
@@ -82,6 +84,7 @@ namespace Portal.Pages.DbAssessment
 
             await GetCarisProjectDetails(processId);
 
+            CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
             SessionFilename = _generalConfig.Value.SessionFilename;
         }
 
