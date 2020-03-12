@@ -149,6 +149,7 @@ namespace Portal.Pages.DbAssessment
                         ActivityCode,
                         SourceCategory,
                         Verifier,
+                        UserFullName,
                         RecordProductAction,
                         DataImpacts, action,
                         ValidationErrorMessages, Team))
@@ -173,6 +174,7 @@ namespace Portal.Pages.DbAssessment
                                                                         ActivityCode,
                                                                         SourceCategory,
                                                                         Verifier,
+                                                                        UserFullName,
                                                                         RecordProductAction,
                                                                         DataImpacts, action,
                                                                         ValidationErrorMessages, Team))
@@ -244,6 +246,24 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError("Comment is null, empty or whitespace: {Comment}");
                 ValidationErrorMessages.Add($"Reject comment cannot be empty.");
 
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
+
+            var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
+
+            if (!await _pageValidationHelper.ValidateVerifyPage(
+                Ion,
+                ActivityCode,
+                SourceCategory,
+                verifyData.Verifier,
+                UserFullName,
+                RecordProductAction,
+                DataImpacts, "Reject",
+                ValidationErrorMessages, Team))
+            {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
                     StatusCode = (int)HttpStatusCode.BadRequest

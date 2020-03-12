@@ -171,7 +171,7 @@ namespace Portal.Helpers
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
-        /// <param name="verifier"></param>
+        /// <param name="currentAssignedVerifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
@@ -181,7 +181,8 @@ namespace Portal.Helpers
         public async Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
             string sourceCategory,
-            string verifier,
+            string currentAssignedVerifier,
+            string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string action,
@@ -190,12 +191,28 @@ namespace Portal.Helpers
         {
             var isValid = true;
 
+            if (action == "Reject")
+            {
+                if (string.IsNullOrWhiteSpace(currentAssignedVerifier))
+                {
+                    validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+                else if (!currentUsername.Equals(currentAssignedVerifier, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validationErrorMessages.Add($"Operators: {currentAssignedVerifier} is assigned to this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
             if (!ValidateVerifyTaskInformation(ion, activityCode, sourceCategory, validationErrorMessages))
             {
                 isValid = false;
             }
 
-            if (!await ValidateOperators(verifier,"Verifier", validationErrorMessages))
+            if (!await ValidateOperators(currentAssignedVerifier,"Verifier", validationErrorMessages))
             {
                 isValid = false;
             }
