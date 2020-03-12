@@ -83,12 +83,12 @@ namespace WorkflowCoordinator
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                         options.UseSqlServer(connection));
 
-                    //if (isLocalDebugging)
-                    //{
-                    //    using var sp = services.BuildServiceProvider();
-                    //    using var context = sp.GetRequiredService<WorkflowDbContext>();
-                    //    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                    //}
+                    if (isLocalDebugging)
+                    {
+                        using var sp = services.BuildServiceProvider();
+                        using var context = sp.GetRequiredService<WorkflowDbContext>();
+                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    }
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                         .SetHandlerLifetime(TimeSpan.FromMinutes(5));

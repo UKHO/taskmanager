@@ -95,7 +95,7 @@ namespace WorkflowCoordinator.Handlers
         {
             if (k2Task != null)
             {
-                // if task as at Completed, then we expect k2Task to be null
+                // if task is at Completed, then we expect k2Task to be null
                 _logger.LogError("K2 Task is not at expected stage {ToActivity} for ProcessId {ProcessId}; but was at " +
                                  k2Task.ActivityName);
                 throw new ApplicationException(
@@ -107,15 +107,15 @@ namespace WorkflowCoordinator.Handlers
         {
             if (k2Task == null)
             {
-                _logger.LogError("Failed to get data for K2 Task at stage with ProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get data for K2 Task at stage with ProcessId {message.ProcessId}");
+                _logger.LogError("Failed to get data for K2 Task with ProcessId {ProcessId} while moving task from {FromActivity} to {ToActivity}");
+                throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {message.ProcessId} while moving task from {message.FromActivity} to {message.ToActivity}");
             }
 
             if (k2Task.ActivityName != message.ToActivity.ToString())
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);
-                _logger.LogError("K2Task at stage {K2Stage} is not at {ToActivity}");
-                throw new ApplicationException($"K2Task at stage {k2Task.ActivityName} is not at {message.ToActivity}");
+                _logger.LogError("K2Task with ProcessId {ProcessId} is at K2 stage {K2Stage} and not at {ToActivity}, while moving task from {FromActivity}");
+                throw new ApplicationException($"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}");
             }
         }
 
