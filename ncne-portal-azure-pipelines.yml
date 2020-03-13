@@ -80,6 +80,30 @@ stages:
       #     summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
 
       - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\ncneportal'
+        displayName: 'Publish ncneportal-project'
+  
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\ncneportal'
+          ArtifactName: 'ncneportal'
+          publishLocation: 'Container'
+        displayName: 'Publish ncneportal Artifact'
+
+
+    - job: BuildSpecs
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: DotNetCoreCLI@2
         displayName: 'dotnet restore portalspecs'
         inputs:
           command: 'restore'
@@ -96,33 +120,18 @@ stages:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
-          zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\ncneportal'
-        displayName: 'Publish ncneportal-project'
-  
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.TestAutomation.Specs\\NCNEPortal.TestAutomation.Specs.csproj'
           zipAfterPublish: false
           arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
         displayName: 'Publish specs-project'
-  
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\ncneportal'
-          ArtifactName: 'ncneportal'
-          publishLocation: 'Container'
-        displayName: 'Publish ncneportal Artifact'
-  
+
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)\\specs'
           ArtifactName: 'specs'
           publishLocation: 'Container'
         displayName: 'Publish specs Artifact'
+
 
     - job: Publish_Pickles
       pool:
