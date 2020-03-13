@@ -50,7 +50,6 @@ namespace Common.Helpers
             return projectId;
         }
 
-
         public async Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout)
         {
 
@@ -66,6 +65,53 @@ namespace Common.Helpers
 
             // Create project
             await UpdateProject(projectId, assignedUserId, carisTimeout);
+        }
+
+        public async Task MarkCarisProjectAsComplete(int projectId, int carisTimeout)
+        {
+
+            // Check if project already exists
+            if (!await _hpdDbContext.CarisProjectData.AnyAsync(p =>
+                p.ProjectId == projectId))
+            {
+                throw new ArgumentException($"Failed to find Caris project with id {projectId}, project does not exist");
+            }
+
+            // Update Caris
+            using (var command = _hpdDbContext.Database.GetDbConnection().CreateCommand())
+            {
+                var transaction = _hpdDbContext.Database.BeginTransaction(IsolationLevel.Serializable);
+
+                try
+                {
+                    command.CommandTimeout = carisTimeout;
+
+                    command.Parameters.Add(
+                        new OracleParameter("projectId", OracleDbType.Int32, ParameterDirection.Input)
+                        {
+                            Value = projectId
+                        });
+
+                    command.CommandText = "hpdowner.P_PROJECT_MANAGER.COMPLETEPROJECT";
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    await command.ExecuteNonQueryAsync();
+
+                    transaction.Commit();
+                }
+                catch (OracleException e)
+                {
+                    transaction.Rollback();
+                    var error = FormatOracleError(e);
+                    if (error != null) throw error;
+
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw e;
+                }
+            }
         }
 
         private async Task<int> CreateProject(int k2processId, int userId, string projectName, int projectTypeId, int projectStatusId,
@@ -251,8 +297,7 @@ namespace Common.Helpers
                 if (oracleError.Contains("Project is already complete"))
                 {
                     // Project already marked complete
-                    return new ApplicationException(
-                        "Unable to change project status, project is already marked as complete");
+                    return null;
                 }
 
                 if (oracleError.Contains("NO CHANGES DETECTED"))

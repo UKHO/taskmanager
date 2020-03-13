@@ -8,5 +8,6 @@ namespace Common.Helpers
             string projectType, string projectStatus, string projectPriority,
             int carisTimeout);
         Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout);
+        Task MarkCarisProjectAsComplete(int projectId, int carisTimeout);
     }
 }
