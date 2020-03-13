@@ -5,6 +5,7 @@
 [AssessmentData](#assessmentdata)  
 [AssignedTaskType](#assignedtasksourcetype)  
 [CachedHpdWorkspace](#CachedHpdWorkspace)  
+[CarisProjectDetails](#CarisProjectDetails)  
 [Comment](#comment)  
 [DatabaseDocumentStatus](#DatabaseDocumentStatus)  
 [OnHold](#onhold)  
@@ -74,6 +75,23 @@ It gets populated via Post Deployment script
 |Name             |NVARCHAR(100)            |No           |                                                                                                 |
 
 There is a Unique Index for `Name`
+
+[Go To Tables](#tables)
+
+### CarisProjectDetails
+
+`CarisProjectDetails` table holds the details of Caris projects that have been created by users as part of the Db Assessment workflow.
+
+| Column Name       | Datatype      | Allow nulls | Description                                                                                     |
+|-------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|CarisProjectDetailsId   |INT            |No           |PRIMARY KEY                                                                    |
+|ProcessId             |INT           |No           |                                                                                                 |
+|ProjectId             |INT           |No           |                                                                                                 |
+|ProjectName             |NVARCHAR(100)           |No           |                                                                                                 |
+|Created             |DATETIME           |No           |                                                                                                 |
+|CreatedBy             |NVARCHAR(255)           |No           |                                                                                                 |
+
+There is a Unique constraint for `ProcessId`. `ProcessId` is a foreign key from [WorkflowInstance](#workflowinstance) table.
 
 [Go To Tables](#tables)
 
