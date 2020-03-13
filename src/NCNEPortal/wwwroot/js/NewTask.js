@@ -48,39 +48,35 @@
     $("#btnCreate").click(function() {
 
 
-        removedAssignRoleErrors();
-
-        var compiler = $("#Compiler").val();
-        var verifier1 = $("#Verifier1").val();
-        var verifier2 = $("#Verifier2").val();
-        var publisher = $("#Publisher").val();
+        removeAssignRoleErrors();
+        var formData = $("#frmNewTask").serialize();
 
         $.ajax({
             type: "POST",
-            url: "NewTask/?handler=AssignRoleToUser",
+            url: "NewTask/?handler=Save",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
-            data: {
-                "compiler": compiler,
-                "verifierOne": verifier1,
-                "verifierTwo": verifier2,
-                "publisher": publisher
-            },
+            data: formData,
             success: function(result) {
-                $("form").submit();
+                window.location.href = '/Index';
             },
             error: function(error) {
                 var responseJson = error.responseJSON;
-                displayAssignRoleErrors(responseJson);
-            }
 
+                if (responseJson != null) {
+                    var responseJson = error.responseJSON;
+                    displayAssignRoleErrors(responseJson);
+                }
+
+            }
         });
 
     });
 
-    function removedAssignRoleErrors() {
+
+    function removeAssignRoleErrors() {
         $("#assignRoleErrorList").empty();
         $("#assignRoleErrorMessages").collapse("hide");
     }
@@ -164,7 +160,7 @@
         var promise = users.initialize();
         promise
             .done(function() {
-                removedAssignRoleErrors();
+                removeAssignRoleErrors();
             })
             .fail(function() {
                 $('#assignRoleErrorMessages').collapse("show");
