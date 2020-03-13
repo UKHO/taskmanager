@@ -95,6 +95,7 @@ namespace NCNEPortal
             services.AddScoped<ICommentsHelper, CommentsHelper>();
             services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
             services.AddScoped<IPageValidationHelper, PageValidationHelper>();
+            services.AddScoped<IStageTypeFactory, StageTypeFactory>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>

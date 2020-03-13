@@ -3,6 +3,7 @@
 	[TaskStageId] INT NOT NULL IDENTITY,
 	[ProcessId] INT NOT NULL,
 	[TaskStageTypeId] INT NOT NULL,
+	[AssignedUser] NVARCHAR(255) NULL,
 	[DateExpected] DATETIME NULL,
 	[DateCompleted] DATETIME NULL,
 	[Status] NVARCHAR(25) NOT NULL,
