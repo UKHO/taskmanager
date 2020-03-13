@@ -254,6 +254,12 @@ stages:
             downloadType: 'specific'
             downloadPath: '$(System.ArtifactsDirectory)' 
 
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
         - task: AzureCLI@1
           displayName: 'Run SpecFlow tests'
           inputs:
