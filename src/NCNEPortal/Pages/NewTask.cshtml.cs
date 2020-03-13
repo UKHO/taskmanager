@@ -224,18 +224,14 @@ namespace NCNEPortal
                 this.CISDate = cisDate;
                 this.AnnounceDate = formsDate;
 
-
             }
-
-            _logger.LogInformation($"Deadline Dates recalculated before saving");
-
         }
 
         private async Task CreateTaskStages(int processId)
         {
 
 
-            foreach (var taskStageType in _stageTypeFactory.GeTaskStages(ChartType))
+            foreach (var taskStageType in _stageTypeFactory.GetTaskStages(ChartType))
             {
                 var taskStage = _ncneWorkflowDbContext.TaskStage.Add(new TaskStage()).Entity;
 

@@ -255,7 +255,7 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task Test_StageType_Factory_For_Adoption_ChartType()
         {
-            var stagetypes = _stageTypeFactory.GeTaskStages("Adoption");
+            var stagetypes = _stageTypeFactory.GetTaskStages("Adoption");
 
             var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
 
@@ -267,7 +267,7 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task Test_StageType_Factory_For_Primary_ChartType()
         {
-            var stagetypes = _stageTypeFactory.GeTaskStages("Primary");
+            var stagetypes = _stageTypeFactory.GetTaskStages("Primary");
 
             var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
 

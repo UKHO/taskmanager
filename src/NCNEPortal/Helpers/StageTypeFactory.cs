@@ -15,7 +15,7 @@ namespace NCNEPortal.Helpers
             _dbContext = dbContext;
         }
 
-        public List<TaskStageType> GeTaskStages(string chartType)
+        public List<TaskStageType> GetTaskStages(string chartType)
         {
             List<TaskStageType> taskStageTypes;
 

@@ -5,6 +5,6 @@ namespace NCNEPortal.Helpers
 {
     public interface IStageTypeFactory
     {
-        List<TaskStageType> GeTaskStages(string chartType);
+        List<TaskStageType> GetTaskStages(string chartType);
     }
 }
