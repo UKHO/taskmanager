@@ -91,7 +91,7 @@ There is a Unique Index for `Name`
 |Created             |DATETIME           |No           |                                                                                                 |
 |CreatedBy             |NVARCHAR(255)           |No           |                                                                                                 |
 
-There is a Unique Index for `Name`
+There is a Unique constraint for `ProcessId`. `ProcessId` is a foreign key from [WorkflowInstance](#workflowinstance) table.
 
 [Go To Tables](#tables)
 
