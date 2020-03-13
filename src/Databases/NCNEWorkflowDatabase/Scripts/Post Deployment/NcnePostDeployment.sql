@@ -55,24 +55,24 @@ merge [dbo].[TaskStageType] as target
 using (
   values
        
-         (1, 'With SDRA', 1, false),
-         (2, 'With Geodesy', 2, false),
-         (3, 'Specification', 3, false),
-         (4, 'Compile Chart', 4, false),
-         (5, 'V1', 5, false),
-         (6, 'V1 rework', 6, false),
-         (7, 'V2', 7, false),
-         (8, 'V2 rework', 8, false),
-         (9, 'Forms', 9, false),
-         (10, 'Final updating', 10, false),
-         (11, '100% check', 11, false),
-         (12, 'Commit to print', 12, false),
-         (13, 'CIS', 13, false),
-         (14, 'Publication', 14, false),
-         (15, 'Publish chart', 15, false),
-         (16, 'Clear vector', 16, false),
-         (17, 'Retire old minor version', 17, false),
-         (18, 'Consider withdrawn charts', 18, false)
+         (1, 'With SDRA', 1, 0),
+         (2, 'With Geodesy', 2, 0),
+         (3, 'Specification', 3, 0),
+         (4, 'Compile Chart', 4, 0),
+         (5, 'V1', 5, 1),
+         (6, 'V1 rework', 6, 0),
+         (7, 'V2', 7, 1),
+         (8, 'V2 rework', 8, 0),
+         (9, 'Forms', 9, 0),
+         (10, 'Final updating', 10, 0),
+         (11, '100% check', 11, 0),
+         (12, 'Commit to print', 12, 0),
+         (13, 'CIS', 13, 0),
+         (14, 'Publication', 14, 0),
+         (15, 'Publish chart', 15, 0),
+         (16, 'Clear vector', 16, 0),
+         (17, 'Retire old minor version', 17, 0),
+         (18, 'Consider withdrawn charts', 18, 0)
 
 ) as source ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
 on (target.[TaskStageTypeId] = source.[TaskStageTypeId])
