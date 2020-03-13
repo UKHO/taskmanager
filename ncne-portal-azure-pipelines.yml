@@ -235,8 +235,30 @@ stages:
                   WebAppName: 'taskmanager-dev-web-ncneportal'
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
+
+- stage: DeployUAT
+  dependsOn: Build
+  jobs:    
+    - deployment: DeployNCNEPortalWebsiteUAT
+      displayName: Deploy ncneportal website
+      pool: "UKHO Ubuntu 1804"
+        # creates an environment if it doesn't exist
+      environment: 'TaskmanagerUAT'
+      strategy:
+        # default deployment strategy, more coming...
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'taskmanager-uat-web-ncneportal'
+                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
+
     - job: RunAutomatedTests
-      dependsOn: DeployNCNEPortalWebsiteDev
+      displayName: 'Run automated UI tests'
+      dependsOn: DeployNCNEPortalWebsiteUAT
       pool:
           NautilusBuild
       steps:
@@ -275,25 +297,6 @@ stages:
             testResultsFiles: '**/*.trx'
             testRunTitle: 'Portal UI tests - $(System.StageName)'
 
-- stage: DeployUAT
-  dependsOn: Build
-  jobs:    
-    - deployment: DeployNCNEPortalWebsiteUAT
-      displayName: Deploy ncneportal website
-      pool: "UKHO Ubuntu 1804"
-        # creates an environment if it doesn't exist
-      environment: 'TaskmanagerUAT'
-      strategy:
-        # default deployment strategy, more coming...
-        runOnce:
-          deploy:
-            steps:
-              - task: AzureRmWebAppDeployment@4
-                displayName: 'Azure App Service Deploy'
-                inputs:
-                  azureSubscription: 'TaskmanagerUAT-SC'
-                  WebAppName: 'taskmanager-uat-web-ncneportal'
-                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
 - stage: DeployPre
   dependsOn: Build
