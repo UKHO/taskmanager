@@ -169,15 +169,22 @@ namespace Portal.Pages.DbAssessment
 
                     return StatusCode((int)HttpStatusCode.OK);
                 case "Done":
+                    var verifyData =
+                        await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
+                            t.ProcessId == processId);
                     if (!await _pageValidationHelper.ValidateVerifyPage(
                                                                         Ion,
                                                                         ActivityCode,
                                                                         SourceCategory,
-                                                                        Verifier,
+                                                                        Verifier, // from submitted form data
                                                                         UserFullName,
                                                                         RecordProductAction,
-                                                                        DataImpacts, action,
-                                                                        ValidationErrorMessages, Team))
+                                                                        DataImpacts,
+                                                                        action,
+                                                                        ValidationErrorMessages,
+                                                                        Team,
+                                                                        verifyData.Verifier)) // from database
+
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -288,7 +295,7 @@ namespace Portal.Pages.DbAssessment
             {
                 return BadRequest(this.ValidationErrorMessages);
             }
-            
+
             await _commentsHelper.AddComment($"Verify Rejected: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
