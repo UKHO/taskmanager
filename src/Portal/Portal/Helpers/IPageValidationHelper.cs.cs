@@ -68,7 +68,7 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
         /// <param name="formDataAssignedVerifier"></param>
-        /// <param name="currentAssignedVerifier"></param>
+        /// <param name="currentVerifier"></param>
         /// <returns></returns>
         Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
@@ -80,7 +80,7 @@ namespace Portal.Helpers
             string action,
             List<string> validationErrorMessages,
             string team,
-            string currentAssignedVerifier = "");
+            string currentVerifier = "");
 
 
     }

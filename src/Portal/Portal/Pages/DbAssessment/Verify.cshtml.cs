@@ -269,7 +269,7 @@ namespace Portal.Pages.DbAssessment
                 UserFullName,
                 RecordProductAction,
                 DataImpacts, "Reject",
-                ValidationErrorMessages, Team))
+                ValidationErrorMessages, Team, verifyData.Verifier))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
