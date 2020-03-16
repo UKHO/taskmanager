@@ -9,6 +9,16 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
 
+pr:
+  branches:
+    include:
+    - master    
+  paths:
+    include:
+    - src/EventServices/*
+    - src/Databases/WorkflowDatabase.EF/*
+    - src/Common*
+    
 stages:
 - stage: Build
   jobs:
