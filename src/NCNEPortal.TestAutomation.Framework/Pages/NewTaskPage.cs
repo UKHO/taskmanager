@@ -1,34 +1,29 @@
 ﻿using System;
 using Common.Helpers;
-using Microsoft.Extensions.Configuration;
+using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-namespace NCNEPortal.TestAutomation.Framework
+
+namespace NCNEPortal.TestAutomation.Framework.Pages
 {
     public class NewTaskPage
 
     {
         private readonly IWebDriver _driver;
-        private readonly WebDriverWait _wait;
-        private const int SeleniumTimeoutSeconds = 5;
         private readonly Uri _newtaskPageUrl;
-        private readonly NewTaskPageConfig _config = new NewTaskPageConfig();
+        private readonly WebDriverWait _wait;
 
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
-
-        public NewTaskPage(IWebDriver driver)
+        public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
         {
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("urls").Bind(_config);
-
             _driver = driver;
-            _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(SeleniumTimeoutSeconds));
+            _wait = wait;
 
             _newtaskPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? _config.NcneNewTaskPageUrl
-                : _config.NcneLocalDevNewTaskPageUrl;
-              
+                ? urlsConfig.NcneNewTaskPageUrl
+                : urlsConfig.NcneLocalDevNewTaskPageUrl;
         }
+
+        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
 
         public void NavigateTo()
         {
@@ -48,7 +43,6 @@ namespace NCNEPortal.TestAutomation.Framework
                 Console.WriteLine(e);
                 return false;
             }
-
         }
     }
 }

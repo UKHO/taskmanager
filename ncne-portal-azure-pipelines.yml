@@ -89,45 +89,6 @@ stages:
       #     codeCoverageTool: Cobertura
       #     summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
 
-      # - task: DotNetCoreCLI@2
-      #   inputs:
-      #     command: 'restore'
-      #     projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-      #     feedsToUse: 'select'
-      #   displayName: 'dotnet restore portalspecs'
-  
-      # - task: DotNetCoreCLI@2
-      #   inputs:
-      #     command: 'build'
-      #     projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-      #   displayName: 'dotnet build portalspecs'
-  
-      # - task: CmdLine@2
-      #   inputs:
-      #     script: 'choco install pickles'
-      #   displayName: Install Pickles
-  
-      # - task: CmdLine@2
-      #   inputs:
-      #     script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\\src\\Portal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\\src\\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - Portal" --documentation-format=dhtml'
-      #   displayName: Generate Pickles Documentation
-  
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
-      #     ArtifactName: 'drop'
-      #     publishLocation: 'Container'
-      #   displayName: Publish Pickles Artifact
-  
-      # - task: AzureFileCopy@3
-      #   inputs:
-      #     SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
-      #     azureSubscription: 'TestEngineering-Live'
-      #     Destination: 'AzureBlob'
-      #     storage: '$(AzureStorageAccount)'
-      #     ContainerName: '$web/$(Build.Repository.Name)'
-      #   displayName: Publish Pickles Artifact to Azure Blob Storage
-  
       - task: DotNetCoreCLI@2
         inputs:
           command: 'publish'
@@ -137,29 +98,86 @@ stages:
           arguments: '--output $(Build.ArtifactStagingDirectory)\\ncneportal'
         displayName: 'Publish ncneportal-project'
   
-      # - task: DotNetCoreCLI@2
-      #   inputs:
-      #     command: 'publish'
-      #     publishWebProjects: false
-      #     projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
-      #     zipAfterPublish: false
-      #     arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
-      #   displayName: 'Publish specs-project'
-  
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)\\ncneportal'
           ArtifactName: 'ncneportal'
           publishLocation: 'Container'
         displayName: 'Publish ncneportal Artifact'
-  
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(Build.ArtifactStagingDirectory)\\specs'
-      #     ArtifactName: 'specs'
-      #     publishLocation: 'Container'
-      #   displayName: 'Publish specs Artifact'
 
+
+    - job: BuildSpecs
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore portalspecs'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.TestAutomation.Specs\\NCNEPortal.TestAutomation.Specs.csproj'
+          feedsToUse: 'select'
+  
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build portalspecs'
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.TestAutomation.Specs\\NCNEPortal.TestAutomation.Specs.csproj'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.TestAutomation.Specs\\NCNEPortal.TestAutomation.Specs.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
+        displayName: 'Publish specs-project'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\specs'
+          ArtifactName: 'specs'
+          publishLocation: 'Container'
+        displayName: 'Publish specs Artifact'
+
+
+    - job: Publish_Pickles
+      pool:
+          NautilusBuild
+
+      workspace:
+          clean: all
+
+      steps:
+
+      - task: CmdLine@2
+        displayName: Install Pickles
+        inputs:
+          script: 'choco install pickles'
+  
+      - task: CmdLine@2
+        displayName: Generate Pickles Documentation
+        inputs:
+          script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\src\NCNEPortal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - NCNE Portal" --documentation-format=dhtml'
+  
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Pickles Artifact
+        inputs:
+          PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+      - task: AzureFileCopy@3
+        displayName: Publish Pickles Artifact to Azure Blob Storage
+        inputs:
+          SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          azureSubscription: 'TestEngineering-Live'
+          Destination: 'AzureBlob'
+          storage: '$(PicklesAzureStorageAccount)'
+          ContainerName: '$web/$(Build.Repository.Name)NCNE'
+          
     # - job: DependencyCheck
     #   pool: NautilusBuild
 
@@ -227,36 +245,6 @@ stages:
                   WebAppName: 'taskmanager-dev-web-ncneportal'
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
-    # - job: RunAutomatedTests
-    #   dependsOn: DeployNCNEPortalWebsiteDev
-    #   pool:
-    #       NautilusBuild
-    #   steps:
-    #     - task: PowerShell@2
-    #       inputs:
-    #         targetType: 'inline'
-    #         script: |
-    #           Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
-    #           Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
-
-    #     - task: DownloadBuildArtifacts@0
-    #       displayName: 'Download Build Artifacts'
-    #       inputs:
-    #         buildType: 'current'
-    #         downloadType: 'specific'
-    #         downloadPath: '$(System.ArtifactsDirectory)' 
-
-    #     - task: AzureCLI@1
-    #       inputs:
-    #         azureSubscription: 'TM2-Dev'
-    #         scriptLocation: 'inlineScript'
-    #         inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
-    #       displayName: 'Run SpecFlow tests'
-
-    #     - task: PublishTestResults@2
-    #       inputs:
-    #         testResultsFiles: '**/*.trx'
-    #         testResultsFormat: 'VSTest'
 
 - stage: DeployUAT
   dependsOn: Build
@@ -277,6 +265,48 @@ stages:
                   azureSubscription: 'TaskmanagerUAT-SC'
                   WebAppName: 'taskmanager-uat-web-ncneportal'
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
+
+    - job: RunAutomatedTests
+      displayName: 'Run automated UI tests'
+      dependsOn: DeployNCNEPortalWebsiteUAT
+      pool:
+          NautilusBuild
+      steps:
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
+              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download Build Artifacts'
+          inputs:
+            buildType: 'current'
+            downloadType: 'specific'
+            downloadPath: '$(System.ArtifactsDirectory)' 
+
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
+        - task: AzureCLI@1
+          displayName: 'Run SpecFlow tests'
+          inputs:
+            azureSubscription: 'TaskmanagerUAT-SC'
+            scriptLocation: 'inlineScript'
+            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\NCNEPortal.TestAutomation.Specs\NCNEPortal.TestAutomation.Specs.dll --logger:trx'
+
+        - task: PublishTestResults@2
+          displayName: 'Publish SpecFlowTestResults'
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'NCNE Portal UI tests - $(System.StageName)'
+
 
 - stage: DeployPre
   dependsOn: Build
