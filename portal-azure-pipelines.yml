@@ -1,7 +1,6 @@
 trigger:
   branches:
     include:
-    - master
     - features/*
   paths:
     include:
@@ -9,6 +8,17 @@ trigger:
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
     - src/HpdDatabase.EF/*  
+
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - src/Portal/*
+    - src/Databases/WorkflowDatabase.EF/*
+    - src/Common*
+    - src/HpdDatabase.EF/*
 
 stages:
 - stage: Build
