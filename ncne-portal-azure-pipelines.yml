@@ -285,7 +285,7 @@ stages:
         - task: AzureCLI@1
           displayName: 'Run SpecFlow tests'
           inputs:
-            azureSubscription: 'TaskmanagerDev'
+            azureSubscription: 'TaskmanagerUAT-SC'
             scriptLocation: 'inlineScript'
             inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\NCNEPortal.TestAutomation.Specs\NCNEPortal.TestAutomation.Specs.dll --logger:trx'
 
