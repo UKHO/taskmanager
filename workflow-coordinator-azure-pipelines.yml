@@ -1,8 +1,17 @@
 trigger:
   branches:
     include:
-    - master
     - features/*
+  paths:
+    include:
+    - src/WorkflowCoordinator/*
+    - src/Databases/WorkflowDatabase.EF/*
+    - src/Common*
+
+pr:
+  branches:
+    include:
+    - master
   paths:
     include:
     - src/WorkflowCoordinator/*

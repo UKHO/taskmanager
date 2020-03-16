@@ -5,8 +5,16 @@ trigger:
     - features/*
   paths:
     include:
-    - src/Databases/NCNEWorkflowDatabase/*
+    - src/Databases/NCNEWorkflowDatabase*
 
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - src/Databases/NCNEWorkflowDatabase*
+    
 stages:
 - stage: Build
   jobs:
