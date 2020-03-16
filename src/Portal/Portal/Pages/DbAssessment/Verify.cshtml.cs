@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
 using Portal.Configuration;
+using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
@@ -85,6 +86,8 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public string Team { get; set; }
 
+        public string SerialisedCustomHttpStatusCodes { get; set; }
+
         public VerifyModel(WorkflowDbContext dbContext,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
@@ -117,6 +120,7 @@ namespace Portal.Pages.DbAssessment
             var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
+            SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<VerifyCustomHttpStatusCode>();
 
             await GetOnHoldData(processId);
         }
@@ -157,14 +161,15 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.BadRequest
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                         };
                     }
+
                     if (!await SaveTaskData(processId))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.BadRequest
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                         };
                     }
 
@@ -189,7 +194,7 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.BadRequest
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                         };
                     }
 
@@ -197,16 +202,24 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.BadRequest
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
-                    if (await HasActiveChildTasks(workflowInstance))
+                    var hasWarnings = await HasActiveChildTasks(workflowInstance);
+
+                    if (!await MarkCarisProjectAsComplete(processId))
+                    {
+                        hasWarnings = true;
+                    }
+
+                    if (hasWarnings)
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.NotAcceptable
+                            StatusCode = (int)VerifyCustomHttpStatusCode.WarningsDetected
                         };
+
                     }
 
                     if (!await MarkTaskAsComplete(processId, workflowInstance))
@@ -219,11 +232,12 @@ namespace Portal.Pages.DbAssessment
 
                     return StatusCode((int)HttpStatusCode.OK);
                 case "ConfirmedSignOff":
+
                     if (!await MarkTaskAsComplete(processId, workflowInstance))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.InternalServerError
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
@@ -316,12 +330,12 @@ namespace Portal.Pages.DbAssessment
                     .Select(wi => wi.ProcessId)
                     .ToListAsync();
 
+
                 if (childProcessIds.Any())
                 {
-                    foreach (var item in childProcessIds)
-                    {
-                        ValidationErrorMessages.Add(item.ToString());
-                    }
+                    var joined = string.Join(',', childProcessIds);
+
+                    ValidationErrorMessages.Add($"Child Tasks: The current task has the following active child tasks: {joined}.");
 
                     return true;
                 }
@@ -352,6 +366,27 @@ namespace Portal.Pages.DbAssessment
             }
 
             await UpdateDataImpact(processId);
+            return true;
+        }
+
+        private async Task<bool> MarkCarisProjectAsComplete(int processId)
+        {
+            var carisProjectDetails = await
+                _dbContext.CarisProjectDetails.SingleOrDefaultAsync(c => c.ProcessId == processId);
+
+            if (carisProjectDetails != null)
+            {
+                try
+                {
+                    await _carisProjectHelper.MarkCarisProjectAsComplete(carisProjectDetails.ProjectId, _generalConfig.Value.CarisProjectTimeoutSeconds);
+                }
+                catch (Exception e)
+                {
+                    ValidationErrorMessages.Add($"Caris Project: '{carisProjectDetails.ProjectName}' failed to be marked as Completed: {e.Message}");
+                    return false;
+                }
+            }
+
             return true;
         }
 
