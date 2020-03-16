@@ -24,6 +24,24 @@ namespace NCNEPortal.Helpers
             _directoryService = directoryService;
         }
 
+        public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType, List<string> validationErrorMessages)
+        {
+            bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
+
+            if (string.IsNullOrEmpty(chartType))
+            {
+                validationErrorMessages.Add("Task Information: Chart Type cannot be empty");
+                isValid = false;
+            }
+            if (string.IsNullOrEmpty(workflowType))
+            {
+                validationErrorMessages.Add("Task Information: Workflow Type cannot be empty");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
         public bool ValidateWorkflowPage(TaskRole taskRole, DateTime? publicationDate, DateTime? repromatDate,
             int dating,
             string chartType,
@@ -139,7 +157,7 @@ namespace NCNEPortal.Helpers
 
             if (string.IsNullOrEmpty(taskRole.Compiler))
             {
-                validationErrorMessages.Add("Task Information: Compiler can not be empty");
+                validationErrorMessages.Add("Task Information: Compiler cannot be empty");
                 isValid = false;
             }
 

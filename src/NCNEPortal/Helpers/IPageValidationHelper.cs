@@ -1,7 +1,6 @@
 ﻿using NCNEWorkflowDatabase.EF.Models;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.Helpers
 {
@@ -16,6 +15,7 @@ namespace NCNEPortal.Helpers
                 threePsInfo,
             List<string> validationErrorMessages);
 
-
+        public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType,
+            List<string> validationErrorMessages);
     }
 }

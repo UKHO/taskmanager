@@ -28,6 +28,7 @@ namespace NCNEPortal
     [Authorize]
     public class NewTaskModel : PageModel
     {
+        private readonly IPageValidationHelper _pageValidationHelper;
         private readonly IStageTypeFactory _stageTypeFactory;
         private readonly IDirectoryService _directoryService;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
@@ -108,8 +109,10 @@ namespace NCNEPortal
                             ILogger<NewTaskModel> logger,
                             IUserIdentityService userIdentityService,
                             IDirectoryService directoryService,
-                            IStageTypeFactory stageTypeFactory)
+                            IStageTypeFactory stageTypeFactory,
+                            IPageValidationHelper pageValidationHelper)
         {
+
 
             try
             {
@@ -119,7 +122,7 @@ namespace NCNEPortal
                 _logger = logger;
                 _userIdentityService = userIdentityService;
                 _stageTypeFactory = stageTypeFactory;
-
+                _pageValidationHelper = pageValidationHelper;
 
                 LogContext.PushProperty("NCNEPortalResource", "NewTask");
 
@@ -150,15 +153,37 @@ namespace NCNEPortal
         {
         }
 
-        public async Task<IActionResult> OnPost()
-        {
 
+        public async Task<IActionResult> OnPostSaveAsync()
+        {
             LogContext.PushProperty("ActivityName", "NewTask");
-            LogContext.PushProperty("NCNEPortalResource", nameof(OnPost));
-            LogContext.PushProperty("Action", "Post");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("Action", "Save");
 
             try
             {
+
+                ValidationErrorMessages.Clear();
+
+
+                //ValidateUsers(Compiler, Verifier1, Verifier2, Publisher);
+                var role = new TaskRole()
+                {
+                    Compiler = Compiler,
+                    VerifierOne = Verifier1,
+                    VerifierTwo = Verifier2,
+                    Publisher = Publisher
+                };
+
+                if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
+                )
+                {
+
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
 
                 ReCalculateDeadlineDates();
 
@@ -166,14 +191,14 @@ namespace NCNEPortal
 
                 await CreateTaskStages(newProcessId);
 
-
-                return RedirectToPage("./Index");
+                return StatusCode(200);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving Task Information");
                 return RedirectToPage("./Index");
             }
+
         }
 
         private async Task<int> CreateTaskInfo()
@@ -313,65 +338,6 @@ namespace NCNEPortal
                 .Select(sc => sc.Name);
 
             WorkflowTypes = new SelectList(workflowTypes);
-        }
-
-        public async Task<IActionResult> OnPostAssignRoleToUserAsync(string compiler, string verifierOne, string verifierTwo, string publisher)
-        {
-
-            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostAssignRoleToUserAsync));
-
-            ValidationErrorMessages.Clear();
-
-            if (string.IsNullOrEmpty(compiler))
-                ValidationErrorMessages.Add("Please assign valid user to the Compiler role to create a new task");
-            else
-
-            {
-                if (!userList.Any(a => a == compiler))
-                {
-                    _logger.LogInformation($"Attempted to assign Compiler role to unknown user {compiler}");
-                    ValidationErrorMessages.Add($"Unable to assign Compiler role to unknown user {compiler}");
-                }
-            }
-
-
-            if (!string.IsNullOrEmpty(verifierOne))
-            {
-                if (!userList.Any(a => a == verifierOne))
-                {
-                    _logger.LogInformation($"Attempted to assign Verifier1 role to unknown user {verifierOne}");
-                    ValidationErrorMessages.Add($"Unable to assign Verifier1 role to unknown user {verifierOne}");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(verifierTwo))
-            {
-                if (!userList.Any(a => a == verifierTwo))
-                {
-                    _logger.LogInformation($"Attempted to assign Verifier2 role to unknown user {verifierTwo}");
-                    ValidationErrorMessages.Add($"Unable to assign Verifier2 role to unknown user {verifierTwo}");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(publisher))
-            {
-                if (!userList.Any(a => a == publisher))
-                {
-                    _logger.LogInformation($"Attempted to assign Publisher role to unknown user {publisher}");
-                    ValidationErrorMessages.Add($"Unable to assign Publisher role to unknown user {publisher}");
-                }
-            }
-
-            if (ValidationErrorMessages.Any())
-            {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
-            }
-
-
-            return StatusCode(200);
         }
 
 
