@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
@@ -248,29 +249,29 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            if (string.IsNullOrWhiteSpace(comment))
-            {
-                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
-                ValidationErrorMessages.Add($"Reject comment cannot be empty.");
+            var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
 
+            if (string.IsNullOrWhiteSpace(verifyData.Verifier))
+            {
+                ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
+            }
+            else if (!UserFullName.Equals(verifyData.Verifier, StringComparison.InvariantCultureIgnoreCase))
+            {
+                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
+            }
+            if (ValidationErrorMessages.Any())
+            {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
                     StatusCode = (int)HttpStatusCode.BadRequest
                 };
             }
 
-            var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
-
-            if (!await _pageValidationHelper.ValidateVerifyPage(
-                Ion,
-                ActivityCode,
-                SourceCategory,
-                verifyData.Verifier,
-                UserFullName,
-                RecordProductAction,
-                DataImpacts, "Reject",
-                ValidationErrorMessages, Team, verifyData.Verifier))
+            if (string.IsNullOrWhiteSpace(comment))
             {
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
+                ValidationErrorMessages.Add($"Reject comment cannot be empty.");
+
                 return new JsonResult(this.ValidationErrorMessages)
                 {
                     StatusCode = (int)HttpStatusCode.BadRequest

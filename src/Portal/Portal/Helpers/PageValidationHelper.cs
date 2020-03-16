@@ -178,7 +178,7 @@ namespace Portal.Helpers
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
-        /// <param name="currentVerifier"></param>
+        /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
         public async Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
@@ -190,20 +190,20 @@ namespace Portal.Helpers
             string action,
             List<string> validationErrorMessages,
             string team,
-            string currentVerifier = "")
+            string currentAssignedVerifierInDb = "")
         {
             var isValid = true;
 
-            if (action == "Done" || action == "Reject")
+            if (action == "Done")
             {
-                if (string.IsNullOrWhiteSpace(currentVerifier))
+                if (string.IsNullOrWhiteSpace(currentAssignedVerifierInDb))
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentVerifier, StringComparison.InvariantCultureIgnoreCase))
+                else if (!currentUsername.Equals(currentAssignedVerifierInDb, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentVerifier} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
