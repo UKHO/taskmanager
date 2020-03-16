@@ -63,6 +63,11 @@ namespace NCNEPortal.TestAutomation.Framework
             else
                 RestoreCookies();
 
+            NavigateToDefaultSeleniumStartupPage();
+        }
+
+        private void NavigateToDefaultSeleniumStartupPage()
+        {
             _webDriver.Navigate().GoToUrl("data:,");
         }
 

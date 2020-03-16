@@ -12,14 +12,14 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
         private readonly Uri _landingPageUrl;
         private readonly WebDriverWait _wait;
 
-        public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig config)
+        public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
         {
             _driver = driver;
             _wait = wait;
 
             _landingPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? config.NcneLandingPageUrl
-                : config.NcneLocalDevLandingPageUrl;
+                ? urlsConfig.NcneLandingPageUrl
+                : urlsConfig.NcneLocalDevLandingPageUrl;
         }
 
         private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
