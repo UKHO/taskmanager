@@ -116,7 +116,7 @@ namespace Portal.Helpers
             List<string> validationErrorMessages, string team)
         {
             var isValid = true;
-            
+
             if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (string.IsNullOrWhiteSpace(currentAssignedAssessor))
@@ -136,12 +136,12 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateOperators(assessor,"Assessor", validationErrorMessages))
+            if (!await ValidateOperators(assessor, "Assessor", validationErrorMessages))
             {
                 isValid = false;
             }
 
-            if (!await ValidateOperators(verifier,"Verifier", validationErrorMessages))
+            if (!await ValidateOperators(verifier, "Verifier", validationErrorMessages))
             {
                 isValid = false;
             }
@@ -171,40 +171,41 @@ namespace Portal.Helpers
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
-        /// <param name="currentAssignedVerifier"></param>
+        /// <param name="formDataAssignedVerifier"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
+        /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
         public async Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
             string sourceCategory,
-            string currentAssignedVerifier,
+            string formDataAssignedVerifier,
             string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string action,
             List<string> validationErrorMessages,
-            string team)
+            string team,
+            string currentAssignedVerifierInDb = "")
         {
             var isValid = true;
 
-            if (action == "Reject")
+            if (action == "Done")
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedVerifier))
+                if (string.IsNullOrWhiteSpace(currentAssignedVerifierInDb))
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedVerifier, StringComparison.InvariantCultureIgnoreCase))
+                else if (!currentUsername.Equals(currentAssignedVerifierInDb, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedVerifier} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-
-                return isValid;
             }
 
             if (!ValidateVerifyTaskInformation(ion, activityCode, sourceCategory, validationErrorMessages))
@@ -212,7 +213,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateOperators(currentAssignedVerifier,"Verifier", validationErrorMessages))
+            if (!await ValidateOperators(formDataAssignedVerifier, "Verifier", validationErrorMessages))
             {
                 isValid = false;
             }

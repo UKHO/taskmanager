@@ -215,7 +215,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
-                {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
@@ -245,7 +245,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
-                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
@@ -271,13 +271,15 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_productactions_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
-                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             _hpDbContext.CarisProducts.Add(new CarisProduct
-                { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
@@ -303,6 +305,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_dataimpacts_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
 
@@ -359,7 +363,7 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_has_active_child_tasks_returns_warning_message()
         {
             A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("This User"));
+                .Returns(Task.FromResult("TestUser"));
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
 
@@ -386,16 +390,7 @@ namespace Portal.UnitTests
 
             });
 
-            _dbContext.AssessmentData.Add(new AssessmentData()
-            {
-                AssessmentDataId = 1,
-                ProcessId = ProcessId
-            });
-
-
             await _dbContext.SaveChangesAsync();
-
-            
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -408,7 +403,7 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
                 .Returns(true);
-            
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -460,14 +455,15 @@ namespace Portal.UnitTests
             // Assert
             A.CallTo(() => _pageValidationHelper.ValidateVerifyPage(
                                                                                 A<string>.Ignored,
-                                                                                A<string>.Ignored, 
-                                                                                A<string>.Ignored, 
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
                                                                                 A<List<DataImpact>>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<string>>.Ignored,
+                                                                                A<string>.Ignored,
                                                                                 A<string>.Ignored))
                                                             .MustNotHaveHappened();
 
@@ -509,7 +505,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                      A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -546,7 +542,7 @@ namespace Portal.UnitTests
                 A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored,
                 A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -592,7 +588,7 @@ namespace Portal.UnitTests
                     A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -629,7 +625,7 @@ namespace Portal.UnitTests
                     A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()
@@ -677,6 +673,20 @@ namespace Portal.UnitTests
                 .Returns(true);
 
             await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
+                .Returns(true);
+
+            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);

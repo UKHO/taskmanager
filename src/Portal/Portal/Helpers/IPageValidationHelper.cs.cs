@@ -61,23 +61,26 @@ namespace Portal.Helpers
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
-        /// <param name="currentAssignedVerifier"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
+        /// <param name="formDataAssignedVerifier"></param>
+        /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
         Task<bool> ValidateVerifyPage(string ion,
             string activityCode,
             string sourceCategory,
-            string currentAssignedVerifier,
+            string formDataAssignedVerifier,
             string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string action,
             List<string> validationErrorMessages,
-            string team);
+            string team,
+            string currentAssignedVerifierInDb = "");
 
 
     }
