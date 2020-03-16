@@ -121,7 +121,6 @@ namespace NCNEPortal.UnitTests
             Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("Task Information: Duration cannot be empty"));
 
         }
-
         [Test]
         public async Task Test_validating_the_workflow_for_Compiler()
         {
@@ -135,7 +134,7 @@ namespace NCNEPortal.UnitTests
             await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
 
             Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("Task Information: Compiler can not be empty"));
+            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("Task Information: Compiler cannot be empty"));
 
         }
 

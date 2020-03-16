@@ -1,11 +1,14 @@
 ﻿using FakeItEasy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
@@ -19,8 +22,8 @@ namespace NCNEPortal.UnitTests
         private IUserIdentityService _fakeUserIdentityService;
         private IMilestoneCalculator _milestoneCalculator;
         private IDirectoryService _fakeDirectoryService;
-        private IPageValidationHelper _pageValidationHelper;
-        private IStageTypeFactory _stageTypeFactory;
+        private IPageValidationHelper _fakePageValidationHelper;
+        private IStageTypeFactory _fakeStageTypeFactory;
         private int ProcessId { get; set; }
 
         [SetUp]
@@ -38,78 +41,64 @@ namespace NCNEPortal.UnitTests
 
             _fakeUserIdentityService = A.Fake<IUserIdentityService>();
             _fakeDirectoryService = A.Fake<IDirectoryService>();
+            _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
+            _fakeLogger = A.Fake<ILogger<NewTaskModel>>();
 
-            _fakeLogger = A.Dummy<ILogger<NewTaskModel>>();
+            _fakeStageTypeFactory = A.Fake<IStageTypeFactory>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeUserIdentityService, _fakeDirectoryService);
-
-            _stageTypeFactory = new StageTypeFactory(_dbContext);
-
-
-            _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakeUserIdentityService, _fakeDirectoryService, _stageTypeFactory, _pageValidationHelper);
-
-
+            _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakeUserIdentityService, _fakeDirectoryService, _fakeStageTypeFactory, _fakePageValidationHelper);
         }
-
-
-        [TearDown]
-        public void TearDown()
-        {
-            _dbContext.Database.EnsureDeleted();
-        }
-
 
         [Test]
-        public async Task Test_validating_newtask_for_chart_type()
+        public async Task OnPostSaveAsync_gives_no_validation_errors_when_valid()
         {
 
-            _newTaskModel.Compiler = "Pete";
-
-            _newTaskModel.WorkflowType = "NC";
-
-            _newTaskModel.ChartType = null;
-
-            await _newTaskModel.OnPostSaveAsync();
-
-            Assert.GreaterOrEqual(_newTaskModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_newTaskModel.ValidationErrorMessages.Contains("Task Information: Chart Type cannot be empty"));
-        }
-
-
-        [Test]
-        public async Task Test_validating_newtask_for_workflow_Type()
-        {
-
-            _newTaskModel.Compiler = "Pete";
-
-            _newTaskModel.WorkflowType = null;
-
+            _newTaskModel.Compiler = "Stuart";
             _newTaskModel.ChartType = "Adoption";
-
-            await _newTaskModel.OnPostSaveAsync();
-
-            Assert.GreaterOrEqual(_newTaskModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_newTaskModel.ValidationErrorMessages.Contains("Task Information: Workflow Type cannot be empty"));
-        }
-
-
-
-        [Test]
-        public async Task Test_validating_the_newtask_for_Compiler()
-        {
-            _newTaskModel.Compiler = null;
-
             _newTaskModel.WorkflowType = "NE";
 
-            _newTaskModel.ChartType = "Adoption";
 
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<List<string>>.Ignored))
+                .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(
+                A<TaskRole>.That.Matches(task => task.Compiler == "Stuart"),
+                "NE",
+                "Adoption",
+                A<List<string>>.That.IsEmpty())).Returns(true);
 
             await _newTaskModel.OnPostSaveAsync();
 
-            Assert.GreaterOrEqual(_newTaskModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_newTaskModel.ValidationErrorMessages.Contains("Task Information: Compiler can not be empty"));
+            Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 0);
+        }
 
+        [Test]
+        public async Task OnPostSaveAsync_gives_validation_errors_when_invalid()
+        {
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored))
+                .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
 
+            await _newTaskModel.OnPostSaveAsync();
+
+            Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 1);
+            CollectionAssert.Contains(_newTaskModel.ValidationErrorMessages, "This is an error message");
+        }
+
+        [Test]
+        public async Task OnPostSaveAsync_returns_200_when_valid()
+        {
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored)).Returns(true);
+
+            var result = await _newTaskModel.OnPostSaveAsync();
+            var statusCode = (StatusCodeResult)result;
+
+            Assert.AreEqual(200, statusCode.StatusCode);
         }
     }
 }

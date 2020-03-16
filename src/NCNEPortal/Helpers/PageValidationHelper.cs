@@ -157,7 +157,7 @@ namespace NCNEPortal.Helpers
 
             if (string.IsNullOrEmpty(taskRole.Compiler))
             {
-                validationErrorMessages.Add("Task Information: Compiler can not be empty");
+                validationErrorMessages.Add("Task Information: Compiler cannot be empty");
                 isValid = false;
             }
 
