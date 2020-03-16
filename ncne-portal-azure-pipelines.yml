@@ -295,7 +295,7 @@ stages:
           inputs:
             testResultsFormat: 'VSTest'
             testResultsFiles: '**/*.trx'
-            testRunTitle: 'Portal UI tests - $(System.StageName)'
+            testRunTitle: 'NCNE Portal UI tests - $(System.StageName)'
 
 
 - stage: DeployPre
