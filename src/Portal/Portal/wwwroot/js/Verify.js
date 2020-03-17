@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
+
     $("#Reviewer").prop("disabled", true);
 
     setVerifyDoneHandler();
@@ -32,7 +34,7 @@
     });
 
     $("#btnContinueRejection").on("click",
-        function() {
+        function () {
             $("#modalUnsavedWarning").modal("hide");
             $("#ConfirmReject").modal("show");
         });
@@ -53,7 +55,7 @@
         }
     });
 
-    $("#txtRejectComment").keydown(function(event) {
+    $("#txtRejectComment").keydown(function (event) {
         $("#ConfirmRejectError").html("");
         $("#btnConfirmReject").prop("disabled", false);
     });
@@ -82,7 +84,7 @@
         $.ajax({
             type: "POST",
             url: "Verify/?handler=RejectVerify",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -121,8 +123,8 @@
                     $("#verifyDoneErrorMessage").html("<div class=\"alert alert-danger\" role=\"alert\">System error. Please try again later.</div>");
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
-                
-                
+
+
             }
         });
 
@@ -136,9 +138,9 @@
 
 
     function completeVerify(action) {
-        $("#modalOpenChildTaskWarning").modal("hide");
+        $("#modalVerifyDoneWarning").modal("hide");
         $("#verifyDoneErrorMessage").html("");
-        $("#childTaskWarningMessages").html("");
+        $("#verifyDoneWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
         $("#btnSave").prop("disabled", true);
         $("#modalWaitVerifyDone").modal("show");
@@ -172,31 +174,47 @@
                 var statusCode = error.status;
 
                 if (responseJson != null) {
-                    if (statusCode === 406) {
-                        $("#childTaskWarningMessages").append("<ul/>");
-                        var unOrderedList = $("#childTaskWarningMessages ul");
+                    if (statusCode === customHttpStatusCodes.WarningsDetected) {
+
+                        $("#verifyDoneWarningMessages").append("<ul/>");
+                        var unOrderedList = $("#verifyDoneWarningMessages ul");
 
                         responseJson.forEach(function (item) {
                             unOrderedList.append("<li>" + item + "</li>");
                         });
 
-                        $("#modalOpenChildTaskWarning").modal("show");
-                    } else {
+                        $("#modalVerifyDoneWarning").modal("show");
+
+                    } else if (statusCode === customHttpStatusCodes.FailedValidation) {
+
                         $("#verifyDoneErrorMessage").append("<ul/>");
                         var unOrderedList = $("#verifyDoneErrorMessage ul");
 
-                        responseJson.forEach(function(item) {
+                        responseJson.forEach(function (item) {
                             unOrderedList.append("<li>" + item + "</li>");
                         });
 
                         $("#modalWaitVerifyDoneErrors").modal("show");
+
+                    } else {
+                        $("#verifyDoneErrorMessage").append("<ul/>");
+
+                        var unOrderedList = $("#verifyDoneErrorMessage ul");
+                        unOrderedList.append("<li>" + responseJson + "</li>");
+
+                        $("#modalWaitVerifyDoneErrors").modal("show");
+
                     }
                 } else {
-                    $("#verifyDoneErrorMessage").html("<div class=\"alert alert-danger\" role=\"alert\">System error. Please try again later.</div>");
+
+                    $("#verifyDoneErrorMessage").append("<ul/>");
+
+                    var unOrderedList = $("#verifyDoneErrorMessage ul");
+                    unOrderedList.append("<li>System error. Please try again later</li>");
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
-                
-                
+
+
             }
         });
     }
@@ -220,7 +238,7 @@
     }
 
     function handleContinueChildTaskWarning() {
-        $("#btnContinueChildTaskWarning").on("click", function(e) {
+        $("#btnContinueChildTaskWarning").on("click", function (e) {
             completeVerify("ConfirmedSignOff");
         });
     }

@@ -587,6 +587,10 @@ body, .sticky-footer-wrapper {
     margin-bottom: 8px;
 }
 
+.modal-dialog.error ul, .modal-dialog.warning ul {
+    padding-left: 10px;
+}
+
 /* TYPEAHEAD START */
 span.twitter-typeahead {
     width: 100%;
