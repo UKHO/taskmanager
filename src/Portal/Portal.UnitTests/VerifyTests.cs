@@ -7,6 +7,7 @@ using Common.Helpers;
 using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -133,9 +134,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult) await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 3);
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.Contains($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Activity code cannot be empty", _verifyModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Source category cannot be empty", _verifyModel.ValidationErrorMessages);
@@ -153,8 +154,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages);
         }
@@ -172,8 +174,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Verifier = "TestUser";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages);
         }
@@ -202,8 +205,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages);
         }
@@ -231,8 +235,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages);
         }
@@ -262,8 +267,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages);
         }
@@ -296,8 +302,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages);
         }
@@ -333,8 +340,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages);
         }
@@ -353,8 +361,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Verifier = "TestUser";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages);
         }
@@ -392,8 +401,9 @@ namespace Portal.UnitTests
 
             await _dbContext.SaveChangesAsync();
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_verifyModel.ValidationErrorMessages.Any(v => v.Contains(childProcessId.ToString())));
         }
