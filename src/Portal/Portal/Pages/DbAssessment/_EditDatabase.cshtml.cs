@@ -157,6 +157,10 @@ namespace Portal.Pages.DbAssessment
             // Add assessor and verifier to created project
             await UpdateCarisProjectWithAdditionalUser(projectId, processId, taskStage);
 
+            var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
+            assessData.WorkspaceAffected = carisWorkspace;
+            await _dbContext.SaveChangesAsync();
+
             return StatusCode(200);
         }
 

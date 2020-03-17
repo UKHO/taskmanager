@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using FakeItEasy;
@@ -65,6 +66,42 @@ namespace Portal.UnitTests
         {
             _dbContext.Database.EnsureDeleted();
         }
+
+        [Test]
+        public async Task Test_CreateCarisProject_Given_Valid_Data_Then_Updates_DbAssessmentAssessData_WorkspaceAffected()
+        {
+            //Arrange
+            var userWithHpdUserRecord = "TestUserAd";
+
+            var setupAssessData = new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                Assessor = userWithHpdUserRecord,
+                Verifier = userWithHpdUserRecord
+            };
+            await _dbContext.DbAssessmentAssessData.AddAsync(setupAssessData);
+            await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(userWithHpdUserRecord));
+
+            A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
+                    A<int>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<int>.Ignored))
+                .Returns(1);
+
+            //Act
+            await _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace");
+
+            //Assert
+            var assessData = await _dbContext.DbAssessmentAssessData.FirstOrDefaultAsync();
+            Assert.IsNotNull(assessData);
+            Assert.AreEqual("TestWorkspace", assessData.WorkspaceAffected);
+            Assert.IsFalse(_dbContext.ChangeTracker.HasChanges());
+        }
+
 
         [Test]
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_Invalid_Workspace_Provided()
