@@ -7,6 +7,7 @@ using Common.Helpers;
 using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -75,6 +76,7 @@ namespace Portal.UnitTests
             _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
             {
                 ProcessId = ProcessId,
+                Assessor = "TestUser",
                 Verifier = "TestUser"
             });
 
@@ -133,9 +135,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult) await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
-            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 3);
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.Contains($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Activity code cannot be empty", _verifyModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Source category cannot be empty", _verifyModel.ValidationErrorMessages);
@@ -153,8 +155,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Verifier cannot be empty", _verifyModel.ValidationErrorMessages);
         }
@@ -172,8 +175,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Verifier = "TestUser";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages);
         }
@@ -202,8 +206,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages);
         }
@@ -231,8 +236,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages);
         }
@@ -262,8 +268,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages);
         }
@@ -296,8 +303,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages);
         }
@@ -333,8 +341,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: All Usages must be verified", _verifyModel.ValidationErrorMessages);
         }
@@ -353,8 +362,9 @@ namespace Portal.UnitTests
 
             _verifyModel.Verifier = "TestUser";
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Task Information: Team cannot be empty", _verifyModel.ValidationErrorMessages);
         }
@@ -392,10 +402,93 @@ namespace Portal.UnitTests
 
             await _dbContext.SaveChangesAsync();
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(_verifyModel.ValidationErrorMessages.Any(v => v.Contains(childProcessId.ToString())));
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_not_created_then_MarkCarisProjectAsComplete_is_not_called()
+        {
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            A.CallTo(() => _fakeCarisProjectHelper.MarkCarisProjectAsComplete(A<int>.Ignored,A<int>.Ignored)).MustNotHaveHappened();
+
+        }
+        
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_created_then_MarkCarisProjectAsComplete_is_called()
+        {
+            string aduser = "TestUser";
+
+            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(aduser));
+            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = aduser;
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123
+            });
+
+            _dbContext.HpdUser.Add(new HpdUser()
+            {
+                AdUsername = aduser,
+                HpdUsername = "TestUser_Caris"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            A.CallTo(() => _fakeCarisProjectHelper.MarkCarisProjectAsComplete(123, A<int>.Ignored)).MustHaveHappened();
+
         }
 
         [Test]
