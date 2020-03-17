@@ -5,6 +5,7 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace NCNEPortal.UnitTests
@@ -186,5 +187,282 @@ namespace NCNEPortal.UnitTests
             CollectionAssert.IsEmpty(validationErrorMessages);
 
         }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Repromate_Date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? nulldate = null;
+
+
+            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, null, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Repromat Date cannot be empty");
+
+        }
+
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Duration_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? nulldate = null;
+
+            DateTime repromatDate = DateTime.Now;
+            int Dating = 0;
+
+
+            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, repromatDate, Dating, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Duration cannot be empty");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Publication_Date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (false, invalidDate, invalidDate, invalidDate);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, null, 1, "Primary", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Publication Date cannot be empty");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_3ps_Expected_return_date_without_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (true, invalidDate, DateTime.Now, invalidDate);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering expected return date");
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_3ps_Actual_return_date_without_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (true, invalidDate, invalidDate, DateTime.Now);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 2);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering actual return date");
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter expected return date before entering actual return date");
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_for_3ps_expected_return_date_earlier_than_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now.AddDays(-2), invalidDate);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Expected return date cannot be earlier than Sent to 3PS date");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_for_3ps_actual_return_date_earlier_than_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Actual return date cannot be earlier than Sent to 3PS date");
+
+        }
+
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_Valid_data_Passes()
+        {
+            var validationErrorMessages = new List<string>();
+
+
+            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
+                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+
+            var taskRole = new TaskRole
+            {
+                Compiler = "Valid User1",
+                VerifierOne = "Valid User2",
+                VerifierTwo = "Valid User1",
+                Publisher = "Valid User2"
+            };
+
+            DateTime? invalidDate = null;
+
+            DateTime? publicationDate = null;
+
+
+
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now);
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
+
+            Assert.IsTrue(result);
+            Assert.IsEmpty(validationErrorMessages);
+        }
+
     }
 }

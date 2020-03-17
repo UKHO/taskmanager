@@ -241,6 +241,9 @@
                     //    window.location.replace("/Index");
                     //}
                     formChanged = false;
+                    var chartNo = $("#ChartNo").val();
+                    var workflowType = $("#workflowType").text().trim();
+                    $('h1').text(workflowType + " - " + chartNo);
                     console.log("success");
                 },
                 error: function (error) {

@@ -14,7 +14,7 @@
         </a>
     </div>
     <div class="col-7 offset-1">
-        <h1>New Chart/New Edition</h1>
+        <h1>@Model.WorkflowType - @Model.ChartNo</h1>
     </div>
 </div>
 <div class="row pt-1 pb-1">
@@ -422,7 +422,9 @@
                         <div class="form-group">
                             <div>@Html.LabelFor(model => model.WorkflowType)</div>
                             <div>
-                                <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
+                                <span id="workflowType">
+                                    <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
+                                </span>
                             </div>
                         </div>
 
