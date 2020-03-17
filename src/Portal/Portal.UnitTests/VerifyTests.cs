@@ -395,7 +395,7 @@ namespace Portal.UnitTests
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains(childProcessId.ToString(), _verifyModel.ValidationErrorMessages);
+            Assert.IsTrue(_verifyModel.ValidationErrorMessages.Any(v => v.Contains(childProcessId.ToString())));
         }
 
         [Test]
