@@ -109,7 +109,7 @@ namespace Common.Helpers
                 catch (Exception e)
                 {
                     transaction.Rollback();
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -209,7 +209,7 @@ namespace Common.Helpers
                 catch (Exception e)
                 {
                     transaction.Rollback();
-                    throw e;
+                    throw;
                 }
                 return carisProjectId;
             }
@@ -273,7 +273,7 @@ namespace Common.Helpers
                 catch (Exception e)
                 {
                     transaction.Rollback();
-                    throw e;
+                    throw;
                 }
             }
         }
