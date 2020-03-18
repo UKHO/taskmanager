@@ -6,42 +6,34 @@ using OpenQA.Selenium.Support.UI;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class NewTaskPage
+    public class NewTaskPage : PageBase
 
     {
-        private readonly IWebDriver _driver;
-        private readonly Uri _newtaskPageUrl;
-        private readonly WebDriverWait _wait;
-
         public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
+            : base(driver,
+                wait,
+                ConfigHelpers.IsAzureDevOpsBuild
+                    ? urlsConfig.NcneNewTaskPageUrl
+                    : urlsConfig.NcneLocalDevNewTaskPageUrl)
         {
-            _driver = driver;
-            _wait = wait;
-
-            _newtaskPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? urlsConfig.NcneNewTaskPageUrl
-                : urlsConfig.NcneLocalDevNewTaskPageUrl;
         }
 
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
+        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
 
-        public void NavigateTo()
+        public override bool HasLoaded
         {
-            _driver.Navigate().GoToUrl(_newtaskPageUrl);
-            _driver.Manage().Window.Maximize();
-        }
-
-        public bool HasLoaded()
-        {
-            try
+            get
             {
-                _wait.Until(driver => UkhoLogo.Displayed);
-                return true;
-            }
-            catch (NoSuchElementException e)
-            {
-                Console.WriteLine(e);
-                return false;
+                try
+                {
+                    Wait.Until(driver => UkhoLogo.Displayed);
+                    return true;
+                }
+                catch (NoSuchElementException e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
             }
         }
     }

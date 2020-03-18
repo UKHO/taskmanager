@@ -5,25 +5,27 @@ using OpenQA.Selenium.Support.UI;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class MicrosoftAuthPage
+    public class MicrosoftAuthPage : PageBase
     {
-        private readonly IWebDriver _driver;
+        private readonly LandingPage _landingPage;
         private readonly SecretsConfig _secretsConfig;
-        private readonly WebDriverWait _wait;
 
-        public MicrosoftAuthPage(IWebDriver driver, WebDriverWait wait, SecretsConfig secretsConfig)
+        public MicrosoftAuthPage(IWebDriver driver, WebDriverWait wait, SecretsConfig secretsConfig,
+            LandingPage landingPage) : base(driver, wait, null)
         {
-            _driver = driver;
-            _wait = wait;
             _secretsConfig = secretsConfig;
+            _landingPage = landingPage;
         }
 
-        public bool HasLoaded
+        private IWebElement UsernameField => Driver.FindElement(By.Id("i0116"));
+        private IWebElement PasswordField => Driver.FindElement(By.Id("i0118"));
+
+        public override bool HasLoaded
         {
             get
             {
                 var isMicrosoftAuthPage = false;
-                var shortWait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5))
+                var shortWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5))
                 {
                     PollingInterval = TimeSpan.FromMilliseconds(100)
                 };
@@ -54,8 +56,11 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
             }
         }
 
-        private IWebElement UsernameField => _driver.FindElement(By.Id("i0116"));
-        private IWebElement PasswordField => _driver.FindElement(By.Id("i0118"));
+        public override void NavigateTo()
+        {
+            //Going to the landing page when not logged in will redirect to the auth page
+            _landingPage.NavigateTo();
+        }
 
         public void Login()
         {
@@ -67,32 +72,7 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
             EnterTextInField(password, () => PasswordField);
             PasswordField.Submit();
 
-            CookieStore.SaveCookies(_driver.Manage().Cookies);
-        }
-
-        private void EnterTextInField(string textToEnter, Func<IWebElement> elementFunc)
-        {
-            IWebElement element = null;
-
-            _wait.Until(d =>
-            {
-                try
-                {
-                    element = elementFunc.Invoke();
-                    return element.Displayed;
-                }
-                catch (NoSuchElementException)
-                {
-                    return false;
-                }
-                catch (StaleElementReferenceException)
-                {
-                    return false;
-                }
-            });
-
-            element.Clear();
-            element.SendKeys(textToEnter);
+            CookieStore.SaveCookies(Driver.Manage().Cookies);
         }
     }
 }
