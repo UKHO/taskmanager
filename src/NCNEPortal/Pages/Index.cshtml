@@ -1,4 +1,5 @@
 ﻿@page
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using NCNEPortal.Enums
 @model IndexModel
 @{
@@ -50,16 +51,15 @@
                     <th></th>
                     <th>Process ID</th>
                     <th style="min-width: 3.6rem;">Type</th>
-                    <th style="min-width: 5.8rem;">Chart Number</th>
+                    <th style="min-width: 5.0rem;">Chart Number</th>
                     <th style="min-width: 3.9rem;">Status</th>
                     <th>User</th>
-                    <th>Forms</th>
+                    <th style="min-width: 5.0rem;">Forms</th>
                     <th>Commit to Print</th>
                     <th>CIS</th>
                     <th>Publication</th>
                     <th>Country</th>
                     <th>Workflow Type</th>
-                    <th>Team</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -86,24 +86,114 @@
                         </td>
                         <td>
                             @task.AnnounceDate?.ToShortDateString()
+                            @switch ((task.FormDateStatus))
+                            {
+                                case (int)ncneDateStatus.Green:
+                                    {
+                                        <i class="fa fa-circle" style=color:green></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Amber:
+                                    {
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Red:
+                                    {
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        break;
+                                    }
+
+                            }
+
+
                         </td>
                         <td>
                             @task.CommitDate?.ToShortDateString()
+                            @switch ((task.CommitDateStatus))
+                            {
+                                case (int)ncneDateStatus.Green:
+                                    {
+                                        <i class="fa fa-circle" style=color:green></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Amber:
+                                    {
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Red:
+                                    {
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        break;
+                                    }
+
+                            }
+
                         </td>
                         <td>
                             @task.CisDate?.ToShortDateString()
+                            @switch ((task.CisDateStatus))
+                            {
+                                case (int)ncneDateStatus.Green:
+                                    {
+                                        <i class="fa fa-circle" style=color:green></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Amber:
+                                    {
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Red:
+                                    {
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        break;
+                                    }
+
+                            }
+
                         </td>
                         <td>
                             @task.PublicationDate?.ToShortDateString()
+                            @switch ((task.PublishDateStatus))
+                            {
+                                case (int)ncneDateStatus.Green:
+                                    {
+                                        <i class="fa fa-circle" style=color:green></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Amber:
+                                    {
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        <i class="fa fa-circle" style=color:darkorange></i>
+                                        break;
+                                    }
+                                case (int)ncneDateStatus.Red:
+                                    {
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        <i class="fa fa-circle" style=color:red></i>
+                                        break;
+                                    }
+
+                            }
+
                         </td>
                         <td>
                             @task.Country
                         </td>
                         <td>
                             @task.WorkflowType
-                        </td>
-                        <td>
-                            CPT1
                         </td>
                         <td>
                             <div class="dropdown" style="cursor: pointer;">
@@ -207,12 +297,12 @@
                         'searchable': false
                     },
                     {
-                        'targets': [13],
+                        'targets': [12],
                         'orderable': false,
                         'searchable': false
                     },
                     {
-                        'targets': [14],
+                        'targets': [13],
                         'visible': false,
                         'searchable': false
                     }
@@ -220,7 +310,7 @@
                 "order": [[1, 'asc']],
                 "scrollX": true,
                 "createdRow": function (row, data, dataIndex) {
-                    if (data[14] === "") {
+                    if (data[13] === "") {
                         $("td.details-control", row).removeClass("details-control");
                         $("td.details-control i", row).removeClass("fa");
                     }

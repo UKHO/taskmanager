@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
+using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
@@ -48,7 +49,106 @@ namespace NCNEPortal.Pages
         {
             NcneTasks = await _dbContext.TaskInfo
                 .Include(c => c.TaskNote)
+                .Include(s => s.TaskStage)
                 .ToListAsync();
+
+
+            foreach (var task in NcneTasks)
+            {
+                if (task.TaskStage.Find(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms).Status ==
+                    NcneTaskStatus.Completed.ToString())
+                {
+                    task.FormDateStatus = (int)ncneDateStatus.Green;
+                }
+                else
+                {
+                    if (task.AnnounceDate != null)
+                    {
+                        if ((Convert.ToDateTime(task.AnnounceDate) - DateTime.Today).TotalDays <= 0)
+                        {
+                            task.FormDateStatus = (int)ncneDateStatus.Red;
+                        }
+                        else
+                        {
+                            if ((Convert.ToDateTime(task.AnnounceDate) - DateTime.Today).TotalDays <= 7)
+                            {
+                                task.FormDateStatus = (int)ncneDateStatus.Amber;
+                            }
+                        }
+                    }
+                }
+
+                if (task.TaskStage.Find(t => t.TaskStageTypeId == (int)NcneTaskStageType.Commit_To_Print).Status ==
+                    NcneTaskStatus.Completed.ToString())
+                {
+                    task.CommitDateStatus = (int)ncneDateStatus.Green;
+                }
+                else
+                {
+                    if (task.CommitDate != null)
+                    {
+                        if ((Convert.ToDateTime(task.CommitDate) - DateTime.Today).TotalDays <= 0)
+                        {
+                            task.CommitDateStatus = (int)ncneDateStatus.Red;
+                        }
+                        else
+                        {
+                            if ((Convert.ToDateTime(task.CommitDate) - DateTime.Today).TotalDays <= 7)
+                            {
+                                task.CommitDateStatus = (int)ncneDateStatus.Amber;
+                            }
+                        }
+                    }
+                }
+
+                if (task.TaskStage.Find(t => t.TaskStageTypeId == (int)NcneTaskStageType.CIS).Status ==
+                    NcneTaskStatus.Completed.ToString())
+                {
+                    task.CisDateStatus = (int)ncneDateStatus.Green;
+                }
+                else
+                {
+                    if (task.CisDate != null)
+                    {
+                        if ((Convert.ToDateTime(task.CisDate) - DateTime.Today).TotalDays <= 0)
+                        {
+                            task.CisDateStatus = (int)ncneDateStatus.Red;
+                        }
+                        else
+                        {
+                            if ((Convert.ToDateTime(task.CisDate) - DateTime.Today).TotalDays <= 7)
+                            {
+                                task.CisDateStatus = (int)ncneDateStatus.Amber;
+                            }
+                        }
+                    }
+                }
+
+                if (task.TaskStage.Find(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication).Status ==
+                    NcneTaskStatus.Completed.ToString())
+                {
+                    task.PublishDateStatus = (int)ncneDateStatus.Green;
+                }
+                else
+                {
+                    if (task.PublicationDate != null)
+                    {
+                        if ((Convert.ToDateTime(task.PublicationDate) - DateTime.Today).TotalDays <= 0)
+                        {
+                            task.PublishDateStatus = (int)ncneDateStatus.Red;
+                        }
+                        else
+                        {
+                            if ((Convert.ToDateTime(task.PublicationDate) - DateTime.Today).TotalDays <= 7)
+                            {
+                                task.PublishDateStatus = (int)ncneDateStatus.Amber;
+                            }
+                        }
+                    }
+                }
+
+            }
+
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
