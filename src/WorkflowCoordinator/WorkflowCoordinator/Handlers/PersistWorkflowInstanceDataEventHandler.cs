@@ -32,7 +32,7 @@ namespace WorkflowCoordinator.Handlers
             LogContext.PushProperty("MessageId", context.MessageId);
             LogContext.PushProperty("Message", message.ToJSONSerializedString());
             LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
-            LogContext.PushProperty("CorrelationId", message.CorrelationId);
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
             LogContext.PushProperty("ProcessId", message.ProcessId);
             LogContext.PushProperty("FromActivity", message.FromActivity);
             LogContext.PushProperty("ToActivity", message.ToActivity);

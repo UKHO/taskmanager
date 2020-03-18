@@ -31,7 +31,7 @@ namespace WorkflowCoordinator
                     new SqlColumn
                         {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "CorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "MessageCorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ProcessId", DataType = SqlDbType.Int}
                 }
