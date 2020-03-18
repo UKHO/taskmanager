@@ -192,6 +192,8 @@ namespace WorkflowCoordinator.Sagas
 
         private async void ConstructAndSendLinkedDocumentRetrievalCommands(IMessageHandlerContext context)
         {
+            _logger.LogInformation($"Sending {nameof(GetBackwardDocumentLinksCommand)}");
+
             var backwardDocumentLinkCommand = new GetBackwardDocumentLinksCommand()
             {
                 CorrelationId = Data.CorrelationId,
@@ -201,6 +203,8 @@ namespace WorkflowCoordinator.Sagas
 
             await context.Send(backwardDocumentLinkCommand).ConfigureAwait(false);
 
+            _logger.LogInformation($"Sending {nameof(GetForwardDocumentLinksCommand)}");
+
             var forwardDocumentLinkCommand = new GetForwardDocumentLinksCommand()
             {
                 CorrelationId = Data.CorrelationId,
@@ -209,6 +213,8 @@ namespace WorkflowCoordinator.Sagas
             };
 
             await context.Send(forwardDocumentLinkCommand).ConfigureAwait(false);
+
+            _logger.LogInformation($"Sending {nameof(GetSepDocumentLinksCommand)}");
 
             var sepDocumentLinkCommand = new GetSepDocumentLinksCommand()
             {
