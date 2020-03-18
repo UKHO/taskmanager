@@ -42,6 +42,10 @@ namespace SourceDocumentCoordinator
                 assembly: typeof(InitiateSourceDocumentRetrievalEvent).Assembly,
                 publisherEndpoint: nsbConfig.EventServiceName);
 
+            routing.RegisterPublisher(
+                assembly: typeof(InitiateSourceDocumentRetrievalEvent).Assembly,
+                publisherEndpoint: nsbConfig.WorkflowCoordinatorName);
+
             // Persistence
 
             var persistence = this.UsePersistence<SqlPersistence>();
