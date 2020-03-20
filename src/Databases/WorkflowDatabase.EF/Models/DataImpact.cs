@@ -9,13 +9,8 @@ namespace WorkflowDatabase.EF.Models
         public int HpdUsageId { get; set; }
         public bool Edited { get; set; }
         public string Comments { get; set; }
-
-        [DisplayName("Features Submitted")]
         public bool FeaturesSubmitted { get; set; }
-
-        [DisplayName("Features Verified")]
         public bool FeaturesVerified { get; set; }
-
         public virtual HpdUsage HpdUsage { get; set; }
     }
 }
