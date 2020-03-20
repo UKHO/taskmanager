@@ -195,7 +195,7 @@ namespace WorkflowCoordinator.Handlers
 
             foreach (var dataImpact in workflowInstance.DataImpact)
             {
-                dataImpact.Verified = false;
+                dataImpact.FeaturesVerified = false;
             }
 
             var verifyData = await _dbContext.DbAssessmentVerifyData.SingleAsync(d => d.ProcessId == processId);

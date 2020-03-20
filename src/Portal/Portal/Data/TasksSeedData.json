@@ -785,7 +785,8 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "Verified": false
+        "FeaturesSubmitted": false,
+        "FeaturesVerified": false
       }
     ]
   },
@@ -903,7 +904,8 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "Verified": false
+        "FeaturesSubmitted": false,
+        "FeaturesVerified": false
       }
     ]
   },
@@ -1021,7 +1023,8 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "Verified": false
+        "FeaturesSubmitted": false,
+        "FeaturesVerified": false
       }
     ]
   },
@@ -1220,7 +1223,8 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "Verified": false
+        "FeaturesSubmitted": false,
+        "FeaturesVerified": false
       }
     ]
   }

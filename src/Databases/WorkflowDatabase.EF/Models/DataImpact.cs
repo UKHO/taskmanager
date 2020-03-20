@@ -1,4 +1,6 @@
-﻿namespace WorkflowDatabase.EF.Models
+﻿using System.ComponentModel;
+
+namespace WorkflowDatabase.EF.Models
 {
     public class DataImpact
     {
@@ -7,7 +9,12 @@
         public int HpdUsageId { get; set; }
         public bool Edited { get; set; }
         public string Comments { get; set; }
-        public bool Verified { get; set; }
+
+        [DisplayName("Features Submitted")]
+        public bool FeaturesSubmitted { get; set; }
+
+        [DisplayName("Features Verified")]
+        public bool FeaturesVerified { get; set; }
 
         public virtual HpdUsage HpdUsage { get; set; }
     }

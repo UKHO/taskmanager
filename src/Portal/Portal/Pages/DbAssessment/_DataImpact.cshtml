@@ -16,7 +16,7 @@
                         <div class="col-2"><label>Usage</label></div>
                         <div class="col-1"><label>Edited</label></div>
                         <div class="col-6"><label>Comments</label></div>
-                        <div class="col-1"><label>Verified</label></div>
+                        <div class="col-1"><label>Features Verified</label></div>
                     </div>
                 </div>
                 @foreach (var m in Model.DataImpacts)
@@ -36,8 +36,8 @@
                             <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactVerified" id="UsageVerified-0" @(m.Verified ? "checked" : "") value="true">
-                                    <label class="custom-control-label dataImpactVerifiedLabel"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactFeaturesVerified" id="usageFeaturesVerified-0" @(m.FeaturesVerified ? "checked" : "") value="true">
+                                    <label class="custom-control-label dataImpactFeaturesVerifiedLabel"></label>
                                 </div>
                             </div>
                             <div class="col-1"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
