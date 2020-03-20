@@ -195,6 +195,7 @@ namespace WorkflowCoordinator.Handlers
 
             foreach (var dataImpact in workflowInstance.DataImpact)
             {
+                dataImpact.FeaturesSubmitted = false;
                 dataImpact.FeaturesVerified = false;
             }
 
