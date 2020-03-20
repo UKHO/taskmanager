@@ -252,4 +252,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CreatedBy" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="623a5286-19aa-4fbb-92bb-5df4248b9922" ChangeDateTime="03/20/2020 14:26:05">
+    <Property Name="ElementName" Value="[dbo].[DataImpact].[Verified]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataImpact]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FeaturesVerified" />
+  </Operation>
 </Operations>
