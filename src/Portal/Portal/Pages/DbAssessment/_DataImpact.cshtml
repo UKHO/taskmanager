@@ -9,45 +9,45 @@
         <span>Data Impact</span>
     </h6>
     <div class="col-12">
-        <div class="card-body p-0">
+        <div class="card-body p-0 m-0">
             <div class="row" id="dataImpactContainer">
                 <div class="col-12">
                     <div class="form-row justify-content-start mb-0">
-                        <div class="col-2"><label>Usage</label></div>
-                        <div class="col-1"><label>Edited</label></div>
-                        <div class="col-6"><label>Comments</label></div>
-                        <div class="col-1"><label>Features Submitted</label></div>
-                        <div class="col-1"><label>Features Verified</label></div>
+                        <div class="col-2 p-0 m-0"><label>Usage</label></div>
+                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Edited</label></div>
+                        <div class="col-5 p-0 m-0"><label>Comments</label></div>
+                        <div class="col-2 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Submitted</label></div>
+                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Verified</label></div>
                     </div>
                 </div>
                 @foreach (var m in Model.DataImpacts)
                 {
                     <div class="col-12 dataImpact">
                         <div class="form-row align-items-center">
-                            <div class="col-2">
+                            <div class="col-2 p-0 m-0">
                                 @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages, "",
                                     new { @class = "form-control dataImpactUsage" })
                             </div>
-                            <div class="col-1">
+                            <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-0" @(m.Edited ? "checked" : "") value="true">
                                     <label class="custom-control-label dataImpactEditedLabel"></label>
                                 </div>
                             </div>
-                            <div class="col-6">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
-                            <div class="col-1">
+                            <div class="col-5 p-0 m-0">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
+                            <div class="col-2 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input dataImpactFeaturesSubmitted" id="usageFeaturesSubmitted-0" @(m.FeaturesSubmitted ? "checked" : "") value="true">
                                     <label class="custom-control-label dataImpactFeaturesSubmittedLabel"></label>
                                 </div>
                             </div>
-                            <div class="col-1">
+                            <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input dataImpactFeaturesVerified" id="usageFeaturesVerified-0" @(m.FeaturesVerified ? "checked" : "") value="true">
                                     <label class="custom-control-label dataImpactFeaturesVerifiedLabel"></label>
                                 </div>
                             </div>
-                            <div class="col-1"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
+                            <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
                         </div>
                     </div>
                 }
