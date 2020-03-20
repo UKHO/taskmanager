@@ -55,10 +55,10 @@ namespace NCNEPortal.Pages
 
             foreach (var task in NcneTasks)
             {
-                task.FormDateStatus = (int)GetDeadLineStatus(task.AnnounceDate, (int)NcneTaskStageType.Forms, task.TaskStage);
-                task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, (int)NcneTaskStageType.Commit_To_Print, task.TaskStage);
-                task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, (int)NcneTaskStageType.CIS, task.TaskStage);
-                task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, (int)NcneTaskStageType.Publication, task.TaskStage);
+                task.FormDateStatus = (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
+                task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print, task.TaskStage);
+                task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
+                task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, NcneTaskStageType.Publication, task.TaskStage);
 
             }
 
@@ -135,26 +135,26 @@ namespace NCNEPortal.Pages
             return new JsonResult(await _directoryService.GetGroupMembers());
         }
 
-        public ncneDateStatus GetDeadLineStatus(DateTime? deadline, int taskStageTypeId, List<TaskStage> taskStages)
+        public ncneDateStatus GetDeadLineStatus(DateTime? deadline, NcneTaskStageType taskStageTypeId, List<TaskStage> taskStages)
         {
             ncneDateStatus result = ncneDateStatus.None;
 
-            if (taskStages.Find(t => t.TaskStageTypeId == taskStageTypeId).Status ==
+            if (taskStages.Find(t => t.TaskStageTypeId == (int)taskStageTypeId).Status ==
                 NcneTaskStatus.Completed.ToString())
             {
                 result = ncneDateStatus.Green;
             }
             else
             {
-                if (deadline != null)
+                if (deadline.HasValue)
                 {
-                    if ((Convert.ToDateTime(deadline) - DateTime.Today).TotalDays <= 0)
+                    if ((deadline.Value.Date - DateTime.Today.Date).TotalDays <= 0)
                     {
                         result = ncneDateStatus.Red;
                     }
                     else
                     {
-                        if ((Convert.ToDateTime(deadline) - DateTime.Today).TotalDays <= 7)
+                        if ((deadline.Value.Date - DateTime.Today.Date).TotalDays <= 7)
                         {
                             result = ncneDateStatus.Amber;
                         }
