@@ -1,4 +1,10 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Common.Helpers;
+using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,11 +17,6 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
 {
@@ -25,14 +26,14 @@ namespace NCNEPortal.UnitTests
         private NcneWorkflowDbContext _dbContext;
         private WorkflowModel _workflowModel;
         private ILogger<WorkflowModel> _fakeLogger;
-        private IUserIdentityService _fakeUserIdentityService;
         private ICommentsHelper _fakecommentsHelper;
         private ICarisProjectHelper _carisProjectHelper;
         private IMilestoneCalculator _milestoneCalculator;
-        private IDirectoryService _fakeDirectoryService;
         private IPageValidationHelper _pageValidationHelper;
         private IStageTypeFactory _stageTypeFactory;
         private readonly IOptions<GeneralConfig> _fakeGeneralConfig;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private INcneUserDbService _fakencneUserDbService;
         private int ProcessId { get; set; }
 
         [SetUp]
@@ -49,17 +50,17 @@ namespace NCNEPortal.UnitTests
             ProcessId = 123;
 
 
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
-            _fakeDirectoryService = A.Fake<IDirectoryService>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakencneUserDbService = A.Fake<INcneUserDbService>();
 
             _fakeLogger = A.Dummy<ILogger<WorkflowModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeUserIdentityService, _fakeDirectoryService);
+            _pageValidationHelper = new PageValidationHelper(_fakencneUserDbService);
 
             _stageTypeFactory = new StageTypeFactory(_dbContext);
 
-            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeUserIdentityService, _fakecommentsHelper, _carisProjectHelper,
-                                  _fakeGeneralConfig, _milestoneCalculator, _fakeDirectoryService, _pageValidationHelper);
+            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakecommentsHelper, _carisProjectHelper,
+                                  _fakeGeneralConfig, _milestoneCalculator, _pageValidationHelper, _fakencneUserDbService, _fakeAdDirectoryService);
 
 
             AddStageTypes(_dbContext);

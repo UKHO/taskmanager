@@ -11,13 +11,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Portal.Auth;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
@@ -26,7 +24,6 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IOnHoldCalculator _onHoldCalculator;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IUserIdentityService _userIdentityService;
         private readonly ITaskDataHelper _taskDataHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
 
@@ -76,23 +73,15 @@ namespace Portal.Pages.DbAssessment
         public string Team { get; set; }
         public SelectList Teams { get; set; }
 
-        private string _userFullName;
-        public string UserFullName
-        {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
-        }
-
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper, IUserIdentityService userIdentityService,
+            ICommentsHelper commentsHelper,
             ITaskDataHelper taskDataHelper,
             IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
-            _userIdentityService = userIdentityService;
             _taskDataHelper = taskDataHelper;
             _generalConfig = generalConfig;
         }

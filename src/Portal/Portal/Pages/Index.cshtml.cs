@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,8 +28,8 @@ namespace Portal.Pages
         private readonly WorkflowDbContext _dbContext;
 
         private readonly IMapper _mapper;
-        private readonly IUserIdentityService _userIdentityService;
-        private readonly IDirectoryService _directoryService;
+        private readonly IAdDirectoryService _adDirectoryService;
+        private readonly IPortalUserDbService _portalUserDbService;
         private readonly ILogger<IndexModel> _logger;
         private readonly IIndexFacade _indexFacade;
         private readonly ICarisProjectHelper _carisProjectHelper;
@@ -45,14 +46,14 @@ namespace Portal.Pages
         public IList<TaskViewModel> Tasks { get; set; }
 
         public List<string> TeamList { get; set; }
-        public string TeamsUnassigned { get; set; } 
+        public string TeamsUnassigned { get; set; }
 
         public List<string> ValidationErrorMessages { get; set; }
 
         public IndexModel(WorkflowDbContext dbContext,
             IMapper mapper,
-            IUserIdentityService userIdentityService,
-            IDirectoryService directoryService,
+            IAdDirectoryService adDirectoryService,
+            IPortalUserDbService portalUserDbService,
             ILogger<IndexModel> logger,
             IIndexFacade indexFacade,
             ICarisProjectHelper carisProjectHelper,
@@ -60,8 +61,8 @@ namespace Portal.Pages
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _userIdentityService = userIdentityService;
-            _directoryService = directoryService;
+            _adDirectoryService = adDirectoryService;
+            _portalUserDbService = portalUserDbService;
             _logger = logger;
             _indexFacade = indexFacade;
             _carisProjectHelper = carisProjectHelper;
@@ -84,7 +85,7 @@ namespace Portal.Pages
                 .OrderBy(wi => wi.ProcessId)
                 .ToListAsync();
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
 
@@ -138,7 +139,7 @@ namespace Portal.Pages
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
@@ -180,13 +181,13 @@ namespace Portal.Pages
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
             LogContext.PushProperty("UserFullName", UserFullName);
             LogContext.PushProperty("AssignedUser", userName);
 
             ValidationErrorMessages.Clear();
 
-            if (!await _userIdentityService.ValidateUser(userName))
+            if (!await _portalUserDbService.ValidateUser(userName))
             {
                 _logger.LogInformation("Attempted to assign task to unknown user {AssignedUser}");
                 ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
@@ -251,7 +252,9 @@ namespace Portal.Pages
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            return new JsonResult(await _directoryService.GetGroupMembers());
+            var userDisplayNames = (await _portalUserDbService.GetUsersFromDb()).Select(u => u.DisplayName);
+
+            return new JsonResult(userDisplayNames);
         }
 
         private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)
@@ -291,7 +294,7 @@ namespace Portal.Pages
             HpdUser hpdUsername = null;
             try
             {
-                 hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+                hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
 
             }
             catch (Exception e)

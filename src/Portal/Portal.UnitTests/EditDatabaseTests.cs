@@ -2,12 +2,12 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Pages.DbAssessment;
@@ -22,7 +22,7 @@ namespace Portal.UnitTests
         private _EditDatabaseModel _editDatabaseModel;
         private ILogger<_EditDatabaseModel> _fakeLogger;
         private IOptions<GeneralConfig> _generalConfig;
-        private IUserIdentityService _fakeUserIdentityService;
+        private IAdDirectoryService _fakeAdDirectoryService;
         private ISessionFileGenerator _fakeSessionFileGenerator;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private ICarisProjectNameGenerator _fakeCarisProjectNameGenerator;
@@ -39,7 +39,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<_EditDatabaseModel>>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakeSessionFileGenerator = A.Fake<ISessionFileGenerator>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _fakeCarisProjectNameGenerator = A.Fake<ICarisProjectNameGenerator>();
@@ -57,7 +57,7 @@ namespace Portal.UnitTests
             });
             await _dbContext.SaveChangesAsync();
 
-            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeUserIdentityService,
+            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeAdDirectoryService,
                                                         _fakeSessionFileGenerator, _fakeCarisProjectHelper, _fakeCarisProjectNameGenerator);
         }
 

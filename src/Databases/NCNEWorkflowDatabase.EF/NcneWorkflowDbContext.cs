@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using System.Data.SqlClient;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
-using System;
-using System.Data.SqlClient;
 
 namespace NCNEWorkflowDatabase.EF
 {
@@ -35,6 +35,7 @@ namespace NCNEWorkflowDatabase.EF
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
 
         public DbSet<HpdUser> HpdUser { get; set; }
+        public DbSet<AdUser> AdUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

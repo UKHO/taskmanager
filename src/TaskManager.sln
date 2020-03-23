@@ -83,7 +83,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEWorkflowDatabase.EF", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEWorkflowDatabase.Tests", "Databases\NCNEWorkflowDatabase.Tests\NCNEWorkflowDatabase.Tests.csproj", "{04FDC056-F682-4ED5-8E3A-42D12609934E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCNEPortal.UnitTests", "NCNEPortal.UnitTests\NCNEPortal.UnitTests.csproj", "{1F6DC8D1-F8A8-4EC0-89AE-61F1673051F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCNEPortal.UnitTests", "NCNEPortal.UnitTests\NCNEPortal.UnitTests.csproj", "{1F6DC8D1-F8A8-4EC0-89AE-61F1673051F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

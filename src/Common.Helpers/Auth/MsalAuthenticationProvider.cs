@@ -1,11 +1,11 @@
-﻿using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
 
-namespace NCNEPortal.Auth
+namespace Common.Helpers.Auth
 {
     public class MsalAuthenticationProvider : IAuthenticationProvider
     {

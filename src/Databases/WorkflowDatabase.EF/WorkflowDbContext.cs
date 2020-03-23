@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ namespace WorkflowDatabase.EF
         public DbSet<AssignedTaskType> AssignedTaskType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
+        public DbSet<AdUser> AdUser { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
 

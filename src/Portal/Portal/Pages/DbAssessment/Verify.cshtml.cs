@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Portal.Auth;
 using Portal.Configuration;
 using Portal.Extensions;
 using Portal.Helpers;
@@ -26,7 +26,7 @@ namespace Portal.Pages.DbAssessment
     public class VerifyModel : PageModel
     {
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<VerifyModel> _logger;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
@@ -92,7 +92,7 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
-            IUserIdentityService userIdentityService,
+            IAdDirectoryService adDirectoryService,
             ILogger<VerifyModel> logger,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
@@ -103,7 +103,7 @@ namespace Portal.Pages.DbAssessment
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
             _logger = logger;
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
@@ -131,7 +131,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -246,7 +246,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
             LogContext.PushProperty("UserFullName", UserFullName);
 
             _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
@@ -498,7 +498,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateOnHold(int processId, bool onHold)
         {
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             if (onHold)
             {

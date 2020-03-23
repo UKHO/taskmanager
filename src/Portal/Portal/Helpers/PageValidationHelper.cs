@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
@@ -14,13 +15,15 @@ namespace Portal.Helpers
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly IAdDirectoryService _adDirectoryService;
+        private readonly IPortalUserDbService _portalAduserDbService;
 
-        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IUserIdentityService userIdentityService)
+        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IAdDirectoryService adDirectoryService, IPortalUserDbService portalAduserDbService)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
+            _portalAduserDbService = portalAduserDbService;
         }
 
         /// <summary>
@@ -500,7 +503,7 @@ namespace Portal.Helpers
                 return false;
             }
 
-            if (!await _userIdentityService.ValidateUser(operatorUsername))
+            if (!await _portalAduserDbService.ValidateUser(operatorUsername))
             {
                 validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {operatorUsername}");
                 return false;

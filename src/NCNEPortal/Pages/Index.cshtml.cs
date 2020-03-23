@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Common.Helpers.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +12,6 @@ using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 
 namespace NCNEPortal.Pages
@@ -18,10 +19,10 @@ namespace NCNEPortal.Pages
     [Authorize]
     public class IndexModel : PageModel
     {
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly INcneUserDbService _ncneUserDbService;
         private readonly NcneWorkflowDbContext _dbContext;
         private readonly ILogger<IndexModel> _logger;
-        private readonly IDirectoryService _directoryService;
+        private readonly IAdDirectoryService _adDirectoryService;
 
 
         private string _userFullName;
@@ -34,15 +35,15 @@ namespace NCNEPortal.Pages
         [BindProperty(SupportsGet = true)]
         public List<TaskInfo> NcneTasks { get; set; }
 
-        public IndexModel(IUserIdentityService userIdentityService,
+        public IndexModel(INcneUserDbService ncneUserDbService,
                           NcneWorkflowDbContext ncneWorkflowDbContext,
                           ILogger<IndexModel> logger,
-                          IDirectoryService directoryService)
+                          IAdDirectoryService adDirectoryService)
         {
-            _userIdentityService = userIdentityService;
+            _ncneUserDbService = ncneUserDbService;
             _dbContext = ncneWorkflowDbContext;
             _logger = logger;
-            _directoryService = directoryService;
+            _adDirectoryService = adDirectoryService;
         }
 
         public async Task OnGetAsync()
@@ -70,7 +71,7 @@ namespace NCNEPortal.Pages
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
@@ -113,7 +114,7 @@ namespace NCNEPortal.Pages
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
 
-            if (await _userIdentityService.ValidateUser(userName))
+            if (await _ncneUserDbService.ValidateUserAsync(userName))
             {
                 var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
 
@@ -132,7 +133,7 @@ namespace NCNEPortal.Pages
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            return new JsonResult(await _directoryService.GetGroupMembers());
+            return new JsonResult(await _ncneUserDbService.GetUsersFromDbAsync());
         }
 
         public ncneDateStatus GetDeadLineStatus(DateTime? deadline, NcneTaskStageType taskStageTypeId, List<TaskStage> taskStages)

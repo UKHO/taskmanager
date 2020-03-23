@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Portal.Auth;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
@@ -28,7 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<ReviewModel> _logger;
         private readonly IPageValidationHelper _pageValidationHelper;
 
@@ -76,7 +76,7 @@ namespace Portal.Pages.DbAssessment
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
-            IUserIdentityService userIdentityService,
+            IAdDirectoryService adDirectoryService,
             ILogger<ReviewModel> logger,
             IPageValidationHelper pageValidationHelper)
         {
@@ -85,7 +85,7 @@ namespace Portal.Pages.DbAssessment
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
             _logger = logger;
             _pageValidationHelper = pageValidationHelper;
 
@@ -124,7 +124,7 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -150,7 +150,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -192,7 +192,7 @@ namespace Portal.Pages.DbAssessment
                     await ProcessAdditionalTasks(processId);
                     await PersistPrimaryTask(processId, workflowInstance);
 
-                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+                    UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
                     LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -299,7 +299,7 @@ namespace Portal.Pages.DbAssessment
 
             if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
             {
-                UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+                UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
                 await _dbContext.Comment.AddAsync(new Comment()
                 {
@@ -355,7 +355,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateOnHold(int processId, bool onHold)
         {
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             if (onHold)
             {

@@ -8,6 +8,7 @@ using AutoMapper;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
@@ -19,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
@@ -28,7 +28,6 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
-using Portal.Pages.DbAssessment;
 using Serilog;
 using Serilog.Events;
 using WorkflowDatabase.EF;
@@ -144,6 +143,8 @@ namespace Portal
 
                 });
 
+            //  services.AddAuthorization(options => options.);
+
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
                 options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
@@ -163,19 +164,40 @@ namespace Portal
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
-            services.AddScoped<IUserIdentityService,
-                UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
-                s.GetService<IOptions<GeneralConfig>>(),
-                s.GetService<IOptions<UriConfig>>(),
-                isLocalDevelopment,
+
+            services.AddScoped<IAdDirectoryService,
+                AdDirectoryService>(s => new AdDirectoryService(
+                s.GetService<IOptions<SecretsConfig>>().Value.ClientAzureAdSecret,
+                s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
+                s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
+                isLocalDevelopment
+                    ? s.GetService<IOptions<UriConfig>>().Value.LocalDevLandingPageHttpsUrl
+                    : s.GetService<IOptions<UriConfig>>().Value.LandingPageUrl,
                 s.GetService<HttpProvider>()));
-            services.AddScoped<IDirectoryService,
-                DirectoryService>(s => new DirectoryService(s.GetService<IOptions<SecretsConfig>>(),
-                s.GetService<IOptions<GeneralConfig>>(),
-                s.GetService<IOptions<UriConfig>>(),
-                isLocalDevelopment,
-                s.GetService<HttpProvider>(),
-                s.GetService<ILogger<DirectoryService>>()));
+
+            services.AddScoped<IPortalUserDbService,
+                PortalUserDbService>(s => new PortalUserDbService(s.GetService<WorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
+
+            using (var sp = services.BuildServiceProvider())
+            using (var workflowDbContext = sp.GetRequiredService<WorkflowDbContext>())
+            {
+                var adUserService = sp.GetRequiredService<IPortalUserDbService>();
+
+                try
+                {
+                    var adGroupGuids = new List<Guid>
+                    {
+                        sp.GetService<IOptions<SecretsConfig>>().Value.HDCGuid,
+                        sp.GetService<IOptions<SecretsConfig>>().Value.HDTGuid
+                    };
+
+                    adUserService.UpdateDbFromAd(adGroupGuids).RunSynchronously();
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
+                }
+            }
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
