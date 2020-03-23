@@ -222,6 +222,17 @@ namespace Portal.Pages.DbAssessment
                     }
 
                     break;
+                case "ConfirmedDone":
+
+                    if (!await MarkTaskAsComplete(processId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    break;
                 default:
                     _logger.LogError("Action not found {Action}");
 

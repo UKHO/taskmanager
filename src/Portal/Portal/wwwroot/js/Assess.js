@@ -9,6 +9,7 @@
 
     setAssessDoneHandler();
     setAssessSaveHandler();
+    handleContinueAssessDoneWarning();
 
     var formChanged = false;
     $("#frmAssessPage").change(function () { formChanged = true; });
@@ -24,7 +25,9 @@
     }
 
     function completeAssess(action) {
+        $("#modalAssessDoneWarning").modal("hide");
         $("#assessDoneErrorMessage").html("");
+        $("#assessDoneWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
         $("#btnSave").prop("disabled", true);
         $("#modalWaitAssessDone").modal("show");
@@ -52,7 +55,6 @@
                 if (action === "Done") {
                     window.location.replace("/Index");
                 }
-                console.log("success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
@@ -102,25 +104,6 @@
         });
     }
 
-    function setAssessDoneHandler() {
-        $("#btnDone").prop("disabled", false);
-
-
-        $("#btnDone").click(function (e) {
-            completeAssess("Done");
-        });
-    }
-
-    function setAssessSaveHandler() {
-        $("#btnSave").prop("disabled", false);
-
-
-        $("#btnSave").click(function (e) {
-            completeAssess("Save");
-        });
-    }
-
-
     function initialiseOperatorsTypeaheads() {
 
         removeOperatorsInitialiseErrors();
@@ -163,10 +146,34 @@
             });
     }
 
-
     function removeOperatorsInitialiseErrors() {
         $("#operatorsErrorMessages").collapse("hide");
         $("#operatorsErrorList").empty();
+    }
+
+
+    function setAssessDoneHandler() {
+        $("#btnDone").prop("disabled", false);
+
+
+        $("#btnDone").click(function (e) {
+            completeAssess("Done");
+        });
+    }
+
+    function setAssessSaveHandler() {
+        $("#btnSave").prop("disabled", false);
+
+
+        $("#btnSave").click(function (e) {
+            completeAssess("Save");
+        });
+    }
+
+    function handleContinueAssessDoneWarning() {
+        $("#btnContinueAssessDoneWarning").on("click", function (e) {
+            completeAssess("ConfirmedDone");
+        });
     }
 
 });

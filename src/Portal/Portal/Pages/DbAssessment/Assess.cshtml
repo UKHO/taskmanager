@@ -126,7 +126,7 @@
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Error while saving data</h3>
+                <h3>Errors while processing task</h3>
             </div>
             <div class="modal-body">
                 <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
@@ -136,12 +136,12 @@
                     <div id="assessDoneErrorMessage" class="col-11">
                         @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
                         {
-                        <ul>
-                            @foreach (var message in Model.ValidationErrorMessages)
+                            <ul>
+                                @foreach (var message in Model.ValidationErrorMessages)
                                 {
-                            <li>@message</li>
+                                    <li>@message</li>
                                 }
-                        </ul>
+                            </ul>
                         }
                     </div>
                 </div>
