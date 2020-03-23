@@ -43,6 +43,7 @@ namespace NCNEPortal.TestAutomation.Framework
                 _webDriver.Manage().Window.Maximize();
 
                 _objectContainer.RegisterInstanceAs(_webDriver);
+                _objectContainer.RegisterInstanceAs((IJavaScriptExecutor)_webDriver);
                 _objectContainer.RegisterInstanceAs(new WebDriverWait(_webDriver, TimeSpan.FromSeconds(10)));
             }
             catch

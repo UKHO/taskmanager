@@ -3,37 +3,17 @@ using BoDi;
 using NCNEPortal.TestAutomation.Framework;
 using NCNEPortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 namespace NCNEPortal.AccessibilityTests
 {
     [TestFixture]
     public class AccessibilityTests : IDisposable
     {
-        [SetUp]
-        public void Setup()
-        {
-            _configSupport.RegisterConfigs();
-
-            _webDriverSupport.InitializeWebDriver();
-            _webDriverSupport.SetLoginCookies();
-
-            _wait = _objectContainer.Resolve<WebDriverWait>();
-            _driver = _objectContainer.Resolve<IWebDriver>();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _webDriverSupport.DisposeWebdriver();
-        }
-
         private readonly ConfigSupport _configSupport;
         private readonly IObjectContainer _objectContainer;
         private readonly WebDriverSupport _webDriverSupport;
-        private IWebDriver _driver;
-        private WebDriverWait _wait;
+        private AxeResultAnalyser _axeResultAnalyser;
+        private AxePageEvaluator _axePageEvaluator;
 
         public AccessibilityTests()
         {
@@ -48,6 +28,24 @@ namespace NCNEPortal.AccessibilityTests
             _webDriverSupport?.DisposeWebdriver();
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            _configSupport.RegisterConfigs();
+
+            _webDriverSupport.InitializeWebDriver();
+            _webDriverSupport.SetLoginCookies();
+
+            _axePageEvaluator = _objectContainer.Resolve<AxePageEvaluator>();
+            _axeResultAnalyser = _objectContainer.Resolve<AxeResultAnalyser>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _webDriverSupport.DisposeWebdriver();
+        }
+
         [Test]
         public void LandingPageIsAccessible()
         {
@@ -56,10 +54,9 @@ namespace NCNEPortal.AccessibilityTests
 
             Assert.IsTrue(landingPage.HasLoaded);
 
-            var axePageEvaluator = new AxePageEvaluator((IJavaScriptExecutor) _driver);
-            var axeResult = axePageEvaluator.GetAxeResults();
-            
-            CollectionAssert.IsEmpty(axeResult.Violations);
+            var axeResult = _axePageEvaluator.GetAxeResults();
+
+            _axeResultAnalyser.AssertAxeViolations(axeResult);
         }
     }
 }
