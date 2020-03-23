@@ -122,12 +122,21 @@
                                 });
 
                                 $("#modalWaitVerifyDoneErrors").modal("show");
+                            } else {
+                                $("#verifyDoneErrorMessage").append("<ul/>");
+                                var unOrderedList = $("#verifyDoneErrorMessage ul");
+
+                                unOrderedList.append("<li>" + responseJson + "</li>");
+
+                                $("#modalWaitVerifyDoneErrors").modal("show");
+
                             }
                         } else {
                             $("#verifyDoneErrorMessage").append("<ul/>");
-
                             var unOrderedList = $("#verifyDoneErrorMessage ul");
+
                             unOrderedList.append("<li>System error. Please try again later</li>");
+
                             $("#modalWaitVerifyDoneErrors").modal("show");
                         }
 
@@ -206,8 +215,8 @@
 
                     } else {
                         $("#verifyDoneErrorMessage").append("<ul/>");
-
                         var unOrderedList = $("#verifyDoneErrorMessage ul");
+
                         unOrderedList.append("<li>" + responseJson + "</li>");
 
                         $("#modalWaitVerifyDoneErrors").modal("show");
@@ -216,9 +225,10 @@
                 } else {
 
                     $("#verifyDoneErrorMessage").append("<ul/>");
-
                     var unOrderedList = $("#verifyDoneErrorMessage ul");
+
                     unOrderedList.append("<li>System error. Please try again later</li>");
+
                     $("#modalWaitVerifyDoneErrors").modal("show");
                 }
 

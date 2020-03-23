@@ -56,14 +56,44 @@
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
+                var statusCode = error.status;
 
                 if (responseJson != null) {
+                    if (statusCode === customHttpStatusCodes.WarningsDetected) {
+
+                        $("#assessDoneWarningMessages").append("<ul/>");
+                        var unOrderedList = $("#assessDoneWarningMessages ul");
+
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalAssessDoneWarning").modal("show");
+
+                    } else if (statusCode === customHttpStatusCodes.FailedValidation) {
+                        $("#assessDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#assessDoneErrorMessage ul");
+
+                        responseJson.forEach(function(item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalWaitAssessDoneErrors").modal("show");
+                    } else {
+                        $("#assessDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#assessDoneErrorMessage ul");
+
+                        unOrderedList.append("<li>" + responseJson + "</li>");
+
+                        $("#modalWaitAssessDoneErrors").modal("show");
+
+                    }
+                } else {
+
                     $("#assessDoneErrorMessage").append("<ul/>");
                     var unOrderedList = $("#assessDoneErrorMessage ul");
 
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
+                    unOrderedList.append("<li>System error. Please try again later</li>");
 
                     $("#modalWaitAssessDoneErrors").modal("show");
                 }
