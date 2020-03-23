@@ -149,15 +149,8 @@ namespace Portal.Pages.DbAssessment
             switch (action)
             {
                 case "Save":
-                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(
-                        Ion,
-                        ActivityCode,
-                        SourceCategory,
-                        Verifier,
-                        UserFullName,
-                        RecordProductAction,
-                        DataImpacts, action,
-                        ValidationErrorMessages, Team))
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
+                        Ion, ActivityCode, SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -178,18 +171,11 @@ namespace Portal.Pages.DbAssessment
                     var verifyData =
                         await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
                             t.ProcessId == processId);
-                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(// from submitted form data
+                        action,
                                                                         Ion,
                                                                         ActivityCode,
-                                                                        SourceCategory,
-                                                                        Verifier, // from submitted form data
-                                                                        UserFullName,
-                                                                        RecordProductAction,
-                                                                        DataImpacts,
-                                                                        action,
-                                                                        ValidationErrorMessages,
-                                                                        Team,
-                                                                        verifyData.Verifier)) // from database
+                                                                        SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName, verifyData.Verifier)) // from database
 
                     {
                         return new JsonResult(this.ValidationErrorMessages)

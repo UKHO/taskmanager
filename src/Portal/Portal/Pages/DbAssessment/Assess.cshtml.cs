@@ -153,13 +153,8 @@ namespace Portal.Pages.DbAssessment
                                                 ActivityCode,
                                                 SourceCategory,
                                                 TaskType,
-                                                Assessor,
-                                                Verifier,
-                                                currentAssessData.Assessor,
-                                                UserFullName,
                                                 RecordProductAction,
-                                                DataImpacts,
-                                                ValidationErrorMessages, Team))
+                                                DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

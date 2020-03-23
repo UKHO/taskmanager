@@ -394,8 +394,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
@@ -429,8 +429,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -473,8 +473,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
@@ -508,8 +508,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
+                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.Add(new OnHold()

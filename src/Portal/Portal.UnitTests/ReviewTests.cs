@@ -307,9 +307,7 @@ namespace Portal.UnitTests
                 AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
 
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
-                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
@@ -711,9 +709,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
-                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -757,9 +753,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
-                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
@@ -800,9 +794,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
-                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -846,9 +838,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
-                    A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");

@@ -546,18 +546,10 @@ namespace Portal.UnitTests
             await _verifyModel.OnPostDoneAsync(ProcessId, "ConfirmedSignOff");
 
             // Assert
-            A.CallTo(() => _pageValidationHelper.CheckVerifyPageForErrors(
+            A.CallTo(() => _pageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<List<ProductAction>>.Ignored,
-                                                                                A<List<DataImpact>>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<List<string>>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<string>.Ignored))
+                                                                                A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                                                             .MustNotHaveHappened();
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
@@ -595,10 +587,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored,
-                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -631,11 +620,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<string>.Ignored,
-                A<string>.Ignored,
-                A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -677,11 +662,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored,
-                    A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -714,11 +695,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored,
-                    A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
-                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()
