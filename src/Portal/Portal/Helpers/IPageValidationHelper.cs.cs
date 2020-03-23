@@ -89,13 +89,18 @@ namespace Portal.Helpers
                                             string currentUsername,
                                             string currentAssignedVerifierInDb = "");
 
-
         /// <summary>
         /// Check for warnings
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="workflowInstance"></param>
+        /// <param name="dataImpacts"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        Task<bool> CheckVerifyPageForWarnings(WorkflowInstance workflowInstance, List<string> validationWarningMessages);
+        Task<bool> CheckVerifyPageForWarnings(
+                                                string action, 
+                                                WorkflowInstance workflowInstance, 
+                                                List<DataImpact> dataImpacts, 
+                                                List<string> validationWarningMessages);
     }
 }

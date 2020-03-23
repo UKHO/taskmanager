@@ -193,7 +193,7 @@ namespace Portal.Pages.DbAssessment
                     }
 
 
-                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(workflowInstance, ValidationErrorMessages);
+                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))
                     {

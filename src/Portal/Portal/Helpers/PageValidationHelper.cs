@@ -226,7 +226,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateDataImpact(dataImpacts, action, validationErrorMessages))
+            if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -243,10 +243,16 @@ namespace Portal.Helpers
         /// <summary>
         /// Check for warnings
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="workflowInstance"></param>
+        /// <param name="dataImpacts"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        public async Task<bool> CheckVerifyPageForWarnings(WorkflowInstance workflowInstance, List<string> validationWarningMessages)
+        public async Task<bool> CheckVerifyPageForWarnings(
+                                                            string action, 
+                                                            WorkflowInstance workflowInstance, 
+                                                            List<DataImpact> dataImpacts, 
+                                                            List<string> validationWarningMessages)
         {
             var hasWarnings = false;
 
@@ -255,9 +261,14 @@ namespace Portal.Helpers
                 hasWarnings = true;
             }
 
+            if (!CheckDataImpactFeatures(action, WorkflowStage.Verify, dataImpacts, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
             return hasWarnings;
         }
-        
+
         private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance, List<string> validationWarningMessages)
         {
             if (workflowInstance.ParentProcessId == null)
@@ -558,30 +569,47 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify pages
         /// </summary>
-        /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
-        /// <param name="validationErrorMessages"></param>
+        /// <param name="workflowStage"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        private bool ValidateDataImpact(List<DataImpact> dataImpacts, string action, List<string> validationErrorMessages)
+        private bool CheckDataImpactFeatures(
+                                                string action, 
+                                                WorkflowStage workflowStage, 
+                                                List<DataImpact> dataImpacts,
+                                                List<string> validationWarningMessages)
         {
-            var isValid = ValidateDataImpact(dataImpacts, validationErrorMessages);
 
-            if (action == "Save")
+            if (action == "Save") return true;
+
+            if (dataImpacts == null || dataImpacts.Count <= 0) return true;
+
+            if (dataImpacts.All(di => di.HpdUsageId == 0)) return true;
+
+            switch (workflowStage)
             {
-                return isValid;
-            }
+                case WorkflowStage.Assess:
+                    if (!dataImpacts.All(di => di.FeaturesSubmitted))
+                    {
+                        validationWarningMessages.Add(
+                            "Data Impact: Al Usages Features must be submitted");
+                        return false;
+                    }
 
-            if (dataImpacts != null && dataImpacts.Count > 0)
-            {
-                if (dataImpacts.Any(di => di.HpdUsageId > 0) && !dataImpacts.All(di => di.FeaturesVerified))
-                {
-                    validationErrorMessages.Add(
-                        $"Data Impact: All Usages must be verified");
-                    isValid = false;
-                }
-            }
+                    return true;
+                case WorkflowStage.Verify:
+                    if (!dataImpacts.All(di => di.FeaturesVerified))
+                    {
+                        validationWarningMessages.Add(
+                            "Data Impact: All Usages Features must be verified");
+                        return false;
+                    }
 
-            return isValid;
+                    return true;
+                default:
+                    throw new NotImplementedException($"{workflowStage} not implemented");
+            }
         }
 
         /// <summary>
