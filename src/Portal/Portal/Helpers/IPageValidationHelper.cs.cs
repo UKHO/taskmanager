@@ -59,6 +59,17 @@ namespace Portal.Helpers
                                             List<string> validationErrorMessages,
                                             string currentUsername,
                                             string currentAssignedAssessorInDb);
+        /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        bool CheckAssessPageForWarnings(
+            string action,
+            List<DataImpact> dataImpacts,
+            List<string> validationWarningMessages);
 
 
         /// <summary>
@@ -102,5 +113,6 @@ namespace Portal.Helpers
                                                 WorkflowInstance workflowInstance, 
                                                 List<DataImpact> dataImpacts, 
                                                 List<string> validationWarningMessages);
+
     }
 }

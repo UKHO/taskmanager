@@ -169,6 +169,23 @@ namespace Portal.Helpers
         }
 
         /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        public bool CheckAssessPageForWarnings(
+            string action,
+            List<DataImpact> dataImpacts,
+            List<string> validationWarningMessages)
+        {
+
+           return !CheckDataImpactFeatures(action, WorkflowStage.Assess, dataImpacts, validationWarningMessages);
+
+        }
+
+        /// <summary>
         /// Used in Verify page
         /// </summary>
         /// <param name="action"></param>
@@ -593,7 +610,7 @@ namespace Portal.Helpers
                     if (!dataImpacts.All(di => di.FeaturesSubmitted))
                     {
                         validationWarningMessages.Add(
-                            "Data Impact: Al Usages Features must be submitted");
+                            "Data Impact: All Usages Features must be submitted");
                         return false;
                     }
 
