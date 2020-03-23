@@ -187,7 +187,7 @@ namespace Portal.Pages
 
             ValidationErrorMessages.Clear();
 
-            if (!await _portalUserDbService.ValidateUser(userName))
+            if (!await _portalUserDbService.ValidateUserAsync(userName))
             {
                 _logger.LogInformation("Attempted to assign task to unknown user {AssignedUser}");
                 ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
@@ -252,7 +252,7 @@ namespace Portal.Pages
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            var userDisplayNames = (await _portalUserDbService.GetUsersFromDb()).Select(u => u.DisplayName);
+            var userDisplayNames = (await _portalUserDbService.GetUsersFromDbAsync()).Select(u => u.DisplayName);
 
             return new JsonResult(userDisplayNames);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -64,7 +65,7 @@ namespace NCNEPortal.Pages
             }
 
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
         }
 
@@ -130,10 +131,11 @@ namespace NCNEPortal.Pages
         }
 
 
-
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            return new JsonResult(await _ncneUserDbService.GetUsersFromDbAsync());
+            var userDisplayNames = (await _ncneUserDbService.GetUsersFromDbAsync()).Select(u => u.DisplayName);
+
+            return new JsonResult(userDisplayNames);
         }
 
         public ncneDateStatus GetDeadLineStatus(DateTime? deadline, NcneTaskStageType taskStageTypeId, List<TaskStage> taskStages)

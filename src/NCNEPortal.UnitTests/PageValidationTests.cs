@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace NCNEPortal.UnitTests
 {
@@ -17,7 +16,7 @@ namespace NCNEPortal.UnitTests
     {
         private NcneWorkflowDbContext _dbContext;
         private IAdDirectoryService _fakeAdDirectoryService;
-        private INcneUserDbService _fakencneUserDbService;
+        private INcneUserDbService _fakeNcneUserDbService;
         private PageValidationHelper _pageValidationHelper;
         private List<AdUser> _validUsers;
 
@@ -32,9 +31,9 @@ namespace NCNEPortal.UnitTests
             _dbContext = new NcneWorkflowDbContext(dbContextOptions);
 
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
-            _fakencneUserDbService = A.Fake<INcneUserDbService>();
+            _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 
-            _pageValidationHelper = new PageValidationHelper(_fakencneUserDbService);
+            _pageValidationHelper = new PageValidationHelper(_fakeNcneUserDbService);
 
             _validUsers = new List<AdUser>
             {
@@ -58,7 +57,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                     .Returns(_validUsers);
 
             var taskRole = new TaskRole
@@ -82,7 +81,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                 .Returns(_validUsers);
 
 
@@ -108,7 +107,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                 .Returns(_validUsers);
 
             var taskRole = new TaskRole
@@ -130,7 +129,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                 .Returns(_validUsers);
 
             var taskRole = new TaskRole
@@ -157,7 +156,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                 .Returns(_validUsers);
 
 
@@ -180,7 +179,7 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
                 .Returns(_validUsers);
 
 
@@ -206,9 +205,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
-
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
             var taskRole = new TaskRole
             {
@@ -239,8 +237,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
 
             var taskRole = new TaskRole
@@ -274,8 +272,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
 
             var taskRole = new TaskRole
@@ -309,8 +307,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
 
             var taskRole = new TaskRole
@@ -343,8 +341,9 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
 
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
+
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
 
             var taskRole = new TaskRole
@@ -377,10 +376,8 @@ namespace NCNEPortal.UnitTests
         {
             var validationErrorMessages = new List<string>();
 
-
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
-
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
             var taskRole = new TaskRole
             {
@@ -393,8 +390,6 @@ namespace NCNEPortal.UnitTests
             DateTime? invalidDate = null;
 
             DateTime? publicationDate = null;
-
-
 
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now.AddDays(-2), invalidDate);
 
@@ -412,10 +407,8 @@ namespace NCNEPortal.UnitTests
         {
             var validationErrorMessages = new List<string>();
 
-
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
-
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
             var taskRole = new TaskRole
             {
@@ -428,8 +421,6 @@ namespace NCNEPortal.UnitTests
             DateTime? invalidDate = null;
 
             DateTime? publicationDate = null;
-
-
 
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
 
@@ -448,10 +439,8 @@ namespace NCNEPortal.UnitTests
         {
             var validationErrorMessages = new List<string>();
 
-
-            A.CallTo(() => _fakeDirectoryService.GetGroupMembers())
-                .Returns(new List<string> { "Valid User1", "Valid User2" });
-
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
             var taskRole = new TaskRole
             {
@@ -464,8 +453,6 @@ namespace NCNEPortal.UnitTests
             DateTime? invalidDate = null;
 
             DateTime? publicationDate = null;
-
-
 
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now);
 

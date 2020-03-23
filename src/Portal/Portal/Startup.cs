@@ -179,7 +179,6 @@ namespace Portal
                 PortalUserDbService>(s => new PortalUserDbService(s.GetService<WorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
             using (var sp = services.BuildServiceProvider())
-            using (var workflowDbContext = sp.GetRequiredService<WorkflowDbContext>())
             {
                 var adUserService = sp.GetRequiredService<IPortalUserDbService>();
 
@@ -191,7 +190,7 @@ namespace Portal
                         sp.GetService<IOptions<SecretsConfig>>().Value.HDTGuid
                     };
 
-                    adUserService.UpdateDbFromAd(adGroupGuids).RunSynchronously();
+                    adUserService.UpdateDbFromAdAsync(adGroupGuids);
                 }
                 catch (Exception e)
                 {

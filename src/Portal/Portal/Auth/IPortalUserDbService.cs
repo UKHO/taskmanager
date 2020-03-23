@@ -8,10 +8,10 @@ namespace Portal.Auth
     public interface IPortalUserDbService
     {
 
-        Task<IEnumerable<AdUser>> GetUsersFromDb();
+        Task<IEnumerable<AdUser>> GetUsersFromDbAsync();
 
-        Task<bool> ValidateUser(string username);
+        Task<bool> ValidateUserAsync(string username);
 
-        Task UpdateDbFromAd(IEnumerable<Guid> adGroupGuids);
+        Task UpdateDbFromAdAsync(IEnumerable<Guid> adGroupGuids);
     }
 }

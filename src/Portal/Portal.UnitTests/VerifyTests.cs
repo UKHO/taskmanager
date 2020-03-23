@@ -126,7 +126,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "";
@@ -138,7 +138,7 @@ namespace Portal.UnitTests
 
             _verifyModel.Team = "Home Waters";
 
-            var response = (JsonResult) await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.Contains($"Task Information: Ion cannot be empty", _verifyModel.ValidationErrorMessages);
@@ -168,7 +168,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(false);
 
             _verifyModel.Ion = "Ion";
@@ -188,7 +188,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -219,7 +219,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
@@ -250,7 +250,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
@@ -283,7 +283,7 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -318,7 +318,7 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -369,7 +369,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_empty_team_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -391,7 +391,7 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -429,9 +429,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_not_created_then_MarkCarisProjectAsComplete_is_not_called()
         {
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -456,18 +456,18 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
-            A.CallTo(() => _fakeCarisProjectHelper.MarkCarisProjectAsComplete(A<int>.Ignored,A<int>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeCarisProjectHelper.MarkCarisProjectAsComplete(A<int>.Ignored, A<int>.Ignored)).MustNotHaveHappened();
 
         }
-        
+
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_created_then_MarkCarisProjectAsComplete_is_called()
         {
             string aduser = "TestUser";
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(aduser));
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -511,7 +511,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_signOff_must_not_run_validation()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -589,7 +589,7 @@ namespace Portal.UnitTests
             _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
             _verifyModel.Team = "Home Waters";
@@ -622,7 +622,7 @@ namespace Portal.UnitTests
             _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
             _verifyModel.Team = "Home Waters";
@@ -664,7 +664,7 @@ namespace Portal.UnitTests
             _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
             _verifyModel.Team = "Home Waters";
@@ -697,7 +697,7 @@ namespace Portal.UnitTests
             _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
             _verifyModel.Team = "Home Waters";

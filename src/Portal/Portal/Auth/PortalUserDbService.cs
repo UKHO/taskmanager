@@ -24,7 +24,7 @@ namespace Portal.Auth
         /// Update users in database from AD
         /// </summary>
         /// <remarks>Bust be awaited from an async function or run with .RunSynchronously()</remarks>
-        public async Task UpdateDbFromAd(IEnumerable<Guid> adGroupGuids)
+        public async Task UpdateDbFromAdAsync(IEnumerable<Guid> adGroupGuids)
         {
 
             var adGroupMembers = _adDirectoryService.GetGroupMembersFromAdAsync(adGroupGuids).Result;
@@ -57,7 +57,7 @@ namespace Portal.Auth
         /// Get a TM site's users from database
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<AdUser>> GetUsersFromDb()
+        public async Task<IEnumerable<AdUser>> GetUsersFromDbAsync()
         {
             return await _workflowDbContext.AdUser.ToListAsync();
 
@@ -67,7 +67,7 @@ namespace Portal.Auth
         /// Validate a username exists in the database
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> ValidateUser(string username)
+        public async Task<bool> ValidateUserAsync(string username)
         {
             // TODO do we ever want to go and check AD then update database if we find a new user
             // TODO switch to a unique value instead of display name for validating when we switch over

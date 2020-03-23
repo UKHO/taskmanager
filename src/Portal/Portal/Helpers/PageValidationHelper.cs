@@ -503,7 +503,7 @@ namespace Portal.Helpers
                 return false;
             }
 
-            if (!await _portalAduserDbService.ValidateUser(operatorUsername))
+            if (!await _portalAduserDbService.ValidateUserAsync(operatorUsername))
             {
                 validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {operatorUsername}");
                 return false;

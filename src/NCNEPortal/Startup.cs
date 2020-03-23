@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Common.Helpers;
@@ -131,6 +132,25 @@ namespace NCNEPortal
                 }
             }
 
+            using (var sp = services.BuildServiceProvider())
+            {
+                var adUserService = sp.GetRequiredService<INcneUserDbService>();
+
+                try
+                {
+                    var adGroupGuids = new List<Guid>
+                    {
+                        sp.GetService<IOptions<SecretsConfig>>().Value.NcGuid,
+                        sp.GetService<IOptions<SecretsConfig>>().Value.NeGuid
+                    };
+
+                    adUserService.UpdateDbFromAdAsync(adGroupGuids);
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
+                }
+            }
 
 
             var startupSecretConfig = new StartupSecretsConfig();

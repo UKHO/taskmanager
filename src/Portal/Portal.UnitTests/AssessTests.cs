@@ -128,7 +128,7 @@ namespace Portal.UnitTests
             { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "";
@@ -169,7 +169,7 @@ namespace Portal.UnitTests
             _assessModel.Verifier = "";
             _assessModel.DataImpacts = new List<DataImpact>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(true);
 
 
@@ -192,7 +192,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "";
             _assessModel.DataImpacts = new List<DataImpact>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
@@ -204,7 +204,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -242,7 +242,7 @@ namespace Portal.UnitTests
             await _hpDbContext.SaveChangesAsync();
 
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -274,7 +274,7 @@ namespace Portal.UnitTests
             { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -300,10 +300,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_invalid_username_for_assessor_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("KnownUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("KnownUser"))
                 .Returns(true);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(false);
 
             _assessModel.Ion = "Ion";
@@ -323,10 +323,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("KnownUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("KnownUser"))
                 .Returns(true);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(false);
 
             _assessModel.Ion = "Ion";
@@ -380,7 +380,7 @@ namespace Portal.UnitTests
             _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -415,7 +415,7 @@ namespace Portal.UnitTests
             _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -459,7 +459,7 @@ namespace Portal.UnitTests
             _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -494,7 +494,7 @@ namespace Portal.UnitTests
             _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";

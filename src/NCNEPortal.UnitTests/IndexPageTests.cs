@@ -1,4 +1,10 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Common.Helpers.Auth;
+using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
@@ -7,11 +13,6 @@ using NCNEPortal.Pages;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
 {
@@ -19,10 +20,10 @@ namespace NCNEPortal.UnitTests
     public class IndexPageTests
     {
         private IndexModel _indexModel;
-        private IUserIdentityService _fakeUserIdentityService;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private INcneUserDbService _fakencneUserDbService;
         private NcneWorkflowDbContext _dbContext;
         private ILogger<IndexModel> _fakeLogger;
-        private IDirectoryService _fakeDirectoryService;
         private List<TaskStage> _taskStages;
 
 
@@ -36,16 +37,12 @@ namespace NCNEPortal.UnitTests
 
             _dbContext = new NcneWorkflowDbContext(dbContextOptions);
 
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
-            _fakeDirectoryService = A.Fake<IDirectoryService>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakencneUserDbService = A.Fake<INcneUserDbService>();
 
             _fakeLogger = A.Fake<ILogger<IndexModel>>();
 
-            _indexModel = new IndexModel(_fakeUserIdentityService, _dbContext, _fakeLogger, _fakeDirectoryService);
-
-
-
-
+            _indexModel = new IndexModel(_fakencneUserDbService, _dbContext, _fakeLogger, _fakeAdDirectoryService);
         }
 
         [TestCase(-3, ncneDateStatus.Red)]
@@ -195,7 +192,7 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task OnGetAsync_sets_UserFullName_from_userIdentityService()
         {
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns("The User's Full Name");
 
             await _indexModel.OnGetAsync();

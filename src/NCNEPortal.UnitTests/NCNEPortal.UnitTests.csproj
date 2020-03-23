@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.Helpers\Common.Helpers.csproj" />
     <ProjectReference Include="..\NCNEPortal\NCNEPortal.csproj" />
   </ItemGroup>
 
