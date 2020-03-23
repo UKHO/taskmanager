@@ -157,7 +157,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    if (!await SaveTaskData(processId))
+                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -165,7 +165,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    return StatusCode((int)HttpStatusCode.OK);
+                    break;
                 case "Done":
                     var verifyData =
                         await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
@@ -183,14 +183,13 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    if (!await SaveTaskData(processId))
+                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
                             StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
-
 
                     var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
 
@@ -212,11 +211,11 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.InternalServerError
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
-                    return StatusCode((int)HttpStatusCode.OK);
+                    break;
                 case "ConfirmedSignOff":
 
                     if (!await MarkTaskAsComplete(processId, workflowInstance))
@@ -227,12 +226,17 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    return StatusCode((int)HttpStatusCode.OK);
+                    break;
                 default:
                     _logger.LogError("Action not found {Action}");
 
                     throw new NotImplementedException($"Action not found {action}");
             }
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return StatusCode((int)HttpStatusCode.OK);
+
         }
 
         public async Task<IActionResult> OnPostRejectVerifyAsync(int processId, string comment)
@@ -333,14 +337,11 @@ namespace Portal.Pages.DbAssessment
             return false;
         }
 
-        private async Task<bool> SaveTaskData(int processId)
+        private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
         {
             await UpdateOnHold(processId, IsOnHold);
-
             await UpdateTaskInformation(processId);
-
             await UpdateProductAction(processId);
-
             await UpdateAssessmentData(processId);
 
             try
@@ -355,6 +356,12 @@ namespace Portal.Pages.DbAssessment
             }
 
             await UpdateDataImpact(processId);
+            
+            await _commentsHelper.AddComment($"Verify: Changes saved",
+                processId,
+                workflowInstanceId,
+                UserFullName);
+
             return true;
         }
 
