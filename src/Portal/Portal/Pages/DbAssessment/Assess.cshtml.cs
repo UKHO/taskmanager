@@ -13,9 +13,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
 using Portal.Configuration;
+using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -86,6 +86,8 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
+        public string SerialisedCustomHttpStatusCodes { get; set; }
+
         private string _userFullName;
         public string UserFullName
         {
@@ -120,13 +122,13 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGet(int processId)
         {
-            //TODO: Read operators from DB
-
             ProcessId = processId;
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Assess;
+            SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<AssessCustomHttpStatusCode>();
+
             await GetOnHoldData(processId);
         }
 

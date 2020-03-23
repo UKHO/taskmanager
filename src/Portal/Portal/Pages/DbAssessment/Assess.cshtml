@@ -49,6 +49,9 @@
         </div>
     </div>
 </div>
+
+<input type="hidden" asp-for="SerialisedCustomHttpStatusCodes" />
+
 <form id="frmAssessPage" method="post" asp-page-handler="Done">
 
     <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
@@ -133,12 +136,12 @@
                     <div id="assessDoneErrorMessage" class="col-11">
                         @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
                         {
-                            <ul>
-                                @foreach (var message in Model.ValidationErrorMessages)
+                        <ul>
+                            @foreach (var message in Model.ValidationErrorMessages)
                                 {
-                                    <li>@message</li>
+                            <li>@message</li>
                                 }
-                            </ul>
+                        </ul>
                         }
                     </div>
                 </div>

@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
+
     $("#Reviewer").prop("disabled", true);
 
 
