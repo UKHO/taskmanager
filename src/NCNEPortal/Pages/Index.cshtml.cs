@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
+using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
@@ -48,7 +49,19 @@ namespace NCNEPortal.Pages
         {
             NcneTasks = await _dbContext.TaskInfo
                 .Include(c => c.TaskNote)
+                .Include(s => s.TaskStage)
                 .ToListAsync();
+
+
+            foreach (var task in NcneTasks)
+            {
+                task.FormDateStatus = (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
+                task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print, task.TaskStage);
+                task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
+                task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, NcneTaskStageType.Publication, task.TaskStage);
+
+            }
+
 
             UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
 
@@ -120,6 +133,36 @@ namespace NCNEPortal.Pages
         public async Task<JsonResult> OnGetUsersAsync()
         {
             return new JsonResult(await _directoryService.GetGroupMembers());
+        }
+
+        public ncneDateStatus GetDeadLineStatus(DateTime? deadline, NcneTaskStageType taskStageTypeId, List<TaskStage> taskStages)
+        {
+            ncneDateStatus result = ncneDateStatus.None;
+
+            if (taskStages.Find(t => t.TaskStageTypeId == (int)taskStageTypeId).Status ==
+                NcneTaskStatus.Completed.ToString())
+            {
+                result = ncneDateStatus.Green;
+            }
+            else
+            {
+                if (deadline.HasValue)
+                {
+                    if ((deadline.Value.Date - DateTime.Today.Date).TotalDays <= 0)
+                    {
+                        result = ncneDateStatus.Red;
+                    }
+                    else
+                    {
+                        if ((deadline.Value.Date - DateTime.Today.Date).TotalDays <= 7)
+                        {
+                            result = ncneDateStatus.Amber;
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
     }
