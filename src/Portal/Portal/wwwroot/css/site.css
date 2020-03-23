@@ -587,6 +587,10 @@ body, .sticky-footer-wrapper {
     margin-bottom: 8px;
 }
 
+.modal-dialog.error li:last-child, .modal-dialog.warning li:last-child {
+    margin-bottom: 4px;
+}
+
 .modal-dialog.error ul, .modal-dialog.warning ul {
     padding-left: 10px;
 }
