@@ -260,11 +260,12 @@ namespace Portal.Pages.DbAssessment
             {
                 ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
             }
+
             if (ValidationErrorMessages.Any())
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -275,7 +276,7 @@ namespace Portal.Pages.DbAssessment
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -291,11 +292,13 @@ namespace Portal.Pages.DbAssessment
             var workflowInstance = await _dbContext.WorkflowInstance
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
-
-
+            
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
-                return BadRequest(this.ValidationErrorMessages);
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
+                };
             }
 
             await _commentsHelper.AddComment($"Verify Rejected: {comment}",
@@ -303,7 +306,7 @@ namespace Portal.Pages.DbAssessment
                 workflowInstance.WorkflowInstanceId,
                 UserFullName);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance)

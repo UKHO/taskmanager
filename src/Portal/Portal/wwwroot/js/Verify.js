@@ -7,6 +7,7 @@
     setVerifyDoneHandler();
     setVerifySaveHandler();
     handleContinueChildTaskWarning();
+    handleConfirmReject();
 
     var formChanged = false;
     $("#frmVerifyPage").change(function () { formChanged = true; });
@@ -60,76 +61,83 @@
         $("#btnConfirmReject").prop("disabled", false);
     });
 
-    $("#btnConfirmReject").on("click", function (event) {
-        $("#btnConfirmReject").prop("disabled", true);
+    function handleConfirmReject() {
+        $("#btnConfirmReject").on("click",
+            function(event) {
+                $("#btnConfirmReject").prop("disabled", true);
 
 
-        if ($("#txtRejectComment").val() === "") {
-            $("#ConfirmRejectError")
-                .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
-            $("#txtRejectComment").focus();
-            return;
-        }
-
-        // check unsaved changes
-
-        $("#ConfirmReject").modal("hide");
-        $("#ConfirmRejectError").html("");
-        $("#verifyDoneErrorMessage").html("");
-        $("#modalWaitVerifyReject").modal("show");
-
-        var processId = Number($("#ProcessId").val());
-        var comment = $("#txtRejectComment").val();
-
-        $.ajax({
-            type: "POST",
-            url: "Verify/?handler=RejectVerify",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken",
-                    $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: { "processId": processId, "comment": comment },
-            complete: function () {
-                //Add a delay to account for the modalWaitReviewDone modal
-                //not being fully shown, before trying to hide it
-                window.setTimeout(function () {
-                    $("#modalWaitVerifyReject").modal("hide");
-                    $("#btnDone").prop("disabled", false);
-                    $("#btnSave").prop("disabled", false);
-                    $("#ConfirmReject").prop("disabled", false);
-                    $("#btnReject").prop("disabled", false);
-                }, 200);
-            },
-            success: function (result) {
-                formChanged = false;
-                window.location.replace("/Index");
-            },
-            error: function (error) {
-                var responseJson = error.responseJSON;
-                var statusCode = error.status;
-
-                if (responseJson != null) {
-                    if (statusCode === 400) {
-                        $("#verifyDoneErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#verifyDoneErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalWaitVerifyDoneErrors").modal("show");
-                    }
-                } else {
-                    $("#verifyDoneErrorMessage").html("<div class=\"alert alert-danger\" role=\"alert\">System error. Please try again later.</div>");
-                    $("#modalWaitVerifyDoneErrors").modal("show");
+                if ($("#txtRejectComment").val() === "") {
+                    $("#ConfirmRejectError")
+                        .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
+                    $("#txtRejectComment").focus();
+                    return;
                 }
 
+                // check unsaved changes
 
-            }
-        });
+                $("#ConfirmReject").modal("hide");
+                $("#ConfirmRejectError").html("");
+                $("#verifyDoneErrorMessage").html("");
+                $("#modalWaitVerifyReject").modal("show");
+
+                var processId = Number($("#ProcessId").val());
+                var comment = $("#txtRejectComment").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "Verify/?handler=RejectVerify",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { "processId": processId, "comment": comment },
+                    complete: function() {
+                        //Add a delay to account for the modalWaitReviewDone modal
+                        //not being fully shown, before trying to hide it
+                        window.setTimeout(function() {
+                                $("#modalWaitVerifyReject").modal("hide");
+                                $("#btnDone").prop("disabled", false);
+                                $("#btnSave").prop("disabled", false);
+                                $("#ConfirmReject").prop("disabled", false);
+                                $("#btnReject").prop("disabled", false);
+                            },
+                            200);
+                    },
+                    success: function(result) {
+                        formChanged = false;
+                        window.location.replace("/Index");
+                    },
+                    error: function(error) {
+                        var responseJson = error.responseJSON;
+                        var statusCode = error.status;
+
+                        if (responseJson != null) {
+                            if (statusCode === customHttpStatusCodes.FailedValidation) {
+                                $("#verifyDoneErrorMessage").append("<ul/>");
+                                var unOrderedList = $("#verifyDoneErrorMessage ul");
+
+                                responseJson.forEach(function(item) {
+                                    unOrderedList.append("<li>" + item + "</li>");
+                                });
+
+                                $("#modalWaitVerifyDoneErrors").modal("show");
+                            }
+                        } else {
+                            $("#verifyDoneErrorMessage").append("<ul/>");
+
+                            var unOrderedList = $("#verifyDoneErrorMessage ul");
+                            unOrderedList.append("<li>System error. Please try again later</li>");
+                            $("#modalWaitVerifyDoneErrors").modal("show");
+                        }
 
 
-    });
+                    }
+                });
+
+
+            });
+    }
 
     $("#ConfirmReject").on("shown.bs.modal",
         function () {
