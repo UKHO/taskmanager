@@ -82,7 +82,7 @@ namespace Portal.UnitTests
             await _dbContext.DbAssessmentAssessData.AddAsync(setupAssessData);
             await _dbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(userWithHpdUserRecord));
 
             A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
