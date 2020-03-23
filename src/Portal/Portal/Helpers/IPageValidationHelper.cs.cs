@@ -90,5 +90,12 @@ namespace Portal.Helpers
                                             string currentAssignedVerifierInDb = "");
 
 
+        /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="workflowInstance"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        Task<bool> CheckVerifyPageForWarnings(WorkflowInstance workflowInstance, List<string> validationWarningMessages);
     }
 }

@@ -192,7 +192,8 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    var hasWarnings = await HasActiveChildTasks(workflowInstance);
+
+                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(workflowInstance, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))
                     {

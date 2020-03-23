@@ -241,6 +241,49 @@ namespace Portal.Helpers
         }
 
         /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="workflowInstance"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckVerifyPageForWarnings(WorkflowInstance workflowInstance, List<string> validationWarningMessages)
+        {
+            var hasWarnings = false;
+
+            if (await HasActiveChildTasks(workflowInstance, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
+            return hasWarnings;
+        }
+        
+        private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance, List<string> validationWarningMessages)
+        {
+            if (workflowInstance.ParentProcessId == null)
+            {
+                var childProcessIds = await _dbContext.WorkflowInstance
+                    .Where(wi => wi.ParentProcessId == workflowInstance.ProcessId)
+                    .Where(wi =>
+                        wi.Status == WorkflowStatus.Started.ToString() || wi.Status == WorkflowStatus.Updating.ToString())
+                    .Select(wi => wi.ProcessId)
+                    .ToListAsync();
+
+
+                if (childProcessIds.Any())
+                {
+                    var joined = string.Join(',', childProcessIds);
+
+                    validationWarningMessages.Add($"Child Tasks: The current task has the following active child tasks: {joined}.");
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Used in the Review page
         /// </summary>
         /// <param name="primaryAssignedTask"></param>
