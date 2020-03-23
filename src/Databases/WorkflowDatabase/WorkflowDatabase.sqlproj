@@ -78,7 +78,7 @@
     <Build Include="Tables\ProductAction.sql" />
     <Build Include="Tables\CachedHpdWorkspace.sql" />
     <Build Include="Tables\AssignedTaskType.sql" />
-    <PostDeploy Include="Scripts\Post Deployment\AssignedTaskType.sql" />
+    <None Include="Scripts\Post Deployment\AssignedTaskType.sql" />
     <Build Include="Tables\DbAssessmentAssignTask.sql" />
     <Build Include="Tables\DbAssessmentVerifyData.sql" />
     <Build Include="Tables\CarisProjectDetails.sql" />
@@ -93,5 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post Deployment\ProductActionType.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Post Deployment\Main.sql" />
   </ItemGroup>
 </Project>
