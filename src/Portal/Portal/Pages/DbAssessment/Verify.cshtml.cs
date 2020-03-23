@@ -149,7 +149,7 @@ namespace Portal.Pages.DbAssessment
             switch (action)
             {
                 case "Save":
-                    if (!await _pageValidationHelper.ValidateVerifyPage(
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(
                         Ion,
                         ActivityCode,
                         SourceCategory,
@@ -169,7 +169,7 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
@@ -178,7 +178,7 @@ namespace Portal.Pages.DbAssessment
                     var verifyData =
                         await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
                             t.ProcessId == processId);
-                    if (!await _pageValidationHelper.ValidateVerifyPage(
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(
                                                                         Ion,
                                                                         ActivityCode,
                                                                         SourceCategory,

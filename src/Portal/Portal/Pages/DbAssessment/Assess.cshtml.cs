@@ -147,7 +147,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
-            if (!await _pageValidationHelper.ValidateAssessPage(
+            if (!await _pageValidationHelper.CheckAssessPageForErrors(
                                                 action,
                                                 Ion,
                                                 ActivityCode,

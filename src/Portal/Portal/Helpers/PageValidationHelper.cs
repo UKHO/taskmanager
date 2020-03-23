@@ -32,7 +32,7 @@ namespace Portal.Helpers
         /// <param name="reviewer"></param>
         /// <param name="team"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateReviewPage(
+        public async Task<bool> CheckReviewPageForErrors(
             DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             List<string> validationErrorMessages,
@@ -101,7 +101,7 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateAssessPage(
+        public async Task<bool> CheckAssessPageForErrors(
             string action,
             string ion,
             string activityCode,
@@ -180,7 +180,7 @@ namespace Portal.Helpers
         /// <param name="team"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateVerifyPage(string ion,
+        public async Task<bool> CheckVerifyPageForErrors(string ion,
             string activityCode,
             string sourceCategory,
             string formDataAssignedVerifier,

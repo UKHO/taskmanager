@@ -307,7 +307,7 @@ namespace Portal.UnitTests
                 AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
 
-            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -711,7 +711,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -757,7 +757,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -800,7 +800,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -846,7 +846,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.ValidateReviewPage(_reviewModel.PrimaryAssignedTask,
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(_reviewModel.PrimaryAssignedTask,
                     A<List<DbAssessmentAssignTask>>.Ignored, A<List<string>>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);

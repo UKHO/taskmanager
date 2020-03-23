@@ -546,7 +546,7 @@ namespace Portal.UnitTests
             await _verifyModel.OnPostDoneAsync(ProcessId, "ConfirmedSignOff");
 
             // Assert
-            A.CallTo(() => _pageValidationHelper.ValidateVerifyPage(
+            A.CallTo(() => _pageValidationHelper.CheckVerifyPageForErrors(
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
@@ -595,7 +595,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                      A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
                      A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -631,7 +631,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored,
                 A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
@@ -677,7 +677,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
@@ -714,7 +714,7 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult("TestUser2"));
             //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
             //    .Returns(true);
-            A.CallTo(() => _fakePageValidationHelper.ValidateVerifyPage(A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored,
                     A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored,
