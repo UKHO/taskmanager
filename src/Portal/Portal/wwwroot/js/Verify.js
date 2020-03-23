@@ -6,7 +6,7 @@
 
     setVerifyDoneHandler();
     setVerifySaveHandler();
-    handleContinueChildTaskWarning();
+    handleContinueVerifyDoneWarning();
     handleConfirmReject();
 
     var formChanged = false;
@@ -255,11 +255,10 @@
         });
     }
 
-    function handleContinueChildTaskWarning() {
+    function handleContinueVerifyDoneWarning() {
         $("#btnContinueVerifyDoneWarning").on("click", function (e) {
             completeVerify("ConfirmedSignOff");
         });
     }
-
 
 });
