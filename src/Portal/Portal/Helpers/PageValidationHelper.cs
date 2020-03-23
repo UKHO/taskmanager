@@ -527,7 +527,7 @@ namespace Portal.Helpers
 
             if (dataImpacts != null && dataImpacts.Count > 0)
             {
-                if (dataImpacts.Any(di => di.HpdUsageId > 0) && !dataImpacts.All(di => di.Verified))
+                if (dataImpacts.Any(di => di.HpdUsageId > 0) && !dataImpacts.All(di => di.FeaturesVerified))
                 {
                     validationErrorMessages.Add(
                         $"Data Impact: All Usages must be verified");

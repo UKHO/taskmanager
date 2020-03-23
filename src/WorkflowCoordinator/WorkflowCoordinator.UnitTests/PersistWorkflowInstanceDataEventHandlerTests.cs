@@ -255,7 +255,7 @@ namespace WorkflowCoordinator.UnitTests
                 }},
                 DataImpact = new List<DataImpact> { new DataImpact
                 {
-                    Verified = true
+                    FeaturesVerified = true
                 }}
             };
             await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
@@ -288,7 +288,7 @@ namespace WorkflowCoordinator.UnitTests
             Assert.AreEqual(newAssessData.Ion, verifyData.Ion);
 
             Assert.IsFalse(workflowInstance.ProductAction.First().Verified);
-            Assert.IsFalse(workflowInstance.DataImpact.First().Verified);
+            Assert.IsFalse(workflowInstance.DataImpact.First().FeaturesVerified);
 
             Assert.AreEqual(currentSerialNumber,
                 workflowInstance.SerialNumber);

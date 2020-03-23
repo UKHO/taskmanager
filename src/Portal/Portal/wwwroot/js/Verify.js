@@ -238,7 +238,7 @@
     }
 
     function handleContinueChildTaskWarning() {
-        $("#btnContinueChildTaskWarning").on("click", function (e) {
+        $("#btnContinueVerifyDoneWarning").on("click", function (e) {
             completeVerify("ConfirmedSignOff");
         });
     }
