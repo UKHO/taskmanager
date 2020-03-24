@@ -42,7 +42,7 @@
             },
             data: formData,
             complete: function () {
-                //Add a delay to account for the modalWaitReviewDone modal
+                //Add a delay to account for the modalWaitAssessDone modal
                 //not being fully shown, before trying to hide it
                 window.setTimeout(function () {
                     $("#modalWaitAssessDone").modal("hide");
