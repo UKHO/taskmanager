@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
@@ -149,15 +148,8 @@ namespace Portal.Pages.DbAssessment
             switch (action)
             {
                 case "Save":
-                    if (!await _pageValidationHelper.ValidateVerifyPage(
-                        Ion,
-                        ActivityCode,
-                        SourceCategory,
-                        Verifier,
-                        UserFullName,
-                        RecordProductAction,
-                        DataImpacts, action,
-                        ValidationErrorMessages, Team))
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
+                        Ion, ActivityCode, SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -165,40 +157,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    if (!await SaveTaskData(processId))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                        };
-                    }
-
-                    return StatusCode((int)HttpStatusCode.OK);
-                case "Done":
-                    var verifyData =
-                        await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
-                            t.ProcessId == processId);
-                    if (!await _pageValidationHelper.ValidateVerifyPage(
-                                                                        Ion,
-                                                                        ActivityCode,
-                                                                        SourceCategory,
-                                                                        Verifier, // from submitted form data
-                                                                        UserFullName,
-                                                                        RecordProductAction,
-                                                                        DataImpacts,
-                                                                        action,
-                                                                        ValidationErrorMessages,
-                                                                        Team,
-                                                                        verifyData.Verifier)) // from database
-
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                        };
-                    }
-
-                    if (!await SaveTaskData(processId))
+                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -206,7 +165,33 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    var hasWarnings = await HasActiveChildTasks(workflowInstance);
+                    break;
+                case "Done":
+                    var verifyData =
+                        await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
+                            t.ProcessId == processId);
+                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(// from submitted form data
+                        action,
+                                                                        Ion,
+                                                                        ActivityCode,
+                                                                        SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName, verifyData.Verifier)) // from database
+
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                        };
+                    }
+
+                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))
                     {
@@ -226,11 +211,11 @@ namespace Portal.Pages.DbAssessment
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)HttpStatusCode.InternalServerError
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
-                    return StatusCode((int)HttpStatusCode.OK);
+                    break;
                 case "ConfirmedSignOff":
 
                     if (!await MarkTaskAsComplete(processId, workflowInstance))
@@ -241,12 +226,17 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    return StatusCode((int)HttpStatusCode.OK);
+                    break;
                 default:
                     _logger.LogError("Action not found {Action}");
 
                     throw new NotImplementedException($"Action not found {action}");
             }
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return StatusCode((int)HttpStatusCode.OK);
+
         }
 
         public async Task<IActionResult> OnPostRejectVerifyAsync(int processId, string comment)
@@ -273,11 +263,12 @@ namespace Portal.Pages.DbAssessment
             {
                 ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
             }
+
             if (ValidationErrorMessages.Any())
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -288,7 +279,7 @@ namespace Portal.Pages.DbAssessment
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -304,11 +295,13 @@ namespace Portal.Pages.DbAssessment
             var workflowInstance = await _dbContext.WorkflowInstance
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
-
-
+            
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
-                return BadRequest(this.ValidationErrorMessages);
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
+                };
             }
 
             await _commentsHelper.AddComment($"Verify Rejected: {comment}",
@@ -316,7 +309,7 @@ namespace Portal.Pages.DbAssessment
                 workflowInstance.WorkflowInstanceId,
                 UserFullName);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance)
@@ -344,14 +337,11 @@ namespace Portal.Pages.DbAssessment
             return false;
         }
 
-        private async Task<bool> SaveTaskData(int processId)
+        private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
         {
             await UpdateOnHold(processId, IsOnHold);
-
             await UpdateTaskInformation(processId);
-
             await UpdateProductAction(processId);
-
             await UpdateAssessmentData(processId);
 
             try
@@ -366,6 +356,12 @@ namespace Portal.Pages.DbAssessment
             }
 
             await UpdateDataImpact(processId);
+            
+            await _commentsHelper.AddComment($"Verify: Changes saved",
+                processId,
+                workflowInstanceId,
+                UserFullName);
+
             return true;
         }
 

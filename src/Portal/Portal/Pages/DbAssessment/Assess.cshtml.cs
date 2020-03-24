@@ -13,9 +13,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
 using Portal.Configuration;
+using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
-using Portal.Models;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -86,6 +86,8 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
+        public string SerialisedCustomHttpStatusCodes { get; set; }
+
         private string _userFullName;
         public string UserFullName
         {
@@ -120,13 +122,13 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGet(int processId)
         {
-            //TODO: Read operators from DB
-
             ProcessId = processId;
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Assess;
+            SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<AssessCustomHttpStatusCode>();
+
             await GetOnHoldData(processId);
         }
 
@@ -145,30 +147,145 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-
-            if (!await _pageValidationHelper.ValidateAssessPage(
-                                                action,
-                                                Ion,
-                                                ActivityCode,
-                                                SourceCategory,
-                                                TaskType,
-                                                Assessor,
-                                                Verifier,
-                                                currentAssessData.Assessor,
-                                                UserFullName,
-                                                RecordProductAction,
-                                                DataImpacts,
-                                                ValidationErrorMessages, Team))
-            {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
-            }
-
             ProcessId = processId;
 
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+            switch (action)
+            {
+                case "Save":
+                    if (!await _pageValidationHelper.CheckAssessPageForErrors(
+                        action,
+                        Ion,
+                        ActivityCode,
+                        SourceCategory,
+                        TaskType,
+                        RecordProductAction,
+                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
+                        };
+                    }
+
+                    if (!await SaveTaskData(processId, currentAssessData.WorkflowInstanceId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    break;
+                case "Done":
+                    if (!await _pageValidationHelper.CheckAssessPageForErrors(
+                        action,
+                        Ion,
+                        ActivityCode,
+                        SourceCategory,
+                        TaskType,
+                        RecordProductAction,
+                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
+                        };
+                    }
+
+                    if (!await SaveTaskData(processId, currentAssessData.WorkflowInstanceId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    var hasWarnings = _pageValidationHelper.CheckAssessPageForWarnings(action, DataImpacts, ValidationErrorMessages);
+
+                    if (hasWarnings)
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.WarningsDetected
+                        };
+
+                    }
+
+                    if (!await MarkTaskAsComplete(processId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    break;
+                case "ConfirmedDone":
+
+                    if (!await MarkTaskAsComplete(processId))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                        };
+                    }
+
+                    break;
+                default:
+                    _logger.LogError("Action not found {Action}");
+
+                    throw new NotImplementedException($"Action not found {action}");
+            }
+
+            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        private async Task<bool> MarkTaskAsComplete(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
+                workflowInstance.SerialNumber, "Assess", "Verify");
+
+            if (success)
+            {
+                await PersistCompletedAssess(processId, workflowInstance);
+
+                _logger.LogInformation(
+                    "{UserFullName} successfully progressed {ActivityName} to Verify on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                await _commentsHelper.AddComment($"Assess step completed",
+                    processId,
+                    workflowInstance.WorkflowInstanceId,
+                    UserFullName);
+            }
+            else
+            {
+                workflowInstance.Status = WorkflowStatus.Started.ToString();
+                await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation("Unable to progress task {ProcessId} from Assess to Verify.");
+
+                ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
+        {
             await UpdateOnHold(ProcessId, IsOnHold);
             await UpdateTaskInformation(processId);
             await UpdateProductAction(processId);
@@ -176,76 +293,24 @@ namespace Portal.Pages.DbAssessment
 
             try
             {
-
                 await UpdateEditDatabase(processId);
-
             }
             catch (Exception e)
             {
                 ValidationErrorMessages.Add(e.Message);
 
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
+                return false;
             }
 
             await UpdateDataImpact(processId);
 
-            if (action == "Done")
-            {
-                var workflowInstance = await _dbContext.WorkflowInstance
-                    .Include(w => w.PrimaryDocumentStatus)
-                    .FirstAsync(w => w.ProcessId == processId);
+            await _commentsHelper.AddComment($"Assess: Changes saved",
+                processId,
+                workflowInstanceId,
+                UserFullName);
 
-                workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
-                await _dbContext.SaveChangesAsync();
-
-                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Assess", "Verify");
-
-                if (success)
-                {
-                    await PersistCompletedAssess(processId, workflowInstance);
-
-                    UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
-
-                    LogContext.PushProperty("UserFullName", UserFullName);
-
-                    _logger.LogInformation("{UserFullName} successfully progressed {ActivityName} to Verify on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
-
-                    await _commentsHelper.AddComment($"Assess step completed",
-                        processId,
-                        workflowInstance.WorkflowInstanceId,
-                        UserFullName);
-                }
-                else
-                {
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
-                    await _dbContext.SaveChangesAsync();
-
-                    _logger.LogInformation("Unable to progress task {ProcessId} from Assess to Verify.");
-
-                    ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
-
-                    return new JsonResult(this.ValidationErrorMessages)
-                    {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
-                    };
-                }
-            }
-            else
-            {
-                await _commentsHelper.AddComment($"Assess: Changes saved",
-                    processId,
-                    currentAssessData.WorkflowInstanceId,
-                    UserFullName);
-
-            }
-
-            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
-
-            return StatusCode((int)HttpStatusCode.OK);
+            return true;
         }
 
         private async Task<string> GetCurrentAssessor(int processId)

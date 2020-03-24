@@ -160,12 +160,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
 
-            if (!await _pageValidationHelper.ValidateReviewPage(
-                PrimaryAssignedTask,
-                AdditionalAssignedTasks,
-                ValidationErrorMessages,
-                Reviewer, Team,
-                currentReviewData.Reviewer, UserFullName, action))
+            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, UserFullName, currentReviewData.Reviewer))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

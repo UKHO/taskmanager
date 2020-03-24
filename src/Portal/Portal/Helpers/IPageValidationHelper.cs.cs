@@ -9,18 +9,24 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Review page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="primaryAssignedTask"></param>
         /// <param name="additionalAssignedTasks"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="reviewer"></param>
         /// <param name="team"></param>
+        /// <param name="reviewer"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
+        /// <param name="currentAssignedReviewerInDb"></param>
         /// <returns></returns>
-        Task<bool> ValidateReviewPage(
-            DbAssessmentReviewData primaryAssignedTask,
-            List<DbAssessmentAssignTask> additionalAssignedTasks,
-            List<string> validationErrorMessages,
-            string reviewer, string team,
-            string currentAssignedReviewer, string currentUsername, string action);
+        Task<bool> CheckReviewPageForErrors(
+                                            string action,
+                                            DbAssessmentReviewData primaryAssignedTask,
+                                            List<DbAssessmentAssignTask> additionalAssignedTasks,
+                                            string team,
+                                            string reviewer,
+                                            List<string> validationErrorMessages,
+                                            string currentUsername,
+                                            string currentAssignedReviewerInDb);
 
         /// <summary>
         /// Used in Assess page
@@ -30,58 +36,83 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
-        /// <param name="assessor"></param>
-        /// <param name="verifier"></param>
-        /// <param name="currentAssignedAssessor"></param>
-        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
-        /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
+        /// <param name="assessor"></param>
+        /// <param name="verifier"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
+        /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
-        Task<bool> ValidateAssessPage(
+        Task<bool> CheckAssessPageForErrors(
+                                            string action,
+                                            string ion,
+                                            string activityCode,
+                                            string sourceCategory,
+                                            string taskType,
+                                            List<ProductAction> recordProductAction,
+                                            List<DataImpact> dataImpacts,
+                                            string team,
+                                            string assessor,
+                                            string verifier,
+                                            List<string> validationErrorMessages,
+                                            string currentUsername,
+                                            string currentAssignedAssessorInDb);
+        /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        bool CheckAssessPageForWarnings(
             string action,
-            string ion,
-            string activityCode,
-            string sourceCategory,
-            string taskType,
-            string assessor,
-            string verifier,
-            string currentAssignedAssessor,
-            string currentUsername,
-            List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
-            List<string> validationErrorMessages,
-            string team);
+            List<string> validationWarningMessages);
 
 
         /// <summary>
         /// Used in Verify page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
-        /// <param name="currentUsername"></param>
+        /// <param name="formDataAssignedVerifier"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
-        /// <param name="action"></param>
-        /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
-        /// <param name="formDataAssignedVerifier"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
-        Task<bool> ValidateVerifyPage(string ion,
-            string activityCode,
-            string sourceCategory,
-            string formDataAssignedVerifier,
-            string currentUsername,
-            List<ProductAction> recordProductAction,
-            List<DataImpact> dataImpacts,
-            string action,
-            List<string> validationErrorMessages,
-            string team,
-            string currentAssignedVerifierInDb = "");
+        Task<bool> CheckVerifyPageForErrors(
+                                            string action,
+                                            string ion,
+                                            string activityCode,
+                                            string sourceCategory,
+                                            string formDataAssignedVerifier,
+                                            List<ProductAction> recordProductAction,
+                                            List<DataImpact> dataImpacts,
+                                            string team,
+                                            List<string> validationErrorMessages,
+                                            string currentUsername,
+                                            string currentAssignedVerifierInDb = "");
 
+        /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="workflowInstance"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        Task<bool> CheckVerifyPageForWarnings(
+                                                string action, 
+                                                WorkflowInstance workflowInstance, 
+                                                List<DataImpact> dataImpacts, 
+                                                List<string> validationWarningMessages);
 
     }
 }

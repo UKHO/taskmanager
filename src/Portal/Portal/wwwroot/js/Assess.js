@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
+
     $("#Reviewer").prop("disabled", true);
 
 
@@ -7,6 +9,7 @@
 
     setAssessDoneHandler();
     setAssessSaveHandler();
+    handleContinueAssessDoneWarning();
 
     var formChanged = false;
     $("#frmAssessPage").change(function () { formChanged = true; });
@@ -22,7 +25,9 @@
     }
 
     function completeAssess(action) {
+        $("#modalAssessDoneWarning").modal("hide");
         $("#assessDoneErrorMessage").html("");
+        $("#assessDoneWarningMessages").html("");
         $("#btnDone").prop("disabled", true);
         $("#btnSave").prop("disabled", true);
         $("#modalWaitAssessDone").modal("show");
@@ -37,7 +42,7 @@
             },
             data: formData,
             complete: function () {
-                //Add a delay to account for the modalWaitReviewDone modal
+                //Add a delay to account for the modalWaitAssessDone modal
                 //not being fully shown, before trying to hide it
                 window.setTimeout(function () {
                     $("#modalWaitAssessDone").modal("hide");
@@ -50,18 +55,47 @@
                 if (action === "Done") {
                     window.location.replace("/Index");
                 }
-                console.log("success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
+                var statusCode = error.status;
 
                 if (responseJson != null) {
+                    if (statusCode === customHttpStatusCodes.WarningsDetected) {
+
+                        $("#assessDoneWarningMessages").append("<ul/>");
+                        var unOrderedList = $("#assessDoneWarningMessages ul");
+
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalAssessDoneWarning").modal("show");
+
+                    } else if (statusCode === customHttpStatusCodes.FailedValidation) {
+                        $("#assessDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#assessDoneErrorMessage ul");
+
+                        responseJson.forEach(function(item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalWaitAssessDoneErrors").modal("show");
+                    } else {
+                        $("#assessDoneErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#assessDoneErrorMessage ul");
+
+                        unOrderedList.append("<li>" + responseJson + "</li>");
+
+                        $("#modalWaitAssessDoneErrors").modal("show");
+
+                    }
+                } else {
+
                     $("#assessDoneErrorMessage").append("<ul/>");
                     var unOrderedList = $("#assessDoneErrorMessage ul");
 
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
+                    unOrderedList.append("<li>System error. Please try again later</li>");
 
                     $("#modalWaitAssessDoneErrors").modal("show");
                 }
@@ -69,25 +103,6 @@
             }
         });
     }
-
-    function setAssessDoneHandler() {
-        $("#btnDone").prop("disabled", false);
-
-
-        $("#btnDone").click(function (e) {
-            completeAssess("Done");
-        });
-    }
-
-    function setAssessSaveHandler() {
-        $("#btnSave").prop("disabled", false);
-
-
-        $("#btnSave").click(function (e) {
-            completeAssess("Save");
-        });
-    }
-
 
     function initialiseOperatorsTypeaheads() {
 
@@ -131,10 +146,34 @@
             });
     }
 
-
     function removeOperatorsInitialiseErrors() {
         $("#operatorsErrorMessages").collapse("hide");
         $("#operatorsErrorList").empty();
+    }
+
+
+    function setAssessDoneHandler() {
+        $("#btnDone").prop("disabled", false);
+
+
+        $("#btnDone").click(function (e) {
+            completeAssess("Done");
+        });
+    }
+
+    function setAssessSaveHandler() {
+        $("#btnSave").prop("disabled", false);
+
+
+        $("#btnSave").click(function (e) {
+            completeAssess("Save");
+        });
+    }
+
+    function handleContinueAssessDoneWarning() {
+        $("#btnContinueAssessDoneWarning").on("click", function (e) {
+            completeAssess("ConfirmedDone");
+        });
     }
 
 });

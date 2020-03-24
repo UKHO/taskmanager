@@ -26,31 +26,34 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Review page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="primaryAssignedTask"></param>
         /// <param name="additionalAssignedTasks"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="reviewer"></param>
         /// <param name="team"></param>
+        /// <param name="reviewer"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
+        /// <param name="currentAssignedReviewerInDb"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateReviewPage(
-            DbAssessmentReviewData primaryAssignedTask,
+        public async Task<bool> CheckReviewPageForErrors(string action, DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
-            List<string> validationErrorMessages,
-            string reviewer, string team,
-            string currentAssignedReviewer, string currentUsername, string action)
+            string team,
+            string reviewer,
+            List<string> validationErrorMessages, string currentUsername,
+            string currentAssignedReviewerInDb)
         {
             var isValid = true;
 
             if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedReviewer))
+                if (string.IsNullOrWhiteSpace(currentAssignedReviewerInDb))
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedReviewer, StringComparison.InvariantCultureIgnoreCase))
+                else if (!currentUsername.Equals(currentAssignedReviewerInDb, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedReviewer} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -92,41 +95,41 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
-        /// <param name="assessor"></param>
-        /// <param name="verifier"></param>
-        /// <param name="currentAssignedAssessor"></param>
-        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
-        /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
+        /// <param name="assessor"></param>
+        /// <param name="verifier"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
+        /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateAssessPage(
-            string action,
+        public async Task<bool> CheckAssessPageForErrors(string action,
             string ion,
             string activityCode,
             string sourceCategory,
             string taskType,
-            string assessor,
-            string verifier,
-            string currentAssignedAssessor,
-            string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
-            List<string> validationErrorMessages, string team)
+            string team,
+            string assessor,
+            string verifier,
+            List<string> validationErrorMessages,
+            string currentUsername,
+            string currentAssignedAssessorInDb)
         {
             var isValid = true;
 
             if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedAssessor))
+                if (string.IsNullOrWhiteSpace(currentAssignedAssessorInDb))
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedAssessor, StringComparison.InvariantCultureIgnoreCase))
+                else if (!currentUsername.Equals(currentAssignedAssessorInDb, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedAssessor} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -166,30 +169,47 @@ namespace Portal.Helpers
         }
 
         /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        public bool CheckAssessPageForWarnings(
+            string action,
+            List<DataImpact> dataImpacts,
+            List<string> validationWarningMessages)
+        {
+
+           return !CheckDataImpactFeatures(action, WorkflowStage.Assess, dataImpacts, validationWarningMessages);
+
+        }
+
+        /// <summary>
         /// Used in Verify page
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="ion"></param>
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="formDataAssignedVerifier"></param>
-        /// <param name="currentUsername"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
-        /// <param name="action"></param>
-        /// <param name="validationErrorMessages"></param>
         /// <param name="team"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
         /// <returns></returns>
-        public async Task<bool> ValidateVerifyPage(string ion,
+        public async Task<bool> CheckVerifyPageForErrors(string action,
+            string ion,
             string activityCode,
             string sourceCategory,
             string formDataAssignedVerifier,
-            string currentUsername,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
-            string action,
-            List<string> validationErrorMessages,
             string team,
+            List<string> validationErrorMessages,
+            string currentUsername,
             string currentAssignedVerifierInDb = "")
         {
             var isValid = true;
@@ -223,7 +243,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateDataImpact(dataImpacts, action, validationErrorMessages))
+            if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -235,6 +255,60 @@ namespace Portal.Helpers
             }
 
             return isValid;
+        }
+
+        /// <summary>
+        /// Check for warnings
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="workflowInstance"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckVerifyPageForWarnings(
+                                                            string action, 
+                                                            WorkflowInstance workflowInstance, 
+                                                            List<DataImpact> dataImpacts, 
+                                                            List<string> validationWarningMessages)
+        {
+            var hasWarnings = false;
+
+            if (await HasActiveChildTasks(workflowInstance, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
+            if (!CheckDataImpactFeatures(action, WorkflowStage.Verify, dataImpacts, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
+            return hasWarnings;
+        }
+
+        private async Task<bool> HasActiveChildTasks(WorkflowInstance workflowInstance, List<string> validationWarningMessages)
+        {
+            if (workflowInstance.ParentProcessId == null)
+            {
+                var childProcessIds = await _dbContext.WorkflowInstance
+                    .Where(wi => wi.ParentProcessId == workflowInstance.ProcessId)
+                    .Where(wi =>
+                        wi.Status == WorkflowStatus.Started.ToString() || wi.Status == WorkflowStatus.Updating.ToString())
+                    .Select(wi => wi.ProcessId)
+                    .ToListAsync();
+
+
+                if (childProcessIds.Any())
+                {
+                    var joined = string.Join(',', childProcessIds);
+
+                    validationWarningMessages.Add($"Child Tasks: The current task has the following active child tasks: {joined}.");
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -512,30 +586,47 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify pages
         /// </summary>
-        /// <param name="dataImpacts"></param>
         /// <param name="action"></param>
-        /// <param name="validationErrorMessages"></param>
+        /// <param name="workflowStage"></param>
+        /// <param name="dataImpacts"></param>
+        /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        private bool ValidateDataImpact(List<DataImpact> dataImpacts, string action, List<string> validationErrorMessages)
+        private bool CheckDataImpactFeatures(
+                                                string action, 
+                                                WorkflowStage workflowStage, 
+                                                List<DataImpact> dataImpacts,
+                                                List<string> validationWarningMessages)
         {
-            var isValid = ValidateDataImpact(dataImpacts, validationErrorMessages);
 
-            if (action == "Save")
+            if (action == "Save") return true;
+
+            if (dataImpacts == null || dataImpacts.Count <= 0) return true;
+
+            if (dataImpacts.All(di => di.HpdUsageId == 0)) return true;
+
+            switch (workflowStage)
             {
-                return isValid;
-            }
+                case WorkflowStage.Assess:
+                    if (!dataImpacts.All(di => di.FeaturesSubmitted))
+                    {
+                        validationWarningMessages.Add(
+                            "Data Impact: All Usages Features must be submitted");
+                        return false;
+                    }
 
-            if (dataImpacts != null && dataImpacts.Count > 0)
-            {
-                if (dataImpacts.Any(di => di.HpdUsageId > 0) && !dataImpacts.All(di => di.FeaturesVerified))
-                {
-                    validationErrorMessages.Add(
-                        $"Data Impact: All Usages must be verified");
-                    isValid = false;
-                }
-            }
+                    return true;
+                case WorkflowStage.Verify:
+                    if (!dataImpacts.All(di => di.FeaturesVerified))
+                    {
+                        validationWarningMessages.Add(
+                            "Data Impact: All Usages Features must be verified");
+                        return false;
+                    }
 
-            return isValid;
+                    return true;
+                default:
+                    throw new NotImplementedException($"{workflowStage} not implemented");
+            }
         }
 
         /// <summary>
