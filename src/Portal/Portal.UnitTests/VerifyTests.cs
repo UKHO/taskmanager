@@ -378,12 +378,11 @@ namespace Portal.UnitTests
             _hpDbContext.CarisProducts.Add(new CarisProduct
             { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
-
-
+            
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-
+            _verifyModel.Team = "Home Waters";
             _verifyModel.Verifier = "TestUser";
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
@@ -393,8 +392,6 @@ namespace Portal.UnitTests
             };
 
             _verifyModel.DataImpacts = new List<DataImpact>();
-
-            _verifyModel.Team = "Home Waters";
 
             var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
