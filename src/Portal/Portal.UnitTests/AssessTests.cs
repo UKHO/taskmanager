@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
+using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -623,6 +624,87 @@ namespace Portal.UnitTests
             Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.False(_assessModel.ValidationErrorMessages.Contains("Data Impact: All Usages Features must be submitted"));
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_confirmedDone_must_not_run_validation()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Team = "Home Waters";
+
+            _assessModel.Verifier = "TestUser";
+
+            _assessModel.RecordProductAction = new List<ProductAction>();
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            var childProcessId = 555;
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = childProcessId,
+                ActivityName = "Assess",
+                SerialNumber = "555_456",
+                ParentProcessId = ProcessId,
+                Status = WorkflowStatus.Started.ToString()
+
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            _pageValidationHelper = A.Fake<IPageValidationHelper>();
+
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "ConfirmedDone");
+
+            // Assert
+            A.CallTo(() => _pageValidationHelper.CheckAssessPageForErrors(A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<ProductAction>>.Ignored,
+                                                                                A<List<DataImpact>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<string>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored))
+                                                            .MustNotHaveHappened();
+
+            A.CallTo(() => _pageValidationHelper.CheckAssessPageForWarnings(A<string>.Ignored,
+                                                                                        A<List<DataImpact>>.Ignored,
+                                                                                        A<List<string>>.Ignored))
+                                                            .MustNotHaveHappened();
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
+                                                                                A<int>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>
+                                                                                    .Ignored))
+                                                            .MustHaveHappened();
+
+            A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
+                                                                                nameof(PersistWorkflowInstanceDataEvent),
+                                                                                A<PersistWorkflowInstanceDataEvent>.Ignored))
+                                                            .MustHaveHappened();
         }
     }
 }
