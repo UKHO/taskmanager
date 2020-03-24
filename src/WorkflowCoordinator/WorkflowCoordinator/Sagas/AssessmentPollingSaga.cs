@@ -56,7 +56,7 @@ namespace WorkflowCoordinator.Sagas
         public async Task Timeout(ExecuteAssessmentPollingTask state, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
-            LogContext.PushProperty("CorrelationId", "");
+            LogContext.PushProperty("MessageCorrelationId", "");
             LogContext.PushProperty("EventName", nameof(ExecuteAssessmentPollingTask));
             LogContext.PushProperty("ProcessId", 0);
 

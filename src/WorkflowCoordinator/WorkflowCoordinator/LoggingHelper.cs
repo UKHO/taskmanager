@@ -31,7 +31,7 @@ namespace WorkflowCoordinator
                     new SqlColumn
                         {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
-                        {ColumnName = "CorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "MessageCorrelationId", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ProcessId", DataType = SqlDbType.Int}
                 }
@@ -41,6 +41,7 @@ namespace WorkflowCoordinator
                 .MinimumLevel.Is(logLevel)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.MSSqlServer(loggingConnectionString,

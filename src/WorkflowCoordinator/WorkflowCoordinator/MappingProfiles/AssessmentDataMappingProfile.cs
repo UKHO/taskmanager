@@ -9,6 +9,8 @@ namespace WorkflowCoordinator.MappingProfiles
         public AssessmentDataMappingProfile()
         {
             CreateMap<DocumentAssessmentData, AssessmentData>()
+                .ForMember(destination => destination.PrimarySdocId,
+                    opts => opts.MapFrom(source => source.SdocId))
                 .ForMember(destination => destination.SourceDocumentName,
                     opts => opts.MapFrom(source => source.Name))
                 .ForMember(destination => destination.ToSdoDate,

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Messages.Commands;
 using Common.Messages.Events;
+using DataServices.Models;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,7 @@ using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Sagas;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.UnitTests
 {
@@ -27,6 +29,7 @@ namespace WorkflowCoordinator.UnitTests
         private WorkflowDbContext _dbContext;
         private IMapper _fakeMapper;
         private ILogger<StartDbAssessmentSaga> _fakeLogger;
+        private IOptionsSnapshot<GeneralConfig> _fakeGeneralConfigOptionsSnapshot;
 
         [SetUp]
         public void Setup()
@@ -37,9 +40,9 @@ namespace WorkflowCoordinator.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
-            var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
+            _fakeGeneralConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             var generalConfig = new GeneralConfig { WorkflowCoordinatorAssessmentPollingIntervalSeconds = 5, CallerCode = "HDB" };
-            A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
+            A.CallTo(() => _fakeGeneralConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
@@ -48,7 +51,7 @@ namespace WorkflowCoordinator.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns("1234");
 
 
-            _saga = new StartDbAssessmentSaga(generalConfigOptionsSnapshot,
+            _saga = new StartDbAssessmentSaga(_fakeGeneralConfigOptionsSnapshot,
                 _fakeDataServiceApiClient,
                 _fakeWorkflowServiceApiClient,
                 _dbContext,
@@ -176,6 +179,74 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             Assert.AreEqual(1, _handlerContext.PublishedMessages.Length);
+        }
+
+        [Test]
+        public async Task Test_RetrieveAssessmentDataCommand_Given_Valid_Data_Then_AssessmentData_Is_Added()
+        {
+            //Arrange
+            var workflowInstanceId = 1;
+            var processId = 2;
+            var sourceDocumentId = 3;
+
+            var retrieveAssessmentDataCommand = new RetrieveAssessmentDataCommand()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                CorrelationId = A.Dummy<Guid>(),
+                SourceDocumentId = sourceDocumentId
+            };
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(A<string>.Ignored, sourceDocumentId))
+                .Returns(Task.FromResult(new DocumentAssessmentData()
+                {
+                    SdocId = sourceDocumentId
+                }));
+
+            A.CallTo(() => _fakeMapper.Map<DocumentAssessmentData, AssessmentData>(A<DocumentAssessmentData>.Ignored))
+                .Returns(new AssessmentData() {PrimarySdocId = sourceDocumentId} );
+
+            //Act
+            await _saga.Handle(retrieveAssessmentDataCommand, _handlerContext);
+
+            //Assert
+            var assessmentData = await _dbContext.AssessmentData.FirstOrDefaultAsync();
+            Assert.IsNotNull(assessmentData);
+            Assert.AreEqual(processId, assessmentData.ProcessId);
+            Assert.AreEqual(sourceDocumentId, assessmentData.PrimarySdocId);
+            Assert.IsFalse(_dbContext.ChangeTracker.HasChanges());
+        }
+
+        [Test]
+        public async Task Test_RetrieveAssessmentDataCommand_Given_Valid_Data_Then_Saga_Is_Marked_Complete()
+        {
+            //Arrange
+            var workflowInstanceId = 1;
+            var processId = 2;
+            var sourceDocumentId = 3;
+
+            var retrieveAssessmentDataCommand = new RetrieveAssessmentDataCommand()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                CorrelationId = A.Dummy<Guid>(),
+                SourceDocumentId = sourceDocumentId
+            };
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(A<string>.Ignored, sourceDocumentId))
+                .Returns(Task.FromResult(new DocumentAssessmentData()
+                {
+                    SdocId = sourceDocumentId
+                }));
+
+            A.CallTo(() => _fakeMapper.Map<DocumentAssessmentData, AssessmentData>(A<DocumentAssessmentData>.Ignored))
+                .Returns(new AssessmentData() {PrimarySdocId = sourceDocumentId} );
+
+            //Act
+            await _saga.Handle(retrieveAssessmentDataCommand, _handlerContext);
+
+            //Assert
+            Assert.IsTrue(_saga.Completed);
         }
     }
 }

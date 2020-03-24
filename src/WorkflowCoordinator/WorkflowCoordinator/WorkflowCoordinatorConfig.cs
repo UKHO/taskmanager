@@ -84,6 +84,9 @@ namespace WorkflowCoordinator
             });
             persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
 
+            this.AuditProcessedMessagesTo("audit", TimeSpan.FromMinutes(10));
+            this.SendFailedMessagesTo("error");
+
             // Additional config
 
             this.Conventions()
