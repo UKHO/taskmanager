@@ -13,25 +13,6 @@
    
     setMenuItemSelection();
 
-    inFlightTasksTable.search("").draw();
-
-    $("#btnMyTaskList").click(function () {
-
-        menuItem = 0;
-
-        setMenuItemSelection();
-
-    });
-
-
-    $("#btnTeamTasks").click(function () {
-        menuItem = 1;
-
-        setMenuItemSelection();
-
-    });
-
-
     function setupInFlightTasks() {
 
         return inFlightTasksTable = $('#inFlightTasks').DataTable({
@@ -308,6 +289,9 @@
                 }
             });
     }
+
+    //Show MyTaskList
+    $("#btnMyTaskList").trigger("click");
 });
 
 
