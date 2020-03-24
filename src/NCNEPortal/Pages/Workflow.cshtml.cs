@@ -1,4 +1,12 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Helpers;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,13 +21,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using TaskComment = NCNEPortal.Models.TaskComment;
 
 namespace NCNEPortal
@@ -29,13 +30,13 @@ namespace NCNEPortal
     {
         private readonly NcneWorkflowDbContext _dbContext;
         private readonly ILogger _logger;
-        private readonly IUserIdentityService _userIdentityService;
         private readonly ICommentsHelper _commentsHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IMilestoneCalculator _milestoneCalculator;
-        private readonly IDirectoryService _directoryService;
         private readonly IPageValidationHelper _pageValidationHelper;
+        private readonly INcneUserDbService _ncneUserDbService;
+        private readonly IAdDirectoryService _adDirectoryService;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")]
@@ -149,26 +150,26 @@ namespace NCNEPortal
 
         public WorkflowModel(NcneWorkflowDbContext dbContext,
             ILogger<WorkflowModel> logger,
-            IUserIdentityService userIdentityService,
             ICommentsHelper commentsHelper,
             ICarisProjectHelper carisProjectHelper,
             IOptions<GeneralConfig> generalConfig,
             IMilestoneCalculator milestoneCalculator,
-            IDirectoryService directoryService,
-            IPageValidationHelper pageValidationHelper)
+            IPageValidationHelper pageValidationHelper,
+            INcneUserDbService ncneUserDbService,
+            IAdDirectoryService adDirectoryService)
         {
             _dbContext = dbContext;
             _logger = logger;
-            _userIdentityService = userIdentityService;
             _commentsHelper = commentsHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
             _milestoneCalculator = milestoneCalculator;
-            _directoryService = directoryService;
             _pageValidationHelper = pageValidationHelper;
+            _ncneUserDbService = ncneUserDbService;
+            _adDirectoryService = adDirectoryService;
 
             ValidationErrorMessages = new List<string>();
-            userList = _directoryService.GetGroupMembers().Result.ToList();
+            userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
         }
 
         public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
@@ -192,7 +193,7 @@ namespace NCNEPortal
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -321,7 +322,7 @@ namespace NCNEPortal
                 throw new ArgumentException("Please provide a Caris Project Name.");
             }
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 

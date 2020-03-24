@@ -1,27 +1,19 @@
-﻿using NCNEPortal.Auth;
-using NCNEPortal.Enums;
-using NCNEWorkflowDatabase.EF;
-using NCNEWorkflowDatabase.EF.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NCNEPortal.Auth;
+using NCNEPortal.Enums;
+using NCNEWorkflowDatabase.EF.Models;
 
 namespace NCNEPortal.Helpers
 {
     public class PageValidationHelper : IPageValidationHelper
     {
-        private readonly NcneWorkflowDbContext _dbContext;
-        private readonly IUserIdentityService _userIdentityService;
-        private readonly IDirectoryService _directoryService;
+        private readonly INcneUserDbService _ncneUserDbService;
 
-        public PageValidationHelper(NcneWorkflowDbContext dbContext,
-            IUserIdentityService userIdentityService,
-            IDirectoryService directoryService
-                        )
+        public PageValidationHelper(INcneUserDbService ncneUserDbService)
         {
-            this._dbContext = dbContext;
-            _userIdentityService = userIdentityService;
-            _directoryService = directoryService;
+            _ncneUserDbService = ncneUserDbService;
         }
 
         public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType, List<string> validationErrorMessages)
@@ -153,7 +145,7 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = true;
 
-            var userList = _directoryService.GetGroupMembers().Result.ToList();
+            var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
 
             if (string.IsNullOrEmpty(taskRole.Compiler))
             {

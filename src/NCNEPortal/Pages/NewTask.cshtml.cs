@@ -1,4 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,30 +19,18 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using ChartType = NCNEPortal.Models.ChartType;
-using WorkflowType = NCNEPortal.Models.WorkflowType;
-
 
 namespace NCNEPortal
 {
     [Authorize]
     public class NewTaskModel : PageModel
     {
+        private readonly INcneUserDbService _ncneUserDbService;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly IStageTypeFactory _stageTypeFactory;
-        private readonly IDirectoryService _directoryService;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
         private readonly ILogger<NewTaskModel> _logger;
-        private readonly IUserIdentityService _userIdentityService;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -107,20 +103,17 @@ namespace NCNEPortal
         public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext,
                             IMilestoneCalculator milestoneCalculator,
                             ILogger<NewTaskModel> logger,
-                            IUserIdentityService userIdentityService,
-                            IDirectoryService directoryService,
+                            INcneUserDbService ncneUserDbService,
                             IStageTypeFactory stageTypeFactory,
                             IPageValidationHelper pageValidationHelper)
         {
-
+            _ncneUserDbService = ncneUserDbService;
 
             try
             {
-                _directoryService = directoryService;
                 _ncneWorkflowDbContext = ncneWorkflowDbContext;
                 _milestoneCalculator = milestoneCalculator;
                 _logger = logger;
-                _userIdentityService = userIdentityService;
                 _stageTypeFactory = stageTypeFactory;
                 _pageValidationHelper = pageValidationHelper;
 
@@ -137,7 +130,7 @@ namespace NCNEPortal
 
                 ValidationErrorMessages = new List<string>();
 
-                userList = _directoryService.GetGroupMembers().Result.ToList();
+                userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
 
             }
             catch (Exception ex)

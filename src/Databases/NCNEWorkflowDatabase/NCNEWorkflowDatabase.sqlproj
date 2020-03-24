@@ -73,6 +73,7 @@
     <Build Include="Tables\WorkflowType.sql" />
     <Build Include="Tables\CarisProjectDetails.sql" />
     <Build Include="Tables\HpdUser.sql" />
+    <Build Include="Tables\AdUser.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="NCNEWorkflowDatabase.refactorlog" />

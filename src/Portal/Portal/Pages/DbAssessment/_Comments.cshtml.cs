@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Portal.Auth;
 using Portal.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -15,7 +15,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly IAdDirectoryService _adDirectoryService;
 
         [BindProperty(SupportsGet = true)]
         public int ProcessId { get; set; }
@@ -29,11 +29,11 @@ namespace Portal.Pages.DbAssessment
             private set => _userFullName = value;
         }
 
-        public _CommentsModel(WorkflowDbContext dbContext, ICommentsHelper commentsHelper, IUserIdentityService userIdentityService)
+        public _CommentsModel(WorkflowDbContext dbContext, ICommentsHelper commentsHelper, IAdDirectoryService adDirectoryService)
         {
             _dbContext = dbContext;
             _commentsHelper = commentsHelper;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
         }
 
         public async Task OnGetAsync(int processId)
@@ -46,7 +46,7 @@ namespace Portal.Pages.DbAssessment
         {
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(c => c.ProcessId == ProcessId);
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             await _commentsHelper.AddComment(newCommentMessage,
                 ProcessId,

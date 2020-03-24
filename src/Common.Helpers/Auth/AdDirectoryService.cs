@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.Graph;
+using Microsoft.Graph.Auth;
+using Polly;
+
+namespace Common.Helpers.Auth
+{
+    public class AdDirectoryService : IAdDirectoryService
+    {
+        private GraphServiceClient GraphClient { get; }
+
+        public AdDirectoryService(string clientAzureAdSecret, string azureAdClientId, string tenantId,
+            Uri landingPageUrl, IHttpProvider httpProvider)
+        {
+            var redirectUri = string.Concat(landingPageUrl, "signin-oidc");
+
+            var authenticationProvider =
+                new MsalAuthenticationProvider(azureAdClientId, clientAzureAdSecret, tenantId, redirectUri);
+
+            GraphClient = new GraphServiceClient(authenticationProvider, httpProvider);
+
+        }
+
+        /// <summary>
+        /// Get all AD users in an AD group.
+        /// </summary>
+        public async Task<IEnumerable<DirectoryObject>> GetGroupMembersFromAdAsync(Guid groupGuid)
+        {
+            var users = new List<DirectoryObject>();
+
+            // Retries 3 times at 2, 4 and 6 seconds
+            var result = await Policy.Handle<Exception>()
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2))
+                .ExecuteAndCaptureAsync(async () =>
+                {
+                    users.Clear();
+                    var membersPage = await GraphClient.Groups[groupGuid.ToString()].Members.Request().GetAsync();
+                    users.AddRange(membersPage?.CurrentPage);
+
+                    while (membersPage?.NextPageRequest != null)
+                    {
+                        membersPage = await membersPage.NextPageRequest.GetAsync();
+                        users.AddRange(membersPage?.CurrentPage);
+                    }
+                });
+
+            if (result.Outcome == OutcomeType.Failure)
+            {
+                throw new ApplicationException($"Failed to connect to Graph API for group: {groupGuid}",
+                    result.FinalException);
+            }
+
+            if (!users.Any())
+            {
+                throw new ApplicationException($"No results returned for members of group: {groupGuid}.");
+            }
+
+            return users;
+        }
+
+        /// <summary>
+        /// Get all AD users from a collection of AD groups.
+        /// </summary>
+        public async Task<IEnumerable<(string DisplayName, string ActiveDirectorySid)>> GetGroupMembersFromAdAsync(
+            IEnumerable<Guid> adGroupGuids)
+        {
+            if (adGroupGuids == null) throw new ApplicationException($"{nameof(adGroupGuids)} cannot be null.");
+
+            var users = new List<DirectoryObject>();
+
+            try
+            {
+                foreach (var groupId in adGroupGuids)
+                {
+                    users.AddRange(await GetGroupMembersFromAdAsync(groupId));
+                }
+
+                return users.Select(o => (((User)o).DisplayName, ((User)o).Id))
+                    .OrderBy(s => s.DisplayName).Distinct();
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException("Failed to retrieve group members. See inner exception(s).", e);
+            }
+        }
+
+        // Not sure how to get site user's name without Graph call yet
+        public async Task<string> GetFullNameForUserAsync(ClaimsPrincipal user)
+        {
+            var graphUser = user.ToGraphUserAccount();
+
+            var graphResult = await GraphClient.Users[graphUser.ObjectId].Request().GetAsync();
+            return graphResult.DisplayName;
+        }
+    }
+}

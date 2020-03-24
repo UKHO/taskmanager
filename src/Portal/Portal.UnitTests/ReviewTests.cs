@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Common.Helpers.Auth;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,8 @@ namespace Portal.UnitTests
         private HpdDbContext _hpDbContext;
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
-        private IUserIdentityService _fakeUserIdentityService;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private IPortalUserDbService _fakePortalUserDbService;
         private ILogger<ReviewModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
@@ -47,7 +49,6 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
 
             ProcessId = 123;
 
@@ -89,16 +90,17 @@ namespace Portal.UnitTests
 
             _hpDbContext = new HpdDbContext(hpdDbContextOptions);
 
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger, _pageValidationHelper);
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
         }
 
         [TearDown]
@@ -293,7 +295,7 @@ namespace Portal.UnitTests
             var primaryAssignTaskNote = "Testing primary";
 
             _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient,
-                _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService, _fakeLogger,
+                _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger,
                 _fakepageValidationHelper)
             {
                 PrimaryAssignedTask = new DbAssessmentReviewData
@@ -310,12 +312,12 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("This Use"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -348,7 +350,7 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("This Use"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -379,7 +381,7 @@ namespace Portal.UnitTests
                 Assessor = "Test User"
             };
             _reviewModel.Reviewer = "Invalid User";
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("Invalid User")).Returns(false);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Invalid User")).Returns(false);
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
@@ -466,7 +468,7 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A.Dummy<string>())).MustNotHaveHappened();
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A.Dummy<string>())).MustNotHaveHappened();
         }
 
 
@@ -491,7 +493,7 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Save");
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A.Dummy<string>())).MustNotHaveHappened();
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A.Dummy<string>())).MustNotHaveHappened();
         }
 
 
@@ -514,7 +516,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(false);
 
             _reviewModel.Ion = "Ion";
@@ -568,7 +570,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_empty_team_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
@@ -625,12 +627,12 @@ namespace Portal.UnitTests
             row.Reviewer = "";
             await _dbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("This Use"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -664,12 +666,12 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -683,7 +685,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -699,13 +701,13 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -727,7 +729,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeUserIdentityService,
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -743,13 +745,13 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -768,7 +770,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -784,13 +786,13 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -812,7 +814,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeUserIdentityService,
+            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -828,13 +830,13 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);

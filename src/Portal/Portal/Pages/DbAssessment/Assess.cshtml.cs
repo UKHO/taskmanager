@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Portal.Auth;
 using Portal.Configuration;
 using Portal.Extensions;
 using Portal.Helpers;
@@ -31,7 +31,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
         private readonly ICommentsHelper _commentsHelper;
-        private readonly IUserIdentityService _userIdentityService;
+        private readonly IAdDirectoryService _adDirectoryService;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
@@ -101,7 +101,7 @@ namespace Portal.Pages.DbAssessment
             IEventServiceApiClient eventServiceApiClient,
             ILogger<AssessModel> logger,
             ICommentsHelper commentsHelper,
-            IUserIdentityService userIdentityService,
+            IAdDirectoryService adDirectoryService,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
             IOptions<GeneralConfig> generalConfig)
@@ -112,7 +112,7 @@ namespace Portal.Pages.DbAssessment
             _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
             _commentsHelper = commentsHelper;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
@@ -139,7 +139,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -328,7 +328,7 @@ namespace Portal.Pages.DbAssessment
                 CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
                 ProcessId = processId,
                 FromActivity = WorkflowStage.Assess,
-                ToActivity= WorkflowStage.Verify
+                ToActivity = WorkflowStage.Verify
             };
 
             LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
@@ -437,7 +437,7 @@ namespace Portal.Pages.DbAssessment
             }
 
         }
-        
+
         private async Task UpdateDataImpact(int processId)
         {
             var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
@@ -460,7 +460,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateOnHold(int processId, bool onHold)
         {
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             if (onHold)
             {

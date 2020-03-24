@@ -1,4 +1,6 @@
-﻿using FakeItEasy;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,8 +10,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
 {
@@ -19,9 +19,8 @@ namespace NCNEPortal.UnitTests
         private NcneWorkflowDbContext _dbContext;
         private NewTaskModel _newTaskModel;
         private ILogger<NewTaskModel> _fakeLogger;
-        private IUserIdentityService _fakeUserIdentityService;
+        private INcneUserDbService _fakencneUserDbService;
         private IMilestoneCalculator _milestoneCalculator;
-        private IDirectoryService _fakeDirectoryService;
         private IPageValidationHelper _fakePageValidationHelper;
         private IStageTypeFactory _fakeStageTypeFactory;
         private int ProcessId { get; set; }
@@ -38,15 +37,12 @@ namespace NCNEPortal.UnitTests
 
             ProcessId = 123;
 
-
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
-            _fakeDirectoryService = A.Fake<IDirectoryService>();
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _fakeLogger = A.Fake<ILogger<NewTaskModel>>();
 
             _fakeStageTypeFactory = A.Fake<IStageTypeFactory>();
 
-            _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakeUserIdentityService, _fakeDirectoryService, _fakeStageTypeFactory, _fakePageValidationHelper);
+            _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakencneUserDbService, _fakeStageTypeFactory, _fakePageValidationHelper);
         }
 
         [Test]

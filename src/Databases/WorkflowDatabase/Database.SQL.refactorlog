@@ -252,11 +252,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CreatedBy" />
   </Operation>
-  <Operation Name="Rename Refactor" Key="623a5286-19aa-4fbb-92bb-5df4248b9922" ChangeDateTime="03/20/2020 14:26:05">
-    <Property Name="ElementName" Value="[dbo].[DataImpact].[Verified]" />
+  <Operation Name="Rename Refactor" Key="78d61162-6883-4ef1-9bb1-e1c0a8e4b983" ChangeDateTime="03/17/2020 09:32:37">
+    <Property Name="ElementName" Value="[dbo].[Users].[DisplayNamr]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DataImpact]" />
+    <Property Name="ParentElementName" Value="[dbo].[Users]" />
     <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="FeaturesVerified" />
+    <Property Name="NewName" Value="DisplayName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8b3a78dd-57c7-484c-8903-615aae5de4f9" ChangeDateTime="03/17/2020 09:38:45">
+    <Property Name="ElementName" Value="[dbo].[Users].[ActiveDirectoryId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Users]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ActiveDirectorySid" />
   </Operation>
 </Operations>

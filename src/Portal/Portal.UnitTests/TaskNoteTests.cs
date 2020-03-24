@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using FakeItEasy;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,10 +25,9 @@ namespace Portal.UnitTests
         private WorkflowDbContext _dbContext;
         private IndexModel _indexModel;
         private int ProcessId { get; set; }
-        private IHttpContextAccessor _fakeHttpContextAccessor;
         private IMapper _mapper;
-        private IUserIdentityService _fakeUserIdentityService;
-        private IDirectoryService _fakeDirectoryService;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private IPortalUserDbService _fakePortalUserDbService;
         private ILogger<IndexModel> _fakeLogger;
         private IIndexFacade _fakeIndexFacade;
         private ICarisProjectHelper _fakeCarisProjectHelper;
@@ -43,13 +42,13 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
-            _fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
 
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             _mapper = mappingConfig.CreateMapper();
 
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
-            _fakeDirectoryService = A.Dummy<IDirectoryService>();
+            _fakeAdDirectoryService = A.Dummy<IAdDirectoryService>();
+            _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
+
             _fakeLogger = A.Dummy<ILogger<IndexModel>>();
             _fakeIndexFacade = A.Fake<IIndexFacade>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
@@ -100,8 +99,8 @@ namespace Portal.UnitTests
 
             _indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService,
-                _fakeDirectoryService,
+                _fakeAdDirectoryService,
+                _fakePortalUserDbService,
                 _fakeLogger,
                 _fakeIndexFacade,
                 _fakeCarisProjectHelper,
@@ -127,7 +126,7 @@ namespace Portal.UnitTests
                 LastModified = DateTime.Now,
                 LastModifiedByUsername = "Tests"
             };
-           
+
 
             await _indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
 
@@ -181,8 +180,8 @@ namespace Portal.UnitTests
 
             _indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService, 
-                _fakeDirectoryService, 
+                _fakeAdDirectoryService,
+                _fakePortalUserDbService,
                 _fakeLogger,
                 _fakeIndexFacade,
                 _fakeCarisProjectHelper,
@@ -222,8 +221,8 @@ namespace Portal.UnitTests
 
             _indexModel = new IndexModel(_dbContext,
                 _mapper,
-                _fakeUserIdentityService, 
-                _fakeDirectoryService, 
+                _fakeAdDirectoryService,
+                _fakePortalUserDbService,
                 _fakeLogger,
                 _fakeIndexFacade,
                 _fakeCarisProjectHelper,

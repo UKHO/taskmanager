@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
@@ -9,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using NCNEPortal.Auth;
@@ -19,8 +22,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
-using System.Collections.Generic;
-using System.Globalization;
 
 
 namespace NCNEPortal
@@ -72,24 +73,22 @@ namespace NCNEPortal
             Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("ncneportal").Bind(startupConfig);
 
-
-
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
-            services.AddScoped<IUserIdentityService,
-                UserIdentityService>(s => new UserIdentityService(s.GetService<IOptions<SecretsConfig>>(),
-                s.GetService<IOptions<GeneralConfig>>(),
-                s.GetService<IOptions<UriConfig>>(),
-                isLocalDevelopment,
-                s.GetService<HttpProvider>()));
-            services.AddScoped<IDirectoryService,
-                DirectoryService>(s => new DirectoryService(s.GetService<IOptions<SecretsConfig>>(),
-                s.GetService<IOptions<GeneralConfig>>(),
-                s.GetService<IOptions<UriConfig>>(),
-                isLocalDevelopment,
-                s.GetService<HttpProvider>(),
-                s.GetService<ILogger<DirectoryService>>()));
 
+            services.AddScoped<IAdDirectoryService,
+                AdDirectoryService>(s => new AdDirectoryService(
+                s.GetService<IOptions<SecretsConfig>>().Value.ClientAzureAdSecret,
+                s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
+                s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
+                isLocalDevelopment
+                    ? s.GetService<IOptions<UriConfig>>().Value.NcneLocalDevLandingPageHttpsUrl
+                    : s.GetService<IOptions<UriConfig>>().Value.NcneLandingPageUrl,
+                s.GetService<HttpProvider>()));
+
+
+            services.AddScoped<INcneUserDbService,
+                NcneUserDbService>(s => new NcneUserDbService(s.GetService<NcneWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
             services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
@@ -133,6 +132,25 @@ namespace NCNEPortal
                 }
             }
 
+            using (var sp = services.BuildServiceProvider())
+            {
+                var adUserService = sp.GetRequiredService<INcneUserDbService>();
+
+                try
+                {
+                    var adGroupGuids = new List<Guid>
+                    {
+                        sp.GetService<IOptions<SecretsConfig>>().Value.NcGuid,
+                        sp.GetService<IOptions<SecretsConfig>>().Value.NeGuid
+                    };
+
+                    adUserService.UpdateDbFromAdAsync(adGroupGuids);
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
+                }
+            }
 
 
             var startupSecretConfig = new StartupSecretsConfig();

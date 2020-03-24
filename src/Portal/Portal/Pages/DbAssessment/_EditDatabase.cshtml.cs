@@ -6,12 +6,12 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
@@ -27,7 +27,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly ILogger<_EditDatabaseModel> _logger;
         private readonly IOptions<GeneralConfig> _generalConfig;
-        private IUserIdentityService _userIdentityService;
+        private IAdDirectoryService _adDirectoryService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly ICarisProjectNameGenerator _carisProjectNameGenerator;
@@ -58,7 +58,7 @@ namespace Portal.Pages.DbAssessment
 
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
-            IUserIdentityService userIdentityService,
+            IAdDirectoryService adDirectoryService,
             ISessionFileGenerator sessionFileGenerator,
             ICarisProjectHelper carisProjectHelper,
             ICarisProjectNameGenerator carisProjectNameGenerator)
@@ -66,7 +66,7 @@ namespace Portal.Pages.DbAssessment
             _dbContext = dbContext;
             _logger = logger;
             _generalConfig = generalConfig;
-            _userIdentityService = userIdentityService;
+            _adDirectoryService = adDirectoryService;
             _sessionFileGenerator = sessionFileGenerator;
             _carisProjectHelper = carisProjectHelper;
             _carisProjectNameGenerator = carisProjectNameGenerator;
@@ -102,7 +102,7 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -144,7 +144,7 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
-            UserFullName = await _userIdentityService.GetFullNameForUser(this.User);
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
@@ -334,7 +334,7 @@ namespace Portal.Pages.DbAssessment
                     await _dbContext.AssessmentData.SingleAsync(ad => ad.ProcessId == processId);
                 var parsedRsdraNumber = assessmentData.ParsedRsdraNumber;
                 var sourceDocumentName = assessmentData.SourceDocumentName;
-                
+
                 ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
                 return;
             }

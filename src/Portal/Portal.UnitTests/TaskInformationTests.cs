@@ -46,7 +46,7 @@ namespace Portal.UnitTests
 
 
             _taskInformationModel =
-                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, null, _taskDataHelper, generalConfigOptionsSnapshot)
+                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, _taskDataHelper, generalConfigOptionsSnapshot)
                 { ProcessId = ProcessId };
         }
 

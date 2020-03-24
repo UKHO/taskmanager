@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Helpers.Auth;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +31,8 @@ namespace Portal.UnitTests
         private ILogger<AssessModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
-        private IUserIdentityService _fakeUserIdentityService;
-        private ICommentsHelper _commentsHelper;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private IPortalUserDbService _fakePortalUserDbService; private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakePageValidationHelper;
@@ -77,7 +78,7 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 ImpactedProduct = "",
-                ProductActionType = new ProductActionType {Name = "Test"},
+                ProductActionType = new ProductActionType { Name = "Test" },
                 Verified = false
             });
 
@@ -103,14 +104,15 @@ namespace Portal.UnitTests
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
-            _fakeUserIdentityService = A.Fake<IUserIdentityService>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeUserIdentityService);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
         }
 
         [TearDown]
@@ -123,10 +125,10 @@ namespace Portal.UnitTests
         public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_assessor_results_in_validation_error_message()
         {
             _hpDbContext.CarisProducts.Add(new CarisProduct()
-                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "";
@@ -134,7 +136,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "";
             _assessModel.TaskType = "";
             _assessModel.Team = "";
-            
+
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -167,7 +169,7 @@ namespace Portal.UnitTests
             _assessModel.Verifier = "";
             _assessModel.DataImpacts = new List<DataImpact>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(true);
 
 
@@ -190,7 +192,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "";
             _assessModel.DataImpacts = new List<DataImpact>();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Save");
@@ -202,7 +204,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -236,11 +238,11 @@ namespace Portal.UnitTests
         {
 
             _hpDbContext.CarisProducts.Add(new CarisProduct()
-                {ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC"});
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -269,10 +271,10 @@ namespace Portal.UnitTests
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
             _hpDbContext.CarisProducts.Add(new CarisProduct()
-                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
             _assessModel.Ion = "Ion";
@@ -294,14 +296,14 @@ namespace Portal.UnitTests
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
         }
-        
+
         [Test]
         public async Task Test_entering_invalid_username_for_assessor_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("KnownUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("KnownUser"))
                 .Returns(true);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(false);
 
             _assessModel.Ion = "Ion";
@@ -321,10 +323,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("KnownUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("KnownUser"))
                 .Returns(true);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser("TestUser"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(false);
 
             _assessModel.Ion = "Ion";
@@ -344,7 +346,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
         {
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("This User"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
@@ -361,7 +363,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
         {
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
@@ -375,10 +377,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService, 
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -389,7 +391,7 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
@@ -410,10 +412,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeUserIdentityService,
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -424,7 +426,7 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
@@ -454,10 +456,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeUserIdentityService,
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -468,7 +470,7 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
                 .Returns(true);
@@ -489,10 +491,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeUserIdentityService,
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
-            
-            A.CallTo(() => _fakeUserIdentityService.ValidateUser(A<string>.Ignored))
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
             _assessModel.Team = "Home Waters";
@@ -503,7 +505,7 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeUserIdentityService.GetFullNameForUser(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
