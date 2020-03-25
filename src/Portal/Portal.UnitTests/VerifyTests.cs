@@ -314,7 +314,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_dataimpacts_then_validation_error_message_is_present()
+        public async Task Test_OnPostDoneAsync_given_action_done_and_features_unverified_on_dataimpacts_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
@@ -365,6 +365,40 @@ namespace Portal.UnitTests
             Assert.Contains("Data Impact: All Usages Features must be verified", _verifyModel.ValidationErrorMessages);
         }
 
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_features_on_empty_dataimpacts_then_no_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+            
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.False(_verifyModel.ValidationErrorMessages.Contains("Data Impact: All Usages Features must be verified"));
+        }
 
         [Test]
         public async Task Test_entering_empty_team_results_in_validation_error_message()
@@ -537,12 +571,6 @@ namespace Portal.UnitTests
 
             });
 
-            _dbContext.AssessmentData.Add(new AssessmentData()
-            {
-                AssessmentDataId = 1,
-                ProcessId = ProcessId
-            });
-
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = ProcessId,
@@ -566,9 +594,22 @@ namespace Portal.UnitTests
             A.CallTo(() => _pageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
-                                                                                A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<ProductAction>>.Ignored, 
+                                                                                A<List<DataImpact>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<string>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored))
                                                             .MustNotHaveHappened();
 
+            A.CallTo(() => _pageValidationHelper.CheckVerifyPageForWarnings(A<string>.Ignored,
+                                                                                        A<WorkflowInstance>.Ignored, 
+                                                                                        A<List<DataImpact>>.Ignored, 
+                                                                                        A<List<string>>.Ignored))
+                                                            .MustNotHaveHappened();
+            
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
                                                                                 A<int>.Ignored,
                                                                                 A<string>.Ignored,
@@ -602,8 +643,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
-            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-            //    .Returns(true);
+
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -635,8 +675,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
-            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-            //    .Returns(true);
+
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
@@ -677,8 +716,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
-            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
-            //    .Returns(true);
+
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
@@ -710,8 +748,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
-            //A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-            //    .Returns(true);
+
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 

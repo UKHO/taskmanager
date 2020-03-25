@@ -278,10 +278,10 @@ namespace Portal.Pages.DbAssessment
 
                 ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
 
-                return true;
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)

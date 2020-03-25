@@ -5,8 +5,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
+using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -531,6 +533,178 @@ namespace Portal.UnitTests
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
                 c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_features_unsubmitted_on_dataimpacts_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+            
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            var hpdUsage1 = new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "HpdUsageName1"
+            };
+            var hpdUsage2 = new HpdUsage()
+            {
+                HpdUsageId = 2,
+                Name = "HpdUsageName2"
+            };
+            _assessModel.DataImpacts = new List<DataImpact>()
+            {
+                new DataImpact() { DataImpactId = 1, HpdUsageId = 1, HpdUsage = hpdUsage1, ProcessId = 123},
+                new DataImpact() {DataImpactId = 2, HpdUsageId = 2, HpdUsage = hpdUsage2, ProcessId = 123}
+            };
+
+            _assessModel.Team = "Home Waters";
+
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Data Impact: All Usages Features must be submitted", _assessModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_unsubmitted_features_on_empty_dataimpacts_then_no_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.False(_assessModel.ValidationErrorMessages.Contains("Data Impact: All Usages Features must be submitted"));
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_confirmedDone_must_not_run_validation()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Team = "Home Waters";
+
+            _assessModel.Verifier = "TestUser";
+
+            _assessModel.RecordProductAction = new List<ProductAction>();
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            var childProcessId = 555;
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = childProcessId,
+                ActivityName = "Assess",
+                SerialNumber = "555_456",
+                ParentProcessId = ProcessId,
+                Status = WorkflowStatus.Started.ToString()
+
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            _pageValidationHelper = A.Fake<IPageValidationHelper>();
+
+            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            await _assessModel.OnPostDoneAsync(ProcessId, "ConfirmedDone");
+
+            // Assert
+            A.CallTo(() => _pageValidationHelper.CheckAssessPageForErrors(A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<ProductAction>>.Ignored,
+                                                                                A<List<DataImpact>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<string>>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored))
+                                                            .MustNotHaveHappened();
+
+            A.CallTo(() => _pageValidationHelper.CheckAssessPageForWarnings(A<string>.Ignored,
+                                                                                        A<List<DataImpact>>.Ignored,
+                                                                                        A<List<string>>.Ignored))
+                                                            .MustNotHaveHappened();
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
+                                                                                A<int>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<string>
+                                                                                    .Ignored))
+                                                            .MustHaveHappened();
+
+            A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
+                                                                                nameof(PersistWorkflowInstanceDataEvent),
+                                                                                A<PersistWorkflowInstanceDataEvent>.Ignored))
+                                                            .MustHaveHappened();
         }
     }
 }
