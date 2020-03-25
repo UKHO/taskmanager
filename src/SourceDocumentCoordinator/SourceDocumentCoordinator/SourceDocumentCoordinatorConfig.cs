@@ -42,6 +42,10 @@ namespace SourceDocumentCoordinator
                 assembly: typeof(InitiateSourceDocumentRetrievalEvent).Assembly,
                 publisherEndpoint: nsbConfig.EventServiceName);
 
+            routing.RegisterPublisher(
+                assembly: typeof(InitiateSourceDocumentRetrievalEvent).Assembly,
+                publisherEndpoint: nsbConfig.WorkflowCoordinatorName);
+
             // Persistence
 
             var persistence = this.UsePersistence<SqlPersistence>();
@@ -62,6 +66,9 @@ namespace SourceDocumentCoordinator
                 }
             });
             persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
+
+            this.AuditProcessedMessagesTo("audit", TimeSpan.FromMinutes(10));
+            this.SendFailedMessagesTo("error");
 
             // Additional config
 

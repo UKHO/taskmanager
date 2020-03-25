@@ -45,7 +45,7 @@ namespace SourceDocumentCoordinator.Sagas
         public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
-            LogContext.PushProperty("CorrelationId", message.CorrelationId);
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
             LogContext.PushProperty("EventName", nameof(InitiateSourceDocumentRetrievalEvent));
             LogContext.PushProperty("ProcessId", 0);
 
