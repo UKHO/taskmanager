@@ -144,7 +144,7 @@ namespace NCNEPortal
                         sp.GetService<IOptions<SecretsConfig>>().Value.NeGuid
                     };
 
-                    adUserService.UpdateDbFromAdAsync(adGroupGuids);
+                    adUserService.UpdateDbFromAdAsync(adGroupGuids).Wait();
                 }
                 catch (Exception e)
                 {
