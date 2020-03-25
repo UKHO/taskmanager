@@ -172,7 +172,7 @@ namespace Portal.Pages.DbAssessment
                                                                     processId,
                                                                     linkedSdocId, null, null,
                                                                     SourceDocumentRetrievalStatus.Started,
-                                                                    SourceType.Linked);
+                                                                    SourceType.Linked, correlationId);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
@@ -213,7 +213,7 @@ namespace Portal.Pages.DbAssessment
                 processId,
                 sdocId, docName, docType,
                 SourceDocumentRetrievalStatus.Started,
-                SourceType.Database);
+                SourceType.Database, correlationId);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
