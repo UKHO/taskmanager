@@ -1,17 +1,17 @@
 ﻿using System;
-using NCNEPortal.TestAutomation.Framework.Configs;
+using Common.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace NCNEPortal.TestAutomation.Framework.Pages
+namespace Common.TestAutomation.Framework.Pages
 {
     public class MicrosoftAuthPage : PageBase
     {
-        private readonly LandingPage _landingPage;
+        private readonly ILandingPage _landingPage;
         private readonly SecretsConfig _secretsConfig;
 
         public MicrosoftAuthPage(IWebDriver driver, WebDriverWait wait, SecretsConfig secretsConfig,
-            LandingPage landingPage) : base(driver, wait, null)
+            ILandingPage landingPage) : base(driver, wait, null)
         {
             _secretsConfig = secretsConfig;
             _landingPage = landingPage;

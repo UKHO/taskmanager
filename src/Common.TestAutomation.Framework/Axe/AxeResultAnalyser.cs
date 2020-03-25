@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Text;
-using NCNEPortal.AccessibilityTests.AxeModel;
+using Common.TestAutomation.Framework.Axe.AxeModel;
 using NUnit.Framework;
 
-namespace NCNEPortal.AccessibilityTests
+namespace Common.TestAutomation.Framework.Axe
 {
     public class AxeResultAnalyser
     {

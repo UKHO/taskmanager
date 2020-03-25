@@ -7,11 +7,11 @@
   <ItemGroup>
     <PackageReference Include="Selenium.Support" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
-    <PackageReference Include="SpecFlow" Version="3.1.82" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\Common.TestAutomation.Framework\Common.TestAutomation.Framework.csproj" />
   </ItemGroup>
 
 </Project>

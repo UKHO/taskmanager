@@ -1,5 +1,6 @@
 ﻿using System;
 using Common.Helpers;
+using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;

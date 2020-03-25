@@ -1,4 +1,4 @@
-﻿namespace NCNEPortal.TestAutomation.Framework.Configs
+﻿namespace Common.TestAutomation.Framework.Configs
 {
     public class SecretsConfig
     {

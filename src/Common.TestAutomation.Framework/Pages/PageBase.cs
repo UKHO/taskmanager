@@ -2,7 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace NCNEPortal.TestAutomation.Framework.Pages
+namespace Common.TestAutomation.Framework.Pages
 {
     public abstract class PageBase
     {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using BoDi;
-using NCNEPortal.TestAutomation.Framework.Pages;
+using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 
-namespace NCNEPortal.TestAutomation.Framework
+namespace Common.TestAutomation.Framework
 {
     [Binding]
     public sealed class WebDriverSupport : IDisposable
@@ -59,7 +59,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _skipLogin = true;
         }
 
-        [BeforeScenario(Order = 3)]
+        [BeforeScenario(Order = 4)]
         public void SetLoginCookies()
         {
             if (_skipLogin)

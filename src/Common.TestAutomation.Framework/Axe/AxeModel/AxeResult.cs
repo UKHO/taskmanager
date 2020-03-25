@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
-namespace NCNEPortal.AccessibilityTests.AxeModel
+namespace Common.TestAutomation.Framework.Axe.AxeModel
 {
     public class AxeResult
     {

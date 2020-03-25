@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NCNEPortal.AccessibilityTests.AxeModel
+namespace Common.TestAutomation.Framework.Axe.AxeModel
 {
     public class AxeResultNode
     {

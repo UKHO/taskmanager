@@ -1,9 +1,10 @@
+using System;
 using System.IO;
-using NCNEPortal.AccessibilityTests.AxeModel;
+using Common.TestAutomation.Framework.Axe.AxeModel;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 
-namespace NCNEPortal.AccessibilityTests
+namespace Common.TestAutomation.Framework.Axe
 {
     public class AxePageEvaluator
     {
@@ -14,13 +15,14 @@ namespace NCNEPortal.AccessibilityTests
         {
             _javaScriptExecutor = javaScriptExecutor;
 
-            var testsDllDirectory = new DirectoryInfo(Path.GetDirectoryName(GetType().Assembly.Location));
-            var pathToAxeLibrary = Path.Combine(
-                testsDllDirectory.Parent.Parent.Parent.FullName,
-                "node_modules",
-                "axe-core",
-                "axe.min.js");
-            _jsToIncludeAxeLibrary = File.ReadAllText(pathToAxeLibrary);
+            var axeMinJsResourceLocation = "Common.TestAutomation.Framework.node_modules.axe_core.axe.min.js";
+            using (var manifestResourceStream = GetType().Assembly.GetManifestResourceStream(axeMinJsResourceLocation))
+            {
+                using (var sr = new StreamReader(manifestResourceStream ?? throw new ApplicationException("axe.min.js not found")))
+                {
+                    _jsToIncludeAxeLibrary = sr.ReadToEnd();
+                }
+            }
         }
 
         public AxeResult GetAxeResults()

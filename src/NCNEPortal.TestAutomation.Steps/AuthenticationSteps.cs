@@ -1,4 +1,5 @@
-﻿using NCNEPortal.TestAutomation.Framework.Pages;
+﻿using Common.TestAutomation.Framework.Pages;
+using NCNEPortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 

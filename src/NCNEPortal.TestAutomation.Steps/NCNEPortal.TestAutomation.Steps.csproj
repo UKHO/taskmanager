@@ -11,10 +11,10 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="SpecFlow" Version="3.1.82" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.82" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.TestAutomation.Framework\Common.TestAutomation.Framework.csproj" />
     <ProjectReference Include="..\NCNEPortal.TestAutomation.Framework\NCNEPortal.TestAutomation.Framework.csproj" />
   </ItemGroup>
 

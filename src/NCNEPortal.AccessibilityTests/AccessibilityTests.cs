@@ -1,5 +1,7 @@
 using System;
 using BoDi;
+using Common.TestAutomation.Framework;
+using Common.TestAutomation.Framework.Axe;
 using NCNEPortal.TestAutomation.Framework;
 using NCNEPortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;

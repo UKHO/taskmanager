@@ -11,15 +11,10 @@
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.TestAutomation.Framework\Common.TestAutomation.Framework.csproj" />
     <ProjectReference Include="..\NCNEPortal.TestAutomation.Framework\NCNEPortal.TestAutomation.Framework.csproj" />
   </ItemGroup>
-
-  <Target Name="InstallPackages" BeforeTargets="BeforeBuild">
-    <Message Importance="high" Text="*** Installing npm packages ***" />
-    <Exec Command="npm install axe-core" ContinueOnError="false" />
-  </Target>
 </Project>
