@@ -190,7 +190,7 @@ namespace Portal
                         sp.GetService<IOptions<SecretsConfig>>().Value.HDTGuid
                     };
 
-                    adUserService.UpdateDbFromAdAsync(adGroupGuids);
+                    adUserService.UpdateDbFromAdAsync(adGroupGuids).Wait();
                 }
                 catch (Exception e)
                 {
