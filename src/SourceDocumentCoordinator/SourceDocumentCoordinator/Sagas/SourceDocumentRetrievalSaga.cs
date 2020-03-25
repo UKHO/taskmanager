@@ -136,7 +136,7 @@ namespace SourceDocumentCoordinator.Sagas
                 case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
                     await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, 
-                        null, null, SourceDocumentRetrievalStatus.Ready, Data.SourceType, null);
+                        null, null, SourceDocumentRetrievalStatus.Ready, Data.SourceType, message.CorrelationId);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
@@ -199,16 +199,5 @@ namespace SourceDocumentCoordinator.Sagas
                                                       $"{sourceDocument.Code}");
             }
         }
-
-        //private void UpdateSourceDocumentStatus(GetDocumentRequestQueueStatusCommand message)
-        //{
-        //    var primaryDocumentStatus =
-        //        _dbContext.PrimaryDocumentStatus.FirstOrDefault(s => s.SdocId == message.SourceDocumentId);
-        //    if (primaryDocumentStatus != null)
-        //    {
-        //        primaryDocumentStatus.Status = SourceDocumentRetrievalStatus.Ready.ToString();
-        //        _dbContext.SaveChanges();
-        //    }
-        //}
     }
 }
