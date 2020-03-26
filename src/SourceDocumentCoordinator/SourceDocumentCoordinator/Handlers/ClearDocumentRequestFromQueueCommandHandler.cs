@@ -48,7 +48,7 @@ namespace SourceDocumentCoordinator.Handlers
                                                     message.ProcessId, 
                                                     message.SourceDocumentId, null, null, 
                                                     SourceDocumentRetrievalStatus.Complete, 
-                                                    message.SourceType);
+                                                    message.SourceType, message.CorrelationId);
                         break;
                     default:
                         throw new NotImplementedException();

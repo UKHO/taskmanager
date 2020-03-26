@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
  <ItemGroup>
+   <None Remove="Data\AdUsers.json" />
    <None Remove="Data\AssignedTaskType.json" />
    <None Remove="Data\HpdUsages.json" />
    <None Remove="Data\HpdUsers.json" />
@@ -14,6 +15,11 @@
    <None Remove="Data\Users.json" />
  </ItemGroup>
  <ItemGroup>
+   <Content Include="Data\AdUsers.json">
+     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+     <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+   </Content>
    <Content Include="Data\AssignedTaskType.json">
      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

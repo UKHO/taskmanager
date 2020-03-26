@@ -402,6 +402,74 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.IsNotNull(persistDocumentInStoreCommand, $"No message of type {nameof(PersistDocumentInStoreCommand)} seen.");
         }
 
+        [Test]
+        public async Task Test_GetDocumentRequestQueueStatusCommand_Creates_PrimaryDocumentStatus_Row_with_CorrelationId()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+
+            var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId,
+                SourceType = SourceType.Primary
+            };
+
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData
+            {
+                CorrelationId = correlationId,
+                DocumentStatusId = 1,
+                IsStarted = true,
+                SourceDocumentId = sdocId
+            };
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored)).Returns(
+                new QueuedDocumentObjects()
+                {
+                    new QueuedDocumentObject()
+                    {
+                        SodcId = sdocId,
+                        Code = 0
+                    }
+                });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
+
+            //Then
+            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(pds => pds.SdocId == sdocId);
+            Assert.AreEqual(correlationId, row.CorrelationId);
+        }
+
+        [Test]
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Creates_PrimaryDocumentStatus_Row_with_CorrelationId()
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var initiateSourceDocumentRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId,
+                ProcessId = 1
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData
+            {
+                CorrelationId = correlationId,
+                DocumentStatusId = 1,
+                IsStarted = true
+            };
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentForViewing(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new ReturnCode() { Code = 0 });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
+
+            //Then
+            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(pds => pds.SdocId == sdocId);
+            Assert.AreEqual(correlationId, row.CorrelationId);
+        }
+
         private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)
         {
             return new SqlConnection(workflowDbConnectionString)
