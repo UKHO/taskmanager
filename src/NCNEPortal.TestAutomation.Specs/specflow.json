@@ -12,6 +12,9 @@
     },
     {
       "assembly": "NCNEPortal.TestAutomation.Framework"
+    },
+    {
+       "assembly": "Common.TestAutomation.Framework"
     }
   ]
 }

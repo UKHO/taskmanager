@@ -1,46 +1,39 @@
 ﻿using System;
 using Common.Helpers;
+using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class LandingPage
+    public class LandingPage : PageBase, ILandingPage
     {
-        private readonly IWebDriver _driver;
-        private readonly Uri _landingPageUrl;
-        private readonly WebDriverWait _wait;
-
         public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
+            : base(driver,
+                wait,
+                ConfigHelpers.IsAzureDevOpsBuild
+                    ? urlsConfig.NcneLandingPageUrl
+                    : urlsConfig.NcneLocalDevLandingPageUrl)
         {
-            _driver = driver;
-            _wait = wait;
-
-            _landingPageUrl = ConfigHelpers.IsAzureDevOpsBuild
-                ? urlsConfig.NcneLandingPageUrl
-                : urlsConfig.NcneLocalDevLandingPageUrl;
         }
 
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
+        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
 
-        public void NavigateTo()
+        public override bool HasLoaded
         {
-            _driver.Navigate().GoToUrl(_landingPageUrl);
-            _driver.Manage().Window.Maximize();
-        }
-        
-        public bool HasLoaded()
-        {
-            try
+            get
             {
-                _wait.Until(driver => UkhoLogo.Displayed);
-                return true;
-            }
-            catch (NoSuchElementException e)
-            {
-                Console.WriteLine(e);
-                return false;
+                try
+                {
+                    Wait.Until(driver => UkhoLogo.Displayed);
+                    return true;
+                }
+                catch (NoSuchElementException e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
             }
         }
     }

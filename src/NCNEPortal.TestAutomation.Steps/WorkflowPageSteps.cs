@@ -23,7 +23,7 @@ namespace NCNEPortal.TestAutomation.Steps
         [Then(@"The NCNE Workflow page has loaded")]
         public void ThenTheNCNEWorkflowPageHasLoaded()
         {
-            Assert.IsTrue(_workflowPage.HasLoaded());
+            Assert.IsTrue(_workflowPage.HasLoaded);
         }
     }
 }

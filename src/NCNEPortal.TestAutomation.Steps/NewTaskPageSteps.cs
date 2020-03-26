@@ -29,7 +29,7 @@ namespace NCNEPortal.TestAutomation.Steps
         public void ThenTheNCNENewTaskPageHasLoaded()
 
         {
-            Assert.IsTrue(_newtaskPage.HasLoaded());
+            Assert.IsTrue(_newtaskPage.HasLoaded);
         }
     }
 

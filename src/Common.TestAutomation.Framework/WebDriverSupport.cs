@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using BoDi;
-using NCNEPortal.TestAutomation.Framework.Pages;
+using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 
-namespace NCNEPortal.TestAutomation.Framework
+namespace Common.TestAutomation.Framework
 {
     [Binding]
     public sealed class WebDriverSupport : IDisposable
     {
+        private readonly Lazy<MicrosoftAuthPage> _lazyAuthPage;
         private readonly IObjectContainer _objectContainer;
         private bool _skipLogin;
         private IWebDriver _webDriver;
@@ -19,7 +20,10 @@ namespace NCNEPortal.TestAutomation.Framework
         public WebDriverSupport(IObjectContainer objectContainer)
         {
             _objectContainer = objectContainer;
+            _lazyAuthPage = new Lazy<MicrosoftAuthPage>(() => _objectContainer.Resolve<MicrosoftAuthPage>());
         }
+
+        private MicrosoftAuthPage AuthPage => _lazyAuthPage.Value;
 
         public void Dispose()
         {
@@ -36,7 +40,10 @@ namespace NCNEPortal.TestAutomation.Framework
             try
             {
                 _webDriver = new ChromeDriver(chromeDriverDirectory);
+                _webDriver.Manage().Window.Maximize();
+
                 _objectContainer.RegisterInstanceAs(_webDriver);
+                _objectContainer.RegisterInstanceAs((IJavaScriptExecutor)_webDriver);
                 _objectContainer.RegisterInstanceAs(new WebDriverWait(_webDriver, TimeSpan.FromSeconds(10)));
             }
             catch
@@ -52,7 +59,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _skipLogin = true;
         }
 
-        [BeforeScenario(Order = 3)]
+        [BeforeScenario(Order = 4)]
         public void SetLoginCookies()
         {
             if (_skipLogin)
@@ -74,7 +81,7 @@ namespace NCNEPortal.TestAutomation.Framework
         private void RestoreCookies()
         {
             //Need to be on the auth page so we are in the same domain as the cookies
-            GoToAuthPage();
+            AuthPage.NavigateTo();
 
             foreach (var cookie in CookieStore.Cookies)
             {
@@ -90,20 +97,12 @@ namespace NCNEPortal.TestAutomation.Framework
 
         private void DoLogin()
         {
-            GoToAuthPage();
+            AuthPage.NavigateTo();
 
-            var authPage = _objectContainer.Resolve<MicrosoftAuthPage>();
-            if (authPage.HasLoaded)
-                authPage.Login();
+            if (AuthPage.HasLoaded)
+                AuthPage.Login();
             else
                 throw new ApplicationException("Could not get to Microsoft authentication page");
-        }
-
-        private void GoToAuthPage()
-        {
-            //Going to the landing page when not logged in will redirect to the auth page
-            var landingPage = _objectContainer.Resolve<LandingPage>();
-            landingPage.NavigateTo();
         }
 
         [AfterScenario]
@@ -114,7 +113,6 @@ namespace NCNEPortal.TestAutomation.Framework
             _webDriver = null;
         }
     }
-
 
     internal static class CookieStore
     {

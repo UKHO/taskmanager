@@ -1,7 +1,10 @@
 ﻿using BoDi;
 using Common.Helpers;
+using Common.TestAutomation.Framework.Configs;
+using Common.TestAutomation.Framework.Pages;
 using Microsoft.Extensions.Configuration;
 using NCNEPortal.TestAutomation.Framework.Configs;
+using NCNEPortal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 
 namespace NCNEPortal.TestAutomation.Framework
@@ -30,6 +33,12 @@ namespace NCNEPortal.TestAutomation.Framework
 
             _objectContainer.RegisterInstanceAs(secrets);
             _objectContainer.RegisterInstanceAs(urls);
+        }
+
+        [BeforeScenario(Order = 3)]
+        public void RegisterLandingPage()
+        {
+            _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
         }
     }
 }

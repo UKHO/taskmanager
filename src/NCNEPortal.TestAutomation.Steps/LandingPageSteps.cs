@@ -25,7 +25,7 @@ namespace NCNEPortal.TestAutomation.Steps
         [Then(@"I am redirected to the landing page")]
         public void ThenTheLandingPageHasLoaded()
         {
-            Assert.IsTrue(_landingPage.HasLoaded());
+            Assert.IsTrue(_landingPage.HasLoaded);
         }
     }
 }
