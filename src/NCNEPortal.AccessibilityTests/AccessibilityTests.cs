@@ -34,10 +34,11 @@ namespace NCNEPortal.AccessibilityTests
         public void Setup()
         {
             _configSupport.RegisterConfigs();
+            _configSupport.RegisterLandingPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();
-
+            
             _axePageEvaluator = _objectContainer.Resolve<AxePageEvaluator>();
             _axeResultAnalyser = _objectContainer.Resolve<AxeResultAnalyser>();
         }
