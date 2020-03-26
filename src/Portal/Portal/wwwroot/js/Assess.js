@@ -52,7 +52,7 @@
             },
             success: function (result) {
                 formChanged = false;
-                if (action === "Done") {
+                if (action === "Done" || action === "ConfirmedDone") {
                     window.location.replace("/Index");
                 }
             },
