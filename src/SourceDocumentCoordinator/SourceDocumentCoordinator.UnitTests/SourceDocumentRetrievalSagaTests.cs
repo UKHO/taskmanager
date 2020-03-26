@@ -403,7 +403,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_GetDocumentRequestQueueStatusCommand_Creates_PrimaryDocumentStatus_row_with_CorrelationId()
+        public async Task Test_GetDocumentRequestQueueStatusCommand_Creates_PrimaryDocumentStatus_Row_with_CorrelationId()
         {
             // Given
             var sdocId = 1111;
@@ -439,12 +439,11 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(pds => pds.SdocId == sdocId);
-            Assert.IsNotNull(row);
-            Assert.AreEqual(row.CorrelationId, correlationId);
+            Assert.AreEqual(correlationId, row.CorrelationId);
         }
 
         [Test]
-        public async Task Test_InitiateSourceDocumentRetrievalEvent_Creates_PrimaryDocumentStatus_row_with_CorrelationId()
+        public async Task Test_InitiateSourceDocumentRetrievalEvent_Creates_PrimaryDocumentStatus_Row_with_CorrelationId()
         {
             // Given
             var sdocId = 1111;
@@ -467,10 +466,8 @@ namespace SourceDocumentCoordinator.UnitTests
             await _sourceDocumentRetrievalSaga.Handle(initiateSourceDocumentRetrievalEvent, _handlerContext);
 
             //Then
-            //Then
             var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(pds => pds.SdocId == sdocId);
-            Assert.IsNotNull(row);
-            Assert.AreEqual(row.CorrelationId, correlationId);
+            Assert.AreEqual(correlationId, row.CorrelationId);
         }
 
         private SqlConnection SetupWorkflowDatabaseConnection(string workflowDbConnectionString, bool isLocalDebugging, StartupConfig startupConfig)
