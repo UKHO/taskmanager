@@ -613,7 +613,7 @@ namespace Portal.Helpers
                     if (!dataImpacts.All(di => di.FeaturesSubmitted))
                     {
                         validationWarningMessages.Add(
-                            "Data Impact: All Usages Features must be submitted");
+                            "Data Impact: Some Features Submitted are not ticked");
                         return false;
                     }
 
@@ -622,7 +622,7 @@ namespace Portal.Helpers
                     if (!dataImpacts.All(di => di.FeaturesVerified))
                     {
                         validationWarningMessages.Add(
-                            "Data Impact: All Usages Features must be verified");
+                            "Data Impact: Some Features Verified are not ticked");
                         return false;
                     }
 
