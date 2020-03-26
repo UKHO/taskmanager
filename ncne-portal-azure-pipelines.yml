@@ -4,7 +4,7 @@ trigger:
     - features/*
   paths:
     include:
-    - src/NCNEPortal/*
+    - src/NCNEPortal*
     - src/Databases/NCNEWorkflowDatabase.EF/*
     - src/Common*
     - src/HpdDatabase.EF/*    
@@ -15,10 +15,13 @@ pr:
     - master
   paths:
     include:
-    - src/NCNEPortal/*
+    - src/NCNEPortal*
     - src/Databases/NCNEWorkflowDatabase.EF/*
     - src/Common*
     - src/HpdDatabase.EF/*       
+
+variables:
+  MSBUILDSINGLELOADCONTEXT: 1    # This is a workaround for an issue building SpecFlow projects using the .NET Core SDK 3.1.200 https://github.com/SpecFlowOSS/SpecFlow/issues/1912
 
 stages:
 - stage: Build
@@ -143,6 +146,43 @@ stages:
         displayName: 'Publish specs Artifact'
 
 
+    - job: BuildAccessibilityTests
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore AccessibilityTests'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.AccessibilityTests\\NCNEPortal.AccessibilityTests.csproj'
+          feedsToUse: 'select'
+  
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build AccessibilityTests'
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.AccessibilityTests\\NCNEPortal.AccessibilityTests.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish AccessibilityTests'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.AccessibilityTests\\NCNEPortal.AccessibilityTests.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish AccessibilityTests Artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+          ArtifactName: 'AccessibilityTests'
+          publishLocation: 'Container'
+
+
     - job: Publish_Pickles
       pool:
           NautilusBuild
@@ -253,9 +293,8 @@ stages:
       displayName: Deploy ncneportal website
       pool: "UKHO Ubuntu 1804"
         # creates an environment if it doesn't exist
-      environment: 'TaskmanagerUAT'
+      environment: 'TaskmanagerUAT_UI'
       strategy:
-        # default deployment strategy, more coming...
         runOnce:
           deploy:
             steps:
@@ -266,13 +305,60 @@ stages:
                   WebAppName: 'taskmanager-uat-web-ncneportal'
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
 
-    - job: RunAutomatedTests
+
+    - job: RunAutomatedAccessibilityTests
+      displayName: 'Run automated accessibility tests'
+      dependsOn: DeployNCNEPortalWebsiteUAT
+      pool:
+          NautilusBuild
+      steps:
+        - checkout: none
+        - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
+          inputs:
+            targetType: 'inline'
+            script: |
+              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
+              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download Build Artifacts'
+          inputs:
+            buildType: 'current'
+            downloadType: 'specific'
+            downloadPath: '$(System.ArtifactsDirectory)' 
+
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
+        - task: AzureCLI@1
+          displayName: 'Run Accessibility tests'
+          inputs:
+            azureSubscription: 'TaskmanagerUAT-SC'
+            scriptLocation: 'inlineScript'
+            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\AccessibilityTests\NCNEPortal.AccessibilityTests\NCNEPortal.AccessibilityTests.dll --logger:trx'
+
+        - task: PublishTestResults@2
+          displayName: 'Publish Accessibility Test Results'
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'NCNE Portal accessibility tests - $(System.StageName)'
+
+
+    - job: RunAutomatedUITests
       displayName: 'Run automated UI tests'
       dependsOn: DeployNCNEPortalWebsiteUAT
       pool:
           NautilusBuild
       steps:
+        - checkout: none
         - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
           inputs:
             targetType: 'inline'
             script: |
