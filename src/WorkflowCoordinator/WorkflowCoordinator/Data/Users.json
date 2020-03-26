@@ -9,7 +9,7 @@
   },
   {
     "UserId": 3,
-    "Name": "Stu Barzey"
+    "Name": "Stuart Barzey"
   },
   {
     "UserId": 4,
@@ -17,6 +17,22 @@
   },
   {
     "UserId": 5,
-    "Name": "Ross Sandford"
+    "Name": "Rossall Sandford"
+  },
+  {
+    "UserId": 6,
+    "Name": "Samir Hasson"
+  },
+  {
+    "UserId": 7,
+    "Name": "Ben Hall"
+  },
+  {
+    "UserId": 8,
+    "Name": "Bonnie Poole"
+  },
+  {
+    "UserId": 9,
+    "Name": "Benjamin Ilo"
   }
 ]
