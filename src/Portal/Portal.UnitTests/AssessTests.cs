@@ -586,7 +586,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Data Impact: Some Features Submitted are not ticked", _assessModel.ValidationErrorMessages);
+            Assert.Contains("Data Impact: There are incomplete Features Submitted tick boxes.", _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -623,7 +623,7 @@ namespace Portal.UnitTests
 
             Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.False(_assessModel.ValidationErrorMessages.Contains("Data Impact: Some Features Submitted are not ticked"));
+            Assert.False(_assessModel.ValidationErrorMessages.Contains("Data Impact: There are incomplete Features Submitted tick boxes."));
         }
 
         [Test]

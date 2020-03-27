@@ -613,7 +613,7 @@ namespace Portal.Helpers
                     if (!dataImpacts.All(di => di.FeaturesSubmitted))
                     {
                         validationWarningMessages.Add(
-                            "Data Impact: Some Features Submitted are not ticked");
+                            "Data Impact: There are incomplete Features Submitted tick boxes.");
                         return false;
                     }
 
@@ -622,7 +622,7 @@ namespace Portal.Helpers
                     if (!dataImpacts.All(di => di.FeaturesVerified))
                     {
                         validationWarningMessages.Add(
-                            "Data Impact: Some Features Verified are not ticked");
+                            "Data Impact: There are incomplete Features Verified tick boxes.");
                         return false;
                     }
 
