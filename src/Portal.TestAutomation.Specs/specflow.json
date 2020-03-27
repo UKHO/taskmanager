@@ -12,6 +12,9 @@
     },
     {
       "assembly": "Portal.TestAutomation.Framework"
+    },
+    {
+      "assembly": "Common.TestAutomation.Framework"
     }
   ]
 }

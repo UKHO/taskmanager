@@ -12,29 +12,30 @@ namespace Portal.TestAutomation.Steps
     {
         private readonly LandingPage _landingPage;
 
-        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
+        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, LandingPage landingPage)
         {
-            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
+            _landingPage = landingPage;
 
-            _landingPage = new LandingPage(driver, 5);
+            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
         }
 
-        [Given(@"I navigate to the landing page")]
-        public void GivenINavigateToTheLandingPage()
+        [When(@"I navigate to the landing page")]
+        public void WhenINavigateToTheLandingPage()
         {
             _landingPage.NavigateTo();
-        }
-
-        [Then(@"The landing page has loaded")]
-        public void ThenTheLandingPageHasLoaded()
-        {
-            _landingPage.HasLoaded();
         }
 
         [When(@"I enter Process Id of ""(.*)""")]
         public void WhenIEnterProcessIdOf(int processId)
         {
             _landingPage.FilterRowsByProcessIdInGlobalSearch(processId);
+        }
+
+        [Then(@"The landing page has loaded")]
+        [Then(@"I am redirected to the landing page")]
+        public void ThenTheLandingPageHasLoaded()
+        {
+            Assert.IsTrue(_landingPage.HasLoaded);
         }
 
         [Then(@"Task with process id (.*) appears in both the assigned and unassigned tasks tables")]

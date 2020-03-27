@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using NUnit.Framework;
+using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 
@@ -9,10 +10,9 @@ namespace Portal.TestAutomation.Steps
     {
         private readonly VerifyPage _verifyPage;
 
-        public VerifyPageSteps(IWebDriver driver)
+        public VerifyPageSteps(VerifyPage verifyPage)
         {
-            //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
-            _verifyPage = new VerifyPage(driver, 5);
+            _verifyPage = verifyPage;
         }
 
         [Given(@"I navigate to the verify page")]
@@ -24,7 +24,7 @@ namespace Portal.TestAutomation.Steps
         [Then(@"The verify page has loaded")]
         public void ThenTheVerifyPageHasLoaded()
         {
-            _verifyPage.HasLoaded();
+            Assert.IsTrue(_verifyPage.HasLoaded);
         }
     }
 }

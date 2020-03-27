@@ -12,16 +12,15 @@ namespace Portal.TestAutomation.Steps
     public class ReviewPageSteps
     {
         private readonly ReviewPage _reviewPage;
-        private readonly WorkflowDbContext _workflowDbContext;
         private readonly WorkflowInstanceContext _workflowContext;
-        private readonly IWebDriver _driver;
+        private readonly WorkflowDbContext _workflowDbContext;
 
-        public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, WorkflowInstanceContext workflowContext)
+        public ReviewPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext,
+            WorkflowInstanceContext workflowContext, ReviewPage reviewPage)
         {
             _workflowDbContext = workflowDbContext;
             _workflowContext = workflowContext;
-            //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
-            _reviewPage = new ReviewPage(driver, 5);
+            _reviewPage = reviewPage;
         }
 
         [Given(@"I navigate to the review page")]
@@ -41,16 +40,15 @@ namespace Portal.TestAutomation.Steps
         [Then(@"The review page has loaded")]
         public void ThenTheReviewPageHasLoaded()
         {
-            _reviewPage.HasLoaded();
+            Assert.IsTrue(_reviewPage.HasLoaded);
         }
 
         [Then(@"The source document with the corresponding process Id in the database matches the sdocId on the UI")]
         public void ThenTheSourceDocumentWithTheCorrespondingProcessIdInTheDatabaseMatchesTheSdocIdOnTheUI()
         {
-            var sDocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId).PrimarySdocId;
+            var sDocId = _workflowDbContext.AssessmentData.First(x => x.ProcessId == _workflowContext.ProcessId)
+                .PrimarySdocId;
             Assert.IsTrue(_reviewPage.IsSdocIdInDetails(sDocId));
         }
     }
 }
-
-

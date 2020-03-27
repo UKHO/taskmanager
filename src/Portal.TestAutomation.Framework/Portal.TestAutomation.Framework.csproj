@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Helpers\Common.Helpers.csproj" />
+    <ProjectReference Include="..\Common.TestAutomation.Framework\Common.TestAutomation.Framework.csproj" />
     <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
   </ItemGroup>
 

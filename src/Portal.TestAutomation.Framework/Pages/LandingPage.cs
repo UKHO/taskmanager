@@ -2,65 +2,57 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common.Helpers;
-using Microsoft.Extensions.Configuration;
+using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Portal.TestAutomation.Framework.Configuration;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public class LandingPage : BasePage
+    public class LandingPage : PageBase
     {
-        private readonly IWebDriver _driver;
-        private readonly WebDriverWait _wait;
-        private readonly LandingPageConfig _config = new LandingPageConfig();
+        public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
+            : base(driver,
+                wait,
+                ConfigHelpers.IsAzureDevOpsBuild
+                    ? urlsConfig.LandingPageUrl
+                    : urlsConfig.LocalDevLandingPageUrl)
+        {
+        }
 
-        private Uri LandingPageUrl;
+        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
+        private IWebElement UnassignedTaskTable => Driver.FindElement(By.Id("unassignedTasks"));
+        private IWebElement InFlightTaskTable => Driver.FindElement(By.Id("inFlightTasks"));
+        private IWebElement GlobalSearchField => Driver.FindElement(By.Id("txtGlobalSearch"));
 
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
-        private IWebElement UnassignedTaskTable => _driver.FindElement(By.Id("unassignedTasks"));
-        private IWebElement InFlightTaskTable => _driver.FindElement(By.Id("inFlightTasks"));
-        private IWebElement GlobalSearchField => _driver.FindElement(By.Id("txtGlobalSearch"));
-        private IWebElement ClickOnTask => _driver.FindElement(By.XPath("//*[@id='inFlightTasks']/tbody/tr[1]/td[1]/a"));
+        private IWebElement ClickOnTask =>
+            Driver.FindElement(By.XPath("//*[@id='inFlightTasks']/tbody/tr[1]/td[1]/a"));
 
         private List<IWebElement> UnassignedTaskTableActualDataRows =>
             UnassignedTaskTable.FindElements(By.XPath("//*[@id='unassignedTasks']/tbody/tr"))
                 .Where(r => r.FindElements(By.TagName("td")).Count > 1)
                 .ToList();
+
         private List<IWebElement> InFlightTaskTableActualDataRows =>
             InFlightTaskTable.FindElements(By.XPath("//*[@id='inFlightTasks']/tbody/tr"))
-            .Where(r => r.FindElements(By.TagName("td")).Count > 1)
-            .ToList();
+                .Where(r => r.FindElements(By.TagName("td")).Count > 1)
+                .ToList();
 
-        public LandingPage(IWebDriver driver, int seconds)
+        public override bool HasLoaded
         {
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("urls").Bind(_config);
-
-            LandingPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.LandingPageUrl : _config.LocalDevLandingPageUrl;
-
-            _driver = driver;
-            _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
-        }
-
-        public override bool HasLoaded()
-        {
-            try
+            get
             {
-                _wait.Until(driver => UkhoLogo.Displayed);
-                return true;
+                try
+                {
+                    Wait.Until(driver => UkhoLogo.Displayed);
+                    return true;
+                }
+                catch (NoSuchElementException e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
             }
-            catch (NoSuchElementException e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-        }
-
-        public void NavigateTo()
-        {
-            _driver.Navigate().GoToUrl(LandingPageUrl);
-            _driver.Manage().Window.Maximize();
         }
 
         public void FilterRowsByProcessIdInGlobalSearch(int processId)

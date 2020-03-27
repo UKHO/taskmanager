@@ -6,7 +6,7 @@ namespace Common.TestAutomation.Framework.Pages
 {
     public abstract class PageBase
     {
-        private readonly Uri _pageUrl;
+        protected readonly Uri PageUrl;
         protected readonly IWebDriver Driver;
         protected readonly WebDriverWait Wait;
 
@@ -14,12 +14,12 @@ namespace Common.TestAutomation.Framework.Pages
         {
             Driver = driver;
             Wait = wait;
-            _pageUrl = pageUrl;
+            PageUrl = pageUrl;
         }
 
         public virtual void NavigateTo()
         {
-            Driver.Navigate().GoToUrl(_pageUrl);
+            Driver.Navigate().GoToUrl(PageUrl);
         }
 
         public abstract bool HasLoaded { get; }
