@@ -362,7 +362,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Data Impact: All Usages Features must be verified", _verifyModel.ValidationErrorMessages);
+            Assert.Contains("Data Impact: There are incomplete Features Verified tick boxes.", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -397,7 +397,7 @@ namespace Portal.UnitTests
 
             Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.False(_verifyModel.ValidationErrorMessages.Contains("Data Impact: All Usages Features must be verified"));
+            Assert.False(_verifyModel.ValidationErrorMessages.Contains("Data Impact: There are incomplete Features Verified tick boxes."));
         }
 
         [Test]

@@ -164,11 +164,11 @@ h2, .h2 {
     min-width: 28px;
 }
 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
 .slider {
     position: absolute;
@@ -184,18 +184,18 @@ h2, .h2 {
     border-radius: 16px;
 }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 12px;
-    width: 12px;
-    left: 1px;
-    bottom: 1px;
-    background-color: #adb5bd;
-    -webkit-transition: .1s;
-    transition: .1s;
-    border-radius: 50%;
-}
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 12px;
+        width: 12px;
+        left: 1px;
+        bottom: 1px;
+        background-color: #adb5bd;
+        -webkit-transition: .1s;
+        transition: .1s;
+        border-radius: 50%;
+    }
 
 input:checked + .slider {
     background-color: #4aab37;
@@ -313,13 +313,13 @@ table > tbody > tr > th {
     color: white;
 }
 
-.alertText.red {
-    background-color: red;
-}
+    .alertText.red {
+        background-color: red;
+    }
 
-.alertText.amber {
-    background-color: #ffbf00;
-}
+    .alertText.amber {
+        background-color: #ffbf00;
+    }
 
 /* Footer start */
 footer {
@@ -498,6 +498,10 @@ body, .sticky-footer-wrapper {
         color: #ef8123;
     }
 
+    .modal-dialog.warning h6 {
+        color: #ef8123;
+    }
+
     .modal-dialog.warning i.fa.fa-info-circle {
         color: #ef8123;
     }
@@ -559,9 +563,9 @@ body, .sticky-footer-wrapper {
             color: #e20d0d;
         }
 
-        .dialog.error h5 > span {
-            margin-left: 0.6rem;
-        }        
+            .dialog.error h5 > span {
+                margin-left: 0.6rem;
+            }
 
     .dialog.success {
         border-left: 5px solid #4aab37;
@@ -579,6 +583,7 @@ body, .sticky-footer-wrapper {
             color: #ef8123;
         }
 
+
 #assessDoneErrorMessage > ul {
     display: inline;
 }
@@ -588,11 +593,16 @@ body, .sticky-footer-wrapper {
 }
 
 .modal-dialog.error li:last-child, .modal-dialog.warning li:last-child {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .modal-dialog.error ul, .modal-dialog.warning ul {
     padding-left: 10px;
+    margin-bottom: 0;
+}
+
+.modal-dialog.error .modal-body, .modal-dialog.warning .modal-body {
+    padding: 8px;
 }
 
 /* TYPEAHEAD START */
@@ -612,11 +622,11 @@ span.twitter-typeahead {
     border-radius: unset;
 }
 
-.tt-input.form-text-input:focus {
-    border-color: #0177c1;
-    color: #0177c1;
-    background-color: #ffffff;
-}
+    .tt-input.form-text-input:focus {
+        border-color: #0177c1;
+        color: #0177c1;
+        background-color: #ffffff;
+    }
 
 .tt-menu {
     background-color: #FFFFFF;
@@ -633,11 +643,11 @@ span.twitter-typeahead {
     padding: 3px 0px;
 }
 
-.tt-suggestion:hover {
-    cursor: pointer;
-    background-color: #0097CF;
-    color: #FFFFFF;
-}
+    .tt-suggestion:hover {
+        cursor: pointer;
+        background-color: #0097CF;
+        color: #FFFFFF;
+    }
 /* TYPEAHEAD END */
 
 /* 
@@ -651,23 +661,23 @@ ol.error-list {
     margin-bottom: 30px;
 }
 
-ol.error-list a {
+    ol.error-list a {
         font-weight: 300;
-}
+    }
 
-ol.error-list li::before {
+    ol.error-list li::before {
         content: counter(li) ".";
         color: #03284F;
         font-size: 18px;
         display: inline-block;
         margin-right: 20px;
-}
+    }
 
-ol.error-list li {
-    counter-increment: li;
-    margin-bottom: 12px;
-    text-decoration: underline;
-    line-height: 1.4rem;
+    ol.error-list li {
+        counter-increment: li;
+        margin-bottom: 12px;
+        text-decoration: underline;
+        line-height: 1.4rem;
     }
 
 ol.error-list {
@@ -675,16 +685,17 @@ ol.error-list {
     padding-inline-start: 0px;
 }
 
-ol.error-list li {
-    transform: translateX(31px);
-    padding-right: 30px;
-}
+    ol.error-list li {
+        transform: translateX(31px);
+        padding-right: 30px;
+    }
 
-ol.error-list li::before {
-    position: absolute;
-    left: -30px;
-}
+        ol.error-list li::before {
+            position: absolute;
+            left: -30px;
+        }
 
 /* End ordered lists */
 
-operator { }
+operator {
+}
