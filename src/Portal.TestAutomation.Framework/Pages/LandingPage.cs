@@ -9,7 +9,7 @@ using Portal.TestAutomation.Framework.Configuration;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public class LandingPage : PageBase
+    public class LandingPage : PageBase, ILandingPage
     {
         public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
             : base(driver,

@@ -1,6 +1,5 @@
 ﻿using Common.Helpers;
 using NUnit.Framework;
-using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
@@ -12,11 +11,9 @@ namespace Portal.TestAutomation.Steps
     {
         private readonly LandingPage _landingPage;
 
-        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, LandingPage landingPage)
+        public LandingPageSteps(WorkflowDbContext workflowDbContext, LandingPage landingPage)
         {
             _landingPage = landingPage;
-
-            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
         }
 
         [When(@"I navigate to the landing page")]
