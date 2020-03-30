@@ -20,5 +20,9 @@ namespace NCNEWorkflowDatabase.EF.Models
 
         public virtual List<TaskStageComment> TaskStageComment { get; set; }
 
+        public virtual TaskStageType TaskStageType { get; set; }
+
+
     }
+
 }
