@@ -1,13 +1,12 @@
 ﻿using BoDi;
 using Common.Helpers;
-using Common.TestAutomation.Framework.Configs;
 using Common.TestAutomation.Framework.Pages;
 using Microsoft.Extensions.Configuration;
-using NCNEPortal.TestAutomation.Framework.Configs;
-using NCNEPortal.TestAutomation.Framework.Pages;
+using Portal.TestAutomation.Framework.Configuration;
+using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 
-namespace NCNEPortal.TestAutomation.Framework
+namespace Portal.TestAutomation.Framework.Setup
 {
     [Binding]
     public class ConfigSupport
@@ -27,12 +26,20 @@ namespace NCNEPortal.TestAutomation.Framework
 
             var secrets = new SecretsConfig();
             var urls = new UrlsConfig();
+            var dbConfig = new DbConfig();
 
+            appConfigRoot.GetSection("databases").Bind(dbConfig);
+            appConfigRoot.GetSection("urls").Bind(dbConfig);
             appConfigRoot.GetSection("urls").Bind(urls);
-            keyVaultRoot.GetSection("NCNEPortalUITest").Bind(secrets);
 
+            keyVaultRoot.GetSection("PortalUITest").Bind(secrets);
+            keyVaultRoot.GetSection("WorkflowDbSection").Bind(secrets);
+
+
+            _objectContainer.RegisterInstanceAs((Common.TestAutomation.Framework.Configs.SecretsConfig)secrets);
             _objectContainer.RegisterInstanceAs(secrets);
             _objectContainer.RegisterInstanceAs(urls);
+            _objectContainer.RegisterInstanceAs(dbConfig);
         }
 
         [BeforeScenario(Order = 19)]

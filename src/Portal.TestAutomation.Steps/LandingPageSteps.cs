@@ -1,6 +1,5 @@
 ﻿using Common.Helpers;
 using NUnit.Framework;
-using OpenQA.Selenium;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
@@ -12,29 +11,28 @@ namespace Portal.TestAutomation.Steps
     {
         private readonly LandingPage _landingPage;
 
-        public LandingPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext)
+        public LandingPageSteps(WorkflowDbContext workflowDbContext, LandingPage landingPage)
         {
-            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
-
-            _landingPage = new LandingPage(driver, 5);
+            _landingPage = landingPage;
         }
 
-        [Given(@"I navigate to the landing page")]
-        public void GivenINavigateToTheLandingPage()
+        [When(@"I navigate to the landing page")]
+        public void WhenINavigateToTheLandingPage()
         {
             _landingPage.NavigateTo();
-        }
-
-        [Then(@"The landing page has loaded")]
-        public void ThenTheLandingPageHasLoaded()
-        {
-            _landingPage.HasLoaded();
         }
 
         [When(@"I enter Process Id of ""(.*)""")]
         public void WhenIEnterProcessIdOf(int processId)
         {
             _landingPage.FilterRowsByProcessIdInGlobalSearch(processId);
+        }
+
+        [Then(@"The landing page has loaded")]
+        [Then(@"I am redirected to the landing page")]
+        public void ThenTheLandingPageHasLoaded()
+        {
+            Assert.IsTrue(_landingPage.HasLoaded);
         }
 
         [Then(@"Task with process id (.*) appears in both the assigned and unassigned tasks tables")]

@@ -1,28 +1,19 @@
-﻿using OpenQA.Selenium;
+﻿using NUnit.Framework;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
-using WorkflowDatabase.EF;
-using Portal.TestAutomation.Framework.ContextClasses;
-
 
 namespace Portal.TestAutomation.Steps
-{    
+{
     [Binding]
     public class AssessPageSteps
     {
         private readonly AssessPage _assessPage;
-        private readonly WorkflowDbContext _workflowDbContext;
-        private readonly WorkflowInstanceContext _workflowContext;
-        private readonly IWebDriver _driver;
 
-        public AssessPageSteps(IWebDriver driver, WorkflowDbContext workflowDbContext, WorkflowInstanceContext workflowContext)
+        public AssessPageSteps(AssessPage assessPage)
         {
-            _workflowDbContext = workflowDbContext;
-            _workflowContext = workflowContext;
-            //TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
-            _assessPage = new AssessPage(driver, 5);
+            _assessPage = assessPage;
         }
-                
+
         [Given(@"I navigate to the assess page")]
         public void GivenINavigateToTheAssessPage()
         {
@@ -32,7 +23,7 @@ namespace Portal.TestAutomation.Steps
         [Then(@"The assess page has loaded")]
         public void ThenTheAssessPageHasLoaded()
         {
-            _assessPage.HasLoaded();
+            Assert.IsTrue(_assessPage.HasLoaded);
         }
     }
 }

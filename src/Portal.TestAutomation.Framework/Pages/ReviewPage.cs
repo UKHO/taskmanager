@@ -1,60 +1,47 @@
 ﻿using System;
 using Common.Helpers;
-using Microsoft.Extensions.Configuration;
+using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Portal.TestAutomation.Framework.Configuration;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public class ReviewPage : BasePage
+    public class ReviewPage : PageBase
     {
-        private readonly IWebDriver _driver;
-        private readonly WebDriverWait _wait;
-        private readonly ReviewPageConfig _config = new ReviewPageConfig();
-
-        //add below to azure config values
-        private Uri ReviewPageUrl;
-
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
-
-        private IWebElement SourceDocumentTable => _driver.FindElement(By.XPath("//*[@id='srcDocDetailsTable']"));
-
-        public ReviewPage(IWebDriver driver, int seconds)
+        public ReviewPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
+            : base(driver,
+                wait,
+                ConfigHelpers.IsAzureDevOpsBuild
+                    ? urlsConfig.ReviewPageUrl
+                    : urlsConfig.LocalDevReviewPageUrl)
         {
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("urls").Bind(_config);
-
-            ReviewPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.ReviewPageUrl : _config.LocalDevReviewPageUrl;
-
-            _driver = driver;
-            _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
         }
 
-        public override bool HasLoaded()
-        {
-            try
-            {
-                _wait.Until(driver => UkhoLogo.Displayed);
-                return true;
-            }
-            catch (NoSuchElementException e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-        }
+        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
 
-        public void NavigateTo()
+        private IWebElement SourceDocumentTable => Driver.FindElement(By.XPath("//*[@id='srcDocDetailsTable']"));
+
+        public override bool HasLoaded
         {
-            _driver.Navigate().GoToUrl(ReviewPageUrl);
-            _driver.Manage().Window.Maximize();
+            get
+            {
+                try
+                {
+                    Wait.Until(driver => UkhoLogo.Displayed);
+                    return true;
+                }
+                catch (NoSuchElementException e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
+            }
         }
 
         public void NavigateToProcessId(int processId)
         {
-            _driver.Navigate().GoToUrl(ReviewPageUrl + "?processId=" + processId);
-            _driver.Manage().Window.Maximize();
+            Driver.Navigate().GoToUrl($"{PageUrl}?processId={processId}");
         }
 
         public bool IsSdocIdInDetails(int sDocId)
@@ -62,6 +49,5 @@ namespace Portal.TestAutomation.Framework.Pages
             int.TryParse(SourceDocumentTable.FindElement(By.XPath("//tbody/tr/td[3]")).Text, out var sDocOnPage);
             return sDocId == sDocOnPage;
         }
-
     }
 }

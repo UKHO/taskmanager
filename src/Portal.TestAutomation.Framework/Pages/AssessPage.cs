@@ -1,52 +1,40 @@
 ﻿using System;
 using Common.Helpers;
-using Microsoft.Extensions.Configuration;
+using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Portal.TestAutomation.Framework.Configuration;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public class AssessPage : BasePage
+    public class AssessPage : PageBase
     {
-        private readonly IWebDriver _driver;
-        private readonly WebDriverWait _wait;
-        private readonly AssessPageConfig _config = new AssessPageConfig();
-
-        //add below to azure config values
-        private Uri AssessPageUrl;
-
-        private IWebElement UkhoLogo => _driver.FindElement(By.Id("ukhoLogo"));
-
-        public AssessPage(IWebDriver driver, int seconds)
+        public AssessPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
+            : base(driver,
+                wait,
+                ConfigHelpers.IsAzureDevOpsBuild
+                    ? urlsConfig.AssessPageUrl
+                    : urlsConfig.LocalDevAssessPageUrl)
         {
-            var configRoot = AzureAppConfigConfigurationRoot.Instance;
-            configRoot.GetSection("urls").Bind(_config);
-
-            AssessPageUrl = ConfigHelpers.IsAzureDevOpsBuild ? _config.AssessPageUrl : _config.LocalDevAssessPageUrl;
-
-            _driver = driver;
-            _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
         }
 
-        public override bool HasLoaded()
-        {
-            try
-            {
-                _wait.Until(driver => UkhoLogo.Displayed);
-                return true;
-            }
-            catch (NoSuchElementException e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-        }
+        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
 
-        public void NavigateTo()
+        public override bool HasLoaded
         {
-            _driver.Navigate().GoToUrl(AssessPageUrl);
-            _driver.Manage().Window.Maximize();
+            get
+            {
+                try
+                {
+                    Wait.Until(driver => UkhoLogo.Displayed);
+                    return true;
+                }
+                catch (NoSuchElementException e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
+            }
         }
     }
 }
