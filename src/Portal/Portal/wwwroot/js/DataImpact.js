@@ -91,10 +91,8 @@ function setVerified() {
 
     var pageIdentity = $("#pageIdentity").val();
     if (pageIdentity === "Assess") {
-        $(".dataImpactFeaturesSubmitted").prop("disabled", false);
-        $(".dataImpactFeaturesVerified").prop("disabled", true);
+        $(".dataImpactFeaturesVerified").bind("click", false);
     } else if (pageIdentity === "Verify") {
-        $(".dataImpactFeaturesSubmitted").prop("disabled", true);
-        $(".dataImpactFeaturesVerified").prop("disabled", false);
+        $(".dataImpactFeaturesSubmitted").bind("click", false);
     }
 }

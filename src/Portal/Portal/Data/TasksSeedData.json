@@ -785,7 +785,7 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "FeaturesSubmitted": false,
+        "FeaturesSubmitted": true,
         "FeaturesVerified": false
       }
     ]
@@ -904,7 +904,7 @@
         "HpdUsageId": 1,
         "Edited": false,
         "Comments": "Test",
-        "FeaturesSubmitted": false,
+        "FeaturesSubmitted": true,
         "FeaturesVerified": false
       }
     ]
