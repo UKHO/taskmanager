@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -12,9 +13,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
+using Portal.ViewModels;
 using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -48,6 +51,10 @@ namespace Portal.Pages.DbAssessment
 
         public int CarisProjectNameCharacterLimit { get; set; }
 
+        public List<string> HpdUsages { get; set; }
+
+        public List<SourceViewModel> SourceDocuments { get; set; } = new List<SourceViewModel>();
+
         private string _userFullName;
 
         public string UserFullName
@@ -80,12 +87,46 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
+            HpdUsages = await _dbContext.HpdUsage.Select(u => u.Name).ToListAsync();
+
+            await GetSourceDocuments(processId);
+
             await GetCarisData(processId, taskStage);
 
             await GetCarisProjectDetails(processId);
 
             CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
             SessionFilename = _generalConfig.Value.SessionFilename;
+        }
+
+        private async Task GetSourceDocuments(int processId)
+        {
+            var assessmentData = await _dbContext.AssessmentData
+                .FirstOrDefaultAsync(sd => sd.ProcessId == processId);
+
+            var primarySourceDocument = new SourceViewModel()
+            {
+                DocumentName = assessmentData.SourceDocumentName,
+                FileExtension = "Not implemented"
+            };
+
+            SourceDocuments.Add(primarySourceDocument);
+
+            //TODO: Make sure we're using the correct status values.
+            var linkedDocuments = await _dbContext.LinkedDocument
+                .Where(ld => ld.ProcessId == processId && ld.Status == "Started")
+                .Select(ld => new SourceViewModel() {DocumentName = ld.SourceDocumentName, FileExtension = "Not implemented"})
+                .ToListAsync();
+
+            SourceDocuments.AddRange(linkedDocuments);
+
+            //TODO: Make sure we're using the correct status values.
+            var databaseDocuments = await _dbContext.DatabaseDocumentStatus
+                .Where(dd => dd.ProcessId == processId && dd.Status == "Started")
+                .Select(dd => new SourceViewModel() {DocumentName = dd.SourceDocumentName, FileExtension = "Not implemented"})
+                .ToListAsync();
+
+            SourceDocuments.AddRange(databaseDocuments);
         }
 
         public async Task<JsonResult> OnGetWorkspacesAsync()
