@@ -31,50 +31,73 @@
                     </div>
                     <div class="form-row align-items-center justify-content-center">
                         <div class="col-4">@Html.LabelFor(model => model.ProjectName, new { @class = "col-form-label" })</div>
-                        <div class="col-8">@Html.TextBoxFor(model => model.ProjectName,
-                                               new { @class = "form-control form-text-input", @disabled = "disabled", @maxlength=Model.CarisProjectNameCharacterLimit })</div>
+                        <div class="col-8">
+                            @Html.TextBoxFor(model => model.ProjectName,
+                            new { @class = "form-control form-text-input", @disabled = "disabled", @maxlength = Model.CarisProjectNameCharacterLimit })
                     </div>
-                    <div class="row justify-content-start">
-                        <div class="col-4">
-                            <button id="btnCreateCarisProject" type="button" class="btn btn-primary">
-                                <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
-                                Create CARIS Project
-                            </button>
-                        </div>
-                        <div class="col-8 pl-2">
-                            <a id="hdnDownloadLink" hidden></a>
-                            <button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary">Launch CARIS Source Editor</button>
-                        </div>
+                </div>
+                <div class="row justify-content-start">
+                    <div class="col-4">
+                        <button id="btnCreateCarisProject" type="button" class="btn btn-primary">
+                            <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                            Create CARIS Project
+                        </button>
                     </div>
+                    <div class="col-8 pl-2">
+                        <a id="hdnDownloadLink" hidden></a>
+                        <button id="btnOpenLaunchCarisSelectionModal" type="button" class="btn btn-primary">Launch CARIS Source Editor</button>
+                    </div>
+                </div>
 
-                    <section id="launchSourceEditorDownloadError" class="dialog error collapse mt-3">
-                        <h5>
-                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                            <span id="launchSourceEditorDownloadErrorMessage">Failed to load Source Documents</span>
-                        </h5>
-                    </section>
+                <section id="launchSourceEditorDownloadError" class="dialog error collapse mt-3">
+                    <h5>
+                        <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                        <span id="launchSourceEditorDownloadErrorMessage">Failed to load Source Documents</span>
+                    </h5>
+                </section>
 
-                    <section id="launchSourceEditorDownloadSuccess" class="dialog success collapse mt-3">
-                        <h5>
-                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
-                            <span>Successfully generated session file</span>
-                        </h5>
-                    </section>
+                <section id="launchSourceEditorDownloadSuccess" class="dialog success collapse mt-3">
+                    <h5>
+                        <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                        <span>Successfully generated session file</span>
+                    </h5>
+                </section>
 
 
-                    <section id="createCarisProjectError" class="dialog error collapse mt-3">
-                        <h5>
-                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                            <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
-                        </h5>
-                    </section>
+                <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                    <h5>
+                        <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                        <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                    </h5>
+                </section>
 
-                    <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
-                        <h5>
-                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
-                            <span>Caris project successfully created</span>
-                        </h5>
-                    </section>
+                <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                    <h5>
+                        <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                        <span>Caris project successfully created</span>
+                    </h5>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@* Modal launch Caris selection *@
+<div class="modal fade" id="LaunchCarisSelectionModal" tabindex="-1" role="dialog" aria-labelledby="LaunchCarisSelectionModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Launch Caris Selection</h4>
+            </div>
+            <div class="modal-body">
+                <p>Put modal body here</p>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-3 pr-1"><button type="button" id="btnClearLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="d" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Clear All">Clear</button></div>
+                    <div class="col-3 pr-1"><button type="button" id="btnCancelLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Launch Caris Selections">Cancel</button></div>
+                    <div class="col-5 pl-1 pr-0"><button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary">Launch</button></div>
                 </div>
             </div>
         </div>

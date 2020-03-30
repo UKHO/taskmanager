@@ -1,26 +1,138 @@
 [
   {
     "HpdUsageId": 1,
-    "Name": "Nav 1"
+    "Name": "Nav 1[1500000-49999999]"
   },
   {
     "HpdUsageId": 2,
-    "Name": "Nav 2"
+    "Name": "Nav 2[750000-1499999]"
   },
   {
     "HpdUsageId": 3,
-    "Name": "Nav 3"
+    "Name": "Nav 3[500000-749999]"
   },
   {
     "HpdUsageId": 4,
-    "Name": "Nav 4"
+    "Name": "Nav 4[200000-499999]"
   },
   {
     "HpdUsageId": 5,
-    "Name": "Nav 5"
+    "Name": "Nav 5[150000-199999]"
   },
   {
     "HpdUsageId": 6,
+    "Name": "Nav 6[90000-149999]"
+  },
+  {
+    "HpdUsageId": 7,
+    "Name": "Nav 7 Medium[70000-200000]"
+  },
+  {
+    "HpdUsageId": 8,
+    "Name": "Nav 8[50000-69999]"
+  },
+  {
+    "HpdUsageId": 9,
+    "Name": "Nav 9[35000-49999]"
+  },
+  {
+    "HpdUsageId": 10,
+    "Name": "Nav 10[27000-34999]"
+  },
+  {
+    "HpdUsageId": 11,
+    "Name": "Nav 11[16000-26999]"
+  },
+  {
+    "HpdUsageId": 12,
+    "Name": "Nav 12[13000-15999]"
+  },
+  {
+    "HpdUsageId": 13,
+    "Name": "Nav 13[11000-12999]"
+  },
+  {
+    "HpdUsageId": 14,
+    "Name": "Nav 14[6001-10999]"
+  },
+  {
+    "HpdUsageId": 15,
+    "Name": "Nav 15 Large[6000-69999]"
+  },
+  {
+    "HpdUsageId": 16,
+    "Name": "Nav 16 Berthing[Unscaled]"
+  },
+  {
+    "HpdUsageId": 17,
+    "Name": "AML 1[<25000000]"
+  },
+  {
+    "HpdUsageId": 18,
+    "Name": "AML 2[5000001-25000000]"
+  },
+  {
+    "HpdUsageId": 19,
+    "Name": "AML 3[1000001-5000000]"
+  },
+  {
+    "HpdUsageId": 20,
+    "Name": "AML 4[250001-1000000]"
+  },
+  {
+    "HpdUsageId": 21,
+    "Name": "AML 5[50001-250000]"
+  },
+  {
+    "HpdUsageId": 22,
+    "Name": "AML 6[10001-50000]"
+  },
+  {
+    "HpdUsageId": 23,
+    "Name": "AML 7[2501-10000]"
+  },
+  {
+    "HpdUsageId": 24,
+    "Name": "AML 8[1601-2500]"
+  },
+  {
+    "HpdUsageId": 25,
+    "Name": "AML 9[>1600]"
+  },
+  {
+    "HpdUsageId": 26,
+    "Name": "LOS - All Data"
+  },
+  {
+    "HpdUsageId": 27,
+    "Name": "LOS - Charting Data"
+  },
+  {
+    "HpdUsageId": 28,
+    "Name": "MAGVAR"
+  },
+  {
+    "HpdUsageId": 29,
+    "Name": "Marine Limits and Boundaries"
+  },
+  {
+    "HpdUsageId": 30,
     "Name": "Offshore Energy"
+  },
+  {
+    "HpdUsageId": 31,
+    "Name": "PEXA"
+  },
+  {
+    "HpdUsageId": 32,
+    "Name": "Scale Band 0[Unscaled]"
+  },
+  {
+    "HpdUsageId": 33,
+    "Name": "TEST [20000-50000]"
+  },
+  {
+    "HpdUsageId": 34,
+    "Name": "Wrecks"
   }
 ]

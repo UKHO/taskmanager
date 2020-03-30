@@ -37,6 +37,7 @@ function getEditDatabase() {
         }, 
         success: function (result) {
             $("#editDatabase").html(result);
+            launchSourceEditorModalHandler();
             launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
@@ -102,6 +103,13 @@ function createCarisProjectHandler() {
         });
 
     });
+}
+
+function launchSourceEditorModalHandler() {
+    $("#btnOpenLaunchCarisSelectionModal").on("click",
+        function() {
+            $("#LaunchCarisSelectionModal").modal("show");
+        });
 }
 
 function launchSourceEditorDownloadHandler() {
