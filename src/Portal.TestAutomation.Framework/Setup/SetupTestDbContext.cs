@@ -18,7 +18,7 @@ namespace Portal.TestAutomation.Framework.Setup
             _objectContainer = objectContainer;
         }
 
-        [BeforeScenario(Order = 10)]
+        [BeforeScenario(Order = 50)]
         public void InitializeDbContext()
         {
             var dbConfig = _objectContainer.Resolve<DbConfig>();

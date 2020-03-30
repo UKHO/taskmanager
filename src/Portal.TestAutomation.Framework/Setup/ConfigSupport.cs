@@ -6,7 +6,7 @@ using Portal.TestAutomation.Framework.Configuration;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 
-namespace Portal.TestAutomation.Framework
+namespace Portal.TestAutomation.Framework.Setup
 {
     [Binding]
     public class ConfigSupport
@@ -18,7 +18,7 @@ namespace Portal.TestAutomation.Framework
             _objectContainer = objectContainer;
         }
 
-        [BeforeScenario(Order = 0)]
+        [BeforeScenario(Order = 1)]
         public void RegisterConfigs()
         {
             var appConfigRoot = AzureAppConfigConfigurationRoot.Instance;
@@ -42,7 +42,7 @@ namespace Portal.TestAutomation.Framework
             _objectContainer.RegisterInstanceAs(dbConfig);
         }
 
-        [BeforeScenario(Order = 3)]
+        [BeforeScenario(Order = 19)]
         public void RegisterLandingPage()
         {
             _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();

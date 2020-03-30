@@ -30,7 +30,7 @@ namespace Common.TestAutomation.Framework
             DisposeWebdriver();
         }
 
-        [BeforeScenario(Order = 1)]
+        [BeforeScenario(Order = 10)]
         public void InitializeWebDriver()
         {
             var chromeDriverDirectory = Environment.GetEnvironmentVariable("ChromeWebDriver");
@@ -44,6 +44,7 @@ namespace Common.TestAutomation.Framework
 
                 _objectContainer.RegisterInstanceAs(_webDriver);
                 _objectContainer.RegisterInstanceAs((IJavaScriptExecutor)_webDriver);
+                _objectContainer.RegisterInstanceAs((ITakesScreenshot)_webDriver);
                 _objectContainer.RegisterInstanceAs(new WebDriverWait(_webDriver, TimeSpan.FromSeconds(10)));
             }
             catch
@@ -53,13 +54,13 @@ namespace Common.TestAutomation.Framework
             }
         }
 
-        [BeforeScenario("skipLogin", Order = 2)]
+        [BeforeScenario("skipLogin", Order = 20)]
         public void SkipLogin()
         {
             _skipLogin = true;
         }
 
-        [BeforeScenario(Order = 4)]
+        [BeforeScenario(Order = 21)]
         public void SetLoginCookies()
         {
             if (_skipLogin)

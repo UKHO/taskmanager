@@ -19,7 +19,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer = objectContainer;
         }
 
-        [BeforeScenario(Order = 0)]
+        [BeforeScenario(Order = 1)]
         public void RegisterConfigs()
         {
             var appConfigRoot = AzureAppConfigConfigurationRoot.Instance;
@@ -35,7 +35,7 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer.RegisterInstanceAs(urls);
         }
 
-        [BeforeScenario(Order = 3)]
+        [BeforeScenario(Order = 19)]
         public void RegisterLandingPage()
         {
             _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
