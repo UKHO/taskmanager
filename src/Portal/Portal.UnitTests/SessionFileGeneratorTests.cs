@@ -100,13 +100,13 @@ namespace Portal.UnitTests
                 "Assess");
 
             Assert.IsNotNull(sessionFile);
-            Assert.IsNotNull(sessionFile.CarisWorkspace);
+            Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual(hpdUsername,
-                sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.USERNAME);
+                sessionFile.DataSources.DataSource.SourceParam.USERNAME);
             Assert.AreEqual(hpdUsername,
-                sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.ASSIGNED_USER);
+                sessionFile.DataSources.DataSource.SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
-                sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.SERVICENAME);
+                sessionFile.DataSources.DataSource.SourceParam.SERVICENAME);
         }
 
         [Test]
@@ -129,8 +129,8 @@ namespace Portal.UnitTests
                 "Assess");
 
             Assert.IsNotNull(sessionFile);
-            Assert.IsNotNull(sessionFile.CarisWorkspace);
-            Assert.AreEqual("TestWorkspace", sessionFile.CarisWorkspace.DataSources.DataSource.SourceParam.WORKSPACE);
+            Assert.IsNotNull(sessionFile.DataSources);
+            Assert.AreEqual("TestWorkspace", sessionFile.DataSources.DataSource.SourceParam.WORKSPACE);
         }
     }
 }
