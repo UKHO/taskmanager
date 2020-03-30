@@ -113,7 +113,10 @@ namespace Portal.Pages.DbAssessment
             var fs = new MemoryStream();
             try
             {
-                serializer.Serialize(fs, sessionFile);
+
+                var xmlnsEmpty = new XmlSerializerNamespaces();
+                xmlnsEmpty.Add("", "");
+                serializer.Serialize(fs, sessionFile, xmlnsEmpty);
 
                 fs.Position = 0;
 

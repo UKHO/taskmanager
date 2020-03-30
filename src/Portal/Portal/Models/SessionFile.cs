@@ -4,27 +4,24 @@ using System.Xml.Serialization;
 namespace Portal.Models
 {
     // TODO: Ensure node is called CARIS_Workspace version="1.1"
-    [XmlRoot(ElementName = "Caris_Workspace version=1.1")]
+    [XmlRoot(ElementName = "CARIS_Workspace")]
     public class SessionFile
     {
-        [XmlElement(Order = 1)]
-        public CARIS_WorkspaceNode CarisWorkspace = new CARIS_WorkspaceNode();
+        [XmlAttribute(AttributeName = "version")]
+        public string Version { get; set; }
 
+        [XmlElement(Order = 1, ElementName = "DataSources")]
+        public DataSourcesNode DataSources { get; set; }
+
+        [XmlElement(Order = 2, ElementName = "Views")]
+        public ViewsNode Views { get; set; }
+
+        [XmlElement(Order = 3, ElementName = "Properties")]
+        public PropertiesNode Properties { get; set; }
+        
         public SessionFile()
         {
 
-        }
-
-        public class CARIS_WorkspaceNode
-        {
-            [XmlElement(ElementName = "DataSources")]
-            public DataSourcesNode DataSources { get; set; }
-            [XmlElement(ElementName = "Views")]
-            public ViewsNode Views { get; set; }
-            [XmlElement(ElementName = "Properties")]
-            public PropertiesNode Properties { get; set; }
-            [XmlAttribute(AttributeName = "version")]
-            public string Version { get; set; }
         }
 
         [XmlRoot(ElementName = "SELECTEDPROJECTUSAGES")]
