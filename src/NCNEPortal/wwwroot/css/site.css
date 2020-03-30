@@ -811,6 +811,14 @@ table#workflow-table tr.shaded {
     color: #EF8123;
 }
 
+.status.Complete {
+    color:#4aab37
+}
+
+h4.Inactive {
+    color: #adb5bd
+}
+
 #generic-comments-table td {
     border-right: none;
     font-weight: 300;

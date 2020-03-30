@@ -1,37 +1,69 @@
-﻿@model NCNEWorkflowDatabase.EF.Models.TaskStage
-<tr class="workflow-row">
-    <td><h4>@Model.TaskStageType.Name</h4></td>
-    <td>
-        <div class="status inProgress">
-            <span class="fa fa-edit"> </span>
-            <span>@Model.Status</span>
-        </div>
-    </td>
-    <td>@Model.AssignedUser</td>
-    <td>@Model.DateExpected</td>
-    <td>@Model.DateCompleted</td>
-    <td>
-        <div class="d-flex justify-content-end align-items-center">
-            <div class="mr-4">
-                <span>Comments</span>
-                <label class="switch ml-1 mb-auto">
-                    <input type="checkbox" class="success">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            @*<span class="fa fa-pencil-alt"></span>
-            <div class="ml-2"><a href="#">Edit</a></div>*@
-        </div>
-        <div class="d-flex justify-content-end">
-            @if (@Model.TaskStageType.AllowRework)
+﻿@using NCNEPortal.Enums
+@model NCNEWorkflowDatabase.EF.Models.TaskStage
+
+@if (@Model.Status != NcneTaskStageStatus.Inactive.ToString())
+{
+    <tr class="workflow-row">
+        <td>
+            @if (Model.Status == NcneTaskStageStatus.Open.ToString())
             {
-                <div class="mt-3 mr-3">
-                    <button id="btn@(Model.TaskStageType.Name)Rework" class="btn btn-block btn-secondary">Rework</button>
+                <h4 class="Inactive">@Model.TaskStageType.Name</h4>
+
+            }
+            else
+            {
+                <h4>@Model.TaskStageType.Name</h4>
+            }
+
+        </td>
+        <td>
+            @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+            {
+                <div class="status inProgress">
+                    <span class="fa fa-edit"> </span>
+                    <span>@Model.Status</span>
                 </div>
             }
-            <div class="mt-3">
-                <button id="btn@(Model.TaskStageType.Name)Complete" class="btn btn-block btn-complete" style="min-width: 139px;">Mark Complete</button>
+            else
+            {
+                @if (Model.Status == NcneTaskStageStatus.Completed.ToString())
+                {
+                    <div class="status Complete">
+                        <span class="fa fa-edit"> </span>
+                        <span>@Model.Status</span>
+                    </div>
+                }
+
+            }
+        </td>
+        <td>@Model.AssignedUser</td>
+        <td>@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
+        <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
+        <td>
+            <div class="d-flex justify-content-end align-items-center">
+                <div class="mr-4">
+                    <span>Comments</span>
+                    <label class="switch ml-1 mb-auto">
+                        <input type="checkbox" class="success">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
-        </div>
-    </td>
-</tr>
+
+            @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+            {
+                <div class="d-flex justify-content-end">
+                    @if (@Model.TaskStageType.AllowRework)
+                    {
+                        <div class="mt-3 mr-3">
+                            <button id="btn@(Model.TaskStageType.Name)Rework" class="btn btn-block btn-secondary">Rework</button>
+                        </div>
+                    }
+                    <div class="mt-3">
+                        <button id="btn@(Model.TaskStageType.Name)Complete" class="btn btn-block btn-complete" style="min-width: 139px;">Mark Complete</button>
+                    </div>
+                </div>
+            }
+        </td>
+    </tr>
+}
