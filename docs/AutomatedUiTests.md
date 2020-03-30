@@ -1,5 +1,28 @@
 # Automated UI testing in Portal and NCNE Portal
 
+## Running tests locally
+
+You will need to configure four environment variables:
+
+* ENVIRONMENT
+* AZURE_APP_CONFIGURATION_CONNECTION_STRING
+* KEY_VAULT_ADDRESS
+* ChromeWebDriver
+
+AZURE_APP_CONFIGURATION_CONNECTION_STRING and KEY_VAULT_ADDRESS can be obtained from the team. It is advisable to use the UAT environment variables as this is the dedicated autotest environment and so is unlikely to be being used for manual testing.
+
+### ENVIRONMENT variable values
+
+* AzureDevOpsBuild - for running against a deployed environment (like UAT)
+* AzureDevelopment - for debugging against Azure itself
+* LocalDevelopment - for running against a local environment
+
+### Chrome Driver
+
+Chrome driver is used by Selenium to interact with your local browser. The environment variable is used to point Selenium at the folder where your local copy resides, e.g. `C:\ChromeDriver`.
+
+Chrome driver must always be the correct version for your copy of Chrome. If you do not have a copy of chrome driver (or if it is too far out of date) then the tests will not run. You can get the latest version of chrome driver by visiting <https://chromedriver.chromium.org/downloads>.
+
 ## Common Test Automation Framework
 
 All test automation projects share a common base framework called `Common.TestAutomation.Framework`. This framework is responsible for Portal-agnostic tasks including:
@@ -21,6 +44,4 @@ Each POM should register an `ILandingPage`, this is used by the authentication p
 
 ## Logging
 
-`Common.TestAutomation.Framework.Logging` contains SpecFlow hooks to automatically log Features, Scenarios and Steps as they are being run. It also takes screenshots on error and attaches them to the test run. Logs can be accessed from the test result.
-
-A `Log` method is provided for any further information that may need logging during test execution.
+`Common.TestAutomation.Framework.Logging` contains SpecFlow hooks to automatically log Features, Scenarios and Steps as they are being run. It also takes screenshots on error and attaches them to the test run.
