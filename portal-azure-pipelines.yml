@@ -4,7 +4,7 @@ trigger:
     - features/*
   paths:
     include:
-    - src/Portal/*
+    - src/Portal*
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
     - src/HpdDatabase.EF/*  
@@ -15,10 +15,13 @@ pr:
     - master
   paths:
     include:
-    - src/Portal/*
+    - src/Portal*
     - src/Databases/WorkflowDatabase.EF/*
     - src/Common*
     - src/HpdDatabase.EF/*
+variables:
+  MSBUILDSINGLELOADCONTEXT: '1'
+  # This is a workaround for an issue building SpecFlow projects using the .NET Core SDK 3.1.200 https://github.com/SpecFlowOSS/SpecFlow/issues/1912
 
 stages:
 - stage: Build
@@ -89,6 +92,36 @@ stages:
 
       - task: DotNetCoreCLI@2
         inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
+        displayName: 'Publish portal-project'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\portal'
+          ArtifactName: 'portal'
+          publishLocation: 'Container'
+        displayName: 'Publish portal Artifact'
+
+
+    - job: BuildSpecs
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: DotNetCoreCLI@2
+        inputs:
           command: 'restore'
           projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
           feedsToUse: 'select'
@@ -100,14 +133,6 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\Portal.TestAutomation.Specs\\Portal.TestAutomation.Specs.csproj'
         displayName: 'dotnet build portalspecs'
     
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
-          zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
-        displayName: 'Publish portal-project'
   
       - task: DotNetCoreCLI@2
         inputs:
@@ -120,17 +145,11 @@ stages:
   
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\portal'
-          ArtifactName: 'portal'
-          publishLocation: 'Container'
-        displayName: 'Publish portal Artifact'
-  
-      - task: PublishBuildArtifacts@1
-        inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)\\specs'
           ArtifactName: 'specs'
           publishLocation: 'Container'
         displayName: 'Publish specs Artifact'
+
 
     - job: Publish_Pickles
       pool:
@@ -140,7 +159,6 @@ stages:
           clean: all
 
       steps:
-
       - task: CmdLine@2
         displayName: Install Pickles
         inputs:
@@ -233,39 +251,7 @@ stages:
                   WebAppName: 'taskmanager-dev-web-portal'
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
 
-    - job: RunAutomatedTests
-      dependsOn: DeployPortalWebsiteDev
-      pool:
-          NautilusBuild
-      steps:
-        - task: PowerShell@2
-          inputs:
-            targetType: 'inline'
-            script: |
-              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
-              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
 
-        - task: DownloadBuildArtifacts@0
-          displayName: 'Download Build Artifacts'
-          inputs:
-            buildType: 'current'
-            downloadType: 'specific'
-            downloadPath: '$(System.ArtifactsDirectory)' 
-
-        - task: AzureCLI@1
-          displayName: 'Run SpecFlow tests'
-          inputs:
-            azureSubscription: 'TaskmanagerDev'
-            scriptLocation: 'inlineScript'
-            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
-
-        - task: PublishTestResults@2
-          displayName: 'Publish SpecFlowTestResults'
-          condition: succeededOrFailed()
-          inputs:
-            testResultsFormat: 'VSTest'
-            testResultsFiles: '**/*.trx'
-            testRunTitle: 'Portal UI tests - $(System.StageName)'
 
 - stage: DeployUAT
   dependsOn: 
@@ -286,12 +272,15 @@ stages:
                   WebAppName: 'taskmanager-uat-web-portal'
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
 
-    - job: RunAutomatedTests
+    - job: RunAutomatedUITests
+      displayName: 'Run automated UI tests'
       dependsOn: DeployPortalWebsiteUAT
       pool:
           NautilusBuild
       steps:
+        - checkout: none
         - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
           inputs:
             targetType: 'inline'
             script: |
@@ -305,6 +294,12 @@ stages:
             downloadType: 'specific'
             downloadPath: '$(System.ArtifactsDirectory)' 
 
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
         - task: AzureCLI@1
           inputs:
             azureSubscription: 'TaskmanagerUAT-SC'
@@ -313,9 +308,13 @@ stages:
           displayName: 'Run SpecFlow tests'
 
         - task: PublishTestResults@2
+          displayName: 'Publish SpecFlowTestResults'
+          condition: succeededOrFailed()
           inputs:
-            testResultsFiles: '**/*.trx'
             testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'Portal UI tests - $(System.StageName)'
+
 
 - stage: DeployPre
   dependsOn: 
@@ -335,34 +334,3 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'taskmanager-pre-web-portal'
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
-
-    - job: RunAutomatedTests
-      dependsOn: DeployPortalWebsitePre
-      pool:
-          NautilusBuild
-      steps:
-        - task: PowerShell@2
-          inputs:
-            targetType: 'inline'
-            script: |
-              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
-              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
-
-        - task: DownloadBuildArtifacts@0
-          displayName: 'Download Build Artifacts'
-          inputs:
-            buildType: 'current'
-            downloadType: 'specific'
-            downloadPath: '$(System.ArtifactsDirectory)' 
-
-        - task: AzureCLI@1
-          inputs:
-            azureSubscription: 'TaskmanagerPre-SC'
-            scriptLocation: 'inlineScript'
-            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\Portal.TestAutomation.Specs\Portal.TestAutomation.Specs.dll --logger:trx'
-          displayName: 'Run SpecFlow tests'
-
-        - task: PublishTestResults@2
-          inputs:
-            testResultsFiles: '**/*.trx'
-            testResultsFormat: 'VSTest'
