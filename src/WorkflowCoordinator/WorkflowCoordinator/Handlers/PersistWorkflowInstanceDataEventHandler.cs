@@ -78,6 +78,8 @@ namespace WorkflowCoordinator.Handlers
 
                     await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
+                    // Fire new CompleteAssessmentCommand: CorrelationId, processId
+
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
 
                     break;
