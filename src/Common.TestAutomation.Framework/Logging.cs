@@ -12,8 +12,8 @@ namespace Common.TestAutomation.Framework
     public class Logging
     {
         private readonly FeatureContext _featureContext;
-        private readonly ScenarioContext _scenarioContext;
         private readonly IObjectContainer _objectContainer;
+        private readonly ScenarioContext _scenarioContext;
 
         public Logging(FeatureContext featureContext, ScenarioContext scenarioContext, IObjectContainer objectContainer)
         {
@@ -25,19 +25,27 @@ namespace Common.TestAutomation.Framework
         [BeforeScenario(Order = 0)]
         public void LogScenarioStart()
         {
-            Log();
+            LogLineBreak();
             Log("--------------------------------------------------------------");
             Log($"Feature:  {_featureContext.FeatureInfo.Title}");
             Log($"Scenario: --{_scenarioContext.ScenarioInfo.Title}" +
                 (_scenarioContext.ScenarioInfo.Tags.Any()
                     ? $" [{string.Join(", ", _scenarioContext.ScenarioInfo.Tags)}]"
                     : ""));
+            Log("Executing BeforeScenario steps...........");
         }
 
         [BeforeStep]
         public void LogStep()
         {
-            Log($"          ----{_scenarioContext.StepContext.StepInfo.Text}");
+            var stepInstance = _scenarioContext.StepContext.StepInfo.StepInstance;
+            Log($"Executing Step: ----{stepInstance.Keyword} {stepInstance.Text}");
+        }
+
+        [AfterStep]
+        public void LogLineBreak()
+        {
+            Log();
         }
 
         [AfterScenario]
@@ -58,14 +66,15 @@ namespace Common.TestAutomation.Framework
         [AfterScenario]
         public void AttachScreenShotOnError()
         {
-            if (_objectContainer.IsRegistered<ITakesScreenshot>() 
-                && (_scenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError 
-                || TestContext.CurrentContext.Result.FailCount > 0))
+            if (_objectContainer.IsRegistered<ITakesScreenshot>()
+                && (_scenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError
+                    || TestContext.CurrentContext.Result.FailCount > 0))
             {
                 var driver = _objectContainer.Resolve<ITakesScreenshot>();
 
                 var screenShot = driver.GetScreenshot();
-                var screenshotFileName = $"{DateTime.Now:yyyy-MM-dd-hh-mm-ss}_{TestContext.CurrentContext.Test.Name}.png";
+                var screenshotFileName =
+                    $"{DateTime.Now:yyyy-MM-dd-hh-mm-ss}_{TestContext.CurrentContext.Test.Name}.png";
 
                 var tempFilePath = $"{Path.GetTempPath()}{screenshotFileName}";
                 screenShot.SaveAsFile(tempFilePath);
@@ -73,7 +82,7 @@ namespace Common.TestAutomation.Framework
             }
         }
 
-        public static void Log(string message = "")
+        public void Log(string message = "")
         {
             TestContext.Out.WriteLine(message);
         }
