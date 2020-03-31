@@ -1,5 +1,6 @@
 ﻿using BoDi;
 using Common.Helpers;
+using Common.TestAutomation.Framework.Configs;
 using Common.TestAutomation.Framework.Pages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +41,7 @@ namespace Portal.TestAutomation.Framework.Setup
             appConfigRoot.GetSection("urls").Bind(_urls);
 
             keyVaultRoot.GetSection("PortalUITest").Bind(_secrets);
-            keyVaultRoot.GetSection("WorkflowDbSection").Bind(_secrets);
+            keyVaultRoot.GetSection("PortalUITest").Bind(_dbConfig);
         }
 
         [BeforeTestRun]
@@ -57,7 +58,7 @@ namespace Portal.TestAutomation.Framework.Setup
                 ConfigHelpers.IsAzureDevOpsBuild || ConfigHelpers.IsAzure || ConfigHelpers.IsAzureDevelopment
                     ? _dbConfig.WorkflowDbServer
                     : _dbConfig.LocalDbServer, _dbConfig.WorkflowDbName,
-                _dbConfig.WorkflowDbUITestAcct, _secrets.WorkflowDbPassword);
+                _dbConfig.WorkflowDbUITestAcct, _dbConfig.WorkflowDbPassword);
 
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)
@@ -70,7 +71,6 @@ namespace Portal.TestAutomation.Framework.Setup
         [BeforeScenario(Order = 1)]
         public void RegisterConfigs()
         {
-            _objectContainer.RegisterInstanceAs((Common.TestAutomation.Framework.Configs.SecretsConfig) _secrets);
             _objectContainer.RegisterInstanceAs(_secrets);
             _objectContainer.RegisterInstanceAs(_urls);
             _objectContainer.RegisterInstanceAs(_dbConfig);
