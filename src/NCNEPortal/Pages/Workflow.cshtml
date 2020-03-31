@@ -87,7 +87,7 @@
 
                 @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageTypeId))
                 {
-                    @await Component.InvokeAsync("WorkflowStage", new int[] { Model.ProcessId, taskStage.TaskStageId });
+                    @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId });
                 }
 
 

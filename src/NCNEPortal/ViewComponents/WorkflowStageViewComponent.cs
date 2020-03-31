@@ -14,10 +14,10 @@ namespace NCNEPortal.ViewComponents
 
         }
 
-        public IViewComponentResult Invoke(int[] parameters)
+        public IViewComponentResult Invoke(int processId, int taskStageId)
         {
 
-            var taskStage = _dbContext.TaskStage.Find(parameters[0], parameters[1]);
+            var taskStage = _dbContext.TaskStage.Find(processId, taskStageId);
 
             taskStage.TaskStageType = _dbContext.TaskStageType.Find(taskStage.TaskStageTypeId);
 
