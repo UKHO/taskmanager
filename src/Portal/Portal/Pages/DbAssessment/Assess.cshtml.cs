@@ -516,22 +516,6 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
-        {
-            try
-            {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId,
-                    comment);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
-                    nameof(_dataServiceApiClient.PutAssessmentCompleted),
-                    workflowInstance.AssessmentData.PrimarySdocId,
-                    comment);
-            }
-        }
-
         private async Task GetOnHoldData(int processId)
         {
             var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
