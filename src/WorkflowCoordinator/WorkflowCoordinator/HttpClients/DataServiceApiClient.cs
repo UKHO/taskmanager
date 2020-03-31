@@ -69,7 +69,7 @@ namespace WorkflowCoordinator.HttpClients
         public async Task MarkAssessmentAsCompleted(int sdocId, string comment)
         {
             var data = "";
-            var fullUri = _uriConfig.Value.BuildDataServicesCompleteAssessmentUri(_generalConfig.Value.CallerCode, sdocId, comment);
+            var fullUri = _uriConfig.Value.BuildDataServicesMarkAssessmentCompletedUri(_generalConfig.Value.CallerCode, sdocId, comment);
 
             using (var response = await _httpClient.PutAsync(fullUri.ToString(), null).ConfigureAwait(false))
             {
@@ -81,6 +81,23 @@ namespace WorkflowCoordinator.HttpClients
             }
         }
 
+        public async Task MarkAssessmentAsAssessed(string transactionId,
+                                                    int sdocId,
+                                                    string actionType,
+                                                    string change)
+        {
+            var data = "";
+            var fullUri = _uriConfig.Value.BuildDataServicesMarkAssessmentAssessedUri(_generalConfig.Value.CallerCode, transactionId, sdocId, actionType, change);
+
+            using (var response = await _httpClient.PutAsync(fullUri.ToString(), null).ConfigureAwait(false))
+            {
+                data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+        }
 
         public async Task<bool> CheckDataServicesConnection()
         {

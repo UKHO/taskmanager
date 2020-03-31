@@ -61,11 +61,9 @@ namespace WorkflowCoordinator.Handlers
         {
             // TODO: Mark SDRA Assessment as Assessed first, then mark as completed
 
-
             try
             {
-                //await _dataServiceApiClient.MarkAssessmentAsCompleted(workflowInstance.AssessmentData.PrimarySdocId,
-                //    comment);
+                await _dataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, "");
             }
             catch (Exception e)
             {
