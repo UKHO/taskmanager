@@ -17,11 +17,20 @@ namespace WorkflowCoordinator.Config
         public Uri K2WebServiceGetTasksUri { get; set; }
         public Uri DataServicesLocalhostHealthcheckUrl { get; set; }
         public Uri DataServicesHealthcheckUrl { get; set; }
-
+        public string DataServicesWebServiceAssessmentCompletedUri { get; set; }
+        
         public Uri BuildDataServicesUri(string callerCode, int sdocId)
         {
             return sdocId == 0 ? new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesWebServiceDocumentsForAssessmentUri}{callerCode}") : 
                 new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
         }
+
+        public Uri BuildDataServicesCompleteAssessmentUri(string callerCode, int sdocId, string comment)
+        {
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
+                $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}?comment={Uri.EscapeDataString(comment)}");
+        }
+
     }
 }
