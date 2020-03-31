@@ -1,6 +1,7 @@
 ﻿using System;
+using Common.Messages;
 
-namespace Common.Messages.Commands
+namespace WorkflowCoordinator.Messages
 {
     public class CompleteAssessmentCommand : ICorrelate
     {
