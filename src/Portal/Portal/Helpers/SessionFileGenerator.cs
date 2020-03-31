@@ -81,49 +81,47 @@ namespace Portal.Helpers
 
             return new SessionFile
             {
-                CarisWorkspace =
+                Version = "1.1",
+                DataSources = new SessionFile.DataSourcesNode
                 {
-                    DataSources = new SessionFile.DataSourcesNode
+                    DataSource = new SessionFile.DataSourceNode
                     {
-                        DataSource = new SessionFile.DataSourceNode
+                        SourceParam = new SessionFile.SourceParamNode
                         {
-                            SourceParam = new SessionFile.SourceParamNode
-                            {
-                                SERVICENAME = _secretsConfig.Value.HpdServiceName,
-                                USERNAME = hpdUser.HpdUsername,
-                                ASSIGNED_USER = hpdUser.HpdUsername,
-                                USAGE = hpdUsageName,
-                                WORKSPACE = workspaceAffected,
-                                SecureCredentialPlugin = "{guid in here}",
-                                SecureCredentialPlugin_UserParam = "UserParameter",
-                                HAS_BOUNDARY = "true",
-                                OPENED_BY_PROJECT = "true",
-                                PROJECT = "19_29_SDRA4.1 registration test2",
-                                PROJECT_ID = "53756"
-                            },
-                            SourceString = "HPD:Project:19_29",
-                            UserLayers = ""
-                        }
-                    },
-                    Views = new SessionFile.ViewsNode
+                            SERVICENAME = _secretsConfig.Value.HpdServiceName,
+                            USERNAME = hpdUser.HpdUsername,
+                            ASSIGNED_USER = hpdUser.HpdUsername,
+                            USAGE = hpdUsageName,
+                            WORKSPACE = workspaceAffected,
+                            SecureCredentialPlugin = "{guid in here}",
+                            SecureCredentialPlugin_UserParam = "UserParameter",
+                            HAS_BOUNDARY = "true",
+                            OPENED_BY_PROJECT = "true",
+                            PROJECT = "19_29_SDRA4.1 registration test2",
+                            PROJECT_ID = "53756"
+                        },
+                        SourceString = "HPD:Project:19_29",
+                        UserLayers = ""
+                    }
+                },
+                Views = new SessionFile.ViewsNode
+                {
+                    View = new SessionFile.ViewNode
                     {
-                        View = new SessionFile.ViewNode
+                        DisplayState = new SessionFile.DisplayStateNode
                         {
-                            DisplayState = new SessionFile.DisplayStateNode
+                            DisplayLayer = new SessionFile.DisplayLayerNode
                             {
-                                DisplayLayer = new SessionFile.DisplayLayerNode
-                                {
-                                    Visible = "true",
-                                    Expanded = "false",
-                                    Name = "registration test2:Nav 15"
-                                }
+                                Visible = "true",
+                                Expanded = "false",
+                                Name = "registration test2:Nav 15"
                             }
                         }
-                    },
-                    Properties = new SessionFile.PropertiesNode
-                    {
-                        Property = sources
                     }
+                },
+                Properties = new SessionFile.PropertiesNode
+                {
+                    Property = sources
                 }
             };
         }
