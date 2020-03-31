@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,6 +14,13 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TaskComment = NCNEPortal.Models.TaskComment;
 
 namespace NCNEPortal
@@ -148,6 +148,8 @@ namespace NCNEPortal
             private set => _userFullName = value;
         }
 
+        public List<TaskStage> TaskStages { get; set; }
+
         public WorkflowModel(NcneWorkflowDbContext dbContext,
             ILogger<WorkflowModel> logger,
             ICommentsHelper commentsHelper,
@@ -266,6 +268,8 @@ namespace NCNEPortal
             Verifier1 = taskInfo.TaskRole.VerifierOne;
             Verifier2 = taskInfo.TaskRole.VerifierTwo;
             Publisher = taskInfo.TaskRole.Publisher;
+
+            TaskStages = taskInfo.TaskStage;
 
 
             var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,6 +11,14 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace NCNEPortal
 {
@@ -269,6 +269,7 @@ namespace NCNEPortal
                     NcneTaskStageType.V2_Rework => (this.Verifier2 == null
                         ? NcneTaskStageStatus.Inactive.ToString()
                         : NcneTaskStageStatus.Open.ToString()),
+                    NcneTaskStageType.Forms => NcneTaskStageStatus.InProgress.ToString(),
                     _ => NcneTaskStageStatus.Open.ToString()
                 };
 

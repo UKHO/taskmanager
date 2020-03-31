@@ -1,7 +1,9 @@
 ﻿@page
+@using System.Runtime.Intrinsics.X86
 @using Microsoft.CodeAnalysis.CSharp.Syntax
 @using NCNEPortal.Components;
 @using NCNEPortal.Enums
+@using NCNEWorkflowDatabase.EF.Models
 @model NCNEPortal.WorkflowModel
 @{
     ViewData["Title"] = "New Chart / New Edition";
@@ -82,21 +84,12 @@
                 </tr>
             </thead>
             <tbody class="workflow-row">
-                <tr class="workflow-row">
-                    <td><h4>Compile Chart</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CompileChart", Rework = false }))
-                    </td>
-                </tr>
+
+                @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageTypeId))
+                {
+                    @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId });
+                }
+
 
                 @*--- START WORKFLOW TABLE: COMPILE CHART ---*@
                 <tr id="compileComment" class="collapse show">
@@ -125,265 +118,7 @@
                     </td>
                 </tr>
 
-                @*--- START WORKFLOW TABLE: V1 ---*@
-                <tr class="shaded">
-                    <td><h4>V1</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1", Rework = true }))
-                    </td>
-                </tr>
 
-                @*--- START WORKFLOW TABLE: V1 REWORK ---*@
-                <tr>
-                    <td><h4>V1 rework</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V1Rework", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V2 ---*@
-                <tr class="shaded">
-                    <td><h4>V2</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2", Rework = true }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: V2 REWORK ---*@
-                <tr>
-                    <td><h4>V2 Rework</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "V2Rework", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: FORMS ---*@
-                <tr class="shaded">
-                    <td><h4>Forms</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Forms", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: FINAL UPDATING ---*@
-                <tr>
-                    <td><h4>Final updating</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "FinalUpdating", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: 100% CHECK ---*@
-                <tr class="shaded">
-                    <td><h4>100% check</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "HundredPercentCheck", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: COMMIT TO PRINT ---*@
-                <tr>
-                    <td><h4>Commit to print</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CommitToPrint", Rework = false }))
-                    </td>
-                </tr>
-
-                @*--- START WORKFLOW TABLE: CIS ---*@
-                <tr class="shaded">
-                    <td><h4>CIS</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "CIS", Rework = false }))
-                    </td>
-                </tr>
-
-                <!-- #region START WORKFLOW TABLE: PUBLICATION -->
-                <tr>
-                    <td><h4>Publication</h4></td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        @(await Html.RenderComponentAsync<WorkflowActions>(RenderMode.ServerPrerendered, new { WorkflowStep = "Publication", Rework = false }))
-                    </td>
-                </tr>
-                <tr>
-                    <td>Publish chart</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-8"><button id="btnPublishChartPublishInCaris" class="btn btn-block btn-primary">Publish in CARIS</button></div>
-                            <div class="col-2 offset-2">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox1">
-                                    <label for="checkbox1"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Clear vector from<br />new minor version</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
-
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox2">
-                                    <label for="checkbox2"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Retire old minor version</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox3">
-                                    <label for="checkbox3"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Action withdrawn charts</td>
-                    <td>
-                        <div class="status inProgress">
-                            <span class="fa fa-edit"> </span>
-                            <span>In Progress</span>
-                        </div>
-                    </td>
-                    <td>stoodleym</td>
-                    <td />
-                    <td>12/01/2020</td>
-                    <td>
-                        <div class="row align-items-center">
-                            <div class="col-2 offset-10">
-                                <div class="checkbox-wrapper">
-                                    <input type="checkbox" id="checkbox4">
-                                    <label for="checkbox4"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
             </tbody>
 
         </table>
