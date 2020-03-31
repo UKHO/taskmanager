@@ -7,6 +7,7 @@ using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 using NUnit.Framework;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -115,6 +116,110 @@ namespace Portal.UnitTests
         {
             Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace"));
+        }
+
+        [Test]
+        public async Task Test_OnGet_Retrieves_All_Usages()
+        {
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "Nav1"
+            });
+
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 2,
+                Name = "Nav2"
+            });
+
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 3,
+                Name = "Nav3"
+            });
+
+            await SetupForOnGetAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual(3, _editDatabaseModel.HpdUsages.Count);
+        }
+
+        [Test]
+        public async Task Test_OnGet_Retrieves_Primary_Source_Document()
+        {
+            await SetupForOnGetAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
+        }
+
+        //TODO: Update Status with correct value once spoken to MS
+        [Test]
+        public async Task Test_OnGet_Retrieves_Linked_Documents()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = "Started"
+            });
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = "Started"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            //Expected value is 1 higher than added LinkedDocuments as an item
+            //is added to SourceDocuments in SetupForOnGetAsync()
+            Assert.AreEqual(3, _editDatabaseModel.SourceDocuments.Count);
+        }
+
+        [Test]
+        public async Task Test_OnGet_Retrieves_Database_Documents()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = "Started"
+            });
+
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            //Expected value is 1 higher than added DatabaseDocumentStatus as an item
+            //is added to SourceDocuments in SetupForOnGetAsync()
+            Assert.AreEqual(2, _editDatabaseModel.SourceDocuments.Count);
+        }
+        
+        private async Task SetupForOnGetAsync()
+        {
+            _dbContext.AssessmentData.Add(new AssessmentData()
+            {
+                ProcessId = ProcessId,
+                SourceDocumentName = "Source",
+                RsdraNumber = "RSDRA123"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                WorkspaceAffected = "AWorkspace"
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
