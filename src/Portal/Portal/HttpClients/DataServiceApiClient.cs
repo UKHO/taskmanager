@@ -22,7 +22,7 @@ namespace Portal.HttpClients
             _uriConfig = uriConfig;
         }
 
-        public async Task PutAssessmentCompleted(int sdocId, string comment)
+        public async Task MarkAssessmentAsCompleted(int sdocId, string comment)
         {
             var data = "";
             var fullUri = _uriConfig.Value.BuildDataServicesUri(_generalConfig.Value.CallerCode, sdocId, comment);
