@@ -25,7 +25,7 @@ namespace Portal.HttpClients
         public async Task MarkAssessmentAsCompleted(int sdocId, string comment)
         {
             var data = "";
-            var fullUri = _uriConfig.Value.BuildDataServicesUri(_generalConfig.Value.CallerCode, sdocId, comment);
+            var fullUri = _uriConfig.Value.BuildDataServicesMarkAssessmentCompletedUri(_generalConfig.Value.CallerCode, sdocId, comment);
 
             using (var response = await _httpClient.PutAsync(fullUri.ToString(), null).ConfigureAwait(false))
             {
