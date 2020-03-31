@@ -33,6 +33,8 @@ function updateDataImpact() {
         if (index > 0) {
             setDeleteHandler($(element).find(".deleteUsage"));
         }
+
+        setVerified();
     });
 }
 
@@ -68,7 +70,6 @@ function getDataImpacts() {
         success: function (result) {
             $("#existingDataImpacts").html(result);
 
-            setVerified();
             setAddUsageHandler();
             updateDataImpact();
         },
