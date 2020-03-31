@@ -91,7 +91,33 @@
                 <h4 class="modal-title">Launch Caris Selection</h4>
             </div>
             <div class="modal-body">
-                <p>Put modal body here</p>
+                <div>
+                    <h5>Data Layers</h5>
+                    <table id="usagesSelection" class="table-striped" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var hpdUsage in Model.HpdUsages)
+                            {
+                                <tr>
+                                    <td>
+                                        @hpdUsage
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+
+                </div>
             </div>
             <div class="modal-footer">
                 <div class="row col-11 justify-content-end">

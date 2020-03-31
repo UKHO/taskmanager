@@ -739,5 +739,7 @@ ol.error-list {
 
 /* End ordered lists */
 
-operator {
+#LaunchCarisSelectionModal .modal-dialog {
+    max-width: 1000px;
 }
+    

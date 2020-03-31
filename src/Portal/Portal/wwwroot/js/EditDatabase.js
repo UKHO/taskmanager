@@ -38,6 +38,7 @@ function getEditDatabase() {
         success: function (result) {
             $("#editDatabase").html(result);
             launchSourceEditorModalHandler();
+            initializeLaunchSourceEditorModal();
             launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
@@ -110,6 +111,12 @@ function launchSourceEditorModalHandler() {
         function() {
             $("#LaunchCarisSelectionModal").modal("show");
         });
+}
+
+function initializeLaunchSourceEditorModal() {
+    $("#usagesSelection").DataTable({
+        "pageLength": 6
+    });
 }
 
 function launchSourceEditorDownloadHandler() {
