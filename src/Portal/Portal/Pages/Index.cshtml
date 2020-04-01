@@ -64,21 +64,21 @@
                             <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
                                 @task.DaysToDmEndDate
-                            </span>
+                            </div>
                         </td>
                         <td>
                             @task.DmEndDate.ToShortDateString()
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                            <span class="float-right mr-1">
+                            <span class="float-right mr-2">
                                 @if (task.IsOnHold)
                                 {
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "color: green" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red": "")"></i>
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "display:none" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red" : "")"></i>
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysRed ? "color: red": "display: none")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" @(task.OnHoldDaysGreen ? "style='display: none'" : "")></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" @(task.OnHoldDaysRed ? "" : "style='display: none'")></i>
                                 }
                             </span>
                         </td>
@@ -154,21 +154,21 @@
                             <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            <span class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
                                 @task.DaysToDmEndDate
-                            </span>
+                            </div>
                         </td>
                         <td>
                             @task.DmEndDate.ToShortDateString()
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                            <span class="float-right mr-1">
+                            <span class="float-right mr-2">
                                 @if (task.IsOnHold)
                                 {
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "color: green" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red": "")"></i>
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysGreen ? "display:none" : "") @(task.OnHoldDaysAmber ? "color: darkorange" : "") @(task.OnHoldDaysRed ? "color: red" : "")"></i>
-                                    <i class="fa fa-circle" style="@(task.OnHoldDaysRed ? "color: red": "display: none")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" @(task.OnHoldDaysGreen ? "style='display: none'" : "")></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" @(task.OnHoldDaysRed ? "" : "style='display: none'")></i>
                                 }
                             </span>
                         </td>

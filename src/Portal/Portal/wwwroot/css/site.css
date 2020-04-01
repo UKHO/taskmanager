@@ -307,14 +307,31 @@ table > tbody > tr > th {
     width: 68px;
 }
 
+
+/* DAYS ON HOLD WARNING START */
+.onHoldRedCircle {
+    color: #cd2026;
+}
+.onHoldAmberCircle {
+    color: #ff8c00;
+}
+.onHoldGreenCircle {
+    color: #008000;
+}
+/* DAYS ON HOLD WARNING END */
+
 .alertText {
     border-radius: .25rem;
-    padding: .25rem .50rem;
     color: white;
+    font-weight: 400;
+    min-width: 1rem;
+    max-width: 3.0rem;
+    max-height: 1.75rem;
+    text-align: center;
 }
 
     .alertText.red {
-        background-color: red;
+        background-color: #cd2026;
     }
 
     .alertText.amber {
