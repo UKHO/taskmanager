@@ -216,11 +216,11 @@
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
             if (index === menuItem) {
-                $(this).addClass("btn-info");
+                $(this).addClass("buttonSelected");
                 $(this).removeClass("btn-primary");
 
             } else {
-                $(this).removeClass("btn-info");
+                $(this).removeClass("buttonSelected");
                 $(this).addClass("btn-primary");
             }
         });
