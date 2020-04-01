@@ -44,10 +44,6 @@ namespace Portal.Models
             public string USAGE { get; set; }
             [XmlElement(ElementName = "WORKSPACE")]
             public string WORKSPACE { get; set; }
-            [XmlElement(ElementName = "SecureCredentialPlugin")]
-            public string SecureCredentialPlugin { get; set; }
-            [XmlElement(ElementName = "SecureCredentialPlugin_UserParam")]
-            public string SecureCredentialPlugin_UserParam { get; set; }
             [XmlElement(ElementName = "HAS_BOUNDARY")]
             public string HAS_BOUNDARY { get; set; }
             [XmlElement(ElementName = "OPENED_BY_PROJECT")]
