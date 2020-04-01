@@ -71,6 +71,12 @@ table.task-list thead tr th {
 .deleteAssignTask {
 }
 
+.btn.btn-primary:disabled {
+    background-color: #DBDBDB;
+    color: #3A3A3A;
+    border-color: #DBDBDB;
+}
+
 .btn-size > div {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
