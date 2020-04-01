@@ -308,6 +308,12 @@ table > tbody > tr > th {
 }
 
 
+.buttonSelected {
+    background-color: #007e97;
+    color: #fff;
+    font-weight: 400;
+}
+
 /* DAYS ON HOLD WARNING START */
 .onHoldRedCircle {
     color: #cd2026;
