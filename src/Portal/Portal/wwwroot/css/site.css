@@ -8,6 +8,10 @@ body {
     font-weight: 300;
 }
 
+a {
+    color: #0062DC;
+}
+
 /* Start chevron for notes on landing page */
 table.dataTable td.details-control i:before {
     content: '\f078';
@@ -442,7 +446,7 @@ body, .sticky-footer-wrapper {
 
 /* START of pagination matching UKHO design system */
 
-.page-link {
+.pagination .page-link {
     position: relative;
     display: block;
     padding: 0.5rem 0.75rem;
@@ -452,6 +456,12 @@ body, .sticky-footer-wrapper {
     background-color: #fff;
     border: 1px solid #dee2e6;
 }
+
+.page-item.active .page-link {
+    background-color: #007e97;
+    border: 1px solid #007e97;
+}
+
 
 /* Square off prev/next buttons button corners */
 .page-item:last-child .page-link {
@@ -468,11 +478,13 @@ body, .sticky-footer-wrapper {
 .pagination > li:first-child a {
     background-color: #09315B;
     color: #ffffff;
+    border: 1px solid #09315B;
 }
 
 .pagination > li:last-child a {
     background-color: #09315B;
     color: #ffffff;
+    border: 1px solid #09315B;
 }
 
 .page-link:focus {
@@ -485,14 +497,15 @@ body, .sticky-footer-wrapper {
 .pagination .page-item:last-child .page-link:active {
     color: #09315B;
     background-color: #ffffff;
-    border-color: #09315B;
+    border: 1px solid #09315B;
 }
 
 .pagination .page-item:first-child .page-link:active {
     color: #09315B;
     background-color: #ffffff;
-    border-color: #09315B;
+    border: 1px solid #09315B;
 }
+
 /* END of pagination matching UKHO design system */
 
 /* Start UKHO design system error dialog stuff*/
