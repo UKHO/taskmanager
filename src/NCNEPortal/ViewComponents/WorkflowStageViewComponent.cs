@@ -19,8 +19,6 @@ namespace NCNEPortal.ViewComponents
 
             var taskStage = _dbContext.TaskStage.Find(processId, taskStageId);
 
-            taskStage.TaskStageType = _dbContext.TaskStageType.Find(taskStage.TaskStageTypeId);
-
             return View(taskStage);
         }
     }

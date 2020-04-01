@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Common.Helpers.Auth;
+﻿using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NCNEPortal.Auth;
@@ -8,6 +6,8 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace NCNEPortal.UnitTests
 {
@@ -418,8 +418,6 @@ namespace NCNEPortal.UnitTests
                 Publisher = "Valid User2"
             };
 
-            DateTime? invalidDate = null;
-
             DateTime? publicationDate = null;
 
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
@@ -449,8 +447,6 @@ namespace NCNEPortal.UnitTests
                 VerifierTwo = "Valid User1",
                 Publisher = "Valid User2"
             };
-
-            DateTime? invalidDate = null;
 
             DateTime? publicationDate = null;
 
