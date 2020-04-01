@@ -93,8 +93,6 @@ namespace Portal.Helpers
                             ASSIGNED_USER = hpdUser.HpdUsername,
                             USAGE = hpdUsageName,
                             WORKSPACE = workspaceAffected,
-                            SecureCredentialPlugin = "{guid in here}",
-                            SecureCredentialPlugin_UserParam = "UserParameter",
                             HAS_BOUNDARY = "true",
                             OPENED_BY_PROJECT = "true",
                             PROJECT = "19_29_SDRA4.1 registration test2",
