@@ -91,16 +91,18 @@
                 <h4 class="modal-title">Launch Caris Selection</h4>
             </div>
             <div class="modal-body">
-                <div>
-                    <h5>Data Layers</h5>
-                    <table id="usagesSelection" class="table-striped" style="width:100%">
-                        <thead>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Data Layers</h5>
+                        <p>Select data layers</p>
+                        <table id="usagesSelection" class="table-striped" style="width: 100%">
+                            <thead>
                             <tr>
                                 <th></th>
                                 <th></th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             @foreach (var hpdUsage in Model.HpdUsages)
                             {
                                 <tr>
@@ -108,15 +110,47 @@
                                         @hpdUsage
                                     </td>
                                     <td>
-                                        <input type="checkbox" />
+                                        <input type="checkbox" data-usage-name="@hpdUsage" />
                                     </td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
-                </div>
-                <div>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
 
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Sources</h5>
+                        <p>Select sources</p>
+                        <table id="sourcesSelection" class="table-striped" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var source in Model.SourceDocuments)
+                            {
+                                <tr>
+                                    <td>
+                                        @source.DocumentName
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" data-source-filename="@( source.DocumentName + "." + source.FileExtension)" />
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
+
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

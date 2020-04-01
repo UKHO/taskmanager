@@ -115,7 +115,15 @@ function launchSourceEditorModalHandler() {
 
 function initializeLaunchSourceEditorModal() {
     $("#usagesSelection").DataTable({
-        "pageLength": 6
+        "pageLength": 6,
+        "pagingType": "simple",
+        "dom": "tip"
+    });
+
+    $("#sourcesSelection").DataTable({
+        "pageLength": 6,
+        "pagingType": "simple",
+        "dom": "tip"
     });
 }
 
