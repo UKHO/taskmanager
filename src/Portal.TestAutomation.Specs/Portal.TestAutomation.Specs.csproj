@@ -7,50 +7,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\AssignedTaskType.json" />
-    <None Remove="Data\HpdUsages.json" />
-    <None Remove="Data\HpdUsers.json" />
-    <None Remove="Data\ProductActionType.json" />
-    <None Remove="Data\SourceCategories.json" />
-    <None Remove="Data\TasksSeedData.json" />
-    <None Remove="Data\Users.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Data\AssignedTaskType.json">
+    <Content Include="..\Portal\Portal\Data\AdUsers.json" Link="Data\AdUsers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Data\HpdUsages.json">
+    <Content Include="..\Portal\Portal\Data\AssignedTaskType.json" Link="Data\AssignedTaskType.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Data\HpdUsers.json">
+    <Content Include="..\Portal\Portal\Data\HpdUsages.json" Link="Data\HpdUsages.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Data\ProductActionType.json">
+    <Content Include="..\Portal\Portal\Data\HpdUsers.json" Link="Data\HpdUsers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Data\SourceCategories.json">
+    <Content Include="..\Portal\Portal\Data\ProductActionType.json" Link="Data\ProductActionType.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Data\TasksSeedData.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Include="Data\Users.json">
+    <Content Include="..\Portal\Portal\Data\SourceCategories.json" Link="Data\SourceCategories.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\Portal\Portal\Data\TasksSeedData.json" Link="Data\TasksSeedData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Portal\Portal\Data\Users.json" Link="Data\Users.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -78,9 +57,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LandingPageTasks.feature</DependentUpon>
     </Compile>
-    <Compile Update="AssessPageTasks.feature.cs">
-      <DependentUpon>AssessPageTasks.feature</DependentUpon>
-    </Compile>
     <Compile Update="ReviewPageTasks.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -104,16 +80,14 @@
       <LastGenOutput>LandingPageTasks.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"></Generator>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="AssessPageTasks.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-      <LastGenOutput>ReviewPageTasks.feature.cs</LastGenOutput>
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="ReviewPageTasks.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ReviewPageTasks.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

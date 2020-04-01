@@ -4,6 +4,7 @@ using BoDi;
 using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 
@@ -39,12 +40,17 @@ namespace Common.TestAutomation.Framework
 
             try
             {
-                _webDriver = new ChromeDriver(chromeDriverDirectory);
+                var logger = _objectContainer.Resolve<Logging>();
+
+                var eventDriver = new EventFiringWebDriver(new ChromeDriver(chromeDriverDirectory));
+                eventDriver.Navigating += (sender, e) => logger.Log($"    Navigating to {e.Url}");
+
+                _webDriver = eventDriver;
                 _webDriver.Manage().Window.Maximize();
 
                 _objectContainer.RegisterInstanceAs(_webDriver);
-                _objectContainer.RegisterInstanceAs((IJavaScriptExecutor)_webDriver);
-                _objectContainer.RegisterInstanceAs((ITakesScreenshot)_webDriver);
+                _objectContainer.RegisterInstanceAs((IJavaScriptExecutor) _webDriver);
+                _objectContainer.RegisterInstanceAs((ITakesScreenshot) _webDriver);
                 _objectContainer.RegisterInstanceAs(new WebDriverWait(_webDriver, TimeSpan.FromSeconds(10)));
             }
             catch
