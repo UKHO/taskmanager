@@ -203,7 +203,78 @@ namespace Portal.UnitTests
             //is added to SourceDocuments in SetupForOnGetAsync()
             Assert.AreEqual(2, _editDatabaseModel.SourceDocuments.Count);
         }
-        
+
+        [Test]
+        public async Task Test_SourceViewModel_Has_Been_Populated()
+        {
+            await SetupForOnGetAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
+            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[0].FileExtension);
+            
+        }
+
+        [Test]
+        public async Task Test_OnGet_Retrieves_Linked_Documents_And_Database_Documents()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = "Started"
+            });
+
+            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = "Started"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            //Expected value is 1 higher than added DatabaseDocumentStatus as an item
+            //is added to SourceDocuments in SetupForOnGetAsync()
+            Assert.AreEqual(3, _editDatabaseModel.SourceDocuments.Count);
+        }
+
+        [Test]
+        public async Task Test_Only_Documents_With_Matching_ProcessId_Are_Added()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.AssessmentData.Add(new AssessmentData()
+            {
+                ProcessId = 456,
+                SourceDocumentName = "Source2",
+                RsdraNumber = "RSDRA456"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                ProcessId = 456,
+                WorkspaceAffected = "AWorkspace2"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
+            Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
+
+        }
+
+        [Test]
+        public async Task Test_Only_Documents_With_Applicable_Status_Are_Added()
+        {
+
+        }
+
         private async Task SetupForOnGetAsync()
         {
             _dbContext.AssessmentData.Add(new AssessmentData()
@@ -212,7 +283,7 @@ namespace Portal.UnitTests
                 SourceDocumentName = "Source",
                 RsdraNumber = "RSDRA123"
             });
-
+            
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
                 ProcessId = ProcessId,
