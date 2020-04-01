@@ -7,7 +7,6 @@ using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Graph;
 using NUnit.Framework;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -205,7 +204,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceViewModel_Has_Been_Populated()
+        public async Task Test_SourceViewModel_Has_Been_Populated_For_Primary_Document()
         {
             await SetupForOnGetAsync();
 
@@ -214,6 +213,49 @@ namespace Portal.UnitTests
             Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
             Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[0].FileExtension);
             
+        }
+
+        [Test]
+        public async Task Test_SourceViewModel_Has_Been_Populated_For_Linked_Document()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = "Started",
+                SourceDocumentName = "LinkedSource"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual("LinkedSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[1].FileExtension);
+
+        }
+
+        [Test]
+        public async Task Test_SourceViewModel_Has_Been_Populated_For_Database_Document()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = "Started",
+                SourceDocumentName = "DatabaseSource"
+
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual("DatabaseSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[1].FileExtension);
+
         }
 
         [Test]
@@ -260,6 +302,18 @@ namespace Portal.UnitTests
                 WorkspaceAffected = "AWorkspace2"
             });
 
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = 456,
+                Status = "Started"
+            });
+
+            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            {
+                ProcessId = 456,
+                Status = "Started"
+            });
+            
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
@@ -272,7 +326,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_Only_Documents_With_Applicable_Status_Are_Added()
         {
-
+            Assert.Inconclusive();
         }
 
         private async Task SetupForOnGetAsync()
