@@ -744,8 +744,12 @@ ol.error-list {
     max-width: 1000px; /*FIXME*/
 }
 
+#LaunchCarisSelectionModal h4, #LaunchCarisSelectionModal h5 {
+    color: #09315b;
+}
+
 #selectedUsagesContainer {
-    background-color: lightgray; /*FIXME*/
+    background-color: #eeeeee;
     overflow-y: auto;
     max-height: 250px;
 }
@@ -756,7 +760,7 @@ ol.error-list {
 }
 
 .selectedUsage > .fa.fa-check {
-    color: navy; /*FIXME*/
+    color: #09315b;
 }
 
 .selectedUsage > span {
@@ -764,7 +768,10 @@ ol.error-list {
 }
 
 .selectedUsage > .fa.fa-times-circle {
-    color: red; /*FIXME*/
+    color: red;
     cursor: pointer;
 }
+
+
+
 /* End LaunchCarisSelectionModal */
