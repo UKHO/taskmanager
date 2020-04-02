@@ -43,7 +43,16 @@ function attachUsagesSelectionCheckboxesHandler() {
 
 function attachSourcesSelectionCheckboxesHandler() {
     $("#sourcesSelection input[type='checkbox']").change(function () {
-        selectSource();
+        var sourceName = $(this).data("source-filename");
+
+        if (!$(this).prop('checked')) {
+
+            var selectedSourceElement = $(".selectedSource[data-source-filename='" + sourceName + "']");
+            deselectSource(selectedSourceElement);
+            return;
+        }
+
+        selectSource(sourceName);
     });
 }
 
@@ -72,8 +81,29 @@ function selectUsage(usageName) {
     selectedUsageElement.append(crossElement);
 }
 
-function selectSource() {
-    alert("bbbds");
+function selectSource(sourceName) {
+    var containerElement = $("#selectedSourcesContainer");
+
+    var selectedSourceElement = $(document.createElement("div"));
+    selectedSourceElement.addClass("selectedSource d-flex mt-1 mb-1 p-2");
+    selectedSourceElement.attr("data-source-filename", sourceName);
+    containerElement.append(selectedSourceElement);
+
+    var checkElement = $(document.createElement("i"));
+    checkElement.addClass("fa fa-check pl-1 pr-1");
+    selectedSourceElement.append(checkElement);
+
+    var sourceNameElement = $(document.createElement("span"));
+    sourceNameElement.addClass("pl-1 pr-1");
+    sourceNameElement.text(sourceName);
+    selectedSourceElement.append(sourceNameElement);
+
+    var crossElement = $(document.createElement("i"));
+    crossElement.addClass("fa fa-times-circle pl-1 pr-1");
+    crossElement.click(function () {
+        deselectSource($(this).parent());
+    });
+    selectedSourceElement.append(crossElement);
 }
 
 function deselectUsage(selectedUsageElement) {
@@ -84,3 +114,5 @@ function deselectUsage(selectedUsageElement) {
     checkbox.prop('checked', false);
 
 }
+
+function deselectSource() {}
