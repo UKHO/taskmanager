@@ -748,29 +748,30 @@ ol.error-list {
     color: #09315b;
 }
 
-#selectedUsagesContainer {
+#selectedUsagesContainer, #selectedSourcesContainer {
     background-color: #eeeeee;
     overflow-y: auto;
     max-height: 250px;
 }
 
-.selectedUsage {
+.selectedUsage, .selectedSource {
     background-color: #ffffff;
     max-width: max-content;
 }
 
-.selectedUsage > .fa.fa-check {
+.selectedUsage > .fa.fa-check, .selectedSource > .fa.fa-check {
     color: #09315b;
 }
 
-.selectedUsage > span {
+.selectedUsage > span, .selectedSource > span {
     word-break: break-word;
 }
 
-.selectedUsage > .fa.fa-times-circle {
+.selectedUsage > .fa.fa-times-circle, .selectedSource > .fa.fa-times-circle {
     color: red;
     cursor: pointer;
 }
+
 
 
 
