@@ -74,7 +74,7 @@
 </form>
 
 @* Modal On Hold error comment *@
-<div class="modal fade" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <form id="frmOnHoldError">
@@ -99,7 +99,7 @@
 </div>
 
 @* Modal Add Termination comment *@
-<div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="terminatingReview" asp-page-handler="ReviewTerminate" method="post">
@@ -143,7 +143,7 @@
 
 </div>
 
-<div class="modal fade" id="modalWaitReviewDoneErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewDoneErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewDoneErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewDoneErrors" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
