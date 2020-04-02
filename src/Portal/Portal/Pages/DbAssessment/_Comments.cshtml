@@ -10,31 +10,31 @@
         @if (Model != null && Model.Comments != null)
         {
             @foreach (var comment in Model.Comments)
-             {
-                 <div class="row justify-content-between mb-3">
-                     <div class="col-6">
-                         @comment.Username
-                     </div>
-                     <div class="col-6">
-                         <div class="row justify-content-end mr-1">
-                             @comment.Created.ToString("M")
-                         </div>
-                     </div>
-                 </div>
-                 <div class="row justify-content-start">
-                     <div class="col-12">
-                         <p>
-                             @comment.Text
-                         </p>
-                         <hr />
-                     </div>
-                 </div>
-             }
+            {
+                <div class="row justify-content-between mb-3">
+                    <div class="col-6">
+                        @comment.Username
+                    </div>
+                    <div class="col-6">
+                        <div class="row justify-content-end mr-1">
+                            @comment.Created.ToString("M")
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-start">
+                    <div class="col-12">
+                        <p>
+                            @comment.Text
+                        </p>
+                        <hr />
+                    </div>
+                </div>
+            }
         }
         <button id="btnAddComment" class="btn btn-primary" type="button"><span style="padding-right: 5px;"></span>Add Comment</button>
 
         @* Modal Add new comment *@
-        <div class="modal fade" id="addCommentModal" tabindex="-1" role="dialog" aria-labelledby="AddComment" aria-hidden="true">
+        <div class="modal fade" data-backdrop="static" data-keyboard="false" id="addCommentModal" tabindex="-1" role="dialog" aria-labelledby="AddComment" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
