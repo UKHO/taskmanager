@@ -115,4 +115,10 @@ function deselectUsage(selectedUsageElement) {
 
 }
 
-function deselectSource() {}
+function deselectSource(selectedSourceElement) {
+    var sourceName = selectedSourceElement.data("source-filename");
+    selectedSourceElement.remove();
+
+    var checkbox = $("#sourcesSelection").DataTable().$("input[data-source-filename='" + sourceName + "']");
+    checkbox.prop('checked', false);
+}
