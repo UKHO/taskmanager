@@ -75,9 +75,17 @@ namespace WorkflowCoordinator.HttpClients
             {
                 data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
+                {
+                    if (data.Contains("not being assessed by HDB", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        // Treat this error as sdoc-id is already assessed and completed
+                        return;
+                    }
+
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
                                                    $"\n Url='{fullUri}'");
+                }
             }
         }
 
@@ -92,10 +100,18 @@ namespace WorkflowCoordinator.HttpClients
             using (var response = await _httpClient.PutAsync(fullUri.ToString(), null).ConfigureAwait(false))
             {
                 data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
                 if (!response.IsSuccessStatusCode)
+                {
+                    if (data.Contains("not being assessed by HDB", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        // Treat this error as sdoc-id is already assessed and completed
+                        return;
+                    }
+
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                    $"\n Message= '{data}'," +
-                                                   $"\n Url='{fullUri}'");
+                                                   $"\n Url='{fullUri}'"); }
             }
         }
 
