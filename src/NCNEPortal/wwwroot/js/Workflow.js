@@ -12,11 +12,9 @@
 
         var check = $("#commentscheck-" + stage).prop('checked');
         if (check) {
-            $("#comment-" + stage).removeClass("show");
-            $("#comment-" + stage).addClass("hide");
+           $("#comment-" + stage).collapse("hide");
         } else {
-            $("#comment-" + stage).removeClass("hide");
-            $("#comment-" + stage).addClass("show");
+            $("#comment-" + stage).collapse("show");
         }
 
     });
