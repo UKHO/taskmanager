@@ -3,7 +3,7 @@
 });
 
 function setControlState(enableCarisProject, enableLaunchSource) {
-    $("#editDatabase *").prop("disabled", true);
+    $("#editDatabase > .card *").prop("disabled", true);
 
     if (enableCarisProject) {
         $("#SelectedCarisWorkspace")
