@@ -739,7 +739,32 @@ ol.error-list {
 
 /* End ordered lists */
 
+/* Start LaunchCarisSelectionModal */
 #LaunchCarisSelectionModal .modal-dialog {
-    max-width: 1000px;
+    max-width: 1000px; /*FIXME*/
 }
-    
+
+#selectedUsagesContainer {
+    background-color: lightgray; /*FIXME*/
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.selectedUsage {
+    background-color: #ffffff;
+    max-width: max-content;
+}
+
+.selectedUsage > .fa.fa-check {
+    color: navy; /*FIXME*/
+}
+
+.selectedUsage > span {
+    word-break: break-word;
+}
+
+.selectedUsage > .fa.fa-times-circle {
+    color: red; /*FIXME*/
+    cursor: pointer;
+}
+/* End LaunchCarisSelectionModal */

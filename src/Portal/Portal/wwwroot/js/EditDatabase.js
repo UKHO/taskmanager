@@ -37,7 +37,6 @@ function getEditDatabase() {
         }, 
         success: function (result) {
             $("#editDatabase").html(result);
-            launchSourceEditorModalHandler();
             initializeLaunchSourceEditorModal();
             launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
@@ -106,26 +105,6 @@ function createCarisProjectHandler() {
     });
 }
 
-function launchSourceEditorModalHandler() {
-    $("#btnOpenLaunchCarisSelectionModal").on("click",
-        function() {
-            $("#LaunchCarisSelectionModal").modal("show");
-        });
-}
-
-function initializeLaunchSourceEditorModal() {
-    $("#usagesSelection").DataTable({
-        "pageLength": 6,
-        "pagingType": "simple",
-        "dom": "tip"
-    });
-
-    $("#sourcesSelection").DataTable({
-        "pageLength": 6,
-        "pagingType": "simple",
-        "dom": "tip"
-    });
-}
 
 function launchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {
