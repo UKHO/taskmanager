@@ -47,7 +47,7 @@ namespace SourceDocumentCoordinator.Handlers
                                                     _documentStatusFactory, 
                                                     message.ProcessId, 
                                                     message.SourceDocumentId, null, null, 
-                                                    SourceDocumentRetrievalStatus.Complete, 
+                                                    SourceDocumentRetrievalStatus.FileGenerated, 
                                                     message.SourceType, message.CorrelationId);
                         break;
                     default:

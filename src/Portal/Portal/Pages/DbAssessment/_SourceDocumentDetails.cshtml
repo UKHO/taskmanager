@@ -37,7 +37,7 @@
                         </td>
                         <td>
                             @{
-                                if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.Complete.ToString())
+                                if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                 {
                                     <a href="@Model.PrimaryDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
                                 }
