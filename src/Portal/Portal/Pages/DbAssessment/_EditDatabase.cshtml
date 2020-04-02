@@ -106,7 +106,7 @@
                             @foreach (var hpdUsage in Model.HpdUsages)
                             {
                                 <tr>
-                                    <td>
+                                    <td class="hpdUsageName">
                                         @hpdUsage
                                     </td>
                                     <td>
@@ -139,7 +139,7 @@
                             @foreach (var source in Model.SourceDocuments)
                             {
                                 <tr>
-                                    <td>
+                                    <td class="sourceDocumentName">
                                         @source.DocumentName
                                     </td>
                                     <td>

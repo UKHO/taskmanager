@@ -5,7 +5,9 @@
 function initializeLaunchSourceEditorModal() {
     attachLaunchSourceEditorModalButtonHandler();
     attachUsagesSelectionCheckboxesHandler();
+    attachUsagesSelectionTextClickHandler();
     attachSourcesSelectionCheckboxesHandler();
+    attachSourcesSelectionTextClickHandler();
 
     $("#usagesSelection").DataTable({
         "pageLength": 6,
@@ -41,17 +43,52 @@ function attachUsagesSelectionCheckboxesHandler() {
     });
 }
 
+
+
+function attachUsagesSelectionTextClickHandler() {
+    $("#usagesSelection .hpdUsageName").click(function () {
+        var thisUsageCheckbox = $(this).siblings("td").find("input[type='checkbox']");
+        var usageName = thisUsageCheckbox.data("usage-name");
+
+        if (thisUsageCheckbox.is(":checked")) {
+
+            var selectedUsageElement = $(".selectedUsage[data-usage-name='" + usageName + "']");
+            deselectUsage(selectedUsageElement);
+            return;
+        }
+
+        thisUsageCheckbox.prop('checked', true);
+        selectUsage(usageName);
+    });
+}
+
 function attachSourcesSelectionCheckboxesHandler() {
     $("#sourcesSelection input[type='checkbox']").change(function () {
         var sourceName = $(this).data("source-filename");
 
         if (!$(this).prop('checked')) {
+            var selectedSourceElement = $(".selectedSource[data-source-filename='" + sourceName + "']");
+            deselectSource(selectedSourceElement);
+            return;
+        }
+
+        selectSource(sourceName);
+    });
+}
+
+function attachSourcesSelectionTextClickHandler() {
+    $("#sourcesSelection .sourceDocumentName").click(function () {
+        var thisSourceCheckbox = $(this).siblings("td").find("input[type='checkbox']");
+        var sourceName = thisSourceCheckbox.data("source-filename");
+
+        if (thisSourceCheckbox.is(":checked")) {
 
             var selectedSourceElement = $(".selectedSource[data-source-filename='" + sourceName + "']");
             deselectSource(selectedSourceElement);
             return;
         }
 
+        thisSourceCheckbox.prop('checked', true);
         selectSource(sourceName);
     });
 }

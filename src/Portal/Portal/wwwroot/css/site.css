@@ -772,6 +772,9 @@ ol.error-list {
     cursor: pointer;
 }
 
+.sourceDocumentName, .hpdUsageName {
+    cursor: pointer;
+}
 
 
 
