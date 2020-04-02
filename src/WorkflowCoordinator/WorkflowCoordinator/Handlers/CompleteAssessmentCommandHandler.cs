@@ -58,10 +58,12 @@ namespace WorkflowCoordinator.Handlers
                     ? "Imm Act - NM"
                     : "Longer-term Action";
 
+            LogContext.PushProperty("SdocId", sdocId);
+
             if (workflowInstance.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.Completed.ToString())
             {
                 // Already marked as Completed
-                _logger.LogInformation("SDRA Job with SdocId {sdocId}, belongs to ProcessId {ProcessId}, is already marked as Completed.", sdocId);
+                _logger.LogInformation("SDRA Job with SdocId {SdocId}, belongs to ProcessId {ProcessId}, is already marked as Completed.");
 
                 return;
             }
@@ -77,7 +79,7 @@ namespace WorkflowCoordinator.Handlers
 
         private async Task UpdateSdraAssessmentAsAssessed(int sdocId, int processId, string action)
         {
-            _logger.LogInformation("Marking PrimarySdocIds {SdocId}s as Assessed, triggered by ProcessId {ProcessId}", sdocId);
+            _logger.LogInformation("Marking PrimarySdocIds {SdocId} as Assessed, triggered by ProcessId {ProcessId}");
             
             try
             {
@@ -89,7 +91,7 @@ namespace WorkflowCoordinator.Handlers
 
                 await _dbContext.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully Marked PrimarySdocIds {SdocId} as Assessed, triggered by ProcessId {ProcessId}", sdocId);
+                _logger.LogInformation("Successfully Marked PrimarySdocIds {SdocId} as Assessed, triggered by ProcessId {ProcessId}");
 
             }
             catch (Exception e)
@@ -104,7 +106,7 @@ namespace WorkflowCoordinator.Handlers
 
         private async Task UpdateSdraAssessmentAsCompleted(int sdocId)
         {
-            _logger.LogInformation("Marking PrimarySdocIds {SdocId}s as Completed, triggered by ProcessId {ProcessId}", sdocId);
+            _logger.LogInformation("Marking PrimarySdocIds {SdocId} as Completed, triggered by ProcessId {ProcessId}");
 
             try
             {
@@ -116,7 +118,7 @@ namespace WorkflowCoordinator.Handlers
 
                 await _dbContext.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully Marked PrimarySdocIds {SdocId} as Completed, triggered by ProcessId {ProcessId}", sdocId);
+                _logger.LogInformation("Successfully Marked PrimarySdocIds {SdocId} as Completed, triggered by ProcessId {ProcessId}");
 
             }
             catch (Exception e)
