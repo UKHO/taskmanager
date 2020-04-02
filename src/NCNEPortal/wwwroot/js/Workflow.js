@@ -4,6 +4,21 @@
     var formChanged = false;
     $("#frmWorkflow").change(function () { formChanged = true; });
 
+    $(".commentslider").click(function() {
+
+        var stage = $(this).data("taskstage");
+        var processid = $(this).data("processid");
+
+
+        var check = $("#commentscheck-" + stage).prop('checked');
+        if (check) {
+           $("#comment-" + stage).collapse("hide");
+        } else {
+            $("#comment-" + stage).collapse("show");
+        }
+
+    });
+
     window.onbeforeunload = function () {
         if (formChanged) {
             return "Changes detected";

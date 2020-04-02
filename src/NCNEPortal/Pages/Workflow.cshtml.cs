@@ -233,7 +233,8 @@ namespace NCNEPortal
 
             var taskInfo = _dbContext.TaskInfo
                 .Include(task => task.TaskRole)
-                .Include(task => task.TaskStage)
+                .Include(task => task.TaskStage).ThenInclude(comment => comment.TaskStageComment)
+                .Include(task => task.TaskStage).ThenInclude(stagetype => stagetype.TaskStageType)
                 .Include(task => task.TaskComment)
                 .FirstOrDefault(t => t.ProcessId == processId);
 

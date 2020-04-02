@@ -154,7 +154,7 @@ namespace NCNEPortal.UnitTests
 
 
         [Test]
-        public async Task Test_StageType_Factory_For_Adoption_ChartType()
+        public void Test_StageType_Factory_For_Adoption_ChartType()
         {
             var stagetypes = _stageTypeFactory.GetTaskStages("Adoption");
 
@@ -166,7 +166,7 @@ namespace NCNEPortal.UnitTests
 
 
         [Test]
-        public async Task Test_StageType_Factory_For_Primary_ChartType()
+        public void Test_StageType_Factory_For_Primary_ChartType()
         {
             var stagetypes = _stageTypeFactory.GetTaskStages("Primary");
 
