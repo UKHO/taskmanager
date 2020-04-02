@@ -102,28 +102,42 @@ namespace Portal.Pages.DbAssessment
         private async Task GetSourceDocuments(int processId)
         {
             var assessmentData = await _dbContext.AssessmentData
-                .FirstOrDefaultAsync(sd => sd.ProcessId == processId);
+                .FirstOrDefaultAsync(ad => ad.ProcessId == processId);
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
+                .FirstOrDefaultAsync(pds => pds.ProcessId == processId);
 
-            var primarySourceDocument = new SourceViewModel()
+            if (assessmentData != null && primaryDocumentStatus != null &&
+                primaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
             {
-                DocumentName = assessmentData.SourceDocumentName,
-                FileExtension = "Not implemented"
-            };
+                var primarySourceDocument = new SourceViewModel()
+                {
+                    DocumentName = assessmentData.SourceDocumentName,
+                    FileExtension = "Not implemented"
+                };
 
-            SourceDocuments.Add(primarySourceDocument);
+                SourceDocuments.Add(primarySourceDocument);
+            }
 
-            //TODO: Make sure we're using the correct status values.
             var linkedDocuments = await _dbContext.LinkedDocument
-                .Where(ld => ld.ProcessId == processId && ld.Status == "Started")
-                .Select(ld => new SourceViewModel() {DocumentName = ld.SourceDocumentName, FileExtension = "Not implemented"})
+                .Where(ld => ld.ProcessId == processId &&
+                                          ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                .Select(ld => new SourceViewModel()
+                {
+                    DocumentName = ld.SourceDocumentName,
+                    FileExtension = "Not implemented"
+                })
                 .ToListAsync();
 
             SourceDocuments.AddRange(linkedDocuments);
 
-            //TODO: Make sure we're using the correct status values.
             var databaseDocuments = await _dbContext.DatabaseDocumentStatus
-                .Where(dd => dd.ProcessId == processId && dd.Status == "Started")
-                .Select(dd => new SourceViewModel() {DocumentName = dd.SourceDocumentName, FileExtension = "Not implemented"})
+                .Where(dd => dd.ProcessId == processId &&
+                                                dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                .Select(dd => new SourceViewModel()
+                {
+                    DocumentName = dd.SourceDocumentName,
+                    FileExtension = "Not implemented"
+                })
                 .ToListAsync();
 
             SourceDocuments.AddRange(databaseDocuments);
