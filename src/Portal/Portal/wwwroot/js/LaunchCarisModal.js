@@ -102,6 +102,7 @@ function attachClearLaunchSourceEditorModalButtonHandler() {
 
 function attachLaunchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#numberOfSelectedUsagesValidationError").collapse("hide");
         hideDialogBoxes();
         $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
@@ -118,6 +119,12 @@ function attachLaunchSourceEditorDownloadHandler() {
         $(".selectedSource").each(function () {
             selectedSources.push($(this).data("source-filename"));
         });
+
+        if (selectedHpdUsages.length === 0) {
+            $("#numberOfSelectedUsagesValidationError").collapse("show");
+            $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+            return;
+        }
 
         $.ajax({
             type: "GET",
@@ -163,7 +170,6 @@ function attachLaunchSourceEditorDownloadHandler() {
 
     });
 }
-
 
 function selectUsage(usageName) {
     var containerElement = $("#selectedUsagesContainer");
