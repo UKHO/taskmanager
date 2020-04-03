@@ -8,6 +8,7 @@ function initializeLaunchSourceEditorModal() {
     attachUsagesSelectionTextClickHandler();
     attachSourcesSelectionCheckboxesHandler();
     attachSourcesSelectionTextClickHandler();
+    attachClearLaunchSourceEditorModalButtonHandler();
 
     $("#usagesSelection").DataTable({
         "pageLength": 6,
@@ -24,6 +25,7 @@ function initializeLaunchSourceEditorModal() {
 
 function attachLaunchSourceEditorModalButtonHandler() {
     $("#btnOpenLaunchCarisSelectionModal").click(function () {
+        clearLaunchSourceEditorModal();
         $("#LaunchCarisSelectionModal").modal("show");
     });
 }
@@ -42,8 +44,6 @@ function attachUsagesSelectionCheckboxesHandler() {
         selectUsage(usageName);
     });
 }
-
-
 
 function attachUsagesSelectionTextClickHandler() {
     $("#usagesSelection .hpdUsageName").click(function () {
@@ -90,6 +90,12 @@ function attachSourcesSelectionTextClickHandler() {
 
         thisSourceCheckbox.prop('checked', true);
         selectSource(sourceName);
+    });
+}
+
+function attachClearLaunchSourceEditorModalButtonHandler() {
+    $("#btnClearLaunchCarisSelections").click(function () {
+        clearLaunchSourceEditorModal();
     });
 }
 
@@ -158,4 +164,17 @@ function deselectSource(selectedSourceElement) {
 
     var checkbox = $("#sourcesSelection").DataTable().$("input[data-source-filename='" + sourceName + "']");
     checkbox.prop('checked', false);
+}
+
+function clearLaunchSourceEditorModal() {
+    $(".selectedUsage").each(function () {
+        deselectUsage($(this));
+    });
+
+    $(".selectedSource").each(function () {
+        deselectSource($(this));
+    });
+
+    $("#usagesSelection").DataTable().page("first").draw();
+    $("#sourcesSelection").DataTable().page("first").draw();
 }
