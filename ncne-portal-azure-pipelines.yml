@@ -72,7 +72,7 @@ stages:
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
-          # arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\CodeCoverage.runsettings
+          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\CodeCoverage.runsettings
         displayName: 'dotnet test ncneportal tests'
 
       - task: DotNetCoreCLI@2
