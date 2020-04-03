@@ -1097,6 +1097,14 @@
         "Notes": "Important note"
       }
     ],
+    "PrimaryDocumentStatus": {
+      "processId": 127,
+      "SdocId": 934153,
+      "ContentServiceId": null,
+      "Status": "Started",
+      "StartedAt": "2020-01-03T00:00:00",
+      "CorrelationId": "c5479f90-1110-40ba-9131-5a8efc561948"
+    },
     "DatabaseDocumentStatus": [
       {
         "processId": 127,
