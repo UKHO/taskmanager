@@ -18,9 +18,9 @@ namespace Portal.TestAutomation.Framework.Pages
         {
         }
 
-        private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
+        private IWebElement ReviewForm => Driver.FindElement(By.Id("frmReviewPage"));
 
-        private IWebElement SourceDocumentTable => Driver.FindElement(By.XPath("//*[@id='srcDocDetailsTable']"));
+        private IWebElement SourceDocumentTable => Driver.FindElement(By.Id("srcDocDetailsTable"));
 
         public override bool HasLoaded
         {
@@ -28,7 +28,7 @@ namespace Portal.TestAutomation.Framework.Pages
             {
                 try
                 {
-                    Wait.Until(driver => UkhoLogo.Displayed);
+                    Wait.Until(driver => ReviewForm.Displayed);
                     return true;
                 }
                 catch (NoSuchElementException e)
