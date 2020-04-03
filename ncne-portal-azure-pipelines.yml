@@ -255,7 +255,7 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: publish
-          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          arguments: "--output $(System.DefaultWorkingDirectory)/publish_output"
           projects: "**/ncneportal.csproj"
           publishWebProjects: false
           modifyOutputPath: false
