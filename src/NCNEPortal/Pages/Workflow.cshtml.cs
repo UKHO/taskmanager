@@ -39,9 +39,7 @@ namespace NCNEPortal
         private readonly IAdDirectoryService _adDirectoryService;
         public int ProcessId { get; set; }
 
-        [DisplayName("ION")]
-        [BindProperty]
-        public string Ion { get; set; }
+        [DisplayName("ION")] [BindProperty] public string Ion { get; set; }
 
         [DisplayName("Chart title")] public string ChartTitle { get; set; }
 
@@ -54,14 +52,13 @@ namespace NCNEPortal
         [BindProperty]
         public string Country { get; set; }
 
-        [DisplayName("Chart type")]
-        public string ChartType { get; set; }
+        [DisplayName("Chart type")] public string ChartType { get; set; }
 
-        [DisplayName("Workflow type")]
-        public string WorkflowType { get; set; }
+        [DisplayName("Workflow type")] public string WorkflowType { get; set; }
 
         [BindProperty]
-        [DisplayName("Duration")] public int Dating { get; set; }
+        [DisplayName("Duration")]
+        public int Dating { get; set; }
 
 
         [DisplayName("Repromat date")]
@@ -111,8 +108,7 @@ namespace NCNEPortal
         [BindProperty]
         public string Publisher { get; set; }
 
-        [BindProperty]
-        public bool SentTo3Ps { get; set; }
+        [BindProperty] public bool SentTo3Ps { get; set; }
 
         [DisplayName("Sent to 3PS")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -132,8 +128,7 @@ namespace NCNEPortal
         public List<TaskComment> TaskComments { get; set; }
 
 
-        [DisplayName("CARIS Project Name")]
-        public string CarisProjectName { get; set; }
+        [DisplayName("CARIS Project Name")] public string CarisProjectName { get; set; }
 
         public CarisProjectDetails CarisProjectDetails { get; set; }
         public bool IsCarisProjectCreated { get; set; }
@@ -142,6 +137,7 @@ namespace NCNEPortal
         public List<string> userList = new List<string>();
 
         private string _userFullName;
+
         public string UserFullName
         {
             get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
@@ -294,19 +290,21 @@ namespace NCNEPortal
                 new TaskComment()
                 {
                     CommentDate = DateTime.Now, Name = "WilliamsG",
-                    CommentText = "This is a very important comment that will eventually reach a, not insignificant character count. " +
-                                  "This is a very important comment that will eventually reach a, not insignificant character count. " +
-                                  "This is purely to demonstrate that this will look lovely, nothing more to it than that.",Role = "Verifier 2"
+                    CommentText =
+                        "This is a very important comment that will eventually reach a, not insignificant character count. " +
+                        "This is a very important comment that will eventually reach a, not insignificant character count. " +
+                        "This is purely to demonstrate that this will look lovely, nothing more to it than that.",
+                    Role = "Verifier 2"
                 },
                 new TaskComment()
                 {
                     CommentDate = DateTime.Now, Name = "StoodleyM",
-                    CommentText = "",Role = "Verifier 2"
+                    CommentText = "", Role = "Verifier 2"
                 },
                 new TaskComment()
                 {
                     CommentDate = DateTime.Now, Name = "StoodleyM",
-                    CommentText = "Rework required as it isn't right.",Role = "Verifier 2"
+                    CommentText = "Rework required as it isn't right.", Role = "Verifier 2"
                 }
             };
         }
@@ -343,7 +341,8 @@ namespace NCNEPortal
         private async Task<int> CreateCarisProject(int processId, string projectName)
         {
 
-            var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+            var carisProjectDetails =
+                await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
 
             if (carisProjectDetails != null)
             {
@@ -455,7 +454,8 @@ namespace NCNEPortal
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
 
-            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType, ThreePSInfo,
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
+                ThreePSInfo,
                 ValidationErrorMessages)))
             {
 
@@ -481,7 +481,8 @@ namespace NCNEPortal
             task.RepromatDate = RepromatDate;
             if (chartType == "Adoption" && RepromatDate != null)
             {
-                task.PublicationDate = PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
+                task.PublicationDate =
+                    PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
 
             }
             else
@@ -524,6 +525,7 @@ namespace NCNEPortal
                         StatusCode = (int)HttpStatusCode.InternalServerError
                     };
                 }
+
                 return new JsonResult(userList);
 
             }
@@ -537,6 +539,37 @@ namespace NCNEPortal
             }
 
         }
+
+        public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)
+        {
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
+
+
+            if (!string.IsNullOrEmpty(txtComment))
+            {
+                await _dbContext.TaskStageComment.AddAsync(new TaskStageComment()
+                {
+                    ProcessId = commentProcessId,
+                    TaskStageId = stageId,
+                    Comment = txtComment,
+                    Created = DateTime.Now,
+                    Username = UserFullName
+                });
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            var result = new[]
+            {
+                UserFullName,
+                DateTime.Now.ToLongDateString()
+            };
+            return new JsonResult(result);
+
+        }
+
     }
 }
 
