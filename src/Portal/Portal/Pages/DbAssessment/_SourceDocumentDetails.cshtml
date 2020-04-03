@@ -37,7 +37,7 @@
                         </td>
                         <td>
                             @{
-                                if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.Complete.ToString())
+                                if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                 {
                                     <a href="@Model.PrimaryDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
                                 }
@@ -97,7 +97,7 @@
                                 </td>
                                 <td>
                                     @{
-                                        if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
                                             <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
                                         }
@@ -129,7 +129,7 @@
                                 <td>@databaseDocument.SdocId</td>
                                 <td>
                                     @{
-                                        if (databaseDocument.Status.Equals(LinkedDocumentRetrievalStatus.Complete.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (databaseDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
                                             <a href="@databaseDocument.ContentServiceUri" target="_blank"></a>
                                         }

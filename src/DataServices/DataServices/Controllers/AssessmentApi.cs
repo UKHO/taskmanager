@@ -117,17 +117,17 @@ namespace DataServices.Controllers
         [HttpPut]
         [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}")]
         [ValidateModelState]
-        [SwaggerOperation("PutAssessmentCompleted")]
+        [SwaggerOperation("PutAssessmentAsCompleted")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
         [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
         [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public async Task<IActionResult> PutAssessmentCompleted([FromRoute] [Required] string callerCode,
+        public async Task<IActionResult> PutAssessmentAsCompleted([FromRoute] [Required] string callerCode,
             [FromRoute] [Required] int? sdocId, [FromQuery] [Required] string comment)
         {
-            LogContext.PushProperty("ApiResource", nameof(PutAssessmentCompleted));
+            LogContext.PushProperty("ApiResource", nameof(PutAssessmentAsCompleted));
             LogContext.PushProperty("CallerCode", callerCode);
             LogContext.PushProperty("SdocId", sdocId);
             LogContext.PushProperty("Comment", comment);
@@ -182,7 +182,7 @@ namespace DataServices.Controllers
         /// <param name="callerCode">System that is calling the API  Example: HDB </param>
         /// <param name="transactionId">Cross reference from SDRA to  external system providing the assessment record   Example: tbc </param>
         /// <param name="sdocId">Unique identifier for an SDRA Source Document   Example:  </param>
-        /// <param name="action">A action type from a list  Example: Imm Act - NM, Longer-term Action, No Action, No Impact </param>
+        /// <param name="actionType">A action type from a list  Example: Imm Act - NM, Longer-term Action, No Action, No Impact </param>
         /// <param name="change">tbc  Example: tbc </param>
         /// <response code="200">SDRA notified that document has been assessment</response>
         /// <response code="400">Bad request.</response>
@@ -194,37 +194,81 @@ namespace DataServices.Controllers
         [HttpPut]
         [Route("/DataServices/v1/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}")]
         [ValidateModelState]
-        [SwaggerOperation("PutDocumentAssessed")]
+        [SwaggerOperation("PutDocumentAsAssessed")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
         [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
         [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public async Task<IActionResult> PutDocumentAssessed([FromRoute][Required]string callerCode, [FromRoute][Required]string transactionId, [FromRoute][Required]int? sdocId, [FromRoute][Required]string actionType, [FromRoute][Required]string change)
+        public async Task<IActionResult> PutDocumentAsAssessed(
+                                                            [FromRoute][Required]string callerCode, 
+                                                            [FromRoute][Required]string transactionId,
+                                                            [FromRoute][Required]int? sdocId,
+                                                            [FromRoute][Required]string actionType, 
+                                                            [FromRoute][Required]string change)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(DefaultErrorResponse));
+            LogContext.PushProperty("ApiResource", nameof(PutDocumentAsAssessed));
+            LogContext.PushProperty("CallerCode", callerCode);
+            LogContext.PushProperty("SdocId", sdocId??0);
+            LogContext.PushProperty("TransactionId", transactionId);
+            LogContext.PushProperty("ActionType", actionType);
+            LogContext.PushProperty("Change", change);
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(DefaultErrorResponse));
+            _logger.LogInformation("{ApiResource} entered with: CallerCode: {CallerCode}; " +
+                                               "SdocId: {SdocId}; " +
+                                               "TransactionId: {TransactionId}; " +
+                                               "ActionType: {ActionType}; " +
+                                               "Change: {Change}");
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(DefaultErrorResponse));
+            if (!sdocId.HasValue || sdocId <= 0)
+                throw new ArgumentException("Error marking assessment Assessed due to invalid parameter", nameof(sdocId));
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
+            CallOutcome result;
 
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
+            try
+            {
+                var notifyAssessmentCompletedRequest = new NotifyDocumentAssessedRequest(
+                                                    new NotifyDocumentAssessedRequestBody(
+                                                                                            callerCode, 
+                                                                                            transactionId, 
+                                                                                            sdocId.Value,
+                                                                                            0, 
+                                                                                            null,
+                                                                                            actionType, 
+                                                                                            change));
 
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
+                LogContext.PushProperty("WebServiceRequestResource", nameof(_assessmentWebServiceSoapClientAdapter.SoapClient.NotifyDocumentAssessedAsync));
+                LogContext.PushProperty("WebServiceRequestBody", notifyAssessmentCompletedRequest.Body.ToJSONSerializedString());
+                _logger.LogInformation("{ApiResource} requesting Web Service {WebServiceRequestResource} with: WebServiceRequestBody: {@WebServiceRequestBody};");
 
-            throw new NotImplementedException();
+                var task = await _assessmentWebServiceSoapClientAdapter.SoapClient.NotifyDocumentAssessedAsync(notifyAssessmentCompletedRequest);
+
+                _logger.LogInformation("{ApiResource} finished requesting Web Service {WebServiceRequestResource} successfully");
+
+                result = task.Body.NotifyDocumentAssessedResult;
+            }
+            catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
+            {
+                _logger.LogError(e, "{ApiResource} Endpoint not found");
+                return StatusCode(500, e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "{ApiResource} Error marking assessment Assessed");
+                return StatusCode(500, e.Message);
+            }
+
+            if (result.ErrorCode != 0)
+            {
+                LogContext.PushProperty("WebServiceResponseMessage", result.Message);
+                _logger.LogError("{ApiResource} Error marking assessment Assessed, WebServiceResponseMessage: {WebServiceResponseMessage}");
+
+                return StatusCode(500, $"Error marking assessment Assessed, Message: {result.Message}");
+            }
+
+            return new ObjectResult(HttpStatusCode.OK);
         }
     }
 }

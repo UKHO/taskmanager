@@ -20,7 +20,7 @@ namespace Portal.Configuration
         public Uri LocalDevLandingPageHttpsUrl { get; set; }
         public Uri LandingPageUrl { get; set; }
 
-        public Uri BuildDataServicesUri(string callerCode, int sdocId, string comment)
+        public Uri BuildDataServicesMarkAssessmentCompletedUri(string callerCode, int sdocId, string comment)
         {
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,

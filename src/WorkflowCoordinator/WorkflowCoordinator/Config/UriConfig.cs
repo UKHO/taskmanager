@@ -17,11 +17,32 @@ namespace WorkflowCoordinator.Config
         public Uri K2WebServiceGetTasksUri { get; set; }
         public Uri DataServicesLocalhostHealthcheckUrl { get; set; }
         public Uri DataServicesHealthcheckUrl { get; set; }
+        public string DataServicesWebServiceAssessmentCompletedUri { get; set; }
+        public string DataServicesWebServiceAssessmentAssessedUri { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId)
         {
             return sdocId == 0 ? new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesWebServiceDocumentsForAssessmentUri}{callerCode}") : 
                 new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
         }
+
+        public Uri BuildDataServicesMarkAssessmentCompletedUri(string callerCode, int sdocId, string comment)
+        {
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
+                $@"{DataServicesWebServiceAssessmentCompletedUri}{callerCode}/{sdocId}?comment={Uri.EscapeDataString(comment)}");
+        }
+
+        public Uri BuildDataServicesMarkAssessmentAssessedUri(string callerCode,
+                                                                string transactionId,
+                                                                int? sdocId,
+                                                                string actionType,
+                                                                string change)
+        {
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
+                $@"{DataServicesWebServiceAssessmentAssessedUri}{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}");
+        }
+
     }
 }

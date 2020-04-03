@@ -5,7 +5,9 @@
         NotAttached,
         Started,    // Equivalent to SDRA Status 1 (Queued)
         Ready,       // Equivalent to SDRA Status 0 (success)
-        Complete
+        FileGenerated,
+        Assessed,
+        Completed
 
     }
 }

@@ -342,12 +342,12 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                await _dataServiceApiClient.PutAssessmentCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
+                await _dataServiceApiClient.MarkAssessmentAsCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
-                    nameof(_dataServiceApiClient.PutAssessmentCompleted),
+                    nameof(_dataServiceApiClient.MarkAssessmentAsCompleted),
                     workflowInstance.AssessmentData.PrimarySdocId,
                     comment);
             }

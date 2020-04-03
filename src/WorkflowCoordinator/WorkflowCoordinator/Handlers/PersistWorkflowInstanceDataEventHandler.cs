@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -78,6 +79,15 @@ namespace WorkflowCoordinator.Handlers
 
                     await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
 
+                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed
+                    var completeAssessment = new CompleteAssessmentCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        ProcessId = message.ProcessId
+                    };
+
+                    await context.SendLocal(completeAssessment).ConfigureAwait(false);
+                    
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
 
                     break;
