@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -155,7 +156,6 @@ namespace Portal.UnitTests
             Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
         }
 
-        //TODO: Update Status with correct value once spoken to MS
         [Test]
         public async Task Test_OnGet_Retrieves_Linked_Documents()
         {
@@ -164,13 +164,13 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -190,7 +190,7 @@ namespace Portal.UnitTests
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
 
@@ -204,7 +204,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceViewModel_Has_Been_Populated_For_Primary_Document()
+        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Primary_Document()
         {
             await SetupForOnGetAsync();
 
@@ -216,14 +216,14 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceViewModel_Has_Been_Populated_For_Linked_Document()
+        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Linked_Document()
         {
             await SetupForOnGetAsync();
 
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = "Started",
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 SourceDocumentName = "LinkedSource"
             });
 
@@ -237,14 +237,14 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_SourceViewModel_Has_Been_Populated_For_Database_Document()
+        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Database_Document()
         {
             await SetupForOnGetAsync();
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = "Started",
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 SourceDocumentName = "DatabaseSource"
 
             });
@@ -266,13 +266,13 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -285,7 +285,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_Only_Documents_With_Matching_ProcessId_Are_Added()
+        public async Task Test_OnGet_Only_Documents_With_Matching_ProcessId_Are_Added()
         {
             await SetupForOnGetAsync();
 
@@ -305,13 +305,13 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = 456,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = 456,
-                Status = "Started"
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
             
             await _dbContext.SaveChangesAsync();
@@ -324,9 +324,30 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_Only_Documents_With_Applicable_Status_Are_Added()
+        public async Task Test_OnGet_Given_Document_Status_Is_Not_FileGenerated_Then_Sources_List_Is_Empty()
         {
-            Assert.Inconclusive();
+            await SetupForOnGetAsync();
+
+            var primaryDocumentStatus = _dbContext.PrimaryDocumentStatus.First(pds => pds.ProcessId == ProcessId);
+            primaryDocumentStatus.Status = SourceDocumentRetrievalStatus.Started.ToString();
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = LinkedDocumentRetrievalStatus.NotAttached.ToString()
+            });
+
+            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual(0, _editDatabaseModel.SourceDocuments.Count);
         }
 
         private async Task SetupForOnGetAsync()
@@ -336,6 +357,12 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 SourceDocumentName = "Source",
                 RsdraNumber = "RSDRA123"
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
             
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
