@@ -114,6 +114,16 @@ function launchSourceEditorDownloadHandler() {
         var processId = Number($("#hdnProcessId").val());
         var pageIdentity = $("#pageIdentity").val();
         var sessionFilename = $(this).data("sessionfilename");
+        var selectedHpdUsages = [];
+        var selectedSources = [];
+
+        $(".selectedUsage").each(function () {
+            selectedHpdUsages.push($(this).data("usage-name"));
+        });
+
+        $(".selectedSource").each(function () {
+            selectedSources.push($(this).data("source-filename"));
+        });
 
         $.ajax({
             type: "GET",
@@ -130,8 +140,8 @@ function launchSourceEditorDownloadHandler() {
                 "processId": processId,
                 "taskStage": pageIdentity,
                 "sessionFilename": sessionFilename,
-                "selectedHpdUsages": ["UsageTest", "UsageTest1", "UsageTest2"],
-                "selectedSources": ["SourceTest", "SourceTest1"]
+                "selectedHpdUsages": selectedHpdUsages,
+                "selectedSources": selectedSources
             },
             success: function (data) {
 
