@@ -117,17 +117,17 @@ namespace DataServices.Controllers
         [HttpPut]
         [Route("/DataServices/v1/SourceDocument/Assessment/AssessmentCompleted/{callerCode}/{sdocId}")]
         [ValidateModelState]
-        [SwaggerOperation("MarkAssessmentAsCompleted")]
+        [SwaggerOperation("PutAssessmentAsCompleted")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
         [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
         [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public async Task<IActionResult> MarkAssessmentAsCompleted([FromRoute] [Required] string callerCode,
+        public async Task<IActionResult> PutAssessmentAsCompleted([FromRoute] [Required] string callerCode,
             [FromRoute] [Required] int? sdocId, [FromQuery] [Required] string comment)
         {
-            LogContext.PushProperty("ApiResource", nameof(MarkAssessmentAsCompleted));
+            LogContext.PushProperty("ApiResource", nameof(PutAssessmentAsCompleted));
             LogContext.PushProperty("CallerCode", callerCode);
             LogContext.PushProperty("SdocId", sdocId);
             LogContext.PushProperty("Comment", comment);
@@ -194,14 +194,14 @@ namespace DataServices.Controllers
         [HttpPut]
         [Route("/DataServices/v1/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}")]
         [ValidateModelState]
-        [SwaggerOperation("MarkDocumentAsAssessed")]
+        [SwaggerOperation("PutDocumentAsAssessed")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
         [SwaggerResponse(statusCode: 401, type: typeof(DefaultErrorResponse), description: "Unauthorised.")]
         [SwaggerResponse(statusCode: 403, type: typeof(DefaultErrorResponse), description: "Forbidden.")]
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public async Task<IActionResult> MarkDocumentAsAssessed(
+        public async Task<IActionResult> PutDocumentAsAssessed(
                                                             [FromRoute][Required]string callerCode, 
                                                             [FromRoute][Required]string transactionId,
                                                             [FromRoute][Required]int? sdocId,
@@ -209,7 +209,7 @@ namespace DataServices.Controllers
                                                             [FromRoute][Required]string change)
         {
 
-            LogContext.PushProperty("ApiResource", nameof(MarkDocumentAsAssessed));
+            LogContext.PushProperty("ApiResource", nameof(PutDocumentAsAssessed));
             LogContext.PushProperty("CallerCode", callerCode);
             LogContext.PushProperty("SdocId", sdocId??0);
             LogContext.PushProperty("TransactionId", transactionId);
