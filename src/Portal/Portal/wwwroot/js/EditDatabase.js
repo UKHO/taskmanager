@@ -3,7 +3,7 @@
 });
 
 function setControlState(enableCarisProject, enableLaunchSource) {
-    $("#editDatabase *").prop("disabled", true);
+    $("#editDatabase > .card *").prop("disabled", true);
 
     if (enableCarisProject) {
         $("#SelectedCarisWorkspace")
@@ -37,7 +37,7 @@ function getEditDatabase() {
         }, 
         success: function (result) {
             $("#editDatabase").html(result);
-            launchSourceEditorModalHandler();
+            initializeLaunchSourceEditorModal();
             launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
@@ -105,12 +105,6 @@ function createCarisProjectHandler() {
     });
 }
 
-function launchSourceEditorModalHandler() {
-    $("#btnOpenLaunchCarisSelectionModal").on("click",
-        function() {
-            $("#LaunchCarisSelectionModal").modal("show");
-        });
-}
 
 function launchSourceEditorDownloadHandler() {
     $("#btnLaunchSourceEditorDownload").on("click", function () {

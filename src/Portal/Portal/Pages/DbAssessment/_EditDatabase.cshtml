@@ -91,13 +91,95 @@
                 <h4 class="modal-title">Launch Caris Selection</h4>
             </div>
             <div class="modal-body">
-                <p>Put modal body here</p>
+                <div class="row">
+                    <div class="col-5">
+                        <h5>Data Layers</h5>
+                        <p>Select data layers</p>
+                        <table id="usagesSelection" class="table-striped" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th style="width: 300px;"></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+                                var usageIndex = -1;
+                                foreach (var hpdUsage in Model.HpdUsages)
+                                {
+                                    usageIndex++;
+                                    var id = $"usageCheckbox{usageIndex}";
+                                    <tr>
+                                        <td class="hpdUsageName">
+                                            @hpdUsage
+                                        </td>
+                                        <td>
+                                            <div class="checkbox-wrapper">
+                                                <input type="checkbox" id="@id" data-usage-name="@hpdUsage">
+                                                <label for="@id"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-5 offset-2">
+                        <div id="selectedUsagesContainer" class="p-3 mt-5">
+                            <p>Your selected data layers</p>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-5">
+                        <h5>Sources</h5>
+                        <p>Select sources</p>
+                        <table id="sourcesSelection" class="table-striped" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th style="width: 300px;"></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+                                var sourceIndex = -1;
+                                foreach (var source in Model.SourceDocuments)
+                                {
+                                    sourceIndex++;
+                                    var id = $"sourceCheckbox{sourceIndex}";
+                                    <tr>
+                                        <td class="sourceDocumentName">
+                                            @source.DocumentName
+                                        </td>
+                                        <td>
+                                            <div class="checkbox-wrapper">
+                                                <input type="checkbox" id="@id" data-source-filename="@(source.DocumentName + "." + source.FileExtension)">
+                                                <label for="@id"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-5 offset-2">
+                        <div id="selectedSourcesContainer" class="p-3 mt-5">
+                            <p>Your selected sources</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <div class="row col-11 justify-content-end">
-                    <div class="col-3 pr-1"><button type="button" id="btnClearLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="d" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Clear All">Clear</button></div>
-                    <div class="col-3 pr-1"><button type="button" id="btnCancelLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Launch Caris Selections">Cancel</button></div>
-                    <div class="col-5 pl-1 pr-0"><button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary">Launch</button></div>
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-2"><button type="button" id="btnClearLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="d" data-toggle="tooltip" data-placement="left" title="Clear All">Clear</button></div>
+                        <div class="col-2 offset-6"><button type="button" id="btnCancelLaunchCarisSelections" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Launch Caris Selections">Cancel</button></div>
+                        <div class="col-2"><button id="btnLaunchSourceEditorDownload" type="button" data-sessionfilename="@Model.SessionFilename" class="btn btn-primary btn-block">Launch</button></div>
+                    </div>
                 </div>
             </div>
         </div>

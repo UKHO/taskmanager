@@ -739,5 +739,97 @@ ol.error-list {
 
 /* End ordered lists */
 
-operator {
+/* CHECKBOX START */
+
+.checkbox-wrapper input[type=checkbox] {
+    opacity: 0;
+    position: absolute;
+    left: -9999px;
 }
+
+.checkbox-wrapper label {
+    position: relative;
+    display: inline-block;
+    padding-left: 35px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 24px;
+}
+
+.checkbox-wrapper label::before,
+.checkbox-wrapper label::after {
+    position: absolute;
+    content: "";
+    display: inline-block;
+}
+
+.checkbox-wrapper label::before {
+    height: 22px;
+    width: 22px;
+    border: 2px solid #03284F;
+    left: 0;
+    top: 0;
+}
+
+.checkbox-wrapper label::after {
+    color: #09315b;
+    height: 6px;
+    width: 13px;
+    border-left: 3px solid;
+    border-bottom: 3px solid;
+    transform: rotate(-45deg);
+    left: 5px;
+    top: 7px;
+}
+
+.checkbox-wrapper input[type=checkbox] + label::after {
+    content: none;
+}
+
+.checkbox-wrapper input[type=checkbox]:checked + label::after {
+    content: "";
+}
+
+/* CHECKBOX END */
+
+/* Start LaunchCarisSelectionModal */
+#LaunchCarisSelectionModal .modal-dialog {
+    max-width: 1000px; /*FIXME*/
+}
+
+#LaunchCarisSelectionModal h4, #LaunchCarisSelectionModal h5 {
+    color: #09315b;
+}
+
+#selectedUsagesContainer, #selectedSourcesContainer {
+    background-color: #eeeeee;
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.selectedUsage, .selectedSource {
+    background-color: #ffffff;
+    max-width: max-content;
+}
+
+.selectedUsage > .fa.fa-check, .selectedSource > .fa.fa-check {
+    color: #09315b;
+}
+
+.selectedUsage > span, .selectedSource > span {
+    word-break: break-word;
+}
+
+.selectedUsage > .fa.fa-times-circle, .selectedSource > .fa.fa-times-circle {
+    color: red;
+    cursor: pointer;
+}
+
+.sourceDocumentName, .hpdUsageName {
+    cursor: pointer;
+}
+
+
+
+/* End LaunchCarisSelectionModal */
