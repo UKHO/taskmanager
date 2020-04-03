@@ -6,4 +6,4 @@ Scenario: The source document on the review page is present
 
 Scenario: The source document is present on the review page
 	When I go to the review page for a task
-	Then I can see the source document
+	Then I can see the primary source document for that task

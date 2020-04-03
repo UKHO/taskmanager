@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Common.Helpers;
+using Common.TestAutomation.Framework.PageElements;
 using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -9,6 +11,8 @@ namespace Portal.TestAutomation.Framework.Pages
 {
     public class ReviewPage : PageBase
     {
+        private readonly Table _sourceDocumentTable;
+
         public ReviewPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
             : base(driver,
                 wait,
@@ -16,11 +20,10 @@ namespace Portal.TestAutomation.Framework.Pages
                     ? urlsConfig.ReviewPageUrl
                     : urlsConfig.LocalDevReviewPageUrl)
         {
+            _sourceDocumentTable = new Table(Driver, By.Id("srcDocDetailsTable"));
         }
 
         private IWebElement ReviewForm => Driver.FindElement(By.Id("frmReviewPage"));
-
-        private IWebElement SourceDocumentTable => Driver.FindElement(By.Id("srcDocDetailsTable"));
 
         public override bool HasLoaded
         {
@@ -46,8 +49,7 @@ namespace Portal.TestAutomation.Framework.Pages
 
         public bool IsSdocIdInDetails(int sDocId)
         {
-            int.TryParse(SourceDocumentTable.FindElement(By.XPath("//tbody/tr/td[3]")).Text, out var sDocOnPage);
-            return sDocId == sDocOnPage;
+            return _sourceDocumentTable["SDOC"].Contains(sDocId.ToString());
         }
     }
 }
