@@ -149,7 +149,8 @@ namespace Portal.Pages.DbAssessment
             return new JsonResult(cachedHpdWorkspaces);
         }
 
-        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage, string sessionFilename)
+        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage, string sessionFilename,
+                                                                        List<string> selectedHpdUsages, List<string> selectedSources)
         {
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);

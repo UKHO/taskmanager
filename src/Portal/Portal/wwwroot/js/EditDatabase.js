@@ -124,11 +124,14 @@ function launchSourceEditorDownloadHandler() {
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
+            traditional: true,
             contentType: "application/json; charset=utf-8",
             data: {
                 "processId": processId,
                 "taskStage": pageIdentity,
-                "sessionFilename": sessionFilename
+                "sessionFilename": sessionFilename,
+                "selectedHpdUsages": ["UsageTest", "UsageTest1", "UsageTest2"],
+                "selectedSources": ["SourceTest", "SourceTest1"]
             },
             success: function (data) {
 
