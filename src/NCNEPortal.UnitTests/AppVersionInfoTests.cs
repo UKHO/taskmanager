@@ -41,8 +41,8 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task Test_BuildNumber_set_to_today_when_no_buildInfo_file_exists()
         {
-            var today = DateTime.UtcNow.ToString("yyyyMMdd") + ".0";
-            Assert.AreEqual(today, _appVersionInfo.BuildNumber);
+            var today = DateTime.UtcNow.ToString("yyyyMMdd");
+            StringAssert.Contains(today, _appVersionInfo.BuildNumber);
         }
     }
 }
