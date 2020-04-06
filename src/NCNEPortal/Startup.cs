@@ -152,7 +152,6 @@ namespace NCNEPortal
                 }
             }
 
-
             var startupSecretConfig = new StartupSecretsConfig();
             Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
             Configuration.GetSection("HpdDbSection").Bind(startupSecretConfig);
@@ -163,6 +162,7 @@ namespace NCNEPortal
             services.AddDbContext<HpdDbContext>((serviceProvider, options) =>
                 options.UseOracle(hpdConnection));
 
+            services.AddSingleton<AppVersionInfo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
