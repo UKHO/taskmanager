@@ -33,13 +33,7 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public async Task Test_BuildId_set_to_123456_when_no_buildInfo_file_exists()
-        {
-            Assert.AreEqual("123456", _appVersionInfo.BuildId);
-        }
-
-        [Test]
-        public async Task Test_BuildNumber_set_to_today_when_no_buildInfo_file_exists()
+        public async Task Test_BuildNumber_set_to_today()
         {
             var today = DateTime.UtcNow.ToString("yyyyMMdd");
             StringAssert.Contains(today, _appVersionInfo.BuildNumber);
