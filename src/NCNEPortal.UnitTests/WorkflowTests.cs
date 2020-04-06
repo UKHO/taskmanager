@@ -36,6 +36,7 @@ namespace NCNEPortal.UnitTests
         private IAdDirectoryService _fakeAdDirectoryService;
         private INcneUserDbService _fakencneUserDbService;
         private int ProcessId { get; set; }
+        private List<AdUser> _validUsers;
 
         [SetUp]
         public void Setup()
@@ -59,6 +60,18 @@ namespace NCNEPortal.UnitTests
             _pageValidationHelper = new PageValidationHelper(_fakencneUserDbService);
 
             _stageTypeFactory = new StageTypeFactory(_dbContext);
+
+            _validUsers = new List<AdUser>
+            {
+                new AdUser
+                {
+                    DisplayName = "Valid User1"
+                },
+                new AdUser
+                {
+                    DisplayName = "Valid User2"
+                }
+            };
 
             _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakecommentsHelper, _carisProjectHelper,
                                   _fakeGeneralConfig, _milestoneCalculator, _pageValidationHelper, _fakencneUserDbService, _fakeAdDirectoryService);
@@ -152,6 +165,63 @@ namespace NCNEPortal.UnitTests
 
         }
 
+        [Test]
+        public async Task Test_Validating_TaskStage_Dates_on_Saving_TaskInfo()
+        {
+            var taskInfo = _dbContext.TaskInfo.Add(
+                new TaskInfo()
+                {
+                    WorkflowType = "NC",
+                    ChartType = "Primary",
+                    TaskRole = new TaskRole()
+                    { Compiler = "Valid User1" },
+                    TaskStage = new List<TaskStage>()
+                    {
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "InProgress"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
+                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
+                    }
+                });
+
+            await _dbContext.SaveChangesAsync();
+
+            var processId = taskInfo.Entity.ProcessId;
+
+            //Get the task information   
+            _workflowModel.OnGetAsync(processId);
+
+            //Update it
+            _workflowModel.PublicationDate = DateTime.Now;
+            _workflowModel.Dating = 1;
+
+
+            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
+
+            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+
+            var newTaskInfo = _dbContext.TaskInfo.Include(s => s.TaskStage).FirstOrDefault(t => t.ProcessId == processId);
+
+
+            var publication = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Publication);
+
+            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
+            Assert.AreEqual(newTaskInfo?.PublicationDate, publication?.DateExpected);
+
+        }
 
         [Test]
         public void Test_StageType_Factory_For_Adoption_ChartType()

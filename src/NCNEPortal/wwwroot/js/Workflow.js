@@ -326,14 +326,17 @@
                     }, 200);
                 },
                 success: function (result) {
-                    //formChanged = false;
-                    //if (action === "Done") {
-                    //    window.location.replace("/Index");
-                    //}
                     formChanged = false;
                     var chartNo = $("#ChartNo").val();
                     var workflowType = $("#workflowType").text().trim();
                     $('h1').text(workflowType + " - " + chartNo);
+                    //update Deadline dates
+                    var dateIds = JSON.parse(result);
+                    $("#DtExp-" + dateIds.FormsDate).html($("#AnnounceDate").val());
+                    $("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
+                    $("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
+                    $("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
+
                     console.log("success");
                 },
                 error: function (error) {
