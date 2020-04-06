@@ -10,6 +10,7 @@ using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -164,6 +165,56 @@ namespace WorkflowCoordinator.UnitTests
                 workflowInstance.ActivityName);
             Assert.AreEqual(WorkflowStatus.Started.ToString(),
                 workflowInstance.Status);
+        }
+        
+        [Test]
+        public async Task Test_Handle_Given_FromActivity_Verify_And_ToActivity_Completed_Then_CompleteAssessmentCommand_Is_Fired()
+        {
+            //Given
+            var fromActivity = WorkflowStage.Verify;
+            var toActivity = WorkflowStage.Completed;
+            var processId = 1;
+            var workflowInstanceId = 1;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId,
+                FromActivity = fromActivity,
+                ToActivity = toActivity,
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(A<int>.Ignored))
+                .Returns(Task.FromResult((K2TaskData) null));
+
+            var currentWorkflowInstance = new WorkflowInstance()
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                ActivityName = fromActivity.ToString(),
+                Status = WorkflowStatus.Updating.ToString(),
+                SerialNumber = "VERIFY_SERIAL_NUMBER"
+            };
+            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            var assessData = new DbAssessmentAssessData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId
+            };
+            await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
+            await _dbContext.SaveChangesAsync();
+
+            //When
+            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+
+            //Then
+            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+
+            var completeAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is CompleteAssessmentCommand);
+            Assert.IsNotNull(completeAssessmentCommand, $"No message of type {nameof(CompleteAssessmentCommand)} seen.");
         }
 
         [TestCase(WorkflowStage.Review, WorkflowStage.Assess, WorkflowStage.Review)]
