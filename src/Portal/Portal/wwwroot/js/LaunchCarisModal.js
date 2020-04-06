@@ -9,6 +9,7 @@ function initializeLaunchSourceEditorModal() {
     attachSourcesSelectionCheckboxesHandler();
     attachSourcesSelectionTextClickHandler();
     attachClearLaunchSourceEditorModalButtonHandler();
+    attachLaunchSourceEditorDownloadHandler();
 
     $("#usagesSelection").DataTable({
         "pageLength": 6,
@@ -96,6 +97,77 @@ function attachSourcesSelectionTextClickHandler() {
 function attachClearLaunchSourceEditorModalButtonHandler() {
     $("#btnClearLaunchCarisSelections").click(function () {
         clearLaunchSourceEditorModal();
+    });
+}
+
+function attachLaunchSourceEditorDownloadHandler() {
+    $("#btnLaunchSourceEditorDownload").on("click", function () {
+        $("#numberOfSelectedUsagesValidationError").collapse("hide");
+        hideDialogBoxes();
+        $("#btnLaunchSourceEditorDownload").prop("disabled", true);
+
+        var processId = Number($("#hdnProcessId").val());
+        var pageIdentity = $("#pageIdentity").val();
+        var sessionFilename = $(this).data("sessionfilename");
+        var selectedHpdUsages = [];
+        var selectedSources = [];
+
+        $(".selectedUsage").each(function () {
+            selectedHpdUsages.push($(this).data("usage-name"));
+        });
+
+        $(".selectedSource").each(function () {
+            selectedSources.push($(this).data("source-filename"));
+        });
+
+        if (selectedHpdUsages.length === 0) {
+            $("#numberOfSelectedUsagesValidationError").collapse("show");
+            $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+            return;
+        }
+
+        $.ajax({
+            type: "GET",
+            xhrFields: {
+                responseType: 'blob'
+            },
+            url: "_EditDatabase/?handler=LaunchSourceEditor",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            traditional: true,
+            contentType: "application/json; charset=utf-8",
+            data: {
+                "processId": processId,
+                "taskStage": pageIdentity,
+                "sessionFilename": sessionFilename,
+                "selectedHpdUsages": selectedHpdUsages,
+                "selectedSources": selectedSources
+            },
+            success: function (data) {
+
+                var url = window.URL.createObjectURL(data);
+                $("#hdnDownloadLink").attr("href", url);
+                $("#hdnDownloadLink").attr("download", sessionFilename);
+                $("#hdnDownloadLink")[0].click();
+
+                $("#launchSourceEditorDownloadSuccess").collapse("show");
+            },
+            error: function (error) {
+                var errorMessage = error.getResponseHeader("Error");
+
+                $("#launchSourceEditorDownloadErrorMessage").text("Failed to generate Session File. " + errorMessage);
+                $("#launchSourceEditorDownloadError").collapse("show");
+            },
+            complete: function () {
+                $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+                $("#hdnDownloadLink").removeAttr("href");
+                $("#hdnDownloadLink").removeAttr("download");
+
+                $("#LaunchCarisSelectionModal").modal("hide");
+            }
+        });
+
     });
 }
 

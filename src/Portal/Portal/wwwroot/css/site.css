@@ -798,7 +798,7 @@ ol.error-list {
     max-width: 1000px; /*FIXME*/
 }
 
-#LaunchCarisSelectionModal h4, #LaunchCarisSelectionModal h5 {
+#LaunchCarisSelectionModal div > h4, #LaunchCarisSelectionModal div > h5 {
     color: #09315b;
 }
 

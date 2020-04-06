@@ -38,7 +38,6 @@ function getEditDatabase() {
         success: function (result) {
             $("#editDatabase").html(result);
             initializeLaunchSourceEditorModal();
-            launchSourceEditorDownloadHandler();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
 
@@ -106,56 +105,6 @@ function createCarisProjectHandler() {
 }
 
 
-function launchSourceEditorDownloadHandler() {
-    $("#btnLaunchSourceEditorDownload").on("click", function () {
-        hideDialogBoxes();
-        $("#btnLaunchSourceEditorDownload").prop("disabled", true);
-
-        var processId = Number($("#hdnProcessId").val());
-        var pageIdentity = $("#pageIdentity").val();
-        var sessionFilename = $(this).data("sessionfilename");
-
-        $.ajax({
-            type: "GET",
-            xhrFields: {
-                responseType: 'blob'
-            },
-            url: "_EditDatabase/?handler=LaunchSourceEditor",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            contentType: "application/json; charset=utf-8",
-            data: {
-                "processId": processId,
-                "taskStage": pageIdentity,
-                "sessionFilename": sessionFilename
-            },
-            success: function (data) {
-
-                var url = window.URL.createObjectURL(data);
-                $("#hdnDownloadLink").attr("href", url);
-                $("#hdnDownloadLink").attr("download", sessionFilename);
-                $("#hdnDownloadLink")[0].click();
-
-
-                $("#launchSourceEditorDownloadSuccess").collapse("show");
-            },
-            error: function (error) {
-                var errorMessage = error.getResponseHeader("Error");
-
-                $("#launchSourceEditorDownloadErrorMessage").text("Failed to generate Session File. " + errorMessage);
-                $("#launchSourceEditorDownloadError").collapse("show");
-            },
-            complete: function () {
-
-                $("#btnLaunchSourceEditorDownload").prop("disabled", false);
-                $("#hdnDownloadLink").removeAttr("href");
-                $("#hdnDownloadLink").removeAttr("download");
-            }
-        });
-
-    });
-}
 
 function hideDialogBoxes() {
 
