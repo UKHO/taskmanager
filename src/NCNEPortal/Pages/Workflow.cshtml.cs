@@ -11,8 +11,10 @@ using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
+using NCNEPortal.Models;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
+using Newtonsoft.Json;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
@@ -468,10 +470,10 @@ namespace NCNEPortal
             var result = await UpdateTaskInformation(processId, chartType);
 
 
-            return new JsonResult(result);
+            return new JsonResult(JsonConvert.SerializeObject(result));
         }
 
-        private async Task<int[]> UpdateTaskInformation(int processId, string chartType)
+        private async Task<DeadLineId> UpdateTaskInformation(int processId, string chartType)
         {
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
@@ -548,10 +550,15 @@ namespace NCNEPortal
 
             await _dbContext.SaveChangesAsync();
 
-            return new int[]
+            return new DeadLineId()
             {
-                formStageId, commitStageId, cisStageId, publishStageId
+                FormsDate = formStageId,
+                CommitDate = commitStageId,
+                CisDate = cisStageId,
+                PublishDate = publishStageId
             };
+
+
         }
 
 

@@ -331,10 +331,11 @@
                     var workflowType = $("#workflowType").text().trim();
                     $('h1').text(workflowType + " - " + chartNo);
                     //update Deadline dates
-                    $("#DtExp-" + result[0]).html($("#AnnounceDate").val());
-                    $("#DtExp-" + result[1]).html($("#CommitToPrintDate").val());
-                    $("#DtExp-" + result[2]).html($("#CISDate").val());
-                    $("#DtExp-" + result[3]).html($("#PublicationDate").val());
+                    var dateIds = JSON.parse(result);
+                    $("#DtExp-" + dateIds.FormsDate).html($("#AnnounceDate").val());
+                    $("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
+                    $("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
+                    $("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
 
                     console.log("success");
                 },
