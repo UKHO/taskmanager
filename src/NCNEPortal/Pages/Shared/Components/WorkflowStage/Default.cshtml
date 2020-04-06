@@ -71,8 +71,8 @@
     <tr id="comment-@(Model.TaskStageId)" class="collapse hide">
 
         <td colspan="6" class="pl-3 pr-3">
-            <div class="container" style="overflow-y: auto; max-height: 150px;">
-                @foreach (var comment in Model.TaskStageComment)
+            <div id="container-@(Model.TaskStageId)" class="container" style="overflow-y: auto; max-height: 150px;">
+                @foreach (var comment in Model.TaskStageComment.OrderByDescending(t => t.Created))
                 {
                     <div class="row m-3">
                         <div class="col-2">
@@ -93,8 +93,9 @@
             </div>
             <div class="col text-right">
                 <span class="fas fa-comment-alt mr-2"></span>
-                <a href="#">Add a comment</a>
+                <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)">Add a comment</button>
             </div>
+
         </td>
 
     </tr>

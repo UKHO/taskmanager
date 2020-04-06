@@ -492,6 +492,29 @@
     </div>
 </div>
 
+@* Modal Edit stage comment *@
+<div class="modal fade" id="editStageCommentModal" tabindex="-1" role="dialog" aria-labelledby="EditStageComment" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Comment</h4>
+            </div>
+            <div class="modal-body">
+                <textarea style="height: 100px;" maxlength="4000" id="txtComment" name="txtComment" class="form-control"></textarea>
+                <input type="hidden" id="hdnCommentProcessId" name="commentProcessId" />
+                <input type="hidden" id="hdnStageId" name="StageId" />
+                <br />
+                <div id="editStageCommentError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClearComment" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                <button type="button" id="btnCancelComment" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmStageComment" id="btnPostComment" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="js/DesignCustomSelect.js">
     </script>

@@ -19,6 +19,81 @@
 
     });
 
+    $(".btnAddcomment").click(function () {
+        var stageid = $(this).data("taskstage");
+        var processid = $(this).data("processid");
+        $("#hdnCommentProcessId").val(processid);
+        $("#hdnStageId").val(stageid);
+
+        $("#btnPostComment").prop("disabled", false);
+        $("#editStageCommentError").html("");
+
+
+        $("#editStageCommentModal").modal("show");
+    });
+
+
+
+    $("#editStageCommentModal").on("shown.bs.modal",
+        function () {
+            $("#txtComment").val("");
+            $("#txtComment").focus();
+        });
+
+    $("#btnClearComment").click(function () {
+        $("#txtComment").val("");
+        $("#txtComment").focus();
+    });
+
+    $("#btnPostComment").on("click", function () {
+        var comment = $("#txtComment").val();
+        $("#editStageCommentError").html("");
+        if (comment.trim().length === 0) {
+            $("#editStageCommentError").html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
+            $('#txtComment').focus();
+        } else {
+
+            $("#btnPostComment").prop("disabled", true);
+            var stageid = $("#hdnStageId").val();
+            var processid = $("#hdnCommentProcessId").val();
+
+            $.ajax({
+                type: "POST",
+                url: "Workflow/?handler=StageComment",
+
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "txtComment": comment,
+                    "commentProcessId": processid,
+                    "stageId": stageid
+                },
+                success: function(result) {
+                    $('#container-' +
+                        stageid.toString()).prepend(' <div class="row m-3"><div class= "col-2" ><div>' +
+                        result[1] +
+                        '</div > <br /> <div><strong>' +
+                        result[0] +
+                        '</strong ></div ></div > <div class="col-10">' +
+                        comment +
+                        '</div > </div ><br />');
+
+                    $("#editStageCommentModal").modal("hide");
+
+
+                },
+                error: function(error) {
+                    var responseJson = error.responseJSON;
+                    $("#editStageCommentError").append(responseJson);
+
+                }
+            });
+        }
+    });
+
+        
     window.onbeforeunload = function () {
         if (formChanged) {
             return "Changes detected";
