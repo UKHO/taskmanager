@@ -34,20 +34,28 @@ function getEditDatabase() {
         data: {
             "processId": processId,
             "taskStage": pageIdentity
-        }, 
+        },
         success: function (result) {
             $("#editDatabase").html(result);
             initializeLaunchSourceEditorModal();
             createCarisProjectHandler();
             initialiseWorkspaceTypeahead();
 
-            if (pageIdentity === 'Verify') {
-                setControlState(false, true);
-            } else if ($("#IsCarisProjectCreated").val() === "True") {
-                setControlState(false, true);
-            } else {
-                setControlState(true, false);
+            if (pageIdentity === 'Assess') {
+                if ($("#IsCarisProjectCreated").val() === "True") {
+                    setControlState(false, true);
+                } else {
+                    setControlState(true, false);
+                }
             }
+            else if (pageIdentity === 'Verify') {
+                if ($("#IsCarisProjectCreated").val() === "True") {
+                    setControlState(false, true);
+                } else {
+                    setControlState(false, false);
+                }
+            }
+
         },
         error: function (error) {
 
