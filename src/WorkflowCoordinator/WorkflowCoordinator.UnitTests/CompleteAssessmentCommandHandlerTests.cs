@@ -84,5 +84,180 @@ namespace WorkflowCoordinator.UnitTests
                 _handler.Handle(completeAssessmentCommand, _handlerContext));
         }
 
+        [TestCase("Simple", "Imm Act - NM")]
+        [TestCase("LTA (Product only)", "Longer-term Action")]
+        [TestCase("LTA", "Longer-term Action")]
+        [Test]
+        public async Task Test_Handle_Given_SdocId_Not_Assessed_For_ProcessId_Then_Action_Is_Generated_based_On_TaskType(string taskType, string action)
+        {
+            //Given
+            var fromActivity = WorkflowStage.Verify;
+            var processId = 123;
+            var workflowInstanceId = 1;
+            var sdocId = 1;
+
+            var currentWorkflowInstance = new WorkflowInstance()
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                ActivityName = fromActivity.ToString(),
+                Status = WorkflowStatus.Updating.ToString(),
+                SerialNumber = "VERIFY_SERIAL_NUMBER"
+            };
+            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            var verifyData = new DbAssessmentVerifyData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                TaskType = taskType
+            };
+            await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
+
+            var primarydocument = new PrimaryDocumentStatus()
+            {
+                PrimaryDocumentStatusId = 1,
+                ContentServiceId = Guid.NewGuid(),
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = processId,
+                SdocId = sdocId,
+                StartedAt = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primarydocument);
+
+            await _dbContext.SaveChangesAsync();
+
+            var completeAssessmentCommand = new CompleteAssessmentCommand()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId
+            };
+
+            //When
+            await _handler.Handle(completeAssessmentCommand, _handlerContext);
+
+            //Then
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, "tbc")).MustHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Assessed and Completed by TM2")).MustHaveHappened();
+
+        }
+
+        [Test]
+        public async Task Test_Handle_Given_SdocId_Is_Assessed_For_ProcessId_Then_Only_A_Call_For_Marking_As_Completed_Is_Made_To_Sdra_Api()
+        {
+            //Given
+            var fromActivity = WorkflowStage.Verify;
+            var processId = 123;
+            var workflowInstanceId = 1;
+            var sdocId = 1;
+
+            var currentWorkflowInstance = new WorkflowInstance()
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                ActivityName = fromActivity.ToString(),
+                Status = WorkflowStatus.Updating.ToString(),
+                SerialNumber = "VERIFY_SERIAL_NUMBER"
+            };
+            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            var verifyData = new DbAssessmentVerifyData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                TaskType = "Simple"
+            };
+            await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
+
+            var primarydocument = new PrimaryDocumentStatus()
+            {
+                PrimaryDocumentStatusId = 1,
+                ContentServiceId = Guid.NewGuid(),
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = processId,
+                SdocId = sdocId,
+                StartedAt = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.Assessed.ToString()
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primarydocument);
+
+            await _dbContext.SaveChangesAsync();
+
+            var completeAssessmentCommand = new CompleteAssessmentCommand()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId
+            };
+
+            //When
+            await _handler.Handle(completeAssessmentCommand, _handlerContext);
+
+            //Then
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Assessed and Completed by TM2")).MustHaveHappened();
+
+        }
+
+        [Test]
+        public async Task Test_Handle_Given_SdocId_Already_Marked_Completed_For_Another_ProcessId_Then_No_Call_Is_Made_To_Sdra_Api()
+        {
+            //Given
+            var fromActivity = WorkflowStage.Verify;
+            var processId = 123;
+            var workflowInstanceId = 1;
+            var sdocId = 1;
+
+            var currentWorkflowInstance = new WorkflowInstance()
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                ActivityName = fromActivity.ToString(),
+                Status = WorkflowStatus.Updating.ToString(),
+                SerialNumber = "VERIFY_SERIAL_NUMBER"
+            };
+            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            var verifyData = new DbAssessmentVerifyData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                TaskType = "Simple"
+            };
+            await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
+
+            var primarydocument = new PrimaryDocumentStatus()
+            {
+                PrimaryDocumentStatusId = 1,
+                ContentServiceId = Guid.NewGuid(),
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = processId,
+                SdocId = sdocId,
+                StartedAt = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.Completed.ToString()
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primarydocument);
+
+            await _dbContext.SaveChangesAsync();
+
+            var completeAssessmentCommand = new CompleteAssessmentCommand()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId
+            };
+
+            //When
+            await _handler.Handle(completeAssessmentCommand, _handlerContext);
+
+            //Then
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(A<int>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+        }
+
+
     }
 }
