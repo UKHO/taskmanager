@@ -326,14 +326,16 @@
                     }, 200);
                 },
                 success: function (result) {
-                    //formChanged = false;
-                    //if (action === "Done") {
-                    //    window.location.replace("/Index");
-                    //}
                     formChanged = false;
                     var chartNo = $("#ChartNo").val();
                     var workflowType = $("#workflowType").text().trim();
                     $('h1').text(workflowType + " - " + chartNo);
+                    //update Deadline dates
+                    $("#DtExp-" + result[0]).html($("#AnnounceDate").val());
+                    $("#DtExp-" + result[1]).html($("#CommitToPrintDate").val());
+                    $("#DtExp-" + result[2]).html($("#CISDate").val());
+                    $("#DtExp-" + result[3]).html($("#PublicationDate").val());
+
                     console.log("success");
                 },
                 error: function (error) {

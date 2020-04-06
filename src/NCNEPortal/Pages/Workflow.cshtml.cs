@@ -465,16 +465,17 @@ namespace NCNEPortal
                 };
             }
 
-            await UpdateTaskInformation(processId, chartType);
+            var result = await UpdateTaskInformation(processId, chartType);
 
 
-            return StatusCode(200);
+            return new JsonResult(result);
         }
 
-        private async Task UpdateTaskInformation(int processId, string chartType)
+        private async Task<int[]> UpdateTaskInformation(int processId, string chartType)
         {
             var task =
-                await _dbContext.TaskInfo.Include(t => t.TaskRole).FirstAsync(t => t.ProcessId == processId);
+                await _dbContext.TaskInfo.Include(t => t.TaskRole)
+                      .Include(s => s.TaskStage).FirstAsync(t => t.ProcessId == processId);
             task.Ion = Ion;
             task.ChartNumber = ChartNo;
             task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
@@ -505,8 +506,52 @@ namespace NCNEPortal
             task.ExpectedDate3Ps = ExpectedReturnDate3ps;
             task.ActualDate3Ps = ActualReturnDate3ps;
 
+            int formStageId = 0;
+            int cisStageId = 0;
+            int commitStageId = 0;
+            int publishStageId = 0;
+
+            //Update deadline dates in the taskstages
+            foreach (var taskStage in task.TaskStage)
+            {
+                switch ((NcneTaskStageType)taskStage.TaskStageTypeId)
+                {
+                    case NcneTaskStageType.Forms:
+                        {
+                            taskStage.DateExpected = AnnounceDate;
+                            formStageId = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.Commit_To_Print:
+                        {
+                            taskStage.DateExpected = CommitToPrintDate;
+                            commitStageId = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.CIS:
+                        {
+                            taskStage.DateExpected = CISDate;
+                            cisStageId = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.Publication:
+                        {
+                            taskStage.DateExpected = PublicationDate;
+                            publishStageId = taskStage.TaskStageId;
+                            break;
+                        }
+                }
+            }
 
             await _dbContext.SaveChangesAsync();
+
+            return new int[]
+            {
+                formStageId, commitStageId, cisStageId, publishStageId
+            };
         }
 
 
