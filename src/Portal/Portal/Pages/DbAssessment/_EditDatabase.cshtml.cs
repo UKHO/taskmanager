@@ -398,8 +398,8 @@ namespace Portal.Pages.DbAssessment
                     ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
                     return;
                 }
-
-                ProjectName = "NO PROJECT HAS BEEN CREATED";
+                
+                ProjectName = "NO PROJECT HAS BEEN CREATED"; //TODO: Check with Matt for desired wording.
                 return;
             }
 
