@@ -347,7 +347,7 @@ namespace DataServices.Controllers
                 document => new QueuedDocumentObject
                 {
                     Code = document.ErrorCode,
-                    Message = document.Message,
+                    Message = document.Message, // contains filename: "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments\\RSDRA2018000065913_1.pdf"
                     SodcId = document.SdocId,
                     StatusTime = document.StatusTime
                 });
@@ -355,14 +355,6 @@ namespace DataServices.Controllers
             queuedDocumentObjects.AddRange(documents);
 
             return new ObjectResult(queuedDocumentObjects);
-
-            //string exampleJson = null;
-            //exampleJson = "[ {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\server\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n}, {\n  \"code\" : 6,\n  \"statusTime\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"message\" : \"The requested document has been added to the queue., The document is not of a type that is permitted to be exported from SDRA.,\\\\servername\\\\SDRA\\1955393\\\\filename.pdf\",\n  \"sodcId\" : 0\n} ]";
-
-            //var example = exampleJson != null
-            //? JsonConvert.DeserializeObject<QueuedDocumentObjects>(exampleJson)
-            //: default(QueuedDocumentObjects);            //TODO: Change the data returned
-            //return new ObjectResult(example);
         }
 
         /// <summary>
