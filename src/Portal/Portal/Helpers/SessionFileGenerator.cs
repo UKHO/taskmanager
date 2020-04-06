@@ -28,7 +28,7 @@ namespace Portal.Helpers
             _logger = logger;
         }
 
-        public async Task<SessionFile> PopulateSessionFile(int processId, string userFullName, string taskStage)
+        public async Task<SessionFile> PopulateSessionFile(int processId, string userFullName, string taskStage, CarisProjectDetails carisProjectDetails, List<string> selectedHpdUsages, List<string> selectedSources)
         {
             LogContext.PushProperty("PortalResource", nameof(PopulateSessionFile));
             LogContext.PushProperty("UserFullName", userFullName);
@@ -53,11 +53,6 @@ namespace Portal.Helpers
                 throw new InvalidOperationException($"Unable to find HPD username for {userFullName}.",
                     ex.InnerException);
             }
-
-            // Data impact
-            var dataImpact = _dbContext.DataImpact.Include(di => di.HpdUsage)
-                .FirstOrDefault(di => di.ProcessId == processId);
-            var hpdUsageName = dataImpact == null ? string.Empty : dataImpact.HpdUsage.Name;
 
             // TODO: populate Workspace from relevant table
             string workspaceAffected;
@@ -91,14 +86,18 @@ namespace Portal.Helpers
                             SERVICENAME = _secretsConfig.Value.HpdServiceName,
                             USERNAME = hpdUser.HpdUsername,
                             ASSIGNED_USER = hpdUser.HpdUsername,
-                            USAGE = hpdUsageName,
+                            USAGE = selectedHpdUsages.First(),
                             WORKSPACE = workspaceAffected,
                             HAS_BOUNDARY = "true",
                             OPENED_BY_PROJECT = "true",
-                            PROJECT = "19_29_SDRA4.1 registration test2",
-                            PROJECT_ID = "53756"
+                            PROJECT = carisProjectDetails.ProjectName,
+                            PROJECT_ID = carisProjectDetails.ProjectId.ToString(),
+                            SELECTEDPROJECTUSAGES = new SessionFile.SelectedProjectUsages()
+                            {
+                                Value = selectedHpdUsages.First()
+                            }
                         },
-                        SourceString = "HPD:Project:19_29",
+                        SourceString = $":HPD:Project:|{carisProjectDetails.ProjectName}",
                         UserLayers = ""
                     }
                 },
@@ -112,7 +111,7 @@ namespace Portal.Helpers
                             {
                                 Visible = "true",
                                 Expanded = "false",
-                                Name = "registration test2:Nav 15"
+                                Name = $":HPD:Project:|{carisProjectDetails.ProjectName}:{selectedHpdUsages.First()}"
                             }
                         }
                     }
