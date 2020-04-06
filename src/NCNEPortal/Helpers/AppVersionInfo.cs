@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Hosting;
 
-namespace Portal.Helpers
+namespace NCNEPortal.Helpers
 {
     public class AppVersionInfo
     {
