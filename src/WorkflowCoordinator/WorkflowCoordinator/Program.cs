@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
@@ -161,11 +162,13 @@ namespace WorkflowCoordinator
 
             var host = builder.Build();
 
+            var cancellationToken = new WebJobsShutdownWatcher().Token;
+
             using (host)
             {
                 try
                 {
-                    await host.WorkflowCoordinatorRunAsync();
+                    await host.WorkflowCoordinatorRunAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {

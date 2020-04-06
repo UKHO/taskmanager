@@ -6,6 +6,7 @@ using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
@@ -145,11 +146,12 @@ namespace SourceDocumentCoordinator
 
             var host = builder.Build();
 
+            var cancellationToken = new WebJobsShutdownWatcher().Token;
             using (host)
             {
                 try
                 {
-                    await host.RunAsync();
+                    await host.RunAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
