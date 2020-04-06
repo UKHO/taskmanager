@@ -12,7 +12,7 @@ function setControlState(enableCarisProject, enableLaunchSource) {
             .prop("disabled", false);
     }
     if (enableLaunchSource) {
-        $("#btnLaunchSourceEditorDownload").prop("disabled", false);
+        $("#btnOpenLaunchCarisSelectionModal").prop("disabled", false);
     }
 }
 
