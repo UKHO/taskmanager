@@ -41,32 +41,25 @@ stages:
           packageType: sdk
           version: 3.1.x
           installationPath: $(Agent.ToolsDirectory)\\dotnet
-          
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
-          feedsToUse: 'select'
-        displayName: 'dotnet restore ncneportal'
     
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion)'
         displayName: 'dotnet build ncneportal'
-  
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
-          feedsToUse: 'select'
-        displayName: 'dotnet restore ncneportal tests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\NCNEPortal.UnitTests\\ncneportal.unittests.csproj'
         displayName: 'dotnet build ncneportal tests'
+
+      # Write build number and Id to text file
+      - script: '(echo $(Build.BuildNumber) && echo $(Build.BuildId)) > .buildinfo.json'
+        displayName: "Emit build number"
+        workingDirectory: '$(Build.SourcesDirectory)\\src\\ncneportal'
+        failOnStderr: true
   
       - task: DotNetCoreCLI@2
         inputs:
@@ -97,7 +90,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
           zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\ncneportal'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\ncneportal'
         displayName: 'Publish ncneportal-project'
   
       - task: PublishBuildArtifacts@1
