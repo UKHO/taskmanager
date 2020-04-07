@@ -88,7 +88,6 @@ namespace Portal.Helpers
                             ASSIGNED_USER = hpdUser.HpdUsername,
                             USAGE = selectedHpdUsages.First(),
                             WORKSPACE = workspaceAffected,
-                            HAS_BOUNDARY = "true",
                             OPENED_BY_PROJECT = "true",
                             PROJECT = carisProjectDetails.ProjectName,
                             PROJECT_ID = carisProjectDetails.ProjectId.ToString(),
