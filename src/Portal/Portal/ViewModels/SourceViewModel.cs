@@ -4,5 +4,6 @@
     {
         public string DocumentName { get; set; }
         public string FileExtension { get; set; }
+        public string Path { get; set; }    
     }
 }

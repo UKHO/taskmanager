@@ -112,7 +112,8 @@ namespace Portal.Pages.DbAssessment
                 var primarySourceDocument = new SourceViewModel()
                 {
                     DocumentName = assessmentData.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 };
 
                 SourceDocuments.Add(primarySourceDocument);
@@ -124,7 +125,8 @@ namespace Portal.Pages.DbAssessment
                 .Select(ld => new SourceViewModel()
                 {
                     DocumentName = ld.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 })
                 .ToListAsync();
 
@@ -136,7 +138,8 @@ namespace Portal.Pages.DbAssessment
                 .Select(dd => new SourceViewModel()
                 {
                     DocumentName = dd.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 })
                 .ToListAsync();
 
