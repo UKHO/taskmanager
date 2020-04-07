@@ -93,7 +93,7 @@ namespace Portal.Pages.DbAssessment
 
             await GetCarisData(processId, taskStage);
 
-            await GetCarisProjectDetails(processId);
+            await GetCarisProjectDetails(processId, taskStage);
 
             CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
             SessionFilename = _generalConfig.Value.SessionFilename;
@@ -380,7 +380,7 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task GetCarisProjectDetails(int processId)
+        private async Task GetCarisProjectDetails(int processId, string taskStage)
         {
             CarisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
 
@@ -388,13 +388,18 @@ namespace Portal.Pages.DbAssessment
 
             if (!IsCarisProjectCreated)
             {
+                if (taskStage == "Assess")
+                {
+                    var assessmentData =
+                        await _dbContext.AssessmentData.SingleAsync(ad => ad.ProcessId == processId);
+                    var parsedRsdraNumber = assessmentData.ParsedRsdraNumber;
+                    var sourceDocumentName = assessmentData.SourceDocumentName;
 
-                var assessmentData =
-                    await _dbContext.AssessmentData.SingleAsync(ad => ad.ProcessId == processId);
-                var parsedRsdraNumber = assessmentData.ParsedRsdraNumber;
-                var sourceDocumentName = assessmentData.SourceDocumentName;
-
-                ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
+                    ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
+                    return;
+                }
+                
+                ProjectName = "NO PROJECT HAS BEEN CREATED"; //TODO: Check with Matt for desired wording.
                 return;
             }
 
