@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using Common.Messages.Commands;
 using Common.Messages.Events;
+using Microsoft.Azure.Services.AppAuthentication;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
@@ -12,7 +13,7 @@ namespace WorkflowCoordinator
     public class WorkflowCoordinatorConfig : EndpointConfiguration
     {
         public WorkflowCoordinatorConfig(NsbConfig nsbConfig,
-            NsbSecretsConfig nsbSecretsConfig) : base(nsbConfig.WorkflowCoordinatorName)
+            NsbSecretsConfig nsbSecretsConfig, AzureServiceTokenProvider azureServiceTokenProvider = null) : base(nsbConfig.WorkflowCoordinatorName)
         {
             // Transport
 
@@ -24,7 +25,10 @@ namespace WorkflowCoordinator
                         try
                         {
                             con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                            if (!nsbConfig.IsLocalDevelopment) con.AccessToken = nsbSecretsConfig.AzureAccessToken;
+                            if (!nsbConfig.IsLocalDevelopment && azureServiceTokenProvider != null)
+                            {
+                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString());
+                            }
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
                         }
@@ -68,20 +72,22 @@ namespace WorkflowCoordinator
             var persistence = this.UsePersistence<SqlPersistence>();
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
             persistence.ConnectionBuilder(connectionBuilder: () =>
-            {
-                var con = new SqlConnection();
-                try
-                {
-                    con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                    if (!nsbConfig.IsLocalDevelopment) con.AccessToken = nsbSecretsConfig.AzureAccessToken;
-                    return con;
-                }
-                catch
-                {
-                    con.Dispose();
-                    throw;
-                }
-            });
+           {
+               var con = new SqlConnection();
+               try
+               {
+                   con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
+                   if (!nsbConfig.IsLocalDevelopment)
+                       con.AccessToken = azureServiceTokenProvider
+                           .GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).Result;
+                   return con;
+               }
+               catch
+               {
+                   con.Dispose();
+                   throw;
+               }
+           });
             persistence.SubscriptionSettings().CacheFor(TimeSpan.FromMinutes(1));
 
             this.AuditProcessedMessagesTo("audit", TimeSpan.FromMinutes(10));

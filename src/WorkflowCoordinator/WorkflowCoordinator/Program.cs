@@ -84,6 +84,8 @@ namespace WorkflowCoordinator
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                         options.UseSqlServer(connection));
 
+                    services.AddSingleton<AzureServiceTokenProvider>(new AzureServiceTokenProvider());
+
                     if (isLocalDebugging)
                     {
                         using var sp = services.BuildServiceProvider();
@@ -113,6 +115,11 @@ namespace WorkflowCoordinator
                             Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername,
                                 startupSecretsConfig.K2RestApiPassword)
                         });
+
+                    // Bridge to Terabithia
+                    using var provider = services.BuildServiceProvider();
+                    var tokenProvider = provider.GetRequiredService<AzureServiceTokenProvider>();
+                    hostingContext.Properties.Add("AzureServiceTokenProvider", tokenProvider);
                 })
                 .UseNServiceBus(hostBuilderContext =>
                 {
@@ -127,11 +134,7 @@ namespace WorkflowCoordinator
                     var nsbSecretsConfig = new NsbSecretsConfig();
                     hostBuilderContext.Configuration.GetSection("NsbDbSection").Bind(nsbSecretsConfig);
 
-                    var endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
-
-                    var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
-                    serilogTracing.EnableSagaTracing();
-                    serilogTracing.EnableMessageTracing();
+                    WorkflowCoordinatorConfig endpointConfiguration = null;
 
                     if (isLocalDebugging)
                     {
@@ -144,17 +147,21 @@ namespace WorkflowCoordinator
                             nsbSecretsConfig.NsbInitialCatalog,
                             DatabasesHelpers.BuildSqlConnectionString(true, localDbServer),
                             ConfigHelpers.IsLocalDevelopment);
+
+                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
                     }
                     else
                     {
                         nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false,
                             nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
-                        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                        var azureDbTokenUrl = nsbConfig.AzureDbTokenUrl;
-                        nsbSecretsConfig.AzureAccessToken = azureServiceTokenProvider
-                            .GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                        hostBuilderContext.Properties.TryGetValue("AzureServiceTokenProvider", out var azureServiceTokenProvider);
+                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig, (AzureServiceTokenProvider)azureServiceTokenProvider);
                     }
+
+                    var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
+                    serilogTracing.EnableSagaTracing();
+                    serilogTracing.EnableMessageTracing();
 
                     return endpointConfiguration;
                 })
