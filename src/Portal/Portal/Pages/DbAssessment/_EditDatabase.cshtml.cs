@@ -399,7 +399,7 @@ namespace Portal.Pages.DbAssessment
                     return;
                 }
                 
-                ProjectName = "NO PROJECT HAS BEEN CREATED"; //TODO: Check with Matt for desired wording.
+                ProjectName = "NO PROJECT WAS CREATED AT ASSESS";
                 return;
             }
 
