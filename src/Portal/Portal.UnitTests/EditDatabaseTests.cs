@@ -103,7 +103,6 @@ namespace Portal.UnitTests
             Assert.IsFalse(_dbContext.ChangeTracker.HasChanges());
         }
 
-
         [Test]
         public void Test_CreateCarisProject_Throws_InvalidOperationException_When_Invalid_Workspace_Provided()
         {
@@ -348,6 +347,69 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual(0, _editDatabaseModel.SourceDocuments.Count);
+        }
+
+        [Test]
+        public async Task Test_OnGet_Sets_Project_Name_To_Default_Value_When_At_Assess()
+        {
+            // Default being: {processId}_{parsedRsdraNumber}_{sourceDocumentName}
+
+            _generalConfig.Value.CarisProjectNameCharacterLimit = 50;
+
+            await SetupForOnGetAsync();
+
+            var thisAssessmentData = _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId);
+            var parsedRsdraNumber = thisAssessmentData.ParsedRsdraNumber;
+            var sourceDocumentName = thisAssessmentData.SourceDocumentName;
+
+            A.CallTo(() => _fakeCarisProjectNameGenerator.Generate(ProcessId, parsedRsdraNumber, sourceDocumentName))
+                .Returns($"{ProcessId}_{parsedRsdraNumber}_{sourceDocumentName}");
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual("123_123_Source", _editDatabaseModel.ProjectName);
+        }
+
+        [Test]
+        public async Task Test_OnGet_Sets_Project_Name_To_Warning_When_At_Verify_And_No_Project_Has_Been_Created_At_Assess()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
+            {
+                ProcessId = ProcessId,
+                WorkspaceAffected = "AWorkspace"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Verify");
+
+            Assert.AreEqual("NO PROJECT WAS CREATED AT ASSESS", _editDatabaseModel.ProjectName);
+        }
+
+        [Test]
+        public async Task Test_OnGet_Sets_Project_Name_To_Name_Given_At_Assess_When_At_Verify()
+        {
+            await SetupForOnGetAsync();
+
+            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
+            {
+                ProcessId = ProcessId,
+                WorkspaceAffected = "AWorkspace"
+            });
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectName = "Name given at Assess"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Verify");
+
+            Assert.AreEqual("Name given at Assess", _editDatabaseModel.ProjectName);
         }
 
         private async Task SetupForOnGetAsync()
