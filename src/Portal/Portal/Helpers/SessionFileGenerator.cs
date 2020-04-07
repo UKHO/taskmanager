@@ -94,7 +94,7 @@ namespace Portal.Helpers
                             PROJECT_ID = carisProjectDetails.ProjectId.ToString(),
                             SELECTEDPROJECTUSAGES = new SessionFile.SelectedProjectUsages()
                             {
-                                Value = selectedHpdUsages.First()
+                                Value = selectedHpdUsages
                             }
                         },
                         SourceString = $":HPD:Project:|{carisProjectDetails.ProjectName}",

@@ -28,7 +28,7 @@ namespace Portal.Models
         public class SelectedProjectUsages
         {
             [XmlElement(ElementName = "value")]
-            public string Value { get; set; }
+            public List<string> Value { get; set; }
         }
 
         [XmlRoot(ElementName = "SourceParam")]
