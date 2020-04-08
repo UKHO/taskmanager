@@ -83,7 +83,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_PopulateSessionFile_Returns_Valid_Session_File_Contents()
+        public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Data()
         {
             UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
@@ -116,6 +116,39 @@ namespace Portal.UnitTests
                 sessionFile.DataSources.DataSource.SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
                 sessionFile.DataSources.DataSource.SourceParam.SERVICENAME);
+        }
+        
+        [Test]
+        public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Usages()
+        {
+            UserFullName = "Test User 1";
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUsername = UserFullName,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+            await _dbContext.SaveChangesAsync();
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                "Assess",
+                new CarisProjectDetails(), selectedUsages, null);
+
+            Assert.IsNotNull(sessionFile);
+            Assert.IsNotNull(sessionFile.DataSources);
+            Assert.AreEqual(selectedUsages[0],
+                sessionFile.DataSources.DataSource.SourceParam.USAGE);
+            Assert.That(selectedUsages, Is.EqualTo(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value));
         }
 
         [Test]
