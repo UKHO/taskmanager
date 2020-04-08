@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Common.Helpers;
 using Common.TestAutomation.Framework.PageElements;
 using Common.TestAutomation.Framework.Pages;
@@ -20,7 +19,7 @@ namespace Portal.TestAutomation.Framework.Pages
                     ? urlsConfig.ReviewPageUrl
                     : urlsConfig.LocalDevReviewPageUrl)
         {
-            _sourceDocumentTable = new Table(Driver, By.Id("srcDocDetailsTable"));
+            _sourceDocumentTable = new Table(Driver, Wait, "#srcDocDetailsTable");
         }
 
         private IWebElement ReviewForm => Driver.FindElement(By.Id("frmReviewPage"));
@@ -32,11 +31,11 @@ namespace Portal.TestAutomation.Framework.Pages
                 try
                 {
                     Wait.Until(driver => ReviewForm.Displayed);
+
                     return true;
                 }
-                catch (NoSuchElementException e)
+                catch (NoSuchElementException)
                 {
-                    Console.WriteLine(e);
                     return false;
                 }
             }
