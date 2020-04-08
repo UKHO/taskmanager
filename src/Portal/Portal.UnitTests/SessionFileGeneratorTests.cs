@@ -78,7 +78,7 @@ namespace Portal.UnitTests
                     ProcessId,
                     UserFullName,
                     "Assess",
-                    new CarisProjectDetails(), new List<string>(), new List<string>())
+                    new CarisProjectDetails(), null, null)
             );
         }
 
@@ -96,11 +96,17 @@ namespace Portal.UnitTests
             await _dbContext.HpdUser.AddAsync(hpdUser);
             await _dbContext.SaveChangesAsync();
 
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
                 "Assess",
-                new CarisProjectDetails(), new List<string>(), new List<string>());
+                new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
@@ -126,11 +132,18 @@ namespace Portal.UnitTests
             await _dbContext.HpdUser.AddAsync(hpdUser);
             await _dbContext.SaveChangesAsync();
 
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
                 "Assess",
-                new CarisProjectDetails(), new List<string>(), new List<string>());
+                new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
