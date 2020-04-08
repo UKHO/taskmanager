@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -76,7 +77,8 @@ namespace Portal.UnitTests
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
                     UserFullName,
-                    "Assess")
+                    "Assess",
+                    new CarisProjectDetails(), new List<string>(), new List<string>())
             );
         }
 
@@ -97,7 +99,8 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
-                "Assess");
+                "Assess",
+                new CarisProjectDetails(), new List<string>(), new List<string>());
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
@@ -126,7 +129,8 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
-                "Assess");
+                "Assess",
+                new CarisProjectDetails(), new List<string>(), new List<string>());
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
