@@ -81,7 +81,7 @@ namespace DataServices.Controllers
                 returnCode = new ReturnCode
                 {
                     Code = task.ErrorCode,
-                    Message = task.Message
+                    Message = task.Message  // contains filename: "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments\\RSDRA2018000065913_1.pdf"
                 };
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)
@@ -347,7 +347,7 @@ namespace DataServices.Controllers
                 document => new QueuedDocumentObject
                 {
                     Code = document.ErrorCode,
-                    Message = document.Message, // contains filename: "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments\\RSDRA2018000065913_1.pdf"
+                    Message = document.Message,
                     SodcId = document.SdocId,
                     StatusTime = document.StatusTime
                 });
