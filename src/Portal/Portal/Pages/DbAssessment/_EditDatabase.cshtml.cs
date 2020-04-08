@@ -158,14 +158,14 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
-            LogContext.PushProperty("SelectedHpdUsages", string.Join(',', selectedHpdUsages));
-            LogContext.PushProperty("SelectedSources", string.Join(',', selectedSources));
-            
+            LogContext.PushProperty("SelectedHpdUsages", (selectedHpdUsages != null && selectedHpdUsages.Count > 0 ? string.Join(',', selectedHpdUsages) : ""));
+            LogContext.PushProperty("SelectedSources", (selectedSources != null && selectedSources.Count > 0 ? string.Join(',', selectedSources) : ""));
+
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
-            _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; " +
+            _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; " +
                                    "ActivityName: {ActivityName}; " +
                                    "with SelectedHpdUsages {SelectedHpdUsages}, " +
                                    "and SelectedSources {SelectedSources}");
@@ -191,11 +191,11 @@ namespace Portal.Pages.DbAssessment
             }
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
-                                                                                processId, 
-                                                                                UserFullName, 
-                                                                                taskStage, 
-                                                                                carisProjectDetails, 
-                                                                                selectedHpdUsages, 
+                                                                                processId,
+                                                                                UserFullName,
+                                                                                taskStage,
+                                                                                carisProjectDetails,
+                                                                                selectedHpdUsages,
                                                                                 selectedSources);
 
             var serializer = new XmlSerializer(typeof(SessionFile));
@@ -432,7 +432,7 @@ namespace Portal.Pages.DbAssessment
                     ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
                     return;
                 }
-                
+
                 ProjectName = "NO PROJECT WAS CREATED AT ASSESS";
                 return;
             }
