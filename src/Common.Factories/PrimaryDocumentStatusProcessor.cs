@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,8 @@ namespace Common.Factories
         }
 
         public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
-            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
+            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null,
+            string generatedFullFilename = null)
         {
             var row = await _dbContext.PrimaryDocumentStatus
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
@@ -47,6 +49,13 @@ namespace Common.Factories
 
             // update
             row.Status = status.ToString();
+            
+            if (!string.IsNullOrWhiteSpace(generatedFullFilename) && status == SourceDocumentRetrievalStatus.FileGenerated)
+            {
+                row.Filename = Path.GetFileName(generatedFullFilename).Trim();
+                row.Filepath = Path.GetFullPath(generatedFullFilename).Trim();
+            }
+
             await _dbContext.SaveChangesAsync();
             return row.PrimaryDocumentStatusId;
         }
