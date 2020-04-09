@@ -17,8 +17,6 @@ namespace WorkflowDatabase.EF.Models
         public string SourceDocumentType { get; set; }
         public string SourceNature { get; set; }
         public string Datum { get; set; }
-        public string Filename { get; set; }
-        public string Filepath { get; set; }
     }
 }
     
