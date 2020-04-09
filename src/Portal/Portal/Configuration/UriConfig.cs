@@ -16,6 +16,8 @@ namespace Portal.Configuration
         public Uri EventServiceLocalhostBaseUri { get; set; }
         public Uri EventServiceWebServiceBaseUri { get; set; }
         public Uri EventServiceWebServicePostEventUrl { get; set; }
+        public Uri PcpEventServiceUri { get; set; }
+        public Uri PcpEventServiceLocalUri { get; set; }
         public Uri DataServicesDocumentAssessmentDataUri { get; set; }
         public Uri LocalDevLandingPageHttpsUrl { get; set; }
         public Uri LandingPageUrl { get; set; }
@@ -32,6 +34,15 @@ namespace Portal.Configuration
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? EventServiceLocalhostBaseUri : EventServiceWebServiceBaseUri,
                 $@"{EventServiceWebServicePostEventUrl}{Uri.EscapeDataString(eventName)}");
+        }
+
+        public Uri BuildPcpEventServiceUri(string eventName)
+        {
+            var postUri = string.Concat("UKHO-Events-" + eventName, "/publish/");
+
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? PcpEventServiceLocalUri : PcpEventServiceUri,
+                $@"{PcpEventServiceUri}/{postUri}");
         }
 
         public Uri BuildContentServiceUri(Guid fileGuid)

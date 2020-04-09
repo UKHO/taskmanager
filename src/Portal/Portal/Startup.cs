@@ -111,6 +111,7 @@ namespace Portal
             var startupSecretConfig = new StartupSecretsConfig();
             Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
             Configuration.GetSection("HpdDbSection").Bind(startupSecretConfig);
+            Configuration.GetSection("PCPEventService").Bind(startupSecretConfig);
 
             var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretConfig.DataSource,
                 startupSecretConfig.UserId, startupSecretConfig.Password);
@@ -123,6 +124,14 @@ namespace Portal
 
             services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+            services.AddHttpClient<IPcpEventServiceApiClient, PcpEventServiceApiClient>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = (message, certificate, arg3, arg4) => true,
+                    Credentials = new NetworkCredential(startupSecretConfig.PCPEventServiceUsername, startupSecretConfig.PCPEventServicePassword)
+                });
 
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
