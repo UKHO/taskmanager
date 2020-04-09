@@ -548,6 +548,23 @@ namespace NCNEPortal
                 }
             }
 
+            foreach (var taskStage in task.TaskStage.Where
+                         (s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
+            {
+                taskStage.AssignedUser = (NcneTaskStageType)taskStage.TaskStageTypeId switch
+                {
+                    NcneTaskStageType.With_Geodesy => this.Compiler,
+                    NcneTaskStageType.With_SDRA => this.Compiler,
+                    NcneTaskStageType.Specification => this.Compiler,
+                    NcneTaskStageType.Compile => this.Compiler,
+                    NcneTaskStageType.V1_Rework => this.Compiler,
+                    NcneTaskStageType.V2_Rework => this.Compiler,
+                    NcneTaskStageType.V1 => this.Verifier1,
+                    NcneTaskStageType.V2 => this.Verifier2,
+                    _ => this.Publisher
+                };
+            }
+
             await _dbContext.SaveChangesAsync();
 
             return new DeadLineId()
