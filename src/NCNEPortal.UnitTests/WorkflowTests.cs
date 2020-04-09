@@ -278,7 +278,7 @@ namespace NCNEPortal.UnitTests
 
             var verifier = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.V1);
 
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
+            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
             Assert.AreEqual(newTaskInfo?.TaskRole.VerifierOne, verifier?.AssignedUser);
 
         }
@@ -340,7 +340,7 @@ namespace NCNEPortal.UnitTests
 
             var verifier = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.V1);
 
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
+            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
             Assert.AreEqual(newTaskInfo?.TaskRole.VerifierOne, verifier?.AssignedUser);
 
         }
@@ -400,7 +400,7 @@ namespace NCNEPortal.UnitTests
             var specification = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Specification);
             var compilation = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Compile);
 
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
+            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
             Assert.AreEqual("Valid User1", specification?.AssignedUser);
             Assert.AreEqual(newTaskInfo?.TaskRole.Compiler, compilation?.AssignedUser);
 
