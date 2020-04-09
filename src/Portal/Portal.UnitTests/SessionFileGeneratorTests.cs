@@ -148,7 +148,7 @@ namespace Portal.UnitTests
             Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual(selectedUsages[0],
                 sessionFile.DataSources.DataSource.SourceParam.USAGE);
-            Assert.That(selectedUsages, Is.EqualTo(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value));
+            Assert.That(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
         }
 
         [Test]
