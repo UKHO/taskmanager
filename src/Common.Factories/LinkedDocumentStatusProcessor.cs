@@ -37,11 +37,12 @@ namespace Common.Factories
             // update
             row.Status = status.ToString();
 
-            if (!string.IsNullOrWhiteSpace(generatedFullFilename) && status == SourceDocumentRetrievalStatus.FileGenerated)
+            if (status == SourceDocumentRetrievalStatus.FileGenerated && !string.IsNullOrWhiteSpace(generatedFullFilename))
             {
                 row.Filename = Path.GetFileName(generatedFullFilename).Trim();
-                row.Filepath = Path.GetFullPath(generatedFullFilename).Trim();
+                row.Filepath = Path.GetDirectoryName(generatedFullFilename)?.Trim();
             }
+
             await _dbContext.SaveChangesAsync();
             return row.LinkedDocumentId;
         }
