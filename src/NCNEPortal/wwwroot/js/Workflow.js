@@ -336,8 +336,9 @@
                     $("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
                     $("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
                     $("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
+                    var processId = $("#hdnProcessId").val();
+                    window.location.href = "/workflow?ProcessId="+processId;
 
-                    console.log("success");
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
