@@ -138,16 +138,28 @@ namespace Portal.UnitTests
                 "Usage2"
             };
 
+            var carisproject = new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123456,
+                ProjectName = "SomeName",
+                Created = DateTime.Today,
+                CreatedBy = UserFullName
+            };
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
                 "Assess",
-                new CarisProjectDetails(), selectedUsages, null);
+                carisproject, selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual(selectedUsages[0],
                 sessionFile.DataSources.DataSource.SourceParam.USAGE);
+
+            Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}",
+                sessionFile.DataSources.DataSource.SourceString);
             Assert.That(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
         }
 
