@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using FakeItEasy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.Models;
 using Portal.Pages.DbAssessment;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -27,7 +31,9 @@ namespace Portal.UnitTests
         private ISessionFileGenerator _fakeSessionFileGenerator;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private ICarisProjectNameGenerator _fakeCarisProjectNameGenerator;
+
         public int ProcessId { get; set; }
+        public string UserFullName { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -46,6 +52,10 @@ namespace Portal.UnitTests
             _fakeCarisProjectNameGenerator = A.Fake<ICarisProjectNameGenerator>();
 
             ProcessId = 123;
+            UserFullName = "TestUser";
+
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(UserFullName);
 
             _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
             {
@@ -143,6 +153,7 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual(3, _editDatabaseModel.HpdUsages.Count);
+            Assert.That(_dbContext.HpdUsage.Select(h => h.Name).ToList(), Is.EqualTo(_editDatabaseModel.HpdUsages));
         }
 
         [Test]
@@ -211,7 +222,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
             Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[0].FileExtension);
-            
+
         }
 
         [Test]
@@ -312,7 +323,7 @@ namespace Portal.UnitTests
                 ProcessId = 456,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
-            
+
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
@@ -426,7 +437,7 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
             });
-            
+
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
                 ProcessId = ProcessId,
@@ -434,6 +445,119 @@ namespace Portal.UnitTests
             });
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        [Test]
+        public void Test_OnGetLaunchSourceEditor_Throws_ArgumentException_When_No_Usages_Supplied()
+        {
+            var taskStage = "Assess";
+
+            var ex = Assert.ThrowsAsync<ArgumentException>(
+                () => _editDatabaseModel.OnGetLaunchSourceEditorAsync(
+                                                                            ProcessId,
+                                                                            taskStage,
+                                                                            "SomeFilename",
+                                                                            null,
+                                                                            null));
+            Assert.AreEqual("Failed to generate session file. No Hpd Usages were selected.", ex.Message);
+            A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
+                                                                            ProcessId,
+                                                                            UserFullName,
+                                                                            taskStage,
+                                                                            A<CarisProjectDetails>.Ignored,
+                                                                            A<List<string>>.Ignored,
+                                                                            A<List<string>>.Ignored)).MustNotHaveHappened();
+
+        }
+
+        [Test]
+        public void Test_OnGetLaunchSourceEditor_Throws_ArgumentException_When_No_Caris_Project_Was_Created()
+        {
+            var taskStage = "Assess";
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
+            var ex = Assert.ThrowsAsync<ArgumentException>(
+                () => _editDatabaseModel.OnGetLaunchSourceEditorAsync(
+                    ProcessId,
+                    taskStage,
+                    "SomeFilename",
+                    selectedUsages,
+                    null));
+            Assert.AreEqual("Failed to generate session file. Caris project was never created.", ex.Message);
+            A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                taskStage,
+                A<CarisProjectDetails>.Ignored,
+                A<List<string>>.Ignored,
+                A<List<string>>.Ignored)).MustNotHaveHappened();
+
+        }
+
+        [Test]
+        public async Task Test_OnGetLaunchSourceEditor_When_Supplied_With_Correct_Data_Then_Generates_Session_File()
+        {
+            var taskStage = "Assess";
+            var sessionFilename = "SomeFilename";
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
+            var carisproject = new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123456,
+                ProjectName = "SomeName",
+                Created = DateTime.Today,
+                CreatedBy = UserFullName
+            };
+
+            await _dbContext.CarisProjectDetails.AddAsync(carisproject);
+
+            await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                taskStage,
+                carisproject,
+                selectedUsages,
+                A<List<string>>.Ignored)).Returns(new SessionFile()
+                                                                            {
+                                                                                DataSources = new SessionFile.DataSourcesNode(),
+                                                                                Properties = new SessionFile.PropertiesNode(),
+                                                                                Version = "1.1",
+                                                                                Views = new SessionFile.ViewsNode()
+                                                                            });
+
+            var response = await _editDatabaseModel.OnGetLaunchSourceEditorAsync(
+                                                                                            ProcessId,
+                                                                                            taskStage,
+                                                                                            sessionFilename,
+                                                                                            selectedUsages,
+                                                                                            null);
+
+            A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                taskStage,
+                carisproject,
+                selectedUsages,
+                A<List<string>>.Ignored)).MustHaveHappened();
+
+            var sessionFileStream = response as FileStreamResult;
+            Assert.IsNotNull(sessionFileStream);
+            Assert.AreEqual(sessionFilename, sessionFileStream.FileDownloadName);
+
+
         }
     }
 }

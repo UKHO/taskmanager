@@ -28,7 +28,7 @@ namespace Portal.Models
         public class SelectedProjectUsages
         {
             [XmlElement(ElementName = "value")]
-            public string Value { get; set; }
+            public List<string> Value { get; set; }
         }
 
         [XmlRoot(ElementName = "SourceParam")]
@@ -44,16 +44,12 @@ namespace Portal.Models
             public string USAGE { get; set; }
             [XmlElement(ElementName = "WORKSPACE")]
             public string WORKSPACE { get; set; }
-            [XmlElement(ElementName = "HAS_BOUNDARY")]
-            public string HAS_BOUNDARY { get; set; }
             [XmlElement(ElementName = "OPENED_BY_PROJECT")]
             public string OPENED_BY_PROJECT { get; set; }
             [XmlElement(ElementName = "PROJECT")]
             public string PROJECT { get; set; }
             [XmlElement(ElementName = "PROJECT_ID")]
             public string PROJECT_ID { get; set; }
-            [XmlElement(ElementName = "_PROJECT_BOUNDARIES")]
-            public string _PROJECT_BOUNDARIES { get; set; }
             [XmlElement(ElementName = "SELECTEDPROJECTUSAGES")]
             public SelectedProjectUsages SELECTEDPROJECTUSAGES { get; set; }
         }

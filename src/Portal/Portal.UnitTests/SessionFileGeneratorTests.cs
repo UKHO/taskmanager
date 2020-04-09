@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -76,12 +77,13 @@ namespace Portal.UnitTests
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
                     UserFullName,
-                    "Assess")
+                    "Assess",
+                    new CarisProjectDetails(), null, null)
             );
         }
 
         [Test]
-        public async Task Test_PopulateSessionFile_Returns_Valid_Session_File_Contents()
+        public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Data()
         {
             UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
@@ -94,10 +96,17 @@ namespace Portal.UnitTests
             await _dbContext.HpdUser.AddAsync(hpdUser);
             await _dbContext.SaveChangesAsync();
 
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
-                "Assess");
+                "Assess",
+                new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
@@ -107,6 +116,57 @@ namespace Portal.UnitTests
                 sessionFile.DataSources.DataSource.SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
                 sessionFile.DataSources.DataSource.SourceParam.SERVICENAME);
+        }
+        
+        [Test]
+        public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Usages()
+        {
+            UserFullName = "Test User 1";
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUsername = UserFullName,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+            await _dbContext.SaveChangesAsync();
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
+            var carisproject = new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123456,
+                ProjectName = "SomeName",
+                Created = DateTime.Today,
+                CreatedBy = UserFullName
+            };
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                "Assess",
+                carisproject, selectedUsages, null);
+
+            Assert.IsNotNull(sessionFile);
+            Assert.IsNotNull(sessionFile.DataSources);
+            Assert.AreEqual(selectedUsages[0],
+                sessionFile.DataSources.DataSource.SourceParam.USAGE);
+
+            Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}",
+                sessionFile.DataSources.DataSource.SourceString);
+            Assert.That(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
+
+
+            Assert.IsNotNull(sessionFile.Views);
+
+            Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}:{selectedUsages[0]}",
+                sessionFile.Views.View.DisplayState.DisplayLayer.Name);
         }
 
         [Test]
@@ -123,10 +183,18 @@ namespace Portal.UnitTests
             await _dbContext.HpdUser.AddAsync(hpdUser);
             await _dbContext.SaveChangesAsync();
 
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 UserFullName,
-                "Assess");
+                "Assess",
+                new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);

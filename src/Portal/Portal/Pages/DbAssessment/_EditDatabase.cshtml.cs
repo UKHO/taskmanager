@@ -11,9 +11,9 @@ using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Graph;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
@@ -112,7 +112,8 @@ namespace Portal.Pages.DbAssessment
                 var primarySourceDocument = new SourceViewModel()
                 {
                     DocumentName = assessmentData.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 };
 
                 SourceDocuments.Add(primarySourceDocument);
@@ -124,7 +125,8 @@ namespace Portal.Pages.DbAssessment
                 .Select(ld => new SourceViewModel()
                 {
                     DocumentName = ld.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 })
                 .ToListAsync();
 
@@ -136,7 +138,8 @@ namespace Portal.Pages.DbAssessment
                 .Select(dd => new SourceViewModel()
                 {
                     DocumentName = dd.SourceDocumentName,
-                    FileExtension = "Not implemented"
+                    FileExtension = "Not implemented",
+                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
                 })
                 .ToListAsync();
 
@@ -155,14 +158,45 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
-
-            _logger.LogInformation("Launching Source Editor with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
+            LogContext.PushProperty("SelectedHpdUsages", (selectedHpdUsages != null && selectedHpdUsages.Count > 0 ? string.Join(',', selectedHpdUsages) : ""));
+            LogContext.PushProperty("SelectedSources", (selectedSources != null && selectedSources.Count > 0 ? string.Join(',', selectedSources) : ""));
 
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
-            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(processId, UserFullName, taskStage);
+            _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; " +
+                                   "ActivityName: {ActivityName}; " +
+                                   "with SelectedHpdUsages {SelectedHpdUsages}, " +
+                                   "and SelectedSources {SelectedSources}");
+
+            if (selectedHpdUsages == null || selectedHpdUsages.Count == 0)
+            {
+                _logger.LogError("Failed to generate session file. No Hpd Usages were selected. " +
+                                 "ProcessId: {ProcessId}; " +
+                                 "ActivityName: {ActivityName};");
+                throw new ArgumentException("Failed to generate session file. No Hpd Usages were selected.");
+            }
+
+            var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+
+            var isCarisProjectCreated = carisProjectDetails != null;
+
+            if (!isCarisProjectCreated)
+            {
+                _logger.LogError("Failed to generate session file. Caris project was never created. " +
+                                 "ProcessId: {ProcessId}; " +
+                                 "ActivityName: {ActivityName};");
+                throw new ArgumentException("Failed to generate session file. Caris project was never created.");
+            }
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                                                                                processId,
+                                                                                UserFullName,
+                                                                                taskStage,
+                                                                                carisProjectDetails,
+                                                                                selectedHpdUsages,
+                                                                                selectedSources);
 
             var serializer = new XmlSerializer(typeof(SessionFile));
 
@@ -398,7 +432,7 @@ namespace Portal.Pages.DbAssessment
                     ProjectName = _carisProjectNameGenerator.Generate(processId, parsedRsdraNumber, sourceDocumentName);
                     return;
                 }
-                
+
                 ProjectName = "NO PROJECT WAS CREATED AT ASSESS";
                 return;
             }

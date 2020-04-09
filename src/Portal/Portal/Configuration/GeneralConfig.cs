@@ -22,7 +22,8 @@ namespace Portal.Configuration
         public string CarisNewProjectType { get; set; }
         public int CarisProjectTimeoutSeconds { get; set; }
         public int CarisProjectNameCharacterLimit { get; set; }
-            
+        public string SourceDocumentWriteableFolderName { get; set; }
+
         public string TeamsAsCsv { get; set; }
         public string TeamsUnassigned { get; set; }
 

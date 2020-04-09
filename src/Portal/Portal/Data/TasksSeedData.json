@@ -413,6 +413,13 @@
       "workspaceAffected": "123",
       "CarisProjectName": "Sunrise"
     },
+    "CarisProjectDetails": {
+      "ProcessId": 125,
+      "ProjectId": 54179,
+      "ProjectName": "1072_2017000302065_HUA HIN",
+      "Created": "2020-02-28",
+      "CreatedBy": "pcp_user"
+    },
     "OnHold": [
       {
         "processId": 125,
