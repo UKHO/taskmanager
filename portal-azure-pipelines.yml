@@ -46,6 +46,8 @@ stages:
           command: 'restore'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
           feedsToUse: 'select'
+          vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
+          includeNuGetOrg: true
         displayName: 'dotnet restore portal'
     
       - task: DotNetCoreCLI@2
@@ -208,8 +210,17 @@ stages:
 
       - task: DotNetCoreCLI@2
         inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
+          feedsToUse: 'select'
+          vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
+          includeNuGetOrg: true
+        displayName: 'dotnet restore portal'
+        
+      - task: DotNetCoreCLI@2
+        inputs:
           command: publish
-          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output --no-restore"
           projects: "**/portal.csproj"
           publishWebProjects: false
           modifyOutputPath: false
