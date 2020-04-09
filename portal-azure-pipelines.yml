@@ -217,7 +217,7 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: publish
-          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output --no-restore"
           projects: "**/portal.csproj"
           publishWebProjects: false
           modifyOutputPath: false
