@@ -161,6 +161,12 @@ namespace Portal.UnitTests
             Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}",
                 sessionFile.DataSources.DataSource.SourceString);
             Assert.That(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
+
+
+            Assert.IsNotNull(sessionFile.Views);
+
+            Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}:{selectedUsages[0]}",
+                sessionFile.Views.View.DisplayState.DisplayLayer.Name);
         }
 
         [Test]
