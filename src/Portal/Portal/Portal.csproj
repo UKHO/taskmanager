@@ -22,6 +22,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.1.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+    <PackageReference Include="UKHO.Events" Version="1.2.19052.1" />
   </ItemGroup>
 
   <ItemGroup>

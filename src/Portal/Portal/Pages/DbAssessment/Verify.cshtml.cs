@@ -225,7 +225,6 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
-
                     break;
                 default:
                     _logger.LogError("Action not found {Action}");
