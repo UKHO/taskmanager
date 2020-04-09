@@ -225,17 +225,6 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
-                    else
-                    {
-                        // Start ENC workflow
-                        var hdbEvent = new UKHO.Events.HDBAssessmentReadyEvent
-                        {
-                            SourceDocumentAssessmentId = workflowInstance.PrimaryDocumentStatus.SdocId.ToString()
-                        };
-
-                        await PostEventToPcp();
-                    }
-
                     break;
                 default:
                     _logger.LogError("Action not found {Action}");
@@ -684,11 +673,6 @@ namespace Portal.Pages.DbAssessment
 
                 await _dbContext.SaveChangesAsync();
             }
-        }
-
-        private async Task PostEventToPcp()
-        {
-            return;
         }
     }
 }
