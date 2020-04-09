@@ -7,6 +7,8 @@
 	[SourceDocumentType] NVARCHAR(4000) NULL,
     [ContentServiceId] UNIQUEIDENTIFIER NULL, 
     [Status] NVARCHAR(25) NOT NULL,
-    [Created] DATETIME NOT NULL, 
+    [Created] DATETIME NOT NULL,      
+	[Filename] NVARCHAR(100) NULL, 
+	[Filepath] NVARCHAR(255) NULL,
     CONSTRAINT [FK_DatabaseDocumentStatus_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId])
 )
