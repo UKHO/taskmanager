@@ -26,21 +26,13 @@ namespace Portal.HttpClients
             var content = new StringContent(eventBody.ToJSONSerializedString(), System.Text.Encoding.UTF8,
                 "application/json");
 
-            try
-            {
-                using var response = await _httpClient.PostAsync(fullUri, content).ConfigureAwait(false);
-                data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
-                                                   $"\n Message= '{data}'," +
-                                                   $"\n Url='{fullUri}'");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            using var response = await _httpClient.PostAsync(fullUri, content).ConfigureAwait(false);
+            data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                               $"\n Message= '{data}'," +
+                                               $"\n Url='{fullUri}'");
         }
-    }
 
+    }
 }
