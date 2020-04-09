@@ -170,7 +170,7 @@ namespace Portal.Pages.DbAssessment
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                                     _documentStatusFactory,
                                                                     processId,
-                                                                    linkedSdocId, null, null,
+                                                                    linkedSdocId,
                                                                     SourceDocumentRetrievalStatus.Started,
                                                                     SourceType.Linked, correlationId);
 
@@ -211,9 +211,9 @@ namespace Portal.Pages.DbAssessment
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                 _documentStatusFactory,
                 processId,
-                sdocId, docName, docType,
+                sdocId,
                 SourceDocumentRetrievalStatus.Started,
-                SourceType.Database, correlationId);
+                SourceType.Database, correlationId, docName, docType);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {

@@ -46,7 +46,7 @@ namespace SourceDocumentCoordinator.Handlers
                         await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                     _documentStatusFactory, 
                                                     message.ProcessId, 
-                                                    message.SourceDocumentId, null, null, 
+                                                    message.SourceDocumentId, 
                                                     SourceDocumentRetrievalStatus.FileGenerated, 
                                                     message.SourceType, message.CorrelationId);
                         break;
