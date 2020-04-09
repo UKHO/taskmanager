@@ -361,3 +361,4 @@ ASALocalRun/
 *.lst
 /src/EventServices/EventServices.ApiTestsOld
 /src/EventServices/EventServices.ApiTests/src/.vscode/launch.json
+/src/Common.TestAutomation.Framework/package-lock.json

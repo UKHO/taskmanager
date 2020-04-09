@@ -1,11 +1,12 @@
 ﻿Feature: LandingPageTasks
 
-Scenario: The landing page loads
-	When I navigate to the landing page 
-	Then The landing page has loaded
+Scenario: The landing page shows my tasks
+	When I navigate to the landing page
+	Then I should see all of the tasks assigned to me
+		And I should see all of the unassigned tasks
+		And I shouldn't see tasks assigned to other people
 
-Scenario: The landing page has some tasks
-	When I navigate to the landing page 
-	Then The landing page has loaded
-	When I enter Process Id of "321"
-	Then Task with process id 321 appears in both the assigned and unassigned tasks tables
+Scenario: I can search My Task List
+	Given I am on the landing page
+	When I search for a task
+	Then I should only see tasks that match my search
