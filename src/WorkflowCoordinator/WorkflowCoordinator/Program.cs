@@ -159,6 +159,7 @@ namespace WorkflowCoordinator
                         endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig, (AzureServiceTokenProvider)azureServiceTokenProvider);
                     }
 
+
                     var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
                     serilogTracing.EnableSagaTracing();
                     serilogTracing.EnableMessageTracing();
@@ -167,24 +168,22 @@ namespace WorkflowCoordinator
                 })
                 .UseConsoleLifetime();
 
-            var host = builder.Build();
+            IHost host = null;
 
-            var cancellationToken = new WebJobsShutdownWatcher().Token;
-
-            using (host)
+            try
             {
-                try
-                {
-                    await host.WorkflowCoordinatorRunAsync(cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    Log.Fatal(ex, "Host terminated unexpectedly");
-                }
-                finally
-                {
-                    Log.CloseAndFlush();
-                }
+                host = builder.Build();
+                var cancellationToken = new WebJobsShutdownWatcher().Token;
+                await host.RunAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+                host?.Dispose();
             }
         }
     }
