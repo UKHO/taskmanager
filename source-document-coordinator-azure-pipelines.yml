@@ -167,7 +167,7 @@ stages:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
     - job: SAST
-      pool: "UKHO Windows 2019"
+      pool: "NautilusBuild"
       workspace:
           clean: all
       steps:
@@ -194,7 +194,7 @@ stages:
           customCommandArgs: true
           covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
           covCommitArgs: '--scm git'
-        displayName: 'dotnet build sourcedocumentcoordinator'
+        displayName: 'Scan sourcedocumentcoordinator'
 
 - stage: DeployDev
   dependsOn: 
