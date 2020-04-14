@@ -166,6 +166,7 @@ stages:
         inputs:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+          
     - job: SAST
       pool: "NautilusBuild"
       workspace:
@@ -190,7 +191,7 @@ stages:
           projectName: 'taskmanager'
           streamName: 'source-document-coordinator'
           coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-          buildCommand: '$(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator\sourcedocumentcoordinator.csproj'
+          buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator\sourcedocumentcoordinator.csproj'
           customCommandArgs: true
           covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
           covCommitArgs: '--scm git'
