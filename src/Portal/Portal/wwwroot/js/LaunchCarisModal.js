@@ -11,16 +11,29 @@ function initializeLaunchSourceEditorModal() {
     attachClearLaunchSourceEditorModalButtonHandler();
     attachLaunchSourceEditorDownloadHandler();
 
+    var usagesSelectionPageLength = Number($("#UsagesSelectionPageLength").val());
+    var sourcesSelectionPageLength = Number($("#SourcesSelectionPageLength").val());
+
     $("#usagesSelection").DataTable({
-        "pageLength": 6,
+        "pageLength": usagesSelectionPageLength,
         "pagingType": "simple",
-        "dom": "tip"
+        "ordering": false,
+        "dom": "tip",
+        "drawCallback": function (settings) {
+            var table = $("#usagesSelection").DataTable();
+            addDummyRowsCallback(table, usagesSelectionPageLength, 2);
+        }
     });
 
     $("#sourcesSelection").DataTable({
-        "pageLength": 6,
+        "pageLength": sourcesSelectionPageLength,
         "pagingType": "simple",
-        "dom": "tip"
+        "ordering": false,
+        "dom": "tip",
+        "drawCallback": function (settings) {
+            var table = $("#sourcesSelection").DataTable();
+            addDummyRowsCallback(table, sourcesSelectionPageLength, 2);
+        }
     });
 }
 
@@ -249,4 +262,33 @@ function clearLaunchSourceEditorModal() {
 
     $("#usagesSelection").DataTable().page("first").draw();
     $("#sourcesSelection").DataTable().page("first").draw();
+}
+
+function addDummyRowsCallback(dataTable, pageLength, blankColumnCount) {
+    var pageInfo = dataTable.page.info();
+
+    if (pageInfo.recordsTotal === 0) {
+        return;
+    }
+
+    var isLastPage = pageInfo.page + 1 === pageInfo.pages;
+    if (isLastPage) {
+        var recordsShownCount = pageInfo.end - pageInfo.start;
+        var recordsToAdd = pageLength - recordsShownCount;
+
+        var body = dataTable.table().body();
+
+        for (var i = 0; i < recordsToAdd; i++) {
+            var tr = $(document.createElement("tr"));
+
+            for (var j = 0; j < blankColumnCount; j++) {
+                var td = $(document.createElement("td"));
+                td.html("&nbsp;");
+
+                tr.append(td);
+            }
+
+            $(body).append(tr);
+        }
+    }
 }
