@@ -21,4 +21,4 @@ steps:
     coverityBuildDirectory: '$(Build.SourcesDirectory)'
     buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\portal\portal\portal.csproj'
     customCommandArgs: true
-    covAnalyzeArgs: '--webapp-security'
+    covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
