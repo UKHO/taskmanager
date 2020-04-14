@@ -166,7 +166,7 @@ stages:
         inputs:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
-    - job: RestoreBuildAndDeploy
+    - job: SAST
       pool: "UKHO Windows 2019"
       workspace:
           clean: all
