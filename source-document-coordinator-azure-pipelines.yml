@@ -166,6 +166,35 @@ stages:
         inputs:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
+      workspace:
+          clean: all
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore sourcedocumentcoordinator'
+
+      - task: synopsys-coverity@1
+        inputs:
+          coverityService: 'coverity.mgmt.local'
+          projectName: 'taskmanager'
+          streamName: 'source-document-coordinator'
+          coverityBuildDirectory: '$(Build.Repository.LocalPath)'
+          buildCommand: '$(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator\sourcedocumentcoordinator.csproj'
+          customCommandArgs: true
+          covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
+          covCommitArgs: '--scm git'
+        displayName: 'dotnet build sourcedocumentcoordinator'
 
 - stage: DeployDev
   dependsOn: 
