@@ -51,6 +51,10 @@ namespace Portal.Pages.DbAssessment
 
         public int CarisProjectNameCharacterLimit { get; set; }
 
+        public int UsagesSelectionPageLength { get; set; }
+
+        public int SourcesSelectionPageLength { get; set; }
+
         public List<string> HpdUsages { get; set; }
 
         public List<SourceViewModel> SourceDocuments { get; set; } = new List<SourceViewModel>();
@@ -95,6 +99,8 @@ namespace Portal.Pages.DbAssessment
 
             await GetCarisProjectDetails(processId, taskStage);
 
+            UsagesSelectionPageLength = _generalConfig.Value.UsagesSelectionPageLength;
+            SourcesSelectionPageLength = _generalConfig.Value.SourcesSelectionPageLength;
             CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
             SessionFilename = _generalConfig.Value.SessionFilename;
         }

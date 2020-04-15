@@ -5,6 +5,8 @@
 @{ Layout = null; }
 
 @Html.HiddenFor(m => m.IsCarisProjectCreated)
+@Html.HiddenFor(m => m.UsagesSelectionPageLength)
+@Html.HiddenFor(m => m.SourcesSelectionPageLength)
 <div class="card mb-4">
     <h6>
         <span>Edit Database</span>
@@ -88,7 +90,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Launch Caris Selection</h4>
+                <h4 class="modal-title">Launch CARIS Selection</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
