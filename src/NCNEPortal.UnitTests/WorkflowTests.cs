@@ -11,11 +11,8 @@ using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
-using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,61 +21,30 @@ namespace NCNEPortal.UnitTests
     [TestFixture]
     public class WorkflowTests
     {
+
         private NcneWorkflowDbContext _dbContext;
         private WorkflowModel _workflowModel;
-        private ILogger<WorkflowModel> _fakeLogger;
-        private ICommentsHelper _fakecommentsHelper;
-        private ICarisProjectHelper _carisProjectHelper;
-        private IMilestoneCalculator _milestoneCalculator;
-        private IPageValidationHelper _pageValidationHelper;
-        private IStageTypeFactory _stageTypeFactory;
-        private readonly IOptions<GeneralConfig> _fakeGeneralConfig;
-        private IAdDirectoryService _fakeAdDirectoryService;
-        private INcneUserDbService _fakencneUserDbService;
-        private int ProcessId { get; set; }
-        private List<AdUser> _validUsers;
+        private readonly ILogger<WorkflowModel> _fakeLogger = A.Dummy<ILogger<WorkflowModel>>();
+        private readonly ICommentsHelper _fakeCommentsHelper = A.Fake<ICommentsHelper>();
+        private ICarisProjectHelper _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+        private IMilestoneCalculator _fakeMilestoneCalculator = A.Fake<IMilestoneCalculator>();
+        private readonly IPageValidationHelper _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
+        private readonly IOptions<GeneralConfig> _fakeGeneralConfig = A.Fake<IOptions<GeneralConfig>>();
+        private readonly IAdDirectoryService _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+        private readonly INcneUserDbService _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 
         [SetUp]
         public void Setup()
         {
             var dbContextOptions = new DbContextOptionsBuilder<NcneWorkflowDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
+                .UseInMemoryDatabase("inmemory")
                 .Options;
 
-
             _dbContext = new NcneWorkflowDbContext(dbContextOptions);
-            _fakecommentsHelper = A.Fake<ICommentsHelper>();
 
-            ProcessId = 123;
-
-
-            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
-            _fakencneUserDbService = A.Fake<INcneUserDbService>();
-
-            _fakeLogger = A.Dummy<ILogger<WorkflowModel>>();
-
-            _pageValidationHelper = new PageValidationHelper(_fakencneUserDbService);
-
-            _stageTypeFactory = new StageTypeFactory(_dbContext);
-
-            _validUsers = new List<AdUser>
-            {
-                new AdUser
-                {
-                    DisplayName = "Valid User1"
-                },
-                new AdUser
-                {
-                    DisplayName = "Valid User2"
-                }
-            };
-
-            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakecommentsHelper, _carisProjectHelper,
-                                  _fakeGeneralConfig, _milestoneCalculator, _pageValidationHelper, _fakencneUserDbService, _fakeAdDirectoryService);
-
-
-            AddStageTypes(_dbContext);
-
+            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
+                _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
+                _fakeAdDirectoryService);
         }
 
 
@@ -89,358 +55,73 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public async Task Test_TaskStages_after_Onget_method_of_workflow()
+        public void Test_constructor_populates_userList_from_ncne_user_service()
+        {
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync()).Returns(new List<AdUser>
+            {
+                new AdUser() {DisplayName = "user 1"},
+                new AdUser() {DisplayName = "user 2"}
+            });
+
+            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
+                _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
+                _fakeAdDirectoryService);
+
+            Assert.That(_workflowModel.userList, Is.EqualTo(new[] { "user 1", "user 2" }));
+        }
+
+        [Test]
+        public void Test_OnPostTaskTerminate_throws_argument_exception_when_comment_is_empty()
         {
 
-            var taskInfo = _dbContext.TaskInfo.Add(
-                new TaskInfo()
-                {
-                    WorkflowType = "NC",
-                    ChartType = "Primary",
-                    TaskRole = new TaskRole()
-                    { Compiler = "Valid User" },
-                    TaskStage = new List<TaskStage>()
-                    {
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
-                    }
-                });
+            Assert.That(async () => await _workflowModel.OnPostTaskTerminateAsync("", 0), Throws.ArgumentException.With.Message.Contains("is null, empty or whitespace"));
 
-            await _dbContext.SaveChangesAsync();
+        }
 
-            var processid = taskInfo.Entity.ProcessId;
+        [TestCase(0, "is less than 1")]
+        [TestCase(-20, "is less than 1")]
+        [TestCase(9999, "does not appear in the TaskInfo table")]
 
-            _workflowModel.OnGetAsync(processid);
+        public void Test_OnPostTaskTerminate_throws_argument_exception_when_ProcessId_is_Invalid(int processId, string expectedMessage)
+        {
 
-            Assert.AreEqual(16, _workflowModel.TaskStages.Count);
-
+            Assert.That(async () => await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", processId), Throws.ArgumentException.With.Message.Contains(expectedMessage));
 
         }
 
         [Test]
-        public async Task Test_validating_the_workflow_for_Compiler()
+        public async Task Test_OnPostTaskTerminate_Terminate_the_status_for_valid_processId()
         {
-            _workflowModel.ProcessId = 123;
-            _workflowModel.RepromatDate = DateTime.Now;
-            _workflowModel.ChartType = "Primary";
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Compiler = null;
-            _workflowModel.Dating = 0;
+            AddTaskInfo(100);
 
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+            await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
 
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_workflowModel.ValidationErrorMessages.Contains("Task Information: Compiler cannot be empty"));
+            Assert.That(_dbContext.TaskInfo.Single().Status, Is.EqualTo(NcneTaskStatus.Terminated.ToString()));
 
         }
-
         [Test]
-        public async Task Test_validating_the_taskinformation_all_valid()
+        public async Task Test_OnPostTaskTerminate_Adds_termination_comments_for_valid_comments()
         {
-            _workflowModel.ProcessId = 123;
-            _workflowModel.RepromatDate = DateTime.Now;
-            _workflowModel.ChartType = "Primary";
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Compiler = "Stuat";
-            _workflowModel.Dating = 1;
+            AddTaskInfo(100);
 
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
+            await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
 
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
-
-
-        }
-
-        [Test]
-        public async Task Test_Validating_TaskStage_Dates_on_Saving_TaskInfo()
-        {
-            var taskInfo = _dbContext.TaskInfo.Add(
-                new TaskInfo()
-                {
-                    WorkflowType = "NC",
-                    ChartType = "Primary",
-                    TaskRole = new TaskRole()
-                    { Compiler = "Valid User1" },
-                    TaskStage = new List<TaskStage>()
-                    {
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
-                    }
-                });
-
-            await _dbContext.SaveChangesAsync();
-
-            var processId = taskInfo.Entity.ProcessId;
-
-            //Get the task information   
-            _workflowModel.OnGetAsync(processId);
-
-            //Update it
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Dating = 1;
-
-
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
-                .Returns(_validUsers);
-
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
-
-            var newTaskInfo = _dbContext.TaskInfo.Include(s => s.TaskStage).FirstOrDefault(t => t.ProcessId == processId);
-
-
-            var publication = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Publication);
-
-            Assert.GreaterOrEqual(_workflowModel.ValidationErrorMessages.Count, 0);
-            Assert.AreEqual(newTaskInfo?.PublicationDate, publication?.DateExpected);
+            A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Terminate comment: Valid Comment", 100, A<string>.Ignored))
+                .MustHaveHappened();
 
         }
 
 
-        [Test]
-        public async Task Test_Checking_workflow_stage_for_Adding_Users_in_task_information()
+
+        private void AddTaskInfo(int processId)
         {
-            var taskInfo = _dbContext.TaskInfo.Add(
-                new TaskInfo()
-                {
-                    WorkflowType = "NC",
-                    ChartType = "Primary",
-                    TaskRole = new TaskRole()
-                    { Compiler = "Valid User1" },
-                    TaskStage = new List<TaskStage>()
-                    {
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
-                    }
-                });
-
-            await _dbContext.SaveChangesAsync();
-
-            var processId = taskInfo.Entity.ProcessId;
-
-            //Get the task information   
-            _workflowModel.OnGetAsync(processId);
-
-            //Update it
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Dating = 1;
-            _workflowModel.Verifier1 = "Valid User2";
-
-
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
-                .Returns(_validUsers);
-
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
-
-            var newTaskInfo = _dbContext.TaskInfo.Include(s => s.TaskStage).FirstOrDefault(t => t.ProcessId == processId);
-
-
-            var verifier = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.V1);
-
-            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
-            Assert.AreEqual(newTaskInfo?.TaskRole.VerifierOne, verifier?.AssignedUser);
-
-        }
-
-        [Test]
-        public async Task Test_Checking_workflow_stage_for_removing_Users_in_task_information()
-        {
-            var taskInfo = _dbContext.TaskInfo.Add(
-                new TaskInfo()
-                {
-                    WorkflowType = "NC",
-                    ChartType = "Primary",
-                    TaskRole = new TaskRole()
-                    {
-                        Compiler = "Valid User1",
-                        VerifierOne = "Valid User2"
-                    },
-                    TaskStage = new List<TaskStage>()
-                    {
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
-                    }
-                });
-
-            await _dbContext.SaveChangesAsync();
-
-            var processId = taskInfo.Entity.ProcessId;
-
-            //Get the task information   
-            _workflowModel.OnGetAsync(processId);
-
-            //Update it
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Dating = 1;
-            _workflowModel.Verifier1 = null;
-
-
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
-                .Returns(_validUsers);
-
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
-
-            var newTaskInfo = _dbContext.TaskInfo.Include(s => s.TaskStage).FirstOrDefault(t => t.ProcessId == processId);
-
-
-            var verifier = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.V1);
-
-            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
-            Assert.AreEqual(newTaskInfo?.TaskRole.VerifierOne, verifier?.AssignedUser);
-
-        }
-
-        [Test]
-        public async Task Test_Checking_Completed_workflow_stage_after_Changing_Users_in_task_information()
-        {
-            var taskInfo = _dbContext.TaskInfo.Add(
-                new TaskInfo()
-                {
-                    WorkflowType = "NC",
-                    ChartType = "Primary",
-                    TaskRole = new TaskRole()
-                    { Compiler = "Valid User1" },
-                    TaskStage = new List<TaskStage>()
-                    {
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Specification, Status = "Completed", AssignedUser = "Valid User1"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Compile, Status = "InProgess",AssignedUser = "Valid User1"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V1_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.V2_Rework, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Forms, Status = "InProgress"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Final_Updating, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Hundred_Percent_Check, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Commit_To_Print, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.CIS, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publication, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Publish_Chart, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Clear_Vector, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Retire_Old_Version, Status = "Open"},
-                        new TaskStage {TaskStageTypeId = (int) NcneTaskStageType.Consider_Withdrawn_Charts, Status = "Open"}
-                    }
-                });
-
-            await _dbContext.SaveChangesAsync();
-
-            var processId = taskInfo.Entity.ProcessId;
-
-            //Get the task information   
-            _workflowModel.OnGetAsync(processId);
-
-            //Update it
-            _workflowModel.PublicationDate = DateTime.Now;
-            _workflowModel.Dating = 1;
-            _workflowModel.Compiler = "Valid User2";
-
-
-            A.CallTo(() => _fakencneUserDbService.GetUsersFromDbAsync())
-                .Returns(_validUsers);
-
-            await _workflowModel.OnPostSaveAsync(_workflowModel.ProcessId, _workflowModel.ChartType);
-
-            var newTaskInfo = _dbContext.TaskInfo.Include(s => s.TaskStage).FirstOrDefault(t => t.ProcessId == processId);
-
-
-            var specification = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Specification);
-            var compilation = newTaskInfo?.TaskStage.Find(s => s.TaskStageTypeId == (int)NcneTaskStageType.Compile);
-
-            Assert.AreEqual(_workflowModel.ValidationErrorMessages.Count, 0);
-            Assert.AreEqual("Valid User1", specification?.AssignedUser);
-            Assert.AreEqual(newTaskInfo?.TaskRole.Compiler, compilation?.AssignedUser);
-
-        }
-
-        [Test]
-        public void Test_StageType_Factory_For_Adoption_ChartType()
-        {
-            var stagetypes = _stageTypeFactory.GetTaskStages("Adoption");
-
-            var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
-
-            Assert.AreEqual(stagetypes.Count, 18);
-            Assert.AreEqual(Sdra.Count(), 1);
-        }
-
-
-        [Test]
-        public void Test_StageType_Factory_For_Primary_ChartType()
-        {
-            var stagetypes = _stageTypeFactory.GetTaskStages("Primary");
-
-            var Sdra = stagetypes.Where(t => t.Name == "With SDRA");
-
-            Assert.AreEqual(stagetypes.Count, 16);
-            Assert.AreEqual(Sdra.Count(), 0);
-        }
-
-        private void AddStageTypes(NcneWorkflowDbContext dbContext)
-        {
-            if (!File.Exists(@"Data\TaskStageType.json")) throw new FileNotFoundException(@"Data\TaskStageType.json");
-
-            var jsonString = File.ReadAllText(@"Data\TaskStageType.json");
-            var stageType = JsonConvert.DeserializeObject<IEnumerable<TaskStageType>>(jsonString);
-
-            dbContext.TaskStageType.AddRange(stageType);
+            _dbContext.TaskInfo.Add(new TaskInfo()
+            {
+                ProcessId = processId,
+                Status = NcneTaskStatus.InProgress.ToString()
+            });
 
             _dbContext.SaveChanges();
         }
-
     }
-
 }
