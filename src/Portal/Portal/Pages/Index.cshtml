@@ -77,8 +77,8 @@
                                 @if (task.IsOnHold)
                                 {
                                     <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
-                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" @(task.OnHoldDaysGreen ? "style='display: none'" : "")></i>
-                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" @(task.OnHoldDaysRed ? "" : "style='display: none'")></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
                                 }
                             </span>
                         </td>
@@ -167,8 +167,8 @@
                                 @if (task.IsOnHold)
                                 {
                                     <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
-                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" @(task.OnHoldDaysGreen ? "style='display: none'" : "")></i>
-                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" @(task.OnHoldDaysRed ? "" : "style='display: none'")></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
                                 }
                             </span>
                         </td>
