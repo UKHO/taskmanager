@@ -33,8 +33,8 @@ namespace Portal.UnitTests
         private int ProcessId { get; set; }
         private ILogger<VerifyModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
-        private IDataServiceApiClient _fakeDataServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
+        private IPcpEventServiceApiClient _fakePcpEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
         private ICommentsHelper _commentsHelper;
@@ -55,7 +55,7 @@ namespace Portal.UnitTests
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
-            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakePcpEventServiceApiClient = A.Fake<IPcpEventServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
@@ -113,8 +113,8 @@ namespace Portal.UnitTests
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
         }
 
         [TearDown]
@@ -582,8 +582,8 @@ namespace Portal.UnitTests
             _pageValidationHelper = A.Fake<IPageValidationHelper>();
 
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -627,8 +627,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -659,8 +659,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -700,8 +700,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -732,8 +732,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
