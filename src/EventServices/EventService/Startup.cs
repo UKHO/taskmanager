@@ -59,7 +59,6 @@ namespace EventService
                 });
             });
 
-            string azureAccessToken = null;
             var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
@@ -95,11 +94,11 @@ namespace EventService
             else
             {
                 connectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDebugging, startupSecretsConfig.NsbDataSource, startupSecretsConfig.NsbInitialCatalog);
-
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                var azureDbTokenUrl = startupConfig.AzureDbTokenUrl;
-                azureAccessToken = azureServiceTokenProvider.GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
             }
+
+            // Implicit singleton to reduce load on GC (transport SQL connection factory delegate is called continually).
+            // Not required for its internal cache, which is static.
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
                 .Transactions(TransportTransactionMode.SendsAtomicWithReceive).UseCustomSqlConnectionFactory(
@@ -109,7 +108,7 @@ namespace EventService
                         try
                         {
                             con.ConnectionString = connectionString;
-                            if (!isLocalDebugging) con.AccessToken = azureAccessToken;
+                            if (!isLocalDebugging) con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).ConfigureAwait(false);
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
                         }
@@ -128,7 +127,7 @@ namespace EventService
                 try
                 {
                     con.ConnectionString = connectionString;
-                    if (!isLocalDebugging) con.AccessToken = azureAccessToken;
+                    if (!isLocalDebugging) con.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result; ;
                     return con;
                 }
                 catch

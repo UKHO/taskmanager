@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Common.Messages.Events;
 using Microsoft.Azure.Services.AppAuthentication;
 using NServiceBus;
@@ -14,8 +12,13 @@ namespace SourceDocumentCoordinator
     public class SourceDocumentCoordinatorConfig : EndpointConfiguration
     {
         public SourceDocumentCoordinatorConfig(NsbConfig nsbConfig,
-            NsbSecretsConfig nsbSecretsConfig, AzureServiceTokenProvider azureServiceTokenProvider = null) : base(nsbConfig.SourceDocumentCoordinatorName)
+            NsbSecretsConfig nsbSecretsConfig) : base(nsbConfig.SourceDocumentCoordinatorName)
         {
+
+            // Implicit singleton to reduce load on GC (transport SQL connection factory delegate is called continually).
+            // Not required for its internal cache, which is static.
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
             // Transport
 
             var transport = this.UseTransport<SqlServerTransport>()
@@ -26,9 +29,9 @@ namespace SourceDocumentCoordinator
                         try
                         {
                             con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                            if (!nsbConfig.IsLocalDevelopment && azureServiceTokenProvider != null)
+                            if (!nsbConfig.IsLocalDevelopment)
                             {
-                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString());
+                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).ConfigureAwait(false);
                             }
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
@@ -87,7 +90,6 @@ namespace SourceDocumentCoordinator
             this.AssemblyScanner().ScanAssembliesInNestedDirectories = true;
             this.EnableInstallers();
             this.UseSerialization<NewtonsoftSerializer>();
-            this.DefineCriticalErrorAction(OnCriticalError);
 
             // Additional config for local development
 
@@ -107,24 +109,5 @@ namespace SourceDocumentCoordinator
                     });
             }
         }
-
-        #region WebJobHost_CriticalError
-        // Need to collect Application Events in Azure to see this
-        static async Task OnCriticalError(ICriticalErrorContext context)
-        {
-            var fatalMessage =
-                $"The following critical error was encountered:{Environment.NewLine}{context.Error}{Environment.NewLine}Process is shutting down. StackTrace: {Environment.NewLine}{context.Exception.StackTrace}";
-            EventLog.WriteEntry(".NET Runtime", fatalMessage, EventLogEntryType.Error);
-
-            try
-            {
-                await context.Stop().ConfigureAwait(false);
-            }
-            finally
-            {
-                Environment.FailFast(fatalMessage, context.Exception);
-            }
-        }
-        #endregion
     }
 }

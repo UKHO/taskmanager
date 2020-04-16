@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -95,20 +94,12 @@ namespace SourceDocumentCoordinator
                 services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                     options.UseSqlServer(workflowDbConnectionString));
 
-                services.AddSingleton<AzureServiceTokenProvider>(new AzureServiceTokenProvider());
-
                 if (isLocalDebugging)
                 {
                     using var sp = services.BuildServiceProvider();
                     using var context = sp.GetRequiredService<WorkflowDbContext>();
                     TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
                 }
-
-                // Bridge to Terabithia
-                using var provider = services.BuildServiceProvider();
-                var tokenProvider = provider.GetRequiredService<AzureServiceTokenProvider>();
-                hostingContext.Properties.Add("AzureServiceTokenProvider", tokenProvider);
-
             })
             .UseNServiceBus(hostBuilderContext =>
             {
@@ -143,8 +134,7 @@ namespace SourceDocumentCoordinator
                 {
                     nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false, nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
-                    hostBuilderContext.Properties.TryGetValue("AzureServiceTokenProvider", out var azureServiceTokenProvider);
-                    endpointConfiguration = new SourceDocumentCoordinatorConfig(nsbConfig, nsbSecretsConfig, (AzureServiceTokenProvider)azureServiceTokenProvider);
+                    endpointConfiguration = new SourceDocumentCoordinatorConfig(nsbConfig, nsbSecretsConfig);
                 }
 
                 var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
@@ -161,7 +151,7 @@ namespace SourceDocumentCoordinator
             {
                 host = builder.Build();
                 var cancellationToken = new WebJobsShutdownWatcher().Token;
-                await host.RunAsync(cancellationToken);
+                await host.RunAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

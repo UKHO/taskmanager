@@ -84,8 +84,6 @@ namespace WorkflowCoordinator
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                         options.UseSqlServer(connection));
 
-                    services.AddSingleton<AzureServiceTokenProvider>(new AzureServiceTokenProvider());
-
                     if (isLocalDebugging)
                     {
                         using var sp = services.BuildServiceProvider();
@@ -115,11 +113,6 @@ namespace WorkflowCoordinator
                             Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername,
                                 startupSecretsConfig.K2RestApiPassword)
                         });
-
-                    // Bridge to Terabithia
-                    using var provider = services.BuildServiceProvider();
-                    var tokenProvider = provider.GetRequiredService<AzureServiceTokenProvider>();
-                    hostingContext.Properties.Add("AzureServiceTokenProvider", tokenProvider);
                 })
                 .UseNServiceBus(hostBuilderContext =>
                 {
@@ -155,8 +148,7 @@ namespace WorkflowCoordinator
                         nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false,
                             nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
-                        hostBuilderContext.Properties.TryGetValue("AzureServiceTokenProvider", out var azureServiceTokenProvider);
-                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig, (AzureServiceTokenProvider)azureServiceTokenProvider);
+                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
                     }
 
 
@@ -174,7 +166,7 @@ namespace WorkflowCoordinator
             {
                 host = builder.Build();
                 var cancellationToken = new WebJobsShutdownWatcher().Token;
-                await host.RunAsync(cancellationToken);
+                await host.RunAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

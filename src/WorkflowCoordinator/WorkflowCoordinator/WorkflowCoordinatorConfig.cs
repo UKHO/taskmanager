@@ -13,8 +13,14 @@ namespace WorkflowCoordinator
     public class WorkflowCoordinatorConfig : EndpointConfiguration
     {
         public WorkflowCoordinatorConfig(NsbConfig nsbConfig,
-            NsbSecretsConfig nsbSecretsConfig, AzureServiceTokenProvider azureServiceTokenProvider = null) : base(nsbConfig.WorkflowCoordinatorName)
+            NsbSecretsConfig nsbSecretsConfig) : base(nsbConfig.WorkflowCoordinatorName)
         {
+
+
+            // Implicit singleton to reduce load on GC (transport SQL connection factory delegate is called continually).
+            // Not required for its internal cache, which is static.
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
             // Transport
 
             var transport = this.UseTransport<SqlServerTransport>()
@@ -25,9 +31,9 @@ namespace WorkflowCoordinator
                         try
                         {
                             con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                            if (!nsbConfig.IsLocalDevelopment && azureServiceTokenProvider != null)
+                            if (!nsbConfig.IsLocalDevelopment)
                             {
-                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString());
+                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).ConfigureAwait(false);
                             }
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
@@ -78,8 +84,7 @@ namespace WorkflowCoordinator
                {
                    con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
                    if (!nsbConfig.IsLocalDevelopment)
-                       con.AccessToken = azureServiceTokenProvider
-                           .GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).Result;
+                       con.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).Result;
                    return con;
                }
                catch
