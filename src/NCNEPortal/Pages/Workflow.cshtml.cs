@@ -23,7 +23,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using TaskComment = NCNEPortal.Models.TaskComment;
+using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
+
 
 namespace NCNEPortal
 {
@@ -273,7 +274,7 @@ namespace NCNEPortal
 
             var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
 
-
+            TaskComments = taskInfo.TaskComment;
 
             if (carisProject != null)
             {
@@ -282,33 +283,6 @@ namespace NCNEPortal
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
 
-            TaskComments = new List<TaskComment>
-            {
-                new TaskComment()
-                {
-                    CommentDate = DateTime.Now, Name = "StoodleyM",
-                    CommentText = "lsldjkojk sjjksdf kksdfsdf klsdfsdf  sdflks;lksdf  sd;flkkeok;lk';df ", Role = ""
-                },
-                new TaskComment()
-                {
-                    CommentDate = DateTime.Now, Name = "WilliamsG",
-                    CommentText =
-                        "This is a very important comment that will eventually reach a, not insignificant character count. " +
-                        "This is a very important comment that will eventually reach a, not insignificant character count. " +
-                        "This is purely to demonstrate that this will look lovely, nothing more to it than that.",
-                    Role = "Verifier 2"
-                },
-                new TaskComment()
-                {
-                    CommentDate = DateTime.Now, Name = "StoodleyM",
-                    CommentText = "", Role = "Verifier 2"
-                },
-                new TaskComment()
-                {
-                    CommentDate = DateTime.Now, Name = "StoodleyM",
-                    CommentText = "Rework required as it isn't right.", Role = "Verifier 2"
-                }
-            };
         }
 
 
@@ -627,6 +601,34 @@ namespace NCNEPortal
                 };
             }
 
+        }
+
+        public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
+        {
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
+
+            if (!string.IsNullOrEmpty(txtComment))
+            {
+                await _dbContext.TaskComment.AddAsync(new TaskComment()
+                {
+                    ProcessId = commentProcessId,
+                    ActionIndicator = false,
+                    Comment = txtComment,
+                    Created = DateTime.Now,
+                    Username = UserFullName
+                });
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            var result = new[]
+            {
+                UserFullName,
+                DateTime.Now.ToLongDateString()
+            };
+            return new JsonResult(result);
         }
 
         public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)

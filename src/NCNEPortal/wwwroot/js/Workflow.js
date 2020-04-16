@@ -19,6 +19,84 @@
 
     });
 
+    $(".btnAddTaskcomment").click(function() {
+        var processId = $(this).data("processid");
+        $("#hdnTaskCommentProcessId").val(processId);
+        $("#btnPostTaskComment").prop("disabled", false);
+        $("#editTaskCommentError").html("");
+
+
+        $("#editTaskCommentModal").modal("show");
+    });
+
+    $("#editTaskCommentModal").on("shown.bs.modal",
+        function () {
+            $("#txtTaskComment").val("");
+            $("#txtTaskComment").focus();
+        });
+
+    $("#btnClearTaskComment").click(function () {
+        $("#txtTaskComment").val("");
+        $("#txtTaskComment").focus();
+    });
+
+
+    $("#btnPostTaskComment").on("click",
+        function() {
+            var comment = $("#txtTaskComment").val();
+            $("#editTaskCommentError").html("");
+            if (comment.trim().length === 0) {
+                $("#editTaskCommentError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
+                $('#txtTaskComment').focus();
+
+            }
+            else {
+
+                $("#btnPostTaskComment").prop("disabled", true);
+                var processId = $("#hdnTaskCommentProcessId").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "Workflow/?handler=TaskComment",
+
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        "txtComment": comment,
+                        "commentProcessId": processId
+                       
+                    },
+                    success: function (result) {
+
+                        var tableRow = "<tr><td style='width:200px'><div  class='mb-2'><strong>" + result[0] + "</strong></div>" +
+                            "<div>" + result[1] + "</div></td>" +
+                            "<td style='width:20px'><span class='fas fa-comment-alt'></span></td>" +
+                            "<td><div class='d-inline'>" + comment + "</div></td></tr> ";
+
+                        var count = parseInt($("#commentCount").html());
+
+                        $("#commentCount").html((count + 1).toString());
+
+                        $('#TaskCommentsTable').append(tableRow);
+
+                        $("#editTaskCommentModal").modal("hide");
+
+
+                    },
+                    error: function (error) {
+                        var responseJson = error.responseJSON;
+                        $("#editTaskCommentError").append(responseJson);
+
+                    }
+                });
+            }
+
+        });
+
+
     $(".btnAddcomment").click(function () {
         var stageid = $(this).data("taskstage");
         var processid = $(this).data("processid");

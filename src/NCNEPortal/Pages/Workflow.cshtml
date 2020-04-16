@@ -31,9 +31,12 @@
                             <div class="speech bubble">
                                 <i class="fas fa-comment-alt"></i>
                             </div>
-                            <div class="speech count">
-                                4
-                            </div>
+                            <a href="#CommentsSection">
+                                <div id="commentCount" class="speech count">
+                                    @Model.TaskComments.Count()
+                                </div>
+                            </a>
+
                         </div>
                     </div>
                 </div>
@@ -378,30 +381,30 @@
                 </div>
                 <div class="col text-right">
                     <span class="fas fa-comment-alt mr-2"></span>
-                    <a href="#" style="color: white;">Add a comment</a>
+                    <button type="button" style="color: white; padding-left: 0; padding-top:0" class="btn btn-link btnAddTaskcomment" data-processid="@(Model.ProcessId)">Add a comment</button>
                 </div>
             </div>
         </h3>
 
-        <div class="card-body p-3">
+        <div id="CommentsSection" class="card-body p-3">
 
-            <table class="table table-striped m-2" id="generic-comments-table">
+            <table id="TaskCommentsTable" class="table table-striped m-2" id="generic-comments-table">
                 <tbody>
                     @if (Model.TaskComments != null)
                     {
                         @foreach (var comment in Model.TaskComments)
                         {
                             <tr>
-                                <td>
+                                <td style="width:200px">
                                     <div class="mb-2">
-                                        <strong>@comment.Name</strong>
+                                        <strong>@comment.Username</strong>
                                     </div>
                                     <div>
-                                        @comment.CommentDate.ToShortDateString()
+                                        @comment.Created.ToShortDateString()
                                     </div>
                                 </td>
-                                <td>
-                                    @if (@comment.CommentText == "")
+                                <td style="width:20px">
+                                    @if (@comment.Comment == "")
                                     {
                                         <span class="fa fa-edit" style="color: #EF8123"> </span>
                                     }
@@ -411,13 +414,13 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (@comment.CommentText == "")
+                                    @if (@comment.Comment == "")
                                     {
-                                        <span style="color: #ef8123">Edited @comment.Role</span>
+                                        <span style="color: #ef8123">Edited @comment.ActionRole</span>
                                     }
                                     else
                                     {
-                                        <div class="d-inline">@comment.CommentText</div>
+                                        <div class="d-inline">@comment.Comment</div>
                                     }
                                 </td>
                             </tr>
@@ -510,6 +513,28 @@
                 <button type="button" id="btnClearComment" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
                 <button type="button" id="btnCancelComment" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
                 <button type="button" form="frmStageComment" id="btnPostComment" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Edit Task comment *@
+<div class="modal fade" id="editTaskCommentModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskComment" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Comment</h4>
+            </div>
+            <div class="modal-body">
+                <textarea style="height: 100px;" maxlength="4000" id="txtTaskComment" name="txtTaskComment" class="form-control"></textarea>
+                <input type="hidden" id="hdnTaskCommentProcessId" name="TaskCommentProcessId" />
+                <br />
+                <div id="editTaskCommentError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClearTaskComment" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                <button type="button" id="btnCancelTaskComment" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmTaskComment" id="btnPostTaskComment" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
             </div>
         </div>
     </div>
