@@ -18,6 +18,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
+using UKHO.Events;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -26,15 +27,14 @@ namespace Portal.UnitTests
     [TestFixture]
     public class VerifyTests
     {
-
         private WorkflowDbContext _dbContext;
         private HpdDbContext _hpDbContext;
         private VerifyModel _verifyModel;
         private int ProcessId { get; set; }
         private ILogger<VerifyModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
-        private IDataServiceApiClient _fakeDataServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
+        private IPcpEventServiceApiClient _fakePcpEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
         private ICommentsHelper _commentsHelper;
@@ -55,7 +55,7 @@ namespace Portal.UnitTests
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
-            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakePcpEventServiceApiClient = A.Fake<IPcpEventServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
@@ -113,8 +113,8 @@ namespace Portal.UnitTests
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
         }
 
         [TearDown]
@@ -582,8 +582,8 @@ namespace Portal.UnitTests
             _pageValidationHelper = A.Fake<IPageValidationHelper>();
 
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -627,8 +627,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -659,8 +659,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -700,8 +700,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -732,8 +732,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -814,6 +814,104 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_Done_and_validation_passed_then_HDBAssessmentReadyEvent_is_published()
+        {
+            string aduser = "TestUser";
+
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(aduser));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = aduser;
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid(),
+                SdocId = 123
+            });
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123
+            });
+
+            _dbContext.HpdUser.Add(new HpdUser()
+            {
+                AdUsername = aduser,
+                HpdUsername = "TestUser_Caris"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            A.CallTo(() => _fakePcpEventServiceApiClient.PostEvent(nameof(HDBAssessmentReadyEvent),
+                A<HDBAssessmentReadyEvent>.Ignored)).MustHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_ConfirmedSignOff_and_validation_passed_then_HDBAssessmentReadyEvent_is_published()
+        {
+            string aduser = "TestUser";
+
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(aduser));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+
+            _verifyModel.Verifier = aduser;
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid(),
+                SdocId = 123
+            });
+
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123
+            });
+
+            _dbContext.HpdUser.Add(new HpdUser()
+            {
+                AdUsername = aduser,
+                HpdUsername = "TestUser_Caris"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "ConfirmedSignOff");
+
+            A.CallTo(() => _fakePcpEventServiceApiClient.PostEvent(nameof(HDBAssessmentReadyEvent),
+                A<HDBAssessmentReadyEvent>.Ignored)).MustHaveHappened();
         }
     }
 }

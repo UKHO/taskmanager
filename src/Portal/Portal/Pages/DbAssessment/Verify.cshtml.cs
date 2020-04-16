@@ -32,9 +32,9 @@ namespace Portal.Pages.DbAssessment
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly WorkflowDbContext _dbContext;
-        private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
+        private readonly IPcpEventServiceApiClient _pcpEventServiceApiClient;
 
         [BindProperty]
         public bool IsOnHold { get; set; }
@@ -88,7 +88,6 @@ namespace Portal.Pages.DbAssessment
         public string SerialisedCustomHttpStatusCodes { get; set; }
 
         public VerifyModel(WorkflowDbContext dbContext,
-            IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
@@ -96,10 +95,10 @@ namespace Portal.Pages.DbAssessment
             ILogger<VerifyModel> logger,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
             _dbContext = dbContext;
-            _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
@@ -108,6 +107,7 @@ namespace Portal.Pages.DbAssessment
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
+            _pcpEventServiceApiClient = pcpEventServiceApiClient;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -215,6 +215,8 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
+                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
+
                     break;
                 case "ConfirmedSignOff":
 
@@ -225,6 +227,9 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
+
+                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
+
                     break;
                 default:
                     _logger.LogError("Action not found {Action}");
@@ -673,6 +678,26 @@ namespace Portal.Pages.DbAssessment
 
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// Posts a HdbAssessmentReadyEvent to PCP's Event Service API
+        /// </summary>
+        /// <param name="sdocId"></param>
+        /// <returns></returns>
+        private async Task PublishHdbAssessmentReadyEvent(int sdocId)
+        {
+            var hdbAssessmentReadyEvent = new UKHO.Events.HDBAssessmentReadyEvent
+            {
+                SourceDocumentAssessmentId = sdocId.ToString()
+            };
+
+            LogContext.PushProperty("HDBAssessmentReadyEvent",
+                hdbAssessmentReadyEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
+
+            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
         }
     }
 }
