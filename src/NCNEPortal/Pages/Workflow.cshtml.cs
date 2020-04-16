@@ -473,7 +473,7 @@ namespace NCNEPortal
             return new JsonResult(JsonConvert.SerializeObject(result));
         }
 
-        private async Task<DeadLineId> UpdateTaskInformation(int processId, string chartType)
+        private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
@@ -587,7 +587,7 @@ namespace NCNEPortal
 
             await _dbContext.SaveChangesAsync();
 
-            return new DeadLineId()
+            return new DeadlineId()
             {
                 FormsDate = formStageId,
                 CommitDate = commitStageId,
