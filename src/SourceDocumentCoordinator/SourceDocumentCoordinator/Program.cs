@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Factories;
+using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Azure.WebJobs;

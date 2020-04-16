@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Factories;
+using Common.Factories.DocumentStatusFactory;
 using Common.Helpers;
 using Common.Messages.Events;
 using FakeItEasy;

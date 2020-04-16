@@ -4,20 +4,19 @@ using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
-namespace Common.Factories
+namespace Common.Factories.DocumentStatusFactory
 {
-    public class PrimaryDocumentStatusProcessor : IDocumentStatusProcessor
+    public class LinkedDocumentStatusProcessor : IDocumentStatusProcessor
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public PrimaryDocumentStatusProcessor(WorkflowDbContext _dbContext)
+        public LinkedDocumentStatusProcessor(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext;
         }
 
-        private int Add()
+        public int Add()
         {
             throw new NotImplementedException();
         }
@@ -26,30 +25,18 @@ namespace Common.Factories
             string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null,
             string generatedFullFilename = null)
         {
-            var row = await _dbContext.PrimaryDocumentStatus
+            var row = await _dbContext.LinkedDocument
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
-                && r.SdocId == sourceDocumentId);
+                                           && r.LinkedSdocId == sourceDocumentId);
 
             if (row == null)
             {
-                // add
-                var primaryDocumentStatus = new PrimaryDocumentStatus
-                {
-                    CorrelationId = correlationId,
-                    ProcessId = processId,
-                    SdocId = sourceDocumentId,
-                    Status = status.ToString(),
-                    StartedAt = DateTime.Now
-                };
-
-                await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
-                await _dbContext.SaveChangesAsync();
-                return primaryDocumentStatus.PrimaryDocumentStatusId;
+                throw new ApplicationException($"Could not find linked document row for SdocId: {sourceDocumentId}");
             }
 
             // update
             row.Status = status.ToString();
-            
+
             if (status == SourceDocumentRetrievalStatus.FileGenerated && !string.IsNullOrWhiteSpace(generatedFullFilename))
             {
                 row.Filename = Path.GetFileName(generatedFullFilename).Trim();
@@ -57,7 +44,7 @@ namespace Common.Factories
             }
 
             await _dbContext.SaveChangesAsync();
-            return row.PrimaryDocumentStatusId;
+            return row.LinkedDocumentId;
         }
     }
 }

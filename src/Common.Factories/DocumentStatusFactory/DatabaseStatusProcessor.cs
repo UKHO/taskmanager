@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
-namespace Common.Factories
+namespace Common.Factories.DocumentStatusFactory
 {
     public class DatabaseDocumentStatusProcessor : IDocumentStatusProcessor
     {

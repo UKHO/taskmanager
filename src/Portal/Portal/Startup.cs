@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using AutoMapper;
 using Common.Factories;
+using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Common.Helpers.Auth;

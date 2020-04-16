@@ -3,7 +3,7 @@ using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using WorkflowDatabase.EF;
 
-namespace Common.Factories
+namespace Common.Factories.DocumentStatusFactory
 {
     public class DocumentStatusFactory : IDocumentStatusFactory
     {
