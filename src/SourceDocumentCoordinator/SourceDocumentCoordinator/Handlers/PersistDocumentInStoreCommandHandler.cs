@@ -1,13 +1,15 @@
-﻿using System.Threading.Tasks;
-using NServiceBus;
-using SourceDocumentCoordinator.Messages;
-using System.IO;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Common.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NServiceBus;
+using Serilog.Context;
 using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.HttpClients;
+using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
 
 namespace SourceDocumentCoordinator.Handlers
@@ -18,16 +20,19 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IContentServiceApiClient _contentServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
         private readonly IDocumentFileLocationFactory _documentFileLocationFactory;
+        private readonly ILogger<PersistDocumentInStoreCommandHandler> _logger;
 
         public PersistDocumentInStoreCommandHandler(IOptionsSnapshot<GeneralConfig> generalConfig, 
                                                     IContentServiceApiClient contentServiceApiClient, 
                                                     WorkflowDbContext dbContext, 
-                                                    IDocumentFileLocationFactory documentFileLocationFactory)
+                                                    IDocumentFileLocationFactory documentFileLocationFactory,
+                                                    ILogger<PersistDocumentInStoreCommandHandler> logger)
         {
             _generalConfig = generalConfig;
             _contentServiceApiClient = contentServiceApiClient;
             _dbContext = dbContext;
             _documentFileLocationFactory = documentFileLocationFactory;
+            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +43,15 @@ namespace SourceDocumentCoordinator.Handlers
         /// <returns></returns>
         public async Task Handle(PersistDocumentInStoreCommand message, IMessageHandlerContext context)
         {
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
+            LogContext.PushProperty("EventName", nameof(PersistDocumentInStoreCommand));
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
+            LogContext.PushProperty("ProcessId", message.ProcessId);
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
+
+
             var fileBytes = File.ReadAllBytes(message.Filepath);
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
