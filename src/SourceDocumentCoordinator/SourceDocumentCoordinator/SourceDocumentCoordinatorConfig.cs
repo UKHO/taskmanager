@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using Common.Messages.Events;
+using Microsoft.Azure.Services.AppAuthentication;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport.SQLServer;
@@ -13,6 +14,11 @@ namespace SourceDocumentCoordinator
         public SourceDocumentCoordinatorConfig(NsbConfig nsbConfig,
             NsbSecretsConfig nsbSecretsConfig) : base(nsbConfig.SourceDocumentCoordinatorName)
         {
+
+            // Implicit singleton to reduce load on GC (transport SQL connection factory delegate is called continually).
+            // Not required for its internal cache, which is static.
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
             // Transport
 
             var transport = this.UseTransport<SqlServerTransport>()
@@ -23,7 +29,10 @@ namespace SourceDocumentCoordinator
                         try
                         {
                             con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                            if (!nsbConfig.IsLocalDevelopment) con.AccessToken = nsbSecretsConfig.AzureAccessToken;
+                            if (!nsbConfig.IsLocalDevelopment)
+                            {
+                                con.AccessToken = await azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).ConfigureAwait(false);
+                            }
                             await con.OpenAsync().ConfigureAwait(false);
                             return con;
                         }
@@ -56,7 +65,7 @@ namespace SourceDocumentCoordinator
                 try
                 {
                     con.ConnectionString = nsbSecretsConfig.NsbDbConnectionString;
-                    if (!nsbConfig.IsLocalDevelopment) con.AccessToken = nsbSecretsConfig.AzureAccessToken;
+                    if (!nsbConfig.IsLocalDevelopment) con.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(nsbConfig.AzureDbTokenUrl.ToString()).Result;
                     return con;
                 }
                 catch

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
@@ -126,11 +127,7 @@ namespace WorkflowCoordinator
                     var nsbSecretsConfig = new NsbSecretsConfig();
                     hostBuilderContext.Configuration.GetSection("NsbDbSection").Bind(nsbSecretsConfig);
 
-                    var endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
-
-                    var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
-                    serilogTracing.EnableSagaTracing();
-                    serilogTracing.EnableMessageTracing();
+                    WorkflowCoordinatorConfig endpointConfiguration = null;
 
                     if (isLocalDebugging)
                     {
@@ -143,38 +140,42 @@ namespace WorkflowCoordinator
                             nsbSecretsConfig.NsbInitialCatalog,
                             DatabasesHelpers.BuildSqlConnectionString(true, localDbServer),
                             ConfigHelpers.IsLocalDevelopment);
+
+                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
                     }
                     else
                     {
                         nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false,
                             nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
-                        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                        var azureDbTokenUrl = nsbConfig.AzureDbTokenUrl;
-                        nsbSecretsConfig.AzureAccessToken = azureServiceTokenProvider
-                            .GetAccessTokenAsync(azureDbTokenUrl.ToString()).Result;
+                        endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
                     }
+
+
+                    var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
+                    serilogTracing.EnableSagaTracing();
+                    serilogTracing.EnableMessageTracing();
 
                     return endpointConfiguration;
                 })
                 .UseConsoleLifetime();
 
-            var host = builder.Build();
+            IHost host = null;
 
-            using (host)
+            try
             {
-                try
-                {
-                    await host.WorkflowCoordinatorRunAsync();
-                }
-                catch (Exception ex)
-                {
-                    Log.Fatal(ex, "Host terminated unexpectedly");
-                }
-                finally
-                {
-                    Log.CloseAndFlush();
-                }
+                host = builder.Build();
+                var cancellationToken = new WebJobsShutdownWatcher().Token;
+                await host.RunAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+                host?.Dispose();
             }
         }
     }
