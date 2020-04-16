@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
-using Common.Messages.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
@@ -19,20 +18,17 @@ namespace SourceDocumentCoordinator.Handlers
 {
     public class ClearDocumentRequestFromQueueCommandHandler : IHandleMessages<ClearDocumentRequestFromQueueCommand>
     {
-        private readonly WorkflowDbContext _dbContext;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IDocumentStatusFactory _documentStatusFactory;
         private readonly ILogger<ClearDocumentRequestFromQueueCommandHandler> _logger;
 
         public ClearDocumentRequestFromQueueCommandHandler(IDataServiceApiClient dataServiceApiClient,
-                                                            WorkflowDbContext dbContext, 
                                                             IOptionsSnapshot<GeneralConfig> generalConfig, 
                                                             IDocumentStatusFactory documentStatusFactory, 
                                                             ILogger<ClearDocumentRequestFromQueueCommandHandler> logger)
         {
             _dataServiceApiClient = dataServiceApiClient;
-            _dbContext = dbContext;
             _generalConfig = generalConfig;
             _documentStatusFactory = documentStatusFactory;
             _logger = logger;
@@ -75,7 +71,7 @@ namespace SourceDocumentCoordinator.Handlers
                                                     message.ProcessId, 
                                                     message.SourceDocumentId, 
                                                     SourceDocumentRetrievalStatus.FileGenerated, 
-                                                    message.SourceType, message.CorrelationId, generatedFullFilename:returnCode.Message.Trim());
+                                                    message.SourceType, message.CorrelationId);
                         break;
                     default:
                         throw new NotImplementedException();

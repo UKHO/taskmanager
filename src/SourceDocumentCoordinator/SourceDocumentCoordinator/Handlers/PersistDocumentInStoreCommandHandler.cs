@@ -2,6 +2,8 @@
 using NServiceBus;
 using SourceDocumentCoordinator.Messages;
 using System.IO;
+using Common.Factories;
+using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SourceDocumentCoordinator.Config;
@@ -15,12 +17,17 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IContentServiceApiClient _contentServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IDocumentFileLocationFactory _documentFileLocationFactory;
 
-        public PersistDocumentInStoreCommandHandler(IOptionsSnapshot<GeneralConfig> generalConfig, IContentServiceApiClient contentServiceApiClient, WorkflowDbContext dbContext)
+        public PersistDocumentInStoreCommandHandler(IOptionsSnapshot<GeneralConfig> generalConfig, 
+                                                    IContentServiceApiClient contentServiceApiClient, 
+                                                    WorkflowDbContext dbContext, 
+                                                    IDocumentFileLocationFactory documentFileLocationFactory)
         {
             _generalConfig = generalConfig;
             _contentServiceApiClient = contentServiceApiClient;
             _dbContext = dbContext;
+            _documentFileLocationFactory = documentFileLocationFactory;
         }
 
         /// <summary>
@@ -35,10 +42,11 @@ namespace SourceDocumentCoordinator.Handlers
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
 
-            var row = await _dbContext.PrimaryDocumentStatus.FirstAsync(x => x.SdocId == message.SourceDocumentId);
-            row.ContentServiceId = newGuid;
-
-            await _dbContext.SaveChangesAsync();
+            await SourceDocumentHelper.UpdateSourceDocumentFileLocation(
+                                                                        _documentFileLocationFactory,
+                                                                        message.ProcessId,
+                                                                        message.SourceDocumentId,
+                                                                        message.SourceType, newGuid, message.Filepath);
         }
     }
 }
