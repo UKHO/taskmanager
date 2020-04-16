@@ -81,7 +81,7 @@ namespace DataServices.Controllers
                 returnCode = new ReturnCode
                 {
                     Code = task.ErrorCode,
-                    Message = task.Message // on success, returnCode.Message will contain the generated document full filename
+                    Message = task.Message
 
                 };
             }
