@@ -165,6 +165,9 @@ namespace WorkflowCoordinator
             try
             {
                 host = builder.Build();
+
+                await host.WorkflowCoordinatorRunAsync();
+
                 var cancellationToken = new WebJobsShutdownWatcher().Token;
                 await host.RunAsync(cancellationToken).ConfigureAwait(false);
             }
