@@ -147,7 +147,9 @@ namespace SourceDocumentCoordinator.Sagas
                     var persistCommand = new PersistDocumentInStoreCommand
                     {
                         CorrelationId = message.CorrelationId,
+                        ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId,
+                        SourceType = message.SourceType,
                         Filepath = sourceDocument.Message
                     };
                     await context.SendLocal(persistCommand).ConfigureAwait(false);
