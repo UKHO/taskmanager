@@ -24,14 +24,14 @@ namespace NCNEPortal.UnitTests
 
         private NcneWorkflowDbContext _dbContext;
         private WorkflowModel _workflowModel;
-        private readonly ILogger<WorkflowModel> _fakeLogger = A.Dummy<ILogger<WorkflowModel>>();
-        private readonly ICommentsHelper _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-        private ICarisProjectHelper _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
-        private IMilestoneCalculator _fakeMilestoneCalculator = A.Fake<IMilestoneCalculator>();
-        private readonly IPageValidationHelper _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
-        private readonly IOptions<GeneralConfig> _fakeGeneralConfig = A.Fake<IOptions<GeneralConfig>>();
-        private readonly IAdDirectoryService _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
-        private readonly INcneUserDbService _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
+        private ILogger<WorkflowModel> _fakeLogger;
+        private ICommentsHelper _fakeCommentsHelper;
+        private ICarisProjectHelper _fakeCarisProjectHelper;
+        private IMilestoneCalculator _fakeMilestoneCalculator;
+        private IPageValidationHelper _fakepageValidationHelper;
+        private IOptions<GeneralConfig> _fakeGeneralConfig;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private INcneUserDbService _fakeNcneUserDbService;
 
         [SetUp]
         public void Setup()
@@ -41,6 +41,15 @@ namespace NCNEPortal.UnitTests
                 .Options;
 
             _dbContext = new NcneWorkflowDbContext(dbContextOptions);
+
+            _fakeLogger = A.Dummy<ILogger<WorkflowModel>>();
+            _fakeCommentsHelper = A.Fake<ICommentsHelper>();
+            _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
+            _fakeMilestoneCalculator = A.Fake<IMilestoneCalculator>();
+            _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
+            _fakeGeneralConfig = A.Fake<IOptions<GeneralConfig>>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 
             _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
                 _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
