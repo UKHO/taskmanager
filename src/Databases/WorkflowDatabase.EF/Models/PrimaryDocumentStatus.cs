@@ -11,6 +11,7 @@ namespace WorkflowDatabase.EF.Models
         public string Status { get; set; }
         public DateTime StartedAt { get; set; }
         public Guid? CorrelationId { get; set; }
+        public Uri ContentServiceUri { get; set; }
         public string Filename { get; set; }
         public string Filepath { get; set; }
     }
