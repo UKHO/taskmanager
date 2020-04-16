@@ -102,7 +102,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="terminatingReview" asp-page-handler="ReviewTerminate" method="post">
+            <form id="terminatingReview">
                 <div class="modal-header">
                     <h4 class="modal-title">Terminate Database Assessment</h4>
                 </div>
@@ -118,7 +118,7 @@
                 <div class="modal-footer">
                     <div class="row col-11 justify-content-end">
                         <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
-                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="button" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
                     </div>
                 </div>
             </form>
