@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +11,9 @@ namespace Common.Factories.DocumentStatusFactory
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public PrimaryDocumentStatusProcessor(WorkflowDbContext _dbContext)
+        public PrimaryDocumentStatusProcessor(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext;
         }
 
         private int Add()

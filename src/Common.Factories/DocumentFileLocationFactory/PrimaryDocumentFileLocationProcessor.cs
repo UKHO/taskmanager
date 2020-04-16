@@ -11,9 +11,9 @@ namespace Common.Factories.DocumentFileLocationFactory
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public PrimaryDocumentFileLocationProcessor(WorkflowDbContext _dbContext)
+        public PrimaryDocumentFileLocationProcessor(WorkflowDbContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext;
         }
 
         public async Task<int> Update(int processId, int sourceDocumentId, Guid contentServiceId, string generatedFullFilename)
