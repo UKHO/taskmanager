@@ -35,7 +35,6 @@ namespace Portal.Pages.DbAssessment
         public IEnumerable<LinkedDocument> AttachedLinkedDocuments { get; set; }
         public PrimaryDocumentStatus PrimaryDocumentStatus { get; set; }
         public IEnumerable<DatabaseDocumentStatus> DatabaseDocuments { get; set; }
-        public Uri PrimaryDocumentContentServiceUri { get; set; }
 
         public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
             IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient,
@@ -119,6 +118,14 @@ namespace Portal.Pages.DbAssessment
                 DatabaseDocuments = _dbContext
                     .DatabaseDocumentStatus
                     .Where(c => c.ProcessId == ProcessId).ToList();
+
+                foreach (var databaseDocumentStatus in DatabaseDocuments)
+                {
+                    if (databaseDocumentStatus.ContentServiceId.HasValue)
+                        databaseDocumentStatus.ContentServiceUri =
+                            _uriConfig.Value.BuildContentServiceUri(databaseDocumentStatus.ContentServiceId.Value);
+                }
+
             }
             catch (ArgumentNullException e)
             {
@@ -136,7 +143,7 @@ namespace Portal.Pages.DbAssessment
                 PrimaryDocumentStatus = _dbContext.PrimaryDocumentStatus.First(s => s.ProcessId == ProcessId);
 
                 if (PrimaryDocumentStatus.ContentServiceId.HasValue)
-                    PrimaryDocumentContentServiceUri =
+                    PrimaryDocumentStatus.ContentServiceUri =
                         _uriConfig.Value.BuildContentServiceUri(PrimaryDocumentStatus.ContentServiceId.Value);
             }
             catch (InvalidOperationException e)

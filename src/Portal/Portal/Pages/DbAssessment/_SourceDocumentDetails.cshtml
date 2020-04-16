@@ -39,7 +39,7 @@
                             @{
                                 if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                 {
-                                    <a href="@Model.PrimaryDocumentContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
+                                    <a href="@Model.PrimaryDocumentStatus.ContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
                                 }
                                 else
                                 {
