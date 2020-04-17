@@ -139,8 +139,7 @@ namespace Portal.Pages.DbAssessment
             await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
             _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
-
-            return RedirectToPage("/Index");
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
