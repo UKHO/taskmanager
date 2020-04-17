@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
+
     $('#operators').find('div .operator:gt(0)').hide();
     
     initialiseOperatorsTypeaheads();
