@@ -184,7 +184,9 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore sourcedocumentcoordinator'
-
+      - script: |
+          cov-configure --config cov/cov-config.xml --cs
+        displayName: "cov configuration"
       - task: synopsys-coverity@1
         inputs:
           coverityService: 'coverity.mgmt.local'
