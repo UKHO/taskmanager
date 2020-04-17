@@ -11,9 +11,7 @@
 			[TeamDistributedTo] NVARCHAR(50) NULL,
 			[SourceDocumentType] NVARCHAR(4000) NULL,
 			[SourceNature] NVARCHAR(255) NULL,
-			[Datum] NVARCHAR(2000) NULL, 
-			[Filename] NVARCHAR(100) NULL, 
-			[Filepath] NVARCHAR(255) NULL, 
+			[Datum] NVARCHAR(2000) NULL
     CONSTRAINT [AK_AssessmentData_ProcessId] UNIQUE ([ProcessId]), 
     CONSTRAINT [FK_AssessmentData_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId])
 )

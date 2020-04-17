@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
-namespace Common.Factories
+namespace Common.Factories.DocumentStatusFactory
 {
-    public class DatabaseDocumentStatusProcessor : IDocumentStatusProcessor
+    public class PrimaryDocumentStatusProcessor : IDocumentStatusProcessor
     {
         private readonly WorkflowDbContext _dbContext;
 
-        public DatabaseDocumentStatusProcessor(WorkflowDbContext dbContext)
+        public PrimaryDocumentStatusProcessor(WorkflowDbContext dbContext)
         {
             this._dbContext = dbContext;
         }
@@ -24,32 +24,32 @@ namespace Common.Factories
         public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
             string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
         {
-            var row = await _dbContext.DatabaseDocumentStatus
+            var row = await _dbContext.PrimaryDocumentStatus
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
                 && r.SdocId == sourceDocumentId);
 
             if (row == null)
             {
                 // add
-                var databaseDocumentStatus = new DatabaseDocumentStatus
+                var primaryDocumentStatus = new PrimaryDocumentStatus
                 {
+                    CorrelationId = correlationId,
                     ProcessId = processId,
                     SdocId = sourceDocumentId,
-                    SourceDocumentName = sourceDocumentName,
-                    SourceDocumentType = sourceDocumentType,
                     Status = status.ToString(),
-                    Created = DateTime.Now
+                    StartedAt = DateTime.Now
                 };
 
-                await _dbContext.DatabaseDocumentStatus.AddAsync(databaseDocumentStatus);
+                await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
                 await _dbContext.SaveChangesAsync();
-                return databaseDocumentStatus.DatabaseDocumentStatusId;
+                return primaryDocumentStatus.PrimaryDocumentStatusId;
             }
 
             // update
             row.Status = status.ToString();
+
             await _dbContext.SaveChangesAsync();
-            return row.DatabaseDocumentStatusId;
+            return row.PrimaryDocumentStatusId;
         }
     }
 }

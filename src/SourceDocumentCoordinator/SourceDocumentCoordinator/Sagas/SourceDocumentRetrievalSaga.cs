@@ -103,14 +103,12 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, 
-                        null, null, SourceDocumentRetrievalStatus.Started, message.SourceType, message.CorrelationId);
+                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType, message.CorrelationId);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
                     if (Data.DocumentStatusId < 1)
                     {
-                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, 
-                            null, null, SourceDocumentRetrievalStatus.Started, message.SourceType, message.CorrelationId);
+                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType, message.CorrelationId);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -135,8 +133,7 @@ namespace SourceDocumentCoordinator.Sagas
             {
                 case RequestQueueStatusReturnCodeEnum.Success:
                     // Doc Ready; update DB;
-                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, 
-                        null, null, SourceDocumentRetrievalStatus.Ready, Data.SourceType, message.CorrelationId);
+                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.SourceType, message.CorrelationId);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
@@ -150,7 +147,9 @@ namespace SourceDocumentCoordinator.Sagas
                     var persistCommand = new PersistDocumentInStoreCommand
                     {
                         CorrelationId = message.CorrelationId,
+                        ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId,
+                        SourceType = message.SourceType,
                         Filepath = sourceDocument.Message
                     };
                     await context.SendLocal(persistCommand).ConfigureAwait(false);

@@ -239,6 +239,7 @@ namespace SourceDocumentCoordinator.HttpClients
 
             }
 
+            // on success, returnCode.Message will contain the generated document full filename
             var returnCode = JsonConvert.DeserializeObject<ReturnCode>(data);
 
             return returnCode;

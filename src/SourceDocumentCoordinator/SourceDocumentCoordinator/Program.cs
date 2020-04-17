@@ -2,7 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Factories;
+using Common.Factories.DocumentFileLocationFactory;
+using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Azure.WebJobs;
@@ -72,6 +73,7 @@ namespace SourceDocumentCoordinator
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
                 services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
+                services.AddScoped<IDocumentFileLocationFactory, DocumentFileLocationFactory>();
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));

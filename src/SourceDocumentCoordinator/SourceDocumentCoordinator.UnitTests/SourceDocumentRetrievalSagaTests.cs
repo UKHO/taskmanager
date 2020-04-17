@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Factories;
+using Common.Factories.DocumentStatusFactory;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;

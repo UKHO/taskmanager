@@ -81,7 +81,8 @@ namespace DataServices.Controllers
                 returnCode = new ReturnCode
                 {
                     Code = task.ErrorCode,
-                    Message = task.Message  // contains filename: "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments\\RSDRA2018000065913_1.pdf"
+                    Message = task.Message
+
                 };
             }
             catch (AggregateException e) when (e.InnerException is System.ServiceModel.EndpointNotFoundException)

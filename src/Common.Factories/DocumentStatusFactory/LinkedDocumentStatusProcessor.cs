@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Factories.Interfaces;
-using WorkflowDatabase.EF;
 using Microsoft.EntityFrameworkCore;
+using WorkflowDatabase.EF;
 
-namespace Common.Factories
+namespace Common.Factories.DocumentStatusFactory
 {
     public class LinkedDocumentStatusProcessor : IDocumentStatusProcessor
     {
@@ -34,6 +34,7 @@ namespace Common.Factories
 
             // update
             row.Status = status.ToString();
+
             await _dbContext.SaveChangesAsync();
             return row.LinkedDocumentId;
         }
