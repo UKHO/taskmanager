@@ -121,6 +121,26 @@ namespace NCNEPortal.UnitTests
         }
 
 
+        [Test]
+        public async Task Test_OnPostTaskComment_adds_TaskComments_for_valid_comments()
+        {
+            AddTaskInfo(100);
+
+            await _workflowModel.OnPostTaskCommentAsync("Valid Comment", 100);
+
+            Assert.That(_dbContext.TaskComment.Single().Comment, Is.EqualTo("Valid Comment"));
+            Assert.That(_dbContext.TaskComment.Single().ProcessId, Is.EqualTo(100));
+        }
+
+        [Test]
+        public async Task Test_OnPostTaskComment_does_not_add_TaskComments_for_Invalid_comments()
+        {
+            AddTaskInfo(100);
+
+            await _workflowModel.OnPostTaskCommentAsync("", 100);
+
+            Assert.That(_dbContext.TaskComment.Count(), Is.EqualTo(0));
+        }
 
         private void AddTaskInfo(int processId)
         {
