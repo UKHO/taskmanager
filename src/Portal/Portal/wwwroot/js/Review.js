@@ -26,6 +26,7 @@
 
     function attachTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
+            $("#txtTerminateComment").val("");
             $("#ConfirmTerminate").modal("show");
         });
 
@@ -49,6 +50,10 @@
 
         $("#ConfirmTerminate").on("shown.bs.modal", function () {
             $("#txtTerminateComment").focus();
+        });
+
+        $("#modalWaitReviewTerminateErrors").on("hidden.bs.modal", function () {
+            $("#ConfirmTerminate").modal("show");
         });
     }
 
@@ -125,6 +130,14 @@
         $("#btnConfirmTerminate").prop("disabled", true);
         $("#btnCancelTerminate").prop("disabled", true);
 
+        $("#reviewTerminateErrorMessage").html("");
+
+        //Hide ConfirmTerminate modal and show modalWaitReviewTerminate modal
+        $("#ConfirmTerminate").one("hidden.bs.modal", function () {
+            $("#modalWaitReviewTerminate").modal("show");
+        });
+        $("#ConfirmTerminate").modal("hide");
+
         $.ajax({
             type: "POST",
             url: "Review/?handler=ReviewTerminate",
@@ -147,7 +160,27 @@
                 $("#btnConfirmTerminate").prop("disabled", false);
                 $("#btnCancelTerminate").prop("disabled", false);
 
-                //TODO: error functionality
+                var responseJson = error.responseJSON;
+                var statusCode = error.status;
+
+                $("#reviewTerminateErrorMessage").append("<ul/>");
+                var unOrderedList = $("#reviewTerminateErrorMessage ul");
+
+                if (responseJson == null) {
+                    unOrderedList.append("<li>System error. Please try again later</li>");
+                } else if (statusCode === customHttpStatusCodes.FailuresDetected) {
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+                } else {
+                    unOrderedList.append("<li>" + responseJson + "</li>");
+                }
+
+                //Hide modalWaitReviewTerminate modal and show modalWaitReviewTerminateErrors modal
+                $("#modalWaitReviewTerminate").one("hidden.bs.modal", function () {
+                    $("#modalWaitReviewTerminateErrors").modal("show");
+                });
+                $("#modalWaitReviewTerminate").modal("hide");
             }
         });
     }

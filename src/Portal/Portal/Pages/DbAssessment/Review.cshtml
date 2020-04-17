@@ -167,3 +167,41 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalWaitReviewTerminate" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Terminate Database Assessment...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewTerminateErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewTerminateErrors" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Errors while terminating Database Assessment</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div id="reviewTerminateErrorMessage" class="col-11"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnReviewTerminateErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Terminating Database Assessment">Ok</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
