@@ -103,10 +103,7 @@ namespace Portal.Pages.DbAssessment
             SourcesSelectionPageLength = _generalConfig.Value.SourcesSelectionPageLength;
             CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
 
-            var filename = Path.GetFileNameWithoutExtension(_generalConfig.Value.SessionFilename);
-            var ext = Path.GetExtension(_generalConfig.Value.SessionFilename);
-            SessionFilename = $"{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{ext}";
-
+            SessionFilename = GenerateSessionFilename();
         }
 
         public async Task<JsonResult> OnGetWorkspacesAsync()
@@ -448,6 +445,13 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProjectName = CarisProjectDetails.ProjectName;
+        }
+
+        private string GenerateSessionFilename()
+        {
+            var filename = Path.GetFileNameWithoutExtension(_generalConfig.Value.SessionFilename);
+            var ext = Path.GetExtension(_generalConfig.Value.SessionFilename);
+            return $"{filename}_{DateTime.Now:yyMMdd-HHmmss}{ext}"; // $"{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{ext}"
         }
     }
 }
