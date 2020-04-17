@@ -1,6 +1,6 @@
 ﻿namespace NCNEPortal.Models
 {
-    public class DeadLineId
+    public class DeadlineId
     {
 
         public int FormsDate { get; set; }

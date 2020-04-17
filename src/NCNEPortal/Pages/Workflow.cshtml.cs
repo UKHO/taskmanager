@@ -473,7 +473,7 @@ namespace NCNEPortal
             return new JsonResult(JsonConvert.SerializeObject(result));
         }
 
-        private async Task<DeadLineId> UpdateTaskInformation(int processId, string chartType)
+        private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
@@ -549,7 +549,7 @@ namespace NCNEPortal
             }
 
             foreach (var taskStage in task.TaskStage.Where
-                         (s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
+                         (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
             {
                 taskStage.AssignedUser = (NcneTaskStageType)taskStage.TaskStageTypeId switch
                 {
@@ -565,9 +565,29 @@ namespace NCNEPortal
                 };
             }
 
+            var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
+            var v2Rework = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2_Rework);
+
+            if (Verifier2 == null)
+            {
+                if (v2 != null) v2.Status = NcneTaskStageStatus.Inactive.ToString();
+                if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Inactive.ToString();
+            }
+            else
+            {
+                if (v2?.Status == NcneTaskStageStatus.Inactive.ToString())
+                {
+                    if (v2 != null) v2.Status = NcneTaskStageStatus.Open.ToString();
+                }
+                if (v2Rework?.Status == NcneTaskStageStatus.Inactive.ToString())
+                {
+                    if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Open.ToString();
+                }
+            }
+
             await _dbContext.SaveChangesAsync();
 
-            return new DeadLineId()
+            return new DeadlineId()
             {
                 FormsDate = formStageId,
                 CommitDate = commitStageId,
