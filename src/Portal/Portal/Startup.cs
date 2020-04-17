@@ -214,6 +214,8 @@ namespace Portal
 
             services.AddHealthChecks();
 
+            services.AddSingleton<AppVersionInfo>();
+
             using (var sp = services.BuildServiceProvider())
             using (var workflowDbContext = sp.GetRequiredService<WorkflowDbContext>())
             using (var hpdDbContext = sp.GetRequiredService<HpdDbContext>())
