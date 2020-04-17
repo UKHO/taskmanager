@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Portal.Helpers
+@inject AppVersionInfo appInfo
+@{
     ViewData["Year"] = DateTime.Now.Year;
 }
 <!DOCTYPE html>
@@ -53,7 +55,15 @@
         <div class="container body-content flex-fill">
             @RenderBody()
         </div>
-        <footer>&copy; Crown copyright @ViewData["Year"] UK Hydrographic Office</footer>
+        <footer>
+            <div class="row">
+                <div class="col-4 justify-content-start">&copy; Crown copyright @ViewData["Year"] UK Hydrographic Office</div>
+                <div class="col-8 versioning">
+                    Deployed from commit <a href="https://github.com/UKHO/taskmanager/commit/@appInfo.GitHash" target="_blank">@appInfo.ShortGitHash</a>
+                    via build <a href="https://ukhogov.visualstudio.com/Pipelines/_build/results?buildId=@appInfo.BuildId&view=results" target="_blank">@appInfo.BuildNumber</a>
+                </div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>
