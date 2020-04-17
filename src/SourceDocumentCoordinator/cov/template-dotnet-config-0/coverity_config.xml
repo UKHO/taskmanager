@@ -16,6 +16,8 @@
         </compiler>
         <options>
           <id>dotnet-dotnet-.*</id>
+          <skip_substring>^.*Common.*$</skip_substring>
+          <skip_substring>^.*Data.*$</skip_substring>
           <begin_command_line_config></begin_command_line_config>
         </options>
       </build>
