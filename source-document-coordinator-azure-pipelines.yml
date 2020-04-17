@@ -185,7 +185,7 @@ stages:
           feedsToUse: 'select'
         displayName: 'dotnet restore sourcedocumentcoordinator'
       - script: |
-          cov-configure --config cov/cov-config.xml --cs
+          $(COVERITY_TOOL_HOME)\bin\cov-configure --config cov/cov-config.xml --cs
         displayName: "cov configuration"
       - task: synopsys-coverity@1
         inputs:
