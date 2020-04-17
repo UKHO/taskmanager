@@ -12,7 +12,7 @@
     <div class="col-12">
         <div class="card-body pb-0 pt-0">
             <div class="row">
-                <div class="col-12 col-sm-12 col-md-12 col-lg-5 col-xl-5">
+                <div class="col-12 col-lg-5">
                     <div class="form-row justify-content-between">
                         <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.Assessor, new { @class = "col-form-label" })</div>
                         <div class="col-7">@Html.DropDownListFor(model => model.PrimaryAssignedTask.Assessor, Model.Assessors, "", new { @class = "form-control assignTaskAssessor" })</div>
@@ -30,7 +30,7 @@
                         <div class="col-7">@Html.TextBoxFor(model => model.PrimaryAssignedTask.WorkspaceAffected, new { @class = "form-control assignTaskWorkspaceAffected" })</div>
                     </div>
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 d-flex flex-column">
+                <div class="col-12 col-lg-7 d-flex flex-column">
                     <div class="form-row flex-grow-1 d-flex flex-column">
                         @Html.LabelFor(model => model.PrimaryAssignedTask.Notes, new { @class = "pl-2" })
                         @Html.TextAreaFor(model => model.PrimaryAssignedTask.Notes, htmlAttributes: new { @class = "form-control flex-grow-1 assignTaskNotes pl-2" })
@@ -53,7 +53,7 @@
             <div class="col-12">
                 <div class="card-body pb-0 pt-0">
                     <div class="row">
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-5 col-xl-5">
+                        <div class="col-12 col-lg-5">
                             <div class="form-row justify-content-between">
                                 <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, new { @class = "col-form-label" })</div>
                                 <div class="col-7">@Html.DropDownListFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, Model.Assessors, "", new { @class = "form-control assignTaskAssessor" })</div>
@@ -71,7 +71,7 @@
                                 <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).WorkspaceAffected, new { @class = "form-control assignTaskWorkspaceAffected" })</div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 d-flex flex-column">
+                        <div class="col-12 col-lg-7 d-flex flex-column">
                             <div class="form-row flex-grow-1 d-flex flex-column">
                                 @Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes, new { @class = "pl-2" })
                                 @Html.TextAreaFor(model => model.AdditionalAssignedTasks.ElementAt(i).Notes, htmlAttributes: new { @class = "form-control flex-grow-1 assignTaskNotes pl-2" })
