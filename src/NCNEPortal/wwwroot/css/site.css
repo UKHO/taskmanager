@@ -822,6 +822,10 @@ h4.Inactive {
     color: #adb5bd
 }
 
+h6.Inactive {
+    color: #adb5bd
+}
+
 #generic-comments-table td {
     border-right: none;
     font-weight: 300;
