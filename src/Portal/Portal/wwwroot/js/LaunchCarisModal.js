@@ -129,8 +129,8 @@ function attachLaunchSourceEditorDownloadHandler() {
             selectedHpdUsages.push($(this).data("usage-name"));
         });
 
-        $(".selectedSource").each(function () {
-            selectedSources.push($(this).data("source-filename"));
+        $("#sourcesSelection input:checkbox:checked").each(function () {
+            selectedSources.push($(this).data("source-fullfilename"));
         });
 
         if (selectedHpdUsages.length === 0) {
