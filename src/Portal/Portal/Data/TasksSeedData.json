@@ -386,7 +386,7 @@
         "ContentServiceId": null,
         "Status": "FileGenerated",
         "Filename": "RSDRA2018000094806_1.tif",
-        "Filepath": "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments",
+        "Filepath": "<add path>",
         "created": "2020-01-01T00:00:00"
       }
     ],
@@ -444,7 +444,7 @@
       "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49",
       "Status": "FileGenerated",
       "Filename": "GeoReferenced_RSDRA2018000030860_1.TIF",
-      "Filepath": "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments"
+      "Filepath": "<add path>"
     },
     "DatabaseDocumentStatus": [
       {
@@ -456,7 +456,7 @@
         "created": "2020-01-01T00:00:00",
         "Status": "FileGenerated",
         "Filename": "RSDRA2018000030860_1.TIF",
-        "Filepath": "\\\\engineering.ukho.gov.uk\\dfs\\AppData\\HDB\\DEV1\\SDRADocuments"
+        "Filepath": "<add path>"
       }
     ]
   },
