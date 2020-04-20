@@ -219,19 +219,16 @@ namespace Portal.Pages.DbAssessment
         
         private async Task GetSourceDocuments(int processId)
         {
-            var assessmentData = await _dbContext.AssessmentData
-                .FirstOrDefaultAsync(ad => ad.ProcessId == processId);
             var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
                 .FirstOrDefaultAsync(pds => pds.ProcessId == processId);
 
-            if (assessmentData != null && primaryDocumentStatus != null &&
+            if (primaryDocumentStatus != null &&
                 primaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
             {
                 var primarySourceDocument = new SourceViewModel()
                 {
-                    DocumentName = assessmentData.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
+                    DocumentName = primaryDocumentStatus.Filename,
+                    DocumentFullName = Path.Combine(primaryDocumentStatus.Filepath, primaryDocumentStatus.Filename)
                 };
 
                 SourceDocuments.Add(primarySourceDocument);
@@ -242,9 +239,8 @@ namespace Portal.Pages.DbAssessment
                                           ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                 .Select(ld => new SourceViewModel()
                 {
-                    DocumentName = ld.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
+                    DocumentName = ld.Filename,
+                    DocumentFullName = Path.Combine(ld.Filepath, ld.Filename)
                 })
                 .ToListAsync();
 
@@ -255,9 +251,8 @@ namespace Portal.Pages.DbAssessment
                                                 dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                 .Select(dd => new SourceViewModel()
                 {
-                    DocumentName = dd.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
+                    DocumentName = dd.Filename,
+                    DocumentFullName = Path.Combine(dd.Filepath, dd.Filename)
                 })
                 .ToListAsync();
 

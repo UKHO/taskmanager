@@ -61,7 +61,6 @@ namespace Portal.Helpers
                     ex.InnerException);
             }
 
-            // TODO: populate Workspace from relevant table
             string workspaceAffected;
 
             switch (taskStage)
@@ -79,7 +78,10 @@ namespace Portal.Helpers
                     throw new NotImplementedException($"Unable to establish Caris Workspace as task {processId} is at {taskStage}.");
             }
 
-            var sources = await SetSources(processId, hpdUser, workspaceAffected, carisProjectDetails, selectedHpdUsages);
+            var sources = new List<SessionFile.DataSourceNode>();
+
+            SetUsages(sources, hpdUser, workspaceAffected, carisProjectDetails, selectedHpdUsages);
+            SetSources(sources, selectedSources);
 
             return new SessionFile
             {
@@ -106,10 +108,8 @@ namespace Portal.Helpers
             };
         }
 
-        private async Task<List<SessionFile.DataSourceNode>> SetSources(int processId, HpdUser hpdUser, string workspaceAffected, CarisProjectDetails carisProjectDetails, List<string> selectedHpdUsages)
+        private void SetUsages(List<SessionFile.DataSourceNode> sources, HpdUser hpdUser, string workspaceAffected, CarisProjectDetails carisProjectDetails, List<string> selectedHpdUsages)
         {
-            var sources = new List<SessionFile.DataSourceNode>();
-
             sources.Add(new SessionFile.DataSourceNode()
             {
                 SourceParam = new SessionFile.SourceParamNode
@@ -131,69 +131,26 @@ namespace Portal.Helpers
                 UserLayers = ""
 
             });
+        }
 
-            sources.AddRange(_dbContext.PrimaryDocumentStatus.Where(pd => pd.ProcessId == processId)
-                .Select(pd => new SessionFile.DataSourceNode()
+        private void SetSources(List<SessionFile.DataSourceNode> sources, List<string> selectedSources)
+        {
+
+            sources.AddRange(selectedSources.Select(s => new SessionFile.DataSourceNode()
                 {
-                    SourceString = Path.Combine(pd.Filepath, pd.Filename),
+                    SourceString = s,
                     SourceParam = new SessionFile.SourceParamNode()
                     {
                         DisplayName = new SessionFile.DisplayNameNode()
                         {
-                            Value = Path.GetFileNameWithoutExtension(pd.Filename)
+                            Value = Path.GetFileNameWithoutExtension(s)
                         },
                         SurfaceString = new SessionFile.SurfaceStringNode()
                         {
-                            Value = Path.Combine(pd.Filepath, pd.Filename)
+                            Value = s
                         }
                     }
                 }));
-
-            var ddsRows = _dbContext.DatabaseDocumentStatus.Where(dd => dd.ProcessId == processId);
-
-            if (await ddsRows.AnyAsync())
-            {
-                sources.AddRange(ddsRows.Select(dd => new SessionFile.DataSourceNode
-                {
-                    SourceString = Path.Combine(dd.Filepath, dd.Filename),
-                    SourceParam = new SessionFile.SourceParamNode()
-                    {
-                        DisplayName = new SessionFile.DisplayNameNode()
-                        {
-                            Value = Path.GetFileNameWithoutExtension(dd.Filename)
-                        },
-                        SurfaceString = new SessionFile.SurfaceStringNode()
-                        {
-                            Value = Path.Combine(dd.Filepath, dd.Filename)
-                        }
-                    }
-                }));
-            }
-
-            var attachedLinkedDocs = _dbContext.LinkedDocument.Where(ad =>
-                                                            ad.ProcessId == processId
-                                                            && !ad.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(), StringComparison.OrdinalIgnoreCase));
-
-            if (await attachedLinkedDocs.AnyAsync())
-            {
-                sources.AddRange(attachedLinkedDocs.Select(ld => new SessionFile.DataSourceNode
-                {
-                    SourceString = Path.Combine(ld.Filepath, ld.Filename),
-                    SourceParam = new SessionFile.SourceParamNode()
-                    {
-                        DisplayName = new SessionFile.DisplayNameNode()
-                        {
-                            Value = Path.GetFileNameWithoutExtension(ld.Filename)
-                        },
-                        SurfaceString = new SessionFile.SurfaceStringNode()
-                        {
-                            Value = Path.Combine(ld.Filepath, ld.Filename)
-                        }
-                    }
-                }));
-            }
-
-            return sources;
         }
     }
 }
