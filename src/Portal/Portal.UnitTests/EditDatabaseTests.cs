@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -174,13 +173,17 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing1.tif",
+                Filepath = "c:\\Temp"
             });
 
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing2.tif",
+                Filepath = "c:\\Temp"
             });
 
             await _dbContext.SaveChangesAsync();
@@ -200,7 +203,9 @@ namespace Portal.UnitTests
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
             });
 
 
@@ -220,7 +225,7 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
+            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[0].DocumentName);
 
         }
 
@@ -233,14 +238,15 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
-                SourceDocumentName = "LinkedSource"
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
             });
 
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual("LinkedSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[1].DocumentName);
 
         }
 
@@ -253,7 +259,8 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
-                SourceDocumentName = "DatabaseSource"
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
 
             });
 
@@ -261,7 +268,7 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual("DatabaseSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[1].DocumentName);
 
         }
 
@@ -273,13 +280,17 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing1.tif",
+                Filepath = "c:\\Temp"
             });
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing2.tif",
+                Filepath = "c:\\Temp"
             });
 
             await _dbContext.SaveChangesAsync();
@@ -326,7 +337,7 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
-            Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
+            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[0].DocumentName);
 
         }
 
@@ -432,7 +443,9 @@ namespace Portal.UnitTests
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
                 ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()

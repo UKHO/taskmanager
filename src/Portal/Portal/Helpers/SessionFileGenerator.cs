@@ -81,7 +81,9 @@ namespace Portal.Helpers
             var sources = new List<SessionFile.DataSourceNode>();
 
             SetUsages(sources, hpdUser, workspaceAffected, carisProjectDetails, selectedHpdUsages);
-            SetSources(sources, selectedSources);
+
+            if (selectedSources?.Count > 0)
+                SetSources(sources, selectedSources);
 
             return new SessionFile
             {
@@ -137,20 +139,20 @@ namespace Portal.Helpers
         {
 
             sources.AddRange(selectedSources.Select(s => new SessionFile.DataSourceNode()
+            {
+                SourceString = s,
+                SourceParam = new SessionFile.SourceParamNode()
                 {
-                    SourceString = s,
-                    SourceParam = new SessionFile.SourceParamNode()
+                    DisplayName = new SessionFile.DisplayNameNode()
                     {
-                        DisplayName = new SessionFile.DisplayNameNode()
-                        {
-                            Value = Path.GetFileNameWithoutExtension(s)
-                        },
-                        SurfaceString = new SessionFile.SurfaceStringNode()
-                        {
-                            Value = s
-                        }
+                        Value = Path.GetFileNameWithoutExtension(s)
+                    },
+                    SurfaceString = new SessionFile.SurfaceStringNode()
+                    {
+                        Value = s
                     }
-                }));
+                }
+            }));
         }
     }
 }
