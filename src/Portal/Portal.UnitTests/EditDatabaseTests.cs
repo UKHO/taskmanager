@@ -221,7 +221,6 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual("Source", _editDatabaseModel.SourceDocuments[0].DocumentName);
-            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[0].FileExtension);
 
         }
 
@@ -242,7 +241,6 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual("LinkedSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
-            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[1].FileExtension);
 
         }
 
@@ -264,7 +262,6 @@ namespace Portal.UnitTests
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
             Assert.AreEqual("DatabaseSource", _editDatabaseModel.SourceDocuments[1].DocumentName);
-            Assert.AreEqual("Not implemented", _editDatabaseModel.SourceDocuments[1].FileExtension);
 
         }
 
