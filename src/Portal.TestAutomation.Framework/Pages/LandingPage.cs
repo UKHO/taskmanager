@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common.Helpers;
+using Common.TestAutomation.Framework.PageElements;
 using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -18,11 +19,12 @@ namespace Portal.TestAutomation.Framework.Pages
                     ? urlsConfig.LandingPageUrl
                     : urlsConfig.LocalDevLandingPageUrl)
         {
+            InFlightTaskTable = new DataTable(Driver, Wait, "inFlightTasks");
         }
 
         private IWebElement UkhoLogo => Driver.FindElement(By.Id("ukhoLogo"));
         private IWebElement UnassignedTaskTable => Driver.FindElement(By.Id("unassignedTasks"));
-        private IWebElement InFlightTaskTable => Driver.FindElement(By.Id("inFlightTasks"));
+        private Table InFlightTaskTable { get; }
         private IWebElement GlobalSearchField => Driver.FindElement(By.Id("txtGlobalSearch"));
 
         private IWebElement ClickOnTask =>
@@ -32,12 +34,7 @@ namespace Portal.TestAutomation.Framework.Pages
             UnassignedTaskTable.FindElements(By.XPath("//*[@id='unassignedTasks']/tbody/tr"))
                 .Where(r => r.FindElements(By.TagName("td")).Count > 1)
                 .ToList();
-
-        private List<IWebElement> InFlightTaskTableActualDataRows =>
-            InFlightTaskTable.FindElements(By.XPath("//*[@id='inFlightTasks']/tbody/tr"))
-                .Where(r => r.FindElements(By.TagName("td")).Count > 1)
-                .ToList();
-
+        
         public override bool HasLoaded
         {
             get
@@ -55,28 +52,12 @@ namespace Portal.TestAutomation.Framework.Pages
             }
         }
 
+        public IList<TaskListEntry> InFlightTasks => InFlightTaskTable.GetRows<TaskListEntry>();
+        public string UserName => Driver.FindElement(By.Id("userFullName")).Text.Replace("Hello ", "");
+
         public void FilterRowsByProcessIdInGlobalSearch(int processId)
         {
             GlobalSearchField.SendKeys(processId.ToString());
-        }
-
-        public bool FindTaskByProcessId(int processId)
-        {
-            if (UnassignedTaskTableActualDataRows.Count > 0 && InFlightTaskTableActualDataRows.Count > 0) return false;
-
-            foreach (var row in UnassignedTaskTableActualDataRows)
-            {
-                int.TryParse(row.FindElements(By.TagName("td"))[0].Text, out var found);
-                if (found == processId) return true;
-            }
-
-            foreach (var row in InFlightTaskTableActualDataRows)
-            {
-                int.TryParse(row.FindElements(By.TagName("td"))[1].Text, out var found);
-                if (found == processId) return true;
-            }
-
-            return false;
         }
     }
 }

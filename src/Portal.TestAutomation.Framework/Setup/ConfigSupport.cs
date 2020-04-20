@@ -51,6 +51,11 @@ namespace Portal.TestAutomation.Framework.Setup
             InitialiseWorkflowDbContext();
 
             TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
+
+            TestData.UsingDbContext(_workflowDbContext)
+                .AddUser(_secrets.LoginAccount)
+                .ReassignReviewsToUser(_secrets.LoginAccount)
+                .SaveChanges();
         }
 
         private static void InitialiseWorkflowDbContext()

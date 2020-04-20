@@ -10,9 +10,9 @@ namespace Common.Helpers
 {
     public class TestWorkflowDatabaseSeeder : ICanPopulateTables, ICanSaveChanges
     {
-        private readonly WorkflowDbContext _context;
+        protected readonly WorkflowDbContext _context;
 
-        private TestWorkflowDatabaseSeeder(WorkflowDbContext context)
+        protected TestWorkflowDatabaseSeeder(WorkflowDbContext context)
         {
             _context = context;
         }
