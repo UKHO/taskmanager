@@ -184,10 +184,6 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore sourcedocumentcoordinator'
-      - script: |
-          cd $(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator
-          $(COVERITY_TOOL_HOME)\bin\cov-configure --config cov/cov-config.xml --cs
-        displayName: "cov configuration"
       - task: synopsys-coverity@1
         inputs:
           coverityService: 'coverity.mgmt.local'
@@ -198,6 +194,7 @@ stages:
           customCommandArgs: true
           covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
           covCommitArgs: '--scm git'
+          covBuildArgs: --config $(Build.SourcesDirectory)/src/sourcedocumentcoordinator/cov/cov-config.xml
         displayName: 'Scan sourcedocumentcoordinator'
 
 - stage: DeployDev
