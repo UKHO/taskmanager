@@ -384,6 +384,11 @@ body, .sticky-footer-wrapper {
 .flex-fill {
     flex: 1 1 auto;
 }
+
+.versioning {
+    text-align: right;
+    font-size: 11px;
+}
 /* Footer end */
 
 

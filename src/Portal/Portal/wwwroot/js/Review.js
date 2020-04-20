@@ -7,6 +7,8 @@
     setReviewDoneHandler();
     setReviewSaveHandler();
 
+    attachTerminateHandlers();
+
     var formChanged = false;
     $("#frmReviewPage").change(function () { formChanged = true; });
 
@@ -20,23 +22,33 @@
         $("#modalWaitReviewDoneErrors").modal("show");
     }
 
-    $("#btnTerminate").on("click", function () {
-        $("#ConfirmTerminate").modal("show");
-    });
+    function attachTerminateHandlers() {
+        $("#btnTerminate").on("click", function () {
+            $("#ConfirmTerminate").modal("show");
+        });
 
-    $("#terminatingReview").submit(function (event) {
-        if ($("#txtTerminateComment").val() === "") {
-            $("#ConfirmTerminateError")
-                .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
-            $("#txtTerminateComment").focus();
-            event.preventDefault();
-        }
-    });
+        $("#txtTerminateComment").keydown(function (e) {
+            if (e.keyCode !== 13) {
+                $("#ConfirmTerminateError").html("");
+                return;
+            }
+            $("#btnConfirmTerminate").trigger("click");
+        });
 
-    $("#ConfirmTerminate").on("shown.bs.modal",
-        function () {
+        $("#btnConfirmTerminate").on("click", function () {
+            if ($("#txtTerminateComment").val() === "") {
+                $("#ConfirmTerminateError")
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
+                $("#txtTerminateComment").focus();
+                return;
+            }
+            submitTerminateForm();
+        });
+
+        $("#ConfirmTerminate").on("shown.bs.modal", function () {
             $("#txtTerminateComment").focus();
         });
+    }
 
     function completeReview(action) {
         $("#reviewDoneErrorMessage").html("");
@@ -102,6 +114,39 @@
 
         $("#btnSave").click(function (e) {
             completeReview("Save");
+        });
+    }
+
+    function submitTerminateForm() {
+        var formData = $("#terminatingReview").serialize();
+
+        $("#btnConfirmTerminate").prop("disabled", true);
+        $("#btnCancelTerminate").prop("disabled", true);
+
+        $.ajax({
+            type: "POST",
+            url: "Review/?handler=ReviewTerminate",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: formData,
+            complete: function () {
+                console.log("terminate complete");
+
+            },
+            success: function (result) {
+                console.log("terminate success");
+                formChanged = false;
+
+                window.location.replace("/Index");
+            },
+            error: function (error) {
+                console.log("terminate error");
+                $("#btnConfirmTerminate").prop("disabled", false);
+                $("#btnCancelTerminate").prop("disabled", false);
+
+                //TODO: error functionality
+            }
         });
     }
 

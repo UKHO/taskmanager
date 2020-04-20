@@ -54,20 +54,20 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion)'
         displayName: 'dotnet build portal'
-  
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
-          feedsToUse: 'select'
-        displayName: 'dotnet restore portaltests'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
         displayName: 'dotnet build portaltests'
+
+      # Write build number and Id to text file
+      - script: '(echo $(Build.BuildNumber) && echo $(Build.BuildId)) > .buildinfo.json'
+        displayName: "Emit build number"
+        workingDirectory: '$(Build.SourcesDirectory)\\src\\portal\\portal'
+        failOnStderr: true
   
       - task: DotNetCoreCLI@2
         inputs:
@@ -98,7 +98,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
           zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\portal'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\portal'
         displayName: 'Publish portal-project'
 
       - task: PublishBuildArtifacts@1
