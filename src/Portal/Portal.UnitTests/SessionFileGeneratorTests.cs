@@ -111,11 +111,11 @@ namespace Portal.UnitTests
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual(hpdUsername,
-                sessionFile.DataSources.DataSource.SourceParam.USERNAME);
+                sessionFile.DataSources.DataSource[0].SourceParam.USERNAME);
             Assert.AreEqual(hpdUsername,
-                sessionFile.DataSources.DataSource.SourceParam.ASSIGNED_USER);
+                sessionFile.DataSources.DataSource[0].SourceParam.ASSIGNED_USER);
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
-                sessionFile.DataSources.DataSource.SourceParam.SERVICENAME);
+                sessionFile.DataSources.DataSource[0].SourceParam.SERVICENAME);
         }
         
         [Test]
@@ -156,11 +156,11 @@ namespace Portal.UnitTests
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual(selectedUsages[0],
-                sessionFile.DataSources.DataSource.SourceParam.USAGE);
+                sessionFile.DataSources.DataSource[0].SourceParam.USAGE);
 
             Assert.AreEqual($":HPD:Project:|{carisproject.ProjectName}",
-                sessionFile.DataSources.DataSource.SourceString);
-            Assert.That(sessionFile.DataSources.DataSource.SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
+                sessionFile.DataSources.DataSource[0].SourceString);
+            Assert.That(sessionFile.DataSources.DataSource[0].SourceParam.SELECTEDPROJECTUSAGES.Value, Is.EqualTo(selectedUsages));
 
 
             Assert.IsNotNull(sessionFile.Views);
@@ -198,7 +198,7 @@ namespace Portal.UnitTests
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
-            Assert.AreEqual("TestWorkspace", sessionFile.DataSources.DataSource.SourceParam.WORKSPACE);
+            Assert.AreEqual("TestWorkspace", sessionFile.DataSources.DataSource[0].SourceParam.WORKSPACE);
         }
     }
 }

@@ -102,54 +102,8 @@ namespace Portal.Pages.DbAssessment
             UsagesSelectionPageLength = _generalConfig.Value.UsagesSelectionPageLength;
             SourcesSelectionPageLength = _generalConfig.Value.SourcesSelectionPageLength;
             CarisProjectNameCharacterLimit = _generalConfig.Value.CarisProjectNameCharacterLimit;
-            SessionFilename = _generalConfig.Value.SessionFilename;
-        }
 
-        private async Task GetSourceDocuments(int processId)
-        {
-            var assessmentData = await _dbContext.AssessmentData
-                .FirstOrDefaultAsync(ad => ad.ProcessId == processId);
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
-                .FirstOrDefaultAsync(pds => pds.ProcessId == processId);
-
-            if (assessmentData != null && primaryDocumentStatus != null &&
-                primaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
-            {
-                var primarySourceDocument = new SourceViewModel()
-                {
-                    DocumentName = assessmentData.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
-                };
-
-                SourceDocuments.Add(primarySourceDocument);
-            }
-
-            var linkedDocuments = await _dbContext.LinkedDocument
-                .Where(ld => ld.ProcessId == processId &&
-                                          ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
-                .Select(ld => new SourceViewModel()
-                {
-                    DocumentName = ld.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
-                })
-                .ToListAsync();
-
-            SourceDocuments.AddRange(linkedDocuments);
-
-            var databaseDocuments = await _dbContext.DatabaseDocumentStatus
-                .Where(dd => dd.ProcessId == processId &&
-                                                dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
-                .Select(dd => new SourceViewModel()
-                {
-                    DocumentName = dd.SourceDocumentName,
-                    FileExtension = "Not implemented",
-                    Path = _generalConfig.Value.SourceDocumentWriteableFolderName
-                })
-                .ToListAsync();
-
-            SourceDocuments.AddRange(databaseDocuments);
+            SessionFilename = GenerateSessionFilename();
         }
 
         public async Task<JsonResult> OnGetWorkspacesAsync()
@@ -261,6 +215,48 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
 
             return StatusCode(200);
+        }
+        
+        private async Task GetSourceDocuments(int processId)
+        {
+            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
+                .FirstOrDefaultAsync(pds => pds.ProcessId == processId);
+
+            if (primaryDocumentStatus != null &&
+                primaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+            {
+                var primarySourceDocument = new SourceViewModel()
+                {
+                    DocumentName = primaryDocumentStatus.Filename,
+                    DocumentFullName = Path.Combine(primaryDocumentStatus.Filepath, primaryDocumentStatus.Filename)
+                };
+
+                SourceDocuments.Add(primarySourceDocument);
+            }
+
+            var linkedDocuments = await _dbContext.LinkedDocument
+                .Where(ld => ld.ProcessId == processId &&
+                                          ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                .Select(ld => new SourceViewModel()
+                {
+                    DocumentName = ld.Filename,
+                    DocumentFullName = Path.Combine(ld.Filepath, ld.Filename)
+                })
+                .ToListAsync();
+
+            SourceDocuments.AddRange(linkedDocuments);
+
+            var databaseDocuments = await _dbContext.DatabaseDocumentStatus
+                .Where(dd => dd.ProcessId == processId &&
+                                                dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                .Select(dd => new SourceViewModel()
+                {
+                    DocumentName = dd.Filename,
+                    DocumentFullName = Path.Combine(dd.Filepath, dd.Filename)
+                })
+                .ToListAsync();
+
+            SourceDocuments.AddRange(databaseDocuments);
         }
 
         private async Task<int> CreateCarisProject(int processId, string projectName)
@@ -444,6 +440,13 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProjectName = CarisProjectDetails.ProjectName;
+        }
+
+        private string GenerateSessionFilename()
+        {
+            var filename = Path.GetFileNameWithoutExtension(_generalConfig.Value.SessionFilename);
+            var ext = Path.GetExtension(_generalConfig.Value.SessionFilename);
+            return $"{filename}_{DateTime.Now:yyMMdd-HHmmss}{ext}"; // $"{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{ext}"
         }
     }
 }

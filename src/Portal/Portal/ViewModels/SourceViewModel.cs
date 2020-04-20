@@ -3,7 +3,6 @@
     public class SourceViewModel
     {
         public string DocumentName { get; set; }
-        public string FileExtension { get; set; }
-        public string Path { get; set; }    
+        public string DocumentFullName { get; set; }    
     }
 }
