@@ -52,6 +52,10 @@ namespace Portal.Models
             public string PROJECT_ID { get; set; }
             [XmlElement(ElementName = "SELECTEDPROJECTUSAGES")]
             public SelectedProjectUsages SELECTEDPROJECTUSAGES { get; set; }
+            [XmlElement(ElementName = "DisplayName")]
+            public DisplayNameNode DisplayName { get; set; }
+            [XmlElement(ElementName = "SurfaceString")]
+            public SurfaceStringNode SurfaceString { get; set; }
         }
 
         [XmlRoot(ElementName = "DataSource")]
@@ -69,7 +73,7 @@ namespace Portal.Models
         public class DataSourcesNode
         {
             [XmlElement(ElementName = "DataSource")]
-            public DataSourceNode DataSource { get; set; }
+            public List<DataSourceNode> DataSource { get; set; }
         }
 
         [XmlRoot(ElementName = "displayLayer")]
@@ -138,5 +142,20 @@ namespace Portal.Models
             [XmlElement(ElementName = "Property")]
             public List<PropertyNode> Property { get; set; }
         }
+
+        [XmlRoot(ElementName = "DisplayName")]
+        public class DisplayNameNode
+        {
+            [XmlElement(ElementName = "value")]
+            public string Value { get; set; }
+        }
+
+        [XmlRoot(ElementName = "SurfaceString")]
+        public class SurfaceStringNode
+        {
+            [XmlElement(ElementName = "value")]
+            public string Value { get; set; }
+        }
+
     }
 }

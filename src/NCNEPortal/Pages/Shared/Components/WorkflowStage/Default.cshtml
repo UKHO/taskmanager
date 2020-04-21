@@ -5,24 +5,28 @@
 {
     <tr class="workflow-row">
         <td>
-            @if (Model.Status == NcneTaskStageStatus.Open.ToString())
-            {
-                <h4 class="Inactive">@Model.TaskStageType.Name</h4>
 
+            @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
+            {
+                <h4 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")" )>@Model.TaskStageType.Name</h4>
             }
             else
             {
-                <h4>@Model.TaskStageType.Name</h4>
+                <h6 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")" )>@Model.TaskStageType.Name</h6>
             }
+
 
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
             {
-                <div class="status inProgress">
-                    <span class="fa fa-edit"> </span>
-                    <span>@Model.Status</span>
-                </div>
+                @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
+                {
+                    <div class="status inProgress">
+                        <span class="fa fa-edit"> </span>
+                        <span>@Model.Status</span>
+                    </div>
+                }
             }
             else
             {
@@ -37,32 +41,79 @@
             }
         </td>
         <td>@Model.AssignedUser</td>
-        <td id="DtExp-@(Model.TaskStageId)" >@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
+        <td id="DtExp-@(Model.TaskStageId)">@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
         <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
         <td>
-            <div class="d-flex justify-content-end align-items-center">
-                <div class="mr-4">
-                    <span>Comments</span>
-                    <label class="switch ml-1 mb-auto">
-                        <input type="checkbox" class="success" id="commentscheck-@(Model.TaskStageId)">
-                        <span class="slider commentslider" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)"></span>
-                    </label>
-                </div>
-            </div>
-
-            @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+            @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
             {
-                <div class="d-flex justify-content-end">
-                    @if (@Model.TaskStageType.AllowRework)
-                    {
-                        <div class="mt-3 mr-3">
-                            <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary">Rework</button>
-                        </div>
-                    }
-                    <div class="mt-3">
-                        <button id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete" style="min-width: 139px;">Mark Complete</button>
+                <div class="d-flex justify-content-end align-items-center">
+                    <div class="mr-4">
+                        <span>Comments</span>
+                        <label class="switch ml-1 mb-auto">
+                            <input type="checkbox" class="success" id="commentscheck-@(Model.TaskStageId)">
+                            <span class="slider commentslider" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)"></span>
+                        </label>
                     </div>
                 </div>
+            }
+            @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication)
+            {
+                @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+                {
+                    <div class="d-flex justify-content-end">
+                        @if (@Model.TaskStageType.AllowRework)
+                        {
+                            <div class="mt-3 mr-3">
+                                <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary">Rework</button>
+                            </div>
+                        }
+                        <div class="mt-3">
+                            <button id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete" style="min-width: 139px;">Mark Complete</button>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @if (Model.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart)
+                {
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <button id="btnPublishChartPublishInCaris"
+                                    @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
+                                    class="btn btn-block btn-primary">
+                                Publish in CARIS
+                            </button>
+                        </div>
+                        <div class="col-2 offset-2">
+                            <div class="checkbox-wrapper ">
+                                <input type="checkbox"
+                                       @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
+                                       disabled "check@(Model.TaskStageId)">
+                                <label for="check@(Model.TaskStageId)"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    if (Model.TaskStageTypeId != (int)NcneTaskStageType.Publication)
+                    {
+                        <div class="row align-items-center">
+                            <div class="col-2 offset-10">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox"
+                                           @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
+                                           @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
+                                           id="check@(Model.TaskStageId)">
+                                    <label for="check@(Model.TaskStageId)"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+
             }
         </td>
     </tr>
