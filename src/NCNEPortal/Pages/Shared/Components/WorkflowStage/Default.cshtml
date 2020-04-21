@@ -95,7 +95,6 @@
                         </div>
                     </div>
 
-                    @*<button id="btnPublish" style="alignment:left" class="btn btn-block btn-primary">Publish in CARIS</button>*@
                 }
                 else
                 {
@@ -106,7 +105,7 @@
                                 <div class="checkbox-wrapper">
                                     <input type="checkbox"
                                            @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
-                                           @((Model.Status == NcneTaskStageStatus.Open.ToString()) ? " disabled " : "")
+                                           @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
                                            id="check@(Model.TaskStageId)">
                                     <label for="check@(Model.TaskStageId)"></label>
                                 </div>
