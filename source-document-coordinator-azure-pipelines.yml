@@ -166,7 +166,25 @@ stages:
         inputs:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
-          
+    - job: SASTv2
+      pool: "NautilusBuild"
+      workspace:
+          clean: all
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore sourcedocumentcoordinator'
+      - PowerShell: |
+          &"$(env:COVERITY_TOOL_HOME)\bin\cov-build" --config $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\cov\cov-config.xml --dir $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\idir dotnet build $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\SourceDocumentCoordinator\SourceDocumentCoordinator.csproj -nowarn:472,168         
     - job: SAST
       pool: "NautilusBuild"
       workspace:
@@ -194,7 +212,7 @@ stages:
           customCommandArgs: true
           covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
           covCommitArgs: '--scm git'
-          covBuildArgs: --config $(Build.SourcesDirectory)/src/sourcedocumentcoordinator/cov/cov-config.xml
+          covBuildArgs: --config $(Build.SourcesDirectory)\src\sourcedocumentcoordinator\cov\cov-config.xml
         displayName: 'Scan sourcedocumentcoordinator'
 
 - stage: DeployDev
