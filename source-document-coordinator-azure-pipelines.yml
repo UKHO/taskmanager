@@ -183,7 +183,7 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\sourcedocumentcoordinator\\sourcedocumentcoordinator\\sourcedocumentcoordinator.csproj'
           feedsToUse: 'select'
         displayName: 'dotnet restore sourcedocumentcoordinator'
-      - PowerShell: |
+      - script: |
           &"$(env:COVERITY_TOOL_HOME)\bin\cov-build" --config $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\cov\cov-config.xml --dir $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\idir dotnet build $(Build.SourcesDirectory)\src\SourceDocumentCoordinator\SourceDocumentCoordinator\SourceDocumentCoordinator.csproj -nowarn:472,168         
     - job: SAST
       pool: "NautilusBuild"
