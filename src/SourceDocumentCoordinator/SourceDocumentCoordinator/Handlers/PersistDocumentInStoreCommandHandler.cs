@@ -19,18 +19,21 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
         private readonly IContentServiceApiClient _contentServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IDocumentStatusFactory _documentStatusFactory;
         private readonly IDocumentFileLocationFactory _documentFileLocationFactory;
         private readonly ILogger<PersistDocumentInStoreCommandHandler> _logger;
 
         public PersistDocumentInStoreCommandHandler(IOptionsSnapshot<GeneralConfig> generalConfig, 
                                                     IContentServiceApiClient contentServiceApiClient, 
-                                                    WorkflowDbContext dbContext, 
+                                                    WorkflowDbContext dbContext,
+                                                    IDocumentStatusFactory documentStatusFactory,
                                                     IDocumentFileLocationFactory documentFileLocationFactory,
                                                     ILogger<PersistDocumentInStoreCommandHandler> logger)
         {
             _generalConfig = generalConfig;
             _contentServiceApiClient = contentServiceApiClient;
             _dbContext = dbContext;
+            _documentStatusFactory = documentStatusFactory;
             _documentFileLocationFactory = documentFileLocationFactory;
             _logger = logger;
         }
@@ -56,6 +59,13 @@ namespace SourceDocumentCoordinator.Handlers
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
 
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                                                                    _documentStatusFactory,
+                                                                    message.ProcessId,
+                                                                    message.SourceDocumentId,
+                                                                    SourceDocumentRetrievalStatus.FileGenerated,
+                                                                    message.SourceType, message.CorrelationId);
+            
             await SourceDocumentHelper.UpdateSourceDocumentFileLocation(
                                                                         _documentFileLocationFactory,
                                                                         message.ProcessId,
