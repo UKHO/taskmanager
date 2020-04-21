@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,17 +14,14 @@ namespace SourceDocumentCoordinator.Handlers
     {
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IOptionsSnapshot<GeneralConfig> _generalConfig;
-        private readonly IDocumentStatusFactory _documentStatusFactory;
         private readonly ILogger<ClearDocumentRequestFromQueueCommandHandler> _logger;
 
         public ClearDocumentRequestFromQueueCommandHandler(IDataServiceApiClient dataServiceApiClient,
                                                             IOptionsSnapshot<GeneralConfig> generalConfig,
-                                                            IDocumentStatusFactory documentStatusFactory,
                                                             ILogger<ClearDocumentRequestFromQueueCommandHandler> logger)
         {
             _dataServiceApiClient = dataServiceApiClient;
             _generalConfig = generalConfig;
-            _documentStatusFactory = documentStatusFactory;
             _logger = logger;
         }
 
