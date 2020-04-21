@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Common.Factories;
+﻿using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Microsoft.Extensions.Logging;
@@ -9,10 +6,8 @@ using Microsoft.Extensions.Options;
 using NServiceBus;
 using Serilog.Context;
 using SourceDocumentCoordinator.Config;
-using SourceDocumentCoordinator.Enums;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
-using WorkflowDatabase.EF;
 
 namespace SourceDocumentCoordinator.Handlers
 {
@@ -24,8 +19,8 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly ILogger<ClearDocumentRequestFromQueueCommandHandler> _logger;
 
         public ClearDocumentRequestFromQueueCommandHandler(IDataServiceApiClient dataServiceApiClient,
-                                                            IOptionsSnapshot<GeneralConfig> generalConfig, 
-                                                            IDocumentStatusFactory documentStatusFactory, 
+                                                            IOptionsSnapshot<GeneralConfig> generalConfig,
+                                                            IDocumentStatusFactory documentStatusFactory,
                                                             ILogger<ClearDocumentRequestFromQueueCommandHandler> logger)
         {
             _dataServiceApiClient = dataServiceApiClient;
@@ -53,30 +48,8 @@ namespace SourceDocumentCoordinator.Handlers
 
             LogContext.PushProperty("ReturnCode", returnCode.ToJSONSerializedString());
 
-            if (string.IsNullOrWhiteSpace(returnCode.Message) || !Path.IsPathRooted(returnCode.Message.Trim()))
-            {
-                _logger.LogError("A call to DeleteDocumentRequestJobFromQueue did not return a path to the generated source document; ReturnCode: {ReturnCode}");
+            _logger.LogInformation("A call to DeleteDocumentRequestJobFromQueue completed with ReturnCode: {ReturnCode}");
 
-                throw new ApplicationException($"A call to DeleteDocumentRequestJobFromQueue did not return a path to the generated source document; ReturnCode: {returnCode.ToJSONSerializedString()}");
-            }
-
-            if (returnCode.Code.HasValue)
-            {
-                switch (returnCode.Code.Value)
-                {
-                    case (int)ClearFromQueueReturnCodeEnum.Success:
-                    case (int)ClearFromQueueReturnCodeEnum.Warning:
-                        await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                                                    _documentStatusFactory, 
-                                                    message.ProcessId, 
-                                                    message.SourceDocumentId, 
-                                                    SourceDocumentRetrievalStatus.FileGenerated, 
-                                                    message.SourceType, message.CorrelationId);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
         }
     }
 }
