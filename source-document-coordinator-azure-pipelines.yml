@@ -208,7 +208,7 @@ stages:
           projectName: 'taskmanager'
           streamName: 'source-document-coordinator'
           coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-          buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator\sourcedocumentcoordinator.csproj'
+          buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\sourcedocumentcoordinator\sourcedocumentcoordinator\sourcedocumentcoordinator.csproj -nowarn:472,168'
           customCommandArgs: true
           covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
           covCommitArgs: '--scm git'
