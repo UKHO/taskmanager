@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Common.Factories;
 using Common.Factories.Interfaces;
@@ -22,13 +23,15 @@ namespace SourceDocumentCoordinator.Handlers
         private readonly IDocumentStatusFactory _documentStatusFactory;
         private readonly IDocumentFileLocationFactory _documentFileLocationFactory;
         private readonly ILogger<PersistDocumentInStoreCommandHandler> _logger;
+        private readonly IFileSystem _fileSystem;
 
         public PersistDocumentInStoreCommandHandler(IOptionsSnapshot<GeneralConfig> generalConfig, 
                                                     IContentServiceApiClient contentServiceApiClient, 
                                                     WorkflowDbContext dbContext,
                                                     IDocumentStatusFactory documentStatusFactory,
                                                     IDocumentFileLocationFactory documentFileLocationFactory,
-                                                    ILogger<PersistDocumentInStoreCommandHandler> logger)
+                                                    ILogger<PersistDocumentInStoreCommandHandler> logger,
+                                                    IFileSystem fileSystem)
         {
             _generalConfig = generalConfig;
             _contentServiceApiClient = contentServiceApiClient;
@@ -36,6 +39,7 @@ namespace SourceDocumentCoordinator.Handlers
             _documentStatusFactory = documentStatusFactory;
             _documentFileLocationFactory = documentFileLocationFactory;
             _logger = logger;
+            _fileSystem = fileSystem;
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace SourceDocumentCoordinator.Handlers
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
 
-            var fileBytes = File.ReadAllBytes(message.Filepath);
+            var fileBytes = _fileSystem.File.ReadAllBytes(message.Filepath);
 
             var newGuid = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
 
