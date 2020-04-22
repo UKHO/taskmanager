@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Common.Messages.Enums;
@@ -41,7 +43,12 @@ namespace SourceDocumentCoordinator.UnitTests
             _fakeContentServiceApiClient = A.Fake<IContentServiceApiClient>();
             _fakeDocumentStatusFactory = A.Fake<IDocumentStatusFactory>();
             _fakeDocumentFileLocationFactory = A.Fake<IDocumentFileLocationFactory>();
-            _fakeFileSystem = A.Fake<IFileSystem>();
+            _fakeFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
+                { @"c:\demo\jQuery.js", new MockFileData("some js") },
+                { @"c:\test\TestImage.tif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
+            });
             _fakeLogger = A.Fake<ILogger<PersistDocumentInStoreCommandHandler>>();
 
             var generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
@@ -68,14 +75,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 5678,
                 SourceDocumentId = 1999999,
                 SourceType = SourceType.Primary,
-                Filepath = "TestImage.tif"
+                Filepath = @"c:\test\TestImage.tif"
             };
 
             A.CallTo(() =>
                     _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
                 .Returns(Guid.NewGuid());
-
-            A.CallTo(() => _fakeFileSystem.File.ReadAllBytes(message.Filepath)).Returns(new byte[] {1,2,3});
 
             // when
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
@@ -107,15 +112,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 5678,
                 SourceDocumentId = 1999999,
                 SourceType = SourceType.Linked,
-                Filepath = "TestImage.tif"
+                Filepath = @"c:\test\TestImage.tif"
             };
 
             A.CallTo(() =>
                     _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
                 .Returns(Guid.NewGuid());
-
-            A.CallTo(() => _fakeFileSystem.File.ReadAllBytes(message.Filepath)).Returns(new byte[] { 1, 2, 3 });
-
 
             // when
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
@@ -147,14 +149,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 5678,
                 SourceDocumentId = 1999999,
                 SourceType = SourceType.Database,
-                Filepath = "TestImage.tif"
+                Filepath = @"c:\test\TestImage.tif"
             };
 
             A.CallTo(() =>
                     _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
                 .Returns(Guid.NewGuid());
-
-            A.CallTo(() => _fakeFileSystem.File.ReadAllBytes(message.Filepath)).Returns(new byte[] { 1, 2, 3 });
 
             // when
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
@@ -189,9 +189,6 @@ namespace SourceDocumentCoordinator.UnitTests
                 Filepath = "DoesNotExists.tif"
             };
 
-            A.CallTo(() => _fakeFileSystem.File.ReadAllBytes(message.Filepath)).Throws<FileNotFoundException>();
-
-
             // when
             Assert.ThrowsAsync<FileNotFoundException>(() => _handler.Handle(message, _handlerContext));
 
@@ -212,14 +209,12 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 5678,
                 SourceDocumentId = 1999999,
                 SourceType = SourceType.Database,
-                Filepath = "TestImage.tif"
+                Filepath = @"c:\test\TestImage.tif"
             };
 
             A.CallTo(() =>
                     _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
                 .Throws(new Exception());
-
-            A.CallTo(() => _fakeFileSystem.File.ReadAllBytes(message.Filepath)).Returns(new byte[] { 1, 2, 3 });
 
             // when
             Assert.ThrowsAsync<Exception>(() => _handler.Handle(message, _handlerContext));
