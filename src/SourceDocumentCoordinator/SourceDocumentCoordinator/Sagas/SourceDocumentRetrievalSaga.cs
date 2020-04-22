@@ -178,7 +178,7 @@ namespace SourceDocumentCoordinator.Sagas
                         SourceDocumentId = message.SourceDocumentId,
                         GeoReferenced = false
                     };
-                    await context.SendLocal(msg);
+                    await context.Publish(msg);
                     break;
                 case RequestQueueStatusReturnCodeEnum.FolderNotWritable:
                     MarkAsComplete();
