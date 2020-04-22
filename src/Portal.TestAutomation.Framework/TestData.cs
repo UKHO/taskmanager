@@ -14,8 +14,14 @@ namespace Portal.TestAutomation.Framework
 
         public TestData AddUser(string userToAdd)
         {
+            var rand = new Random();
+
             _context.AdUser.Add(new AdUser
-                {ActiveDirectorySid = "1234567890", DisplayName = userToAdd, LastCheckedDate = DateTime.Today.AddDays(1)});
+            {
+                ActiveDirectorySid = rand.Next(1000, 100000).ToString(),
+                DisplayName = userToAdd,
+                LastCheckedDate = DateTime.Today.AddDays(1)
+            });
 
             _context.HpdUser.Add(new HpdUser
                 {AdUsername = userToAdd, HpdUsername = userToAdd.Replace(" ", "") + "-Caris"});
@@ -25,19 +31,23 @@ namespace Portal.TestAutomation.Framework
 
         public TestData ReassignReviewsToUser(string user)
         {
-            var inProgressWorkflows = _context.WorkflowInstance.Where(wi => wi.Status == WorkflowStatus.Started.ToString());
+            var inProgressWorkflows =
+                _context.WorkflowInstance.Where(wi => wi.Status == WorkflowStatus.Started.ToString());
 
-            var workflowAtAssessId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Assess.ToString()).WorkflowInstanceId;
+            var workflowAtAssessId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Assess.ToString())
+                .WorkflowInstanceId;
             var assess = _context.DbAssessmentAssessData.First(x => x.WorkflowInstanceId == workflowAtAssessId);
             assess.Reviewer = user;
 
 
-            var workflowAtReviewId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Review.ToString()).WorkflowInstanceId;
+            var workflowAtReviewId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Review.ToString())
+                .WorkflowInstanceId;
             var review = _context.DbAssessmentReviewData.First(x => x.WorkflowInstanceId == workflowAtReviewId);
             review.Reviewer = user;
 
 
-            var workflowAtVerifyId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Verify.ToString()).WorkflowInstanceId;
+            var workflowAtVerifyId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Verify.ToString())
+                .WorkflowInstanceId;
             var verify = _context.DbAssessmentVerifyData.First(x => x.WorkflowInstanceId == workflowAtVerifyId);
             verify.Reviewer = user;
 
