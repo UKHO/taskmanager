@@ -55,6 +55,13 @@ namespace SourceDocumentCoordinator.HttpClients
                     return "application/zip";
                 case ".TXT":
                     return "text/plain";
+                case ".TIF":
+                case ".TIFF":
+                    return "image/tiff";
+                case ".XLS":
+                    return "application/vnd.ms-excel";
+                case ".7Z":
+                    return "application/x-7z-compressed";
                 default:
                     throw new NotImplementedException();
             }
