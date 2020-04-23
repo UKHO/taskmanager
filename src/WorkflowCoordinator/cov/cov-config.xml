@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverity SYSTEM "coverity_config.dtd">
+<coverity>
+<!-- Version 2019.12 -->
+    <cit_version>1</cit_version>
+    <config>
+      <include>$CONFIGDIR$\template-csc-config-0\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-msvc_devenv-config-0\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-msvc_msbuild-config-0\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-csc-config-1\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-csc-config-2\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-dotnet-config-0\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-0\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-1\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-2\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-3\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-4\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-5\coverity_config.xml</include>
+      <include>$CONFIGDIR$\template-razor-config-6\coverity_config.xml</include>
+    </config>
+</coverity>
