@@ -167,6 +167,36 @@ stages:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
+    - job: Coverity
+      pool: "NautilusBuild"
+      workspace:
+          clean: all
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore workflowcoordinator'
+      - task: synopsys-coverity@1
+        inputs:
+          coverityService: 'coverity.mgmt.local'
+          projectName: 'taskmanager'
+          streamName: 'workflow-coordinator-master'
+          coverityBuildDirectory: '$(Build.Repository.LocalPath)'
+          buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\workflowcoordinator\workflowcoordinator\workflowcoordinator.csproj'
+          customCommandArgs: true
+          covAnalyzeArgs: '--strip-path $(Build.Repository.LocalPath) --webapp-security --all'
+          covCommitArgs: '--scm git'
+          covBuildArgs: --config $(Build.SourcesDirectory)\src\workflowcoordinator\cov\cov-config.xml
+        displayName: 'Scan workflowcoordinator'
+
 - stage: DeployDev
   dependsOn: 
     - Build
