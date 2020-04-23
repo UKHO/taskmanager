@@ -168,8 +168,10 @@ stages:
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
     - job: Coverity
-      pool: "NautilusBuild"
-      demands: agent.name -equals HTFSPRDUAG06
+      pool: 
+        name: "NautilusBuild"
+        demands:
+        - agent.name -equals HTFSPRDUAG06
       workspace:
           clean: all
       steps:
