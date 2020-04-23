@@ -132,6 +132,7 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((RequestQueueStatusReturnCodeEnum)sourceDocument.Code.Value)
             {
                 case RequestQueueStatusReturnCodeEnum.Success:
+                case RequestQueueStatusReturnCodeEnum.NotGeoreferenced:
                     // Doc Ready; update DB;
                     await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.SourceType, message.CorrelationId);
 
@@ -167,7 +168,6 @@ namespace SourceDocumentCoordinator.Sagas
                 case RequestQueueStatusReturnCodeEnum.ConversionFailed:
                 case RequestQueueStatusReturnCodeEnum.ConversionTimeOut:
                 case RequestQueueStatusReturnCodeEnum.NotSuitableForConversion:
-                case RequestQueueStatusReturnCodeEnum.NotGeoreferenced:
 
                     MarkAsComplete();
 
@@ -178,7 +178,7 @@ namespace SourceDocumentCoordinator.Sagas
                         SourceDocumentId = message.SourceDocumentId,
                         GeoReferenced = false
                     };
-                    await context.SendLocal(msg);
+                    await context.Publish(msg);
                     break;
                 case RequestQueueStatusReturnCodeEnum.FolderNotWritable:
                     MarkAsComplete();

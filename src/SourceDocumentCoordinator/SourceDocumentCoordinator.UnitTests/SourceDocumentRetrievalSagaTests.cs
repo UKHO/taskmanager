@@ -286,7 +286,6 @@ namespace SourceDocumentCoordinator.UnitTests
         [Test]
         public async Task Test_GetDocumentRequestQueueStatusCommand_When_Request_Queue_Status_Returns_Error_Code_Does_Not_Fire_Timeout_And_InitiateSourceDocumentRetrievalCommand_Is_Sent_With_GeoReferenced_Set_to_False(
                         [Values(
-                            RequestQueueStatusReturnCodeEnum.NotGeoreferenced,
                             RequestQueueStatusReturnCodeEnum.ConversionFailed,
                             RequestQueueStatusReturnCodeEnum.NotSuitableForConversion,
             RequestQueueStatusReturnCodeEnum.ConversionTimeOut)]
@@ -319,7 +318,7 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.IsNull(timeoutCommand, $"Timeout '{nameof(GetDocumentRequestQueueStatusCommand)}' should only be fired on successful queuing");
 
             // Ensure new InitiateSourceDocumentRetrievalEvent is sent
-            var initiateSourceDocumentRetrievalCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+            var initiateSourceDocumentRetrievalCommand = _handlerContext.PublishedMessages.SingleOrDefault(t =>
                 t.Message is InitiateSourceDocumentRetrievalEvent);
             Assert.IsNotNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalEvent)} seen.");
 
