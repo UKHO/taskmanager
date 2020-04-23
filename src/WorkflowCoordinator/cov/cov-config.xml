@@ -19,4 +19,4 @@
       <include>$CONFIGDIR$\template-razor-config-6\coverity_config.xml</include>
     </config>
 </coverity>
-
+<!-- comment -->
