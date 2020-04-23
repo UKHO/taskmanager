@@ -329,10 +329,12 @@ The HpdUsage table holds the usages from HPD.
 
 | Column Name       | Datatype          | Allow nulls | Description                          |
 |-------------------|-------------------|-------------|--------------------------------------|
-|HpdUsageId         |INT                |No           |PRIMARY KEY         |
-|Name               |NVARCHAR(25)       |No           |                                      |
+|HpdUsageId         |INT                |No           |PRIMARY KEY                           |
+|Name               |NVARCHAR(255)      |No           |                                      |
+|SortIndex          |TINYINT            |No           |                                      |
 
 The Name column has a unique constraint.
+The SortIndex column has a unique constraint.
 
 [Go To Tables](#tables)
 
