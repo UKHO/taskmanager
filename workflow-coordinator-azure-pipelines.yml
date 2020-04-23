@@ -169,6 +169,7 @@ stages:
 
     - job: Coverity
       pool: "NautilusBuild"
+      demands: agent.name -equals HTFSPRDUAG06
       workspace:
           clean: all
       steps:
