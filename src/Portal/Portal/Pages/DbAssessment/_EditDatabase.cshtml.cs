@@ -91,7 +91,8 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
-            HpdUsages = await _dbContext.HpdUsage.Select(u => u.Name).ToListAsync();
+            HpdUsages = await _dbContext.HpdUsage.OrderBy(u => u.SortIndex)
+                .Select(u => u.Name).ToListAsync();
 
             await GetSourceDocuments(processId);
 
