@@ -507,7 +507,7 @@
         "linkType": "Forward",
         "linkedSdocId": 306707,
         "ContentServiceId": null,
-        "Status": "FileGenerated",
+        "Status": "Started",
         "created": "2020-01-01T00:00:00"
       },
       {
@@ -522,7 +522,7 @@
         "linkType": "Backward",
         "linkedSdocId": 938037,
         "ContentServiceId": null,
-        "Status": "FileGenerated",
+        "Status": "Started",
         "created": "2020-01-01T00:00:00"
       },
       {
@@ -537,7 +537,7 @@
         "linkType": "SEP",
         "linkedSdocId": 83848,
         "ContentServiceId": null,
-        "Status": "FileGenerated",
+        "Status": "Started",
         "created": "2020-01-01T00:00:00"
       }
     ],
@@ -569,7 +569,7 @@
       "processId": 126,
       "SdocId": 938096,
       "ContentServiceId": null,
-      "Status": "FileGenerated",
+      "Status": "Started",
       "StartedAt": "2020-01-03T00:00:00",
       "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
     },
