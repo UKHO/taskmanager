@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Abstractions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -74,6 +75,7 @@ namespace SourceDocumentCoordinator
 
                 services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
                 services.AddScoped<IDocumentFileLocationFactory, DocumentFileLocationFactory>();
+                services.AddScoped<IFileSystem, FileSystem>();
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));

@@ -52,6 +52,7 @@ namespace Portal.UnitTests
 
             ProcessId = 123;
             UserFullName = "TestUser";
+            _generalConfig.Value.SessionFilename = "Testing.ext";
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(UserFullName);
@@ -127,6 +128,17 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnGet_Adds_timestamp_to_session_filename()
+        {
+
+            await SetupForOnGetAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.IsTrue(_editDatabaseModel.SessionFilename.Contains(DateTime.Now.ToString("yyMMdd-HHmm")));
+        }
+
+        [Test]
         public async Task Test_OnGet_Retrieves_All_Usages()
         {
             _dbContext.HpdUsage.Add(new HpdUsage()
@@ -166,7 +178,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_Retrieves_Linked_Documents()
+        public async Task Test_OnGet_when_status_is_FileGenerated_Retrieves_Linked_Documents()
         {
             await SetupForOnGetAsync();
 
@@ -196,11 +208,41 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_Retrieves_Database_Documents()
+        public async Task Test_OnGet_when_status_is_not_FileGenerated_Then_No_Linked_Document_is_added()
         {
             await SetupForOnGetAsync();
 
-            _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.Ready.ToString(),
+                Filename = "Testing1.tif",
+                Filepath = "c:\\Temp"
+            });
+
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.Ready.ToString(),
+                Filename = "Testing2.tif",
+                Filepath = "c:\\Temp"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            //Expected value is 1 higher than added LinkedDocuments as an item
+            //is added to SourceDocuments in SetupForOnGetAsync()
+            Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
+        }
+
+        [Test]
+        public async Task Test_OnGet_when_status_is_FileGenerated_Retrieves_Database_Documents()
+        {
+            await SetupForOnGetAsync();
+
+            await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
@@ -218,6 +260,30 @@ namespace Portal.UnitTests
             Assert.AreEqual(2, _editDatabaseModel.SourceDocuments.Count);
         }
 
+
+        [Test]
+        public async Task Test_OnGet_when_status_is_Not_FileGenerated_Then_No_Database_Document_Is_added()
+        {
+            await SetupForOnGetAsync();
+
+            await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.Ready.ToString(),
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
+            });
+
+
+            await _dbContext.SaveChangesAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            //Expected value is 1 higher than added DatabaseDocumentStatus as an item
+            //is added to SourceDocuments in SetupForOnGetAsync()
+            Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
+        }
+
         [Test]
         public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Primary_Document()
         {
@@ -230,7 +296,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Linked_Document()
+        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Linked_Document_when_status_is_FileGenerated()
         {
             await SetupForOnGetAsync();
 
@@ -251,7 +317,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Database_Document()
+        public async Task Test_OnGet_SourceViewModel_Has_Been_Populated_For_Database_Document_when_status_is_FileGenerated()
         {
             await SetupForOnGetAsync();
 
@@ -273,7 +339,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_Retrieves_Linked_Documents_And_Database_Documents()
+        public async Task Test_OnGet_Retrieves_Linked_Documents_And_Database_Documents_when_status_is_FileGenerated()
         {
             await SetupForOnGetAsync();
 
@@ -303,7 +369,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_Only_Documents_With_Matching_ProcessId_Are_Added()
+        public async Task Test_OnGet_Only_Adds_Documents_With_Matching_ProcessId_And_status_is_FileGenerated_()
         {
             await SetupForOnGetAsync();
 
@@ -431,32 +497,6 @@ namespace Portal.UnitTests
             Assert.AreEqual("Name given at Assess", _editDatabaseModel.ProjectName);
         }
 
-        private async Task SetupForOnGetAsync()
-        {
-            _dbContext.AssessmentData.Add(new AssessmentData()
-            {
-                ProcessId = ProcessId,
-                SourceDocumentName = "Source",
-                RsdraNumber = "RSDRA123"
-            });
-
-            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
-            {
-                ProcessId = ProcessId,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
-                Filename = "Testing.tif",
-                Filepath = "c:\\Temp"
-            });
-
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                WorkspaceAffected = "AWorkspace"
-            });
-
-            await _dbContext.SaveChangesAsync();
-        }
-
         [Test]
         public void Test_OnGetLaunchSourceEditor_Throws_ArgumentException_When_No_Usages_Supplied()
         {
@@ -568,6 +608,32 @@ namespace Portal.UnitTests
             Assert.AreEqual(sessionFilename, sessionFileStream.FileDownloadName);
 
 
+        }
+
+        private async Task SetupForOnGetAsync()
+        {
+            _dbContext.AssessmentData.Add(new AssessmentData()
+            {
+                ProcessId = ProcessId,
+                SourceDocumentName = "Source",
+                RsdraNumber = "RSDRA123"
+            });
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                Filename = "Testing.tif",
+                Filepath = "c:\\Temp"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                WorkspaceAffected = "AWorkspace"
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

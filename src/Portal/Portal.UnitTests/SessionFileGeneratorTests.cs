@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -117,7 +118,7 @@ namespace Portal.UnitTests
             Assert.AreEqual(_secretsConfig.Value.HpdServiceName,
                 sessionFile.DataSources.DataSource[0].SourceParam.SERVICENAME);
         }
-        
+
         [Test]
         public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Usages()
         {
@@ -155,6 +156,10 @@ namespace Portal.UnitTests
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
+
+            Assert.AreEqual(1,
+                sessionFile.DataSources.DataSource.Count);
+
             Assert.AreEqual(selectedUsages[0],
                 sessionFile.DataSources.DataSource[0].SourceParam.USAGE);
 
@@ -199,6 +204,79 @@ namespace Portal.UnitTests
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
             Assert.AreEqual("TestWorkspace", sessionFile.DataSources.DataSource[0].SourceParam.WORKSPACE);
+        }
+
+        [Test]
+        public async Task Test_PopulateSessionFile_Returns_Populated_With_Selected_Sources()
+        {
+            UserFullName = "Test User 1";
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUsername = UserFullName,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+            await _dbContext.SaveChangesAsync();
+
+            var selectedUsages = new List<string>()
+            {
+                "Usage1",
+                "Usage2"
+            };
+
+
+            var selectedSources = new List<string>()
+            {
+                "c:\\Temp\\Test1.tif",
+                "c:\\Temp\\Test2.tif"
+            };
+
+            var carisproject = new CarisProjectDetails()
+            {
+                ProcessId = ProcessId,
+                ProjectId = 123456,
+                ProjectName = "SomeName",
+                Created = DateTime.Today,
+                CreatedBy = UserFullName
+            };
+
+            var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
+                ProcessId,
+                UserFullName,
+                "Assess",
+                carisproject, selectedUsages, selectedSources);
+
+            Assert.IsNotNull(sessionFile);
+            Assert.IsNotNull(sessionFile.DataSources);
+
+            Assert.AreEqual(3,
+                sessionFile.DataSources.DataSource.Count);
+
+            Assert.AreEqual(
+                        $":HPD:Project:|{carisproject.ProjectName}", 
+                        sessionFile.DataSources.DataSource[0].SourceString);
+            Assert.AreEqual(
+                        selectedSources[0], 
+                        sessionFile.DataSources.DataSource[1].SourceString);
+            Assert.AreEqual(
+                        selectedSources[1], 
+                        sessionFile.DataSources.DataSource[2].SourceString);
+
+            Assert.AreEqual(
+                Path.GetFileNameWithoutExtension(selectedSources[0]),
+                sessionFile.DataSources.DataSource[1].SourceParam.DisplayName.Value);
+            Assert.AreEqual(
+                Path.GetFileNameWithoutExtension(selectedSources[1]),
+                sessionFile.DataSources.DataSource[2].SourceParam.DisplayName.Value);
+            
+            Assert.AreEqual(
+                selectedSources[0],
+                sessionFile.DataSources.DataSource[1].SourceParam.SurfaceString.Value);
+            Assert.AreEqual(
+                selectedSources[1],
+                sessionFile.DataSources.DataSource[2].SourceParam.SurfaceString.Value);
         }
     }
 }
