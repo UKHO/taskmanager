@@ -168,6 +168,39 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnGet_Retrieves_Usages_Sorted_By_SortIndex()
+        {
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "Nav1",
+                SortIndex = 2
+            });
+
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 2,
+                Name = "Nav2",
+                SortIndex = 0
+            });
+
+            _dbContext.HpdUsage.Add(new HpdUsage()
+            {
+                HpdUsageId = 3,
+                Name = "Nav3",
+                SortIndex = 1
+            });
+
+            await SetupForOnGetAsync();
+
+            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
+
+            Assert.AreEqual("Nav2", _editDatabaseModel.HpdUsages.ElementAt(0));
+            Assert.AreEqual("Nav3", _editDatabaseModel.HpdUsages.ElementAt(1));
+            Assert.AreEqual("Nav1", _editDatabaseModel.HpdUsages.ElementAt(2));
+        }
+
+        [Test]
         public async Task Test_OnGet_Retrieves_Primary_Source_Document()
         {
             await SetupForOnGetAsync();
