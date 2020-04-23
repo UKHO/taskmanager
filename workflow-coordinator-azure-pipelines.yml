@@ -188,7 +188,7 @@ stages:
         inputs:
           coverityService: 'coverity.mgmt.local'
           projectName: 'taskmanager'
-          streamName: 'workflow-coordinator-master'
+          streamName: 'source-document-coordinator'
           coverityBuildDirectory: '$(Build.Repository.LocalPath)'
           buildCommand: 'dotnet build $(Build.SourcesDirectory)\src\workflowcoordinator\workflowcoordinator\workflowcoordinator.csproj'
           customCommandArgs: true
