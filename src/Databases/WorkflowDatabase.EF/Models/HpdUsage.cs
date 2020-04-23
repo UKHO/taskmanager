@@ -4,5 +4,6 @@
     {
         public int HpdUsageId { get; set; }
         public string Name { get; set; }
+        public int SortIndex { get; set; }
     }
 }
