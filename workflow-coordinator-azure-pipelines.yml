@@ -171,7 +171,7 @@ stages:
       pool: 
         name: "NautilusBuild"
         demands:
-        - agent.name -equals HTFSPRDUAG06
+        - agent.name -contains HTFSPRDUAG06
       workspace:
           clean: all
       steps:
