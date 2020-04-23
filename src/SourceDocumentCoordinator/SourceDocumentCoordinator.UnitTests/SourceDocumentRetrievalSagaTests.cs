@@ -252,6 +252,56 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
+        public async Task Test_GetDocumentRequestQueueStatusCommand_When_Request_Queue_Succeeds_Does_Only_Fires_ClearDocumentRequestFromQueueCommand_and_PersistDocumentInStoreCommand(
+                        [Values(
+                            RequestQueueStatusReturnCodeEnum.Success,
+                            RequestQueueStatusReturnCodeEnum.NotGeoreferenced)]
+                        QueueForRetrievalReturnCodeEnum returnCode)
+        {
+            // Given
+            var sdocId = 1111;
+            var correlationId = Guid.NewGuid();
+            var getDocumentRequestQueueStatusCommand = new GetDocumentRequestQueueStatusCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sdocId
+            };
+            _sourceDocumentRetrievalSaga.Data = new SourceDocumentRetrievalSagaData();
+            A.CallTo(() => _fakeDataServiceApiClient.GetDocumentRequestQueueStatus(A<string>.Ignored))
+                                            .Returns(new QueuedDocumentObjects() { new QueuedDocumentObject
+                                            {
+                                                Code = (int)returnCode,
+                                                Message = "testing",
+                                                StatusTime = DateTime.Now,
+                                                SodcId = sdocId
+                                            } });
+
+            //When
+            await _sourceDocumentRetrievalSaga.Timeout(getDocumentRequestQueueStatusCommand, _handlerContext);
+
+
+            // Ensure new ClearDocumentRequestFromQueueCommand is sent
+            var clearDocumentRequestFromQueueCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is ClearDocumentRequestFromQueueCommand);
+            Assert.IsNotNull(clearDocumentRequestFromQueueCommand, $"No message of type {nameof(ClearDocumentRequestFromQueueCommand)} seen.");
+
+            // Ensure new PersistDocumentInStoreCommand is sent
+            var persistDocumentInStoreCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistDocumentInStoreCommand);
+            Assert.IsNotNull(persistDocumentInStoreCommand, $"No message of type {nameof(PersistDocumentInStoreCommand)} seen.");
+
+            // Ensure no timeout is fired
+            var timeoutCommand = _handlerContext.TimeoutMessages.SingleOrDefault(t =>
+                t.Message is GetDocumentRequestQueueStatusCommand);
+            Assert.IsNull(timeoutCommand, $"Timeout '{nameof(GetDocumentRequestQueueStatusCommand)}' should only be fired on successful queuing");
+
+            // Ensure new InitiateSourceDocumentRetrievalEvent is not sent
+            var initiateSourceDocumentRetrievalCommand = _handlerContext.PublishedMessages.SingleOrDefault(t =>
+                t.Message is InitiateSourceDocumentRetrievalEvent);
+            Assert.IsNull(initiateSourceDocumentRetrievalCommand, $"No message of type {nameof(InitiateSourceDocumentRetrievalEvent)} seen.");
+        }
+
+        [Test]
         public async Task Test_GetDocumentRequestQueueStatusCommand_Fires_Another_Timeout_When_DocumentRetrievalStatus_Queued()
         {
             // Given
