@@ -408,7 +408,7 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username)
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username)
         {
             ValidationErrorMessages.Clear();
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
@@ -421,6 +421,11 @@ namespace NCNEPortal
                 };
             }
 
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username)
+        {
             var result = await CompleteStage(processId, stageId);
 
             return new JsonResult(HttpStatusCode.OK);

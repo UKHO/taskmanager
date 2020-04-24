@@ -75,7 +75,7 @@ namespace NCNEPortal.Helpers
             {
                 if (assignedUser != username)
                 {
-                    validationErrorMessages.Add("Current user not valid for completion of this task stage");
+                    validationErrorMessages.Add("Current user is not valid for completion of this task stage");
                     isValid = false;
                 }
             }

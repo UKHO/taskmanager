@@ -28,7 +28,7 @@
         
         $.ajax({
             type: "POST",
-            url: "Workflow/?handler=Complete",
+            url: "Workflow/?handler=ValidateComplete",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -37,17 +37,12 @@
                 "stageId": stageId,
                 "username" : username
             },
-            complete: function () {
-                window.setTimeout(function () {
-                    //$("#modalWaitAssessDone").modal("hide");
-                    $("#btnClose").prop("disabled", false);
-                    $("#btnSave").prop("disabled", false);
-                }, 200);
-            },
+
             success: function (result) {
-                formChanged = false;
-                var processId = $("#hdnProcessId").val();
-                window.location.href = "/workflow?ProcessId=" + processId;
+                $("#hdnConfirmProcessId").val(processId);
+                $("#hdnConfirmStageId").val(stageId);
+                $("#hdnAssignedUser").val(username);
+                $("#ConfirmModal").modal("show");
 
             },
             error: function (error) {
@@ -67,6 +62,31 @@
             }
         });
 
+
+    });
+
+    $("#btnConfirm").click(function() {
+        var processId = $("#hdnConfirmProcessId").val();
+        var stageId = $("#hdnConfirmStageId").val();
+        var username = $("#hdnAssignedUser").val();
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=Complete",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "stageId": stageId,
+                "username": username
+            },
+            success: function(result) {
+                formChanged = false;
+                window.location.href = "/workflow?ProcessId=" + processId;
+            }
+        });
 
     });
 
