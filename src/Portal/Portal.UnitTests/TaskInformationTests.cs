@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,7 @@ namespace Portal.UnitTests
         private ITaskDataHelper _taskDataHelper;
         private IOnHoldCalculator _onHoldCalculator;
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private IDmEndDateCalculator _dmEndDateCalculator;
 
         private int ProcessId { get; set; }
 
@@ -40,13 +42,17 @@ namespace Portal.UnitTests
             _onHoldCalculator = new OnHoldCalculator(_generalConfig);
             _taskDataHelper = new TaskDataHelper(_dbContext);
 
+            _generalConfig.Value.DmEndDateDaysSimple = 14;
+            _generalConfig.Value.DmEndDateDaysLTA = 72;
+            _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
+
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR" };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
 
             _taskInformationModel =
-                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, _taskDataHelper, generalConfigOptionsSnapshot)
+                new _TaskInformationModel(_dbContext, _onHoldCalculator, null, _taskDataHelper, generalConfigOptionsSnapshot, _dmEndDateCalculator)
                 { ProcessId = ProcessId };
         }
 
@@ -104,6 +110,61 @@ namespace Portal.UnitTests
             Assert.AreEqual("TestCode", _taskInformationModel.ActivityCode);
             Assert.AreEqual("123", _taskInformationModel.Ion);
             Assert.AreEqual("TestCategory", _taskInformationModel.SourceCategory);
+        }
+
+        [TestCase("Review", "Simple")]
+        [TestCase("Assess", "Simple")]
+        [TestCase("Verify", "Simple")]
+        [TestCase("Review", "LTA")]
+        [TestCase("Assess", "LTA")]
+        [TestCase("Verify", "LTA")]
+        public async Task Test_DmEndDate_is_set_when_calling_onGet(string activityName, string taskType)
+        {
+            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
+            {
+                ProcessId = ProcessId,
+                TaskType = taskType
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                TaskType = taskType
+            });
+
+            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
+            {
+                ProcessId = ProcessId,
+                TaskType = taskType
+            });
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance
+            {
+                ProcessId = 123,
+                ActivityName = activityName
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData
+            {
+                ProcessId = 123,
+                EffectiveStartDate = new DateTime(2020, 05, 01)
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _taskInformationModel.OnGetAsync(ProcessId, activityName);
+
+            if (taskType == "Simple" || activityName == "Review")
+            {
+                Assert.AreEqual(new DateTime(2020, 05, 15),
+                    _taskInformationModel.DmEndDate);
+            }
+            else if (taskType == "LTA")
+            {
+                Assert.AreEqual(new DateTime(2020, 07, 12),
+                    _taskInformationModel.DmEndDate);
+            }
+            
         }
     }
 }
