@@ -19,6 +19,57 @@
 
     });
 
+
+    $(".btn-stage-complete").click(function () {
+        var processId = $(this).data("processid");
+        var stageId = $(this).data("taskstageid");
+        var username = $(this).data("username");
+        $("#workflowSaveErrorMessage").html("");
+        
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=Complete",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "stageId": stageId,
+                "username" : username
+            },
+            complete: function () {
+                window.setTimeout(function () {
+                    //$("#modalWaitAssessDone").modal("hide");
+                    $("#btnClose").prop("disabled", false);
+                    $("#btnSave").prop("disabled", false);
+                }, 200);
+            },
+            success: function (result) {
+                formChanged = false;
+                var processId = $("#hdnProcessId").val();
+                window.location.href = "/workflow?ProcessId=" + processId;
+
+            },
+            error: function (error) {
+                var responseJson = error.responseJSON;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+
+            }
+        });
+
+
+    });
+
     $(".btnAddTaskcomment").click(function() {
         var processId = $(this).data("processid");
         $("#hdnTaskCommentProcessId").val(processId);

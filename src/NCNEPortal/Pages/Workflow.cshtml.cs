@@ -147,6 +147,7 @@ namespace NCNEPortal
             private set => _userFullName = value;
         }
 
+        [BindProperty]
         public List<TaskStage> TaskStages { get; set; }
 
         public WorkflowModel(NcneWorkflowDbContext dbContext,
@@ -407,11 +408,114 @@ namespace NCNEPortal
 
         }
 
-        //public async Task<IActionResult> OnPostToggle3PSAsync(bool status)
-        //{
-        //    SentTo3Ps = status;
-        //    return StatusCode(200);
-        //}
+        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username)
+        {
+            ValidationErrorMessages.Clear();
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            if (!(_pageValidationHelper.ValidateForCompletion(processId, stageId, username, UserFullName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+            var result = await CompleteStage(processId, stageId);
+
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        private async Task<bool> CompleteStage(int processId, int stageId)
+        {
+
+
+            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
+
+            var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
+
+            currentStage.Status = NcneTaskStageStatus.Completed.ToString();
+            currentStage.DateCompleted = DateTime.Now;
+
+
+            var nextStages = GetNextStage(currentStage.TaskStageTypeId);
+
+            if (nextStages.Count > 0)
+            {
+                foreach (var stage in nextStages)
+                {
+                    taskStages.First(t => t.TaskStageTypeId == stage).Status =
+                        NcneTaskStageStatus.InProgress.ToString();
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        private List<int> GetNextStage(int stageTypeId)
+        {
+            List<int> result = new List<int>();
+
+            switch ((NcneTaskStageType)stageTypeId)
+            {
+                case NcneTaskStageType.With_SDRA:
+                    result.Add((int)NcneTaskStageType.With_Geodesy);
+                    break;
+                case NcneTaskStageType.With_Geodesy:
+                    result.Add((int)NcneTaskStageType.Specification);
+                    break;
+                case NcneTaskStageType.Specification:
+                    result.Add((int)NcneTaskStageType.Compile);
+                    break;
+                case NcneTaskStageType.Compile:
+                    result.Add((int)NcneTaskStageType.V1);
+                    break;
+                case NcneTaskStageType.V1:
+                    result.Add((int)NcneTaskStageType.V2);
+                    break;
+                case NcneTaskStageType.V1_Rework:
+                    result.Add((int)NcneTaskStageType.V1);
+                    break;
+                case NcneTaskStageType.V2:
+                    result.Add((int)NcneTaskStageType.Final_Updating);
+                    break;
+                case NcneTaskStageType.V2_Rework:
+                    result.Add((int)NcneTaskStageType.V2);
+                    break;
+                case NcneTaskStageType.Forms:
+                    break;
+                case NcneTaskStageType.Final_Updating:
+                    result.Add((int)NcneTaskStageType.Hundred_Percent_Check);
+                    break;
+                case NcneTaskStageType.Hundred_Percent_Check:
+                    result.Add((int)NcneTaskStageType.Commit_To_Print);
+                    break;
+                case NcneTaskStageType.Commit_To_Print:
+                    result.Add((int)NcneTaskStageType.CIS);
+                    break;
+                case NcneTaskStageType.CIS:
+                    result.Add((int)NcneTaskStageType.Publication);
+                    result.Add((int)NcneTaskStageType.Publish_Chart);
+                    result.Add((int)NcneTaskStageType.Clear_Vector);
+                    result.Add((int)NcneTaskStageType.Retire_Old_Version);
+                    result.Add((int)NcneTaskStageType.Consider_Withdrawn_Charts);
+                    break;
+                case NcneTaskStageType.Publication:
+                    break;
+                case NcneTaskStageType.Publish_Chart:
+                    break;
+                case NcneTaskStageType.Clear_Vector:
+                    break;
+                case NcneTaskStageType.Retire_Old_Version:
+                    break;
+                case NcneTaskStageType.Consider_Withdrawn_Charts:
+                    break;
+            }
+
+            return result;
+        }
 
         public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {
