@@ -26,6 +26,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly ITaskDataHelper _taskDataHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IDmEndDateCalculator _dmEndDateCalculator;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
@@ -77,13 +78,15 @@ namespace Portal.Pages.DbAssessment
             IOnHoldCalculator onHoldCalculator,
             ICommentsHelper commentsHelper,
             ITaskDataHelper taskDataHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IDmEndDateCalculator dmEndDateCalculator)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _taskDataHelper = taskDataHelper;
             _generalConfig = generalConfig;
+            _dmEndDateCalculator = dmEndDateCalculator;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -118,12 +121,16 @@ namespace Portal.Pages.DbAssessment
             SourceCategory = taskData?.SourceCategory;
             TaskType = taskData?.TaskType;
             Teams = new SelectList(_generalConfig.Value.GetTeams());
-
+            
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
             {
                 EffectiveReceiptDate = assessmentData.ReceiptDate;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
+
+                DmEndDate = _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
+                                taskData.TaskType, activityName).dmEndDate;
+
             }
         }
 
