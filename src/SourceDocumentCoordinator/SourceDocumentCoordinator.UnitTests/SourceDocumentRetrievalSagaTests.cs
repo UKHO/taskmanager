@@ -252,7 +252,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_GetDocumentRequestQueueStatusCommand_When_Request_Queue_Succeeds_Does_Only_Fires_ClearDocumentRequestFromQueueCommand_and_PersistDocumentInStoreCommand(
+        public async Task Test_GetDocumentRequestQueueStatusCommand_When_Request_Queue_Succeeds_Then_Fires_ClearDocumentRequestFromQueueCommand_and_PersistDocumentInStoreCommand(
                         [Values(
                             RequestQueueStatusReturnCodeEnum.Success,
                             RequestQueueStatusReturnCodeEnum.NotGeoreferenced)]
