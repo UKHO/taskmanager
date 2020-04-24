@@ -36,7 +36,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task PopulateUsages()
         {
-            var usages = await _dbContext.HpdUsage.ToListAsync();
+            var usages = await _dbContext.HpdUsage.OrderBy(u => u.SortIndex).ToListAsync();
             Usages = new SelectList(usages, nameof(HpdUsage.HpdUsageId), nameof(HpdUsage.Name));
         }
 
