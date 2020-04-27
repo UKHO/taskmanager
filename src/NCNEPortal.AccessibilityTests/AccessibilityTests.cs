@@ -2,6 +2,7 @@ using System;
 using BoDi;
 using Common.TestAutomation.Framework;
 using Common.TestAutomation.Framework.Axe;
+using Common.TestAutomation.Framework.Logging;
 using NCNEPortal.TestAutomation.Framework;
 using NCNEPortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;
@@ -30,15 +31,23 @@ namespace NCNEPortal.AccessibilityTests
             _webDriverSupport?.DisposeWebdriver();
         }
 
+        [OneTimeSetUp]
+        public static void BeforeAllTests()
+        {
+            ConfigSupport.PopulateConfigsFromAzure();
+        }
+
         [SetUp]
         public void Setup()
         {
-            _configSupport.RegisterConfigs();
+            _objectContainer.RegisterTypeAs<NunitTestLogging, ITestLogging>();
+
+            _configSupport.RegisterAzureConfigs();
             _configSupport.RegisterLandingPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();
-            
+
             _axePageEvaluator = _objectContainer.Resolve<AxePageEvaluator>();
             _axeResultAnalyser = _objectContainer.Resolve<AxeResultAnalyser>();
         }

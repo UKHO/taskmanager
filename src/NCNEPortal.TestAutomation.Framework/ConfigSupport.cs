@@ -1,6 +1,7 @@
 ﻿using BoDi;
 using Common.Helpers;
 using Common.TestAutomation.Framework.Configs;
+using Common.TestAutomation.Framework.Logging;
 using Common.TestAutomation.Framework.Pages;
 using Microsoft.Extensions.Configuration;
 using NCNEPortal.TestAutomation.Framework.Configs;
@@ -12,6 +13,8 @@ namespace NCNEPortal.TestAutomation.Framework
     [Binding]
     public class ConfigSupport
     {
+        private static SecretsConfig _secrets;
+        private static UrlsConfig _urls;
         private readonly IObjectContainer _objectContainer;
 
         public ConfigSupport(IObjectContainer objectContainer)
@@ -19,20 +22,30 @@ namespace NCNEPortal.TestAutomation.Framework
             _objectContainer = objectContainer;
         }
 
-        [BeforeScenario(Order = 1)]
-        public void RegisterConfigs()
+        [BeforeTestRun(Order = 1)]
+        public static void PopulateConfigsFromAzure()
         {
             var appConfigRoot = AzureAppConfigConfigurationRoot.Instance;
             var keyVaultRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
 
-            var secrets = new SecretsConfig();
-            var urls = new UrlsConfig();
+            _secrets = new SecretsConfig();
+            _urls = new UrlsConfig();
 
-            appConfigRoot.GetSection("urls").Bind(urls);
-            keyVaultRoot.GetSection("NCNEPortalUITest").Bind(secrets);
+            appConfigRoot.GetSection("urls").Bind(_urls);
+            keyVaultRoot.GetSection("NCNEPortalUITest").Bind(_secrets);
+        }
 
-            _objectContainer.RegisterInstanceAs(secrets);
-            _objectContainer.RegisterInstanceAs(urls);
+        [BeforeScenario(Order = 1)]
+        public void RegisterAzureConfigs()
+        {
+            _objectContainer.RegisterInstanceAs(_secrets);
+            _objectContainer.RegisterInstanceAs(_urls);
+        }
+
+        [BeforeScenario(Order = 5)]
+        public void RegisterSpecFlowLogger()
+        {
+            _objectContainer.RegisterTypeAs<SpecFlowLogging, ITestLogging>();
         }
 
         [BeforeScenario(Order = 19)]

@@ -1,6 +1,7 @@
 ﻿using BoDi;
 using Common.Helpers;
 using Common.TestAutomation.Framework.Configs;
+using Common.TestAutomation.Framework.Logging;
 using Common.TestAutomation.Framework.Pages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +28,7 @@ namespace Portal.TestAutomation.Framework.Setup
         }
 
         [BeforeTestRun(Order = 1)]
-        public static void PopulateConfigs()
+        public static void PopulateConfigsFromAzure()
         {
             var appConfigRoot = AzureAppConfigConfigurationRoot.Instance;
             var keyVaultRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
@@ -75,6 +76,12 @@ namespace Portal.TestAutomation.Framework.Setup
             _objectContainer.RegisterInstanceAs(_urls);
             _objectContainer.RegisterInstanceAs(_dbConfig);
             _objectContainer.RegisterInstanceAs(_workflowDbContext);
+        }
+
+        [BeforeScenario(Order = 5)]
+        public void RegisterSpecFlowLogger()
+        {
+            _objectContainer.RegisterTypeAs<SpecFlowLogging, ITestLogging>();
         }
 
         [BeforeScenario(Order = 19)]

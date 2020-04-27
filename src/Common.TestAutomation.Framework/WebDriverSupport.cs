@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using BoDi;
+using Common.TestAutomation.Framework.Logging;
 using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -40,7 +41,7 @@ namespace Common.TestAutomation.Framework
 
             try
             {
-                var logger = _objectContainer.Resolve<Logging>();
+                var logger = _objectContainer.Resolve<ITestLogging>();
 
                 var eventDriver = new EventFiringWebDriver(new ChromeDriver(chromeDriverDirectory));
                 eventDriver.Navigating += (sender, e) => logger.Log($"    Navigating to {e.Url}");

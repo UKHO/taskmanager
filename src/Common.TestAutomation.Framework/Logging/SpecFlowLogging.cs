@@ -6,16 +6,17 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 
-namespace Common.TestAutomation.Framework
+namespace Common.TestAutomation.Framework.Logging
 {
     [Binding]
-    public class Logging
+    public class SpecFlowLogging : NunitTestLogging
     {
         private readonly FeatureContext _featureContext;
         private readonly IObjectContainer _objectContainer;
         private readonly ScenarioContext _scenarioContext;
 
-        public Logging(FeatureContext featureContext, ScenarioContext scenarioContext, IObjectContainer objectContainer)
+        public SpecFlowLogging(FeatureContext featureContext, ScenarioContext scenarioContext,
+            IObjectContainer objectContainer)
         {
             _featureContext = featureContext;
             _scenarioContext = scenarioContext;
@@ -43,9 +44,9 @@ namespace Common.TestAutomation.Framework
         }
 
         [AfterStep]
-        public void LogLineBreak()
+        public override void LogLineBreak()
         {
-            Log();
+            base.LogLineBreak();
         }
 
         [AfterScenario]
@@ -80,11 +81,6 @@ namespace Common.TestAutomation.Framework
                 screenShot.SaveAsFile(tempFilePath);
                 TestContext.AddTestAttachment(tempFilePath);
             }
-        }
-
-        public void Log(string message = "")
-        {
-            TestContext.Out.WriteLine(message);
         }
     }
 }
