@@ -19,6 +19,77 @@
 
     });
 
+
+    $(".btn-stage-complete").click(function () {
+        var processId = $(this).data("processid");
+        var stageId = $(this).data("taskstageid");
+        var username = $(this).data("username");
+        $("#workflowSaveErrorMessage").html("");
+        
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=ValidateComplete",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "stageId": stageId,
+                "username" : username
+            },
+
+            success: function (result) {
+                $("#hdnConfirmProcessId").val(processId);
+                $("#hdnConfirmStageId").val(stageId);
+                $("#hdnAssignedUser").val(username);
+                $("#ConfirmModal").modal("show");
+
+            },
+            error: function (error) {
+                var responseJson = error.responseJSON;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+
+            }
+        });
+
+
+    });
+
+    $("#btnConfirm").click(function() {
+        var processId = $("#hdnConfirmProcessId").val();
+        var stageId = $("#hdnConfirmStageId").val();
+        var username = $("#hdnAssignedUser").val();
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=Complete",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "stageId": stageId,
+                "username": username
+            },
+            success: function(result) {
+                formChanged = false;
+                window.location.href = "/workflow?ProcessId=" + processId;
+            }
+        });
+
+    });
+
     $(".btnAddTaskcomment").click(function() {
         var processId = $(this).data("processid");
         $("#hdnTaskCommentProcessId").val(processId);

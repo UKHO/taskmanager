@@ -40,6 +40,7 @@ namespace NCNEPortal
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly INcneUserDbService _ncneUserDbService;
         private readonly IAdDirectoryService _adDirectoryService;
+        private readonly IWorkflowStageHelper _workflowStageHelper;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] [BindProperty] public string Ion { get; set; }
@@ -147,6 +148,7 @@ namespace NCNEPortal
             private set => _userFullName = value;
         }
 
+        [BindProperty]
         public List<TaskStage> TaskStages { get; set; }
 
         public WorkflowModel(NcneWorkflowDbContext dbContext,
@@ -157,7 +159,8 @@ namespace NCNEPortal
             IMilestoneCalculator milestoneCalculator,
             IPageValidationHelper pageValidationHelper,
             INcneUserDbService ncneUserDbService,
-            IAdDirectoryService adDirectoryService)
+            IAdDirectoryService adDirectoryService,
+            IWorkflowStageHelper workflowStageHelper)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -168,6 +171,7 @@ namespace NCNEPortal
             _pageValidationHelper = pageValidationHelper;
             _ncneUserDbService = ncneUserDbService;
             _adDirectoryService = adDirectoryService;
+            _workflowStageHelper = workflowStageHelper;
 
             ValidationErrorMessages = new List<string>();
             userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
@@ -407,11 +411,57 @@ namespace NCNEPortal
 
         }
 
-        //public async Task<IActionResult> OnPostToggle3PSAsync(bool status)
-        //{
-        //    SentTo3Ps = status;
-        //    return StatusCode(200);
-        //}
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username)
+        {
+            ValidationErrorMessages.Clear();
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username)
+        {
+            var result = await CompleteStage(processId, stageId);
+
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        private async Task<bool> CompleteStage(int processId, int stageId)
+        {
+
+
+            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
+
+            var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
+
+            currentStage.Status = NcneTaskStageStatus.Completed.ToString();
+            currentStage.DateCompleted = DateTime.Now;
+
+
+            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId);
+
+            if (nextStages.Count > 0)
+            {
+                foreach (var stage in nextStages)
+                {
+                    taskStages.First(t => t.TaskStageTypeId == (int)stage).Status =
+                        NcneTaskStageStatus.InProgress.ToString();
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
 
         public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {

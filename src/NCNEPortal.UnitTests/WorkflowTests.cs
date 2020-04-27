@@ -32,6 +32,7 @@ namespace NCNEPortal.UnitTests
         private IOptions<GeneralConfig> _fakeGeneralConfig;
         private IAdDirectoryService _fakeAdDirectoryService;
         private INcneUserDbService _fakeNcneUserDbService;
+        private IWorkflowStageHelper _fakeWorkflowStageHelper;
 
         [SetUp]
         public void Setup()
@@ -50,10 +51,11 @@ namespace NCNEPortal.UnitTests
             _fakeGeneralConfig = A.Fake<IOptions<GeneralConfig>>();
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
+            _fakeWorkflowStageHelper = A.Fake<IWorkflowStageHelper>();
 
             _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
                 _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
-                _fakeAdDirectoryService);
+                _fakeAdDirectoryService, _fakeWorkflowStageHelper);
         }
 
 
@@ -74,7 +76,7 @@ namespace NCNEPortal.UnitTests
 
             _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
                 _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
-                _fakeAdDirectoryService);
+                _fakeAdDirectoryService, _fakeWorkflowStageHelper);
 
             Assert.That(_workflowModel.userList, Is.EqualTo(new[] { "user 1", "user 2" }));
         }

@@ -459,5 +459,20 @@ namespace NCNEPortal.UnitTests
             Assert.IsEmpty(validationErrorMessages);
         }
 
+        [TestCase("", "Valid User", "Please assign a user to this stage before completion")]
+        [TestCase("InValidUser", "Valid User", "Current user is not valid for completion of this task stage")]
+        public void Validation_for_ValidateForCompletion_with_invalid_data_fails(string assignedUser, string CurrentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, CurrentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
+        }
+
     }
 }

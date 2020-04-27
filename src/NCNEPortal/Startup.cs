@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
@@ -22,6 +19,9 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace NCNEPortal
@@ -95,6 +95,7 @@ namespace NCNEPortal
             services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
             services.AddScoped<IPageValidationHelper, PageValidationHelper>();
             services.AddScoped<IStageTypeFactory, StageTypeFactory>();
+            services.AddScoped<IWorkflowStageHelper, WorkflowStageHelper>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
