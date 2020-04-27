@@ -40,12 +40,10 @@ namespace Portal.Pages.DbAssessment
         public DateTime DmReceiptDate { get; set; }
 
         [DisplayName("Effective Receipt Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime EffectiveReceiptDate { get; set; }
+        public string EffectiveReceiptDate { get; set; }
 
         [DisplayName("External End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime ExternalEndDate { get; set; }
+        public string ExternalEndDate { get; set; }
 
         public bool IsOnHold { get; set; }
         public bool OnHoldDaysGreen { get; set; }
@@ -111,8 +109,12 @@ namespace Portal.Pages.DbAssessment
             OnHoldDaysAmber = amberIcon;
             OnHoldDaysRed = redIcon;
 
-            var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
+            var workflowInstanceRow = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId);
 
+            var activityName = workflowInstanceRow.ActivityName;
+
+            DmReceiptDate = workflowInstanceRow.StartedAt;
+            
             var taskData = await _taskDataHelper.GetTaskData(activityName, ProcessId);
 
             ActivityCode = taskData?.ActivityCode;
@@ -124,13 +126,14 @@ namespace Portal.Pages.DbAssessment
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
             {
-                EffectiveReceiptDate = assessmentData.ReceiptDate;
+                EffectiveReceiptDate = assessmentData.EffectiveStartDate != null ? assessmentData.EffectiveStartDate.Value.ToShortDateString() : "N/A" ;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
 
                 DmEndDate = taskData != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
                                 taskData.TaskType, activityName).dmEndDate.ToShortDateString() : "N/A";
 
-                ExternalEndDate = EffectiveReceiptDate.AddDays(_generalConfig.Value.ExternalEndDateDays);
+                ExternalEndDate = assessmentData.EffectiveStartDate != null ?
+                                    assessmentData.EffectiveStartDate.Value.AddDays(_generalConfig.Value.ExternalEndDateDays).ToShortDateString() : "N/A";
 
             }
         }
