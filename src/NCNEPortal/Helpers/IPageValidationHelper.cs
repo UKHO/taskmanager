@@ -18,7 +18,7 @@ namespace NCNEPortal.Helpers
         public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType,
             List<string> validationErrorMessages);
 
-        public bool ValidateForCompletion(int processId, int stageId, string assignedUser, string userName,
+        public bool ValidateForCompletion(string assignedUser, string userName,
             List<string> validationErrorMessages);
     }
 }

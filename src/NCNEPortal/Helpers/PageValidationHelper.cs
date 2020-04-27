@@ -60,10 +60,11 @@ namespace NCNEPortal.Helpers
 
         }
 
-        public bool ValidateForCompletion(int processId, int stageId, string assignedUser, string username,
+        public bool ValidateForCompletion(string assignedUser, string username,
             List<string> validationErrorMessages)
         {
             bool isValid = true;
+
 
             if (string.IsNullOrEmpty(assignedUser))
             {

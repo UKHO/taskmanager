@@ -40,6 +40,7 @@ namespace NCNEPortal
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly INcneUserDbService _ncneUserDbService;
         private readonly IAdDirectoryService _adDirectoryService;
+        private readonly IWorkflowStageHelper _workflowStageHelper;
         public int ProcessId { get; set; }
 
         [DisplayName("ION")] [BindProperty] public string Ion { get; set; }
@@ -158,7 +159,8 @@ namespace NCNEPortal
             IMilestoneCalculator milestoneCalculator,
             IPageValidationHelper pageValidationHelper,
             INcneUserDbService ncneUserDbService,
-            IAdDirectoryService adDirectoryService)
+            IAdDirectoryService adDirectoryService,
+            IWorkflowStageHelper workflowStageHelper)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -169,6 +171,7 @@ namespace NCNEPortal
             _pageValidationHelper = pageValidationHelper;
             _ncneUserDbService = ncneUserDbService;
             _adDirectoryService = adDirectoryService;
+            _workflowStageHelper = workflowStageHelper;
 
             ValidationErrorMessages = new List<string>();
             userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
@@ -413,7 +416,7 @@ namespace NCNEPortal
             ValidationErrorMessages.Clear();
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(processId, stageId, username, UserFullName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -443,13 +446,13 @@ namespace NCNEPortal
             currentStage.DateCompleted = DateTime.Now;
 
 
-            var nextStages = GetNextStage(currentStage.TaskStageTypeId);
+            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType) currentStage.TaskStageTypeId);
 
             if (nextStages.Count > 0)
             {
                 foreach (var stage in nextStages)
                 {
-                    taskStages.First(t => t.TaskStageTypeId == stage).Status =
+                    taskStages.First(t => t.TaskStageTypeId == (int)stage).Status =
                         NcneTaskStageStatus.InProgress.ToString();
                 }
             }
