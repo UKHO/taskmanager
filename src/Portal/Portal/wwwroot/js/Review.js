@@ -31,11 +31,7 @@
         });
 
         $("#txtTerminateComment").keydown(function (e) {
-            if (e.keyCode !== 13) {
-                $("#ConfirmTerminateError").html("");
-                return;
-            }
-            $("#btnConfirmTerminate").trigger("click");
+            $("#ConfirmTerminateError").html("");
         });
 
         $("#btnConfirmTerminate").on("click", function () {
