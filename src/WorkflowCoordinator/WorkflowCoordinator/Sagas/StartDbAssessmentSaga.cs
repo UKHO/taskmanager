@@ -163,8 +163,9 @@ namespace WorkflowCoordinator.Sagas
                 SerialNumber = serialNumber,
                 ActivityName = WorkflowConstants.ActivityName,
                 Status = status.ToString(),
-                StartedAt = DateTime.Now
-            };
+                StartedAt = DateTime.Now,
+                StatusChangedAt = DateTime.Today
+        };
 
             await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
             await _dbContext.SaveChangesAsync();

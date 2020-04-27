@@ -92,8 +92,9 @@ namespace WorkflowCoordinator.Handlers
                     ParentProcessId = command.ParentProcessId,
                     SerialNumber = newSn,
                     StartedAt = DateTime.Today,
-                    Status = WorkflowStatus.Started.ToString()
-                };
+                    Status = WorkflowStatus.Started.ToString(),
+                    StatusChangedAt = DateTime.Today
+            };
 
                 await _dbContext.WorkflowInstance.AddAsync(newWorkflowInstance);
 
