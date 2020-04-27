@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -116,37 +117,14 @@ namespace Portal.UnitTests
         [TestCase("Verify", "LTA")]
         public async Task Test_DmEndDate_is_set_when_calling_onGet(string activityName, string taskType)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = taskType
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = taskType
-            });
+            _dbContext.DbAssessmentReviewData.First(ad => ad.ProcessId == ProcessId).TaskType = taskType;
+            _dbContext.DbAssessmentAssessData.First(ad => ad.ProcessId == ProcessId).TaskType = taskType;
+            _dbContext.DbAssessmentVerifyData.First(ad => ad.ProcessId == ProcessId).TaskType = taskType;
 
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = taskType
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                EffectiveStartDate = new DateTime(2020, 05, 01)
-            });
-
-            await _dbContext.SaveChangesAsync();
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).EffectiveStartDate =
+                new DateTime(2020, 05, 01);
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
@@ -168,36 +146,12 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_ExternalEndDate_is_set_when_calling_onGet(string activityName)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).EffectiveStartDate =
+                new DateTime(2020, 05, 01);
 
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                EffectiveStartDate = new DateTime(2020, 05, 01),
-                ReceiptDate = new DateTime(2020, 05, 01)
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
 
             await _dbContext.SaveChangesAsync();
 
@@ -212,37 +166,12 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_DmReceiptDate_is_set_when_calling_onGet(string activityName)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).EffectiveStartDate =
+                new DateTime(2020, 05, 01);
 
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName,
-                StartedAt = new DateTime(2020, 01, 01)
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                EffectiveStartDate = new DateTime(2020, 05, 01),
-                ReceiptDate = new DateTime(2020, 05, 01)
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
 
             await _dbContext.SaveChangesAsync();
 
@@ -257,37 +186,12 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_EffectiveReceiptDate_is_set_when_calling_onGet(string activityName)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).EffectiveStartDate =
+                new DateTime(2020, 05, 01);
 
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName,
-                StartedAt = new DateTime(2020, 01, 01)
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                EffectiveStartDate = new DateTime(2020, 05, 01),
-                ReceiptDate = new DateTime(2020, 05, 01)
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
 
             await _dbContext.SaveChangesAsync();
 
@@ -302,36 +206,9 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_EffectiveReceiptDate_is_set_to_NA_when_calling_onGet_with_no_EffectiveStartDate(string activityName)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName,
-                StartedAt = new DateTime(2020, 01, 01)
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                ReceiptDate = new DateTime(2020, 05, 01)
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
 
             await _dbContext.SaveChangesAsync();
 
@@ -346,36 +223,9 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_DmEndDate_is_set_to_NA_when_calling_onGet_with_no_EffectiveStartDate(string activityName)
         {
-            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
+            await SetupSupportingTestData(activityName);
 
-            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
-            {
-                ProcessId = ProcessId,
-                TaskType = "Simple"
-            });
-
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance
-            {
-                ProcessId = 123,
-                ActivityName = activityName,
-                StartedAt = new DateTime(2020, 01, 01)
-            });
-
-            _dbContext.AssessmentData.Add(new AssessmentData
-            {
-                ProcessId = 123,
-                ReceiptDate = new DateTime(2020, 05, 01)
-            });
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
 
             await _dbContext.SaveChangesAsync();
 
@@ -391,7 +241,7 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_DmEndDate_is_set_to_NA_when_calling_onGet_with_no_TaskData(string activityName)
         {
-           _dbContext.WorkflowInstance.Add(new WorkflowInstance
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
                 ProcessId = 123,
                 ActivityName = activityName,
@@ -445,6 +295,20 @@ namespace Portal.UnitTests
         [TestCase("Verify")]
         public async Task Test_ExternalEndDate_is_set_to_NA_when_calling_onGet_with_no_EffectiveStartDate(string activityName)
         {
+            await SetupSupportingTestData(activityName);
+            
+            _dbContext.AssessmentData.First(ad => ad.ProcessId == ProcessId).ReceiptDate = new DateTime(2020, 05, 01);
+
+            await _dbContext.SaveChangesAsync();
+
+            await _taskInformationModel.OnGetAsync(ProcessId, activityName);
+
+            Assert.AreEqual("N/A",
+                _taskInformationModel.ExternalEndDate);
+        }
+
+        private async Task SetupSupportingTestData(string activityName)
+        {
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
                 ProcessId = ProcessId,
@@ -472,17 +336,10 @@ namespace Portal.UnitTests
 
             _dbContext.AssessmentData.Add(new AssessmentData
             {
-                ProcessId = 123,
-                ReceiptDate = new DateTime(2020, 05, 01)
+                ProcessId = 123
             });
 
             await _dbContext.SaveChangesAsync();
-
-            await _taskInformationModel.OnGetAsync(ProcessId, activityName);
-
-            Assert.AreEqual("N/A",
-                _taskInformationModel.ExternalEndDate);
         }
-
     }
 }
