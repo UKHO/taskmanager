@@ -19,7 +19,6 @@ namespace Portal.UnitTests
         private _TaskInformationModel _taskInformationModel;
         private ITaskDataHelper _taskDataHelper;
         private IOnHoldCalculator _onHoldCalculator;
-        private IOptionsSnapshot<GeneralConfig> _generalConfig;
         private IDmEndDateCalculator _dmEndDateCalculator;
 
         private int ProcessId { get; set; }
@@ -27,8 +26,6 @@ namespace Portal.UnitTests
         [SetUp]
         public void Setup()
         {
-            _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
@@ -39,19 +36,16 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChangesAsync();
 
-            _onHoldCalculator = new OnHoldCalculator(_generalConfig);
             _taskDataHelper = new TaskDataHelper(_dbContext);
 
-            _generalConfig.Value.DmEndDateDaysSimple = 14;
-            _generalConfig.Value.DmEndDateDaysLTA = 72;
-            _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
-
-            _generalConfig.Value.ExternalEndDateDays = 20;
-
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR" };
+
+            var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR", ExternalEndDateDays = 20, DmEndDateDaysSimple = 14, DmEndDateDaysLTA = 72 };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
+            _dmEndDateCalculator = new DmEndDateCalculator(generalConfigOptionsSnapshot);
+
+            _onHoldCalculator = new OnHoldCalculator(generalConfigOptionsSnapshot);
 
             _taskInformationModel =
                 new _TaskInformationModel(_dbContext, _onHoldCalculator, null, _taskDataHelper, generalConfigOptionsSnapshot, _dmEndDateCalculator)
