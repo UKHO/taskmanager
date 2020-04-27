@@ -46,6 +46,8 @@ namespace Portal.UnitTests
             _generalConfig.Value.DmEndDateDaysLTA = 72;
             _dmEndDateCalculator = new DmEndDateCalculator(_generalConfig);
 
+            _generalConfig.Value.ExternalEndDateDays = 20;
+
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR" };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
@@ -165,6 +167,50 @@ namespace Portal.UnitTests
                     _taskInformationModel.DmEndDate);
             }
             
+        }
+
+        [TestCase("Review")]
+        [TestCase("Assess")]
+        [TestCase("Verify")]
+        public async Task Test_ExternalEndDate_is_set_when_calling_onGet(string activityName)
+        {
+            _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
+            {
+                ProcessId = ProcessId,
+                TaskType = "Simple"
+            });
+
+            _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                TaskType = "Simple"
+            });
+
+            _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
+            {
+                ProcessId = ProcessId,
+                TaskType = "Simple"
+            });
+
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance
+            {
+                ProcessId = 123,
+                ActivityName = activityName
+            });
+
+            _dbContext.AssessmentData.Add(new AssessmentData
+            {
+                ProcessId = 123,
+                EffectiveStartDate = new DateTime(2020, 05, 01),
+                ReceiptDate = new DateTime(2020, 05, 01)
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _taskInformationModel.OnGetAsync(ProcessId, activityName);
+
+            Assert.AreEqual(new DateTime(2020, 05, 21),
+                    _taskInformationModel.ExternalEndDate);
         }
     }
 }

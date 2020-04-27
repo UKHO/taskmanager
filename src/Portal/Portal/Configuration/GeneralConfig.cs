@@ -25,6 +25,7 @@ namespace Portal.Configuration
         public string SourceDocumentWriteableFolderName { get; set; }
         public int UsagesSelectionPageLength { get; set; }
         public int SourcesSelectionPageLength { get; set; }
+        public int ExternalEndDateDays { get; set; }
 
         public string TeamsAsCsv { get; set; }
         public string TeamsUnassigned { get; set; }

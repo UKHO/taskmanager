@@ -129,7 +129,9 @@ namespace Portal.Pages.DbAssessment
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
 
                 DmEndDate = _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
-                                taskData.TaskType, activityName).dmEndDate;
+                                taskData.TaskType, activityName).dmEndDate; //TODO: Check nullability of TaskType.
+
+                ExternalEndDate = EffectiveReceiptDate.AddDays(_generalConfig.Value.ExternalEndDateDays);
 
             }
         }
