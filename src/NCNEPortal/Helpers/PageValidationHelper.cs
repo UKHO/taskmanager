@@ -60,7 +60,7 @@ namespace NCNEPortal.Helpers
 
         }
 
-        public bool ValidateForCompletion(string assignedUser, string username,
+        public bool ValidateForCompletion(string assignedUser, string username, NcneTaskStageType stageType,
             List<string> validationErrorMessages)
         {
             bool isValid = true;
@@ -74,7 +74,7 @@ namespace NCNEPortal.Helpers
             }
             else
             {
-                if (assignedUser != username)
+                if ((stageType!=NcneTaskStageType.Forms)&& (assignedUser != username))
                 {
                     validationErrorMessages.Add("Current user is not valid for completion of this task stage");
                     isValid = false;

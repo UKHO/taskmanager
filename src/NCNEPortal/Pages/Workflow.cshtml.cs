@@ -411,12 +411,12 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username)
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, (NcneTaskStageType) stageTypeId, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

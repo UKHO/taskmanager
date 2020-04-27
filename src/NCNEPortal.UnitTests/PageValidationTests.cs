@@ -2,6 +2,7 @@
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NCNEPortal.Auth;
+using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
@@ -459,20 +460,79 @@ namespace NCNEPortal.UnitTests
             Assert.IsEmpty(validationErrorMessages);
         }
 
-        [TestCase("", "Valid User", "Please assign a user to this stage before completion")]
-        [TestCase("InValidUser", "Valid User", "Current user is not valid for completion of this task stage")]
-        public void Validation_for_ValidateForCompletion_with_invalid_data_fails(string assignedUser, string CurrentUser, string errorMessage)
+        [TestCase("", "Valid User1", NcneTaskStageType.With_SDRA)]
+        [TestCase("", "Valid User1", NcneTaskStageType.With_Geodesy)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Specification)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V1)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V1_Rework)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V2)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V2_Rework)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Forms)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Final_Updating)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Commit_To_Print)]
+        [TestCase("", "Valid User1", NcneTaskStageType.CIS)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Publication)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Publish_Chart)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Clear_Vector)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Retire_Old_Version)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Consider_Withdrawn_Charts)]
+        public void Validation_for_ValidateForCompletion_with_empty_user_fails(string assignedUser, string currentUser, NcneTaskStageType stageType)
         {
             var validationErrorMessages = new List<string>();
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, CurrentUser, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, validationErrorMessages);
 
             Assert.IsFalse(result);
             Assert.AreEqual(validationErrorMessages.Count, 1);
-            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage before completion");
+
+        }
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.With_SDRA)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.With_Geodesy)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Specification)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.V1)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.V1_Rework)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.V2)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.V2_Rework)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Final_Updating)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Commit_To_Print)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.CIS)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Publication)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Publish_Chart)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Clear_Vector)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Retire_Old_Version)]
+        [TestCase("Valid User2", "Valid User1", NcneTaskStageType.Consider_Withdrawn_Charts)]
+        public void Validation_for_ValidateForCompletion_with_wrong_user_fails_for_all_stages_other_than_forms(string assignedUser, string currentUser, NcneTaskStageType stageType)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
 
         }
 
+        [Test]
+        public void Validation_for_ValidateForCompletion_for_Forms_Stage_allows_any_user_to_Complete()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var currentStageType = NcneTaskStageType.Forms;
+
+            var assignedUser = "Valid User";
+            var currentUser = "Another User";
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, validationErrorMessages);
+
+            Assert.IsTrue(result);
+
+        }
     }
 }

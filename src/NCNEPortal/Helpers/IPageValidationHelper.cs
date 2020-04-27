@@ -1,6 +1,7 @@
 ﻿using NCNEWorkflowDatabase.EF.Models;
 using System;
 using System.Collections.Generic;
+using NCNEPortal.Enums;
 
 namespace NCNEPortal.Helpers
 {
@@ -18,7 +19,7 @@ namespace NCNEPortal.Helpers
         public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType,
             List<string> validationErrorMessages);
 
-        public bool ValidateForCompletion(string assignedUser, string userName,
+        public bool ValidateForCompletion(string assignedUser, string userName, NcneTaskStageType stageType,
             List<string> validationErrorMessages);
     }
 }
