@@ -12,6 +12,7 @@ namespace WorkflowDatabase.EF.Models
         public string ActivityName { get; set; }
         public DateTime StartedAt { get; set; }
         public string Status { get; set; }
+        public DateTime StatusChangedAt { get; set; }   
 
         public virtual List<Comment> Comments { get; set; }
         public virtual AssessmentData AssessmentData { get; set; }

@@ -7,5 +7,6 @@
     [ActivityName] NVARCHAR(50) NOT NULL,
 	[StartedAt] DATETIME NOT NULL, 
     [Status] NVARCHAR(25) NOT NULL, 
+    [StatusChangedAt] DATE NOT NULL, 
     CONSTRAINT [AK_WorkflowInstance_ProcessId] UNIQUE ([ProcessId])
 )
