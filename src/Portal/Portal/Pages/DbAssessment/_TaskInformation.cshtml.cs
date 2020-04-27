@@ -129,7 +129,7 @@ namespace Portal.Pages.DbAssessment
                 EffectiveReceiptDate = assessmentData.EffectiveStartDate != null ? assessmentData.EffectiveStartDate.Value.ToShortDateString() : "N/A" ;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
 
-                DmEndDate = taskData != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
+                DmEndDate = taskData != null && assessmentData.EffectiveStartDate != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
                                 taskData.TaskType, activityName).dmEndDate.ToShortDateString() : "N/A";
 
                 ExternalEndDate = assessmentData.EffectiveStartDate != null ?
