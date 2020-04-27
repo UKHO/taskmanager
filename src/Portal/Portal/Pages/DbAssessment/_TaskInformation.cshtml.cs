@@ -33,8 +33,7 @@ namespace Portal.Pages.DbAssessment
         public int ProcessId { get; set; }
 
         [DisplayName("DM End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime DmEndDate { get; set; }
+        public string DmEndDate { get; set; }
 
         [DisplayName("DM Receipt Date:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -128,8 +127,8 @@ namespace Portal.Pages.DbAssessment
                 EffectiveReceiptDate = assessmentData.ReceiptDate;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
 
-                DmEndDate = _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
-                                taskData.TaskType, activityName).dmEndDate; //TODO: Check nullability of TaskType.
+                DmEndDate = taskData != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
+                                taskData.TaskType, activityName).dmEndDate.ToShortDateString() : "N/A";
 
                 ExternalEndDate = EffectiveReceiptDate.AddDays(_generalConfig.Value.ExternalEndDateDays);
 

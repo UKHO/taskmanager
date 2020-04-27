@@ -152,12 +152,12 @@ namespace Portal.UnitTests
 
             if (taskType == "Simple" || activityName == "Review")
             {
-                Assert.AreEqual(new DateTime(2020, 05, 15),
+                Assert.AreEqual(new DateTime(2020, 05, 15).ToShortDateString(),
                     _taskInformationModel.DmEndDate);
             }
             else if (taskType == "LTA")
             {
-                Assert.AreEqual(new DateTime(2020, 07, 12),
+                Assert.AreEqual(new DateTime(2020, 07, 12).ToShortDateString(),
                     _taskInformationModel.DmEndDate);
             }
             
