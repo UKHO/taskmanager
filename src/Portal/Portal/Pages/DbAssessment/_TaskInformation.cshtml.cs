@@ -26,26 +26,24 @@ namespace Portal.Pages.DbAssessment
         private readonly ICommentsHelper _commentsHelper;
         private readonly ITaskDataHelper _taskDataHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IDmEndDateCalculator _dmEndDateCalculator;
 
         [BindProperty(SupportsGet = true)]
         [DisplayName("Process ID:")]
         public int ProcessId { get; set; }
 
         [DisplayName("DM End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime DmEndDate { get; set; }
+        public string DmEndDate { get; set; }
 
         [DisplayName("DM Receipt Date:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime DmReceiptDate { get; set; }
 
         [DisplayName("Effective Receipt Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime EffectiveReceiptDate { get; set; }
+        public string EffectiveReceiptDate { get; set; }
 
         [DisplayName("External End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime ExternalEndDate { get; set; }
+        public string ExternalEndDate { get; set; }
 
         public bool IsOnHold { get; set; }
         public bool OnHoldDaysGreen { get; set; }
@@ -77,13 +75,15 @@ namespace Portal.Pages.DbAssessment
             IOnHoldCalculator onHoldCalculator,
             ICommentsHelper commentsHelper,
             ITaskDataHelper taskDataHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IDmEndDateCalculator dmEndDateCalculator)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
             _commentsHelper = commentsHelper;
             _taskDataHelper = taskDataHelper;
             _generalConfig = generalConfig;
+            _dmEndDateCalculator = dmEndDateCalculator;
         }
 
         public async Task OnGetAsync(int processId, string taskStage)
@@ -109,8 +109,12 @@ namespace Portal.Pages.DbAssessment
             OnHoldDaysAmber = amberIcon;
             OnHoldDaysRed = redIcon;
 
-            var activityName = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId).ActivityName;
+            var workflowInstanceRow = _dbContext.WorkflowInstance.First(wi => wi.ProcessId == ProcessId);
 
+            var activityName = workflowInstanceRow.ActivityName;
+
+            DmReceiptDate = workflowInstanceRow.StartedAt;
+            
             var taskData = await _taskDataHelper.GetTaskData(activityName, ProcessId);
 
             ActivityCode = taskData?.ActivityCode;
@@ -118,12 +122,19 @@ namespace Portal.Pages.DbAssessment
             SourceCategory = taskData?.SourceCategory;
             TaskType = taskData?.TaskType;
             Teams = new SelectList(_generalConfig.Value.GetTeams());
-
+            
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
             {
-                EffectiveReceiptDate = assessmentData.ReceiptDate;
+                EffectiveReceiptDate = assessmentData.EffectiveStartDate != null ? assessmentData.EffectiveStartDate.Value.ToShortDateString() : "N/A" ;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
+
+                DmEndDate = taskData != null && assessmentData.EffectiveStartDate != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
+                                taskData.TaskType, activityName).dmEndDate.ToShortDateString() : "N/A";
+
+                ExternalEndDate = assessmentData.EffectiveStartDate != null ?
+                                    assessmentData.EffectiveStartDate.Value.AddDays(_generalConfig.Value.ExternalEndDateDays).ToShortDateString() : "N/A";
+
             }
         }
 
