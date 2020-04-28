@@ -355,7 +355,7 @@ namespace WorkflowCoordinator.UnitTests
         [TestCase("Assess", "Verify", "Verify")]
         [TestCase("Verify", "Completed", "")]
         [TestCase("Verify", "Assess", "Assess")]
-        public async Task Test_Handle_when_status_changes_from_Review_To_Assess_Then_WorkflowInstance_StatusChangedAt_Is_Updated(string fromAction, string toAction, string k2ActivityName)
+        public async Task Test_Handle_when_status_changes_Then_WorkflowInstance_StatusChangedAt_Is_Updated(string fromAction, string toAction, string k2ActivityName)
         {
             //Given
             var fromActivity = Enum.Parse<WorkflowStage>(fromAction);
