@@ -30,7 +30,7 @@
       ]
     },
     {
-      "library": "datatables@1.10.19",
+      "library": "datatables@1.10.20",
       "destination": "wwwroot/lib/datatables/",
       "files": [
         "js/dataTables.bootstrap.js",
@@ -67,7 +67,7 @@
       ]
     },
     {
-      "library": "font-awesome@5.10.2",
+      "library": "font-awesome@5.13.0",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
         "css/all.min.css",
@@ -91,7 +91,7 @@
     },
     {
       "provider": "unpkg",
-      "library": "bootstrap@4.3.1",
+      "library": "bootstrap@4.4.1",
       "destination": "wwwroot/lib/bootstrap4/",
       "files": [
         "dist/css/bootstrap-grid.css",
@@ -117,7 +117,7 @@
       ]
     },
     {
-      "library": "popper.js@1.15.0",
+      "library": "popper.js@1.16.1",
       "destination": "wwwroot/lib/popper.js/",
       "files": [
         "umd/popper.js",
