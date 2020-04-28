@@ -94,7 +94,7 @@ namespace WorkflowCoordinator.Handlers
                     StartedAt = DateTime.Today,
                     Status = WorkflowStatus.Started.ToString(),
                     StatusChangedAt = DateTime.Today
-            };
+                };
 
                 await _dbContext.WorkflowInstance.AddAsync(newWorkflowInstance);
 
@@ -115,7 +115,7 @@ namespace WorkflowCoordinator.Handlers
                                                     reviewData, additionalAssignedTaskData);
 
             await CopyAdditionalAssignTaskNoteToComments(
-                                                            command.ParentProcessId, 
+                                                            command.ParentProcessId,
                                                             command.ChildProcessId,
                                                             additionalAssignedTaskData.Notes,
                                                             newWorkflowInstance.WorkflowInstanceId,
@@ -135,7 +135,7 @@ namespace WorkflowCoordinator.Handlers
             if (!string.IsNullOrEmpty(assignTaskNote))
             {
                 if (!await _dbContext.Comment.AnyAsync(c =>
-                                                                        c.ProcessId == childProcessId 
+                                                                        c.ProcessId == childProcessId
                                                                         && c.Text.StartsWith("Assign Task:")))
                 {
                     await _dbContext.Comment.AddAsync(new Comment()
@@ -152,11 +152,11 @@ namespace WorkflowCoordinator.Handlers
 
         private async Task PersistChildWorkflowDataToAssess(
                                                         int childProcessId,
-                                                        int  newWorkflowInstanceId,
+                                                        int newWorkflowInstanceId,
                                                         DbAssessmentReviewData reviewData,
                                                         DbAssessmentAssignTask additionalAssignedTaskData)
         {
-            if (! await _dbContext.DbAssessmentAssessData.AnyAsync(d => d.ProcessId == childProcessId))
+            if (!await _dbContext.DbAssessmentAssessData.AnyAsync(d => d.ProcessId == childProcessId))
             {
                 await _dbContext.DbAssessmentAssessData.AddAsync(new DbAssessmentAssessData
                 {
