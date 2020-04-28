@@ -272,7 +272,6 @@ namespace Portal.Pages.DbAssessment
             else
             {
                 workflowInstance.Status = WorkflowStatus.Started.ToString();
-                workflowInstance.StatusChangedAt = DateTime.Today;
                 await _dbContext.SaveChangesAsync();
 
                 _logger.LogInformation("Unable to progress task {ProcessId} from Assess to Verify.");
