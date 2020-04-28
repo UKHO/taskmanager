@@ -31,11 +31,7 @@
         });
 
         $("#txtTerminateComment").keydown(function (e) {
-            if (e.keyCode !== 13) {
-                $("#ConfirmTerminateError").html("");
-                return;
-            }
-            $("#btnConfirmTerminate").trigger("click");
+            $("#ConfirmTerminateError").html("");
         });
 
         $("#btnConfirmTerminate").on("click", function () {
@@ -132,57 +128,64 @@
 
         $("#reviewTerminateErrorMessage").html("");
 
-        //Hide ConfirmTerminate modal and show modalWaitReviewTerminate modal
+        //anonymous function to allow chaining for modal show/hide
+        var reviewTerminateAjax = function () {
+            $.ajax({
+                type: "POST",
+                url: "Review/?handler=ReviewTerminate",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: formData,
+                complete: function () {
+                    console.log("terminate complete");
+
+                },
+                success: function (result) {
+                    console.log("terminate success");
+                    formChanged = false;
+
+                    window.location.replace("/Index");
+                },
+                error: function (error) {
+                    console.log("terminate error");
+                    $("#btnConfirmTerminate").prop("disabled", false);
+                    $("#btnCancelTerminate").prop("disabled", false);
+
+                    var responseJson = error.responseJSON;
+                    var statusCode = error.status;
+
+                    $("#reviewTerminateErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#reviewTerminateErrorMessage ul");
+
+                    if (responseJson == null) {
+                        unOrderedList.append("<li>System error. Please try again later</li>");
+                    } else if (statusCode === customHttpStatusCodes.FailuresDetected) {
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+                    } else {
+                        unOrderedList.append("<li>" + responseJson + "</li>");
+                    }
+
+                    //Hide modalWaitReviewTerminate modal and show modalWaitReviewTerminateErrors modal
+                    $("#modalWaitReviewTerminate").one("hidden.bs.modal", function () {
+                        $("#modalWaitReviewTerminateErrors").modal("show");
+                    });
+                    $("#modalWaitReviewTerminate").modal("hide");
+                }
+            });
+        }
+
+        //Hide ConfirmTerminate modal and show modalWaitReviewTerminate modal,
+        //when modalWaitReviewTerminate modal shows, initiate AJAX
         $("#ConfirmTerminate").one("hidden.bs.modal", function () {
             $("#modalWaitReviewTerminate").modal("show");
         });
-        $("#ConfirmTerminate").modal("hide");
-
-        $.ajax({
-            type: "POST",
-            url: "Review/?handler=ReviewTerminate",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: formData,
-            complete: function () {
-                console.log("terminate complete");
-
-            },
-            success: function (result) {
-                console.log("terminate success");
-                formChanged = false;
-
-                window.location.replace("/Index");
-            },
-            error: function (error) {
-                console.log("terminate error");
-                $("#btnConfirmTerminate").prop("disabled", false);
-                $("#btnCancelTerminate").prop("disabled", false);
-
-                var responseJson = error.responseJSON;
-                var statusCode = error.status;
-
-                $("#reviewTerminateErrorMessage").append("<ul/>");
-                var unOrderedList = $("#reviewTerminateErrorMessage ul");
-
-                if (responseJson == null) {
-                    unOrderedList.append("<li>System error. Please try again later</li>");
-                } else if (statusCode === customHttpStatusCodes.FailuresDetected) {
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-                } else {
-                    unOrderedList.append("<li>" + responseJson + "</li>");
-                }
-
-                //Hide modalWaitReviewTerminate modal and show modalWaitReviewTerminateErrors modal
-                $("#modalWaitReviewTerminate").one("hidden.bs.modal", function () {
-                    $("#modalWaitReviewTerminateErrors").modal("show");
-                });
-                $("#modalWaitReviewTerminate").modal("hide");
-            }
+        $("#modalWaitReviewTerminate").one("shown.bs.modal", function () {
+            reviewTerminateAjax();
         });
+        $("#ConfirmTerminate").modal("hide");
     }
 
     function initialiseOperatorsTypeaheads() {
