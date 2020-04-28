@@ -34,6 +34,7 @@ namespace Portal.UnitTests
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
+        private IDataServiceApiClient _fakDataServiceApiClient;
 
 
         [SetUp]
@@ -49,6 +50,7 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
+            _fakDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             ProcessId = 123;
 
@@ -99,7 +101,7 @@ namespace Portal.UnitTests
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
         }
 
@@ -850,6 +852,39 @@ namespace Portal.UnitTests
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
                 c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        [Test]
+        public async Task Test_OnPostReviewTerminateAsync_Updates_WorkflowInstance_With_ActivityChangedAt()
+        {
+            var processId = 1234;
+            var serialNumber = "1234_14";
+            var currentActivityChangedAt = DateTime.Today.AddDays(-1);
+
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            {
+                ProcessId = processId,
+                SerialNumber = serialNumber,
+                ActivityName = WorkflowStage.Review.ToString(),
+                ActivityChangedAt = currentActivityChangedAt
+            });
+
+            await _dbContext.AssessmentData.AddAsync(new AssessmentData()
+            {
+                ProcessId = processId,
+                PrimarySdocId = 111111
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _reviewModel.OnPostReviewTerminateAsync("Testing", processId);
+
+            // Assert
+            var workflowInstance = _dbContext.WorkflowInstance.SingleOrDefault(w => w.ProcessId == processId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(DateTime.Today, workflowInstance.ActivityChangedAt);
+
         }
     }
 }
