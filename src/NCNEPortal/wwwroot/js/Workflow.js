@@ -24,6 +24,8 @@
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
         var username = $(this).data("username");
+        var stageTypeId = $(this).data("stagetypeid");
+
         $("#workflowSaveErrorMessage").html("");
         
         $.ajax({
@@ -35,7 +37,9 @@
             data: {
                 "processId": processId,
                 "stageId": stageId,
-                "username" : username
+                "username": username,
+                "stageTypeId":stageTypeId
+
             },
 
             success: function (result) {
