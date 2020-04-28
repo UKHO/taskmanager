@@ -161,7 +161,7 @@ namespace WorkflowCoordinator.Sagas
             {
                 ProcessId = processId,
                 SerialNumber = serialNumber,
-                ActivityName = WorkflowConstants.ActivityName,
+                ActivityName = WorkflowStage.Review.ToString(),
                 Status = status.ToString(),
                 StartedAt = DateTime.Now,
                 ActivityChangedAt = DateTime.Today

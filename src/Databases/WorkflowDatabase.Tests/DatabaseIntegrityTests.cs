@@ -104,7 +104,7 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
-                ActivityName = WorkflowConstants.ActivityName,
+                ActivityName = WorkflowStage.Review.ToString(),
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
             });
@@ -117,7 +117,7 @@ namespace WorkflowDatabase.Tests
                     ProcessId = 1,
                     SerialNumber = "2_sn",
                     ParentProcessId = null,
-                    ActivityName = WorkflowConstants.ActivityName,
+                    ActivityName = WorkflowStage.Review.ToString(),
                     Status = WorkflowStatus.Started.ToString(),
                     StartedAt = DateTime.Now
                 });
@@ -174,7 +174,7 @@ namespace WorkflowDatabase.Tests
                 ProcessId = 1,
                 SerialNumber = "2_sn",
                 ParentProcessId = null,
-                ActivityName = WorkflowConstants.ActivityName,
+                ActivityName = WorkflowStage.Review.ToString(),
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
             });
