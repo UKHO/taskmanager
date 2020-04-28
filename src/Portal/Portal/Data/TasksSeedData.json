@@ -6,7 +6,7 @@
     "activityName": "Review",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 445,
@@ -87,7 +87,7 @@
     "activityName": "Review",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 123,
@@ -222,7 +222,7 @@
     "activityName": "Review",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 632,
@@ -347,7 +347,7 @@
     "activityName": "Assess",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 125,
@@ -471,7 +471,7 @@
     "activityName": "Assess",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 126,
@@ -601,7 +601,7 @@
     "activityName": "Assess",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 588,
@@ -697,7 +697,7 @@
     "activityName": "Verify",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 688,
@@ -817,7 +817,7 @@
     "activityName": "Verify",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 788,
@@ -937,7 +937,7 @@
     "activityName": "Verify",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 888,
@@ -1057,7 +1057,7 @@
     "activityName": "Review",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 127,
@@ -1147,7 +1147,7 @@
     "activityName": "Verify",
     "startedAt": "2020-01-01T00:00:00",
     "status": "Started",
-    "statusChangedAt": "2020-04-27",
+    "activityChangedAt": "2020-04-27",
     "comment": [
       {
         "processId": 488,

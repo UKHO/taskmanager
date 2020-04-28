@@ -31,6 +31,7 @@ namespace WorkflowCoordinator.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+
             _handlerContext = new TestableMessageHandlerContext();
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
@@ -132,6 +133,7 @@ namespace WorkflowCoordinator.UnitTests
 
             var parentAssignedTaskData = new DbAssessmentAssignTask()
             {
+                DbAssessmentAssignTaskId = assignedTaskId,
                 ProcessId = parentProcessId,
                 Assessor = "assessor1",
                 TaskType = "Type 1",
@@ -224,7 +226,7 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_Handle_PersistChildWorkflowDataCommand_when_child_workflow_is_porgressed_to_Assess_Then_WorkflowInstance_StatusChangedAt_Is_Updated()
+        public async Task Test_Handle_PersistChildWorkflowDataCommand_when_child_workflow_is_progressed_to_Assess_Then_WorkflowInstance_ActivityChangedAt_Is_Updated()
         {
             //Given
             var parentProcessId = 123;
@@ -232,7 +234,7 @@ namespace WorkflowCoordinator.UnitTests
             var childSerialNumber = "456_14";
             var assignedTaskId = 1;
             var primarySdocId = 1888403;
-            var newStatusChangedAt = DateTime.Today;
+            var newActivityChangedAt = DateTime.Today;
 
 
             var parentReviewData = new DbAssessmentReviewData()
@@ -247,6 +249,7 @@ namespace WorkflowCoordinator.UnitTests
 
             var parentAssignedTaskData = new DbAssessmentAssignTask()
             {
+                DbAssessmentAssignTaskId = assignedTaskId,
                 ProcessId = parentProcessId,
                 Assessor = "assessor1",
                 TaskType = "Type 1",
@@ -298,7 +301,7 @@ namespace WorkflowCoordinator.UnitTests
             //Then
             var childWorkflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == childProcessId);
 
-            Assert.AreEqual(newStatusChangedAt, childWorkflowInstance.ActivityChangedAt);
+            Assert.AreEqual(newActivityChangedAt, childWorkflowInstance.ActivityChangedAt);
         }
 
     }
