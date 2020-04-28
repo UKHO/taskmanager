@@ -5,7 +5,7 @@ namespace NCNEPortal.Helpers
 {
     public class WorkflowStageHelper : IWorkflowStageHelper
     {
-        public List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage)
+        public List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available)
         {
             List<NcneTaskStageType> result = new List<NcneTaskStageType>();
 
@@ -24,7 +24,7 @@ namespace NCNEPortal.Helpers
                     result.Add(NcneTaskStageType.V1);
                     break;
                 case NcneTaskStageType.V1:
-                    result.Add(NcneTaskStageType.V2);
+                    result.Add(v2Available ? NcneTaskStageType.V2 : NcneTaskStageType.Final_Updating);
                     break;
                 case NcneTaskStageType.V1_Rework:
                     result.Add(NcneTaskStageType.V1);
@@ -47,11 +47,14 @@ namespace NCNEPortal.Helpers
                     result.Add(NcneTaskStageType.CIS);
                     break;
                 case NcneTaskStageType.CIS:
-                    result.Add(NcneTaskStageType.Publication);
-                    result.Add(NcneTaskStageType.Publish_Chart);
-                    result.Add(NcneTaskStageType.Clear_Vector);
-                    result.Add(NcneTaskStageType.Retire_Old_Version);
-                    result.Add(NcneTaskStageType.Consider_Withdrawn_Charts);
+                    result.AddRange(new List<NcneTaskStageType>()
+                    {
+                        NcneTaskStageType.Publication,
+                        NcneTaskStageType.Publish_Chart,
+                        NcneTaskStageType.Clear_Vector,
+                        NcneTaskStageType.Retire_Old_Version,
+                        NcneTaskStageType.Consider_Withdrawn_Charts
+                    });
                     break;
                 case NcneTaskStageType.Publication:
                     break;

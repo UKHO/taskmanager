@@ -175,6 +175,7 @@ namespace NCNEPortal
 
             ValidationErrorMessages = new List<string>();
             userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
+
         }
 
         public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
@@ -416,7 +417,7 @@ namespace NCNEPortal
             ValidationErrorMessages.Clear();
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, (NcneTaskStageType) stageTypeId, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, (NcneTaskStageType)stageTypeId, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -442,11 +443,19 @@ namespace NCNEPortal
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
             currentStage.Status = NcneTaskStageStatus.Completed.ToString();
             currentStage.DateCompleted = DateTime.Now;
+            currentStage.AssignedUser = UserFullName;
+
+            var v2 = taskStages.Single(t => t.ProcessId == processId &&
+                                            t.TaskStageTypeId == (int)NcneTaskStageType.V2);
+
+            bool v2Available = (v2.Status != NcneTaskStageStatus.Inactive.ToString());
 
 
-            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId);
+            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId, v2Available);
 
             if (nextStages.Count > 0)
             {

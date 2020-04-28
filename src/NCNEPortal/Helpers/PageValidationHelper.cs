@@ -65,19 +65,21 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = true;
 
-
-            if (string.IsNullOrEmpty(assignedUser))
+            if (stageType != NcneTaskStageType.Forms)
             {
-                validationErrorMessages.Add("Please assign a user to this stage before completion");
-                isValid = false;
-
-            }
-            else
-            {
-                if ((stageType!=NcneTaskStageType.Forms)&& (assignedUser != username))
+                if (string.IsNullOrEmpty(assignedUser))
                 {
-                    validationErrorMessages.Add("Current user is not valid for completion of this task stage");
+                    validationErrorMessages.Add("Please assign a user to this stage before completion");
                     isValid = false;
+
+                }
+                else
+                {
+                    if ((assignedUser != username))
+                    {
+                        validationErrorMessages.Add("Current user is not valid for completion of this task stage");
+                        isValid = false;
+                    }
                 }
             }
 

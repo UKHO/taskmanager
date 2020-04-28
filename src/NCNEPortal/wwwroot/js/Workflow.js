@@ -24,9 +24,10 @@
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
         var username = $(this).data("username");
+        var stageName = $(this).data("stagename");
         var stageTypeId = $(this).data("stagetypeid");
-
-        $("#workflowSaveErrorMessage").html("");
+        
+        
         
         $.ajax({
             type: "POST",
@@ -46,6 +47,7 @@
                 $("#hdnConfirmProcessId").val(processId);
                 $("#hdnConfirmStageId").val(stageId);
                 $("#hdnAssignedUser").val(username);
+                $("#stageName").text(stageName);
                 $("#ConfirmModal").modal("show");
 
             },
@@ -53,6 +55,8 @@
                 var responseJson = error.responseJSON;
 
                 if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").html("");
+
                     $("#workflowSaveErrorMessage").append("<ul/>");
                     var unOrderedList = $("#workflowSaveErrorMessage ul");
 
