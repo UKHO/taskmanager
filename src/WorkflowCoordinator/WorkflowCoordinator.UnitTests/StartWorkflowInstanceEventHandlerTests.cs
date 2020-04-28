@@ -223,5 +223,83 @@ namespace WorkflowCoordinator.UnitTests
             Assert.Contains(newChildComment, childComments);
         }
 
+        [Test]
+        public async Task Test_Handle_PersistChildWorkflowDataCommand_when_child_workflow_is_porgressed_to_Assess_Then_WorkflowInstance_StatusChangedAt_Is_Updated()
+        {
+            //Given
+            var parentProcessId = 123;
+            var childProcessId = 456;
+            var childSerialNumber = "456_14";
+            var assignedTaskId = 1;
+            var primarySdocId = 1888403;
+            var newStatusChangedAt = DateTime.Today;
+
+
+            var parentReviewData = new DbAssessmentReviewData()
+            {
+                ProcessId = parentProcessId,
+                ActivityCode = "Some code",
+                Ion = "Parent Review ION",
+                Reviewer = "reviewer1"
+            };
+
+            await _dbContext.DbAssessmentReviewData.AddAsync(parentReviewData);
+
+            var parentAssignedTaskData = new DbAssessmentAssignTask()
+            {
+                ProcessId = parentProcessId,
+                Assessor = "assessor1",
+                TaskType = "Type 1",
+                Notes = "A note",
+                Verifier = "verifier1",
+                WorkspaceAffected = "Workspace 1"
+
+            };
+
+            await _dbContext.DbAssessmentAssignTask.AddAsync(parentAssignedTaskData);
+
+            var parentAssessmentData = new AssessmentData()
+            {
+                ProcessId = parentProcessId,
+                PrimarySdocId = primarySdocId,
+                RsdraNumber = "RSDRA2017000130865"
+            };
+
+            await _dbContext.AssessmentData.AddAsync(parentAssessmentData);
+
+            var parentPrimarydocument = new PrimaryDocumentStatus()
+            {
+                //PrimaryDocumentStatusId = 1,
+                ContentServiceId = Guid.NewGuid(),
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = parentProcessId,
+                SdocId = primarySdocId,
+                StartedAt = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(parentPrimarydocument);
+
+            await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(childProcessId))
+                .Returns(childSerialNumber);
+
+            var persistChildWorkflowDataCommand = new PersistChildWorkflowDataCommand()
+            {
+                AssignedTaskId = assignedTaskId,
+                CorrelationId = Guid.NewGuid(),
+                ParentProcessId = parentProcessId,
+                ChildProcessId = childProcessId
+            };
+
+            //When
+            await _handler.Handle(persistChildWorkflowDataCommand, _handlerContext);
+
+            //Then
+            var childWorkflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == childProcessId);
+
+            Assert.AreEqual(newStatusChangedAt, childWorkflowInstance.StatusChangedAt);
+        }
+
     }
 }
