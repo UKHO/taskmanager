@@ -164,7 +164,7 @@ namespace WorkflowCoordinator.Sagas
                 ActivityName = WorkflowConstants.ActivityName,
                 Status = status.ToString(),
                 StartedAt = DateTime.Now,
-                StatusChangedAt = DateTime.Today
+                ActivityChangedAt = DateTime.Today
         };
 
             await _dbContext.WorkflowInstance.AddAsync(workflowInstance);

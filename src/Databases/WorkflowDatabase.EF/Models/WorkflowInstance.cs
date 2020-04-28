@@ -10,9 +10,9 @@ namespace WorkflowDatabase.EF.Models
         public string SerialNumber { get; set; }
         public int? ParentProcessId { get; set; }
         public string ActivityName { get; set; }
+        public DateTime ActivityChangedAt { get; set; }
         public DateTime StartedAt { get; set; }
-        public string Status { get; set; }
-        public DateTime StatusChangedAt { get; set; }   
+        public string Status { get; set; }   
 
         public virtual List<Comment> Comments { get; set; }
         public virtual AssessmentData AssessmentData { get; set; }

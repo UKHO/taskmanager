@@ -298,7 +298,7 @@ namespace WorkflowCoordinator.UnitTests
             //Then
             var childWorkflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == childProcessId);
 
-            Assert.AreEqual(newStatusChangedAt, childWorkflowInstance.StatusChangedAt);
+            Assert.AreEqual(newStatusChangedAt, childWorkflowInstance.ActivityChangedAt);
         }
 
     }

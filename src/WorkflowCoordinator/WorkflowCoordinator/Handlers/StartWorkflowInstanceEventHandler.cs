@@ -93,7 +93,7 @@ namespace WorkflowCoordinator.Handlers
                     SerialNumber = newSn,
                     StartedAt = DateTime.Today,
                     Status = WorkflowStatus.Started.ToString(),
-                    StatusChangedAt = DateTime.Today
+                    ActivityChangedAt = DateTime.Today
                 };
 
                 await _dbContext.WorkflowInstance.AddAsync(newWorkflowInstance);

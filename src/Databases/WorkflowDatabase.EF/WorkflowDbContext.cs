@@ -95,7 +95,7 @@ namespace WorkflowDatabase.EF
                 .HasPrincipalKey<WorkflowInstance>(p => p.ProcessId)
                 .HasForeignKey<CarisProjectDetails>(p => p.ProcessId);
 
-            modelBuilder.Entity<WorkflowInstance>().Property(p => p.StatusChangedAt).HasColumnType("date");
+            modelBuilder.Entity<WorkflowInstance>().Property(p => p.ActivityChangedAt).HasColumnType("date");
             modelBuilder.Entity<PrimaryDocumentStatus>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);

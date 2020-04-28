@@ -389,7 +389,7 @@ namespace WorkflowCoordinator.UnitTests
                 WorkflowInstanceId = workflowInstanceId,
                 ActivityName = fromActivity.ToString(),
                 Status = WorkflowStatus.Updating.ToString(),
-                StatusChangedAt = currentStatusChangedAt,
+                ActivityChangedAt = currentStatusChangedAt,
                 SerialNumber = "ASSESS_SERIAL_NUMBER",
                 ProductAction = new List<ProductAction> { new ProductAction
                 {
@@ -431,7 +431,7 @@ namespace WorkflowCoordinator.UnitTests
             //Then
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
 
-            Assert.AreEqual(newStatusChangedAt, workflowInstance.StatusChangedAt);
+            Assert.AreEqual(newStatusChangedAt, workflowInstance.ActivityChangedAt);
         }
     }
 }
