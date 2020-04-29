@@ -13,13 +13,19 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ErrorMessages { get; set; }
 
-        public void OnGet()
+        public HistoricalTasksModel()
         {
             ErrorMessages = new List<string>();
         }
 
+        public void OnGet()
+        {
+        }
+
         public void OnPost()
         {
+            if (ModelState.IsValid) return;
+
             ErrorMessages = new List<string>()
             {
                 "Error1",
