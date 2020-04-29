@@ -43,38 +43,35 @@
             <div class="card-body pb-0 pt-0">
                 <div class="row">
                     <div class="col-6 col-lg-6">
-                        <div class="form-row justify-content-between">
-                            <div class="col-4">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { @class = "form-control assignTaskAssessor" })</div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-4">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { @class = "form-control assignTaskAssessor" })</div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-4">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.RsdraNumber, new { @class = "form-control assignTaskAssessor" })</div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.RsdraNumber, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row justify-content-between">
-                            <div class="col-4">@Html.LabelFor(model => model.SearchParameters.SourceDocumentName, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentName, new { @class = "form-control assignTaskAssessor" })</div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentName, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentName, new { @class = "form-control" })</div>
                         </div>
                     </div>
-                    <div class="col-6 col-lg-6 d-flex flex-column">
-                        <div class="form-row flex-grow-1 d-flex flex-column">
-                            <div class="form-row justify-content-between">
-                                <div class="col-4">@Html.LabelFor(model => model.SearchParameters.Reviewer, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Reviewer, new { @class = "form-control assignTaskAssessor" })</div>
-                            </div>
-                            <div class="form-row justify-content-between">
-                                <div class="col-4">@Html.LabelFor(model => model.SearchParameters.Assessor, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Assessor, new { @class = "form-control assignTaskAssessor" })</div>
-                            </div>
-                            <div class="form-row justify-content-between">
-                                <div class="col-4">@Html.LabelFor(model => model.SearchParameters.Verifier, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Verifier, new { @class = "form-control assignTaskAssessor" })</div>
-                            </div>
-
+                    <div class="col-6 col-lg-6">
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Reviewer, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Reviewer, new { @class = "form-control" })</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Assessor, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Assessor, new { @class = "form-control" })</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Verifier, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Verifier, new { @class = "form-control" })</div>
                         </div>
                     </div>
                 </div>
