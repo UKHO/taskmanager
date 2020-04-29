@@ -42,40 +42,40 @@
         <form id="frmSearchForHistoricalTasks" method="post">
             <div class="card-body pb-0 pt-0">
                 <div class="row">
-                    <div class="col-6 col-lg-6">
-                        <div class="form-row">
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.RsdraNumber, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentName, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentName, new { @class = "form-control" })</div>
                         </div>
                     </div>
-                    <div class="col-6 col-lg-6">
-                        <div class="form-row">
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-end">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Reviewer, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Reviewer, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row d-flex justify-content-end">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Assessor, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Assessor, new { @class = "form-control" })</div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row d-flex justify-content-end">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Verifier, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Verifier, new { @class = "form-control" })</div>
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-end btn-size">
+                <div class="row d-flex justify-content-end btn-size">
                     <div class="col-2"><button id="btnSearch" type="submit" class="btn btn-primary btn-block">Search</button></div>
                 </div>
             </div>
