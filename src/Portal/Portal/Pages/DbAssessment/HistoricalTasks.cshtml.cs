@@ -14,5 +14,10 @@ namespace Portal.Pages.DbAssessment
         {
 
         }
+
+        public void OnPost()
+        {
+
+        }
     }
 }
