@@ -75,6 +75,23 @@
                         </div>
                     </div>
                 </div>
+                <div class="row d-flex justify-content-start">
+
+                    <div id="historicalTasksErrorMessages" class="dialog error @((Model.ErrorMessages != null && Model.ErrorMessages.Count > 0) ? "show" : "collapse" )  mt-3 pb-1">
+                        <h5 class="mb-3">
+                            <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                            <span>There's a problem</span>
+                        </h5>
+                        <ul>
+                            @{
+                                foreach (var error in Model.ErrorMessages)
+                                {
+                                    <li>@error</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
                 <div class="row d-flex justify-content-end btn-size">
                     <div class="col-2"><button id="btnSearch" type="submit" class="btn btn-primary btn-block">Search</button></div>
                 </div>
