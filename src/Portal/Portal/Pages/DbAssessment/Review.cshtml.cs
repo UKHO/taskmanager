@@ -210,7 +210,6 @@ namespace Portal.Pages.DbAssessment
                 else
                 {
                     workflowInstance.Status = WorkflowStatus.Started.ToString();
-                    workflowInstance.StatusChangedAt = DateTime.Today;
                     await _dbContext.SaveChangesAsync();
 
                     _logger.LogInformation("Unable to progress task {ProcessId} from Review to Assess.");
@@ -443,7 +442,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
-            workflowInstance.StatusChangedAt = DateTime.Today;
+            workflowInstance.ActivityChangedAt = DateTime.Today;
             _dbContext.SaveChanges();
 
             return workflowInstance;

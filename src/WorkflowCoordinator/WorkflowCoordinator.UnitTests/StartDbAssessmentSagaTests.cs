@@ -248,5 +248,35 @@ namespace WorkflowCoordinator.UnitTests
             //Assert
             Assert.IsTrue(_saga.Completed);
         }
+
+        [Test]
+        public async Task
+            Test_StartDbAssessmentCommand_When_Creating_New_workflowInstance_then_ActivityChangedAt_is_populated()
+        {
+            //Given
+            var correlationId = Guid.NewGuid();
+            var sourceDocumentId = 99;
+            var processId = 1234;
+            var k2WorkflowinstanceId = 8;
+            var k2SerialNumber = "1234_14";
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetDBAssessmentWorkflowId()).Returns(k2WorkflowinstanceId);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.CreateWorkflowInstance(k2WorkflowinstanceId)).Returns(processId);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns(k2SerialNumber);
+
+            //When
+            await _saga.Handle(new StartDbAssessmentCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sourceDocumentId
+            }, _handlerContext);
+
+            // Assert
+            var workflowInstance = _dbContext.WorkflowInstance.SingleOrDefault(w => w.ProcessId == processId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(DateTime.Today, workflowInstance.ActivityChangedAt);
+
+        }
     }
 }

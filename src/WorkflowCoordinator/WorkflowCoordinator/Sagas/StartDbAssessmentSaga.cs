@@ -161,10 +161,10 @@ namespace WorkflowCoordinator.Sagas
             {
                 ProcessId = processId,
                 SerialNumber = serialNumber,
-                ActivityName = WorkflowConstants.ActivityName,
+                ActivityName = WorkflowStage.Review.ToString(),
                 Status = status.ToString(),
                 StartedAt = DateTime.Now,
-                StatusChangedAt = DateTime.Today
+                ActivityChangedAt = DateTime.Today
         };
 
             await _dbContext.WorkflowInstance.AddAsync(workflowInstance);

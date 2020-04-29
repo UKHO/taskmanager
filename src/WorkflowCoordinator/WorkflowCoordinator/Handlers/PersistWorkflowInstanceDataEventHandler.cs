@@ -139,7 +139,7 @@ namespace WorkflowCoordinator.Handlers
             workflowInstance.ActivityName = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : k2Task.ActivityName;
 
             workflowInstance.Status = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Completed.ToString() : WorkflowStatus.Started.ToString();
-            workflowInstance.StatusChangedAt = DateTime.Today;
+            workflowInstance.ActivityChangedAt = DateTime.Today;
 
             return workflowInstance;
 

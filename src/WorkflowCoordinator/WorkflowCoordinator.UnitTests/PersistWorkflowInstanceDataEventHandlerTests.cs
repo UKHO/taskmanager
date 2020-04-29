@@ -348,5 +348,90 @@ namespace WorkflowCoordinator.UnitTests
             Assert.AreEqual(WorkflowStatus.Started.ToString(),
                 workflowInstance.Status);
         }
+
+
+        [Test]
+        [TestCase("Review", "Assess", "Assess")]
+        [TestCase("Assess", "Verify", "Verify")]
+        [TestCase("Verify", "Completed", "")]
+        [TestCase("Verify", "Assess", "Assess")]
+        public async Task Test_Handle_when_status_changes_Then_WorkflowInstance_ActivityChangedAt_Is_Updated(string fromAction, string toAction, string k2ActivityName)
+        {
+            //Given
+            var fromActivity = Enum.Parse<WorkflowStage>(fromAction);
+            var toActivity = Enum.Parse<WorkflowStage>(toAction);
+            var processId = 1;
+            var workflowInstanceId = 1;
+            var currentSerialNumber = "k2-serialNumber";
+            var currentActivityChangedAt = DateTime.Today.AddDays(-1);
+            var newActivityChangedAt = DateTime.Today;
+
+            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            {
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivity = fromActivity,
+                ToActivity = toActivity,
+            };
+
+            K2TaskData k2TaskData = string.IsNullOrWhiteSpace(k2ActivityName) ? null : new K2TaskData()
+            {
+                ActivityName = k2ActivityName,
+                SerialNumber = currentSerialNumber
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(A<int>.Ignored))
+                .Returns(Task.FromResult(k2TaskData));
+
+            var currentWorkflowInstance = new WorkflowInstance()
+            {
+                ProcessId = processId,
+                WorkflowInstanceId = workflowInstanceId,
+                ActivityName = fromActivity.ToString(),
+                Status = WorkflowStatus.Updating.ToString(),
+                ActivityChangedAt = currentActivityChangedAt,
+                SerialNumber = "ASSESS_SERIAL_NUMBER",
+                ProductAction = new List<ProductAction> { new ProductAction
+                {
+                    Verified = true
+                }},
+                DataImpact = new List<DataImpact> { new DataImpact
+                {
+                    FeaturesVerified = true
+                }}
+            };
+            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.DbAssessmentReviewData.AddAsync(new DbAssessmentReviewData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                Ion = "Review ION"
+            });
+
+            await _dbContext.DbAssessmentAssessData.AddAsync(new DbAssessmentAssessData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                Ion = "Assess ION"
+            });
+
+            await _dbContext.DbAssessmentVerifyData.AddAsync(new DbAssessmentVerifyData()
+            {
+                WorkflowInstanceId = workflowInstanceId,
+                ProcessId = processId,
+                Ion = "Verify ION"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            //When
+            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+
+            //Then
+            var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
+
+            Assert.AreEqual(newActivityChangedAt, workflowInstance.ActivityChangedAt);
+        }
     }
 }
