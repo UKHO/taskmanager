@@ -5,9 +5,9 @@ namespace Portal.Models
     public class HistoricalTasksSearchParameters
     {
         [DisplayName("Process Id:")]
-        public int ProcessId { get; set; }
+        public int? ProcessId { get; set; }
         [DisplayName("Sdoc Id:")]
-        public int SourceDocumentId { get; set; }
+        public int? SourceDocumentId { get; set; }
         [DisplayName("RSDRA Number:")]
         public string RsdraNumber { get; set; }
         [DisplayName("Source Name:")]
