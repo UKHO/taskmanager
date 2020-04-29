@@ -1,0 +1,36 @@
+﻿@page
+@model Portal.Pages.DbAssessment.HistoricalTasksModel
+@{
+    ViewData["Title"] = "Historical Tasks";
+}
+
+<div class="row mt-1">
+    <div class="col-4">
+        <a asp-page="/Index">
+            <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Database Assessment</h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Historical Tasks</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr />
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+    </div>
+</div>

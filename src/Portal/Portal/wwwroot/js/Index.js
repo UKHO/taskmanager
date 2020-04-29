@@ -20,6 +20,7 @@
 
     handleMyTaskList();
     handleTeamTasks();
+    handleHistoricalTasks();
 
     handleAssignTaskToUser();
 
@@ -209,6 +210,14 @@
 
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
+
+        });
+    }
+
+    function handleHistoricalTasks() {
+        $("#btnHistoricalTasks").click(function () {
+
+            window.location.href = '/DbAssessment/HistoricalTasks';
 
         });
     }
