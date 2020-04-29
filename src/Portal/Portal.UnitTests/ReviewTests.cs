@@ -34,7 +34,7 @@ namespace Portal.UnitTests
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
-        private IDataServiceApiClient _fakDataServiceApiClient;
+        private IDataServiceApiClient _fakeDataServiceApiClient;
 
 
         [SetUp]
@@ -50,7 +50,7 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-            _fakDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             ProcessId = 123;
 
@@ -101,7 +101,7 @@ namespace Portal.UnitTests
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _reviewModel = new ReviewModel(_dbContext, _fakDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
         }
 
