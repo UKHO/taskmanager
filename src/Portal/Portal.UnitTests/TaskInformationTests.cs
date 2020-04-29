@@ -130,12 +130,12 @@ namespace Portal.UnitTests
 
             if (taskType == "Simple" || activityName == "Review")
             {
-                Assert.AreEqual(new DateTime(2020, 05, 15).ToShortDateString(),
+                Assert.AreEqual(new DateTime(2020, 05, 15),
                     _taskInformationModel.DmEndDate);
             }
             else if (taskType == "LTA")
             {
-                Assert.AreEqual(new DateTime(2020, 07, 12).ToShortDateString(),
+                Assert.AreEqual(new DateTime(2020, 07, 12),
                     _taskInformationModel.DmEndDate);
             }
 
@@ -157,7 +157,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual(new DateTime(2020, 05, 21).ToShortDateString(),
+            Assert.AreEqual(new DateTime(2020, 05, 21),
                     _taskInformationModel.ExternalEndDate);
         }
 
@@ -197,7 +197,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual(new DateTime(2020, 05, 01).ToShortDateString(),
+            Assert.AreEqual(new DateTime(2020, 05, 01),
                 _taskInformationModel.EffectiveReceiptDate);
         }
 
@@ -214,7 +214,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual("N/A",
+            Assert.AreEqual(null,
                 _taskInformationModel.EffectiveReceiptDate);
         }
 
@@ -231,7 +231,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual("N/A",
+            Assert.AreEqual(null,
                 _taskInformationModel.DmEndDate);
         }
 
@@ -259,7 +259,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual("N/A",
+            Assert.AreEqual(null,
                 _taskInformationModel.DmEndDate);
         }
 
@@ -286,7 +286,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual("N/A",
+            Assert.AreEqual(null,
                 _taskInformationModel.DmEndDate);
         }
 
@@ -303,7 +303,7 @@ namespace Portal.UnitTests
 
             await _taskInformationModel.OnGetAsync(ProcessId, activityName);
 
-            Assert.AreEqual("N/A",
+            Assert.AreEqual(null,
                 _taskInformationModel.ExternalEndDate);
         }
 
