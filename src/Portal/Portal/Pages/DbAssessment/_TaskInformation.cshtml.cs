@@ -33,7 +33,7 @@ namespace Portal.Pages.DbAssessment
         public int ProcessId { get; set; }
 
         [DisplayName("DM End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
+        [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? DmEndDate { get; set; }
 
         [DisplayName("DM Receipt Date:")]
@@ -41,11 +41,11 @@ namespace Portal.Pages.DbAssessment
         public DateTime DmReceiptDate { get; set; }
 
         [DisplayName("Effective Receipt Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
+        [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? EffectiveReceiptDate { get; set; }
 
         [DisplayName("External End Date:")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
+        [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? ExternalEndDate { get; set; }
 
         public bool IsOnHold { get; set; }
