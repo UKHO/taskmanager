@@ -467,7 +467,6 @@ namespace NCNEPortal.UnitTests
         [TestCase("", "Valid User1", NcneTaskStageType.V1_Rework)]
         [TestCase("", "Valid User1", NcneTaskStageType.V2)]
         [TestCase("", "Valid User1", NcneTaskStageType.V2_Rework)]
-        [TestCase("", "Valid User1", NcneTaskStageType.Forms)]
         [TestCase("", "Valid User1", NcneTaskStageType.Final_Updating)]
         [TestCase("", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
         [TestCase("", "Valid User1", NcneTaskStageType.Commit_To_Print)]
@@ -518,15 +517,13 @@ namespace NCNEPortal.UnitTests
 
         }
 
-        [Test]
-        public void Validation_for_ValidateForCompletion_for_Forms_Stage_allows_any_user_to_Complete()
+        [TestCase("", "Valid User")]
+        [TestCase("Valid User", "Another User")]
+        public void Validation_for_ValidateForCompletion_for_Forms_Stage_allows_any_user_and_unassigned_to_Complete(string assignedUser, string currentUser)
         {
             var validationErrorMessages = new List<string>();
 
             var currentStageType = NcneTaskStageType.Forms;
-
-            var assignedUser = "Valid User";
-            var currentUser = "Another User";
 
             var result =
                 _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, validationErrorMessages);

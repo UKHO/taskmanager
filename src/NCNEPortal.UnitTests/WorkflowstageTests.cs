@@ -32,7 +32,7 @@ namespace NCNEPortal.UnitTests
 
         public void Validate_Get_NextStep_for_Completion_return_single_step(NcneTaskStageType currentStage, NcneTaskStageType nextStage)
         {
-            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage);
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true);
 
             Assert.AreEqual(result.Count, 1);
             Assert.AreEqual(result[0], nextStage);
@@ -46,7 +46,7 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts)]
         public void Validate_Get_NextStep_for_Completion_return_no_next_step(NcneTaskStageType currentStage)
         {
-            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage);
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true);
 
             Assert.AreEqual(result.Count, 0);
 
@@ -58,7 +58,7 @@ namespace NCNEPortal.UnitTests
 
             NcneTaskStageType currentStage = NcneTaskStageType.CIS;
 
-            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage);
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true);
 
             Assert.AreEqual(result.Count, 5);
             CollectionAssert.Contains(result, NcneTaskStageType.Publication);
@@ -67,6 +67,17 @@ namespace NCNEPortal.UnitTests
             CollectionAssert.Contains(result, NcneTaskStageType.Retire_Old_Version);
             CollectionAssert.Contains(result, NcneTaskStageType.Consider_Withdrawn_Charts);
 
+        }
+
+        [Test]
+        public void Validate_Get_NextStep_for_Completion_skips_V2_if_not_available()
+        {
+            NcneTaskStageType currentStage = NcneTaskStageType.V1;
+
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, false);
+
+            Assert.AreEqual(result.Count, 1);
+            CollectionAssert.Contains(result, NcneTaskStageType.Final_Updating);
         }
     }
 }
