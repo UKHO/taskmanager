@@ -18,7 +18,8 @@
 
         </td>
         <td>
-            @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+            @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
+                || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
@@ -64,7 +65,12 @@
                         @if (@Model.TaskStageType.AllowRework)
                         {
                             <div class="mt-3 mr-3">
-                                <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary btn-stage-rework">Rework</button>
+                                <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary btn-stage-rework"
+                                        data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                                        data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                        data-StageName="@(Model.TaskStageType.Name)">
+                                    Rework
+                                </button>
                             </div>
                         }
                         <div class="mt-3">

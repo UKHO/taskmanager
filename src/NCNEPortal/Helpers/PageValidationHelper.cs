@@ -86,6 +86,32 @@ namespace NCNEPortal.Helpers
             return isValid;
         }
 
+        public bool ValidateForRework(string assignedUser, string username,
+            List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to this stage before sending this task for Rework");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Current user is not valid for sending this task for Rework");
+                    isValid = false;
+                }
+            }
+
+
+            return isValid;
+        }
+
+
         private bool ValidateThreePs(DateTime? sendDate3Ps, DateTime? expectedReturnDate3Ps, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
         {
             bool isValid = true;

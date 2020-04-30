@@ -79,5 +79,16 @@ namespace NCNEPortal.UnitTests
             Assert.AreEqual(result.Count, 1);
             CollectionAssert.Contains(result, NcneTaskStageType.Final_Updating);
         }
+
+        [TestCase(NcneTaskStageType.V1, NcneTaskStageType.V1_Rework)]
+        [TestCase(NcneTaskStageType.V2, NcneTaskStageType.V2_Rework)]
+        public void Validate_Get_NextStep_for_Rework(NcneTaskStageType currentStage, NcneTaskStageType nextStage)
+        {
+            var result = _workWorkflowStageHelper.GetNextStageForRework(currentStage);
+
+            Assert.AreEqual(nextStage, result);
+
+        }
+
     }
 }

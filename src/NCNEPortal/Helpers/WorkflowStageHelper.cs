@@ -70,5 +70,17 @@ namespace NCNEPortal.Helpers
 
             return result;
         }
+
+        public NcneTaskStageType GetNextStageForRework(NcneTaskStageType currentStage)
+        {
+            NcneTaskStageType result = (NcneTaskStageType) 0;
+
+            if (currentStage == NcneTaskStageType.V1)
+                result = NcneTaskStageType.V1_Rework;
+            else if (currentStage == NcneTaskStageType.V2)
+                result = NcneTaskStageType.V2_Rework;
+
+            return result;
+        }
     }
 }
