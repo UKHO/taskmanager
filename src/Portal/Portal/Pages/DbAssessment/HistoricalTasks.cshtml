@@ -1,0 +1,186 @@
+﻿@page
+@using WorkflowDatabase.EF
+@model Portal.Pages.DbAssessment.HistoricalTasksModel
+@{
+    ViewData["Title"] = "Historical Tasks";
+}
+
+<div class="row mt-1">
+    <div class="col-4">
+        <a asp-page="/Index">
+            <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Database Assessment</h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Historical Tasks</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr />
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="card mb-4 mt-3">
+    <h6>Search</h6>
+    <div class="col-12">
+        <form id="frmSearchForHistoricalTasks" method="post">
+            <div class="card-body pb-0 pt-0">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control" })</div>
+                            <div class="form-row d-flex justify-content-start">
+                                <span>@Html.ValidationMessageFor(model => model.SearchParameters.ProcessId, "", new { @class = "text-danger" })</span>
+                            </div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { type = "number", @class = "form-control" })</div>
+                            <div class="form-row d-flex justify-content-start">
+                                <span>@Html.ValidationMessageFor(model => model.SearchParameters.SourceDocumentId, "", new { @class = "text-danger" })</span>
+                            </div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.RsdraNumber, new { @class = "form-control" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentName, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentName, new { @class = "form-control" })</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-end">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Reviewer, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Reviewer, new { @class = "form-control" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-end">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Assessor, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Assessor, new { @class = "form-control" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-end">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Verifier, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Verifier, new { @class = "form-control" })</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-start">
+
+                    <div id="historicalTasksErrorMessages" class="dialog error @((Model.ErrorMessages != null && Model.ErrorMessages.Count > 0) ? "show" : "collapse" )  mt-3 pb-1">
+                        <h5 class="mb-3">
+                            <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                            <span>There's a problem</span>
+                        </h5>
+                        <ul>
+                            @{
+                                foreach (var error in Model.ErrorMessages)
+                                {
+                                    <li>@error</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-end btn-size">
+                    <div class="col-2"><button id="btnSearch" type="submit" class="btn btn-primary btn-block">Search</button></div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Search Results -->
+<div class="card mb-4 mt-3">
+    <h6>Historical Tasks Results</h6>
+    <div class="card-body" style="width:100%">
+        <table id="historicalTasks" class="table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th style="min-width: 5.8rem;">DM End Date</th>
+                    <th>RSDRA No.</th>
+                    <th>Source Name</th>
+                    <th>Status</th>
+                    <th>Reviewer</th>
+                    <th>Assessor</th>
+                    <th>Verifier</th>
+                    <th>Team</th>
+                    <th>Date Finished</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.HistoricalTasks)
+                {
+                    <tr>
+                        <td>
+                            <a asp-page="@(task.TaskStage == WorkflowStage.Completed ? WorkflowStage.Verify.ToString() : task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            @task.DmEndDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.AssessmentDataRsdraNumber
+                        </td>
+                        <td>
+                            @task.AssessmentDataSourceDocumentName
+                        </td>
+                        <td>
+                            @task.Status
+                        </td>
+                        <td>
+                            @task.Reviewer
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            @task.ActivityChangedAt
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#historicalTasks').DataTable({
+                "pageLength": 10,
+                'sDom': 'ltipr',
+                "lengthMenu": [5, 10, 25, 50],
+                "scrollX": true,
+                "order": [[1, 'asc']],
+                "ordering": true
+            });
+        });
+    </script>
+}

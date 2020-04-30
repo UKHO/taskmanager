@@ -4,6 +4,9 @@
     var usersFetched = false;
 
     var menuItem = 0;
+
+    setMenuItems();
+
     var userFullName = $("#userFullName > strong").text();
 
     var unassignedTasksTable = setupUnassignedTasks();
@@ -20,6 +23,7 @@
 
     handleMyTaskList();
     handleTeamTasks();
+    handleHistoricalTasks();
 
     handleAssignTaskToUser();
 
@@ -27,6 +31,22 @@
     handleClearAllTeams();
     handleFilterTasksByTeam();
     setupFilterTasksByTeamButtonStyle();
+
+    handleGlobalSearch();
+    handleTaskNotes();
+    handleAssignTask();
+    handleSelectAllTeams();
+
+    populateTasks();
+
+    function setMenuItems() {
+        var menuItemPriosToHistoricalTaskView = sessionStorage.getItem('historicalMenuItem');
+
+        if (menuItemPriosToHistoricalTaskView != null) {
+            menuItem = Number(menuItemPriosToHistoricalTaskView);
+            sessionStorage.setItem('historicalMenuItem', 0); // Set it back to default
+        }
+    }
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
@@ -213,6 +233,15 @@
         });
     }
 
+    function handleHistoricalTasks() {
+        $("#btnHistoricalTasks").click(function () {
+
+            sessionStorage.setItem('historicalMenuItem', menuItem);
+            window.location.href = '/DbAssessment/HistoricalTasks';
+
+        });
+    }
+
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
             if (index === menuItem) {
@@ -239,69 +268,74 @@
         }
     }
 
-    $('#txtGlobalSearch').keyup(function () {
-        unassignedTasksTable.search($(this).val()).draw();
-        inFlightTasksTable.search($(this).val()).draw();
-    });
-
-
-    $(".taskNoteItem").on("click",
-        function () {
-
-            $("#btnPostTaskNote").prop("disabled", false);
-            $("#editTaskNoteError").html("");
-
-            var processId = $(this).data("processid");
-            $("#hdnProcessId").val(processId);
-
-            var taskNote = $(this).data("tasknote");
-            $("#txtNote").val(taskNote);
-
-            $("#editTaskNoteModal").modal("show");
+    function handleGlobalSearch() {
+        $('#txtGlobalSearch').keyup(function() {
+            unassignedTasksTable.search($(this).val()).draw();
+            inFlightTasksTable.search($(this).val()).draw();
         });
+    }
 
-    $("#editTaskNoteModal").on("shown.bs.modal",
-        function () {
+    function handleTaskNotes() {
+        $(".taskNoteItem").on("click",
+            function() {
+
+                $("#btnPostTaskNote").prop("disabled", false);
+                $("#editTaskNoteError").html("");
+
+                var processId = $(this).data("processid");
+                $("#hdnProcessId").val(processId);
+
+                var taskNote = $(this).data("tasknote");
+                $("#txtNote").val(taskNote);
+
+                $("#editTaskNoteModal").modal("show");
+            });
+
+        $("#editTaskNoteModal").on("shown.bs.modal",
+            function() {
+                $("#txtNote").focus();
+            });
+
+        $("#btnClearTaskNote").click(function() {
+            $("#txtNote").val("");
             $("#txtNote").focus();
         });
 
-    $("#btnClearTaskNote").click(function () {
-        $("#txtNote").val("");
-        $("#txtNote").focus();
-    });
+        $("#btnPostTaskNote").on("submit",
+            function() {
+                $("#btnPostTaskNote").prop("disabled", true);
 
-    $("#btnPostTaskNote").on("submit",
-        function () {
-            $("#btnPostTaskNote").prop("disabled", true);
+            });
+    }
 
-        });
+    function handleAssignTask() {
+        $(".assignTaskItem").on("click",
+            function() {
+                //$("#btnAssignTaskToUser").prop("disabled", false);
 
-    $(".assignTaskItem").on("click",
-        function () {
-            //$("#btnAssignTaskToUser").prop("disabled", false);
+                var processId = $(this).data("processid");
+                $("#hdnAssignTaskProcessId").val(processId);
 
-            var processId = $(this).data("processid");
-            $("#hdnAssignTaskProcessId").val(processId);
+                var taskStage = $(this).data("taskstage");
+                $("#hdnAssignTaskStage").val(taskStage);
 
-            var taskStage = $(this).data("taskstage");
-            $("#hdnAssignTaskStage").val(taskStage);
+                $("#assignTaskModal").modal("show");
+            });
 
-            $("#assignTaskModal").modal("show");
-        });
+        $("#assignTaskModal").on("shown.bs.modal",
+            function() {
+                $("#assignTaskTypeaheadError").hide();
+                $("#assignTaskErrorMsg").text("");
+                $("#txtUsername").focus();
+                $('.typeahead').typeahead('val', "");
+                $('.typeahead').typeahead('close');
+            });
 
-    $("#assignTaskModal").on("shown.bs.modal",
-        function () {
-            $("#assignTaskTypeaheadError").hide();
-            $("#assignTaskErrorMsg").text("");
-            $("#txtUsername").focus();
-            $('.typeahead').typeahead('val', "");
-            $('.typeahead').typeahead('close');
-        });
-
-    $("#btnCancelAssignTask").on("click",
-        function () {
-            if (usersFetched) removeAssignUserErrors();
-        });
+        $("#btnCancelAssignTask").on("click",
+            function() {
+                if (usersFetched) removeAssignUserErrors();
+            });
+    }
 
     function handleAssignTaskToUser() {
         $("#btnAssignTaskToUser").on("click",
@@ -407,13 +441,27 @@
             });
     }
 
-    $("#btnMyTaskList").trigger("click");
 
-    $("#btnSelectTeam").click(function () {
-        loadTeamSelectionFromSessionStorage();
+    function populateTasks() {
+        switch (menuItem) {
+        case 0:
+            $("#btnMyTaskList").trigger("click");
+            break;
+        case 1:
+                $("#btnTeamTasks").trigger("click");
+            break;
+        default:
+            throw "Not Implemented";
+        }
+    }
 
-        $("#selectTeamsModal").modal("show");
-    });
+    function handleSelectTeam() {
+        $("#btnSelectTeam").click(function() {
+            loadTeamSelectionFromSessionStorage();
+
+            $("#selectTeamsModal").modal("show");
+        });
+    }
 
     function handleSelectAllTeams() {
 
