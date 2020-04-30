@@ -51,11 +51,11 @@ namespace Portal.Pages.DbAssessment
                 AssessmentDataSourceDocumentName = "From galaxy far far away",
                 TaskStage = WorkflowStage.Completed,
                 Status = WorkflowStatus.Completed,
-                Reviewer = "Rossal Sandford",
+                Reviewer = "Rossall Sandford",
                 Assessor = "Ben Hall",
                 Verifier = "Greg Williams",
                 Team = "Testing Team",
-                ActivityChangedAt = new DateTime(2020, 02, 01)
+                ActivityChangedAt = new DateTime(2020, 03, 01)
             });
 
         }
@@ -65,8 +65,6 @@ namespace Portal.Pages.DbAssessment
             // TODO: Validate search parameters
             // TODO: Get results
             // TODO: Check results count. if zero or too large then warn user
-
-            if (ModelState.IsValid) return;
 
             ErrorMessages = new List<string>()
             {
