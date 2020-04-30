@@ -103,18 +103,21 @@ namespace Portal.Pages
 
                 var taskType = GetTaskType(instance);
 
-                var result = _indexFacade.CalculateDmEndDate(
-                                                                            instance.AssessmentData.EffectiveStartDate.Value,
-                                                                            taskType,
-                                                                            instance.ActivityName,
-                                                                            instance.OnHold);
-                task.DmEndDate = result.dmEndDate;
-                task.DaysToDmEndDate = result.daysToDmEndDate;
+                if (instance.AssessmentData.EffectiveStartDate.HasValue)
+                {
+                    var result = _indexFacade.CalculateDmEndDate(
+                        instance.AssessmentData.EffectiveStartDate.Value,
+                        taskType,
+                        instance.ActivityName,
+                        instance.OnHold);
+                    task.DmEndDate = result.dmEndDate;
+                    task.DaysToDmEndDate = result.daysToDmEndDate;
 
-                var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate);
-                task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
-                task.DaysToDmEndDateRedAlert = alerts.redAlert;
-
+                    var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate.Value);
+                    task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
+                    task.DaysToDmEndDateRedAlert = alerts.redAlert;
+                }
+                
                 SetUsersOnTask(instance, task);
             }
 
