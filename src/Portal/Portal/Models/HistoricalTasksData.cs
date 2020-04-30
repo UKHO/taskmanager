@@ -8,8 +8,9 @@ namespace Portal.Models
         public int WorkflowInstanceId { get; set; }
         public int ProcessId { get; set; }
         public DateTime DmEndDate { get; set; }
-        public string AssessmentDataRsdraNumber { get; set; }
-        public string AssessmentDataSourceDocumentName { get; set; }
+        public string RsdraNumber { get; set; }
+        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+        public string SourceDocumentName { get; set; }
         public WorkflowStage TaskStage { get; set; }
         public WorkflowStatus Status { get; set; }
         public string Reviewer { get; set; }
