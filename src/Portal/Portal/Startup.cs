@@ -209,7 +209,11 @@ namespace Portal
             }
 
             // Auto mapper config
-            var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new TaskViewModelMappingProfile());
+                mc.AddProfile(new HistoricalTasksDataMappingProfile());
+            });
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
