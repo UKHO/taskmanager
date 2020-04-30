@@ -35,7 +35,7 @@ namespace Portal.Pages.DbAssessment
                 AssessmentDataSourceDocumentName = "From galaxy far far away",
                 TaskStage = WorkflowStage.Completed,
                 Status = WorkflowStatus.Completed,
-                Reviewer= "Rossal Sandford",
+                Reviewer= "Rossall Sandford",
                 Assessor = "Ben Hall",
                 Verifier= "Greg Williams",
                 Team = "Testing Team",
