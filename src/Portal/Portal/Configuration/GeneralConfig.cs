@@ -29,6 +29,7 @@ namespace Portal.Configuration
 
         public string TeamsAsCsv { get; set; }
         public string TeamsUnassigned { get; set; }
+        public int HistoricalTasksInitialNumberOfRecords { get; set; }
 
         public IEnumerable<string> GetTeams()
         {

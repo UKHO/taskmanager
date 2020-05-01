@@ -6,9 +6,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Portal.Calculators;
+using Portal.Configuration;
 using Portal.Models;
-using Portal.ViewModels;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -19,6 +20,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IDmEndDateCalculator _dmEndDateCalculator;
         private readonly IMapper _mapper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
 
         [BindProperty(SupportsGet = true)]
         public HistoricalTasksSearchParameters SearchParameters { get; set; }
@@ -30,11 +32,13 @@ namespace Portal.Pages.DbAssessment
         public HistoricalTasksModel(
                                     WorkflowDbContext dbContext,
                                     IDmEndDateCalculator dmEndDateCalculator,
-                                    IMapper mapper)
+                                    IMapper mapper,
+                                    IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
             _dmEndDateCalculator = dmEndDateCalculator;
             _mapper = mapper;
+            _generalConfig = generalConfig;
             ErrorMessages = new List<string>();
             HistoricalTasks = new List<HistoricalTasksData>();
         }
@@ -49,7 +53,7 @@ namespace Portal.Pages.DbAssessment
                     wi.Status == WorkflowStatus.Completed.ToString() ||
                     wi.Status == WorkflowStatus.Terminated.ToString())
                 .OrderByDescending(wi => wi.ActivityChangedAt)
-                .Take(20)
+                .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
                 .ToListAsync();
 
 
