@@ -47,16 +47,10 @@
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control" })</div>
-                            <div class="form-row d-flex justify-content-start">
-                                <span>@Html.ValidationMessageFor(model => model.SearchParameters.ProcessId, "", new { @class = "text-danger" })</span>
-                            </div>
                         </div>
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { type = "number", @class = "form-control" })</div>
-                            <div class="form-row d-flex justify-content-start">
-                                <span>@Html.ValidationMessageFor(model => model.SearchParameters.SourceDocumentId, "", new { @class = "text-danger" })</span>
-                            </div>
                         </div>
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
@@ -131,16 +125,16 @@
                 {
                     <tr>
                         <td>
-                            <a asp-page="@(task.TaskStage == WorkflowStage.Completed ? WorkflowStage.Verify.ToString() : task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                            <a asp-page="@(task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            @task.DmEndDate.ToShortDateString()
+                            @Html.DisplayFor(model => task.DmEndDate)
                         </td>
                         <td>
-                            @task.AssessmentDataRsdraNumber
+                            @task.RsdraNumber
                         </td>
                         <td>
-                            @task.AssessmentDataSourceDocumentName
+                            @task.SourceDocumentName
                         </td>
                         <td>
                             @task.Status
@@ -158,7 +152,7 @@
                             @task.Team
                         </td>
                         <td>
-                            @task.ActivityChangedAt
+                            @Html.DisplayFor(model => task.ActivityChangedAt)
                         </td>
                     </tr>
                 }
@@ -178,7 +172,7 @@
                 'sDom': 'ltipr',
                 "lengthMenu": [5, 10, 25, 50],
                 "scrollX": true,
-                "order": [[1, 'asc']],
+                "order": [[9, 'desc']],
                 "ordering": true
             });
         });
