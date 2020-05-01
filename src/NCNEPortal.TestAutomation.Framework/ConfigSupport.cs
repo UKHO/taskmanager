@@ -53,5 +53,11 @@ namespace NCNEPortal.TestAutomation.Framework
         {
             _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
         }
+
+        [BeforeScenario(Order = 19)]
+        public void RegisterWorkflowPage()
+        {
+            _objectContainer.RegisterTypeAs<WorkflowPage, IWorkflowPage>();
+        }
     }
 }

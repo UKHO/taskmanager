@@ -1,5 +1,4 @@
 ﻿using System;
-using Common.Helpers;
 using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
@@ -10,11 +9,7 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
     public class LandingPage : PageBase, ILandingPage
     {
         public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver,
-                wait,
-                ConfigHelpers.IsAzureDevOpsBuild
-                    ? urlsConfig.NcneLandingPageUrl
-                    : urlsConfig.NcneLocalDevLandingPageUrl)
+            : base(driver, wait, urlsConfig.NcneLandingPageUrl)
         {
         }
 

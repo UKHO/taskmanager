@@ -1,8 +1,8 @@
-﻿using NCNEWorkflowDatabase.EF;
+﻿using System.Collections.Generic;
+using System.IO;
+using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.IO;
 
 namespace Common.Helpers
 {
@@ -22,7 +22,10 @@ namespace Common.Helpers
 
         public ICanSaveChanges PopulateTables()
         {
-            DatabasesHelpers.ClearNcneWorkflowDbTables(_context);
+            DatabasesHelpers.ClearNcneWorkflowDbTables(_context, true);
+
+            AddAdditionalAdUsers();
+
             PopulateTaskStageType();
             PopulateChartType();
             PopulateWorkflowType();
@@ -30,6 +33,16 @@ namespace Common.Helpers
             PopulateHpdUser();
 
             return this;
+        }
+
+        private void AddAdditionalAdUsers()
+        {
+            if (!File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
+
+            var jsonString = File.ReadAllText(@"Data\Users.json");
+            var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
+
+            _context.AdUser.AddRange(users);
         }
 
         private void PopulateTaskInfo()

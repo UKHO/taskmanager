@@ -1,5 +1,4 @@
 ﻿using System;
-using Common.Helpers;
 using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
@@ -11,11 +10,7 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
 
     {
         public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver,
-                wait,
-                ConfigHelpers.IsAzureDevOpsBuild
-                    ? urlsConfig.NcneNewTaskPageUrl
-                    : urlsConfig.NcneLocalDevNewTaskPageUrl)
+            : base(driver, wait, urlsConfig.NcneNewTaskPageUrl)
         {
         }
 

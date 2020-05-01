@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
@@ -19,9 +22,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 
 
 namespace NCNEPortal
@@ -86,7 +86,6 @@ namespace NCNEPortal
                     : s.GetService<IOptions<UriConfig>>().Value.NcneLandingPageUrl,
                 s.GetService<HttpProvider>()));
 
-
             services.AddScoped<INcneUserDbService,
                 NcneUserDbService>(s => new NcneUserDbService(s.GetService<NcneWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
@@ -114,44 +113,11 @@ namespace NCNEPortal
                 options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
             });
 
-
-
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                     isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.NcneWorkflowDbName);
 
             services.AddDbContext<NcneWorkflowDbContext>((serviceProvider, options) =>
                 options.UseSqlServer(workflowDbConnectionString));
-
-
-
-            if (isLocalDevelopment)
-            {
-                using (var sp = services.BuildServiceProvider())
-                using (var context = sp.GetRequiredService<NcneWorkflowDbContext>())
-                {
-                    NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                }
-            }
-
-            using (var sp = services.BuildServiceProvider())
-            {
-                var adUserService = sp.GetRequiredService<INcneUserDbService>();
-
-                try
-                {
-                    var adGroupGuids = new List<Guid>
-                    {
-                        sp.GetService<IOptions<SecretsConfig>>().Value.NcGuid,
-                        sp.GetService<IOptions<SecretsConfig>>().Value.NeGuid
-                    };
-
-                    adUserService.UpdateDbFromAdAsync(adGroupGuids).Wait();
-                }
-                catch (Exception e)
-                {
-                    Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
-                }
-            }
 
             var startupSecretConfig = new StartupSecretsConfig();
             Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
@@ -167,7 +133,11 @@ namespace NCNEPortal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IOptions<SecretsConfig> secrets,
+            INcneUserDbService userDbService,
+            NcneWorkflowDbContext ncneWorkflowDbContext)
         {
             app.UseSerilogRequestLogging(
                 options =>
@@ -214,6 +184,35 @@ namespace NCNEPortal
             });
 
             app.UseAzureAppConfiguration();
+
+            // Seeding
+
+            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
+                SeedWorkflowDatabase(ncneWorkflowDbContext);
+
+            UpdateDbFromAd(secrets.Value, userDbService);
+        }
+
+        private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
+        {
+            using var context = ncneWorkflowDbContext;
+            NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+            Log.Logger.Information($"NCNEWorkflowDatabase successfully re-seeded.");
+        }
+
+        private static void UpdateDbFromAd(SecretsConfig secrets, INcneUserDbService userDbService)
+        {
+            var adGroupGuids = new List<Guid> { secrets.NcGuid, secrets.NeGuid };
+
+            try
+            {
+                userDbService.UpdateDbFromAdAsync(adGroupGuids).Wait();
+                Log.Logger.Information($"Users successfully updated in database from AD for guids");
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
+            }
         }
     }
 }
