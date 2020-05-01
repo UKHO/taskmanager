@@ -53,26 +53,27 @@
 <input type="hidden" asp-for="SerialisedCustomHttpStatusCodes" />
 
 <form id="frmReviewPage" method="post">
+    <fieldset>
+        <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
+        <input type="hidden" asp-for="IsReadOnly" />
+        <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
 
-    <input type="hidden" asp-for="ProcessId" id="hdnProcessId" />
-    <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
+        <div id="taskInformation"></div>
+        <div id="taskInformationError"></div>
 
-    <div id="taskInformation"></div>
-    <div id="taskInformationError"></div>
+        @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
 
-    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
+        <div id="sourceDocuments"></div>
+        <div id="sourceDocumentsError"></div>
 
-    <div id="sourceDocuments"></div>
-    <div id="sourceDocumentsError"></div>
+        <div id="assignTasks"></div>
+        <div id="assignTasksError"></div>
 
-    <div id="assignTasks"></div>
-    <div id="assignTasksError"></div>
+        <button id="btnCreateTask" class="btn btn-primary mb-4" type="button"><span style="padding-right: 5px;"></span>Create additional task</button>
 
-    <button id="btnCreateTask" class="btn btn-primary mb-4" type="button"><span style="padding-right: 5px;"></span>Create additional task</button>
-
-    <div id="existingComments"></div>
-    <div id="AddCommentError"></div>
-
+        <div id="existingComments"></div>
+        <div id="AddCommentError"></div>
+    </fieldset>
 </form>
 
 @* Modal On Hold error comment *@

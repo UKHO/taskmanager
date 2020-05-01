@@ -9,6 +9,11 @@
     handleContinueVerifyDoneWarning();
     handleConfirmReject();
 
+    var isReadOnly = $("#IsReadOnly").val() !== "False";
+    if (isReadOnly) {
+        makeFormReadOnly($("#frmVerifyPage"));
+    }
+
     var formChanged = false;
     $("#frmVerifyPage").change(function () { formChanged = true; });
 
@@ -261,4 +266,9 @@
         });
     }
 
+    function makeFormReadOnly(formElement) {
+        var fieldset = $(formElement).children("fieldset");
+        fieldset.prop("disabled", true);
+        $(formElement).off();
+    }
 });
