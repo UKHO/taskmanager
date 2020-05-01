@@ -1,7 +1,7 @@
-﻿using NCNEWorkflowDatabase.EF.Models;
+﻿using NCNEPortal.Enums;
+using NCNEWorkflowDatabase.EF.Models;
 using System;
 using System.Collections.Generic;
-using NCNEPortal.Enums;
 
 namespace NCNEPortal.Helpers
 {
@@ -21,5 +21,7 @@ namespace NCNEPortal.Helpers
 
         public bool ValidateForCompletion(string assignedUser, string userName, NcneTaskStageType stageType,
             List<string> validationErrorMessages);
+
+        public bool ValidateForRework(string assignedUser, string userName, List<string> validationErrorMessages);
     }
 }

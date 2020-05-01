@@ -531,5 +531,23 @@ namespace NCNEPortal.UnitTests
             Assert.IsTrue(result);
 
         }
+
+
+        [TestCase("", "Valid User1", "Please assign a user to this stage before sending this task for Rework")]
+        [TestCase("Valid User2", "Valid User1", "Current user is not valid for sending this task for Rework")]
+        public void Validation_for_ValidateForRework_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForRework(assignedUser, currentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
+
+        }
+
     }
 }

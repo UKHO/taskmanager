@@ -7,5 +7,7 @@ namespace NCNEPortal.Helpers
     {
 
         List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available);
+
+        NcneTaskStageType GetNextStageForRework(NcneTaskStageType currentStage);
     }
 }

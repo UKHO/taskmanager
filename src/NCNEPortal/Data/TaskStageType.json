@@ -31,7 +31,7 @@
   },
   {
     "TaskStageTypeId": 6,
-    "Name": "V1 rework",
+    "Name": "V1 Rework",
     "SequenceNumber": 6,
     "AllowRework": false
   },
@@ -43,7 +43,7 @@
   },
   {
     "TaskStageTypeId": 8,
-    "Name": "V2 rework",
+    "Name": "V2 Rework",
     "SequenceNumber": 8,
     "AllowRework": false
   },

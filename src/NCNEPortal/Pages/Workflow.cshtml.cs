@@ -428,11 +428,58 @@ namespace NCNEPortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
-        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username)
+        public async Task<IActionResult> OnPostValidateReworkAsync(int processId, int stageId, string username, int stageTypeId)
         {
-            var result = await CompleteStage(processId, stageId);
+            ValidationErrorMessages.Clear();
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            if (!(_pageValidationHelper.ValidateForRework(username, UserFullName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
 
             return new JsonResult(HttpStatusCode.OK);
+        }
+
+        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username,
+            Boolean isRework)
+        {
+            if (isRework)
+            {
+                await SendtoRework(processId, stageId);
+            }
+            else
+            {
+                await CompleteStage(processId, stageId);
+            }
+
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        private async Task<bool> SendtoRework(int processId, int stageId)
+        {
+            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
+
+            var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
+
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            currentStage.Status = NcneTaskStageStatus.Rework.ToString();
+            currentStage.DateCompleted = DateTime.Now;
+            currentStage.AssignedUser = UserFullName;
+
+            var nextStage =
+                _workflowStageHelper.GetNextStageForRework((NcneTaskStageType)currentStage.TaskStageTypeId);
+
+            taskStages.First(t => t.TaskStageTypeId == (int)nextStage).Status =
+                NcneTaskStageStatus.InProgress.ToString();
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         private async Task<bool> CompleteStage(int processId, int stageId)

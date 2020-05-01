@@ -19,6 +19,58 @@
 
     });
 
+    $(".btn-stage-rework").click(function() {
+        var processId = $(this).data("processid");
+        var stageId = $(this).data("taskstageid");
+        var username = $(this).data("username");
+        var stageName = $(this).data("stagename");
+        var stageTypeId = $(this).data("stagetypeid");
+
+
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=ValidateRework",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "stageId": stageId,
+                "username": username,
+                "stageTypeId": stageTypeId
+
+            },
+
+            success: function (result) {
+                $("#hdnConfirmProcessId").val(processId);
+                $("#hdnConfirmStageId").val(stageId);
+                $("#hdnAssignedUser").val(username);
+                $("#Rework").val(true);
+                $("#msgComplete").html("Are you sure you want to send for <span style='font-weight:600'>" + stageName + "</span> Rework?");
+                $("#ConfirmModal").modal("show");
+
+            },
+            error: function (error) {
+                var responseJson = error.responseJSON;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").html("");
+
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+
+            }
+        });
+
+    });
 
     $(".btn-stage-complete").click(function () {
         var processId = $(this).data("processid");
@@ -47,7 +99,8 @@
                 $("#hdnConfirmProcessId").val(processId);
                 $("#hdnConfirmStageId").val(stageId);
                 $("#hdnAssignedUser").val(username);
-                $("#stageName").text(stageName);
+                $("#Rework").val(false);
+                $("#msgComplete").html("Are you sure you want to mark <span style='font-weight:600'>" + stageName + "</span> as complete?");
                 $("#ConfirmModal").modal("show");
 
             },
@@ -69,14 +122,13 @@
 
             }
         });
-
-
     });
 
     $("#btnConfirm").click(function() {
         var processId = $("#hdnConfirmProcessId").val();
         var stageId = $("#hdnConfirmStageId").val();
         var username = $("#hdnAssignedUser").val();
+        var rework = $("#Rework").val();
 
         $.ajax({
             type: "POST",
@@ -88,7 +140,8 @@
             data: {
                 "processId": processId,
                 "stageId": stageId,
-                "username": username
+                "username": username,
+                "isRework" :rework
             },
             success: function(result) {
                 formChanged = false;
