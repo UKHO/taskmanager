@@ -125,7 +125,7 @@
                 {
                     <tr>
                         <td>
-                            <a asp-page="@(task.TaskStage == WorkflowStage.Completed ? WorkflowStage.Verify.ToString() : task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                            <a asp-page="@(task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
                             @Html.DisplayFor(model => task.DmEndDate)

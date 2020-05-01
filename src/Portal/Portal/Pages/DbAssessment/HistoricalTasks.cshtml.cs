@@ -103,7 +103,7 @@ namespace Portal.Pages.DbAssessment
                     task.Assessor = instance.DbAssessmentReviewData.Assessor;
                     task.Verifier = instance.DbAssessmentReviewData.Verifier;
                     break;
-                case WorkflowStage.Completed:
+                case WorkflowStage.Verify:
                     task.Reviewer = instance.DbAssessmentVerifyData.Reviewer;
                     task.Assessor = instance.DbAssessmentVerifyData.Assessor;
                     task.Verifier = instance.DbAssessmentVerifyData.Verifier;
@@ -119,7 +119,7 @@ namespace Portal.Pages.DbAssessment
             {
                 case WorkflowStage.Review:
                     return instance.DbAssessmentReviewData.TaskType;
-                case WorkflowStage.Completed:
+                case WorkflowStage.Verify:
                     return instance.DbAssessmentVerifyData.TaskType;
                 default:
                     throw new NotImplementedException($"'{instance.ActivityName}' not implemented");
