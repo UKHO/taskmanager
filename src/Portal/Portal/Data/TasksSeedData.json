@@ -1450,7 +1450,7 @@
       "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
       "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
       "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+      "effectiveStartDate": null, // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Photographic Sortie",
       "sourceNature": "Graphical",
@@ -1568,9 +1568,9 @@
       "PrimarySdocId": 206733,
       "rsdraNumber": "RSDRA2006000104322",
       "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+      "receiptDate": "2019-12-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
       "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+      "effectiveStartDate": "2019-12-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
       "teamDistributedTo": "HW",
       "sourceDocumentType": "Photographic Sortie",
       "sourceNature": "Graphical",

@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Portal.Calculators;
 using Portal.Models;
 using Portal.ViewModels;
 using WorkflowDatabase.EF;
@@ -16,6 +17,7 @@ namespace Portal.Pages.DbAssessment
     public class HistoricalTasksModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
+        private readonly IDmEndDateCalculator _dmEndDateCalculator;
         private readonly IMapper _mapper;
 
         [BindProperty(SupportsGet = true)]
@@ -25,23 +27,27 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ErrorMessages { get; set; }
 
-        public HistoricalTasksModel(WorkflowDbContext dbContext,
-            IMapper mapper)
+        public HistoricalTasksModel(
+                                    WorkflowDbContext dbContext,
+                                    IDmEndDateCalculator dmEndDateCalculator,
+                                    IMapper mapper)
         {
             _dbContext = dbContext;
+            _dmEndDateCalculator = dmEndDateCalculator;
             _mapper = mapper;
             ErrorMessages = new List<string>();
             HistoricalTasks = new List<HistoricalTasksData>();
         }
 
-        public async Task OnGet()
+        public async Task OnGetAsync()
         {
-            // TODO: Get the latest 20 of finished tasks
             var workflows = await _dbContext.WorkflowInstance
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
                 .Include(vd => vd.DbAssessmentVerifyData)
-                .Where(wi => wi.Status == WorkflowStatus.Completed.ToString() || wi.Status == WorkflowStatus.Terminated.ToString())
+                .Where(wi =>
+                    wi.Status == WorkflowStatus.Completed.ToString() ||
+                    wi.Status == WorkflowStatus.Terminated.ToString())
                 .OrderByDescending(wi => wi.ActivityChangedAt)
                 .Take(20)
                 .ToListAsync();
@@ -53,8 +59,21 @@ namespace Portal.Pages.DbAssessment
             {
                 var task = HistoricalTasks.First(t => t.ProcessId == instance.ProcessId);
                 SetUsersOnTask(instance, task);
-            }
 
+                var taskType = GetTaskType(instance, task);
+
+                if (instance.AssessmentData.EffectiveStartDate.HasValue)
+                {
+                    var result = _dmEndDateCalculator.CalculateDmEndDate(
+                        instance.AssessmentData.EffectiveStartDate.Value,
+                        taskType,
+                        instance.ActivityName);
+
+                    task.DmEndDate = result.dmEndDate;
+
+                }
+
+            }
         }
 
         public void OnPost()
@@ -63,7 +82,7 @@ namespace Portal.Pages.DbAssessment
             // TODO: Get results
             // TODO: Check results count. if zero or too large then warn user
 
-            ErrorMessages = new List<string>()
+            ErrorMessages = new List<string>()  
             {
                 "Error1",
                 "Error2"
@@ -80,8 +99,6 @@ namespace Portal.Pages.DbAssessment
                     task.Assessor = instance.DbAssessmentReviewData.Assessor;
                     task.Verifier = instance.DbAssessmentReviewData.Verifier;
                     break;
-                case WorkflowStage.Assess:
-                    throw new NotImplementedException($"{task.TaskStage} is not implemented.");
                 case WorkflowStage.Completed:
                     task.Reviewer = instance.DbAssessmentVerifyData.Reviewer;
                     task.Assessor = instance.DbAssessmentVerifyData.Assessor;
@@ -91,5 +108,19 @@ namespace Portal.Pages.DbAssessment
                     throw new NotImplementedException($"{task.TaskStage} is not implemented.");
             }
         }
+
+        private string GetTaskType(WorkflowInstance instance, HistoricalTasksData task)
+        {
+            switch (task.TaskStage)
+            {
+                case WorkflowStage.Review:
+                    return instance.DbAssessmentReviewData.TaskType;
+                case WorkflowStage.Completed:
+                    return instance.DbAssessmentVerifyData.TaskType;
+                default:
+                    throw new NotImplementedException($"'{instance.ActivityName}' not implemented");
+            }
+        }
+
     }
 }

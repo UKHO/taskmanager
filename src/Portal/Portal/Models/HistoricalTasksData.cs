@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using WorkflowDatabase.EF;
 
 namespace Portal.Models
@@ -7,7 +8,9 @@ namespace Portal.Models
     {
         public int WorkflowInstanceId { get; set; }
         public int ProcessId { get; set; }
-        public DateTime DmEndDate { get; set; }
+
+        [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
+        public DateTime? DmEndDate { get; set; }
         public string RsdraNumber { get; set; }
         public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
         public string SourceDocumentName { get; set; }
@@ -17,6 +20,8 @@ namespace Portal.Models
         public string Assessor { get; set; }
         public string Verifier { get; set; }
         public string Team { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime ActivityChangedAt { get; set; }
     }
 }
