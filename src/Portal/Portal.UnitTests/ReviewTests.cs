@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.BusinessLogic;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
@@ -25,6 +26,7 @@ namespace Portal.UnitTests
         private HpdDbContext _hpDbContext;
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
+        private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
         private ILogger<ReviewModel> _fakeLogger;
@@ -46,6 +48,7 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
+            _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
@@ -101,7 +104,7 @@ namespace Portal.UnitTests
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _reviewModel = new ReviewModel(_dbContext, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
         }
 
@@ -296,7 +299,7 @@ namespace Portal.UnitTests
 
             var primaryAssignTaskNote = "Testing primary";
 
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient,
                 _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger,
                 _fakepageValidationHelper)
             {
@@ -687,7 +690,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -731,7 +734,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -772,7 +775,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -816,7 +819,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Auth;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
@@ -31,6 +32,7 @@ namespace Portal.UnitTests
         private HpdDbContext _hpDbContext;
         private VerifyModel _verifyModel;
         private int ProcessId { get; set; }
+        private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
         private ILogger<VerifyModel> _fakeLogger;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
@@ -53,6 +55,7 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
+            _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakePcpEventServiceApiClient = A.Fake<IPcpEventServiceApiClient>();
@@ -113,8 +116,17 @@ namespace Portal.UnitTests
 
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
+            _verifyModel = new VerifyModel(_dbContext,
+                _fakeWorkflowBusinessLogicService,
+                _fakeWorkflowServiceApiClient,
+                _fakeEventServiceApiClient,
+                _fakeCommentsHelper,
+                _fakeAdDirectoryService,
+                _fakeLogger,
+                _pageValidationHelper,
+                _fakeCarisProjectHelper,
+                _generalConfig,
+                _fakePcpEventServiceApiClient);
         }
 
         [TearDown]
@@ -584,7 +596,7 @@ namespace Portal.UnitTests
             _pageValidationHelper = A.Fake<IPageValidationHelper>();
 
 
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
@@ -631,7 +643,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -663,7 +675,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -704,7 +716,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -736,7 +748,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePcpEventServiceApiClient);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))

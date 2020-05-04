@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
@@ -24,6 +25,7 @@ namespace Portal.UnitTests
     {
         private WorkflowDbContext _dbContext;
         private _EditDatabaseModel _editDatabaseModel;
+        private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
         private ILogger<_EditDatabaseModel> _fakeLogger;
         private IOptions<GeneralConfig> _generalConfig;
         private IAdDirectoryService _fakeAdDirectoryService;
@@ -43,6 +45,7 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
+            _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeLogger = A.Dummy<ILogger<_EditDatabaseModel>>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
@@ -66,9 +69,14 @@ namespace Portal.UnitTests
                 AdUsername = "TestUserAd",
                 HpdUsername = "HpdUser"
             });
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = ProcessId,
+                Status = WorkflowStatus.Started.ToString()
+            });
             await _dbContext.SaveChangesAsync();
 
-            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeAdDirectoryService,
+            _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeWorkflowBusinessLogicService, _fakeAdDirectoryService,
                                                         _fakeSessionFileGenerator, _fakeCarisProjectHelper, _fakeCarisProjectNameGenerator);
         }
 
@@ -90,7 +98,7 @@ namespace Portal.UnitTests
                 Assessor = userWithHpdUserRecord,
                 Verifier = userWithHpdUserRecord
             };
-            await _dbContext.DbAssessmentAssessData.AddAsync(setupAssessData);
+            _dbContext.DbAssessmentAssessData.Add(setupAssessData);
             await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))

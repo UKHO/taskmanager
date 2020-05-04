@@ -24,6 +24,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Portal.Auth;
+using Portal.BusinessLogic;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -171,6 +172,7 @@ namespace Portal
             services.AddScoped<ISessionFileGenerator, SessionFileGenerator>();
             services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
             services.AddScoped<ICarisProjectNameGenerator, CarisProjectNameGenerator>();
+            services.AddScoped<IWorkflowBusinessLogicService, WorkflowBusinessLogicService>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();

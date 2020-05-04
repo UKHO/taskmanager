@@ -10,10 +10,13 @@ using Common.Messages.Events;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.HttpClients;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using LinkedDocument = WorkflowDatabase.EF.Models.LinkedDocument;
@@ -24,6 +27,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<UriConfig> _uriConfig;
+        private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IDocumentStatusFactory _documentStatusFactory;
@@ -37,12 +41,15 @@ namespace Portal.Pages.DbAssessment
         public IEnumerable<DatabaseDocumentStatus> DatabaseDocuments { get; set; }
 
         public _SourceDocumentDetailsModel(WorkflowDbContext dbContext,
-            IOptions<UriConfig> uriConfig, IEventServiceApiClient eventServiceApiClient,
+            IOptions<UriConfig> uriConfig,
+            IWorkflowBusinessLogicService workflowBusinessLogicService,
+            IEventServiceApiClient eventServiceApiClient,
             IDataServiceApiClient dataServiceApiClient, IDocumentStatusFactory documentStatusFactory,
             ILogger<_SourceDocumentDetailsModel> logger)
         {
             _dbContext = dbContext;
             _uriConfig = uriConfig;
+            _workflowBusinessLogicService = workflowBusinessLogicService;
             _eventServiceApiClient = eventServiceApiClient;
             _dataServiceApiClient = dataServiceApiClient;
             _documentStatusFactory = documentStatusFactory;
@@ -173,6 +180,19 @@ namespace Portal.Pages.DbAssessment
 
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId, int processId, Guid correlationId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostAttachLinkedDocumentAsync));
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+                throw appException;
+            }
+
             // Update DB first, as it is the one used for populating Attached secondary sources
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                                     _documentStatusFactory,
@@ -208,6 +228,19 @@ namespace Portal.Pages.DbAssessment
         /// <returns></returns>
         public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, string docName, string docType, int processId, Guid correlationId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostAddSourceFromSdraAsync));
+            
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot add source from SDRA");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot add source from SDRA");
+                throw appException;
+            }
+
             if (_dbContext.DatabaseDocumentStatus.Any(dds => dds.SdocId == sdocId && dds.ProcessId == processId))
             {
                 // Method not allowed - Sdoc Id already added previously

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Portal.BusinessLogic;
 using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
@@ -25,6 +26,7 @@ namespace Portal.Pages.DbAssessment
     public class ReviewModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
+        private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IDataServiceApiClient _dataServiceApiClient;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -77,6 +79,7 @@ namespace Portal.Pages.DbAssessment
         }
 
         public ReviewModel(WorkflowDbContext dbContext,
+            IWorkflowBusinessLogicService workflowBusinessLogicService,
             IDataServiceApiClient dataServiceApiClient,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
@@ -86,6 +89,7 @@ namespace Portal.Pages.DbAssessment
             IPageValidationHelper pageValidationHelper)
         {
             _dbContext = dbContext;
+            _workflowBusinessLogicService = workflowBusinessLogicService;
             _dataServiceApiClient = dataServiceApiClient;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
@@ -101,9 +105,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            var workflowInstance = await _dbContext.WorkflowInstance
-                .FirstAsync(w => w.ProcessId == processId);
-            IsReadOnly = workflowInstance.IsReadOnly;
+            IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentReviewData);
@@ -139,9 +141,29 @@ namespace Portal.Pages.DbAssessment
 
             LogContext.PushProperty("UserFullName", UserFullName);
 
+            var workflowInstance = _dbContext.WorkflowInstance
+                .Include(wi => wi.AssessmentData)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
+
+            if (workflowInstance == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException =  new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been terminated");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been terminated");
+                throw appException;
+            }
+
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            var workflowInstance = UpdateWorkflowInstanceAsTerminated(processId);
+            UpdateWorkflowInstanceAsTerminated(workflowInstance);
             await _commentsHelper.AddComment($"Terminate comment: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
@@ -163,6 +185,16 @@ namespace Portal.Pages.DbAssessment
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been terminated");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been terminated");
+                throw appException;
+            }
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
 
@@ -435,18 +467,8 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(int processId)
+        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(WorkflowInstance workflowInstance)
         {
-            var workflowInstance = _dbContext.WorkflowInstance
-                .Include(wi => wi.AssessmentData)
-                .FirstOrDefault(wi => wi.ProcessId == processId);
-
-            if (workflowInstance == null)
-            {
-                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
-                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
-            }
-
             workflowInstance.Status = WorkflowStatus.Terminated.ToString();
             workflowInstance.ActivityChangedAt = DateTime.Today;
             _dbContext.SaveChanges();
