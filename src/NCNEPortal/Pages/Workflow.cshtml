@@ -400,11 +400,11 @@
                                         <strong>@comment.Username</strong>
                                     </div>
                                     <div>
-                                        @comment.Created.ToShortDateString()
+                                        @comment.Created.ToLongDateString()
                                     </div>
                                 </td>
                                 <td style="width:20px">
-                                    @if (@comment.Comment == "")
+                                    @if (@comment.ActionIndicator)
                                     {
                                         <span class="fa fa-edit" style="color: #EF8123"> </span>
                                     }
@@ -414,9 +414,9 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (@comment.Comment == "")
+                                    @if (@comment.ActionIndicator)
                                     {
-                                        <span style="color: #ef8123">Edited @comment.ActionRole</span>
+                                        <span style="color: #ef8123">@comment.Comment</span>
                                     }
                                     else
                                     {

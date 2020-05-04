@@ -1,4 +1,5 @@
-﻿using NCNEWorkflowDatabase.EF;
+﻿using NCNEPortal.Enums;
+using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using System;
 using System.Threading.Tasks;
@@ -28,6 +29,34 @@ namespace NCNEPortal.Helpers
             });
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task AddTaskSystemComment(NcneCommentType changeType, int processId, string userFullName, string stageName,
+            string roleName, DateTime? dateChangedTo)
+        {
+            var comment = changeType switch
+            {
+                NcneCommentType.CompleteStage => stageName + " Step completed",
+                NcneCommentType.ReworkStage => stageName + " Step sent for Rework",
+                NcneCommentType.DateChange => "Task Information dates changed",
+                NcneCommentType.CompilerChange => "Compiler role changed to " + roleName,
+                NcneCommentType.V1Change => "V1 role changed to " + roleName,
+                NcneCommentType.V2Change => "V2 role changed to " + roleName,
+                NcneCommentType.PublisherChange => "Publisher role changed to " + roleName,
+                NcneCommentType.CarisPublish => "Chart published in CARIS",
+                NcneCommentType.CompleteWorkflow => "workflow completed",
+                _ => throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null),
+            };
+
+            await _dbContext.TaskComment.AddAsync
+            (new TaskComment
+            {
+                ProcessId = processId,
+                Username = userFullName,
+                Comment = comment,
+                ActionIndicator = true,
+                Created = DateTime.Now
+            });
         }
 
         public async Task AddTaskStageComment(string comment, int processId, int taskStageId, string userFullName)

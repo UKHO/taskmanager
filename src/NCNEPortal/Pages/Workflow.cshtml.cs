@@ -477,7 +477,12 @@ namespace NCNEPortal
             taskStages.First(t => t.TaskStageTypeId == (int)nextStage).Status =
                 NcneTaskStageStatus.InProgress.ToString();
 
+            var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
+
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, UserFullName, stageName, null, null);
+
             await _dbContext.SaveChangesAsync();
+
 
             return true;
         }
@@ -512,6 +517,10 @@ namespace NCNEPortal
                         NcneTaskStageStatus.InProgress.ToString();
                 }
             }
+
+            var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
+
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteStage, processId, UserFullName, stageName, null, null);
 
             await _dbContext.SaveChangesAsync();
 
@@ -555,96 +564,80 @@ namespace NCNEPortal
 
         private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
                       .Include(s => s.TaskStage).FirstAsync(t => t.ProcessId == processId);
             task.Ion = Ion;
             task.ChartNumber = ChartNo;
             task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
-            task.RepromatDate = RepromatDate;
+
             if (chartType == "Adoption" && RepromatDate != null)
             {
-                task.PublicationDate =
-                    PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
+
+                PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
 
             }
-            else
-            {
-                task.PublicationDate = PublicationDate;
-            }
 
+            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher, UserFullName);
 
+            task.RepromatDate = RepromatDate;
+
+            task.PublicationDate = PublicationDate;
             task.AnnounceDate = AnnounceDate;
             task.CommitDate = CommitToPrintDate;
             task.CisDate = CISDate;
             task.Country = Country;
-            task.TaskRole.Compiler = Compiler;
-            task.TaskRole.VerifierOne = Verifier1;
-            task.TaskRole.VerifierTwo = Verifier2;
-            task.TaskRole.Publisher = Publisher;
-
             task.ThreePs = SentTo3Ps;
             task.SentDate3Ps = SendDate3ps;
             task.ExpectedDate3Ps = ExpectedReturnDate3ps;
             task.ActualDate3Ps = ActualReturnDate3ps;
 
-            int formStageId = 0;
-            int cisStageId = 0;
-            int commitStageId = 0;
-            int publishStageId = 0;
+            UpdateRoles(task);
 
-            //Update deadline dates in the taskstages
-            foreach (var taskStage in task.TaskStage)
-            {
-                switch ((NcneTaskStageType)taskStage.TaskStageTypeId)
-                {
-                    case NcneTaskStageType.Forms:
-                        {
-                            taskStage.DateExpected = AnnounceDate;
-                            formStageId = taskStage.TaskStageId;
-                            break;
-                        }
+            UpdateStatus(task);
 
-                    case NcneTaskStageType.Commit_To_Print:
-                        {
-                            taskStage.DateExpected = CommitToPrintDate;
-                            commitStageId = taskStage.TaskStageId;
-                            break;
-                        }
+            var deadLines = UpdateDeadlineDates(task);
 
-                    case NcneTaskStageType.CIS:
-                        {
-                            taskStage.DateExpected = CISDate;
-                            cisStageId = taskStage.TaskStageId;
-                            break;
-                        }
+            await _dbContext.SaveChangesAsync();
 
-                    case NcneTaskStageType.Publication:
-                        {
-                            taskStage.DateExpected = PublicationDate;
-                            publishStageId = taskStage.TaskStageId;
-                            break;
-                        }
-                }
-            }
+            return deadLines;
 
-            foreach (var taskStage in task.TaskStage.Where
-                         (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
-            {
-                taskStage.AssignedUser = (NcneTaskStageType)taskStage.TaskStageTypeId switch
-                {
-                    NcneTaskStageType.With_Geodesy => this.Compiler,
-                    NcneTaskStageType.With_SDRA => this.Compiler,
-                    NcneTaskStageType.Specification => this.Compiler,
-                    NcneTaskStageType.Compile => this.Compiler,
-                    NcneTaskStageType.V1_Rework => this.Compiler,
-                    NcneTaskStageType.V2_Rework => this.Compiler,
-                    NcneTaskStageType.V1 => this.Verifier1,
-                    NcneTaskStageType.V2 => this.Verifier2,
-                    _ => this.Publisher
-                };
-            }
 
+        }
+
+        private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
+              string v1, string v2, string publisher, string UserFullName)
+        {
+
+
+            //update the system comment on changes
+            if (((PublicationDate != null) && (task.PublicationDate != PublicationDate)) ||
+                ((RepromatDate != null) && (task.RepromatDate != RepromatDate)) ||
+                (task.AnnounceDate != AnnounceDate) ||
+                (task.CommitDate != CommitToPrintDate) ||
+                (task.CisDate != CISDate))
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, UserFullName, null,
+                    null, null);
+
+            if (!string.IsNullOrEmpty(Compiler) && task.TaskRole.Compiler != compiler)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, UserFullName,
+                    null, Compiler, null);
+            if (!string.IsNullOrEmpty(Verifier1) && task.TaskRole.VerifierOne != v1)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, UserFullName,
+                    null, Verifier1, null);
+            if (!string.IsNullOrEmpty(Verifier2) && task.TaskRole.VerifierTwo != v2)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, UserFullName,
+                    null, Verifier2, null);
+            if (!string.IsNullOrEmpty(Publisher) && task.TaskRole.Publisher != publisher)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.PublisherChange, processId, UserFullName,
+                    null, Publisher, null);
+        }
+
+
+        private void UpdateStatus(TaskInfo task)
+        {
             var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
             var v2Rework = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2_Rework);
 
@@ -664,20 +657,76 @@ namespace NCNEPortal
                     if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Open.ToString();
                 }
             }
-
-            await _dbContext.SaveChangesAsync();
-
-            return new DeadlineId()
-            {
-                FormsDate = formStageId,
-                CommitDate = commitStageId,
-                CisDate = cisStageId,
-                PublishDate = publishStageId
-            };
-
-
         }
 
+        private void UpdateRoles(TaskInfo task)
+        {
+            task.TaskRole.Compiler = Compiler;
+            task.TaskRole.VerifierOne = Verifier1;
+            task.TaskRole.VerifierTwo = Verifier2;
+            task.TaskRole.Publisher = Publisher;
+
+            foreach (var taskStage in task.TaskStage.Where
+                (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
+            {
+                taskStage.AssignedUser = (NcneTaskStageType)taskStage.TaskStageTypeId switch
+                {
+                    NcneTaskStageType.With_Geodesy => this.Compiler,
+                    NcneTaskStageType.With_SDRA => this.Compiler,
+                    NcneTaskStageType.Specification => this.Compiler,
+                    NcneTaskStageType.Compile => this.Compiler,
+                    NcneTaskStageType.V1_Rework => this.Compiler,
+                    NcneTaskStageType.V2_Rework => this.Compiler,
+                    NcneTaskStageType.V1 => this.Verifier1,
+                    NcneTaskStageType.V2 => this.Verifier2,
+                    _ => this.Publisher
+                };
+            }
+        }
+
+        private DeadlineId UpdateDeadlineDates(TaskInfo task)
+        {
+
+            DeadlineId result = new DeadlineId();
+
+            //Update deadline dates in the taskStages
+            foreach (var taskStage in task.TaskStage)
+            {
+                switch ((NcneTaskStageType)taskStage.TaskStageTypeId)
+                {
+                    case NcneTaskStageType.Forms:
+                        {
+                            taskStage.DateExpected = AnnounceDate;
+                            result.FormsDate = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.Commit_To_Print:
+                        {
+                            taskStage.DateExpected = CommitToPrintDate;
+                            result.CommitDate = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.CIS:
+                        {
+                            taskStage.DateExpected = CISDate;
+                            result.CisDate = taskStage.TaskStageId;
+                            break;
+                        }
+
+                    case NcneTaskStageType.Publication:
+                        {
+                            taskStage.DateExpected = PublicationDate;
+                            result.PublishDate = taskStage.TaskStageId;
+                            break;
+                        }
+                }
+            }
+
+            return result;
+
+        }
 
 
         public async Task<JsonResult> OnGetUsersAsync()
@@ -717,16 +766,7 @@ namespace NCNEPortal
 
             if (!string.IsNullOrEmpty(txtComment))
             {
-                await _dbContext.TaskComment.AddAsync(new TaskComment()
-                {
-                    ProcessId = commentProcessId,
-                    ActionIndicator = false,
-                    Comment = txtComment,
-                    Created = DateTime.Now,
-                    Username = UserFullName
-                });
-
-                await _dbContext.SaveChangesAsync();
+                await _commentsHelper.AddTaskComment(txtComment, commentProcessId, UserFullName);
             }
 
             var result = new[]
@@ -746,16 +786,7 @@ namespace NCNEPortal
 
             if (!string.IsNullOrEmpty(txtComment))
             {
-                await _dbContext.TaskStageComment.AddAsync(new TaskStageComment()
-                {
-                    ProcessId = commentProcessId,
-                    TaskStageId = stageId,
-                    Comment = txtComment,
-                    Created = DateTime.Now,
-                    Username = UserFullName
-                });
-
-                await _dbContext.SaveChangesAsync();
+                await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, UserFullName);
             }
 
             var result = new[]
