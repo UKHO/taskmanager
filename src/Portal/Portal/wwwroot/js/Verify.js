@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    var isReadOnly = $("#IsReadOnly").val() === "True";
     var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
 
     $("#Reviewer").prop("disabled", true);
@@ -9,7 +10,6 @@
     handleContinueVerifyDoneWarning();
     handleConfirmReject();
 
-    var isReadOnly = $("#IsReadOnly").val() !== "False";
     if (isReadOnly) {
         makeFormReadOnly($("#frmVerifyPage"));
     }
@@ -269,6 +269,5 @@
     function makeFormReadOnly(formElement) {
         var fieldset = $(formElement).children("fieldset");
         fieldset.prop("disabled", true);
-        $(formElement).off();
     }
 });

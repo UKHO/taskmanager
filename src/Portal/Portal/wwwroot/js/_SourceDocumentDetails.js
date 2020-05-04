@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
     var processId = Number($("#hdnProcessId").val());
+    var isReadOnly = $("#IsReadOnly").val() === "True";
 
     getSourceDocuments();
 
@@ -16,6 +17,10 @@
                 $("#sourceDocuments").html(result);
 
                 $(".attachLinkedDocumentSpinnerContainer").hide();
+
+                if (isReadOnly) {
+                    return;
+                }
 
                 applyCollapseIconHandler();
                 applyAttachLinkedDocumentHandlers();
