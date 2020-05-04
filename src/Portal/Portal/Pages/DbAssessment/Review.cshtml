@@ -38,15 +38,22 @@
 <hr />
 <div class="col-12">
     <div class="row justify-content-end btn-size">
-        <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
-        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
-        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
-        <div class="col-2">
+        @if (Model.IsReadOnly)
+        {
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/DbAssessment/HistoricalTasks'" /></div>
+        }
+        else
+        {
+            <div class="col-2"><button id="btnTerminate" class="btn btn-primary btn-block">Terminate</button></div>
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+            <div class="col-2">
 
-            <input type="hidden" asp-for="ProcessId" />
-            <button id="btnDone" class="btn btn-primary btn-block" type="button">Done</button>
+                <input type="hidden" asp-for="ProcessId" />
+                <button id="btnDone" class="btn btn-primary btn-block" type="button">Done</button>
 
-        </div>
+            </div>
+        }
     </div>
 </div>
 
