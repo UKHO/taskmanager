@@ -1,5 +1,4 @@
 ﻿using System;
-using Common.Helpers;
 using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
@@ -7,14 +6,10 @@ using OpenQA.Selenium.Support.UI;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class WorkflowPage : PageBase
+    public class WorkflowPage : PageBase, IWorkflowPage
     {
         public WorkflowPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver,
-                wait,
-                ConfigHelpers.IsAzureDevOpsBuild
-                    ? urlsConfig.NcneWorkflowPageUrl
-                    : urlsConfig.NcneLocalDevWorkflowPageUrl)
+            : base(driver, wait, urlsConfig.NcneWorkflowPageUrl)
         {
         }
 
@@ -35,6 +30,20 @@ namespace NCNEPortal.TestAutomation.Framework.Pages
                     return false;
                 }
             }
+        }
+
+        public void NavigateToProcessId(int processId)
+        {
+            var uriBuilder = new UriBuilder(PageUrl);
+
+            var queryToAppend = $"ProcessId={processId}";
+
+            if (uriBuilder.Query?.Length > 1)
+                uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + queryToAppend;
+            else
+                uriBuilder.Query = queryToAppend;
+
+            Driver.Navigate().GoToUrl(uriBuilder.ToString());
         }
     }
 }

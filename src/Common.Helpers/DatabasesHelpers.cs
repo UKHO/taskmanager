@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
-using System;
-using System.Data.SqlClient;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -92,9 +92,8 @@ namespace Common.Helpers
             }
         }
 
-        public static void ClearNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
+        public static void ClearNcneWorkflowDbTables(NcneWorkflowDbContext dbContext, bool reseedIdentity = true)
         {
-
             dbContext.TaskStageComment.RemoveRange(dbContext.TaskStageComment);
             dbContext.TaskComment.RemoveRange(dbContext.TaskComment);
             dbContext.TaskRole.RemoveRange(dbContext.TaskRole);
@@ -111,7 +110,16 @@ namespace Common.Helpers
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
+
+            if (reseedIdentity) ReSeedNcneWorkflowDbTables(dbContext);
+
             dbContext.SaveChanges();
+        }
+
+        private static void ReSeedNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
+        {
+            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
         }
     }
 }

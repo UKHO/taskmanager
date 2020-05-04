@@ -32,18 +32,14 @@ namespace NCNEPortal.AccessibilityTests
         }
 
         [OneTimeSetUp]
-        public static void BeforeAllTests()
-        {
-            ConfigSupport.PopulateConfigsFromAzure();
-        }
-
-        [SetUp]
-        public void Setup()
+        public void BeforeAllTests()
         {
             _objectContainer.RegisterTypeAs<NunitTestLogging, ITestLogging>();
+            ConfigSupport.PopulateConfigsFromAzure();
 
             _configSupport.RegisterAzureConfigs();
             _configSupport.RegisterLandingPage();
+            _configSupport.RegisterWorkflowPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();
@@ -52,7 +48,7 @@ namespace NCNEPortal.AccessibilityTests
             _axeResultAnalyser = _objectContainer.Resolve<AxeResultAnalyser>();
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             _webDriverSupport.DisposeWebdriver();
@@ -65,6 +61,21 @@ namespace NCNEPortal.AccessibilityTests
             landingPage.NavigateTo();
 
             Assert.IsTrue(landingPage.HasLoaded);
+
+            var axeResult = _axePageEvaluator.GetAxeResults();
+
+            _axeResultAnalyser.AssertAxeViolations(axeResult);
+        }
+
+        [Test]
+        public void WorkflowPageIsAccessible()
+        {
+            var workflowPage = _objectContainer.Resolve<WorkflowPage>();
+
+            // For now, relies on deployment re-seeding UAT
+            workflowPage.NavigateToProcessId(1);
+
+            Assert.IsTrue(workflowPage.HasLoaded);
 
             var axeResult = _axePageEvaluator.GetAxeResults();
 
