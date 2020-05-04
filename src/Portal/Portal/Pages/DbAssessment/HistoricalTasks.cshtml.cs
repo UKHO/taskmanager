@@ -102,8 +102,22 @@ namespace Portal.Pages.DbAssessment
                         && (!SearchParameters.SourceDocumentId.HasValue || wi.AssessmentData.PrimarySdocId == SearchParameters.SourceDocumentId.Value)
                         && (string.IsNullOrWhiteSpace(SearchParameters.RsdraNumber) || wi.AssessmentData.RsdraNumber.ToUpper().Contains(SearchParameters.RsdraNumber.ToUpper()))
                         && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
-                       ))
-                       .OrderByDescending(wi => wi.ActivityChangedAt)
+                        && (string.IsNullOrWhiteSpace(SearchParameters.Reviewer) 
+                                || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                         wi.DbAssessmentReviewData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
+                                         : wi.DbAssessmentVerifyData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
+                        && (string.IsNullOrWhiteSpace(SearchParameters.Assessor)
+                            || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                wi.DbAssessmentReviewData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
+                                : wi.DbAssessmentVerifyData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
+                        && (string.IsNullOrWhiteSpace(SearchParameters.Verifier)
+                            || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                wi.DbAssessmentReviewData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
+                                : wi.DbAssessmentVerifyData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
+
+                        ))
+                .OrderByDescending(wi => wi.ActivityChangedAt)
+                .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
                 .ToListAsync();
 
             HistoricalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
