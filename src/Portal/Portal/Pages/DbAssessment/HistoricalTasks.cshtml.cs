@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common.Helpers;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -21,6 +25,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IDmEndDateCalculator _dmEndDateCalculator;
         private readonly IMapper _mapper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IAdDirectoryService _adDirectoryService;
+        private readonly ILogger<HistoricalTasksModel> _logger;
 
         [BindProperty(SupportsGet = true)]
         public HistoricalTasksSearchParameters SearchParameters { get; set; }
@@ -28,23 +34,44 @@ namespace Portal.Pages.DbAssessment
         public List<HistoricalTasksData> HistoricalTasks { get; set; }
 
         public List<string> ErrorMessages { get; set; }
-
+        
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+        
         public HistoricalTasksModel(
                                     WorkflowDbContext dbContext,
                                     IDmEndDateCalculator dmEndDateCalculator,
                                     IMapper mapper,
-                                    IOptions<GeneralConfig> generalConfig)
+                                    IOptions<GeneralConfig> generalConfig,
+                                    IAdDirectoryService adDirectoryService,
+                                    ILogger<HistoricalTasksModel> logger)
         {
             _dbContext = dbContext;
             _dmEndDateCalculator = dmEndDateCalculator;
             _mapper = mapper;
             _generalConfig = generalConfig;
+            _adDirectoryService = adDirectoryService;
+            _logger = logger;
+
             ErrorMessages = new List<string>();
             HistoricalTasks = new List<HistoricalTasksData>();
         }
 
         public async Task OnGetAsync()
         {
+            LogContext.PushProperty("ActivityName", "HistoricalTasks");
+            LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
+
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Entering Get initial Historical Tasks");
+
             List<WorkflowInstance> workflows = null;
             try
             {
@@ -58,28 +85,45 @@ namespace Portal.Pages.DbAssessment
                     .OrderByDescending(wi => wi.ActivityChangedAt)
                     .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
                     .ToListAsync();
+
+
+                _logger.LogInformation("Successfully returned initial data from database");
             }
             catch (Exception e)
             {
                 ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting Historical Tasks from database", e);
             }
 
             if (workflows != null && workflows.Count > 0)
             {
                 try
                 {
-
                     HistoricalTasks = PopulateHistoricalTasks(workflows);
+                    _logger.LogInformation("Successfully populated Historical Tasks from initial data");
+
                 }
                 catch (Exception e)
                 {
-                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from filtered data: {e.Message}");
+                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from initial data: {e.Message}");
+                    _logger.LogError("Error occurred while populating Historical Tasks from initial data", e);
+
                 }
             }
         }
 
-        public async Task OnPost()
+        public async Task OnPostAsync()
         {
+            LogContext.PushProperty("ActivityName", "HistoricalTasks");
+            LogContext.PushProperty("PortalResource", nameof(OnPostAsync));
+            LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
+
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
+
             List<WorkflowInstance> workflows = null;
 
             try
@@ -112,10 +156,15 @@ namespace Portal.Pages.DbAssessment
                     .OrderByDescending(wi => wi.ActivityChangedAt)
                     .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
                     .ToListAsync();
+
+                _logger.LogInformation("Successfully returned filtered data from database");
+
             }
             catch (Exception e)
             {
-                ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+                ErrorMessages.Add($"Error occurred while getting filtered Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting filtered Historical Tasks from database with parameters {HistoricalTasksSearchParameters}", e);
+
             }
 
             if (workflows != null && workflows.Count > 0)
@@ -124,10 +173,14 @@ namespace Portal.Pages.DbAssessment
                 {
 
                     HistoricalTasks = PopulateHistoricalTasks(workflows);
+                    _logger.LogInformation("Successfully populated Historical Tasks from filtered data");
+
                 }
                 catch (Exception e)
                 {
                     ErrorMessages.Add($"Error occurred while populating Historical Tasks from filtered data: {e.Message}");
+                    _logger.LogError("Error occurred while populating Historical Tasks from filtered data with parameters {HistoricalTasksSearchParameters}", e);
+
                 }
             }
         }
