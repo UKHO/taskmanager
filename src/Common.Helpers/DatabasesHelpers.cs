@@ -119,7 +119,7 @@ namespace Common.Helpers
 
         private static void ReSeedNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
         {
-            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('[taskmanager-uat-ncneworkflowdatabase].[dbo].[TaskInfo]', RESEED, 0)");
+            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
         }
     }
 }

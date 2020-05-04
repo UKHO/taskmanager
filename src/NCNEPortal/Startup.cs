@@ -195,8 +195,8 @@ namespace NCNEPortal
 
         private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
         {
-            using var context = ncneWorkflowDbContext;
-            NcneTestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+            var d = ncneWorkflowDbContext.Database.GetDbConnection();
+            NcneTestWorkflowDatabaseSeeder.UsingDbContext(ncneWorkflowDbContext).PopulateTables().SaveChanges();
             Log.Logger.Information($"NCNEWorkflowDatabase successfully re-seeded.");
         }
 
