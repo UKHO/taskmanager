@@ -45,53 +45,91 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGetAsync()
         {
-            var workflows = await _dbContext.WorkflowInstance
-                .Include(a => a.AssessmentData)
-                .Include(d => d.DbAssessmentReviewData)
-                .Include(vd => vd.DbAssessmentVerifyData)
-                .Where(wi =>
-                    wi.Status == WorkflowStatus.Completed.ToString() ||
-                    wi.Status == WorkflowStatus.Terminated.ToString())
-                .OrderByDescending(wi => wi.ActivityChangedAt)
-                .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
-                .ToListAsync();
+            List<WorkflowInstance> workflows = null;
+            try
+            {
+                workflows = await _dbContext.WorkflowInstance
+                    .Include(a => a.AssessmentData)
+                    .Include(d => d.DbAssessmentReviewData)
+                    .Include(vd => vd.DbAssessmentVerifyData)
+                    .Where(wi =>
+                        wi.Status == WorkflowStatus.Completed.ToString() ||
+                        wi.Status == WorkflowStatus.Terminated.ToString())
+                    .OrderByDescending(wi => wi.ActivityChangedAt)
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+            }
 
+            if (workflows != null && workflows.Count > 0)
+            {
+                try
+                {
 
-            HistoricalTasks = PopulateHistoricalTasks(workflows);
+                    HistoricalTasks = PopulateHistoricalTasks(workflows);
+                }
+                catch (Exception e)
+                {
+                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from filtered data: {e.Message}");
+                }
+            }
         }
 
         public async Task OnPost()
         {
-            var workflows = await _dbContext.WorkflowInstance
-                .Include(a => a.AssessmentData)
-                .Include(d => d.DbAssessmentReviewData)
-                .Include(vd => vd.DbAssessmentVerifyData)
-                .Where(wi =>
-                    (wi.Status == WorkflowStatus.Completed.ToString() || wi.Status == WorkflowStatus.Terminated.ToString())
-                    && (
-                        (!SearchParameters.ProcessId.HasValue || wi.ProcessId == SearchParameters.ProcessId.Value)
-                        && (!SearchParameters.SourceDocumentId.HasValue || wi.AssessmentData.PrimarySdocId == SearchParameters.SourceDocumentId.Value)
-                        && (string.IsNullOrWhiteSpace(SearchParameters.RsdraNumber) || wi.AssessmentData.RsdraNumber.ToUpper().Contains(SearchParameters.RsdraNumber.ToUpper()))
-                        && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
-                        && (string.IsNullOrWhiteSpace(SearchParameters.Reviewer) 
+            List<WorkflowInstance> workflows = null;
+
+            try
+            {
+                workflows = await _dbContext.WorkflowInstance
+                    .Include(a => a.AssessmentData)
+                    .Include(d => d.DbAssessmentReviewData)
+                    .Include(vd => vd.DbAssessmentVerifyData)
+                    .Where(wi =>
+                        (wi.Status == WorkflowStatus.Completed.ToString() || wi.Status == WorkflowStatus.Terminated.ToString())
+                        && (
+                            (!SearchParameters.ProcessId.HasValue || wi.ProcessId == SearchParameters.ProcessId.Value)
+                            && (!SearchParameters.SourceDocumentId.HasValue || wi.AssessmentData.PrimarySdocId == SearchParameters.SourceDocumentId.Value)
+                            && (string.IsNullOrWhiteSpace(SearchParameters.RsdraNumber) || wi.AssessmentData.RsdraNumber.ToUpper().Contains(SearchParameters.RsdraNumber.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Reviewer)
+                                    || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                             wi.DbAssessmentReviewData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
+                                             : wi.DbAssessmentVerifyData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Assessor)
                                 || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                         wi.DbAssessmentReviewData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
-                                         : wi.DbAssessmentVerifyData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
-                        && (string.IsNullOrWhiteSpace(SearchParameters.Assessor)
-                            || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                wi.DbAssessmentReviewData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
-                                : wi.DbAssessmentVerifyData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
-                        && (string.IsNullOrWhiteSpace(SearchParameters.Verifier)
-                            || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                wi.DbAssessmentReviewData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
-                                : wi.DbAssessmentVerifyData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
+                                    wi.DbAssessmentReviewData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Verifier)
+                                || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                    wi.DbAssessmentReviewData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
 
-                        ))
-                .OrderByDescending(wi => wi.ActivityChangedAt)
-                .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
-                .ToListAsync();
+                            ))
+                    .OrderByDescending(wi => wi.ActivityChangedAt)
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+            }
 
-            HistoricalTasks = PopulateHistoricalTasks(workflows);
+            if (workflows != null && workflows.Count > 0)
+            {
+                try
+                {
+
+                    HistoricalTasks = PopulateHistoricalTasks(workflows);
+                }
+                catch (Exception e)
+                {
+                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from filtered data: {e.Message}");
+                }
+            }
         }
 
         private List<HistoricalTasksData> PopulateHistoricalTasks(List<WorkflowInstance> workflows)
