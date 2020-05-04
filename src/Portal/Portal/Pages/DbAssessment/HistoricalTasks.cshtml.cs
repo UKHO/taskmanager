@@ -57,40 +57,11 @@ namespace Portal.Pages.DbAssessment
                 .ToListAsync();
 
 
-            HistoricalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
-
-            foreach (var instance in workflows)
-            {
-                var task = HistoricalTasks.First(t => t.ProcessId == instance.ProcessId);
-                SetUsersOnTask(instance, task);
-
-                var taskType = GetTaskType(instance, task);
-
-                if (instance.AssessmentData.EffectiveStartDate.HasValue)
-                {
-                    var result = _dmEndDateCalculator.CalculateDmEndDate(
-                        instance.AssessmentData.EffectiveStartDate.Value,
-                        taskType,
-                        instance.ActivityName);
-
-                    task.DmEndDate = result.dmEndDate;
-
-                }
-
-            }
+            HistoricalTasks = PopulateHistoricalTasks(workflows);
         }
 
         public async Task OnPost()
         {
-            // TODO: Validate search parameters
-            // TODO: Get results
-            // TODO: Check results count. if zero or too large then warn user
-            //ErrorMessages = new List<string>()  
-            //{
-            //    "Error1",
-            //    "Error2"
-            //};
-
             var workflows = await _dbContext.WorkflowInstance
                 .Include(a => a.AssessmentData)
                 .Include(d => d.DbAssessmentReviewData)
@@ -120,11 +91,16 @@ namespace Portal.Pages.DbAssessment
                 .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
                 .ToListAsync();
 
-            HistoricalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
+            HistoricalTasks = PopulateHistoricalTasks(workflows);
+        }
+
+        private List<HistoricalTasksData> PopulateHistoricalTasks(List<WorkflowInstance> workflows)
+        {
+            var historicalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
 
             foreach (var instance in workflows)
             {
-                var task = HistoricalTasks.First(t => t.ProcessId == instance.ProcessId);
+                var task = historicalTasks.First(t => t.ProcessId == instance.ProcessId);
                 SetUsersOnTask(instance, task);
 
                 var taskType = GetTaskType(instance, task);
@@ -137,12 +113,10 @@ namespace Portal.Pages.DbAssessment
                         instance.ActivityName);
 
                     task.DmEndDate = result.dmEndDate;
-
                 }
-
             }
 
-
+            return historicalTasks;
         }
 
         private void SetUsersOnTask(WorkflowInstance instance, HistoricalTasksData task)
