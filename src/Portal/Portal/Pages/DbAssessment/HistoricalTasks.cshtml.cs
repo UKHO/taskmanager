@@ -80,17 +80,54 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        public void OnPost()
+        public async Task OnPost()
         {
             // TODO: Validate search parameters
             // TODO: Get results
             // TODO: Check results count. if zero or too large then warn user
+            //ErrorMessages = new List<string>()  
+            //{
+            //    "Error1",
+            //    "Error2"
+            //};
 
-            ErrorMessages = new List<string>()  
+            var workflows = await _dbContext.WorkflowInstance
+                .Include(a => a.AssessmentData)
+                .Include(d => d.DbAssessmentReviewData)
+                .Include(vd => vd.DbAssessmentVerifyData)
+                .Where(wi =>
+                    (wi.Status == WorkflowStatus.Completed.ToString() || wi.Status == WorkflowStatus.Terminated.ToString())
+                    && (
+                        (!SearchParameters.ProcessId.HasValue || wi.ProcessId == SearchParameters.ProcessId.Value)
+                        && (!SearchParameters.SourceDocumentId.HasValue || wi.AssessmentData.PrimarySdocId == SearchParameters.SourceDocumentId.Value)
+                        && (string.IsNullOrWhiteSpace(SearchParameters.RsdraNumber) || wi.AssessmentData.RsdraNumber.ToUpper().Contains(SearchParameters.RsdraNumber.ToUpper()))
+                        && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
+                       ))
+                       .OrderByDescending(wi => wi.ActivityChangedAt)
+                .ToListAsync();
+
+            HistoricalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
+
+            foreach (var instance in workflows)
             {
-                "Error1",
-                "Error2"
-            };
+                var task = HistoricalTasks.First(t => t.ProcessId == instance.ProcessId);
+                SetUsersOnTask(instance, task);
+
+                var taskType = GetTaskType(instance, task);
+
+                if (instance.AssessmentData.EffectiveStartDate.HasValue)
+                {
+                    var result = _dmEndDateCalculator.CalculateDmEndDate(
+                        instance.AssessmentData.EffectiveStartDate.Value,
+                        taskType,
+                        instance.ActivityName);
+
+                    task.DmEndDate = result.dmEndDate;
+
+                }
+
+            }
+
 
         }
 
