@@ -78,9 +78,10 @@
     color: #ffffff;
 }
 
-.card .wf-status.wf-status-inprogress {
-    background-color: #EF8123;
-}
+    .card .wf-status.wf-status-inprogress {
+        background-color: #EF8123;
+        color: #09315B;
+    }
 
 .card .wf-status.wf-status-complete {
     background-color: #4AAB37;
