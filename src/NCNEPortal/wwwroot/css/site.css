@@ -810,6 +810,7 @@ input:checked + .slider:before {
     color: white;
     text-align: center;
     width: 26px;
+    background-color: #09315B;
 }
 
 .speech.bubble > i {
