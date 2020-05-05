@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
@@ -23,6 +25,8 @@ namespace Portal.UnitTests
         private IDmEndDateCalculator _dmEndDateCalculator;
         private IMapper _mapper;
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private IAdDirectoryService _fakeAdDirectoryService;
+        private ILogger<HistoricalTasksModel> _fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -34,11 +38,13 @@ namespace Portal.UnitTests
 
             _dmEndDateCalculator = A.Fake<IDmEndDateCalculator>();
             _mapper = A.Fake<IMapper>();
+            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakeLogger = A.Fake<ILogger<HistoricalTasksModel>>();
 
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
 
-            _historicalTasksModel = new HistoricalTasksModel(_dbContext, _dmEndDateCalculator, _mapper, _generalConfig);
+            _historicalTasksModel = new HistoricalTasksModel(_dbContext, _dmEndDateCalculator, _mapper, _generalConfig, _fakeAdDirectoryService, _fakeLogger);
 
         }
 

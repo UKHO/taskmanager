@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common.Helpers;
+using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Models;
+using Serilog.Context;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -21,6 +25,8 @@ namespace Portal.Pages.DbAssessment
         private readonly IDmEndDateCalculator _dmEndDateCalculator;
         private readonly IMapper _mapper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IAdDirectoryService _adDirectoryService;
+        private readonly ILogger<HistoricalTasksModel> _logger;
 
         [BindProperty(SupportsGet = true)]
         public HistoricalTasksSearchParameters SearchParameters { get; set; }
@@ -28,40 +34,164 @@ namespace Portal.Pages.DbAssessment
         public List<HistoricalTasksData> HistoricalTasks { get; set; }
 
         public List<string> ErrorMessages { get; set; }
-
+        
+        private string _userFullName;
+        public string UserFullName
+        {
+            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
+            private set => _userFullName = value;
+        }
+        
         public HistoricalTasksModel(
                                     WorkflowDbContext dbContext,
                                     IDmEndDateCalculator dmEndDateCalculator,
                                     IMapper mapper,
-                                    IOptions<GeneralConfig> generalConfig)
+                                    IOptions<GeneralConfig> generalConfig,
+                                    IAdDirectoryService adDirectoryService,
+                                    ILogger<HistoricalTasksModel> logger)
         {
             _dbContext = dbContext;
             _dmEndDateCalculator = dmEndDateCalculator;
             _mapper = mapper;
             _generalConfig = generalConfig;
+            _adDirectoryService = adDirectoryService;
+            _logger = logger;
+
             ErrorMessages = new List<string>();
             HistoricalTasks = new List<HistoricalTasksData>();
         }
 
         public async Task OnGetAsync()
         {
-            var workflows = await _dbContext.WorkflowInstance
-                .Include(a => a.AssessmentData)
-                .Include(d => d.DbAssessmentReviewData)
-                .Include(vd => vd.DbAssessmentVerifyData)
-                .Where(wi =>
-                    wi.Status == WorkflowStatus.Completed.ToString() ||
-                    wi.Status == WorkflowStatus.Terminated.ToString())
-                .OrderByDescending(wi => wi.ActivityChangedAt)
-                .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
-                .ToListAsync();
+            LogContext.PushProperty("ActivityName", "HistoricalTasks");
+            LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
+
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Entering Get initial Historical Tasks");
+
+            List<WorkflowInstance> workflows = null;
+            try
+            {
+                workflows = await _dbContext.WorkflowInstance
+                    .Include(a => a.AssessmentData)
+                    .Include(d => d.DbAssessmentReviewData)
+                    .Include(vd => vd.DbAssessmentVerifyData)
+                    .Where(wi =>
+                        wi.Status == WorkflowStatus.Completed.ToString() ||
+                        wi.Status == WorkflowStatus.Terminated.ToString())
+                    .OrderByDescending(wi => wi.ActivityChangedAt)
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
 
 
-            HistoricalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
+                _logger.LogInformation("Successfully returned initial data from database");
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting Historical Tasks from database", e);
+            }
+
+            if (workflows != null && workflows.Count > 0)
+            {
+                try
+                {
+                    HistoricalTasks = PopulateHistoricalTasks(workflows);
+                    _logger.LogInformation("Successfully populated Historical Tasks from initial data");
+
+                }
+                catch (Exception e)
+                {
+                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from initial data: {e.Message}");
+                    _logger.LogError("Error occurred while populating Historical Tasks from initial data", e);
+
+                }
+            }
+        }
+
+        public async Task OnPostAsync()
+        {
+            LogContext.PushProperty("ActivityName", "HistoricalTasks");
+            LogContext.PushProperty("PortalResource", nameof(OnPostAsync));
+            LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
+
+            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
+
+            LogContext.PushProperty("UserFullName", UserFullName);
+
+            _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
+
+            List<WorkflowInstance> workflows = null;
+
+            try
+            {
+                workflows = await _dbContext.WorkflowInstance
+                    .Include(a => a.AssessmentData)
+                    .Include(d => d.DbAssessmentReviewData)
+                    .Include(vd => vd.DbAssessmentVerifyData)
+                    .Where(wi =>
+                        (wi.Status == WorkflowStatus.Completed.ToString() || wi.Status == WorkflowStatus.Terminated.ToString())
+                        && (
+                            (!SearchParameters.ProcessId.HasValue || wi.ProcessId == SearchParameters.ProcessId.Value)
+                            && (!SearchParameters.SourceDocumentId.HasValue || wi.AssessmentData.PrimarySdocId == SearchParameters.SourceDocumentId.Value)
+                            && (string.IsNullOrWhiteSpace(SearchParameters.RsdraNumber) || wi.AssessmentData.RsdraNumber.ToUpper().Contains(SearchParameters.RsdraNumber.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Reviewer)
+                                    || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                             wi.DbAssessmentReviewData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
+                                             : wi.DbAssessmentVerifyData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Assessor)
+                                || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                    wi.DbAssessmentReviewData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Verifier)
+                                || (wi.ActivityName == WorkflowStage.Review.ToString() ?
+                                    wi.DbAssessmentReviewData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
+
+                            ))
+                    .OrderByDescending(wi => wi.ActivityChangedAt)
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
+
+                _logger.LogInformation("Successfully returned filtered data from database");
+
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting filtered Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting filtered Historical Tasks from database with parameters {HistoricalTasksSearchParameters}", e);
+
+            }
+
+            if (workflows != null && workflows.Count > 0)
+            {
+                try
+                {
+
+                    HistoricalTasks = PopulateHistoricalTasks(workflows);
+                    _logger.LogInformation("Successfully populated Historical Tasks from filtered data");
+
+                }
+                catch (Exception e)
+                {
+                    ErrorMessages.Add($"Error occurred while populating Historical Tasks from filtered data: {e.Message}");
+                    _logger.LogError("Error occurred while populating Historical Tasks from filtered data with parameters {HistoricalTasksSearchParameters}", e);
+
+                }
+            }
+        }
+
+        private List<HistoricalTasksData> PopulateHistoricalTasks(List<WorkflowInstance> workflows)
+        {
+            var historicalTasks = _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(workflows);
 
             foreach (var instance in workflows)
             {
-                var task = HistoricalTasks.First(t => t.ProcessId == instance.ProcessId);
+                var task = historicalTasks.First(t => t.ProcessId == instance.ProcessId);
                 SetUsersOnTask(instance, task);
 
                 var taskType = GetTaskType(instance, task);
@@ -74,24 +204,10 @@ namespace Portal.Pages.DbAssessment
                         instance.ActivityName);
 
                     task.DmEndDate = result.dmEndDate;
-
                 }
-
             }
-        }
 
-        public void OnPost()
-        {
-            // TODO: Validate search parameters
-            // TODO: Get results
-            // TODO: Check results count. if zero or too large then warn user
-
-            ErrorMessages = new List<string>()  
-            {
-                "Error1",
-                "Error2"
-            };
-
+            return historicalTasks;
         }
 
         private void SetUsersOnTask(WorkflowInstance instance, HistoricalTasksData task)

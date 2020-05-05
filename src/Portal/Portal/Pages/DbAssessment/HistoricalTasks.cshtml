@@ -5,6 +5,8 @@
     ViewData["Title"] = "Historical Tasks";
 }
 
+<script type="text/javascript" src="~/js/HistoricalTasks.js"></script>
+
 <div class="row mt-1">
     <div class="col-4">
         <a asp-page="/Index">
@@ -162,19 +164,19 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalWaitHistoricalTasks" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Getting historical data from database ...</li>
+                    <li>Populating Historical Tasks list...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-@section Scripts {
-
-    <script>
-        $(document).ready(function () {
-            $('#historicalTasks').DataTable({
-                "pageLength": 10,
-                'sDom': 'ltipr',
-                "lengthMenu": [5, 10, 25, 50],
-                "scrollX": true,
-                "order": [[9, 'desc']],
-                "ordering": true
-            });
-        });
-    </script>
-}
+</div>
