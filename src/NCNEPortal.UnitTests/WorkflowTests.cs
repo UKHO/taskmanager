@@ -130,8 +130,8 @@ namespace NCNEPortal.UnitTests
 
             await _workflowModel.OnPostTaskCommentAsync("Valid Comment", 100);
 
-            Assert.That(_dbContext.TaskComment.Single().Comment, Is.EqualTo("Valid Comment"));
-            Assert.That(_dbContext.TaskComment.Single().ProcessId, Is.EqualTo(100));
+            A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Valid Comment", 100, A<string>.Ignored))
+                .MustHaveHappened();
         }
 
         [Test]
@@ -141,7 +141,9 @@ namespace NCNEPortal.UnitTests
 
             await _workflowModel.OnPostTaskCommentAsync("", 100);
 
-            Assert.That(_dbContext.TaskComment.Count(), Is.EqualTo(0));
+            A.CallTo(() => _fakeCommentsHelper.AddTaskComment(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+
         }
 
         private void AddTaskInfo(int processId)
