@@ -839,11 +839,13 @@ table#workflow-table tr.shaded {
 }
 
 h4.Inactive {
-    color: #adb5bd
+    color: #707070;
+    font-weight: 200;
 }
 
 h6.Inactive {
-    color: #adb5bd
+    color: #707070;
+    font-weight: 200;
 }
 
 #generic-comments-table td {
