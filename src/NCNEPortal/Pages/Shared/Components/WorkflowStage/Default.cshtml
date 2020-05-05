@@ -5,21 +5,18 @@
 {
     <tr class="workflow-row">
         <td>
-
             @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
             {
-                <h4 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")" )>@Model.TaskStageType.Name</h4>
+                <h4 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")">@Model.TaskStageType.Name</h4>
             }
             else
             {
-                <h6 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")" )>@Model.TaskStageType.Name</h6>
+                <h6 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")">@Model.TaskStageType.Name</h6>
             }
-
-
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
-                || Model.Status == NcneTaskStageStatus.Rework.ToString())
+           || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
