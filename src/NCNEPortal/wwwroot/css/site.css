@@ -182,14 +182,14 @@ table.task-list thead tr th {
 
 .btn.btn-complete {
     color: #ffffff;
-    background-color: #4AAB37;
-    border-color: #4AAB37;
+    background-color: #0D8720;
+    border-color: #0D8720;
 }
 
-.btn.btn-complete:hover, .btn.btn-complete.hover {
-    background-color: #4AA130;
-    border-color: #4AA130;
-}
+    .btn.btn-complete:hover, .btn.btn-complete.hover {
+        background-color: #0B701A;
+        border-color: #0B701A;
+    }
 
 .btn.btn-complete:focus, .btn.btn-complete.focus {
     box-shadow: unset;
@@ -197,9 +197,9 @@ table.task-list thead tr th {
 
 .btn-complete:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
 .show > .btn-complete.dropdown-toggle {
-    color: #4AAB37;
+    color: #0B701A;
     background-color: #ffffff;
-    border-color: #4AAB37;
+    border-color: #0B701A;
 }
 
 .btn-complete:not(:disabled):not(.disabled):active:focus, .btn-complete:not(:disabled):not(.disabled).active:focus,
