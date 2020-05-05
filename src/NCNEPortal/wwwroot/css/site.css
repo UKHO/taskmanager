@@ -92,6 +92,13 @@ table.task-list thead tr th {
     border-color: #09315B;
 }
 
+
+.btn.btn-primary:disabled {
+    background-color: #DBDBDB;
+    color: #3A3A3A;
+    border-color: #DBDBDB;
+}
+
 .buttonSelected {
     background-color: #007e97;
     color: #fff;
@@ -122,6 +129,12 @@ table.task-list thead tr th {
     color: #05284e;
     background-color: #fff;
     border-color: #05284e;
+}
+
+.btn.btn-secondary:disabled {
+    background-color: #DBDBDB;
+    color: #3A3A3A;
+    border-color: #DBDBDB;
 }
 
 .btn-secondary:focus, .btn-secondary.focus {
