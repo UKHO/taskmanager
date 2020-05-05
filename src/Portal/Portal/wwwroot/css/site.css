@@ -839,6 +839,12 @@ ol.error-list {
 
 /* End LaunchCarisSelectionModal */
 
+.numberOnly::-webkit-inner-spin-button,
+.numberOnly::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 /* Start screen reader only. */
 /* To be added to spans which are not visible but should be read by screen readers */
 
