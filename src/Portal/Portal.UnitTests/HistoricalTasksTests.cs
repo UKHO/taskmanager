@@ -248,5 +248,217 @@ namespace Portal.UnitTests
             Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 2));
             Assert.IsFalse(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 4));
         }
+        
+        [Test]
+        public async Task Test_OnPost_when_empty_search_parameters_returns_Latest_Terminated_or_Completed_Tasks_that_is_less_or_equal_configured_count()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
+
+            var returnedWorkflow1 = new WorkflowInstance()
+            {
+                WorkflowInstanceId = 1,
+                ProcessId = 1,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Terminated.ToString(),
+                StartedAt = new DateTime(2020, 01, 01),
+                ActivityChangedAt = new DateTime(2020, 05, 01).Date,
+                AssessmentData = new AssessmentData(),
+                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+            };
+
+            var returnedWorkflow2 = new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = 2,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Terminated.ToString(),
+                StartedAt = new DateTime(2020, 01, 01),
+                ActivityChangedAt = new DateTime(2020, 04, 01).Date,
+                AssessmentData = new AssessmentData(),
+                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+            };
+
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
+                                            returnedWorkflow1,
+                                            returnedWorkflow2,
+                                            new WorkflowInstance()
+                                            {
+                                                WorkflowInstanceId = 3,
+                                                ProcessId = 3,
+                                                ActivityName = WorkflowStage.Verify.ToString(),
+                                                Status = WorkflowStatus.Completed.ToString(),
+                                                StartedAt = new DateTime(2020, 01, 01),
+                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                                                AssessmentData = new AssessmentData(),
+                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                                            },
+                                            new WorkflowInstance()
+                                            {
+                                                WorkflowInstanceId = 4,
+                                                ProcessId = 4,
+                                                ActivityName = WorkflowStage.Verify.ToString(),
+                                                Status = WorkflowStatus.Completed.ToString(),
+                                                StartedAt = new DateTime(2020, 01, 01),
+                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                                                AssessmentData = new AssessmentData(),
+                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                                            }
+            });
+
+
+            await _dbContext.SaveChangesAsync();
+
+            var filteredWorkflows = new List<WorkflowInstance>();
+            filteredWorkflows.Add(returnedWorkflow1);
+            filteredWorkflows.Add(returnedWorkflow2);
+
+            var historicalTasks = new List<HistoricalTasksData>()
+            {
+                new HistoricalTasksData()
+                {
+                    ProcessId = returnedWorkflow1.ProcessId,
+                    TaskStage = Enum.Parse<WorkflowStage>(returnedWorkflow1.ActivityName),
+                    Status = Enum.Parse<WorkflowStatus>(returnedWorkflow1.Status),
+                    ActivityChangedAt = returnedWorkflow1.ActivityChangedAt
+                },
+                new HistoricalTasksData()
+                {
+                    ProcessId = returnedWorkflow2.ProcessId,
+                    TaskStage = Enum.Parse<WorkflowStage>(returnedWorkflow2.ActivityName),
+                    Status = Enum.Parse<WorkflowStatus>(returnedWorkflow2.Status),
+                    ActivityChangedAt = returnedWorkflow2.ActivityChangedAt
+
+                }
+            };
+
+            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+                .Returns(historicalTasks);
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters();
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords, _historicalTasksModel.HistoricalTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 2));
+            Assert.IsFalse(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 4));
+        }
+
+        [Test]
+        public async Task Test_OnPost_when_assessmentData_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fullfill_search_criteria_and_is_less_or_equal_configured_count()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
+
+            var returnedWorkflow1 = new WorkflowInstance()
+            {
+                WorkflowInstanceId = 1,
+                ProcessId = 1,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Terminated.ToString(),
+                StartedAt = new DateTime(2020, 01, 01),
+                ActivityChangedAt = new DateTime(2020, 05, 01).Date,
+                AssessmentData = new AssessmentData()
+                {
+                    PrimarySdocId = 111,
+                    ProcessId = 1,
+                    RsdraNumber = "RSDRA1",
+                    SourceDocumentName = "SourceDocument1"
+                },
+                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+            };
+
+            var returnedWorkflow2 = new WorkflowInstance()
+            {
+                WorkflowInstanceId = 2,
+                ProcessId = 2,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Terminated.ToString(),
+                StartedAt = new DateTime(2020, 01, 01),
+                ActivityChangedAt = new DateTime(2020, 04, 01).Date,
+                AssessmentData = new AssessmentData()
+                {
+                    PrimarySdocId = 222,
+                    ProcessId = 2,
+                    RsdraNumber = "RSDRA2",
+                    SourceDocumentName = "SourceDocument2"
+                },
+                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+            };
+
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
+                                            returnedWorkflow1,
+                                            returnedWorkflow2,
+                                            new WorkflowInstance()
+                                            {
+                                                WorkflowInstanceId = 3,
+                                                ProcessId = 3,
+                                                ActivityName = WorkflowStage.Verify.ToString(),
+                                                Status = WorkflowStatus.Completed.ToString(),
+                                                StartedAt = new DateTime(2020, 01, 01),
+                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                                                AssessmentData = new AssessmentData(),
+                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                                            },
+                                            new WorkflowInstance()
+                                            {
+                                                WorkflowInstanceId = 4,
+                                                ProcessId = 4,
+                                                ActivityName = WorkflowStage.Verify.ToString(),
+                                                Status = WorkflowStatus.Completed.ToString(),
+                                                StartedAt = new DateTime(2020, 01, 01),
+                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                                                AssessmentData = new AssessmentData(),
+                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
+                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                                            }
+            });
+
+
+            await _dbContext.SaveChangesAsync();
+
+            var filteredWorkflows = new List<WorkflowInstance>();
+            filteredWorkflows.Add(returnedWorkflow1);
+            filteredWorkflows.Add(returnedWorkflow2);
+
+            var historicalTasks = new List<HistoricalTasksData>()
+            {
+                new HistoricalTasksData()
+                {
+                    ProcessId = returnedWorkflow1.ProcessId,
+                    TaskStage = Enum.Parse<WorkflowStage>(returnedWorkflow1.ActivityName),
+                    Status = Enum.Parse<WorkflowStatus>(returnedWorkflow1.Status),
+                    ActivityChangedAt = returnedWorkflow1.ActivityChangedAt
+                },
+                new HistoricalTasksData()
+                {
+                    ProcessId = returnedWorkflow2.ProcessId,
+                    TaskStage = Enum.Parse<WorkflowStage>(returnedWorkflow2.ActivityName),
+                    Status = Enum.Parse<WorkflowStatus>(returnedWorkflow2.Status),
+                    ActivityChangedAt = returnedWorkflow2.ActivityChangedAt
+
+                }
+            };
+
+            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+                .Returns(historicalTasks);
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
+            {
+                RsdraNumber = "RSDRA",
+                SourceDocumentName = "SourceDocument"
+            };
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords, _historicalTasksModel.HistoricalTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.RsdraNumber.Contains(_historicalTasksModel.SearchParameters.RsdraNumber)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.SourceDocumentName.Contains(_historicalTasksModel.SearchParameters.SourceDocumentName)));
+        }
     }
 }
