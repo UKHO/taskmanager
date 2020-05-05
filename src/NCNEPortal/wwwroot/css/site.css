@@ -831,11 +831,11 @@ table#workflow-table tr.shaded {
 }
 
 .status.inProgress {
-    color: #EF8123;
+    color: #0177C1;
 }
 
 .status.Complete {
-    color:#4aab37
+    color: #0D8720;
 }
 
 h4.Inactive {
