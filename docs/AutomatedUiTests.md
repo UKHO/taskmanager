@@ -9,7 +9,7 @@ You will need to configure four environment variables:
 * KEY_VAULT_ADDRESS
 * ChromeWebDriver
 
-AZURE_APP_CONFIGURATION_CONNECTION_STRING and KEY_VAULT_ADDRESS can be obtained from the team. It is advisable to use the UAT environment variables as this is the dedicated autotest environment and so is unlikely to be being used for manual testing.
+AZURE_APP_CONFIGURATION_CONNECTION_STRING and KEY_VAULT_ADDRESS can be obtained from the Azure resources. It is advisable to use the UAT environment variables as this is the dedicated autotest environment and so is unlikely to be being used for manual testing.
 
 ### ENVIRONMENT variable values
 
@@ -45,3 +45,17 @@ Each POM should register an `ILandingPage`, this is used by the authentication p
 ## Logging
 
 `Common.TestAutomation.Framework.Logging` contains SpecFlow hooks to automatically log Features, Scenarios and Steps as they are being run. It also takes screenshots on error and attaches them to the test run.
+
+## Axe
+
+Axe is an open source Web Accessibility analysis tool supported by Deque Systems. Documentation for it can be found here: <https://github.com/dequelabs/axe-core>.
+
+Use the `AxePageEvaluator` in the `Common.TestAutomation.Framework` to run the tool against a page.
+
+```csharp
+            var axeResult = _axePageEvaluator.GetAxeResults();
+
+            _axeResultAnalyser.AssertAxeViolations(axeResult);
+```
+
+Be aware that the tool only evaluates visible elements on the current page and that it cannot pick up all accessibility violations. Manual testing will still be required to ensure that any given page is compliant with government standards.
