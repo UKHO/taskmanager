@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
 
     var processId = Number($("#hdnProcessId").val());
+    var isReadOnly = $("#IsReadOnly").val() === "True";
     getAssignedTasks();
 
     function getAssignedTasks() {
@@ -17,6 +18,11 @@
 
                 setCreateHandler();
                 update();
+
+                if (isReadOnly) {
+                    $(".deleteAssignTask").off("click");
+                    $(".btnCreateTask").off("click");
+                }
             },
             error: function (error) {
                 $("#assignTasksError")

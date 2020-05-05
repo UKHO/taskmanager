@@ -42,46 +42,55 @@
 
 <div class="col-12">
     <div class="row justify-content-end btn-size">
-        <div class="col-2"><button id="btnReject" class="btn btn-primary btn-block">Reject</button></div>
+        @if (Model.IsReadOnly)
+        {
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/DbAssessment/HistoricalTasks'"/></div>
+        }
+        else
+        {
+            <div class="col-2"><button id="btnReject" class="btn btn-primary btn-block">Reject</button></div>
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'"/></div>
+            <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
+            <div class="col-2">
 
-        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
-        <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
-        <div class="col-2">
+                <input type="hidden" asp-for="ProcessId"/>
+                <button id="btnDone" class="btn btn-primary btn-block" type="button">Sign Off</button>
 
-            <input type="hidden" asp-for="ProcessId" />
-            <button id="btnDone" class="btn btn-primary btn-block" type="button">Sign Off</button>
-
-        </div>
+            </div>
+        }
+        
     </div>
 </div>
 
 <input type="hidden" asp-for="SerialisedCustomHttpStatusCodes" />
 
 <form id="frmVerifyPage" method="post" asp-page-handler="Done">
+    <fieldset>
+        <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+        <input type="hidden" asp-for="ProcessId" />
+        <input type="hidden" asp-for="IsReadOnly" />
+        <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
 
-    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-    <input type="hidden" asp-for="ProcessId" />
-    <input type="hidden" id="pageIdentity" value="@Model.WorkflowStage.ToString()" />
+        <div id="taskInformation"></div>
+        <div id="taskInformationError"></div>
 
-    <div id="taskInformation"></div>
-    <div id="taskInformationError"></div>
+        @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
 
-    @await Html.PartialAsync("_Operators", Model.OperatorsModel).ConfigureAwait(false)
+        <div id="sourceDocuments"></div>
+        <div id="sourceDocumentsError"></div>
 
-    <div id="sourceDocuments"></div>
-    <div id="sourceDocumentsError"></div>
+        <div id="editDatabase"></div>
+        <div id="editDatabaseError"></div>
 
-    <div id="editDatabase"></div>
-    <div id="editDatabaseError"></div>
+        <div id="recordProductAction"></div>
+        <div id="recordProductActionError"></div>
 
-    <div id="recordProductAction"></div>
-    <div id="recordProductActionError"></div>
+        <div id="existingDataImpacts"></div>
+        <div id="AddDataImpactsError"></div>
 
-    <div id="existingDataImpacts"></div>
-    <div id="AddDataImpactsError"></div>
-
-    <div id="existingComments"></div>
-    <div id="AddCommentError"></div>
+        <div id="existingComments"></div>
+        <div id="AddCommentError"></div>
+    </fieldset>
 </form>
 
 @* Modal On Hold error comment *@

@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    var isReadOnly = $("#IsReadOnly").val() === "True";
     getProductActions();
 
     function getProductActions() {
@@ -17,6 +18,10 @@
             data: data,
             success: function (result) {
                 $("#recordProductAction").html(result);
+
+                if (isReadOnly) {
+                    return;
+                }
 
                 setCreateHandler();
                 update();

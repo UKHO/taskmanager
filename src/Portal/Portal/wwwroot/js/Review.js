@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    var isReadOnly = $("#IsReadOnly").val() === "True";
     var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
 
     $('#operators').find('div .operator:gt(0)').hide();
@@ -10,6 +11,10 @@
     setReviewSaveHandler();
 
     attachTerminateHandlers();
+
+    if (isReadOnly) {
+        makeFormReadOnly($("#frmReviewPage"));
+    }
 
     var formChanged = false;
     $("#frmReviewPage").change(function () { formChanged = true; });
@@ -250,5 +255,10 @@
     function removeOperatorsInitialiseErrors() {
         $("#operatorsErrorMessages").collapse("hide");
         $("#operatorsErrorList").empty();
+    }
+
+    function makeFormReadOnly(formElement) {
+        var fieldset = $(formElement).children("fieldset");
+        fieldset.prop("disabled", true);
     }
 });

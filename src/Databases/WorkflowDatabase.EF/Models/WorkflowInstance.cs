@@ -12,7 +12,19 @@ namespace WorkflowDatabase.EF.Models
         public string ActivityName { get; set; }
         public DateTime ActivityChangedAt { get; set; }
         public DateTime StartedAt { get; set; }
-        public string Status { get; set; }   
+        public string Status { get; set; }
+        public bool IsReadOnly
+        {
+            get
+            {
+                if (Status == WorkflowStatus.Terminated.ToString() ||
+                    Status == WorkflowStatus.Completed.ToString())
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         public virtual List<Comment> Comments { get; set; }
         public virtual AssessmentData AssessmentData { get; set; }

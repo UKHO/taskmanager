@@ -39,6 +39,7 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public bool IsOnHold { get; set; }
         public int ProcessId { get; set; }
+        public bool IsReadOnly { get; set; }
         public _OperatorsModel OperatorsModel { get; set; }
 
         [BindProperty]
@@ -115,6 +116,10 @@ namespace Portal.Pages.DbAssessment
         public async Task OnGet(int processId)
         {
             ProcessId = processId;
+
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .FirstAsync(w => w.ProcessId == processId);
+            IsReadOnly = workflowInstance.IsReadOnly;
 
             var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
