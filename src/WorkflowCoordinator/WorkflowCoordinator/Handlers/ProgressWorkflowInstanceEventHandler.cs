@@ -5,6 +5,7 @@ using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -34,22 +35,11 @@ namespace WorkflowCoordinator.Handlers
         // TODO: Duplicate PersistWorkflowInstanceDataEvent to a command fired by new event ProgressWorkflowInstanceEvent
         // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
 
-        public Task Handle(ProgressWorkflowInstanceEvent message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
+        public async Task Handle(ProgressWorkflowInstanceEvent message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
             LogContext.PushProperty("Message", message.ToJSONSerializedString());
-            LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
+            LogContext.PushProperty("EventName", nameof(ProgressWorkflowInstanceEvent));
             LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
             LogContext.PushProperty("ProcessId", message.ProcessId);
             LogContext.PushProperty("FromActivity", message.FromActivity);
@@ -59,8 +49,68 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            WorkflowInstance workflowInstance = null;
+            switch (message.ToActivity)
+            {
+                case WorkflowStage.Assess:
+                    // TODO: Added code for Verifying, progressing and persisting
+                    throw new NotImplementedException("Progressing Review to Assess, or Rejecting Verify to Ass has not been implemented");
 
+                    //break;
+                case WorkflowStage.Verify:
+                    if (k2Task.ActivityName == WorkflowStage.Assess.ToString())
+                    {
+                        // progress
+                        var success = await _workflowServiceApiClient.ProgressWorkflowInstance(message.ProcessId, k2Task.SerialNumber);
+                        
+                    }
+                    else if (k2Task.ActivityName == WorkflowStage.Review.ToString())
+                    {
+                        LogContext.PushProperty("K2Stage", k2Task.ActivityName);
+                        _logger.LogError("K2Task with ProcessId {ProcessId} is at K2 stage {K2Stage} and not at {ToActivity}, while moving task from {FromActivity}");
+                        throw new ApplicationException($"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}");
+                    }
+
+                    // fire persist command
+                    var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
+                    {
+                        CorrelationId = message.CorrelationId,
+                        ProcessId = message.ProcessId,
+                        FromActivity = message.FromActivity,
+                        ToActivity = message.ToActivity
+                    };
+
+                    await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
+
+                    break;
+                case WorkflowStage.Completed:
+                    // TODO: Added code for Verifying, progressing and persisting
+                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
+
+                    //break;
+                default:
+                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
+            }
+
+            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
+        }
+
+
+        public async Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
+        {
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
+            LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataCommand));
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
+            LogContext.PushProperty("ProcessId", message.ProcessId);
+            LogContext.PushProperty("FromActivity", message.FromActivity);
+            LogContext.PushProperty("ToActivity", message.ToActivity);
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
+            
+            var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
+
+            WorkflowInstance workflowInstance = null;
+            
             switch (message.ToActivity)
             {
                 case WorkflowStage.Assess:
@@ -104,7 +154,7 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     await context.SendLocal(completeAssessment).ConfigureAwait(false);
-                    
+
                     _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
 
                     break;
@@ -118,7 +168,33 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
+        public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
+        {
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
+            LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
+            LogContext.PushProperty("ProcessId", message.ProcessId);
+            LogContext.PushProperty("FromActivity", message.FromActivity);
+            LogContext.PushProperty("ToActivity", message.ToActivity);
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
+
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
+            {
+                CorrelationId = message.CorrelationId,
+                ProcessId = message.ProcessId,
+                FromActivity = message.FromActivity,
+                ToActivity = message.ToActivity
+            };
+
+            await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
+
+            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
+
+        }
+
+        private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataCommand message, K2TaskData k2Task)
         {
             if (k2Task != null)
             {
@@ -130,7 +206,7 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
-        private void ValidateK2TaskForAssessAndVerify(PersistWorkflowInstanceDataEvent message, K2TaskData k2Task)
+        private void ValidateK2TaskForAssessAndVerify(PersistWorkflowInstanceDataCommand message, K2TaskData k2Task)
         {
             if (k2Task == null)
             {
