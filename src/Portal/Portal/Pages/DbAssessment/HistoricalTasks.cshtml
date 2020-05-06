@@ -48,11 +48,11 @@
                     <div class="col-6">
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control numberOnly" })</div>
                         </div>
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.SourceDocumentId, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { type = "number", @class = "form-control" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.SourceDocumentId, new { type = "number", @class = "form-control numberOnly" })</div>
                         </div>
                         <div class="form-row d-flex justify-content-start">
                             <div class="col-3">@Html.LabelFor(model => model.SearchParameters.RsdraNumber, new { @class = "col-form-label" })</div>
