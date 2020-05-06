@@ -14,18 +14,35 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class PersistWorkflowInstanceDataEventHandler : IHandleMessages<PersistWorkflowInstanceDataEvent>
+    public class ProgressWorkflowInstanceEventHandler : IHandleMessages<ProgressWorkflowInstanceEvent>,
+                                                            IHandleMessages<PersistWorkflowInstanceDataCommand>,
+                                                            IHandleMessages<PersistWorkflowInstanceDataEvent>
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
-        private readonly ILogger<PersistWorkflowInstanceDataEventHandler> _logger;
+        private readonly ILogger<ProgressWorkflowInstanceEventHandler> _logger;
         private readonly WorkflowDbContext _dbContext;
 
-        public PersistWorkflowInstanceDataEventHandler(IWorkflowServiceApiClient workflowServiceApiClient,
-            ILogger<PersistWorkflowInstanceDataEventHandler> logger, WorkflowDbContext dbContext)
+        public ProgressWorkflowInstanceEventHandler(IWorkflowServiceApiClient workflowServiceApiClient,
+            ILogger<ProgressWorkflowInstanceEventHandler> logger, WorkflowDbContext dbContext)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
             _dbContext = dbContext;
+        }
+
+        // TODO: Added new Event for ProgressWorkflowInstanceEvent
+        // TODO: Duplicate PersistWorkflowInstanceDataEvent to a command fired by new event ProgressWorkflowInstanceEvent
+        // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
+
+        public Task Handle(ProgressWorkflowInstanceEvent message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)

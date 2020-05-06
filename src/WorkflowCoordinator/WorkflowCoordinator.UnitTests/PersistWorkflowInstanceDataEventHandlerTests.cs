@@ -20,9 +20,9 @@ namespace WorkflowCoordinator.UnitTests
     public class PersistWorkflowInstanceDataEventHandlerTests
     {
         private TestableMessageHandlerContext _handlerContext;
-        private PersistWorkflowInstanceDataEventHandler _handler;
+        private ProgressWorkflowInstanceEventHandler _handler;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
-        private ILogger<PersistWorkflowInstanceDataEventHandler> _fakeLogger;
+        private ILogger<ProgressWorkflowInstanceEventHandler> _fakeLogger;
         private WorkflowDbContext _dbContext;
 
         [SetUp]
@@ -35,11 +35,11 @@ namespace WorkflowCoordinator.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
-            _fakeLogger = A.Dummy<ILogger<PersistWorkflowInstanceDataEventHandler>>();
+            _fakeLogger = A.Dummy<ILogger<ProgressWorkflowInstanceEventHandler>>();
 
             _handlerContext = new TestableMessageHandlerContext();
 
-            _handler = new PersistWorkflowInstanceDataEventHandler(_fakeWorkflowServiceApiClient,
+            _handler = new ProgressWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient,
                 _fakeLogger, _dbContext);
         }
 

@@ -73,6 +73,10 @@ namespace WorkflowCoordinator
                 assembly: typeof(PersistWorkflowInstanceDataEvent).Assembly,
                 publisherEndpoint: nsbConfig.EventServiceName);
 
+            routing.RegisterPublisher(
+                assembly: typeof(ProgressWorkflowInstanceEvent).Assembly,
+                publisherEndpoint: nsbConfig.EventServiceName);
+
             // Persistence
 
             var persistence = this.UsePersistence<SqlPersistence>();
