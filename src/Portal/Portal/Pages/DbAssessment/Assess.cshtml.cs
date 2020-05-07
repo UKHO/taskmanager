@@ -217,19 +217,35 @@ namespace Portal.Pages.DbAssessment
 
                     }
 
-                    if (!await MarkTaskAsComplete(processId))
+                    try
                     {
+                        await MarkTaskAsComplete(processId);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
+
+                        ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
+
                         return new JsonResult(this.ValidationErrorMessages)
                         {
                             StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
                         };
                     }
-
+                    
                     break;
                 case "ConfirmedDone":
 
-                    if (!await MarkTaskAsComplete(processId))
+                    try
                     {
+                        await MarkTaskAsComplete(processId);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
+
+                        ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
+
                         return new JsonResult(this.ValidationErrorMessages)
                         {
                             StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
@@ -248,18 +264,24 @@ namespace Portal.Pages.DbAssessment
             return StatusCode((int)HttpStatusCode.OK);
         }
 
-        private async Task<bool> MarkTaskAsComplete(int processId)
+        private async Task MarkTaskAsComplete(int processId)
         {
-            // Change the status to Updating
-            var workflowInstance = await _dbContext.WorkflowInstance
-                .Include(w => w.PrimaryDocumentStatus)
-                .FirstAsync(w => w.ProcessId == processId);
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance);
 
-            await _dbContext.SaveChangesAsync();
 
-            // Fire ProgressWorkflowInstanceEvent
+            _logger.LogInformation(
+                "{UserFullName} successfully progressed {ActivityName} to Verify on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+            
+            await _commentsHelper.AddComment($"Assess step completed",
+                                                                        processId,
+                                                                    workflowInstance.WorkflowInstanceId,
+                                                                    UserFullName);
+        }
+
+        private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance)
+        {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
 
             var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
@@ -276,8 +298,18 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
             await _eventServiceApiClient.PostEvent(nameof(ProgressWorkflowInstanceEvent), progressWorkflowInstanceEvent);
             _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+        }
 
-            return true;
+        private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+
+            await _dbContext.SaveChangesAsync();
+            return workflowInstance;
         }
 
         private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
