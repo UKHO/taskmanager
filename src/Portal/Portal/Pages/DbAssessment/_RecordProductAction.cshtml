@@ -19,7 +19,7 @@
                 <div class="col-2">@Html.LabelFor(model => model.ProductActioned, new { @class = "col-form-label" })</div>
                 <div class="col-1">
                     <div class="checkbox-wrapper">
-                        <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "")>
+                        <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "") value="true">
                         <label for="ProductActioned"></label>
                     </div>
                 </div>
