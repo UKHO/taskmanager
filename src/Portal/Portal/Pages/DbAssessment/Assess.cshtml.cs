@@ -254,6 +254,10 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
+            // TODO: fire new event ProgressWorkflowInstanceEvent
+            // TODO: Remove K2 call
+            // TODO: Remove firing PersistWorkflowInstanceDataEvent
+
             var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
                 workflowInstance.SerialNumber, "Assess", "Verify");
 

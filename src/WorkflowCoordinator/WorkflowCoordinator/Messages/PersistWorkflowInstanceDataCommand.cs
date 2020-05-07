@@ -1,10 +1,10 @@
 ﻿using System;
+using Common.Messages;
 using WorkflowDatabase.EF;
 
-namespace Common.Messages.Events
+namespace WorkflowCoordinator.Messages
 {
-    // TODO: Remove when Review, Assess, and Verify progression stories are completed
-    public class PersistWorkflowInstanceDataEvent : ICorrelate
+    public class PersistWorkflowInstanceDataCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
         public int ProcessId { get; set; }

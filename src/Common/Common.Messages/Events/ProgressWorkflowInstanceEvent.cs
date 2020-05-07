@@ -3,8 +3,7 @@ using WorkflowDatabase.EF;
 
 namespace Common.Messages.Events
 {
-    // TODO: Remove when Review, Assess, and Verify progression stories are completed
-    public class PersistWorkflowInstanceDataEvent : ICorrelate
+    public class ProgressWorkflowInstanceEvent : ICorrelate
     {
         public Guid CorrelationId { get; set; }
         public int ProcessId { get; set; }
