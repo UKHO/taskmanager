@@ -250,6 +250,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task<bool> MarkTaskAsComplete(int processId)
         {
+            // Change the status to Updating
             var workflowInstance = await _dbContext.WorkflowInstance
                 .Include(w => w.PrimaryDocumentStatus)
                 .FirstAsync(w => w.ProcessId == processId);
@@ -258,36 +259,23 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            // TODO: fire new event ProgressWorkflowInstanceEvent
-            // TODO: Remove K2 call
-            // TODO: Remove firing PersistWorkflowInstanceDataEvent
+            // Fire ProgressWorkflowInstanceEvent
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
 
-            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId,
-                workflowInstance.SerialNumber, "Assess", "Verify");
-
-            if (success)
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
             {
-                await PersistCompletedAssess(processId, workflowInstance);
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivity = WorkflowStage.Assess,
+                ToActivity = WorkflowStage.Verify
+            };
 
-                _logger.LogInformation(
-                    "{UserFullName} successfully progressed {ActivityName} to Verify on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+            LogContext.PushProperty("ProgressWorkflowInstanceEvent",
+                progressWorkflowInstanceEvent.ToJSONSerializedString());
 
-                await _commentsHelper.AddComment($"Assess step completed",
-                    processId,
-                    workflowInstance.WorkflowInstanceId,
-                    UserFullName);
-            }
-            else
-            {
-                workflowInstance.Status = WorkflowStatus.Started.ToString();
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("Unable to progress task {ProcessId} from Assess to Verify.");
-
-                ValidationErrorMessages.Add("Unable to progress task from Assess to Verify. Please retry later.");
-
-                return false;
-            }
+            _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), progressWorkflowInstanceEvent);
+            _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
 
             return true;
         }
@@ -325,26 +313,6 @@ namespace Portal.Pages.DbAssessment
         {
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             return currentAssessData.Assessor;
-        }
-
-        private async Task PersistCompletedAssess(int processId, WorkflowInstance workflowInstance)
-        {
-            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
-
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
-            {
-                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
-                ProcessId = processId,
-                FromActivity = WorkflowStage.Assess,
-                ToActivity = WorkflowStage.Verify
-            };
-
-            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
-                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
-
-            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
-            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
-            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
         private async Task UpdateTaskInformation(int processId)
