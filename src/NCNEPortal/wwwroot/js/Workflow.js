@@ -54,12 +54,12 @@
                 $("#hdnAssignedUser").val(username);
                 $("#Rework").val(rework);
                 if (rework) {
-                    $("#msgComplete").html("Are you sure you want to send for <span style='font-weight:600'>" +
+                    $("#msgComplete").html("Are you sure you want to send for <span id=stageName>" +
                         stageName +
                         "</span> Rework?");
                 } else {
 
-                    $("#msgComplete").html("Are you sure you want to mark <span style='font-weight:600'>" +
+                    $("#msgComplete").html("Are you sure you want to mark <span id=stageName>" +
                         stageName +
                         "</span> as complete?");
                 }
