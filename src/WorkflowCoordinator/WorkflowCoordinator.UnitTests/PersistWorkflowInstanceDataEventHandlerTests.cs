@@ -59,7 +59,7 @@ namespace WorkflowCoordinator.UnitTests
             var workflowInstanceId = 1;
             var currentSerialNumber = "ASSESS_SERIAL_NUMBER";
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
@@ -96,7 +96,7 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+            await _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext);
 
             //Then
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
@@ -118,7 +118,7 @@ namespace WorkflowCoordinator.UnitTests
             var workflowInstanceId = 1;
             var currentSerialNumber = "VERIFY_SERIAL_NUMBER";
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
@@ -155,7 +155,7 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+            await _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext);
 
             //Then
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
@@ -176,7 +176,7 @@ namespace WorkflowCoordinator.UnitTests
             var processId = 1;
             var workflowInstanceId = 1;
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
@@ -207,7 +207,7 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+            await _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext);
 
             //Then
             Assert.AreEqual(1, _handlerContext.SentMessages.Length);
@@ -225,7 +225,7 @@ namespace WorkflowCoordinator.UnitTests
             WorkflowStage fromActivity, WorkflowStage toActivity, WorkflowStage k2TaskStage)
         {
             //Given
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = 0,
@@ -240,7 +240,7 @@ namespace WorkflowCoordinator.UnitTests
 
             //When
             var ex = Assert.ThrowsAsync<ApplicationException>(() =>
-                _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext));
+                _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext));
         }
 
         [TestCase(WorkflowStage.Review)]
@@ -250,7 +250,7 @@ namespace WorkflowCoordinator.UnitTests
         public void Test_Handle_Given_ToActivity_Review_Then_Exception_Is_Thrown(WorkflowStage fromActivity)
         {
             //Given
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = 0,
@@ -260,10 +260,10 @@ namespace WorkflowCoordinator.UnitTests
 
             //When
             var ex = Assert.ThrowsAsync<NotImplementedException>(() =>
-                _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext));
+                _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext));
 
             //Then
-            Assert.AreEqual($"{persistWorkflowInstanceDataEvent.ToActivity} has not been implemented for processId: {persistWorkflowInstanceDataEvent.ProcessId}.", ex.Message);
+            Assert.AreEqual($"{persistWorkflowInstanceDataCommand.ToActivity} has not been implemented for processId: {persistWorkflowInstanceDataCommand.ProcessId}.", ex.Message);
         }
 
         [Test]
@@ -276,7 +276,7 @@ namespace WorkflowCoordinator.UnitTests
             var workflowInstanceId = 1;
             var currentSerialNumber = "VERIFY_SERIAL_NUMBER";
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
@@ -330,7 +330,7 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+            await _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext);
 
             //Then
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
@@ -366,7 +366,7 @@ namespace WorkflowCoordinator.UnitTests
             var currentActivityChangedAt = DateTime.Today.AddDays(-1);
             var newActivityChangedAt = DateTime.Today;
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
             {
                 CorrelationId = Guid.NewGuid(),
                 ProcessId = processId,
@@ -426,7 +426,7 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-            await _handler.Handle(persistWorkflowInstanceDataEvent, _handlerContext);
+            await _handler.Handle(persistWorkflowInstanceDataCommand, _handlerContext);
 
             //Then
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.WorkflowInstanceId == workflowInstanceId);
