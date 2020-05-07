@@ -274,7 +274,7 @@ namespace Portal.Pages.DbAssessment
                 progressWorkflowInstanceEvent.ToJSONSerializedString());
 
             _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
-            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), progressWorkflowInstanceEvent);
+            await _eventServiceApiClient.PostEvent(nameof(ProgressWorkflowInstanceEvent), progressWorkflowInstanceEvent);
             _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
 
             return true;
