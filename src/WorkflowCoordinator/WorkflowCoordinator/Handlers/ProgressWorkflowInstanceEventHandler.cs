@@ -5,7 +5,6 @@ using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
-using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -31,7 +30,6 @@ namespace WorkflowCoordinator.Handlers
             _dbContext = dbContext;
         }
 
-        // TODO: Added new Event for ProgressWorkflowInstanceEvent
         // TODO: Duplicate PersistWorkflowInstanceDataEvent to a command fired by new event ProgressWorkflowInstanceEvent
         // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
 
