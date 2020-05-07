@@ -10,21 +10,22 @@
         <span>Record Product Action</span>
     </h6>
     <div class="col-12">
+        <div class="form-group row justify-content-start">
+            <div class="col-2">@Html.LabelFor(model => model.ProductActionChangeDetails, new { @class = "col-form-label" })</div>
+            <div class="col-9">@Html.TextAreaFor(model => model.ProductActionChangeDetails, new { @class = "form-control", @placeholder = "Enter change details..." })</div>
+        </div>
         <div class="form-group card-body p-0">
             <div class="row justify-content-start align-items-center mb-1">
                 <div class="col-2">@Html.LabelFor(model => model.ProductActioned, new { @class = "col-form-label" })</div>
                 <div class="col-1">
-                    <div class="custom-control custom-checkbox">
-                        @Html.CheckBoxFor(model => model.ProductActioned, new { @class = "custom-control-input" })
-                        <label class="custom-control-label" for="Action"></label> @*Need empty label to keep custom control working*@
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "")>
+                        <label for="ProductActioned"></label>
                     </div>
                 </div>
             </div>
-            <div class="form-group row justify-content-start">
-                <div class="col-2">@Html.LabelFor(model => model.ProductActionChangeDetails, new { @class = "col-form-label" })</div>
-                <div class="col-9">@Html.TextAreaFor(model => model.ProductActionChangeDetails, new { @class = "form-control", @placeholder = "Enter change details..." })</div>
-            </div>
-            <div id="productActions">
+
+        <div id="productActions">
                 @foreach (var row in Model.ProductActions)
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
