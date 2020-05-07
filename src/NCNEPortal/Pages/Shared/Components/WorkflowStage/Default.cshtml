@@ -16,7 +16,7 @@
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
-           || Model.Status == NcneTaskStageStatus.Rework.ToString())
+      || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
@@ -94,7 +94,7 @@
                             </button>
                         </div>
                         <div class="col-2 offset-2">
-                            <div class="checkbox-wrapper ">
+                            <div class="checkbox-wrapper">
                                 <input type="checkbox"
                                        @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
                                        disabled "check@(Model.TaskStageId)">
@@ -111,7 +111,10 @@
                         <div class="row align-items-center">
                             <div class="col-2 offset-10">
                                 <div class="checkbox-wrapper">
-                                    <input type="checkbox"
+                                    <input type="checkbox" class="chk_publish_step"
+                                           data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                                           data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                           data-StageName="@(Model.TaskStageType.Name)"
                                            @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
                                            @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
                                            id="check@(Model.TaskStageId)">

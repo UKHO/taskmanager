@@ -868,3 +868,7 @@ h6.Inactive {
 
 /* WORKFLOW PAGE END */
 
+#stageName {
+    font-weight: 600;
+}
+
