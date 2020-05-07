@@ -168,6 +168,8 @@ namespace WorkflowCoordinator.Handlers
 
         public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
         {
+            // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
+
             LogContext.PushProperty("MessageId", context.MessageId);
             LogContext.PushProperty("Message", message.ToJSONSerializedString());
             LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
