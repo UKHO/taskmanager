@@ -59,7 +59,12 @@ namespace WorkflowCoordinator.Handlers
                     {
                         // progress
                         var success = await _workflowServiceApiClient.ProgressWorkflowInstance(message.ProcessId, k2Task.SerialNumber);
-                        
+
+                        if (!success)
+                        {
+                            _logger.LogError("Unable to progress task {ProcessId} from {FromActivity} to {ToActivity} in K2.");
+                            throw new ApplicationException($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.");
+                        }
                     }
                     else if (k2Task.ActivityName == WorkflowStage.Review.ToString())
                     {
