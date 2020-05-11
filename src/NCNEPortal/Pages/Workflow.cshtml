@@ -71,13 +71,14 @@
                     <th scope="col">Date expected</th>
                     <th scope="col">Date completed</th>
                     <th scope="col">
+
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center show-comments">
                                 <div class="mr-auto">Action</div>
                                 <span>Show all task comments</span>
                                 <label class="switch ml-2 mb-auto">
-                                    <input type="checkbox" class="success">
-                                    <span class="slider"></span>
+                                    <input type="checkbox" class="success" id="allcommentscheck">
+                                    <span class="slider allcommentslider" data-processid="@(Model.ProcessId)"></span>
                                 </label>
                             </div>
                         </div>

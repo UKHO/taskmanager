@@ -4,6 +4,24 @@
     var formChanged = false;
     $("#frmWorkflow").change(function () { formChanged = true; });
 
+    $(".allcommentslider").click(function() {
+        var check = $("#allcommentscheck").prop('checked');
+
+        if (check) {
+
+            $('[id^="commentscheck-"]').collapse("hide");
+            $('[id^="comment-"]').collapse("hide");
+            $('[id^="commentscheck-"]').prop('checked', false);
+
+        } else {
+
+            $('[id^="commentscheck-"]').collapse("show");
+            $('[id^="comment-"]').collapse("show");
+            $('[id^="commentscheck-"]').prop('checked', true);
+        }
+
+    });
+
     $(".commentslider").click(function() {
 
         var stage = $(this).data("taskstage");
@@ -12,7 +30,8 @@
 
         var check = $("#commentscheck-" + stage).prop('checked');
         if (check) {
-           $("#comment-" + stage).collapse("hide");
+            $("#comment-" + stage).collapse("hide");
+            $("#allcommentscheck").prop('checked', false);
         } else {
             $("#comment-" + stage).collapse("show");
         }

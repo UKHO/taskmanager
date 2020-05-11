@@ -16,7 +16,7 @@
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
-      || Model.Status == NcneTaskStageStatus.Rework.ToString())
+         || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
@@ -130,38 +130,40 @@
     </tr>
 
     @*--- TASK STAGE COMMENTS---*@
-    <tr id="comment-@(Model.TaskStageId)" class="collapse hide">
+    @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
+    {
+        <tr id="comment-@(Model.TaskStageId)" class="collapse hide">
 
-        <td colspan="6" class="pl-3 pr-3">
-            <div id="container-@(Model.TaskStageId)" class="container" style="overflow-y: auto; max-height: 150px;">
-                @foreach (var comment in Model.TaskStageComment.OrderByDescending(t => t.Created))
-                {
-                    <div class="row m-3">
-                        <div class="col-2">
-                            <div>
-                                @comment.Created.ToLongDateString()
+            <td colspan="6" class="pl-3 pr-3">
+                <div id="container-@(Model.TaskStageId)" class="container" style="overflow-y: auto; max-height: 150px;">
+                    @foreach (var comment in Model.TaskStageComment.OrderByDescending(t => t.Created))
+                    {
+                        <div class="row m-3">
+                            <div class="col-2">
+                                <div>
+                                    @comment.Created.ToLongDateString()
+                                </div>
+                                <br />
+                                <div>
+                                    <strong>@comment.Username</strong>
+                                </div>
                             </div>
-                            <br />
-                            <div>
-                                <strong>@comment.Username</strong>
+                            <div class="col-10">
+                                @comment.Comment
                             </div>
                         </div>
-                        <div class="col-10">
-                            @comment.Comment
-                        </div>
-                    </div>
-                    <br />
-                }
-            </div>
-            <div class="col text-right">
-                <span class="fas fa-comment-alt mr-2"></span>
-                <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)">Add a comment</button>
-            </div>
+                        <br />
+                    }
+                </div>
+                <div class="col text-right">
+                    <span class="fas fa-comment-alt mr-2"></span>
+                    <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)">Add a comment</button>
+                </div>
 
-        </td>
+            </td>
 
-    </tr>
+        </tr>
 
-
+    }
 
 }
