@@ -229,8 +229,9 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-
             _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -260,8 +261,9 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-
             _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -322,9 +324,9 @@ namespace Portal.UnitTests
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
-                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
             _hpDbContext.CarisProducts.Add(new CarisProduct
-                { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
 
 
@@ -378,7 +380,7 @@ namespace Portal.UnitTests
             _hpDbContext.CarisProducts.Add(new CarisProduct
             { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
-            
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -596,7 +598,9 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
-                                                                                A<List<ProductAction>>.Ignored, 
+                                                                                A<bool>.Ignored,
+                                                                                A<string>.Ignored,
+                                                                                A<List<ProductAction>>.Ignored,
                                                                                 A<List<DataImpact>>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<string>>.Ignored,
@@ -605,11 +609,11 @@ namespace Portal.UnitTests
                                                             .MustNotHaveHappened();
 
             A.CallTo(() => _pageValidationHelper.CheckVerifyPageForWarnings(A<string>.Ignored,
-                                                                                        A<WorkflowInstance>.Ignored, 
-                                                                                        A<List<DataImpact>>.Ignored, 
+                                                                                        A<WorkflowInstance>.Ignored,
+                                                                                        A<List<DataImpact>>.Ignored,
                                                                                         A<List<string>>.Ignored))
                                                             .MustNotHaveHappened();
-            
+
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
                                                                                 A<int>.Ignored,
                                                                                 A<string>.Ignored,
@@ -644,7 +648,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -676,7 +680,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -717,7 +721,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
@@ -749,7 +753,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser2"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()
@@ -912,6 +916,78 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePcpEventServiceApiClient.PostEvent(nameof(HDBAssessmentReadyEvent),
                 A<HDBAssessmentReadyEvent>.Ignored)).MustHaveHappened();
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
+        {
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = "";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "";
+            _verifyModel.Team = "Home Waters";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Test change details";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = false;
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+
         }
     }
 }

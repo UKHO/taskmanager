@@ -15,14 +15,12 @@ namespace Portal.Helpers
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
-        private readonly IAdDirectoryService _adDirectoryService;
         private readonly IPortalUserDbService _portalAduserDbService;
 
         public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IAdDirectoryService adDirectoryService, IPortalUserDbService portalAduserDbService)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
-            _adDirectoryService = adDirectoryService;
             _portalAduserDbService = portalAduserDbService;
         }
 
@@ -106,12 +104,16 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedAssessorInDb"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <returns></returns>
         public async Task<bool> CheckAssessPageForErrors(string action,
             string ion,
             string activityCode,
             string sourceCategory,
             string taskType,
+            bool productActioned,
+            string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -152,7 +154,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(recordProductAction, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -202,12 +204,16 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <returns></returns>
         public async Task<bool> CheckVerifyPageForErrors(string action,
             string ion,
             string activityCode,
             string sourceCategory,
             string formDataAssignedVerifier,
+            bool productActioned,
+            string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -241,7 +247,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(recordProductAction, action, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -515,13 +521,15 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify pages
         /// </summary>
+        /// <param name="productActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="productActioned"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
         {
-            var isValid = await ValidateRecordProductAction(recordProductAction, validationErrorMessages);
+            var isValid = await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
 
             if (action != "Done")
             {
@@ -543,9 +551,20 @@ namespace Portal.Helpers
             return isValid;
         }
 
-        private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            const string messagePrefix = "Record Product Action:";
+
+            var isValid = true;
+
+            if (!productActioned)
+                return true;
+
+            if (string.IsNullOrWhiteSpace(productActionChangeDetails))
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered product action change details");
+                return false;
+            }
 
             if (recordProductAction != null && recordProductAction.Count > 0)
             {
@@ -554,7 +573,7 @@ namespace Portal.Helpers
                     string.IsNullOrWhiteSpace(r.ImpactedProduct)
                     || r.ProductActionTypeId == 0))
                 {
-                    validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
+                    validationErrorMessages.Add($"{messagePrefix} Please ensure impacted product is fully populated");
                     return false;
                 }
 
@@ -569,7 +588,7 @@ namespace Portal.Helpers
                     if (!isExist)
                     {
                         validationErrorMessages.Add(
-                            $"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                            $"{messagePrefix} Impacted product {productAction.ImpactedProduct} does not exist");
                         isValid = false;
                     }
                 }
@@ -578,7 +597,7 @@ namespace Portal.Helpers
                     .Where(g => g.Count() > 1)
                     .Select(y => y.Key).Any())
                 {
-                    validationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    validationErrorMessages.Add($"{messagePrefix} More than one of the same Impacted Products selected");
                     isValid = false;
                 }
             }

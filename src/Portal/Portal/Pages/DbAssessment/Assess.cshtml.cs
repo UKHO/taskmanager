@@ -160,6 +160,8 @@ namespace Portal.Pages.DbAssessment
                         ActivityCode,
                         SourceCategory,
                         TaskType,
+                        ProductActioned,
+                        ProductActionChangeDetails,
                         RecordProductAction,
                         DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
                     {
@@ -185,6 +187,8 @@ namespace Portal.Pages.DbAssessment
                         ActivityCode,
                         SourceCategory,
                         TaskType,
+                        ProductActioned,
+                        ProductActionChangeDetails,
                         RecordProductAction,
                         DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
                     {
@@ -375,10 +379,13 @@ namespace Portal.Pages.DbAssessment
             var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.ProductAction.RemoveRange(toRemove);
 
-            foreach (var productAction in RecordProductAction)
+            if (RecordProductAction != null)
             {
-                productAction.ProcessId = processId;
-                _dbContext.ProductAction.Add(productAction);
+                foreach (var productAction in RecordProductAction)
+                {
+                    productAction.ProcessId = processId;
+                    _dbContext.ProductAction.Add(productAction);
+                }
             }
 
             await _dbContext.SaveChangesAsync();

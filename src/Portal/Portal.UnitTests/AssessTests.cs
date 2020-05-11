@@ -254,7 +254,8 @@ namespace Portal.UnitTests
             _assessModel.Team = "Home Waters";
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
-
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.RecordProductAction = new List<ProductAction>
             {
@@ -287,6 +288,8 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
             _assessModel.RecordProductAction = new List<ProductAction>
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
@@ -398,7 +401,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -433,7 +436,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -477,7 +480,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -512,7 +515,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -678,6 +681,8 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
+                                                                                A<bool>.Ignored,
+                                                                                A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
                                                                                 A<List<DataImpact>>.Ignored,
                                                                                 A<string>.Ignored,
@@ -705,6 +710,87 @@ namespace Portal.UnitTests
                                                                                 nameof(PersistWorkflowInstanceDataEvent),
                                                                                 A<PersistWorkflowInstanceDataEvent>.Ignored))
                                                             .MustHaveHappened();
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "";
+
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _assessModel.ValidationErrorMessages);
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Test change details";
+
+            await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = false;
+
+            await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
         }
     }
 }

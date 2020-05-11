@@ -18,6 +18,7 @@
             <div class="row justify-content-start align-items-center mb-1">
                 <div class="col-2">@Html.LabelFor(model => model.ProductActioned, new { @class = "col-form-label" })</div>
                 <div class="col-1">
+                    @Html.HiddenFor(m => m.ProductActioned, new { @id = "hdnProductActioned" })
                     <div class="checkbox-wrapper">
                         <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "") value="true">
                         <label for="ProductActioned"></label>
@@ -25,7 +26,7 @@
                 </div>
             </div>
 
-        <div id="productActions">
+            <div id="productActions">
                 @foreach (var row in Model.ProductActions)
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
