@@ -36,6 +36,7 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
+        /// <param name="productActioned"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="team"></param>
@@ -51,6 +52,7 @@ namespace Portal.Helpers
                                             string activityCode,
                                             string sourceCategory,
                                             string taskType,
+                                            bool productActioned,
                                             List<ProductAction> recordProductAction,
                                             List<DataImpact> dataImpacts,
                                             string team,
@@ -80,6 +82,7 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="formDataAssignedVerifier"></param>
+        /// <param name="productActioned"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="team"></param>
@@ -93,6 +96,7 @@ namespace Portal.Helpers
                                             string activityCode,
                                             string sourceCategory,
                                             string formDataAssignedVerifier,
+                                            bool productActioned,
                                             List<ProductAction> recordProductAction,
                                             List<DataImpact> dataImpacts,
                                             string team,

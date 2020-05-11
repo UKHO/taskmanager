@@ -566,8 +566,8 @@
       "assessor": "Stuart Barzey",
       "verifier": "Stuart Barzey",
       "taskType": "LTA",
-      "productActioned": false,
-      "productActionChangeDetails": null,
+      "productActioned": true,
+      "productActionChangeDetails": "Test change details",
       "workspaceAffected": "1239_0"
     },
     "PrimaryDocumentStatus": {

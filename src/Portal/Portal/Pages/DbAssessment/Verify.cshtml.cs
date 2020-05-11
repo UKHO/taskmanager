@@ -154,7 +154,16 @@ namespace Portal.Pages.DbAssessment
             {
                 case "Save":
                     if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
-                        Ion, ActivityCode, SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName))
+                        Ion,
+                        ActivityCode,
+                        SourceCategory,
+                        Verifier,
+                        ProductActioned,
+                        RecordProductAction,
+                        DataImpacts,
+                        Team,
+                        ValidationErrorMessages,
+                        UserFullName))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -177,9 +186,17 @@ namespace Portal.Pages.DbAssessment
                             t.ProcessId == processId);
                     if (!await _pageValidationHelper.CheckVerifyPageForErrors(// from submitted form data
                         action,
-                                                                        Ion,
-                                                                        ActivityCode,
-                                                                        SourceCategory, Verifier, RecordProductAction, DataImpacts, Team, ValidationErrorMessages, UserFullName, verifyData.Verifier)) // from database
+                        Ion,
+                        ActivityCode,
+                        SourceCategory,
+                        Verifier,
+                        ProductActioned,
+                        RecordProductAction,
+                        DataImpacts,
+                        Team,
+                        ValidationErrorMessages,
+                        UserFullName,
+                        verifyData.Verifier)) // from database
 
                     {
                         return new JsonResult(this.ValidationErrorMessages)
@@ -304,7 +321,7 @@ namespace Portal.Pages.DbAssessment
             var workflowInstance = await _dbContext.WorkflowInstance
                                                         .Include(p => p.PrimaryDocumentStatus)
                                                         .FirstAsync(w => w.ProcessId == processId);
-            
+
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {
                 return new JsonResult(this.ValidationErrorMessages)
@@ -365,7 +382,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             await UpdateDataImpact(processId);
-            
+
             await _commentsHelper.AddComment($"Verify: Changes saved",
                 processId,
                 workflowInstanceId,

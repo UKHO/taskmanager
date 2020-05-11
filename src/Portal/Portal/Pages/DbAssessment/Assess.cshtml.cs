@@ -160,6 +160,7 @@ namespace Portal.Pages.DbAssessment
                         ActivityCode,
                         SourceCategory,
                         TaskType,
+                        ProductActioned,
                         RecordProductAction,
                         DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
                     {
@@ -185,6 +186,7 @@ namespace Portal.Pages.DbAssessment
                         ActivityCode,
                         SourceCategory,
                         TaskType,
+                        ProductActioned,
                         RecordProductAction,
                         DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
                     {

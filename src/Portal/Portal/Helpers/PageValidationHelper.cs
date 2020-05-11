@@ -15,14 +15,12 @@ namespace Portal.Helpers
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly HpdDbContext _hpdDbContext;
-        private readonly IAdDirectoryService _adDirectoryService;
         private readonly IPortalUserDbService _portalAduserDbService;
 
         public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IAdDirectoryService adDirectoryService, IPortalUserDbService portalAduserDbService)
         {
             _dbContext = dbContext;
             _hpdDbContext = hpdDbContext;
-            _adDirectoryService = adDirectoryService;
             _portalAduserDbService = portalAduserDbService;
         }
 
@@ -112,6 +110,7 @@ namespace Portal.Helpers
             string activityCode,
             string sourceCategory,
             string taskType,
+            bool productActioned,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -152,7 +151,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(recordProductAction, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, recordProductAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -208,6 +207,7 @@ namespace Portal.Helpers
             string activityCode,
             string sourceCategory,
             string formDataAssignedVerifier,
+            bool productActioned,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -241,7 +241,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(recordProductAction, action, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -519,9 +519,9 @@ namespace Portal.Helpers
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
         {
-            var isValid = await ValidateRecordProductAction(recordProductAction, validationErrorMessages);
+            var isValid = await ValidateRecordProductAction(productActioned, recordProductAction, validationErrorMessages);
 
             if (action != "Done")
             {
@@ -543,9 +543,9 @@ namespace Portal.Helpers
             return isValid;
         }
 
-        private async Task<bool> ValidateRecordProductAction(List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            var isValid = true;
 
             if (recordProductAction != null && recordProductAction.Count > 0)
             {
