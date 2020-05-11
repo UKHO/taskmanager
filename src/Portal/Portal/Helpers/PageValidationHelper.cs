@@ -104,6 +104,8 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedAssessorInDb"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <returns></returns>
         public async Task<bool> CheckAssessPageForErrors(string action,
             string ion,
@@ -111,6 +113,7 @@ namespace Portal.Helpers
             string sourceCategory,
             string taskType,
             bool productActioned,
+            string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -151,7 +154,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(productActioned, recordProductAction, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -201,6 +204,8 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <returns></returns>
         public async Task<bool> CheckVerifyPageForErrors(string action,
             string ion,
@@ -208,6 +213,7 @@ namespace Portal.Helpers
             string sourceCategory,
             string formDataAssignedVerifier,
             bool productActioned,
+            string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
             string team,
@@ -241,7 +247,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(productActioned, recordProductAction, action, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -515,13 +521,15 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify pages
         /// </summary>
+        /// <param name="productActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="action"></param>
         /// <param name="validationErrorMessages"></param>
+        /// <param name="productActioned"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateRecordProductAction(bool productActioned, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
         {
-            var isValid = await ValidateRecordProductAction(productActioned, recordProductAction, validationErrorMessages);
+            var isValid = await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
 
             if (action != "Done")
             {
@@ -543,7 +551,7 @@ namespace Portal.Helpers
             return isValid;
         }
 
-        private async Task<bool> ValidateRecordProductAction(bool productActioned, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string ProductActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
             var isValid = true;
 
