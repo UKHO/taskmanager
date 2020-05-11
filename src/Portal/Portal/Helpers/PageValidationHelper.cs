@@ -557,7 +557,10 @@ namespace Portal.Helpers
 
             var isValid = true;
 
-            if (productActioned && string.IsNullOrWhiteSpace(productActionChangeDetails))
+            if (!productActioned)
+                return true;
+
+            if (string.IsNullOrWhiteSpace(productActionChangeDetails))
             {
                 validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered product action change details");
                 return false;

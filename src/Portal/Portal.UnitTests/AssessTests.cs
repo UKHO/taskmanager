@@ -254,7 +254,8 @@ namespace Portal.UnitTests
             _assessModel.Team = "Home Waters";
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
-
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.RecordProductAction = new List<ProductAction>
             {
@@ -287,6 +288,8 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
             _assessModel.RecordProductAction = new List<ProductAction>
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
@@ -760,6 +763,34 @@ namespace Portal.UnitTests
             await _assessModel.OnPostDoneAsync(ProcessId, action);
 
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = false;
+
+            await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
         }
     }
 }

@@ -32,7 +32,7 @@
                     setControlState(true, true, true);
                 } else {
                     if ($(".productActionImpactedProduct").val() !== "") {
-                        setControlState(true, true, true);
+                        setControlState(false, true, true);
                     } else {
                         setControlState(true, false, false);
                     }
@@ -107,10 +107,10 @@
             update();
 
             if ($(".recordProductAction").length > 1) {
-                setControlState(true, true, true);
+                setControlState(false, true, true);
             } else {
                 if ($(".productActionImpactedProduct").val() !== "") {
-                    setControlState(true, true, true);
+                    setControlState(false, true, true);
                 } else {
                     setControlState(true, false, false);
                 }
@@ -133,6 +133,8 @@
     }
 
     function setControlState(enableProductActionedCheckbox, enableAddImpactButton, enableFirstRow) {
+        $("#hdnProductActioned").val($("#ProductActioned").prop("checked"));
+
         if (enableProductActionedCheckbox) {
             $("#ProductActioned").prop("disabled", false);
         } else {

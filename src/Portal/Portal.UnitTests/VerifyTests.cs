@@ -229,8 +229,9 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-
             _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -260,8 +261,9 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-
             _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -959,6 +961,33 @@ namespace Portal.UnitTests
             await _verifyModel.OnPostDoneAsync(ProcessId, action);
 
             CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = false;
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+
         }
     }
 }
