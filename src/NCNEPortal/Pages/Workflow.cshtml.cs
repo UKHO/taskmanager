@@ -787,6 +787,7 @@ namespace NCNEPortal
             if (!string.IsNullOrEmpty(txtComment))
             {
                 await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, UserFullName);
+                await _dbContext.SaveChangesAsync();
             }
 
             var result = new[]
