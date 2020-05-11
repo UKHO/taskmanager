@@ -1,12 +1,13 @@
 ﻿$(document).ready(function () {
     var isReadOnly = $("#IsReadOnly").val() === "True";
+
     getProductActions();
 
     function getProductActions() {
         var data = {
             "processId": Number($("#hdnProcessId").val()),
             "taskStage": $("#pageIdentity").val()
-        }
+        };
 
         $.ajax({
             type: "GET",
@@ -24,7 +25,18 @@
                 }
 
                 setCreateHandler();
+                setProductActionedCheckboxHandler();
                 update();
+
+                if ($(".recordProductAction").length > 1) {
+                    setControlState(true, true, true);
+                } else {
+                    if ($(".productActionImpactedProduct").val() !== "") {
+                        setControlState(true, true, true);
+                    } else {
+                        setControlState(true, false, false);
+                    }
+                }
             },
             error: function (error) {
                 $("#recordProductActionError")
@@ -32,7 +44,6 @@
             }
         });
     }
-
 
     function update() {
 
@@ -43,8 +54,10 @@
                 $(element).find(".deleteAction").hide();
             }
             //Set Form Control Names
-            $(element).find($(".productActionImpactedProduct")).prop("name", "RecordProductAction[" + index + "].ImpactedProduct");
-            $(element).find($(".productActionType")).prop("name", "RecordProductAction[" + index + "].ProductActionTypeId");
+            $(element).find($(".productActionImpactedProduct"))
+                .prop("name", "RecordProductAction[" + index + "].ImpactedProduct");
+            $(element).find($(".productActionType"))
+                .prop("name", "RecordProductAction[" + index + "].ProductActionTypeId");
             $(element).find($(".productActionVerified")).prop("name", "RecordProductAction[" + index + "].Verified");
 
             // Additional required markup settings for checkboxes...
@@ -67,19 +80,24 @@
     };
 
     function setCreateHandler() {
-        $("#btnAddImpact").on("click", function (e) {
-            var currentCount = $(".recordProductAction").length;
-            var newThing = $($(".recordProductAction")[0]).clone();
+        $("#btnAddImpact").on("click",
+            function (e) {
+                var currentCount = $(".recordProductAction").length;
+                var newThing = $($(".recordProductAction")[0]).clone();
 
-            $(newThing).find(".productActionImpactedProduct").val("");
-            $(newThing).find(".productActionType").val(0);
-            $(newThing).find(".productActionVerified").prop('checked', false);
+                $(newThing).find(".productActionImpactedProduct").val("");
+                $(newThing).find(".productActionType").val(0);
+                $(newThing).find(".productActionVerified").prop('checked', false);
 
-            $("#productActions").append(newThing);
-            $(newThing).show();
+                $("#productActions").append(newThing);
+                $(newThing).show();
 
-            update();
-        });
+                update();
+
+                if ($(".recordProductAction").length > 1) {
+                    setControlState(false, true, true);
+                }
+            });
     }
 
     function setDeleteHandler(element) {
@@ -87,6 +105,51 @@
             $(element).parents(".recordProductAction").remove();
 
             update();
+
+            if ($(".recordProductAction").length > 1) {
+                setControlState(true, true, true);
+            } else {
+                if ($(".productActionImpactedProduct").val() !== "") {
+                    setControlState(true, true, true);
+                } else {
+                    setControlState(true, false, false);
+                }
+            }
         }).show();
     }
+
+    function setProductActionedCheckboxHandler() {
+        $("#ProductActioned").change(function () {
+            if ($("#ProductActioned").prop("checked")) {
+                setControlState(true, true, true);
+            } else {
+                if ($(".productActionImpactedProduct").val() !== "") {
+                    setControlState(true, false, true);
+                } else {
+                    setControlState(true, false, false);
+                }
+            }
+        });
+    }
+
+    function setControlState(enableProductActionedCheckbox, enableAddImpactButton, enableFirstRow) {
+        if (enableProductActionedCheckbox) {
+            $("#ProductActioned").prop("disabled", false);
+        } else {
+            $("#ProductActioned").prop("disabled", true);
+        }
+        if (enableAddImpactButton) {
+            $("#btnAddImpact").prop("disabled", false);
+        } else {
+            $("#btnAddImpact").prop("disabled", true);
+        }
+        if (enableFirstRow) {
+            $(".productActionImpactedProduct").prop("disabled", false);
+            $(".productActionType").prop("disabled", false);
+        } else {
+            $(".productActionImpactedProduct").prop("disabled", true);
+            $(".productActionType").prop("disabled", true);
+        }
+    }
+
 });
