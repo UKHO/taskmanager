@@ -915,5 +915,50 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePcpEventServiceApiClient.PostEvent(nameof(HDBAssessmentReadyEvent),
                 A<HDBAssessmentReadyEvent>.Ignored)).MustHaveHappened();
         }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
+        {
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = "";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "";
+            _verifyModel.Team = "Home Waters";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
+        }
+
+        [TestCase("Done")]
+        [TestCase("Save")]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Test change details";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
     }
 }

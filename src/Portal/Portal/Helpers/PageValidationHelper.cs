@@ -551,9 +551,17 @@ namespace Portal.Helpers
             return isValid;
         }
 
-        private async Task<bool> ValidateRecordProductAction(bool productActioned, string ProductActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
+            const string messagePrefix = "Record Product Action:";
+
             var isValid = true;
+
+            if (productActioned && string.IsNullOrWhiteSpace(productActionChangeDetails))
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered product action change details");
+                return false;
+            }
 
             if (recordProductAction != null && recordProductAction.Count > 0)
             {
@@ -562,7 +570,7 @@ namespace Portal.Helpers
                     string.IsNullOrWhiteSpace(r.ImpactedProduct)
                     || r.ProductActionTypeId == 0))
                 {
-                    validationErrorMessages.Add($"Record Product Action: Please ensure impacted product is fully populated");
+                    validationErrorMessages.Add($"{messagePrefix} Please ensure impacted product is fully populated");
                     return false;
                 }
 
@@ -577,7 +585,7 @@ namespace Portal.Helpers
                     if (!isExist)
                     {
                         validationErrorMessages.Add(
-                            $"Record Product Action: Impacted product {productAction.ImpactedProduct} does not exist");
+                            $"{messagePrefix} Impacted product {productAction.ImpactedProduct} does not exist");
                         isValid = false;
                     }
                 }
@@ -586,7 +594,7 @@ namespace Portal.Helpers
                     .Where(g => g.Count() > 1)
                     .Select(y => y.Key).Any())
                 {
-                    validationErrorMessages.Add("Record Product Action: More than one of the same Impacted Products selected");
+                    validationErrorMessages.Add($"{messagePrefix} More than one of the same Impacted Products selected");
                     isValid = false;
                 }
             }
