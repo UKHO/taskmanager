@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -622,11 +623,10 @@ namespace Portal.UnitTests
 
             _assessModel.DataImpacts = new List<DataImpact>();
 
-            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            var response = await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
-            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.False(_assessModel.ValidationErrorMessages.Contains("Data Impact: There are incomplete Features Submitted tick boxes."));
+            Assert.AreNotEqual(HttpStatusCode.OK, response);
+            Assert.AreEqual(0,_assessModel.ValidationErrorMessages.Count);
         }
 
         [Test]
@@ -704,11 +704,11 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<string>
                                                                                     .Ignored))
-                                                            .MustHaveHappened();
+                                                            .MustNotHaveHappened();
 
             A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
-                                                                                nameof(PersistWorkflowInstanceDataEvent),
-                                                                                A<PersistWorkflowInstanceDataEvent>.Ignored))
+                                                                                nameof(ProgressWorkflowInstanceEvent),
+                                                                                A<ProgressWorkflowInstanceEvent>.Ignored))
                                                             .MustHaveHappened();
         }
 
