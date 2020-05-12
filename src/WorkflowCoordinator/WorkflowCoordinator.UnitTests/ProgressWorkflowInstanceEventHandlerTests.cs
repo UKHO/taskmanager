@@ -166,7 +166,7 @@ namespace WorkflowCoordinator.UnitTests
             Assert.AreEqual(WorkflowStatus.Started.ToString(),
                 workflowInstance.Status);
         }
-        
+
         [Test]
         public async Task Test_Handle_Given_FromActivity_Verify_And_ToActivity_Completed_Then_CompleteAssessmentCommand_Is_Fired()
         {
@@ -185,7 +185,7 @@ namespace WorkflowCoordinator.UnitTests
             };
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(A<int>.Ignored))
-                .Returns(Task.FromResult((K2TaskData) null));
+                .Returns(Task.FromResult((K2TaskData)null));
 
             var currentWorkflowInstance = new WorkflowInstance()
             {
@@ -441,7 +441,7 @@ namespace WorkflowCoordinator.UnitTests
             var processId = 234;
             var workflowInstanceId = 1;
 
-            var progressWorkflowInstanceEvent= new ProgressWorkflowInstanceEvent()
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
@@ -539,16 +539,15 @@ namespace WorkflowCoordinator.UnitTests
             await _dbContext.SaveChangesAsync();
 
             //When
-
-            var ex = Assert.ThrowsAsync<ApplicationException>(() =>
-                _handler.Handle(message, _handlerContext));
-
-
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
+            
             //Then
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
-    .MustHaveHappened();
+                                    .MustHaveHappened();
 
-            Assert.AreEqual($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.", ex.Message);
+            Assert.AreEqual(
+                    $"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.",
+                    ex.Message);
 
             Assert.AreEqual(0, _handlerContext.SentMessages.Length);
 
@@ -558,11 +557,9 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_To_Assess_And_Task_Is_At_Review_Then_ApplicationException_Is_Thrown()
+        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_To_Assess_And_Task_Is_At_Review_Then_ApplicationException_Is_Thrown()
         {
-            var k2SerialNumber = "234_123";
             var processId = 234;
-            var workflowInstanceId = 1;
 
             var message = new ProgressWorkflowInstanceEvent()
             {
@@ -572,11 +569,10 @@ namespace WorkflowCoordinator.UnitTests
                 ToActivity = WorkflowStage.Verify
             };
 
-
             var k2Task = new K2TaskData()
             {
                 ActivityName = WorkflowStage.Review.ToString(),
-                SerialNumber = k2SerialNumber,
+                SerialNumber = "234_123",
                 WorkflowInstanceID = processId
             };
 
@@ -584,19 +580,19 @@ namespace WorkflowCoordinator.UnitTests
                 .Returns(k2Task);
 
             //When
-
             var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
-            
-            //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
-    .MustNotHaveHappened();
 
-            Assert.AreEqual($"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}", ex.Message);
+            //Then
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
+
+            Assert.AreEqual(
+                $"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}",
+                ex.Message);
 
             Assert.AreEqual(0, _handlerContext.SentMessages.Length);
 
             var persistWorkflowInstanceDataCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
-                t.Message is PersistWorkflowInstanceDataCommand);
+                                                                                                                t.Message is PersistWorkflowInstanceDataCommand);
             Assert.IsNull(persistWorkflowInstanceDataCommand, $"Message of type {nameof(PersistWorkflowInstanceDataCommand)} seen.");
         }
 
