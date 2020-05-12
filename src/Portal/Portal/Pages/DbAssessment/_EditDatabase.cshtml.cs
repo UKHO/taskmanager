@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Helpers;
 using Portal.Models;
@@ -30,6 +31,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly ILogger<_EditDatabaseModel> _logger;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private IAdDirectoryService _adDirectoryService;
         private readonly ISessionFileGenerator _sessionFileGenerator;
         private readonly ICarisProjectHelper _carisProjectHelper;
@@ -69,6 +71,7 @@ namespace Portal.Pages.DbAssessment
 
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
             IOptions<GeneralConfig> generalConfig,
+            IWorkflowBusinessLogicService workflowBusinessLogicService,
             IAdDirectoryService adDirectoryService,
             ISessionFileGenerator sessionFileGenerator,
             ICarisProjectHelper carisProjectHelper,
@@ -77,6 +80,7 @@ namespace Portal.Pages.DbAssessment
             _dbContext = dbContext;
             _logger = logger;
             _generalConfig = generalConfig;
+            _workflowBusinessLogicService = workflowBusinessLogicService;
             _adDirectoryService = adDirectoryService;
             _sessionFileGenerator = sessionFileGenerator;
             _carisProjectHelper = carisProjectHelper;
@@ -201,6 +205,16 @@ namespace Portal.Pages.DbAssessment
             UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             LogContext.PushProperty("UserFullName", UserFullName);
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been completed");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been completed");
+                throw appException;
+            }
 
             await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
 

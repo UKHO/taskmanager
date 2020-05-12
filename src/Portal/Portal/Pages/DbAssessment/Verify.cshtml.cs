@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Extensions;
 using Portal.Helpers;
@@ -32,6 +33,7 @@ namespace Portal.Pages.DbAssessment
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly IPcpEventServiceApiClient _pcpEventServiceApiClient;
@@ -89,6 +91,7 @@ namespace Portal.Pages.DbAssessment
         public string SerialisedCustomHttpStatusCodes { get; set; }
 
         public VerifyModel(WorkflowDbContext dbContext,
+            IWorkflowBusinessLogicService workflowBusinessLogicService,
             IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
@@ -100,6 +103,7 @@ namespace Portal.Pages.DbAssessment
             IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
             _dbContext = dbContext;
+            _workflowBusinessLogicService = workflowBusinessLogicService;
             _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
@@ -117,9 +121,7 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
-            var workflowInstance = await _dbContext.WorkflowInstance
-                .FirstAsync(w => w.ProcessId == processId);
-            IsReadOnly = workflowInstance.IsReadOnly;
+            IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
             var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
@@ -144,11 +146,27 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            ProcessId = processId;
+            var workflowInstance = _dbContext.WorkflowInstance
+                .Include(wi => wi.PrimaryDocumentStatus)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
 
-            var workflowInstance = await _dbContext.WorkflowInstance
-                .Include(w => w.PrimaryDocumentStatus)
-                .FirstAsync(w => w.ProcessId == processId);
+            if (workflowInstance == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been completed");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been completed");
+                throw appException;
+            }
+
+            ProcessId = processId;
 
             switch (action)
             {
@@ -317,12 +335,27 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
+            var workflowInstance = _dbContext.WorkflowInstance
+                .Include(p => p.PrimaryDocumentStatus)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
 
-            // TODO: Update K2 and persist
-            var workflowInstance = await _dbContext.WorkflowInstance
-                                                        .Include(p => p.PrimaryDocumentStatus)
-                                                        .FirstAsync(w => w.ProcessId == processId);
+            if (workflowInstance == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been completed");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been completed");
+                throw appException;
+            }
+
+            _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
 
             if (!await MarkTaskAsRejected(processId, workflowInstance))
             {

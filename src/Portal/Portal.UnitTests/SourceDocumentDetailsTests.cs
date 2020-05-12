@@ -8,6 +8,7 @@ using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
@@ -19,6 +20,7 @@ namespace Portal.UnitTests
     public class SourceDocumentDetailsTests
     {
         private WorkflowDbContext _dbContext;
+        private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private DocumentStatusFactory _documentStatusFactory;
         private _SourceDocumentDetailsModel _sourceDocumentDetailsModel;
@@ -37,6 +39,7 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+            _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
             _documentStatusFactory = new DocumentStatusFactory(_dbContext);
@@ -46,7 +49,13 @@ namespace Portal.UnitTests
             SdocId = 123456;
             CorrelationId = Guid.NewGuid();
 
-            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, new OptionsSnapshotWrapper<UriConfig>(new UriConfig()), _fakeEventServiceApiClient, _fakeDataServiceApiClient, _documentStatusFactory, _fakeLogger);
+            _sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext,
+                new OptionsSnapshotWrapper<UriConfig>(new UriConfig()),
+                _fakeWorkflowBusinessLogicService,
+                _fakeEventServiceApiClient,
+                _fakeDataServiceApiClient,
+                _documentStatusFactory,
+                _fakeLogger);
         }
 
         [TearDown]
@@ -69,7 +78,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null, _fakeLogger);
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, _fakeWorkflowBusinessLogicService, null, null, null, _fakeLogger);
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sourceDocumentDetailsModel.OnGet());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
@@ -101,7 +110,7 @@ namespace Portal.UnitTests
             });
             _dbContext.SaveChanges();
 
-            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, null, null, null, _fakeLogger) { ProcessId = ProcessId };
+            var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, _fakeWorkflowBusinessLogicService, null, null, null, _fakeLogger) { ProcessId = ProcessId };
             Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
         }
 
