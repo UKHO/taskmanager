@@ -35,7 +35,8 @@ namespace Portal.UnitTests
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
-        private IPortalUserDbService _fakePortalUserDbService; private ICommentsHelper _commentsHelper;
+        private IPortalUserDbService _fakePortalUserDbService;
+        private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakePageValidationHelper;
@@ -644,11 +645,10 @@ namespace Portal.UnitTests
             await _hpDbContext.SaveChangesAsync();
 
 
-            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
-            {
-                ProcessId = ProcessId,
-                CorrelationId = correlationId
-            });
+            var primaryDocumentStatus =
+                await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(pds => pds.ProcessId == ProcessId);
+
+            primaryDocumentStatus.CorrelationId = correlationId;
 
             await _dbContext.SaveChangesAsync();
 
@@ -711,12 +711,6 @@ namespace Portal.UnitTests
                 ParentProcessId = ProcessId,
                 Status = WorkflowStatus.Started.ToString()
 
-            });
-
-            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
-            {
-                ProcessId = ProcessId,
-                CorrelationId = Guid.NewGuid()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -849,6 +843,83 @@ namespace Portal.UnitTests
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+        }
+
+
+        [TestCase("Done")]
+        [TestCase("ConfirmedDone")]
+        public async Task Test_OnPostDoneAsync_When_All_Steps_Were_Successful_Then_Status_Is_Updating_And_Progress_Event_Is_Fired_And_Comment_Is_Added(string action)
+        {
+            var correlationId = Guid.NewGuid();
+            var userFullName = "TestUser";
+
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(userFullName);
+
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors(
+                null,
+                null,
+                null,
+                null,
+                null,
+                A<bool>.Ignored,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null)).WithAnyArguments().Returns(true);
+
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForWarnings(
+                null,
+                null,
+                null)).WithAnyArguments().Returns(false);
+
+            var primaryDocumentStatus =
+                await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(pds => pds.ProcessId == ProcessId);
+
+            primaryDocumentStatus.CorrelationId = correlationId;
+
+            await _dbContext.SaveChangesAsync();
+
+            _assessModel = new AssessModel(
+                            _dbContext, 
+                            null,
+                            _fakeWorkflowServiceApiClient,
+                            _fakeEventServiceApiClient,
+                            _fakeLogger,
+                            _fakeCommentsHelper,
+                            _fakeAdDirectoryService,
+                            _fakePageValidationHelper,
+                            _fakeCarisProjectHelper,
+                            _generalConfig);
+
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            var workflowInstance =
+                await _dbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == ProcessId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(WorkflowStatus.Updating.ToString(), workflowInstance.Status);
+            A.CallTo(() =>
+                _fakeEventServiceApiClient.PostEvent(
+                    nameof(ProgressWorkflowInstanceEvent),
+                    A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
+                        p.CorrelationId == correlationId
+                        && p.ProcessId == ProcessId
+                        && p.FromActivity == WorkflowStage.Assess
+                        && p.ToActivity == WorkflowStage.Verify
+                    ))).MustHaveHappened();
+            A.CallTo(() => _fakeCommentsHelper.AddComment(
+                "Task progression from Assess to Verify has been triggered",
+                ProcessId,
+                workflowInstance.WorkflowInstanceId,
+                userFullName)).MustHaveHappened();
         }
     }
 }
