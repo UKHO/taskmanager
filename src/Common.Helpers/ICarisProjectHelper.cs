@@ -9,5 +9,9 @@ namespace Common.Helpers
             int carisTimeout);
         Task UpdateCarisProject(int projectId, string assignedUsername, int carisTimeout);
         Task MarkCarisProjectAsComplete(int projectId, int carisTimeout);
+
+        Task<bool> PublishCarisProject(int carisChartId);
+
+        Task<(int, string, int, string)> GetValidHpdPanelInfo(int carisChartId);
     }
 }

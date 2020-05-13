@@ -563,6 +563,48 @@
     </div>
 </div>
 
+@* Modal Chart Publish Dialog *@
+<div class="modal fade" id="PublishChartModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Publish Caris Chart</h4>
+            </div>
+            <div class="modal-body">
+                <h6>Enter the version number: </h6>
+                <input type="number" id="chartVersionNo" />
+                <button type="button" id="btnGetChartDetails" class="btn btn-secondary">Get</button>
+                <input type="hidden" id="hdnPublishProcessId" name="ConfirmProcessId" />
+                <input type="hidden" id="hdnPublishStageId" name="publishStageId" />
+                <input type="hidden" id="hdnPublishUser" name="AssignedUser" />
+                <div id="paneldetails">
+                    <div class="row">
+                        <h6>Chart Number :</h6>
+                        <h6 id="chartNo"></h6>
+                    </div>
+                    <div class="row">
+                        <h6>Tile         :</h6>
+                        <h6 id="chartTitle"></h6>
+                    </div>
+                    <div class="row">
+                        <h6>Edition Number:</h6>
+                        <h6 id="editionNumber"></h6>
+                    </div>
+                    <div class="row">
+                        <h6>Version       :</h6>
+                        <h6 id="chartVersion"></h6>
+                    </div>
+                    <div id="publishChartError"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPublishCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmPublish" id="btnPublish" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 @section Scripts {

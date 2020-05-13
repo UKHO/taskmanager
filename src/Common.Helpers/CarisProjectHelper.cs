@@ -1,11 +1,11 @@
-﻿using System;
+﻿using HpdDatabase.EF.Models;
+using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using HpdDatabase.EF.Models;
-using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Common.Helpers
 {
@@ -17,6 +17,77 @@ namespace Common.Helpers
         {
             _hpdDbContext = hpdDbContext;
         }
+
+        public async Task<(int, string, int, string)> GetValidHpdPanelInfo(int chartVersionId)
+        {
+
+            (int, string, int, string) result = (0, null, 0, null);
+
+            var commandText = "SELECT  pc.chtnum, pc.ctitl1, pc.ednumb, pc.version " +
+                              " FROM hpdowner.paper_chart pc WHERE pc.product_status = 'Active' " +
+                              $" AND CHARTVER_CHARTVER_ID = {chartVersionId}";
+
+            try
+            {
+
+                var connection = _hpdDbContext.Database.GetDbConnection();
+                await using var command = connection.CreateCommand();
+                command.CommandType = CommandType.Text;
+                command.CommandText = commandText;
+
+                connection.Open();
+                await using var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+
+                    result = (Convert.ToInt32(reader[0]),
+                        reader[1].ToString(), Convert.ToInt32(reader[2]), reader[3].ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<bool> PublishCarisProject(int carisChartId)
+        {
+            var result = true;
+
+            var connection = _hpdDbContext.Database.GetDbConnection();
+            await using (var command = connection.CreateCommand())
+            {
+                try
+                {
+                    connection.Open();
+
+                    command.Transaction = connection.BeginTransaction();
+
+                    var commandText = "BEGIN P_SAVE_MANAGER.STARTNEWSAVE(null); " +
+                                      $"hpdowner.p_charts.publish ({carisChartId}); END;";
+
+                    command.CommandText = commandText;
+                    command.ExecuteNonQuery();
+
+                    command.Transaction.Commit();
+
+                }
+                catch (Exception)
+                {
+                    command.Transaction.Rollback();
+                    result = false;
+
+                }
+
+            }
+
+            return result;
+        }
+
 
         public async Task<int> CreateCarisProject(int k2ProcessId, string projectName, string creatorHpdUsername,
             string projectType, string projectStatus, string projectPriority,
@@ -280,7 +351,7 @@ namespace Common.Helpers
 
         private ApplicationException FormatOracleError(OracleException exception)
         {
-            var oracleError = exception.Message.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None).FirstOrDefault();
+            var oracleError = exception.Message.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).FirstOrDefault();
 
 
             if (oracleError != null)
@@ -315,72 +386,72 @@ namespace Common.Helpers
         }
 
         private async Task<int> GetCarisProjectPriorityId(string projectPriority)
+        {
+            var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
+                s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
+
+            if (carisProjectPriority == null)
             {
-                var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
-                    s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
-
-                if (carisProjectPriority == null)
-                {
-                    throw new ArgumentException(
-                        $"Failed to get caris project priority {projectPriority}, project priority might not exist in HPD");
-                }
-
-                return carisProjectPriority.ProjectPriorityId;
+                throw new ArgumentException(
+                    $"Failed to get caris project priority {projectPriority}, project priority might not exist in HPD");
             }
 
-            private async Task<int> GetCarisProjectStatusId(string projectStatus)
+            return carisProjectPriority.ProjectPriorityId;
+        }
+
+        private async Task<int> GetCarisProjectStatusId(string projectStatus)
+        {
+            var carisProjectStatus = await _hpdDbContext.CarisProjectStatuses.SingleOrDefaultAsync(s =>
+                s.ProjectStatusName.Equals(projectStatus, StringComparison.InvariantCultureIgnoreCase));
+
+            if (carisProjectStatus == null)
             {
-                var carisProjectStatus = await _hpdDbContext.CarisProjectStatuses.SingleOrDefaultAsync(s =>
-                    s.ProjectStatusName.Equals(projectStatus, StringComparison.InvariantCultureIgnoreCase));
-
-                if (carisProjectStatus == null)
-                {
-                    throw new ArgumentException(
-                        $"Failed to get caris project status {projectStatus}, project status might not exist in HPD");
-                }
-
-                return carisProjectStatus.ProjectStatusId;
+                throw new ArgumentException(
+                    $"Failed to get caris project status {projectStatus}, project status might not exist in HPD");
             }
 
-            private async Task<int> GetCarisProjectTypeId(string projectType)
+            return carisProjectStatus.ProjectStatusId;
+        }
+
+        private async Task<int> GetCarisProjectTypeId(string projectType)
+        {
+            var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
+                p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
+
+            if (carisProjectType == null)
             {
-                var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
-                    p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
-
-                if (carisProjectType == null)
-                {
-                    throw new ArgumentException(
-                        $"Failed to get caris project type {projectType}, project type might not exist in HPD");
-                }
-
-                return carisProjectType.ProjectTypeId;
+                throw new ArgumentException(
+                    $"Failed to get caris project type {projectType}, project type might not exist in HPD");
             }
 
-            private async Task<List<int>> GetAssignedUsersId(List<string> assignedHpdUsernames)
+            return carisProjectType.ProjectTypeId;
+        }
+
+        private async Task<List<int>> GetAssignedUsersId(List<string> assignedHpdUsernames)
+        {
+            var assignedUsersIds = new List<int>(assignedHpdUsernames.Count);
+            foreach (var assignedHpdUsername in assignedHpdUsernames)
             {
-                var assignedUsersIds = new List<int>(assignedHpdUsernames.Count);
-                foreach (var assignedHpdUsername in assignedHpdUsernames)
-                {
-                    var id = await GetHpdUserId(assignedHpdUsername);
+                var id = await GetHpdUserId(assignedHpdUsername);
 
-                    assignedUsersIds.Add(id);
-                }
-
-                return assignedUsersIds;
+                assignedUsersIds.Add(id);
             }
 
-            private async Task<int> GetHpdUserId(string hpdUsername)
+            return assignedUsersIds;
+        }
+
+        private async Task<int> GetHpdUserId(string hpdUsername)
+        {
+            var creator = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
+                u.Username.Equals(hpdUsername, StringComparison.InvariantCultureIgnoreCase));
+
+            if (creator == null)
             {
-                var creator = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
-                    u.Username.Equals(hpdUsername, StringComparison.InvariantCultureIgnoreCase));
-
-                if (creator == null)
-                {
-                    throw new ArgumentException(
-                        $"Failed to get caris username {hpdUsername}, user might not exist in HPD");
-                }
-
-                return creator.UserId;
+                throw new ArgumentException(
+                    $"Failed to get caris username {hpdUsername}, user might not exist in HPD");
             }
+
+            return creator.UserId;
         }
     }
+}

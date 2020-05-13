@@ -748,6 +748,32 @@ namespace NCNEPortal
 
         }
 
+        public async Task<JsonResult> OnPostGetChartDetails(int versionNumber)
+        {
+            var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
+
+            var result = new[]
+            {
+                panelInfo.Item1.ToString(),
+                panelInfo.Item2,
+                panelInfo.Item3.ToString(),
+                panelInfo.Item4
+            };
+
+            return new JsonResult(result);
+        }
+
+        public async Task OnPostPublishCarisChart(int versionNumber, int processId, int stageId, string userName)
+        {
+            var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
+
+            if (result)
+            {
+                await CompleteStage(processId, stageId);
+            }
+
+        }
+
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
