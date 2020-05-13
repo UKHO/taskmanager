@@ -10,9 +10,24 @@
     });
 
     $("#frmSearchForHistoricalTasks").on("submit",
-        function() {
+        function () {
 
             $("#modalWaitHistoricalTasks").modal("show");
         });
 
+    attachClearHistoricalTasksSearchButtonHandler();
 });
+
+function attachClearHistoricalTasksSearchButtonHandler() {
+    $("#btnClearHistoricalTasksSearch").click(function () {
+        clearHistoricalTasksSearch();
+    });
+}
+
+function clearHistoricalTasksSearch() {
+    $(".historicalTaskSearchField").each(function () {
+        $(this).val("");
+    });
+
+    $("#SearchParameters_ProcessId").focus();
+}
