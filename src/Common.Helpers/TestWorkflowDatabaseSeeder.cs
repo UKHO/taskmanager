@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -43,7 +44,7 @@ namespace Common.Helpers
             var jsonString = File.ReadAllText(@"Data\Users.json");
             var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
 
-            _context.AdUser.AddRange(users);
+            if (users?.Any() ?? false) _context.AdUser.AddRange(users);
         }
 
         private void PopulateHpdUsage()
