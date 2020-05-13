@@ -38,15 +38,15 @@ namespace Common.Helpers.Auth
                 .ExecuteAndCaptureAsync(async () =>
                 {
                     users.Clear();
-                    var membersPage = await GraphClient.Groups[groupGuid.ToString()].Members.Request().GetAsync();
-                    users.AddRange(membersPage?.CurrentPage);
+                    var membersPage = await GraphClient.Groups[groupGuid.ToString()].Members.Request().GetAsync().ConfigureAwait(false);
+                    users.AddRange(membersPage?.CurrentPage ?? Enumerable.Empty<DirectoryObject>());
 
                     while (membersPage?.NextPageRequest != null)
                     {
-                        membersPage = await membersPage.NextPageRequest.GetAsync();
-                        users.AddRange(membersPage?.CurrentPage);
+                        membersPage = await membersPage.NextPageRequest.GetAsync().ConfigureAwait(false);
+                        users.AddRange(membersPage?.CurrentPage ?? Enumerable.Empty<DirectoryObject>());
                     }
-                });
+                }).ConfigureAwait(false);
 
             if (result.Outcome == OutcomeType.Failure)
             {
@@ -63,9 +63,9 @@ namespace Common.Helpers.Auth
         }
 
         /// <summary>
-        /// Get all AD users from a collection of AD groups.
+        /// Get all AD users from a collection of AD groups. 
         /// </summary>
-        public async Task<IEnumerable<(string DisplayName, string ActiveDirectorySid)>> GetGroupMembersFromAdAsync(
+        public async Task<IEnumerable<(string DisplayName, string UserPrincipalName)>> GetGroupMembersFromAdAsync(
             IEnumerable<Guid> adGroupGuids)
         {
             if (adGroupGuids == null) throw new ApplicationException($"{nameof(adGroupGuids)} cannot be null.");
@@ -76,10 +76,10 @@ namespace Common.Helpers.Auth
             {
                 foreach (var groupId in adGroupGuids)
                 {
-                    users.AddRange(await GetGroupMembersFromAdAsync(groupId));
+                    users.AddRange(await GetGroupMembersFromAdAsync(groupId).ConfigureAwait(false));
                 }
 
-                return users.Select(o => (((User)o).DisplayName, ((User)o).Id))
+                return users.Select(o => (((User)o).DisplayName, ((User)o).UserPrincipalName))
                     .OrderBy(s => s.DisplayName).Distinct();
             }
             catch (Exception e)

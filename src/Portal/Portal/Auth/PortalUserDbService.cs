@@ -31,10 +31,10 @@ namespace Portal.Auth
             var currentAdUsers = _workflowDbContext.AdUser.ToList();
 
             var newAdUsers = adGroupMembers.Where(m =>
-                currentAdUsers.All(c => c.ActiveDirectorySid != m.ActiveDirectorySid)).Select(n => new AdUser
+                currentAdUsers.All(c => c.UserPrincipalName != m.UserPrincipalName)).Select(n => new AdUser
                 {
                     DisplayName = n.DisplayName,
-                    ActiveDirectorySid = n.ActiveDirectorySid,
+                    UserPrincipalName = n.UserPrincipalName,
 
                     // This will eventually hook into checks
                     // For now, it just records the date user was first stored in our database
