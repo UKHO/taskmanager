@@ -7,6 +7,7 @@ namespace WorkflowDatabase.EF.Models
     {
         public int WorkflowInstanceId { get; set; }
         public int ProcessId { get; set; }
+        public int PrimarySdocId { get; set; }
         public string SerialNumber { get; set; }
         public int? ParentProcessId { get; set; }
         public string ActivityName { get; set; }
