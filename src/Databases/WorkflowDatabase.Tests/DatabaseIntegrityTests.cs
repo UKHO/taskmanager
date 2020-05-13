@@ -310,7 +310,7 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_productAction_table_prevents_duplicate_productActiontypeId_for_the_same_processId_due_to_FK()
+        public void Ensure_productAction_table_allows_duplicate_productActiontypeId_for_the_same_processId()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
@@ -347,8 +347,7 @@ namespace WorkflowDatabase.Tests
                 Verified = false
             });
 
-            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
-            Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            Assert.DoesNotThrow(() => _dbContext.SaveChanges());
         }
 
         [Test]
