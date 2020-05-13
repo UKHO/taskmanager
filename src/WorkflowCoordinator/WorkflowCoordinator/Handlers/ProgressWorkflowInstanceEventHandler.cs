@@ -50,16 +50,23 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivity)
             {
                 case WorkflowStage.Assess:
-                    // TODO: Added code for Verifying, progressing and persisting
+                    // TODO: Progressing task from Review to Assess. Add code for Verifying, progressing and persisting
+                    // TODO: Rejecting task from Verify to Assess. Add code for Verifying, progressing and persisting
                     throw new NotImplementedException("Progressing Review to Assess, or Rejecting Verify to Ass has not been implemented");
 
                     //break;
                 case WorkflowStage.Verify:
+                    // Progressing task from Assess to Verify
                     if (k2Task.ActivityName == WorkflowStage.Assess.ToString())
                     {
                         // progress
                         var success = await _workflowServiceApiClient.ProgressWorkflowInstance(message.ProcessId, k2Task.SerialNumber);
-                        
+
+                        if (!success)
+                        {
+                            _logger.LogError("Unable to progress task {ProcessId} from {FromActivity} to {ToActivity} in K2.");
+                            throw new ApplicationException($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.");
+                        }
                     }
                     else if (k2Task.ActivityName == WorkflowStage.Review.ToString())
                     {
@@ -81,7 +88,7 @@ namespace WorkflowCoordinator.Handlers
 
                     break;
                 case WorkflowStage.Completed:
-                    // TODO: Added code for Verifying, progressing and persisting
+                    // TODO: Sign-off Verify. Add code for Verifying, progressing and persisting
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
 
                     //break;

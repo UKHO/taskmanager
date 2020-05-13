@@ -35,7 +35,8 @@ namespace Portal.UnitTests
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
-        private IPortalUserDbService _fakePortalUserDbService; private ICommentsHelper _commentsHelper;
+        private IPortalUserDbService _fakePortalUserDbService;
+        private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakePageValidationHelper;
@@ -157,6 +158,9 @@ namespace Portal.UnitTests
             Assert.Contains($"Task Information: Source category cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Task type cannot be empty", _assessModel.ValidationErrorMessages);
             Assert.Contains($"Task Information: Team cannot be empty", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -180,6 +184,10 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages);
+
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -202,6 +210,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -234,6 +245,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -268,6 +282,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
 
@@ -301,6 +318,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -324,6 +344,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -347,6 +370,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -364,6 +390,9 @@ namespace Portal.UnitTests
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -378,6 +407,9 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
@@ -591,11 +623,16 @@ namespace Portal.UnitTests
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Data Impact: There are incomplete Features Submitted tick boxes.", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_unsubmitted_features_on_empty_dataimpacts_then_no_validation_error_message_is_present()
         {
+            var correlationId = Guid.NewGuid();
+
             A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult("TestUser"));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -606,6 +643,14 @@ namespace Portal.UnitTests
             _hpDbContext.CarisProducts.Add(new CarisProduct
             { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
+
+
+            var primaryDocumentStatus =
+                await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(pds => pds.ProcessId == ProcessId);
+
+            primaryDocumentStatus.CorrelationId = correlationId;
+
+            await _dbContext.SaveChangesAsync();
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -623,10 +668,20 @@ namespace Portal.UnitTests
 
             _assessModel.DataImpacts = new List<DataImpact>();
 
+
             var response = await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreNotEqual(HttpStatusCode.OK, response);
+            Assert.AreEqual((int)HttpStatusCode.OK, ((StatusCodeResult)response).StatusCode);
             Assert.AreEqual(0,_assessModel.ValidationErrorMessages.Count);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(
+                                            nameof(ProgressWorkflowInstanceEvent), 
+                                            A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
+                                                                                                        p.CorrelationId == correlationId
+                                                                                                        && p.ProcessId == ProcessId
+                                                                                                        && p.FromActivity== WorkflowStage.Assess
+                                                                                                        && p.ToActivity == WorkflowStage.Verify
+                    ))).MustHaveHappened();
         }
 
         [Test]
@@ -656,12 +711,6 @@ namespace Portal.UnitTests
                 ParentProcessId = ProcessId,
                 Status = WorkflowStatus.Started.ToString()
 
-            });
-
-            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
-            {
-                ProcessId = ProcessId,
-                CorrelationId = Guid.NewGuid()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -736,6 +785,9 @@ namespace Portal.UnitTests
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
         }
 
         [TestCase("Done")]
@@ -791,6 +843,83 @@ namespace Portal.UnitTests
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+        }
+
+
+        [TestCase("Done")]
+        [TestCase("ConfirmedDone")]
+        public async Task Test_OnPostDoneAsync_When_All_Steps_Were_Successful_Then_Status_Is_Updating_And_Progress_Event_Is_Fired_And_Comment_Is_Added(string action)
+        {
+            var correlationId = Guid.NewGuid();
+            var userFullName = "TestUser";
+
+            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(userFullName);
+
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors(
+                null,
+                null,
+                null,
+                null,
+                null,
+                A<bool>.Ignored,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null)).WithAnyArguments().Returns(true);
+
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForWarnings(
+                null,
+                null,
+                null)).WithAnyArguments().Returns(false);
+
+            var primaryDocumentStatus =
+                await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(pds => pds.ProcessId == ProcessId);
+
+            primaryDocumentStatus.CorrelationId = correlationId;
+
+            await _dbContext.SaveChangesAsync();
+
+            _assessModel = new AssessModel(
+                            _dbContext, 
+                            null,
+                            _fakeWorkflowServiceApiClient,
+                            _fakeEventServiceApiClient,
+                            _fakeLogger,
+                            _fakeCommentsHelper,
+                            _fakeAdDirectoryService,
+                            _fakePageValidationHelper,
+                            _fakeCarisProjectHelper,
+                            _generalConfig);
+
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            await _assessModel.OnPostDoneAsync(ProcessId, action);
+
+            var workflowInstance =
+                await _dbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == ProcessId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(WorkflowStatus.Updating.ToString(), workflowInstance.Status);
+            A.CallTo(() =>
+                _fakeEventServiceApiClient.PostEvent(
+                    nameof(ProgressWorkflowInstanceEvent),
+                    A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
+                        p.CorrelationId == correlationId
+                        && p.ProcessId == ProcessId
+                        && p.FromActivity == WorkflowStage.Assess
+                        && p.ToActivity == WorkflowStage.Verify
+                    ))).MustHaveHappened();
+            A.CallTo(() => _fakeCommentsHelper.AddComment(
+                "Task progression from Assess to Verify has been triggered",
+                ProcessId,
+                workflowInstance.WorkflowInstanceId,
+                userFullName)).MustHaveHappened();
         }
     }
 }
