@@ -321,9 +321,8 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
-
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
@@ -355,8 +354,8 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
@@ -637,8 +636,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("This Use"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
@@ -676,8 +675,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
@@ -711,9 +710,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
-
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -756,8 +754,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -797,8 +795,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -841,8 +839,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))

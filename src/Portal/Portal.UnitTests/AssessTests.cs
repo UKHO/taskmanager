@@ -378,8 +378,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("This User"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+               .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
                 .Returns(true);
 
@@ -398,8 +398,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
 
@@ -429,8 +429,8 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
@@ -464,8 +464,8 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
@@ -508,8 +508,8 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
@@ -543,8 +543,8 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser2"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
                 .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
@@ -575,8 +575,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_features_unsubmitted_on_dataimpacts_then_validation_error_message_is_present()
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -585,7 +585,7 @@ namespace Portal.UnitTests
             _hpDbContext.CarisProducts.Add(new CarisProduct
             { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
             await _hpDbContext.SaveChangesAsync();
-            
+
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
@@ -633,8 +633,8 @@ namespace Portal.UnitTests
         {
             var correlationId = Guid.NewGuid();
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -659,7 +659,7 @@ namespace Portal.UnitTests
             _assessModel.Verifier = "TestUser2";
             _assessModel.Team = "Home Waters";
             _assessModel.TaskType = "TaskType";
-            
+
             _assessModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
@@ -672,14 +672,14 @@ namespace Portal.UnitTests
             var response = await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.AreEqual((int)HttpStatusCode.OK, ((StatusCodeResult)response).StatusCode);
-            Assert.AreEqual(0,_assessModel.ValidationErrorMessages.Count);
+            Assert.AreEqual(0, _assessModel.ValidationErrorMessages.Count);
             A.CallTo(() =>
                     _fakeEventServiceApiClient.PostEvent(
-                                            nameof(ProgressWorkflowInstanceEvent), 
+                                            nameof(ProgressWorkflowInstanceEvent),
                                             A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
                                                                                                         p.CorrelationId == correlationId
                                                                                                         && p.ProcessId == ProcessId
-                                                                                                        && p.FromActivity== WorkflowStage.Assess
+                                                                                                        && p.FromActivity == WorkflowStage.Assess
                                                                                                         && p.ToActivity == WorkflowStage.Verify
                     ))).MustHaveHappened();
         }
@@ -765,8 +765,8 @@ namespace Portal.UnitTests
         [TestCase("Save")]
         public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -794,8 +794,8 @@ namespace Portal.UnitTests
         [TestCase("Save")]
         public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
@@ -821,8 +821,8 @@ namespace Portal.UnitTests
         [TestCase("Save")]
         public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult("TestUser"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
@@ -852,9 +852,10 @@ namespace Portal.UnitTests
         {
             var correlationId = Guid.NewGuid();
             var userFullName = "TestUser";
+            var userEmail = "testuser@foobar.com";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(userFullName);
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns((userFullName, userEmail));
 
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors(
                 null,
@@ -886,7 +887,7 @@ namespace Portal.UnitTests
             await _dbContext.SaveChangesAsync();
 
             _assessModel = new AssessModel(
-                            _dbContext, 
+                            _dbContext,
                             null,
                             _fakeWorkflowServiceApiClient,
                             _fakeEventServiceApiClient,
