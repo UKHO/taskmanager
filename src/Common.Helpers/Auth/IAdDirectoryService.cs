@@ -14,7 +14,5 @@ namespace Common.Helpers.Auth
             IEnumerable<Guid> adGroupGuids);
 
         Task<(string DisplayName, string UserEmail)> GetUserDetailsAsync(ClaimsPrincipal user);
-
-        Task<string> GetFullNameForUserAsync(ClaimsPrincipal user);
     }
 }

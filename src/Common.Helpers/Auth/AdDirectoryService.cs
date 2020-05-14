@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Graph;
-using Microsoft.Graph.Auth;
 using Polly;
 
 namespace Common.Helpers.Auth
@@ -98,13 +97,5 @@ namespace Common.Helpers.Auth
             return (displayName, userEmail);
         }
 
-        // TODO remove when everywhere is calling method above
-        public async Task<string> GetFullNameForUserAsync(ClaimsPrincipal user)
-        {
-            var graphUser = user.ToGraphUserAccount();
-
-            var graphResult = await GraphClient.Users[graphUser.ObjectId].Request().GetAsync();
-            return graphResult.DisplayName;
-        }
     }
 }
