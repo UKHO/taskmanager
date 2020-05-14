@@ -53,6 +53,9 @@
 
     $("#btnGetChartDetails").click(function () {
         var versionNo = $("#chartVersionNo").val();
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
+
 
         $.ajax({
             type: "POST",
@@ -64,14 +67,22 @@
                 "versionNumber": versionNo
             },
             success: function (result) {
-                $("#chartNo").html(result[0]);
+                $("#chartNumber").html(result[0]);
                 $("#chartTitle").html(result[1]);
                 $("#editionNumber").html(result[2]);
                 $("#chartVersion").html(result[3]);
 
             },
-            error: function(error) {
-                $("#publishChartError").html(error);
+            error: function (error) {
+                $("#chartNumber").html("");
+                $("#chartTitle").html("");
+                $("#editionNumber").html("");
+                $("#chartVersion").html("");
+                var responseJson = error.responseJSON;
+                if (responseJson != null) {
+                    $("#publishChartErrorMessage").text(responseJson);
+                    $("#publishChartError").collapse("show");
+                }
             }
         });
 
@@ -87,32 +98,39 @@
         var processId = $("#hdnPublishProcessId").val();
         var stageId = $("#hdnPublishStageId").val();
         var userName = $("#hdnPublishUser").val();
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
 
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=PublishCarisChart",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: {
                 "versionNumber": versionNo,
                 "processId": processId,
-                "stageId" :stageId,
-                "userName" : userName
+                "stageId": stageId,
+                "userName": userName
             },
-            success: function (result) {
-                $("#panelNo").html(result[0]);
-                $("#panelTitle").html(result[1]);
+            success: function(result) {
+                formChanged = false;
+                $("#PublishChartModal").modal("hide");
+                window.location.href = "/workflow?ProcessId=" + processId;
 
             },
-            error: function (error) {
-                $("#publishChartError").html(error);
+            error: function(error) {
+                var responseJson = error.responseJSON;
+                if (responseJson != null) {
+                    $("#publishChartErrorMessage").text(responseJson);
+                    $("#publishChartError").collapse("show");
+                }
             }
         });
 
 
-
-        });
+    });
 
     function validateCompleteRework(url,  processId,stageId,
           username, stageTypeId,stageName, rework, publish ) {
@@ -186,6 +204,13 @@
         var username = $(this).data("username");
         var stageName = $(this).data("stagename");
         var stageTypeId = $(this).data("stagetypeid");
+        $("#chartNumber").html("");
+        $("#chartTitle").html("");
+        $("#editionNumber").html("");
+        $("#chartVersion").html("");
+        $("#chartVersionNo").val("");
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
         $("#btnPublishInCaris").prop("disabled", true);
 
         var url = "Workflow/?handler=ValidateComplete";

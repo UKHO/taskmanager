@@ -752,24 +752,55 @@ namespace NCNEPortal
         {
             var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
 
-            var result = new[]
+            if (panelInfo.Item1 > 0)
             {
-                panelInfo.Item1.ToString(),
-                panelInfo.Item2,
-                panelInfo.Item3.ToString(),
-                panelInfo.Item4
-            };
-
-            return new JsonResult(result);
+                var result = new[]
+                {
+                    panelInfo.Item1.ToString(),
+                    panelInfo.Item2,
+                    panelInfo.Item3.ToString(),
+                    panelInfo.Item4
+                };
+                return new JsonResult(result);
+            }
+            else
+            {
+                return new JsonResult("Invalid Chart Version Number")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
         }
 
-        public async Task OnPostPublishCarisChart(int versionNumber, int processId, int stageId, string userName)
+        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId, string userName)
         {
-            var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
-
-            if (result)
+            try
             {
-                await CompleteStage(processId, stageId);
+
+
+                var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
+
+                if (result)
+                {
+                    await CompleteStage(processId, stageId);
+
+                    return new JsonResult(result)
+                    { StatusCode = (int)HttpStatusCode.OK };
+                }
+                else
+                {
+                    return new JsonResult(result)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(e.InnerException?.Message)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
         }

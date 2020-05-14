@@ -56,7 +56,6 @@ namespace Common.Helpers
 
         public async Task<bool> PublishCarisProject(int carisChartId)
         {
-            var result = true;
 
             var connection = _hpdDbContext.Database.GetDbConnection();
             await using (var command = connection.CreateCommand())
@@ -76,16 +75,23 @@ namespace Common.Helpers
                     command.Transaction.Commit();
 
                 }
+
+                catch (OracleException e)
+                {
+                    command.Transaction.Rollback();
+                    var error = FormatOracleError(e);
+                    throw error;
+                }
                 catch (Exception)
                 {
                     command.Transaction.Rollback();
-                    result = false;
+                    throw;
 
                 }
 
             }
 
-            return result;
+            return true;
         }
 
 
