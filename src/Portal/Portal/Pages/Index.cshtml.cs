@@ -35,11 +35,14 @@ namespace Portal.Pages
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
 
-        private string _userFullName;
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         [BindProperty(SupportsGet = true)]
@@ -69,6 +72,8 @@ namespace Portal.Pages
             _generalConfig = generalConfig;
 
             ValidationErrorMessages = new List<string>();
+
+
         }
 
         public async Task OnGetAsync()
@@ -84,8 +89,6 @@ namespace Portal.Pages
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .OrderBy(wi => wi.ProcessId)
                 .ToListAsync();
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
             Tasks = _mapper.Map<List<WorkflowInstance>, List<TaskViewModel>>(workflows);
 
@@ -117,7 +120,7 @@ namespace Portal.Pages
                     task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
                     task.DaysToDmEndDateRedAlert = alerts.redAlert;
                 }
-                
+
                 SetUsersOnTask(instance, task);
             }
 
@@ -142,8 +145,6 @@ namespace Portal.Pages
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -160,9 +161,9 @@ namespace Portal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = UserFullName,
+                        CreatedByUsername = CurrentUser.DisplayName,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = UserFullName,
+                        LastModifiedByUsername = CurrentUser.DisplayName,
                     });
                     await _dbContext.SaveChangesAsync();
                 }
@@ -173,7 +174,7 @@ namespace Portal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = UserFullName;
+            existingTaskNote.LastModifiedByUsername = CurrentUser.DisplayName;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();
@@ -184,8 +185,7 @@ namespace Portal.Pages
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
             LogContext.PushProperty("AssignedUser", userName);
 
             ValidationErrorMessages.Clear();

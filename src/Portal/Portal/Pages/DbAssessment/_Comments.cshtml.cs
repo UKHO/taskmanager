@@ -28,15 +28,18 @@ namespace Portal.Pages.DbAssessment
 
         public List<Comment> Comments { get; set; }
 
-        private string _userFullName;
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         public _CommentsModel(WorkflowDbContext dbContext,
-            ICommentsHelper commentsHelper, 
+            ICommentsHelper commentsHelper,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
             IAdDirectoryService adDirectoryService,
             ILogger<_CommentsModel> logger)
@@ -61,8 +64,6 @@ namespace Portal.Pages.DbAssessment
 
             var workflowInstance = await _dbContext.WorkflowInstance.FirstAsync(c => c.ProcessId == ProcessId);
 
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-            
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
             if (isWorkflowReadOnly)
@@ -76,7 +77,7 @@ namespace Portal.Pages.DbAssessment
             await _commentsHelper.AddComment(newCommentMessage,
                 ProcessId,
                 workflowInstance.WorkflowInstanceId,
-                UserFullName);
+                CurrentUser.DisplayName);
 
             Comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 

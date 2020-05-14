@@ -19,7 +19,7 @@
                 <button id="btnTeamTasks" class="btn btn-primary">Team Tasks</button>
                 <button id="btnStats" class="btn btn-primary">Statistics</button>
                 <button id="btnHistoricalTasks" class="btn btn-primary">Historical Tasks</button>
-                <span class="ml-3" id="userFullName">Hello <strong>@Model.UserFullName</strong></span>
+                <span class="ml-3" id="userFullName">Hello <strong>@Model.CurrentUser.DisplayName</strong></span>
             </div>
         </div>
         <div class="row">
@@ -60,63 +60,63 @@
             <tbody>
                 @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.Reviewer)))
                 {
-                <tr>
-                    <td>
-                        <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
-                    </td>
-                    <td>
-                        <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                            @Html.DisplayFor(model => task.DaysToDmEndDate)
-                        </div>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => task.DmEndDate)
-                    </td>
-                    <td>
-                        <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                        <span class="float-right mr-2">
-                            @if (task.IsOnHold)
-                            {
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
-                            }
-                        </span>
-                    </td>
-                    <td>
-                        @task.AssessmentDataRsdraNumber
-                    </td>
-                    <td>
-                        @task.AssessmentDataSourceDocumentName
-                    </td>
-                    <td>
-                        @task.Workspace
-                    </td>
-                    <td>
-                        @task.TaskStage
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        @task.Team
-                    </td>
-                    <td>
-                        <div class="dropdown" style="cursor: pointer;">
-                            <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
-                                    <i class="far fa-user">
-                                    </i>
-                                    Assign Task
-                                </a>
+                    <tr>
+                        <td>
+                            <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                @Html.DisplayFor(model => task.DaysToDmEndDate)
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        @task.TaskNoteText
-                    </td>
-                </tr>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => task.DmEndDate)
+                        </td>
+                        <td>
+                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                            <span class="float-right mr-2">
+                                @if (task.IsOnHold)
+                                {
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @task.AssessmentDataRsdraNumber
+                        </td>
+                        <td>
+                            @task.AssessmentDataSourceDocumentName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                        <i class="far fa-user">
+                                        </i>
+                                        Assign Task
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @task.TaskNoteText
+                        </td>
+                    </tr>
                 }
 
             </tbody>
@@ -148,75 +148,75 @@
             <tbody>
                 @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
                 {
-                <tr>
-                    <td class="details-control"><i class="fa"></i></td>
-                    <td>
-                        <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
-                    </td>
-                    <td>
-                        <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                            @Html.DisplayFor(model => task.DaysToDmEndDate)
-                        </div>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => task.DmEndDate)
-                    </td>
-                    <td>
-                        <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                        <span class="float-right mr-2">
-                            @if (task.IsOnHold)
-                            {
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
-                            <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
-                            }
-                        </span>
-                    </td>
-                    <td>
-                        @task.AssessmentDataRsdraNumber
-                    </td>
-                    <td>
-                        @task.AssessmentDataSourceDocumentName
-                    </td>
-                    <td>
-                        @task.Workspace
-                    </td>
-                    <td>
-                        @task.TaskStage
-                    </td>
-                    <td>
-                        @task.Reviewer
-                    </td>
-                    <td>
-                        @task.Assessor
-                    </td>
-                    <td>
-                        @task.Verifier
-                    </td>
-                    <td>
-                        @task.Team
-                    </td>
-                    <td>
-                        <div class="dropdown" style="cursor: pointer;">
-                            <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
-                                    <i class="far fa-edit">
-                                    </i>
-                                    Edit Task Note
-                                </a>
-                                <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
-                                    <i class="far fa-user">
-                                    </i>
-                                    Assign Task
-                                </a>
+                    <tr>
+                        <td class="details-control"><i class="fa"></i></td>
+                        <td>
+                            <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                @Html.DisplayFor(model => task.DaysToDmEndDate)
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        @task.TaskNoteText
-                    </td>
-                </tr>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => task.DmEndDate)
+                        </td>
+                        <td>
+                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                            <span class="float-right mr-2">
+                                @if (task.IsOnHold)
+                                {
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @task.AssessmentDataRsdraNumber
+                        </td>
+                        <td>
+                            @task.AssessmentDataSourceDocumentName
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td>
+                            @task.Reviewer
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            <div class="dropdown" style="cursor: pointer;">
+                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
+                                        <i class="far fa-edit">
+                                        </i>
+                                        Edit Task Note
+                                    </a>
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                        <i class="far fa-user">
+                                        </i>
+                                        Assign Task
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @task.TaskNoteText
+                        </td>
+                    </tr>
                 }
 
             </tbody>
@@ -305,14 +305,14 @@
 
                     @for (var i = 0; i < Model.TeamList.Count; i++)
                     {
-                    id = $"team{i + 1}";
+                        id = $"team{i + 1}";
 
-                    <div class="ml-3 mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input mt-0 teamsCheckbox" id="@(id)">
-                            <label class="form-check-label teamsCheckboxLabel" for="@(id)">@Model.TeamList[i]</label>
+                        <div class="ml-3 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input mt-0 teamsCheckbox" id="@(id)">
+                                <label class="form-check-label teamsCheckboxLabel" for="@(id)">@Model.TeamList[i]</label>
+                            </div>
                         </div>
-                    </div>
                     }
                 </div>
             </div>
