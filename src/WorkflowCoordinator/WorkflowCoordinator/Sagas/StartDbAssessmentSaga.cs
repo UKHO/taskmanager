@@ -81,7 +81,7 @@ namespace WorkflowCoordinator.Sagas
                 throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {Data.ProcessId}");
             }
 
-            var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, serialNumber, WorkflowStatus.Started);
+            var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, Data.SourceDocumentId, serialNumber, WorkflowStatus.Started);
             await UpdateDbAssessmentReviewTable(Data.ProcessId, workflowInstanceId);
 
             _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");
@@ -151,7 +151,7 @@ namespace WorkflowCoordinator.Sagas
             MarkAsComplete();
         }
 
-        private async Task<int> UpdateWorkflowInstanceTable(int processId, string serialNumber, WorkflowStatus status)
+        private async Task<int> UpdateWorkflowInstanceTable(int processId, int sourceDocumentId, string serialNumber, WorkflowStatus status)
         {
             var existingInstance = await _dbContext.WorkflowInstance.FirstOrDefaultAsync(w => w.ProcessId == processId);
 
@@ -160,6 +160,7 @@ namespace WorkflowCoordinator.Sagas
             var workflowInstance = new WorkflowInstance()
             {
                 ProcessId = processId,
+                PrimarySdocId = sourceDocumentId,
                 SerialNumber = serialNumber,
                 ActivityName = WorkflowStage.Review.ToString(),
                 Status = status.ToString(),
