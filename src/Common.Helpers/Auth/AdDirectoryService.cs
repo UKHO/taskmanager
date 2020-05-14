@@ -88,7 +88,17 @@ namespace Common.Helpers.Auth
             }
         }
 
-        // Not sure how to get site user's name without Graph call yet
+        public async Task<(string DisplayName, string UserEmail)> GetUserDetailsAsync(ClaimsPrincipal user)
+        {
+            var displayName = user.Claims.FirstOrDefault(c => c.Type.Equals("name", StringComparison.OrdinalIgnoreCase))?.Value;
+            var userEmail = user.Claims.FirstOrDefault(c => c.Type.Equals("preferred_username", StringComparison.OrdinalIgnoreCase))?.Value;
+
+
+
+            return (displayName, userEmail);
+        }
+
+        // TODO remove when everywhere is calling method above
         public async Task<string> GetFullNameForUserAsync(ClaimsPrincipal user)
         {
             var graphUser = user.ToGraphUserAccount();
