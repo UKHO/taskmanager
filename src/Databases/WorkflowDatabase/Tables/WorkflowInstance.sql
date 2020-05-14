@@ -10,5 +10,5 @@
 	[StartedAt] DATETIME NOT NULL, 
     [Status] NVARCHAR(25) NOT NULL,
     CONSTRAINT [AK_WorkflowInstance_ProcessId] UNIQUE ([ProcessId]),
-    CONSTRAINT [AK_WorkflowInstance_PrimarySdocId] UNIQUE ([PrimarySdocId])
+    CONSTRAINT [AK_WorkflowInstance_PrimarySdocId] UNIQUE ([ProcessId],[PrimarySdocId])
 )
