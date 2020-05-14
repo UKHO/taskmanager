@@ -272,8 +272,8 @@ namespace Portal.Pages.DbAssessment
 
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Verify has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
-            
+                "Task progression from {ActivityName} to Verify has been triggered by {CurrentUser.DisplayName} with: ProcessId: {ProcessId}; Action: {Action};");
+
             await _commentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
                                                                         processId,
                                                                     workflowInstance.WorkflowInstanceId,
