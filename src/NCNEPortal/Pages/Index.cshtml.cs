@@ -25,12 +25,14 @@ namespace NCNEPortal.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IAdDirectoryService _adDirectoryService;
 
-
-        private string _userFullName;
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         [BindProperty(SupportsGet = true)]
@@ -63,17 +65,11 @@ namespace NCNEPortal.Pages
                 task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, NcneTaskStageType.Publication, task.TaskStage);
 
             }
-
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
         }
 
 
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -87,9 +83,9 @@ namespace NCNEPortal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = UserFullName,
+                        CreatedByUsername = CurrentUser.DisplayName,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = UserFullName
+                        LastModifiedByUsername = CurrentUser.DisplayName
                     });
 
                     await _dbContext.SaveChangesAsync();
@@ -101,14 +97,12 @@ namespace NCNEPortal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = UserFullName;
+            existingTaskNote.LastModifiedByUsername = CurrentUser.DisplayName;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();
             return Page();
-
         }
-
 
         public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
         {
