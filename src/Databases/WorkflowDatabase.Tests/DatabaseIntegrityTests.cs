@@ -356,6 +356,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
                 ProcessId = 123,
+                PrimarySdocId = 1111,
                 SerialNumber = "1_sn",
                 ParentProcessId = null,
                 ActivityName = "Review",
@@ -367,6 +368,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
                 ProcessId = 124,
+                PrimarySdocId = 2222,
                 SerialNumber = "2_sn",
                 ParentProcessId = null,
                 ActivityName = "Review",
@@ -378,6 +380,7 @@ namespace WorkflowDatabase.Tests
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
                 ProcessId = 125,
+                PrimarySdocId = 3333,
                 SerialNumber = "3_sn",
                 ParentProcessId = null,
                 ActivityName = "Review",
