@@ -748,6 +748,63 @@ namespace NCNEPortal
 
         }
 
+        public async Task<JsonResult> OnPostGetChartDetails(int versionNumber)
+        {
+            var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
+
+            if (panelInfo.Item1 > 0)
+            {
+                var result = new[]
+                {
+                    panelInfo.Item1.ToString(),
+                    panelInfo.Item2,
+                    panelInfo.Item3.ToString(),
+                    panelInfo.Item4
+                };
+                return new JsonResult(result);
+            }
+            else
+            {
+                return new JsonResult("Invalid Chart Version Number")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId, string userName)
+        {
+            try
+            {
+
+
+                var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
+
+                if (result)
+                {
+                    await CompleteStage(processId, stageId);
+
+                    return new JsonResult(result)
+                    { StatusCode = (int)HttpStatusCode.OK };
+                }
+                else
+                {
+                    return new JsonResult(result)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(e.InnerException?.Message)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+        }
+
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();

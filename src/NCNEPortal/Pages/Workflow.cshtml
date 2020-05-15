@@ -563,6 +563,63 @@
     </div>
 </div>
 
+@* Modal Chart Publish Dialog *@
+<div class="modal fade" id="PublishChartModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Publish Caris Chart</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdnPublishProcessId" name="ConfirmProcessId" />
+                <input type="hidden" id="hdnPublishStageId" name="publishStageId" />
+                <input type="hidden" id="hdnPublishUser" name="AssignedUser" />
+                <div class="row">
+                    <div class="col-6">Enter the Version No.</div>
+                    <div class="col-6">
+                        <input type="number" min="0" max="99999" style="width:7em" id="chartVersionNo" />
+                        <button type="button" id="btnGetChartDetails" class="btn btn-secondary">Get </button>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Chart Number :</div>
+                    <div class="col-6" id="chartNumber"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Title :</div>
+                    <div class="col-6" id="chartTitle"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Edition Number:</div>
+                    <div class="col-6" id="editionNumber"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Version :</div>
+                    <div class="col-6" id="chartVersion"></div>
+                </div>
+                <div class="row">
+                    <section id="publishChartError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="publishChartErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnPublishCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmPublish" id="btnPublish" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 @section Scripts {

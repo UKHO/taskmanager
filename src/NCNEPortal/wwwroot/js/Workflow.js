@@ -47,12 +47,93 @@
         (this).checked = false;
         var url = "Workflow/?handler=ValidateComplete";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId,stageName, false);
+        validateCompleteRework(url, processId, stageId, username, stageTypeId,stageName, false, false);
          
     });
 
+    $("#btnGetChartDetails").click(function () {
+        var versionNo = $("#chartVersionNo").val();
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
+
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=GetChartDetails",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "versionNumber": versionNo
+            },
+            success: function (result) {
+                $("#chartNumber").html(result[0]);
+                $("#chartTitle").html(result[1]);
+                $("#editionNumber").html(result[2]);
+                $("#chartVersion").html(result[3]);
+
+            },
+            error: function (error) {
+                $("#chartNumber").html("");
+                $("#chartTitle").html("");
+                $("#editionNumber").html("");
+                $("#chartVersion").html("");
+                var responseJson = error.responseJSON;
+                if (responseJson != null) {
+                    $("#publishChartErrorMessage").text(responseJson);
+                    $("#publishChartError").collapse("show");
+                }
+            }
+        });
+
+
+    });
+
+    $("#btnPublishCancel").click(function() {
+        $("#btnPublishInCaris").prop("disabled", false);
+    });
+
+    $("#btnPublish").click(function() {
+        var versionNo = $("#chartVersionNo").val();
+        var processId = $("#hdnPublishProcessId").val();
+        var stageId = $("#hdnPublishStageId").val();
+        var userName = $("#hdnPublishUser").val();
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=PublishCarisChart",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "versionNumber": versionNo,
+                "processId": processId,
+                "stageId": stageId,
+                "userName": userName
+            },
+            success: function(result) {
+                formChanged = false;
+                $("#PublishChartModal").modal("hide");
+                window.location.href = "/workflow?ProcessId=" + processId;
+
+            },
+            error: function(error) {
+                var responseJson = error.responseJSON;
+                if (responseJson != null) {
+                    $("#publishChartErrorMessage").text(responseJson);
+                    $("#publishChartError").collapse("show");
+                }
+            }
+        });
+
+
+    });
+
     function validateCompleteRework(url,  processId,stageId,
-          username, stageTypeId,stageName, rework) {
+          username, stageTypeId,stageName, rework, publish ) {
         $.ajax({
             type: "POST",
             url: url,
@@ -68,21 +149,32 @@
             },
 
             success: function (result) {
-                $("#hdnConfirmProcessId").val(processId);
-                $("#hdnConfirmStageId").val(stageId);
-                $("#hdnAssignedUser").val(username);
-                $("#Rework").val(rework);
-                if (rework) {
-                    $("#msgComplete").html("Are you sure you want to send for <span id=stageName>" +
-                        stageName +
-                        "</span> Rework?");
+                if (publish) {
+                    $("#hdnPublishProcessId").val(processId);
+                    $("#hdnPublishStageId").val(stageId);
+                    $("#hdnPublishUser").val(username);
+
+                    $("#PublishChartModal").modal("show");
+
                 } else {
 
-                    $("#msgComplete").html("Are you sure you want to mark <span id=stageName>" +
-                        stageName +
-                        "</span> as complete?");
+                    $("#hdnConfirmProcessId").val(processId);
+                    $("#hdnConfirmStageId").val(stageId);
+                    $("#hdnAssignedUser").val(username);
+                    $("#Rework").val(rework);
+
+                    if (rework) {
+                        $("#msgComplete").html("Are you sure you want to send for <span id=stageName>" +
+                            stageName +
+                            "</span> Rework?");
+                    } else {
+
+                        $("#msgComplete").html("Are you sure you want to mark <span id=stageName>" +
+                            stageName +
+                            "</span> as complete?");
+                    }
+                    $("#ConfirmModal").modal("show");
                 }
-                $("#ConfirmModal").modal("show");
 
             },
             error: function (error) {
@@ -106,6 +198,29 @@
         });
     }
 
+    $(".btn-caris-publish").click(function() {
+        var processId = $(this).data("processid");
+        var stageId = $(this).data("taskstageid");
+        var username = $(this).data("username");
+        var stageName = $(this).data("stagename");
+        var stageTypeId = $(this).data("stagetypeid");
+        $("#chartNumber").html("");
+        $("#chartTitle").html("");
+        $("#editionNumber").html("");
+        $("#chartVersion").html("");
+        $("#chartVersionNo").val("");
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
+        $("#btnPublishInCaris").prop("disabled", true);
+
+        var url = "Workflow/?handler=ValidateComplete";
+
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false,true);
+
+        $("#btnPublishInCaris").prop("disabled", true);
+
+    });
+
     $(".btn-stage-rework").click(function() {
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
@@ -115,7 +230,7 @@
 
         var url = "Workflow/?handler=ValidateRework";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true);
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true,false);
 
 
     });

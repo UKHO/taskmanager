@@ -16,7 +16,7 @@
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
-         || Model.Status == NcneTaskStageStatus.Rework.ToString())
+        || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
@@ -87,9 +87,12 @@
                 {
                     <div class="row align-items-center">
                         <div class="col-8">
-                            <button id="btnPublishChartPublishInCaris"
+                            <button id="btnPublishInCaris"
                                     @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
-                                    class="btn btn-block btn-primary">
+                                    class="btn btn-block btn-primary btn-caris-publish"
+                                    data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                    data-StageName="@(Model.TaskStageType.Name)">
                                 Publish in CARIS
                             </button>
                         </div>
