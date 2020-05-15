@@ -4,9 +4,9 @@
     var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
 
     $('#operators').find('div .operator:gt(0)').hide();
-    
+
     initialiseOperatorsTypeaheads();
-    
+
     setReviewDoneHandler();
     setReviewSaveHandler();
 
@@ -19,7 +19,7 @@
     var formChanged = false;
     $("#frmReviewPage").change(function () { formChanged = true; });
 
-    window.onbeforeunload = function() {
+    window.onbeforeunload = function () {
         if (formChanged) {
             return "Changes detected";
         }
@@ -31,8 +31,52 @@
 
     function attachTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
-            $("#txtTerminateComment").val("");
-            $("#ConfirmTerminate").modal("show");
+
+            var processId = $("#hdnProcessId").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "Review/?handler=ValidateTerminate",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: processId,
+                success: function () {
+                    $("#txtTerminateComment").val("");
+                    $("#ConfirmTerminateError").html("");
+                    $("#ConfirmTerminate").modal("show");
+                    console.log("success");
+                },
+                error: function (error) {
+                    $("#reviewTerminateErrorMessage").html("");
+
+                    var responseJson = error.responseJSON;
+                    var statusCode = error.status;
+
+                    if (responseJson != null) {
+                        if (statusCode === customHttpStatusCodes.FailedValidation) {
+
+                            $("#reviewTerminateErrorMessage").append("<ul/>");
+                            var validateTerminateErrorList = $("#reviewTerminateErrorMessage ul");
+
+                            responseJson.forEach(function (item) {
+                                validateTerminateErrorList.append("<li>" + item + "</li>");
+                            });
+
+                            $("#modalWaitReviewTerminateErrors").modal("show");
+
+                        } 
+                    } else {
+
+                        $("#reviewTerminateErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#reviewTerminateErrorMessage ul");
+
+                        unOrderedList.append("<li>System error. Please try again later</li>");
+
+                        $("#modalWaitReviewTerminateErrors").modal("show");
+                    }
+                }
+            });
         });
 
         $("#txtTerminateComment").keydown(function (e) {
@@ -53,9 +97,6 @@
             $("#txtTerminateComment").focus();
         });
 
-        $("#modalWaitReviewTerminateErrors").on("hidden.bs.modal", function () {
-            $("#ConfirmTerminate").modal("show");
-        });
     }
 
     function completeReview(action) {
@@ -221,10 +262,10 @@
             });
 
         $('#Reviewer, #Assessor, #Verifier').typeahead({
-                hint: true,
-                highlight: true,    /* Enable substring highlighting */
-                minLength: 3        /* Specify minimum characters required for showing result */
-            },
+            hint: true,
+            highlight: true,    /* Enable substring highlighting */
+            minLength: 3        /* Specify minimum characters required for showing result */
+        },
             {
                 name: 'users',
                 source: users,

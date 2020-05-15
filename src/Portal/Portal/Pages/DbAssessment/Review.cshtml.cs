@@ -267,6 +267,29 @@ namespace Portal.Pages.DbAssessment
             return StatusCode((int)HttpStatusCode.OK);
         }
 
+        public async Task<IActionResult> OnPostValidateTerminateAsync(int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Review");
+            LogContext.PushProperty("ProcessId", processId);
+
+            _logger.LogInformation("Entering ValidateTerminate with: ProcessId: {ProcessId}; Action: {Action};");
+            
+            await GetOnHoldData(processId);
+
+            if (IsOnHold)
+            {
+                ValidationErrorMessages.Add("Unable to Terminate task. Take task off hold before terminating.");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
+                };
+            }
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+
         private async Task PersistPrimaryTask(int processId, WorkflowInstance workflowInstance)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
