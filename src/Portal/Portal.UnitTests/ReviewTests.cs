@@ -887,5 +887,29 @@ namespace Portal.UnitTests
             Assert.AreEqual(DateTime.Today, workflowInstance.ActivityChangedAt);
 
         }
+
+        [Test]
+        public async Task Test_Terminating_On_Hold_Task_Results_In_Validation_Error_Message()
+        {
+            await _reviewModel.OnPostValidateTerminateAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Unable to Terminate task. Take task off hold before terminating.", _reviewModel.ValidationErrorMessages);
+
+        }
+
+        [Test]
+        public async Task Test_Terminating_Off_Hold_Task_Results_In_No_Validation_Error_Messages()
+        {
+            var thisOnHold = _dbContext.OnHold.Single(oh => oh.ProcessId == ProcessId);
+
+            thisOnHold.OffHoldTime = DateTime.Now.Date;
+
+            await _dbContext.SaveChangesAsync();
+
+            await _reviewModel.OnPostValidateTerminateAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 0);
+        }
     }
 }
