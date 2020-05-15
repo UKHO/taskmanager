@@ -96,11 +96,14 @@ namespace WorkflowDatabase.EF
                 .HasForeignKey<CarisProjectDetails>(p => p.ProcessId);
 
             modelBuilder.Entity<WorkflowInstance>().Property(p => p.ActivityChangedAt).HasColumnType("date");
+            modelBuilder.Entity<WorkflowInstance>().HasIndex(c => c.ProcessId).IsUnique();
+            modelBuilder.Entity<WorkflowInstance>().HasIndex(c => new { c.ProcessId, c.PrimarySdocId }).IsUnique();
+            modelBuilder.Entity<LinkedDocument>().HasIndex(c => new {c.ProcessId, c.LinkedSdocId, c.LinkType}).IsUnique();
             modelBuilder.Entity<PrimaryDocumentStatus>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);
         }
-    }
+    }   
 }

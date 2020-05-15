@@ -6,6 +6,7 @@ using Common.Messages.Enums;
 using Common.Messages.Events;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Handlers;
@@ -20,6 +21,7 @@ namespace WorkflowCoordinator.UnitTests
 
         private StartWorkflowInstanceEventHandler _handler;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
+        private ILogger<StartWorkflowInstanceEventHandler> _fakeLogger;
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
 
@@ -35,7 +37,9 @@ namespace WorkflowCoordinator.UnitTests
             _handlerContext = new TestableMessageHandlerContext();
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
-            _handler = new StartWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient, _dbContext);
+            _fakeLogger = A.Dummy<ILogger<StartWorkflowInstanceEventHandler>>();
+
+            _handler = new StartWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient, _dbContext, _fakeLogger);
         }
 
         [TearDown]
@@ -71,7 +75,7 @@ namespace WorkflowCoordinator.UnitTests
             var ex =Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(startWorkflowInstanceEvent, _handlerContext));
 
             //Then
-            Assert.IsTrue(ex.Message.Contains($"Failed to get data for K2 Task with ProcessId {childProcessId}"));
+            Assert.IsTrue(ex.Message.Contains($"Failed to get K2 Task serial number for ProcessId {childProcessId}"));
         }
 
         [Test]
@@ -121,9 +125,25 @@ namespace WorkflowCoordinator.UnitTests
             var assignedTaskId = 1;
             var primarySdocId = 1888403;
 
+            var parentWorkflowinstanceData = new WorkflowInstance()
+            {
+                ProcessId = parentProcessId,
+                PrimarySdocId = primarySdocId,
+                SerialNumber = "445_14",
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                StartedAt = DateTime.Now,
+                Status = WorkflowStatus.Started.ToString(),
+                ActivityChangedAt = DateTime.Today
+            };
+
+            await _dbContext.WorkflowInstance.AddAsync(parentWorkflowinstanceData);
+            await _dbContext.SaveChangesAsync();
+
             var parentReviewData = new DbAssessmentReviewData()
             {
                 ProcessId = parentProcessId,
+                WorkflowInstanceId = parentWorkflowinstanceData.WorkflowInstanceId,
                 ActivityCode = "Some code",
                 Ion = "Parent Review ION",
                 Reviewer = "reviewer1"
@@ -236,10 +256,25 @@ namespace WorkflowCoordinator.UnitTests
             var primarySdocId = 1888403;
             var newActivityChangedAt = DateTime.Today;
 
+            var parentWorkflowinstanceData = new WorkflowInstance()
+            {
+                ProcessId = parentProcessId,
+                PrimarySdocId = primarySdocId,
+                SerialNumber =  "445_14",
+                ParentProcessId =  null,
+                ActivityName =  WorkflowStage.Review.ToString(),
+                StartedAt =  DateTime.Now,
+                Status =  WorkflowStatus.Started.ToString(),
+                ActivityChangedAt = newActivityChangedAt
+            };
+
+            await _dbContext.WorkflowInstance.AddAsync(parentWorkflowinstanceData);
+            await _dbContext.SaveChangesAsync();
 
             var parentReviewData = new DbAssessmentReviewData()
             {
                 ProcessId = parentProcessId,
+                WorkflowInstanceId = parentWorkflowinstanceData.WorkflowInstanceId,
                 ActivityCode = "Some code",
                 Ion = "Parent Review ION",
                 Reviewer = "reviewer1"
