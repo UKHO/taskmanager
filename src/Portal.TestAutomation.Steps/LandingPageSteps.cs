@@ -1,5 +1,4 @@
-﻿using Common.Helpers;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
@@ -16,16 +15,11 @@ namespace Portal.TestAutomation.Steps
             _landingPage = landingPage;
         }
 
+        [Given(@"I am on the landing page")]
         [When(@"I navigate to the landing page")]
         public void WhenINavigateToTheLandingPage()
         {
             _landingPage.NavigateTo();
-        }
-
-        [When(@"I enter Process Id of ""(.*)""")]
-        public void WhenIEnterProcessIdOf(int processId)
-        {
-            _landingPage.FilterRowsByProcessIdInGlobalSearch(processId);
         }
 
         [Then(@"The landing page has loaded")]
@@ -35,10 +29,13 @@ namespace Portal.TestAutomation.Steps
             Assert.IsTrue(_landingPage.HasLoaded);
         }
 
-        [Then(@"Task with process id (.*) appears in both the assigned and unassigned tasks tables")]
-        public void ThenTaskWithProcessIdAppearsInBothTheAssignedAndUnassignedTasksTables(int p0)
+        [Then(@"I should see all of the tasks assigned to me")]
+        public void ThenIShouldSeeAllOfTheTasksAssignedToMe()
         {
-            Assert.IsTrue(_landingPage.FindTaskByProcessId(p0));
+            var inFlightTasks = _landingPage.InFlightTasks;
+
+            Assert.That(inFlightTasks, Is.Not.Null.And.Count.AtLeast(1), "No inflight tasks found");
+            Assert.That(inFlightTasks, Has.All.Property("Reviewer").EqualTo(_landingPage.UserName));
         }
     }
 }
