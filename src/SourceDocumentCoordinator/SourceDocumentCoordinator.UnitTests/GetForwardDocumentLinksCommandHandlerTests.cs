@@ -5,6 +5,7 @@ using Common.Messages.Commands;
 using DataServices.Models;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NServiceBus.Testing;
 using NUnit.Framework;
 using SourceDocumentCoordinator.Handlers;
@@ -16,6 +17,7 @@ namespace SourceDocumentCoordinator.UnitTests
     public class GetForwardDocumentLinksCommandHandlerTests
     {
         private IDataServiceApiClient _fakeDataServiceApiClient;
+        private ILogger<GetForwardDocumentLinksCommandHandler> _fakeLogger;
         private TestableMessageHandlerContext _handlerContext;
         private GetForwardDocumentLinksCommandHandler _handler;
         private WorkflowDbContext _dbContext;
@@ -30,9 +32,10 @@ namespace SourceDocumentCoordinator.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
+            _fakeLogger = A.Dummy<ILogger<GetForwardDocumentLinksCommandHandler>>();
 
             _handlerContext = new TestableMessageHandlerContext();
-            _handler = new GetForwardDocumentLinksCommandHandler(_dbContext, _fakeDataServiceApiClient);
+            _handler = new GetForwardDocumentLinksCommandHandler(_dbContext, _fakeDataServiceApiClient, _fakeLogger);
         }
 
         [TearDown]
