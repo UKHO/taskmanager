@@ -1,8 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -26,7 +25,9 @@ namespace Common.Helpers
         {
 
             DatabasesHelpers.ClearWorkflowDbTables(_context);
-            PopulateAdUser();
+
+            AddAdditionalAdUsers();
+
             PopulateHpdUser();
             PopulateHpdUsage();
             PopulateProductActionType();
@@ -34,6 +35,16 @@ namespace Common.Helpers
             PopulateWorkflowInstance();
 
             return this;
+        }
+
+        private void AddAdditionalAdUsers()
+        {
+            if (!File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
+
+            var jsonString = File.ReadAllText(@"Data\Users.json");
+            var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
+
+            if (users?.Any() ?? false) _context.AdUser.AddRange(users);
         }
 
         private void PopulateHpdUsage()
@@ -54,17 +65,6 @@ namespace Common.Helpers
             var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
 
             _context.HpdUser.AddRange(hpdUsers);
-        }
-
-        private void PopulateAdUser()
-        {
-            if (!File.Exists(@"Data\AdUsers.json")) throw new FileNotFoundException(@"Data\AdUsers.json");
-
-            var jsonString = File.ReadAllText(@"Data\AdUsers.json");
-            var adUsers = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString).ToList();
-            adUsers.ForEach(a => a.LastCheckedDate = DateTime.Today.AddDays(1));
-
-            _context.AdUser.AddRange(adUsers);
         }
 
         private void PopulateProductActionType()

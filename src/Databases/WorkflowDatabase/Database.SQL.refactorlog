@@ -266,4 +266,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ActiveDirectorySid" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="771042a4-632a-4223-84fb-95ec7368ce9e" ChangeDateTime="05/13/2020 09:33:16">
+    <Property Name="ElementName" Value="[dbo].[AdUser].[ActiveDirectorySid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AdUser]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserPrincipalName" />
+  </Operation>
 </Operations>

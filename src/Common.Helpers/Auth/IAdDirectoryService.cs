@@ -10,9 +10,9 @@ namespace Common.Helpers.Auth
     {
         Task<IEnumerable<DirectoryObject>> GetGroupMembersFromAdAsync(Guid groupGuid);
 
-        Task<IEnumerable<(string DisplayName, string ActiveDirectorySid)>> GetGroupMembersFromAdAsync(
+        Task<IEnumerable<(string DisplayName, string UserPrincipalName)>> GetGroupMembersFromAdAsync(
             IEnumerable<Guid> adGroupGuids);
 
-        Task<string> GetFullNameForUserAsync(ClaimsPrincipal user);
+        Task<(string DisplayName, string UserEmail)> GetUserDetailsAsync(ClaimsPrincipal user);
     }
 }

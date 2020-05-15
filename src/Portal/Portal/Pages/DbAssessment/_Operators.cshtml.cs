@@ -2,8 +2,10 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Portal.Models;
 using WorkflowDatabase.EF;
@@ -34,14 +36,9 @@ namespace Portal.Pages.DbAssessment
 
         }
 
-        internal static _OperatorsModel GetOperatorsData(IOperatorData currentData)
+        internal static async Task<_OperatorsModel> GetOperatorsDataAsync(IOperatorData currentData, WorkflowDbContext workflowDbContext)
         {
-            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
-            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
-                .Select(u => u.Name)
-                .ToList();
+            var users = await workflowDbContext.AdUser.ToListAsync().ConfigureAwait(false);
 
             return new _OperatorsModel
             {

@@ -35,6 +35,7 @@ namespace Portal.UnitTests
 
         public int ProcessId { get; set; }
         public string UserFullName { get; set; }
+        public string UserEmail { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -55,10 +56,11 @@ namespace Portal.UnitTests
 
             ProcessId = 123;
             UserFullName = "TestUser";
+            UserEmail = "testuser@foobar.com";
             _generalConfig.Value.SessionFilename = "Testing.ext";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(UserFullName);
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns((UserFullName, UserEmail));
 
             _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
             {
@@ -91,6 +93,7 @@ namespace Portal.UnitTests
         {
             //Arrange
             var userWithHpdUserRecord = "TestUserAd";
+            var userWithHpdUserRecordEmail = "testuserad@foobar.com";
 
             var setupAssessData = new DbAssessmentAssessData()
             {
@@ -101,8 +104,8 @@ namespace Portal.UnitTests
             _dbContext.DbAssessmentAssessData.Add(setupAssessData);
             await _dbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeAdDirectoryService.GetFullNameForUserAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(userWithHpdUserRecord));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult((userWithHpdUserRecord, userWithHpdUserRecordEmail)));
 
             A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
                     A<int>.Ignored, A<string>.Ignored,
@@ -622,12 +625,12 @@ namespace Portal.UnitTests
                 carisproject,
                 selectedUsages,
                 A<List<string>>.Ignored)).Returns(new SessionFile()
-                                                                            {
-                                                                                DataSources = new SessionFile.DataSourcesNode(),
-                                                                                Properties = new SessionFile.PropertiesNode(),
-                                                                                Version = "1.1",
-                                                                                Views = new SessionFile.ViewsNode()
-                                                                            });
+                {
+                    DataSources = new SessionFile.DataSourcesNode(),
+                    Properties = new SessionFile.PropertiesNode(),
+                    Version = "1.1",
+                    Views = new SessionFile.ViewsNode()
+                });
 
             var response = await _editDatabaseModel.OnGetLaunchSourceEditorAsync(
                                                                                             ProcessId,

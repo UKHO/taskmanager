@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
@@ -60,7 +61,7 @@ namespace NCNEPortal
                 .Bind(Configuration.GetSection("caris")); ;
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
-            services.AddOptions<SecretsConfig>()
+            services.AddOptions<StartupSecretsConfig>()
                 .Bind(Configuration.GetSection("NcnePortalSection"))
                 .Bind(Configuration.GetSection("NcneActiveDirectory"));
 
@@ -78,7 +79,7 @@ namespace NCNEPortal
 
             services.AddScoped<IAdDirectoryService,
                 AdDirectoryService>(s => new AdDirectoryService(
-                s.GetService<IOptions<SecretsConfig>>().Value.ClientAzureAdSecret,
+                s.GetService<IOptions<StartupSecretsConfig>>().Value.ClientAzureAdSecret,
                 s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
                 s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
                 isLocalDevelopment
@@ -135,7 +136,7 @@ namespace NCNEPortal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app,
             IWebHostEnvironment env,
-            IOptions<SecretsConfig> secrets,
+            IOptions<StartupSecretsConfig> secrets,
             INcneUserDbService userDbService,
             NcneWorkflowDbContext ncneWorkflowDbContext)
         {
@@ -190,24 +191,26 @@ namespace NCNEPortal
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 SeedWorkflowDatabase(ncneWorkflowDbContext);
 
-            UpdateDbFromAd(secrets.Value, userDbService);
+            UpdateDbUsersFromAd(secrets.Value, userDbService);
         }
 
         private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
         {
-            var d = ncneWorkflowDbContext.Database.GetDbConnection();
             NcneTestWorkflowDatabaseSeeder.UsingDbContext(ncneWorkflowDbContext).PopulateTables().SaveChanges();
             Log.Logger.Information($"NCNEWorkflowDatabase successfully re-seeded.");
         }
 
-        private static void UpdateDbFromAd(SecretsConfig secrets, INcneUserDbService userDbService)
+        private static void UpdateDbUsersFromAd(StartupSecretsConfig secrets, INcneUserDbService userDbService)
         {
-            var adGroupGuids = new List<Guid> { secrets.NcGuid, secrets.NeGuid };
+            var adGroupGuids = secrets.AdUserGroups.Split(',')
+               .Where(x => Guid.TryParse(x, out _))
+               .Select(Guid.Parse)
+               .ToList();
 
             try
             {
                 userDbService.UpdateDbFromAdAsync(adGroupGuids).Wait();
-                Log.Logger.Information($"Users successfully updated in database from AD for guids");
+                Log.Logger.Information($"Users successfully updated in database from AD.");
             }
             catch (Exception e)
             {

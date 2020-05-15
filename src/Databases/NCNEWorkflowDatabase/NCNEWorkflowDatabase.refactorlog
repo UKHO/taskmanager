@@ -21,4 +21,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="VerifierOne" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a30efe63-aca7-4cb5-916a-9a7bba121b18" ChangeDateTime="05/13/2020 08:08:09">
+    <Property Name="ElementName" Value="[dbo].[AdUser].[ActiveDirectorySid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AdUser]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Email" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="edbe1a66-dc81-4d47-ab0c-27135bb70759" ChangeDateTime="05/13/2020 08:10:04">
+    <Property Name="ElementName" Value="[dbo].[AdUser].[Email]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AdUser]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserPrincipalName" />
+  </Operation>
 </Operations>

@@ -1,38 +1,9 @@
-[
-  {
-    "UserId": 1,
-    "Name": "Matthew Stoodley"
-  },
-  {
-    "UserId": 2,
-    "Name": "Peter Bates"
-  },
-  {
-    "UserId": 3,
-    "Name": "Stuart Barzey"
-  },
-  {
-    "UserId": 4,
-    "Name": "Greg Williams"
-  },
-  {
-    "UserId": 5,
-    "Name": "Rossall Sandford"
-  },
-  {
-    "UserId": 6,
-    "Name": "Samir Hasson"
-  },
-  {
-    "UserId": 7,
-    "Name": "Ben Hall"
-  },
-  {
-    "UserId": 8,
-    "Name": "Bonnie Poole"
-  },
-  {
-    "UserId": 9,
-    "Name": "Benjamin Ilo"
-  }
-]
+// e.g. of additional AD users, from NCNE
+
+//[
+//  {
+//    "DisplayName": "SVC_TMNCNEPrtlUITest",
+//    "UserPrincipalName": "SVC_TMNCNEPrtlUITest@ukho.gov.uk",
+//    "LastCheckedDate": "2020-01-10T00:00:00"
+//  }
+//]

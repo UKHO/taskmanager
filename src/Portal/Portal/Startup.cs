@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
-using Common.Factories;
 using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
@@ -56,6 +55,33 @@ namespace Portal
             var startupSecretsConfig = new StartupSecretsConfig();
             Configuration.GetSection("NsbDbSection").Bind(startupSecretsConfig);
             Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+            Configuration.GetSection("PortalSection").Bind(startupSecretsConfig);
+            Configuration.GetSection("K2RestApi").Bind(startupSecretsConfig);
+            Configuration.GetSection("HpdDbSection").Bind(startupSecretsConfig);
+            Configuration.GetSection("PCPEventService").Bind(startupSecretsConfig);
+            Configuration.GetSection("PortalActiveDirectory").Bind(startupSecretsConfig);
+
+            services.AddOptions<GeneralConfig>()
+                .Bind(Configuration.GetSection("portal"))
+                .Bind(Configuration.GetSection("apis"))
+                .Bind(Configuration.GetSection("subscription"))
+                .Bind(Configuration.GetSection("K2"))
+                .Bind(Configuration.GetSection("caris"));
+
+            services.AddOptions<UriConfig>()
+                .Bind(Configuration.GetSection("urls"));
+
+            services.AddOptions<SecretsConfig>()
+                .Bind(Configuration.GetSection("HpdDbSection"));
+
+            services.AddOptions<StartupSecretsConfig>()
+                .Bind(Configuration.GetSection("NsbDbSection"))
+                .Bind(Configuration.GetSection("LoggingDbSection"))
+                .Bind(Configuration.GetSection("PortalSection"))
+                .Bind(Configuration.GetSection("K2RestApi"))
+                .Bind(Configuration.GetSection("HpdDbSection"))
+                .Bind(Configuration.GetSection("PCPEventService"))
+                .Bind(Configuration.GetSection("PortalActiveDirectory"));
 
             LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig, startupSecretsConfig);
 
@@ -72,20 +98,6 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddOptions<GeneralConfig>()
-                .Bind(Configuration.GetSection("portal"))
-                .Bind(Configuration.GetSection("apis"))
-                .Bind(Configuration.GetSection("subscription"))
-                .Bind(Configuration.GetSection("K2"))
-                .Bind(Configuration.GetSection("caris"));
-
-            services.AddOptions<UriConfig>()
-                .Bind(Configuration.GetSection("urls"));
-
-            services.AddOptions<SecretsConfig>()
-                .Bind(Configuration.GetSection("PortalSection"))
-                .Bind(Configuration.GetSection("ActiveDirectory"))
-                .Bind(Configuration.GetSection("HpdDbSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -101,22 +113,8 @@ namespace Portal
             services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
                 options.UseSqlServer(workflowDbConnectionString));
 
-            if (isLocalDevelopment)
-            {
-                using (var sp = services.BuildServiceProvider())
-                using (var context = sp.GetRequiredService<WorkflowDbContext>())
-                {
-                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
-                }
-            }
-
-            var startupSecretConfig = new StartupSecretsConfig();
-            Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
-            Configuration.GetSection("HpdDbSection").Bind(startupSecretConfig);
-            Configuration.GetSection("PCPEventService").Bind(startupSecretConfig);
-
-            var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretConfig.DataSource,
-                startupSecretConfig.UserId, startupSecretConfig.Password);
+            var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretsConfig.DataSource,
+                startupSecretsConfig.UserId, startupSecretsConfig.Password);
 
             services.AddDbContext<HpdDbContext>((serviceProvider, options) =>
                 options.UseOracle(hpdConnection));
@@ -132,7 +130,7 @@ namespace Portal
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                 {
                     ServerCertificateCustomValidationCallback = (message, certificate, arg3, arg4) => true,
-                    Credentials = new NetworkCredential(startupSecretConfig.PCPEventServiceUsername, startupSecretConfig.PCPEventServicePassword)
+                    Credentials = new NetworkCredential(startupSecretsConfig.PCPEventServiceUsername, startupSecretsConfig.PCPEventServicePassword)
                 });
 
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
@@ -140,7 +138,7 @@ namespace Portal
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                 {
                     ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                    Credentials = new NetworkCredential(startupSecretConfig.K2RestApiUsername, startupSecretConfig.K2RestApiPassword)
+                    Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername, startupSecretsConfig.K2RestApiPassword)
                 });
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
@@ -179,7 +177,7 @@ namespace Portal
 
             services.AddScoped<IAdDirectoryService,
                 AdDirectoryService>(s => new AdDirectoryService(
-                s.GetService<IOptions<SecretsConfig>>().Value.ClientAzureAdSecret,
+                startupSecretsConfig.ClientAzureAdSecret,
                 s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
                 s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
                 isLocalDevelopment
@@ -189,26 +187,6 @@ namespace Portal
 
             services.AddScoped<IPortalUserDbService,
                 PortalUserDbService>(s => new PortalUserDbService(s.GetService<WorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
-
-            using (var sp = services.BuildServiceProvider())
-            {
-                var adUserService = sp.GetRequiredService<IPortalUserDbService>();
-
-                try
-                {
-                    var adGroupGuids = new List<Guid>
-                    {
-                        sp.GetService<IOptions<SecretsConfig>>().Value.HDCGuid,
-                        sp.GetService<IOptions<SecretsConfig>>().Value.HDTGuid
-                    };
-
-                    adUserService.UpdateDbFromAdAsync(adGroupGuids).Wait();
-                }
-                catch (Exception e)
-                {
-                    Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
-                }
-            }
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc =>
@@ -250,7 +228,9 @@ namespace Portal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<StartupSecretsConfig> secrets,
+            IPortalUserDbService userDbService,
+            WorkflowDbContext workflowDbContext)
         {
             app.UseSerilogRequestLogging(
                 options =>
@@ -297,6 +277,37 @@ namespace Portal
             });
 
             app.UseAzureAppConfiguration();
+
+            // Seeding
+
+            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
+                SeedWorkflowDatabase(workflowDbContext);
+
+            UpdateDbUsersFromAd(secrets.Value, userDbService);
+        }
+
+        private static void SeedWorkflowDatabase(WorkflowDbContext workflowDbContext)
+        {
+            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
+            Log.Logger.Information($"WorkflowDatabase successfully re-seeded.");
+        }
+
+        private static void UpdateDbUsersFromAd(StartupSecretsConfig secrets, IPortalUserDbService userDbService)
+        {
+            var adGroupGuids = secrets.AdUserGroups.Split(',')
+                .Where(x => Guid.TryParse(x, out _))
+                .Select(Guid.Parse)
+                .ToList();
+
+            try
+            {
+                userDbService.UpdateDbFromAdAsync(adGroupGuids).Wait();
+                Log.Logger.Information($"Users successfully updated in database from AD.");
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
+            }
         }
     }
 }

@@ -61,12 +61,14 @@ namespace Portal.Pages.DbAssessment
 
         public List<SourceViewModel> SourceDocuments { get; set; } = new List<SourceViewModel>();
 
-        private string _userFullName;
-
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         public _EditDatabaseModel(WorkflowDbContext dbContext, ILogger<_EditDatabaseModel> logger,
@@ -125,10 +127,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
             LogContext.PushProperty("SelectedHpdUsages", (selectedHpdUsages != null && selectedHpdUsages.Count > 0 ? string.Join(',', selectedHpdUsages) : ""));
             LogContext.PushProperty("SelectedSources", (selectedSources != null && selectedSources.Count > 0 ? string.Join(',', selectedSources) : ""));
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; " +
                                    "ActivityName: {ActivityName}; " +
@@ -157,7 +156,7 @@ namespace Portal.Pages.DbAssessment
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                                                                                 processId,
-                                                                                UserFullName,
+                                                                                 CurrentUser.DisplayName,
                                                                                 taskStage,
                                                                                 carisProjectDetails,
                                                                                 selectedHpdUsages,
@@ -199,12 +198,9 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostCreateCarisProjectAsync));
             LogContext.PushProperty("ProjectName", projectName);
             LogContext.PushProperty("CarisWorkspace", carisWorkspace);
+            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -216,7 +212,7 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-            await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, UserFullName);
+            await ValidateCarisProjectDetails(processId, projectName, carisWorkspace, taskStage, CurrentUser.DisplayName);
 
             var projectId = await CreateCarisProject(processId, projectName);
 
@@ -231,7 +227,7 @@ namespace Portal.Pages.DbAssessment
 
             return StatusCode(200);
         }
-        
+
         private async Task GetSourceDocuments(int processId)
         {
             var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
@@ -285,7 +281,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             // which will also implicitly validate if the current user has been mapped to HPD account in our database
-            var hpdUser = await GetHpdUser(UserFullName);
+            var hpdUser = await GetHpdUser(CurrentUser.DisplayName);
 
             _logger.LogInformation(
                 "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
@@ -312,7 +308,7 @@ namespace Portal.Pages.DbAssessment
             {
                 ProcessId = processId,
                 Created = DateTime.Now,
-                CreatedBy = UserFullName,
+                CreatedBy = CurrentUser.DisplayName,
                 ProjectId = projectId,
                 ProjectName = projectName
             });
@@ -344,7 +340,7 @@ namespace Portal.Pages.DbAssessment
             if (!userAssignedToTask.Equals(currentLoggedInUser, StringComparison.InvariantCultureIgnoreCase))
             {
                 LogContext.PushProperty("UserAssignedToTask", userAssignedToTask);
-                _logger.LogError("{UserFullName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
+                _logger.LogError("{ CurrentUser.DisplayName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
                 throw new InvalidOperationException($"{userAssignedToTask} is assigned to this task. Please assign the task to yourself and click Save");
             }
 
@@ -406,7 +402,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                _logger.LogError("Unable to find HPD Username for { CurrentUser.DisplayName} in our system.");
                 throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
                     ex.InnerException);
             }

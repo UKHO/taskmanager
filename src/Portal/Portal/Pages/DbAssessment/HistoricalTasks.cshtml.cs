@@ -34,14 +34,17 @@ namespace Portal.Pages.DbAssessment
         public List<HistoricalTasksData> HistoricalTasks { get; set; }
 
         public List<string> ErrorMessages { get; set; }
-        
-        private string _userFullName;
-        public string UserFullName
+
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
-        
+
         public HistoricalTasksModel(
                                     WorkflowDbContext dbContext,
                                     IDmEndDateCalculator dmEndDateCalculator,
@@ -65,10 +68,7 @@ namespace Portal.Pages.DbAssessment
         {
             LogContext.PushProperty("ActivityName", "HistoricalTasks");
             LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Get initial Historical Tasks");
 
@@ -117,10 +117,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "HistoricalTasks");
             LogContext.PushProperty("PortalResource", nameof(OnPostAsync));
             LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
 

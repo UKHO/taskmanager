@@ -6,7 +6,7 @@ namespace WorkflowDatabase.EF.Models
     {
         public int AdUserId { get; set; }
         public string DisplayName { get; set; }
-        public string ActiveDirectorySid { get; set; }
+        public string UserPrincipalName { get; set; }
         public DateTime LastCheckedDate { get; set; }
     }
 }

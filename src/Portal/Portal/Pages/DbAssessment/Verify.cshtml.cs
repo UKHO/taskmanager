@@ -47,11 +47,14 @@ namespace Portal.Pages.DbAssessment
         [BindProperty]
         public List<ProductAction> RecordProductAction { get; set; }
 
-        private string _userFullName;
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         public List<string> ValidationErrorMessages { get; set; }
@@ -124,7 +127,7 @@ namespace Portal.Pages.DbAssessment
             IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
             var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
-            OperatorsModel = _OperatorsModel.GetOperatorsData(currentVerifyData);
+            OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentVerifyData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
             SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<VerifyCustomHttpStatusCode>();
 
@@ -137,10 +140,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -182,7 +182,7 @@ namespace Portal.Pages.DbAssessment
                         DataImpacts,
                         Team,
                         ValidationErrorMessages,
-                        UserFullName))
+                        CurrentUser.DisplayName))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -215,7 +215,7 @@ namespace Portal.Pages.DbAssessment
                         DataImpacts,
                         Team,
                         ValidationErrorMessages,
-                        UserFullName,
+                        CurrentUser.DisplayName,
                         verifyData.Verifier)) // from database
 
                     {
@@ -291,9 +291,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -305,7 +303,7 @@ namespace Portal.Pages.DbAssessment
             {
                 ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
             }
-            else if (!UserFullName.Equals(verifyData.Verifier, StringComparison.InvariantCultureIgnoreCase))
+            else if (!CurrentUser.DisplayName.Equals(verifyData.Verifier, StringComparison.InvariantCultureIgnoreCase))
             {
                 ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
             }
@@ -368,7 +366,7 @@ namespace Portal.Pages.DbAssessment
             await _commentsHelper.AddComment($"Verify Rejected: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
-                UserFullName);
+                CurrentUser.DisplayName);
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -421,7 +419,7 @@ namespace Portal.Pages.DbAssessment
             await _commentsHelper.AddComment($"Verify: Changes saved",
                 processId,
                 workflowInstanceId,
-                UserFullName);
+                CurrentUser.DisplayName);
 
             return true;
         }
@@ -461,12 +459,12 @@ namespace Portal.Pages.DbAssessment
                 await PersistCompletedVerify(processId, workflowInstance);
 
                 _logger.LogInformation(
-                    "{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+                    "{CurrentUser.DisplayName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
 
                 await _commentsHelper.AddComment($"Verify step completed",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                    UserFullName);
+                    CurrentUser.DisplayName);
             }
             else
             {
@@ -497,7 +495,7 @@ namespace Portal.Pages.DbAssessment
 
             if (success)
             {
-                _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
+                _logger.LogInformation("{CurrentUser.DisplayName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
 
                 await PersistRejectedVerify(processId, workflowInstance);
 
@@ -559,8 +557,6 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateOnHold(int processId, bool onHold)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             if (onHold)
             {
                 IsOnHold = true;
@@ -579,7 +575,7 @@ namespace Portal.Pages.DbAssessment
                 {
                     ProcessId = processId,
                     OnHoldTime = DateTime.Now,
-                    OnHoldUser = UserFullName,
+                    OnHoldUser = CurrentUser.DisplayName,
                     WorkflowInstanceId = workflowInstance.WorkflowInstanceId
                 };
 
@@ -589,7 +585,7 @@ namespace Portal.Pages.DbAssessment
                 await _commentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                    UserFullName);
+                    CurrentUser.DisplayName);
             }
             else
             {
@@ -603,7 +599,7 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 existingOnHoldRecord.OffHoldTime = DateTime.Now;
-                existingOnHoldRecord.OffHoldUser = UserFullName;
+                existingOnHoldRecord.OffHoldUser = CurrentUser.DisplayName;
 
                 await _dbContext.SaveChangesAsync();
 
@@ -611,7 +607,7 @@ namespace Portal.Pages.DbAssessment
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
-                    UserFullName);
+                    CurrentUser.DisplayName);
             }
         }
 
@@ -710,7 +706,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
                 throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
                     ex.InnerException);
             }

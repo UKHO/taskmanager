@@ -88,11 +88,14 @@ namespace Portal.Pages.DbAssessment
 
         public string SerialisedCustomHttpStatusCodes { get; set; }
 
-        private string _userFullName;
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         public AssessModel(WorkflowDbContext dbContext,
@@ -125,7 +128,7 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-            OperatorsModel = _OperatorsModel.GetOperatorsData(currentAssessData);
+            OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentAssessData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Assess;
             SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<AssessCustomHttpStatusCode>();
 
@@ -138,10 +141,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -163,7 +163,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
-                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
+                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -190,7 +190,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
-                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, UserFullName, currentAssessData.Assessor))
+                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -232,7 +232,7 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
                         };
                     }
-                    
+
                     break;
                 case "ConfirmedDone":
 
@@ -272,12 +272,12 @@ namespace Portal.Pages.DbAssessment
 
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Verify has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
-            
+                "Task progression from {ActivityName} to Verify has been triggered by {CurrentUser.DisplayName} with: ProcessId: {ProcessId}; Action: {Action};");
+
             await _commentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
                                                                         processId,
                                                                     workflowInstance.WorkflowInstanceId,
-                                                                    UserFullName);
+                                                                     CurrentUser.DisplayName);
         }
 
         private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance)
@@ -335,7 +335,7 @@ namespace Portal.Pages.DbAssessment
             await _commentsHelper.AddComment($"Assess: Changes saved",
                 processId,
                 workflowInstanceId,
-                UserFullName);
+                 CurrentUser.DisplayName);
 
 
             return true;
@@ -442,7 +442,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                _logger.LogError("Unable to find HPD Username for { CurrentUser.DisplayName} in our system.");
                 throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
                     ex.InnerException);
             }
@@ -471,8 +471,6 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateOnHold(int processId, bool onHold)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             if (onHold)
             {
                 IsOnHold = true;
@@ -491,7 +489,7 @@ namespace Portal.Pages.DbAssessment
                 {
                     ProcessId = processId,
                     OnHoldTime = DateTime.Now,
-                    OnHoldUser = UserFullName,
+                    OnHoldUser = CurrentUser.DisplayName,
                     WorkflowInstanceId = workflowInstance.WorkflowInstanceId
                 };
 
@@ -501,7 +499,7 @@ namespace Portal.Pages.DbAssessment
                 await _commentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                    UserFullName);
+                     CurrentUser.DisplayName);
             }
             else
             {
@@ -515,7 +513,7 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 existingOnHoldRecord.OffHoldTime = DateTime.Now;
-                existingOnHoldRecord.OffHoldUser = UserFullName;
+                existingOnHoldRecord.OffHoldUser = CurrentUser.DisplayName;
 
                 await _dbContext.SaveChangesAsync();
 
@@ -523,7 +521,7 @@ namespace Portal.Pages.DbAssessment
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
-                    UserFullName);
+                     CurrentUser.DisplayName);
             }
         }
 

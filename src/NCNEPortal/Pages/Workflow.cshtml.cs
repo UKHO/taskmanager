@@ -1,4 +1,11 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,13 +23,6 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -140,12 +140,14 @@ namespace NCNEPortal
         public List<string> ValidationErrorMessages { get; set; }
         public List<string> userList = new List<string>();
 
-        private string _userFullName;
-
-        public string UserFullName
+        private (string DisplayName, string UserPrincipalName) _currentUser;
+        public (string DisplayName, string UserPrincipalName) CurrentUser
         {
-            get => string.IsNullOrEmpty(_userFullName) ? "Unknown user" : _userFullName;
-            private set => _userFullName = value;
+            get
+            {
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                return _currentUser;
+            }
         }
 
         [BindProperty]
@@ -199,15 +201,13 @@ namespace NCNEPortal
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             var taskInfo = UpdateTaskAsTerminated(processId);
 
-            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, UserFullName);
+            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, CurrentUser.DisplayName);
 
             _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -306,9 +306,7 @@ namespace NCNEPortal
                 throw new ArgumentException("Please provide a Caris Project Name.");
             }
 
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
-            LogContext.PushProperty("UserFullName", UserFullName);
+            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
 
             var projectId = await CreateCarisProject(processId, projectName);
 
@@ -331,7 +329,7 @@ namespace NCNEPortal
             }
 
             // which will also implicitly validate if the current user has been mapped to HPD account in our database
-            var hpdUser = await GetHpdUser(UserFullName);
+            var hpdUser = await GetHpdUser(CurrentUser.DisplayName);
 
             _logger.LogInformation(
                 "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
@@ -359,7 +357,7 @@ namespace NCNEPortal
             {
                 ProcessId = processId,
                 Created = DateTime.Now,
-                CreatedBy = UserFullName,
+                CreatedBy = CurrentUser.DisplayName,
                 ProjectId = projectId,
                 ProjectName = projectName
             });
@@ -376,7 +374,7 @@ namespace NCNEPortal
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
                 throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
                     ex.InnerException);
             }
@@ -415,9 +413,8 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, UserFullName, (NcneTaskStageType)stageTypeId, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName, (NcneTaskStageType)stageTypeId, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -431,9 +428,8 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostValidateReworkAsync(int processId, int stageId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
 
-            if (!(_pageValidationHelper.ValidateForRework(username, UserFullName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForRework(username, CurrentUser.DisplayName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -465,11 +461,9 @@ namespace NCNEPortal
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             currentStage.Status = NcneTaskStageStatus.Rework.ToString();
             currentStage.DateCompleted = DateTime.Now;
-            currentStage.AssignedUser = UserFullName;
+            currentStage.AssignedUser = CurrentUser.DisplayName;
 
             var nextStage =
                 _workflowStageHelper.GetNextStageForRework((NcneTaskStageType)currentStage.TaskStageTypeId);
@@ -479,7 +473,7 @@ namespace NCNEPortal
 
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
 
-            await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, UserFullName, stageName, null, null);
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, CurrentUser.DisplayName, stageName, null, null);
 
             await _dbContext.SaveChangesAsync();
 
@@ -495,11 +489,9 @@ namespace NCNEPortal
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             currentStage.Status = NcneTaskStageStatus.Completed.ToString();
             currentStage.DateCompleted = DateTime.Now;
-            currentStage.AssignedUser = UserFullName;
+            currentStage.AssignedUser = CurrentUser.DisplayName;
 
             var v2 = taskStages.Single(t => t.ProcessId == processId &&
                                             t.TaskStageTypeId == (int)NcneTaskStageType.V2);
@@ -520,7 +512,7 @@ namespace NCNEPortal
 
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
 
-            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteStage, processId, UserFullName, stageName, null, null);
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteStage, processId, CurrentUser.DisplayName, stageName, null, null);
 
             await _dbContext.SaveChangesAsync();
 
@@ -564,8 +556,6 @@ namespace NCNEPortal
 
         private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
                       .Include(s => s.TaskStage).FirstAsync(t => t.ProcessId == processId);
@@ -580,7 +570,7 @@ namespace NCNEPortal
 
             }
 
-            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher, UserFullName);
+            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher, CurrentUser.DisplayName);
 
             task.RepromatDate = RepromatDate;
 
@@ -608,7 +598,7 @@ namespace NCNEPortal
         }
 
         private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
-              string v1, string v2, string publisher, string UserFullName)
+              string v1, string v2, string publisher, string us)
         {
 
 
@@ -618,20 +608,20 @@ namespace NCNEPortal
                 (task.AnnounceDate != AnnounceDate) ||
                 (task.CommitDate != CommitToPrintDate) ||
                 (task.CisDate != CISDate))
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, UserFullName, null,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, CurrentUser.DisplayName, null,
                     null, null);
 
             if (!string.IsNullOrEmpty(Compiler) && task.TaskRole.Compiler != compiler)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, UserFullName,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, CurrentUser.DisplayName,
                     null, Compiler, null);
             if (!string.IsNullOrEmpty(Verifier1) && task.TaskRole.VerifierOne != v1)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, UserFullName,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, CurrentUser.DisplayName,
                     null, Verifier1, null);
             if (!string.IsNullOrEmpty(Verifier2) && task.TaskRole.VerifierTwo != v2)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, UserFullName,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, CurrentUser.DisplayName,
                     null, Verifier2, null);
             if (!string.IsNullOrEmpty(Publisher) && task.TaskRole.Publisher != publisher)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.PublisherChange, processId, UserFullName,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.PublisherChange, processId, CurrentUser.DisplayName,
                     null, Publisher, null);
         }
 
@@ -760,18 +750,16 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
             if (!string.IsNullOrEmpty(txtComment))
             {
-                await _commentsHelper.AddTaskComment(txtComment, commentProcessId, UserFullName);
+                await _commentsHelper.AddTaskComment(txtComment, commentProcessId, CurrentUser.DisplayName);
             }
 
             var result = new[]
             {
-                UserFullName,
+                CurrentUser.DisplayName,
                 DateTime.Now.ToLongDateString()
             };
             return new JsonResult(result);
@@ -779,20 +767,18 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)
         {
-            UserFullName = await _adDirectoryService.GetFullNameForUserAsync(this.User);
-
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
 
             if (!string.IsNullOrEmpty(txtComment))
             {
-                await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, UserFullName);
+                await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, CurrentUser.DisplayName);
                 await _dbContext.SaveChangesAsync();
             }
 
             var result = new[]
             {
-                UserFullName,
+                CurrentUser.DisplayName,
                 DateTime.Now.ToLongDateString()
             };
             return new JsonResult(result);
