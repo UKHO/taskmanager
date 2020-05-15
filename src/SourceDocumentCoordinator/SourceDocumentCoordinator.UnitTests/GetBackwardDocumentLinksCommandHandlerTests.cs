@@ -85,7 +85,7 @@ namespace SourceDocumentCoordinator.UnitTests
             //Then
             Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
             Assert.AreEqual("RSDRA2019000130872", _dbContext.LinkedDocument.First().RsdraNumber);
-            Assert.AreEqual("Backward", _dbContext.LinkedDocument.First().LinkType);
+            Assert.AreEqual(DocumentLinkType.Backward.ToString(), _dbContext.LinkedDocument.First().LinkType);
         }
 
         [Test]
