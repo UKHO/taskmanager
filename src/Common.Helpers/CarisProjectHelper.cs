@@ -35,10 +35,10 @@ namespace Common.Helpers
                 command.CommandType = CommandType.Text;
                 command.CommandText = commandText;
 
-                connection.Open();
-                await using var reader = command.ExecuteReader();
+                await connection.OpenAsync();
+                await using var reader = await command.ExecuteReaderAsync();
 
-                while (reader.Read())
+                while (await reader.ReadAsync())
                 {
 
                     result = (Convert.ToInt32(reader[0]),
@@ -62,29 +62,29 @@ namespace Common.Helpers
             {
                 try
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
 
-                    command.Transaction = connection.BeginTransaction();
+                    command.Transaction = await connection.BeginTransactionAsync();
 
-                    var commandText = "BEGIN P_SAVE_MANAGER.STARTNEWSAVE(null); " +
-                                      $"hpdowner.p_charts.publish ({carisChartId}); END;";
 
-                    command.CommandText = commandText;
-                    command.ExecuteNonQuery();
+                    command.CommandText =  "BEGIN P_SAVE_MANAGER.STARTNEWSAVE(null); " +
+                                                            $"hpdowner.p_charts.publish ({carisChartId}); END;";
 
-                    command.Transaction.Commit();
+                    await command.ExecuteNonQueryAsync();
+
+                    await command.Transaction.CommitAsync();
 
                 }
 
                 catch (OracleException e)
                 {
-                    command.Transaction.Rollback();
+                    await command.Transaction.RollbackAsync();
                     var error = FormatOracleError(e);
                     throw error;
                 }
                 catch (Exception)
                 {
-                    command.Transaction.Rollback();
+                    await command.Transaction.RollbackAsync();
                     throw;
 
                 }
