@@ -703,6 +703,15 @@ span.twitter-typeahead {
         background-color: #0097CF;
         color: #FFFFFF;
     }
+
+.tt-suggestion .displayName {
+    font-size: 14pt;
+
+}
+.tt-suggestion .email {
+    font-size: 12pt;
+    font-style: italic;
+}
 /* TYPEAHEAD END */
 
 /* 
