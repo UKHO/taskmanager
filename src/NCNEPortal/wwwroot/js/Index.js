@@ -256,7 +256,7 @@
 
     function initialiseAssignTaskTypeahead() {
 
-        $('#assignTaskErrorMessages').collapse("hide");
+        $('#assignTaskTypeaheadError').collapse("hide");
 
         var users = new Bloodhound({
             datumTokenizer: function (d) {
@@ -275,7 +275,7 @@
                 $("#btnAssignTaskToUser").prop("disabled", false);
                 $("#txtUsername").prop("disabled", false);
 
-                removeAssignUserErrors();
+                $('#assignTaskTypeaheadError').collapse("hide");
 
                 usersFetched = true;
             })
@@ -283,8 +283,7 @@
                 $("#btnAssignTaskToUser").prop("disabled", true);
                 $("#txtUsername").prop("disabled", true);
 
-                var errorArray = ["Failed to look up users. Try refreshing the page."];
-                displayAssignUserErrors(errorArray);
+                $('#assignTaskTypeaheadError').collapse("show");
 
                 usersFetched = false;
             });
