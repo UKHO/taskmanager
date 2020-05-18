@@ -14,6 +14,7 @@ using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Sagas;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.UnitTests
 {
@@ -199,6 +200,57 @@ namespace WorkflowCoordinator.UnitTests
             var executeAssessmentPollingTask = _handlerContext.SentMessages.SingleOrDefault(t =>
                 t.Message is ExecuteAssessmentPollingTask);
             Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
+        }
+
+
+        [Test]
+        public async Task Test_ExecuteAssessmentPollingTask_checks_with_WorkflowInstance_table_for_processed_sdocs_and_only_sends_StartDbAssessmentCommand_for_unprocessed_sdoc()
+        {
+            //Given
+
+            var primarySdocIdAlreadyProcessed = 1111;
+            var primarySdocIdNotProcessed = 2222;
+
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                PrimarySdocId = primarySdocIdAlreadyProcessed,
+                ActivityName = WorkflowStage.Review.ToString(),
+                ActivityChangedAt = DateTime.Today
+            });
+
+            await _dbContext.SaveChangesAsync();
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessments("HDB"))
+                .Returns( new List<DocumentObject>()
+                    {
+                        new DocumentObject()
+                        {
+                            Id = primarySdocIdAlreadyProcessed,
+                            SourceName = "sourcename1",
+                            Name = "name1"
+                        },
+                        new DocumentObject()
+                        {
+                            Id = primarySdocIdNotProcessed,
+                            SourceName = "sourcename2",
+                            Name = "name2"
+                        }
+
+                    });
+
+            //When
+            await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
+
+            //Then
+            var messages = _handlerContext.SentMessages;
+
+            Assert.AreEqual(2, messages.Length);
+
+            var startDbAssessmentCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is StartDbAssessmentCommand);
+            Assert.IsNotNull(startDbAssessmentCommand, $"No message of type {nameof(StartDbAssessmentCommand)} seen.");
+
+            Assert.AreEqual(primarySdocIdNotProcessed,((StartDbAssessmentCommand) startDbAssessmentCommand.Message).SourceDocumentId);
         }
     }
 }
