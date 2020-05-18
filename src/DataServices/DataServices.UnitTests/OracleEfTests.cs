@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using DataServices.Adapters;
 using DataServices.Controllers;
@@ -62,6 +63,22 @@ namespace DataServices.UnitTests
             var data = objectResult.Value as DocumentAssessmentData;
 
             Assert.AreEqual(data.SdocId, 1871160);
+        }
+
+        [Test]
+        public async Task Test_GetDocumentAssessmentData_when_no_assessment_data_returns_no_assessment_data_exception_for_given_sdoc_Id()
+        {
+            var controller = new DataAccessApiController(_dbContext, _fakeLogger, _fakeDataAccessWebServiceSoapClientAdapter);
+            var sdocId = 1871160;
+
+            var response = await controller.GetDocumentAssessmentData(sdocId).ConfigureAwait(false);
+            var parsedResponse = (ObjectResult) response;
+
+            Assert.IsNotNull(parsedResponse);
+            Assert.IsNotNull(parsedResponse.StatusCode);
+            Assert.IsNotNull(parsedResponse.Value);
+            Assert.AreEqual((int)HttpStatusCode.InternalServerError, parsedResponse.StatusCode.Value);
+            Assert.AreEqual($"No assessment data found for SdocId: {sdocId}", parsedResponse.Value);
         }
     }
 }
