@@ -799,11 +799,13 @@
     function initialiseAssignRoleTypeahead() {
         $('#assignRoleTypeaheadError').collapse("hide");
         // Constructing the suggestion engine
-        var users = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
+        var users = new Bloodhound({ 
+            datumTokenizer: function (d) {
+                return Bloodhound.tokenizers.nonword(d.displayName);
+            },             
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: "Workflow/?handler=Users",
+                url: "/Workflow/?handler=Users",
                 ttl: 600000
             },
             initialize: false
@@ -824,16 +826,19 @@
         $('.ta_compiler').add('.ta_v1').add('.ta_v2').add('.ta_publisher').typeahead({
                 hint: true,
                 highlight: true, /* Enable substring highlighting */
-
-                minLength:
-                    3 /* Specify minimum characters required for showing result */
+                minLength: 3 /* Specify minimum characters required for showing result */
             },
             {
                 name: 'users',
                 source: users,
                 limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
                 templates: {
-                    notFound: '<div>No results</div>'
+                    empty: '<div>No results</div>',
+                    suggestion: function(users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
                 }
             });
 

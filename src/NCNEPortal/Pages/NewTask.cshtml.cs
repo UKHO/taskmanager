@@ -1,4 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,14 +19,6 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace NCNEPortal
 {
@@ -98,8 +98,6 @@ namespace NCNEPortal
 
         public List<string> ValidationErrorMessages { get; set; }
 
-        public List<String> userList = new List<string>();
-
         public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext,
                             IMilestoneCalculator milestoneCalculator,
                             ILogger<NewTaskModel> logger,
@@ -129,8 +127,6 @@ namespace NCNEPortal
                 PublicationDate = null;
 
                 ValidationErrorMessages = new List<string>();
-
-                userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
 
             }
             catch (Exception ex)
@@ -345,29 +341,15 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            LogContext.PushProperty("NCNEPortalResource", nameof(OnGetUsersAsync));
-            LogContext.PushProperty("Action", "GetUsersForTypeAhead");
 
-            try
-            {
-                if (userList.Count == 0)
+            var users =
+                (await _ncneUserDbService.GetUsersFromDbAsync()).Select(u => new
                 {
-                    return new JsonResult("Error")
-                    {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
-                    };
-                }
-                return new JsonResult(userList);
+                    u.DisplayName,
+                    u.UserPrincipalName
+                });
 
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Unable to get the user list");
-                return new JsonResult(ex.Message)
-                {
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
-            }
+            return new JsonResult(users);
 
         }
 
