@@ -138,14 +138,14 @@ namespace SourceDocumentCoordinator.UnitTests
             {
                 new LinkedDocument()
                 {
-                    DocId1 = forwardLinkedWithData,
-                    DocId2 = message.SourceDocumentId,
+                    DocId1 = message.SourceDocumentId,
+                    DocId2 = forwardLinkedWithData,
                     LinkType = "PARENTCHILD"
                 },
                 new LinkedDocument()
                 {
-                    DocId1 = forwardLinkedWithoutData,
-                    DocId2 = message.SourceDocumentId,
+                    DocId1 = message.SourceDocumentId,
+                    DocId2 = forwardLinkedWithoutData,
                     LinkType = "PARENTCHILD"
 
                 }
