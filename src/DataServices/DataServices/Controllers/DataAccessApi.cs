@@ -205,15 +205,13 @@ namespace DataServices.Controllers
             {
                 _logger.LogInformation("{ApiResource} retrieving AssessmentData");
 
-                var retrievedData = await _dbContext.AssessmentData.Where(x => x.SdocId == sdocId.Value).ToListAsync();
+                data = await _dbContext.AssessmentData.SingleOrDefaultAsync(x => x.SdocId == sdocId.Value);
 
-                if (retrievedData == null || retrievedData.Count == 0)
+                if (data == null)
                 {
                     _logger.LogError("{ApiResource} No assessment data found for SdocId: {SdocId}.");
                     return StatusCode(500, $"No assessment data found for SdocId: {sdocId}");
                 }
-
-                data = retrievedData.Single();
 
                 _logger.LogInformation("{ApiResource} finished retrieving AssessmentData successfully");
             }
