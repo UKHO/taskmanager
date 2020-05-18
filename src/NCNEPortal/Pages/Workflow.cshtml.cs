@@ -290,7 +290,12 @@ namespace NCNEPortal
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
 
-            CompleteEnabled = !(TaskStages.Exists(t => t.Status != NcneTaskStageStatus.Completed.ToString()));
+            //Enable complete if Forms and Publication stages are completed.
+            CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
+                                                   t.Status == NcneTaskStageStatus.Completed.ToString()) &&
+                               TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
+                                                      t.Status == NcneTaskStageStatus.Completed.ToString());
+
 
 
         }
@@ -541,6 +546,20 @@ namespace NCNEPortal
                     taskStages.First(t => t.TaskStageTypeId == (int)stage).Status =
                         NcneTaskStageStatus.InProgress.ToString();
                 }
+            }
+
+            var publishInProgress = taskStages.Count(t => t.TaskStageTypeId > (int)NcneTaskStageType.Publication
+                                                            && t.TaskStageTypeId != currentStage.TaskStageTypeId
+                                                            && t.Status != NcneTaskStageStatus.Completed.ToString());
+
+            var publishStage = taskStages.Single(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication);
+
+            if (publishInProgress == 0 && publishStage.Status == NcneTaskStageStatus.InProgress.ToString())
+            {
+                //complete the publication stage
+                publishStage.Status = NcneTaskStageStatus.Completed.ToString();
+                publishStage.DateCompleted = DateTime.Now;
+                publishStage.AssignedUser = CurrentUser.DisplayName;
             }
 
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;

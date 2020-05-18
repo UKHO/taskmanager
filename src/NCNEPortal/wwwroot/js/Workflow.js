@@ -100,8 +100,8 @@
         $("#msgPublishComplete").html("This will publish Chart Number <span id=chartNo>" +
             $("#chartNumber").html() +
             "</span>  Version <span id=versionNo>" +
-            $("#chartVersionNo").val() +
-            "</span> and create a new minor version.This cannot be undone.Are you sure you want to continue?");
+            $("#chartVersion").html() +
+            "</span> and create a new minor version. This cannot be undone. Are you sure you want to continue?");
         $("#PublishChartModal").modal("hide");
         $("#PublishConfirmModal").modal("show");
 
@@ -111,7 +111,7 @@
         var complete = $("#Complete").val();
         var processId = $("#hdnProcessId").val();
         var userName = $("#Publisher").val();
-        if (complete) {
+        if (complete === "true") {
             completeWorkflow(processId,userName);
         } else {
 
