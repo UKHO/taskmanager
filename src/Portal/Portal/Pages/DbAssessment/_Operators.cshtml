@@ -17,11 +17,11 @@
 
                                 @if (Model.ParentPage == WorkflowStage.Review)
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "typeahead tt-query form-text-input" })
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "form-text-input" })
                                 }
                             </div>
                         </div>
@@ -36,11 +36,11 @@
 
                                 @if (Model.ParentPage == WorkflowStage.Assess)
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "typeahead tt-query form-text-input", autocomplete = "off", spellcheck = "false" })
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "typeahead tt-query form-text-input" })
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "form-text-input" })
                                 }
                             </div>
                         </div>

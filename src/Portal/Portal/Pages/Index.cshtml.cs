@@ -252,12 +252,16 @@ namespace Portal.Pages
             return StatusCode(200);
         }
 
-
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            var userDisplayNames = (await _portalUserDbService.GetUsersFromDbAsync()).Select(u => u.DisplayName);
+            var users =
+                (await _portalUserDbService.GetUsersFromDbAsync()).Select(u => new
+                {
+                    u.DisplayName,
+                    u.UserPrincipalName
+                });
 
-            return new JsonResult(userDisplayNames);
+            return new JsonResult(users);
         }
 
         private void SetUsersOnTask(WorkflowInstance instance, TaskViewModel task)

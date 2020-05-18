@@ -392,17 +392,17 @@
 
         $('#assignTaskErrorMessages').collapse("hide");
 
-        // Constructing the suggestion engine
         var users = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            datumTokenizer: function (d) {
+                return Bloodhound.tokenizers.nonword(d.displayName);
+            }, 
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: "Index/?handler=Users",
+                url: "/Index/?handler=Users",
                 ttl: 60000
             },
             initialize: false
         });
-
         var promise = users.initialize();
         promise
             .done(function () {
@@ -425,18 +425,21 @@
 
         // Initializing the typeahead
         $('.typeahead').typeahead({
-            hint: true,
-            highlight: true,    /* Enable substring highlighting */
-
-            minLength:
-                3               /* Specify minimum characters required for showing result */
-        },
+                hint: true,
+                highlight: true, /* Enable substring highlighting */
+                minLength: 3 /* Specify minimum characters required for showing result */
+            },
             {
                 name: 'users',
                 source: users,
                 limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
                 templates: {
-                    notFound: '<div>No results</div>'
+                    empty: '<div>No results</div>',
+                    suggestion: function(users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
                 }
             });
     }
