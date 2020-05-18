@@ -111,6 +111,30 @@ namespace NCNEPortal.Helpers
             return isValid;
         }
 
+        public bool ValidateForCompleteWorkflow(string assignedUser, string username,
+            List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to the publisher role before completing the workflow");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Only users assigned to the publisher role are allowed to complete the workflow.");
+                    isValid = false;
+                }
+            }
+
+
+            return isValid;
+        }
 
         private bool ValidateThreePs(DateTime? sendDate3Ps, DateTime? expectedReturnDate3Ps, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
         {

@@ -549,5 +549,21 @@ namespace NCNEPortal.UnitTests
 
         }
 
+        [TestCase("", "Valid User1", "Please assign a user to the publisher role before completing the workflow")]
+        [TestCase("Valid User2", "Valid User1", "Only users assigned to the publisher role are allowed to complete the workflow.")]
+        public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompleteWorkflow(assignedUser, currentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
+
+        }
+
     }
 }
