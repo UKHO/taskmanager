@@ -112,7 +112,9 @@
         $('#Reviewer, #Assessor, #Verifier').typeahead('close');
 
         var users = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            datumTokenizer: function (d) {
+                return Bloodhound.tokenizers.nonword(d.displayName);
+            }, 
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: "/Index/?handler=Users",
@@ -133,15 +135,20 @@
 
         $('#Reviewer, #Assessor, #Verifier').typeahead({
                 hint: true,
-                highlight: true,    /* Enable substring highlighting */
-                minLength: 3        /* Specify minimum characters required for showing result */
+                highlight: true, /* Enable substring highlighting */
+                minLength: 3 /* Specify minimum characters required for showing result */
             },
             {
                 name: 'users',
                 source: users,
                 limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
                 templates: {
-                    notFound: '<div>No results</div>'
+                    empty: '<div>No results</div>',
+                    suggestion: function(users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
                 }
             });
     }
