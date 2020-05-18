@@ -97,9 +97,9 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_workflowinstance_table_prevents_duplicate_processid_due_to_UQ()
+        public async Task Ensure_workflowinstance_table_prevents_duplicate_processid_due_to_UQ()
         {
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
             {
                 ProcessId = 1,
                 SerialNumber = "1_sn",
@@ -108,11 +108,11 @@ namespace WorkflowDatabase.Tests
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
             });
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.WorkflowInstance.Add(new WorkflowInstance()
+                await newContext.WorkflowInstance.AddAsync(new WorkflowInstance()
                 {
                     ProcessId = 1,
                     SerialNumber = "2_sn",
@@ -122,15 +122,15 @@ namespace WorkflowDatabase.Tests
                     StartedAt = DateTime.Now
                 });
 
-                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                var ex = Assert.ThrowsAsync<DbUpdateException>(() => newContext.SaveChangesAsync());
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
 
         [Test]
-        public void Ensure_workflowinstance_table_prevents_duplicate_processid_primarySdocId_due_to_composite_UQ()
+        public async Task Ensure_workflowinstance_table_prevents_duplicate_processid_primarySdocId_due_to_composite_UQ()
         {
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
             {
                 ProcessId = 1,
                 SerialNumber = "1_sn",
@@ -140,11 +140,11 @@ namespace WorkflowDatabase.Tests
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
             });
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.WorkflowInstance.Add(new WorkflowInstance()
+                await newContext.WorkflowInstance.AddAsync(new WorkflowInstance()
                 {
                     ProcessId = 1,
                     SerialNumber = "2_sn",
@@ -155,15 +155,15 @@ namespace WorkflowDatabase.Tests
                     StartedAt = DateTime.Now
                 });
 
-                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                var ex = Assert.ThrowsAsync<DbUpdateException>(() => newContext.SaveChangesAsync());
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
         }
 
         [Test]
-        public void Ensure_workflowinstance_table_allow_non_duplicated_processid_primarySdocId_due_to_composite_UQ()
+        public async Task Ensure_workflowinstance_table_allow_non_duplicated_processid_primarySdocId_due_to_composite_UQ()
         {
-            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
             {
                 ProcessId = 1,
                 SerialNumber = "1_sn",
@@ -173,11 +173,11 @@ namespace WorkflowDatabase.Tests
                 Status = WorkflowStatus.Started.ToString(),
                 StartedAt = DateTime.Now
             });
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                newContext.WorkflowInstance.Add(new WorkflowInstance()
+                await newContext.WorkflowInstance.AddAsync(new WorkflowInstance()
                 {
                     ProcessId = 2,
                     SerialNumber = "3_sn",
@@ -188,7 +188,7 @@ namespace WorkflowDatabase.Tests
                     StartedAt = DateTime.Now
                 });
                 
-                Assert.DoesNotThrow(() => newContext.SaveChanges());
+                Assert.DoesNotThrowAsync(() => newContext.SaveChangesAsync());
             }
         }
 
@@ -288,12 +288,12 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
-        public void Ensure_LinkedDocument_table_prevents_insert_for_no_ProcessId()
+        public async Task Ensure_LinkedDocument_table_prevents_insert_for_no_ProcessId()
         {
-            _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
             {
                 PrimarySdocId = 1234,
-                LinkType = "Forward",
+                LinkType = DocumentLinkType.Forward.ToString(),
                 RsdraNumber = "x345",
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
@@ -301,8 +301,96 @@ namespace WorkflowDatabase.Tests
                 Status = LinkedDocumentRetrievalStatus.Started.ToString()
             });
 
-            var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());
+            var ex = Assert.ThrowsAsync<DbUpdateException>(() => _dbContext.SaveChangesAsync());
             Assert.That(ex.InnerException.Message.Contains("The INSERT statement conflicted with the FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Test]
+        public async Task Ensure_LinkedDocument_table_prevents_insert_for_duplicated_ProcessId_LinkedSdocId_LinkType_due_to_composite_UQ()
+        {
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            {
+                ProcessId = 12345,
+                SerialNumber = "1_sn",
+                PrimarySdocId = 1111,
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            });
+
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = 12345,
+                PrimarySdocId = 1111,
+                LinkType = DocumentLinkType.Forward.ToString(),
+                RsdraNumber = "x345",
+                LinkedSdocId = 5678,
+                SourceDocumentName = "terstingf",
+                Created = DateTime.Now,
+                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = 12345,
+                PrimarySdocId = 1111,
+                LinkType = DocumentLinkType.Forward.ToString(),
+                RsdraNumber = "x345",
+                LinkedSdocId = 5678,
+                SourceDocumentName = "terstingf",
+                Created = DateTime.Now,
+                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+            });
+
+            var ex = Assert.ThrowsAsync<DbUpdateException>(() => _dbContext.SaveChangesAsync());
+            Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+        }
+
+
+        [Test]
+        public async Task Ensure_LinkedDocument_table_allows_insert_for_non_duplicated_ProcessId_LinkedSdocId_LinkType_due_to_composite_UQ()
+        {
+            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            {
+                ProcessId = 12345,
+                SerialNumber = "1_sn",
+                PrimarySdocId = 1111,
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            });
+
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = 12345,
+                PrimarySdocId = 1111,
+                LinkType = DocumentLinkType.Forward.ToString(),
+                RsdraNumber = "x345",
+                LinkedSdocId = 5678,
+                SourceDocumentName = "terstingf",
+                Created = DateTime.Now,
+                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.LinkedDocument.AddAsync(new LinkedDocument()
+            {
+                ProcessId = 12345,
+                PrimarySdocId = 1111,
+                LinkType = DocumentLinkType.Backward.ToString(),
+                RsdraNumber = "x345",
+                LinkedSdocId = 5678,
+                SourceDocumentName = "terstingf",
+                Created = DateTime.Now,
+                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+            });
+
+            Assert.DoesNotThrowAsync(() => _dbContext.SaveChangesAsync());
         }
 
         [Test]
