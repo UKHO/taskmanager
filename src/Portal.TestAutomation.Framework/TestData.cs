@@ -18,7 +18,7 @@ namespace Portal.TestAutomation.Framework
 
             _context.AdUser.Add(new AdUser
             {
-                ActiveDirectorySid = rand.Next(1000, 100000).ToString(),
+                UserPrincipalName = userToAdd,
                 DisplayName = userToAdd,
                 LastCheckedDate = DateTime.Today.AddDays(1)
             });

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
@@ -8,6 +9,8 @@ using DataServices.Attributes;
 using DataServices.Connected_Services.SDRADataAccessWebService;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using Swashbuckle.AspNetCore.Annotations;
@@ -202,8 +205,13 @@ namespace DataServices.Controllers
             {
                 _logger.LogInformation("{ApiResource} retrieving AssessmentData");
 
-                var retrievedData = _dbContext.AssessmentData.Where(x => x.SdocId == sdocId.Value).ToList();
-                data = retrievedData.Single();
+                data = await _dbContext.AssessmentData.SingleOrDefaultAsync(x => x.SdocId == sdocId.Value);
+
+                if (data == null)
+                {
+                    _logger.LogError("{ApiResource} No assessment data found for SdocId: {SdocId}.");
+                    return StatusCode(500, $"No assessment data found for SdocId: {sdocId}");
+                }
 
                 _logger.LogInformation("{ApiResource} finished retrieving AssessmentData successfully");
             }

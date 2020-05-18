@@ -195,7 +195,7 @@ namespace WorkflowCoordinator.UnitTests
             await _saga.Timeout(new ExecuteAssessmentPollingTask(), _handlerContext).ConfigureAwait(false);
 
             //Then
-            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+            Assert.GreaterOrEqual(_handlerContext.SentMessages.Length, 1);
             var executeAssessmentPollingTask = _handlerContext.SentMessages.SingleOrDefault(t =>
                 t.Message is ExecuteAssessmentPollingTask);
             Assert.IsNotNull(executeAssessmentPollingTask, $"No timeout of type {nameof(ExecuteAssessmentPollingTask)} seen.");
