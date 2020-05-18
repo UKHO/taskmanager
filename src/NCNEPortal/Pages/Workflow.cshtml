@@ -619,7 +619,23 @@
     </div>
 </div>
 
-
+@* Modal Publish Confirmation Dialog *@
+<div class="modal fade" id="PublishConfirmModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Please Confirm</h4>
+            </div>
+            <div class="modal-body">
+                <h5 id="msgPublishComplete"></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPubConfCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmConfirm" id="btnPublishConfirm" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {

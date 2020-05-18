@@ -94,17 +94,34 @@
     });
 
     $("#btnPublish").click(function() {
+        $("#publishChartErrorMessage").text("");
+        $("#publishChartError").collapse("hide");
+
+        $("#msgPublishComplete").html("This will publish Chart Number <span id=chartNo>" +
+            $("#chartNumber").html() +
+            "</span>  Version <span id=versionNo>" +
+            $("#chartVersionNo").val() +
+            "</span> and create a new minor version.This cannot be undone.Are you sure you want to continue?");
+        $("#PublishChartModal").modal("hide");
+        $("#PublishConfirmModal").modal("show");
+
+    });
+
+    $("#btnPublishConfirm").click(function() {
         var versionNo = $("#chartVersionNo").val();
         var processId = $("#hdnPublishProcessId").val();
         var stageId = $("#hdnPublishStageId").val();
         var userName = $("#hdnPublishUser").val();
-        $("#publishChartErrorMessage").text("");
-        $("#publishChartError").collapse("hide");
 
+        publishCarisChart(versionNo, processId, stageId, userName);
+
+    });
+
+    function publishCarisChart(versionNo, processId, stageId, userName) {
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=PublishCarisChart",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -114,23 +131,23 @@
                 "stageId": stageId,
                 "userName": userName
             },
-            success: function(result) {
+            success: function (result) {
                 formChanged = false;
                 $("#PublishChartModal").modal("hide");
                 window.location.href = "/workflow?ProcessId=" + processId;
 
             },
-            error: function(error) {
+            error: function (error) {
                 var responseJson = error.responseJSON;
                 if (responseJson != null) {
                     $("#publishChartErrorMessage").text(responseJson);
                     $("#publishChartError").collapse("show");
                 }
+                $("#PublishConfirmModal").modal("hide");
+                $("#PublishChartModal").modal("show");
             }
         });
-
-
-    });
+    }
 
     function validateCompleteRework(url,  processId,stageId,
           username, stageTypeId,stageName, rework, publish ) {
@@ -217,7 +234,7 @@
 
         validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false,true);
 
-        $("#btnPublishInCaris").prop("disabled", true);
+        $("#btnPublishInCaris").prop("disabled", false);
 
     });
 
