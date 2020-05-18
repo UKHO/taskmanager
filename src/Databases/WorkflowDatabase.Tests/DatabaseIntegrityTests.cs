@@ -128,6 +128,71 @@ namespace WorkflowDatabase.Tests
         }
 
         [Test]
+        public void Ensure_workflowinstance_table_prevents_duplicate_processid_primarySdocId_due_to_composite_UQ()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                PrimarySdocId = 1111,
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.WorkflowInstance.Add(new WorkflowInstance()
+                {
+                    ProcessId = 1,
+                    SerialNumber = "2_sn",
+                    PrimarySdocId = 1111,
+                    ParentProcessId = null,
+                    ActivityName = WorkflowStage.Review.ToString(),
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = DateTime.Now
+                });
+
+                var ex = Assert.Throws<DbUpdateException>(() => newContext.SaveChanges());
+                Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        [Test]
+        public void Ensure_workflowinstance_table_allow_non_duplicated_processid_primarySdocId_due_to_composite_UQ()
+        {
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
+            {
+                ProcessId = 1,
+                SerialNumber = "1_sn",
+                PrimarySdocId = 1111,
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                Status = WorkflowStatus.Started.ToString(),
+                StartedAt = DateTime.Now
+            });
+            _dbContext.SaveChanges();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                newContext.WorkflowInstance.Add(new WorkflowInstance()
+                {
+                    ProcessId = 2,
+                    SerialNumber = "3_sn",
+                    PrimarySdocId = 1111,
+                    ParentProcessId = null,
+                    ActivityName = WorkflowStage.Review.ToString(),
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = DateTime.Now
+                });
+                
+                Assert.DoesNotThrow(() => newContext.SaveChanges());
+            }
+        }
+
+        [Test]
         public void Ensure_primarydocumentstatus_table_prevents_duplicate_processId_due_to_UQ()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
