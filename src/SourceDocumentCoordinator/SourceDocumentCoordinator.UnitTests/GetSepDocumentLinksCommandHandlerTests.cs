@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
 using DataServices.Models;
@@ -115,6 +117,67 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             CollectionAssert.IsEmpty(_dbContext.LinkedDocument);
+        }
+
+
+        [Test]
+        public void Test_When_some_sep_linked_documents_do_not_have_assessment_data_then_exception_throws_only_for_ones_without_data()
+        {
+
+            //Given
+
+            var sepLinkedWithData = 2222;
+            var sepLinkedWithoutData = 3333;
+
+            var message = new GetSepDocumentLinksCommand()
+            {
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = 5678,
+                SourceDocumentId = 1111
+            };
+
+            var docLinks = new DocumentObjects();
+            docLinks.AddRange( new List<DocumentObject>()
+            {
+                new DocumentObject()
+                {
+                    Id = sepLinkedWithData
+                },
+                new DocumentObject()
+                {
+                    Id = sepLinkedWithoutData
+
+                }
+            });
+
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetSepDocumentLinks(message.SourceDocumentId)).Returns(docLinks);
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(sepLinkedWithData))
+                                                                        .Returns(new DocumentAssessmentData()
+                                                                        {
+                                                                            SdocId = sepLinkedWithData
+                                                                        });
+
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(sepLinkedWithoutData))
+                                                                        .Throws(new ApplicationException($"StatusCode='{HttpStatusCode.InternalServerError}'," +
+                                                                                                              $"\n Message= 'No assessment data found for SdocId: {sepLinkedWithoutData}'," +
+                                                                                                              $"\n Url=''"));
+
+            //When
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
+
+            //Then
+            // linked doc without data, exception thrown, not added to DB
+            Assert.IsTrue(ex.Message.Contains($"No assessment data found for SdocId: {sepLinkedWithoutData}"));
+            Assert.IsFalse(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == sepLinkedWithoutData));
+
+            // linked doc with data, not included in exception thrown, added to DB
+            Assert.IsFalse(ex.Message.Contains($"No assessment data found for SdocId: {sepLinkedWithData}"));
+            Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
+            Assert.IsTrue(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == sepLinkedWithData));
+            Assert.AreEqual(DocumentLinkType.Sep.ToString(), _dbContext.LinkedDocument.First(l => l.LinkedSdocId == sepLinkedWithData).LinkType);
         }
 
     }
