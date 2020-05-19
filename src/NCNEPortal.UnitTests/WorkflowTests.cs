@@ -1,4 +1,6 @@
-﻿using Common.Helpers;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +14,6 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
 {
@@ -65,21 +64,6 @@ namespace NCNEPortal.UnitTests
             _dbContext.Database.EnsureDeleted();
         }
 
-        [Test]
-        public void Test_constructor_populates_userList_from_ncne_user_service()
-        {
-            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync()).Returns(new List<AdUser>
-            {
-                new AdUser() {DisplayName = "user 1"},
-                new AdUser() {DisplayName = "user 2"}
-            });
-
-            _workflowModel = new WorkflowModel(_dbContext, _fakeLogger, _fakeCommentsHelper, _fakeCarisProjectHelper,
-                _fakeGeneralConfig, _fakeMilestoneCalculator, _fakepageValidationHelper, _fakeNcneUserDbService,
-                _fakeAdDirectoryService, _fakeWorkflowStageHelper);
-
-            Assert.That(_workflowModel.userList, Is.EqualTo(new[] { "user 1", "user 2" }));
-        }
 
         [Test]
         public void Test_OnPostTaskTerminate_throws_argument_exception_when_comment_is_empty()
