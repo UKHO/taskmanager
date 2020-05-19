@@ -121,3 +121,25 @@ stages:
                   aadSqlUsername: '$(SQLUsernamePre)'
                   aadSqlPassword: '$(SQLPasswordPre)'
                   DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
+
+- stage: DeployPrd
+  dependsOn: Build
+  jobs:
+    - deployment: DeployNCNEWorkflowDatabasePrd
+      displayName: Deploy NCNEWorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPrd'
+                  ServerName: '$(ServerNamePrd)'
+                  DatabaseName: '$(DatabaseNamePrd)'
+                  aadSqlUsername: '$(SQLUsernamePrd)'
+                  aadSqlPassword: '$(SQLPasswordPrd)'
+                  DacpacFile: '$(Pipeline.Workspace)/ncneworkflowdatabase/NCNEWorkflowDatabase.dacpac'
