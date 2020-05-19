@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
 using DataServices.Models;
@@ -114,6 +115,70 @@ namespace SourceDocumentCoordinator.UnitTests
 
             //Then
             CollectionAssert.IsEmpty(_dbContext.LinkedDocument);
+        }
+
+
+        [Test]
+        public void Test_When_some_forward_linked_documents_do_not_have_assessment_data_then_exception_throws_only_for_ones_without_data()
+        {
+
+            //Given
+
+            var forwardLinkedWithData = 2222;
+            var forwardLinkedWithoutData = 3333;
+
+            var message = new GetForwardDocumentLinksCommand()
+            {
+                CorrelationId = Guid.NewGuid(),
+                ProcessId = 5678,
+                SourceDocumentId = 1111
+            };
+
+            var docLinks = new LinkedDocuments()
+            {
+                new LinkedDocument()
+                {
+                    DocId1 = message.SourceDocumentId,
+                    DocId2 = forwardLinkedWithData,
+                    LinkType = "PARENTCHILD"
+                },
+                new LinkedDocument()
+                {
+                    DocId1 = message.SourceDocumentId,
+                    DocId2 = forwardLinkedWithoutData,
+                    LinkType = "PARENTCHILD"
+
+                }
+            };
+
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetForwardDocumentLinks(message.SourceDocumentId)).Returns(docLinks);
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(forwardLinkedWithData))
+                                                                        .Returns(new DocumentAssessmentData()
+                                                                        {
+                                                                            SdocId = forwardLinkedWithData
+                                                                        });
+
+
+            A.CallTo(() => _fakeDataServiceApiClient.GetAssessmentData(forwardLinkedWithoutData))
+                                                                        .Throws(new ApplicationException($"StatusCode='{HttpStatusCode.InternalServerError}'," +
+                                                                                                              $"\n Message= 'No assessment data found for SdocId: {forwardLinkedWithoutData}'," +
+                                                                                                              $"\n Url=''"));
+
+            //When
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
+
+            //Then
+            // linked doc without data, exception thrown, not added to DB
+            Assert.IsTrue(ex.Message.Contains($"No assessment data found for SdocId: {forwardLinkedWithoutData}"));
+            Assert.IsFalse(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == forwardLinkedWithoutData));
+
+            // linked doc with data, not included in exception thrown, added to DB
+            Assert.IsFalse(ex.Message.Contains($"No assessment data found for SdocId: {forwardLinkedWithData}"));
+            Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
+            Assert.IsTrue(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == forwardLinkedWithData));
+            Assert.AreEqual(DocumentLinkType.Forward.ToString(), _dbContext.LinkedDocument.First(l => l.LinkedSdocId == forwardLinkedWithData).LinkType);
         }
 
     }
