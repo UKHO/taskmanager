@@ -124,12 +124,16 @@ namespace NCNEPortal.Pages
             }
         }
 
-
         public async Task<JsonResult> OnGetUsersAsync()
         {
-            var userDisplayNames = (await _ncneUserDbService.GetUsersFromDbAsync()).Select(u => u.DisplayName);
+            var users =
+                (await _ncneUserDbService.GetUsersFromDbAsync()).Select(u => new
+                {
+                    u.DisplayName,
+                    u.UserPrincipalName
+                });
 
-            return new JsonResult(userDisplayNames);
+            return new JsonResult(users);
         }
 
         public ncneDateStatus GetDeadLineStatus(DateTime? deadline, NcneTaskStageType taskStageTypeId, List<TaskStage> taskStages)

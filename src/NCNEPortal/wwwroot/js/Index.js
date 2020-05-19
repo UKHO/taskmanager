@@ -255,41 +255,59 @@
     initialiseAssignTaskTypeahead();
 
     function initialiseAssignTaskTypeahead() {
+
         $('#assignTaskTypeaheadError').collapse("hide");
-        // Constructing the suggestion engine
+
         var users = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            datumTokenizer: function (d) {
+                return Bloodhound.tokenizers.nonword(d.displayName);
+            }, 
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: "Index/?handler=Users",
-                ttl: 600000
+                url: "/Index/?handler=Users",
+                ttl: 60000
             },
             initialize: false
         });
-
         var promise = users.initialize();
-        promise.fail(function () {
-            $('#assignTaskTypeaheadError').collapse("show");
-        });
+        promise
+            .done(function () {
+                $("#btnAssignTaskToUser").prop("disabled", false);
+                $("#txtUsername").prop("disabled", false);
+
+                $('#assignTaskTypeaheadError').collapse("hide");
+
+                usersFetched = true;
+            })
+            .fail(function () {
+                $("#btnAssignTaskToUser").prop("disabled", true);
+                $("#txtUsername").prop("disabled", true);
+
+                $('#assignTaskTypeaheadError').collapse("show");
+
+                usersFetched = false;
+            });
 
         // Initializing the typeahead
         $('.typeahead').typeahead({
-            hint: true,
-            highlight: true, /* Enable substring highlighting */
-
-            minLength:
-                3 /* Specify minimum characters required for showing result */
-        },
+                hint: true,
+                highlight: true, /* Enable substring highlighting */
+                minLength: 3 /* Specify minimum characters required for showing result */
+            },
             {
                 name: 'users',
                 source: users,
                 limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
                 templates: {
-                    notFound: '<div>No results</div>'
+                    empty: '<div>No results</div>',
+                    suggestion: function(users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
                 }
             });
     }
-
     //Show MyTaskList
     $("#btnMyTaskList").trigger("click");
 });

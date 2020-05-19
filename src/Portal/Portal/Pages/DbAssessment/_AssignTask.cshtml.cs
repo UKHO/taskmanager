@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Portal.Models;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -28,7 +25,7 @@ namespace Portal.Pages.DbAssessment
         public SelectList Assessors { get; set; }
         public SelectList Verifiers { get; set; }
         public SelectList AssignedTaskTypes { get; set; }
-        
+
         public int Ordinal { get; set; }
 
         public _AssignTaskModel(WorkflowDbContext dbContext)
@@ -78,18 +75,9 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-
-        /// <summary>
-        /// TODO - Remove assessor and verifier code retrieval from JSON once we are reading users from AD
-        /// </summary>
         private async Task PopulateDropDowns()
         {
-            if (!System.IO.File.Exists(@"Data\Users.json")) throw new FileNotFoundException(@"Data\Users.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\Users.json");
-            var users = JsonConvert.DeserializeObject<IEnumerable<Assessor>>(jsonString)
-                .Select(u => u.Name)
-                .ToList();
+            var users = await _dbContext.AdUser.Select(u => u.DisplayName).ToListAsync();
 
             Assessors = new SelectList(users);
 
