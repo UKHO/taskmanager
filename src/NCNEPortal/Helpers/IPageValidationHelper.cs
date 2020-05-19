@@ -23,5 +23,7 @@ namespace NCNEPortal.Helpers
             List<string> validationErrorMessages);
 
         public bool ValidateForRework(string assignedUser, string userName, List<string> validationErrorMessages);
+
+        public bool ValidateForCompleteWorkflow(string assignedUser, string userName, List<string> validationErrorMessages);
     }
 }

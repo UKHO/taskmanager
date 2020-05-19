@@ -96,26 +96,70 @@
     $("#btnPublish").click(function() {
         $("#publishChartErrorMessage").text("");
         $("#publishChartError").collapse("hide");
-
+        $("#Complete").val(false);
         $("#msgPublishComplete").html("This will publish Chart Number <span id=chartNo>" +
             $("#chartNumber").html() +
             "</span>  Version <span id=versionNo>" +
-            $("#chartVersionNo").val() +
-            "</span> and create a new minor version.This cannot be undone.Are you sure you want to continue?");
+            $("#chartVersion").html() +
+            "</span> and create a new minor version. This cannot be undone. Are you sure you want to continue?");
         $("#PublishChartModal").modal("hide");
         $("#PublishConfirmModal").modal("show");
 
     });
 
-    $("#btnPublishConfirm").click(function() {
-        var versionNo = $("#chartVersionNo").val();
-        var processId = $("#hdnPublishProcessId").val();
-        var stageId = $("#hdnPublishStageId").val();
-        var userName = $("#hdnPublishUser").val();
+    $("#btnPublishConfirm").click(function () {
+        var complete = $("#Complete").val();
+        var processId = $("#hdnProcessId").val();
+        var userName = $("#Publisher").val();
+        if (complete === "true") {
+            completeWorkflow(processId,userName);
+        } else {
 
-        publishCarisChart(versionNo, processId, stageId, userName);
+            var versionNo = $("#chartVersionNo").val();
+            processId = $("#hdnPublishProcessId").val();
+            var stageId = $("#hdnPublishStageId").val();
+            publishCarisChart(versionNo, processId, stageId, userName);
+        }
 
     });
+
+    function completeWorkflow(processId, username) {
+        $.ajax({
+            type: "POST",
+            url: "workflow/?handler=CompleteWorkflow",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "userName": username
+            },
+            success: function () {
+                $("#PublishConfirmModal").modal("hide");
+                window.location.href = '/Index';
+
+            },
+            error: function(error) {
+                var responseJson = error.responseJSON;
+                (this).checked = false;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").html("");
+
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function(item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+            }
+
+        });
+    }
 
     function publishCarisChart(versionNo, processId, stageId, userName) {
         $.ajax({
@@ -888,4 +932,50 @@
         }
     });
 
+
+    $("#btnComplete").click(function () {
+        var processId = $("#hdnProcessId").val();
+        var userName = $("#Publisher").val();
+
+        $.ajax({
+            type: "POST",
+            url: "Workflow/?handler=ValidateCompleteWorkflow",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "userName" : userName
+
+            },
+
+            success: function (result) {
+                $("#Complete").val(true);
+                $("#msgPublishComplete").html("Are you sure you want to complete this workflow ?");
+                $("#PublishConfirmModal").modal("show");
+                }
+            ,
+            error: function(error) {
+                var responseJson = error.responseJSON;
+                (this).checked = false;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").html("");
+
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function(item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+
+            }
+
+        });
+
+    });
 });

@@ -137,6 +137,8 @@ namespace NCNEPortal
         public CarisProjectDetails CarisProjectDetails { get; set; }
         public bool IsCarisProjectCreated { get; set; }
 
+        public bool CompleteEnabled { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
         public List<string> userList = new List<string>();
 
@@ -243,12 +245,12 @@ namespace NCNEPortal
                 .FirstOrDefault(t => t.ProcessId == processId);
 
 
-            Ion = taskInfo.Ion;
-            ChartTitle = taskInfo.ChartTitle;
-            ChartNo = taskInfo.ChartNumber;
-            WorkflowType = taskInfo.WorkflowType;
-            ChartType = taskInfo.ChartType;
-            Country = taskInfo.Country;
+            Ion = taskInfo?.Ion;
+            ChartTitle = taskInfo?.ChartTitle;
+            ChartNo = taskInfo?.ChartNumber;
+            WorkflowType = taskInfo?.WorkflowType;
+            ChartType = taskInfo?.ChartType;
+            Country = taskInfo?.Country;
 
             if (taskInfo.Duration == null)
                 Dating = 0;
@@ -287,6 +289,14 @@ namespace NCNEPortal
                 IsCarisProjectCreated = true;
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
+
+            //Enable complete if Forms and Publication stages are completed.
+            CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
+                                                   t.Status == NcneTaskStageStatus.Completed.ToString()) &&
+                               TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
+                                                      t.Status == NcneTaskStageStatus.Completed.ToString());
+
+
 
         }
 
@@ -440,6 +450,34 @@ namespace NCNEPortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
+        public async Task<IActionResult> OnPostValidateCompleteWorkflow(int processId, string username)
+        {
+            ValidationErrorMessages.Clear();
+
+            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.DisplayName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        public async Task<IActionResult> OnPostCompleteWorkflow(int processId, string username)
+        {
+            var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
+
+            taskInfo.Status = NcneTaskStatus.Completed.ToString();
+
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteWorkflow, processId, CurrentUser.DisplayName, null, null, null);
+
+            await _dbContext.SaveChangesAsync();
+
+            return new JsonResult(HttpStatusCode.OK);
+
+        }
+
         public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username,
             Boolean isRework)
         {
@@ -508,6 +546,20 @@ namespace NCNEPortal
                     taskStages.First(t => t.TaskStageTypeId == (int)stage).Status =
                         NcneTaskStageStatus.InProgress.ToString();
                 }
+            }
+
+            var publishInProgress = taskStages.Count(t => t.TaskStageTypeId > (int)NcneTaskStageType.Publication
+                                                            && t.TaskStageTypeId != currentStage.TaskStageTypeId
+                                                            && t.Status != NcneTaskStageStatus.Completed.ToString());
+
+            var publishStage = taskStages.Single(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication);
+
+            if (publishInProgress == 0 && publishStage.Status == NcneTaskStageStatus.InProgress.ToString())
+            {
+                //complete the publication stage
+                publishStage.Status = NcneTaskStageStatus.Completed.ToString();
+                publishStage.DateCompleted = DateTime.Now;
+                publishStage.AssignedUser = CurrentUser.DisplayName;
             }
 
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;

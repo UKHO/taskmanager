@@ -106,7 +106,7 @@
     </div>
 
     <div class="mt-3">
-        <button id="btnComplete" class="btn btn-block btn-secondary" disabled style="min-width: 139px; ">Complete</button>
+        <button id="btnComplete" class="btn btn-block btn-secondary" @(Model.CompleteEnabled ? "" : "disabled") style="min-width: 139px; ">Complete</button>
     </div>
 </div>
 
@@ -575,7 +575,7 @@
                 <input type="hidden" id="hdnPublishStageId" name="publishStageId" />
                 <input type="hidden" id="hdnPublishUser" name="AssignedUser" />
                 <div class="row">
-                    <div class="col-6">Enter the Version No.</div>
+                    <div class="col-6">Enter the Chart Version Id.</div>
                     <div class="col-6">
                         <input type="number" min="0" max="99999" style="width:7em" id="chartVersionNo" />
                         <button type="button" id="btnGetChartDetails" class="btn btn-secondary">Get </button>
@@ -627,6 +627,7 @@
                 <h4 class="modal-title">Please Confirm</h4>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="Complete" name="Complete" />
                 <h5 id="msgPublishComplete"></h5>
             </div>
             <div class="modal-footer">
