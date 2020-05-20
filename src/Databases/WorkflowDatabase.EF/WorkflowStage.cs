@@ -9,6 +9,7 @@ namespace WorkflowDatabase.EF
         Review,
         Assess,
         Verify,
-        Completed
+        Completed,
+        Terminated
     }
 }
