@@ -110,3 +110,24 @@ stages:
                   aadSqlUsername: '$(SQLUsernamePre)'
                   aadSqlPassword: '$(SQLPasswordPre)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
+
+- stage: DeployPrd
+  dependsOn: Build
+  jobs:
+    - deployment: DeployWorkflowDatabasePrd
+      displayName: Deploy WorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPrd'
+                  ServerName: '$(ServerNamePrd)'
+                  DatabaseName: '$(DatabaseNamePrd)'
+                  aadSqlUsername: '$(SQLUsernamePrd)'
+                  aadSqlPassword: '$(SQLPasswordPrd)'
+                  DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
