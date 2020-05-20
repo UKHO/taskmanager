@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,6 +16,13 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -133,6 +133,8 @@ namespace NCNEPortal
 
 
         [DisplayName("CARIS Project Name")] public string CarisProjectName { get; set; }
+
+        public string Header { get; set; }
 
         public CarisProjectDetails CarisProjectDetails { get; set; }
         public bool IsCarisProjectCreated { get; set; }
@@ -287,6 +289,15 @@ namespace NCNEPortal
             }
             else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
 
+            Header = $"{taskInfo.WorkflowType}{(String.IsNullOrEmpty(taskInfo.ChartNumber) ? "" : $" - {taskInfo.ChartNumber}")}";
+
+            var inProgress = TaskStages.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
+                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
+            Header += inProgress != null
+                ? " - " + inProgress.TaskStageType.Name
+                : " - Awaiting Completion";
+
+
             //Enable complete if Forms and Publication stages are completed.
             CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
                                                    t.Status == NcneTaskStageStatus.Completed.ToString()) &&
@@ -296,6 +307,7 @@ namespace NCNEPortal
 
 
         }
+
 
 
 

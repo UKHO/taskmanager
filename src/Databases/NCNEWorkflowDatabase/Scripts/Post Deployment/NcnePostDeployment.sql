@@ -64,13 +64,13 @@ using (
          (7, 'V2', 7, 1),
          (8, 'V2 Rework', 8, 0),
          (9, 'Forms', 9, 0),
-         (10, 'Final updating', 10, 0),
-         (11, '100% check', 11, 0),
-         (12, 'Commit to print', 12, 0),
+         (10, 'Final Updating', 10, 0),
+         (11, '100% Check', 11, 0),
+         (12, 'Commit to Print', 12, 0),
          (13, 'CIS', 13, 0),
          (14, 'Publication', 14, 0),
-         (15, 'Publish chart', 15, 0),
-         (16, 'Clear vector', 16, 0),
+         (15, 'Publish Chart', 15, 0),
+         (16, 'Clear vector on new minor version', 16, 0),
          (17, 'Retire old minor version', 17, 0),
          (18, 'Consider withdrawn charts', 18, 0)
 

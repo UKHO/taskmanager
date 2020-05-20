@@ -55,19 +55,19 @@
   },
   {
     "TaskStageTypeId": 10,
-    "Name": "Final updating",
+    "Name": "Final Updating",
     "SequenceNumber": 10,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 11,
-    "Name": "100% check",
+    "Name": "100% Check",
     "SequenceNumber": 11,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 12,
-    "Name": "Commit to print",
+    "Name": "Commit to Print",
     "SequenceNumber": 12,
     "AllowRework": false
   },
@@ -85,13 +85,13 @@
   },
   {
     "TaskStageTypeId": 15,
-    "Name": "Publish chart",
+    "Name": "Publish Chart",
     "SequenceNumber": 15,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 16,
-    "Name": "Clear vector",
+    "Name": "Clear vector on new minor version",
     "SequenceNumber": 16,
     "AllowRework": false
   },
