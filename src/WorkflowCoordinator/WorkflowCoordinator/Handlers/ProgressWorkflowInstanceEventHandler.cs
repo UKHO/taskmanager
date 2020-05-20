@@ -49,9 +49,22 @@ namespace WorkflowCoordinator.Handlers
 
             switch (message.ToActivity)
             {
+                case WorkflowStage.Terminated:
+                    // TODO: Terminating Review. Add code for Verifying, progressing and persisting
+                    // TODO: UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
+                    throw new NotImplementedException("Terminating Review has not been implemented");
+
+                //break;
                 case WorkflowStage.Assess:
                     // TODO: Progressing task from Review to Assess. Add code for Verifying, progressing and persisting
                     // TODO: Rejecting task from Verify to Assess. Add code for Verifying, progressing and persisting
+
+                    // TODO: Review progress to Assess
+                    // TODO:  CopyPrimaryAssignTaskNoteToComments(processId);
+                    // TODO:  CreateChildTasks(processId);
+                    // TODO:  PersistPrimaryTask(processId, workflowInstance);
+
                     throw new NotImplementedException("Progressing Review to Assess, or Rejecting Verify to Ass has not been implemented");
 
                     //break;
@@ -118,38 +131,51 @@ namespace WorkflowCoordinator.Handlers
             
             switch (message.ToActivity)
             {
+                case WorkflowStage.Terminated:
+                    // TODO: Terminating Review. Add code for persisting
+
+                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
+                    //break;
                 case WorkflowStage.Assess:
 
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
 
-                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
 
                     var isRejected = message.FromActivity == WorkflowStage.Verify;
 
                     if (isRejected)
                     {
+                        // Verify to Assess
                         await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
                     }
                     else
                     {
+                        // Review to Assess
+
+                        // TODO:  CopyPrimaryAssignTaskNoteToComments(processId);
+                        // TODO:  CreateChildTasks(processId);
+                        // TODO:  PersistPrimaryTask(processId, workflowInstance);
+
                         await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
                     }
 
                     break;
                 case WorkflowStage.Verify:
-
+                    // Assess to Verify
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
 
-                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Verify, WorkflowStatus.Started);
 
                     await PersistWorkflowDataToVerifyFromAssess(message.ProcessId, workflowInstance.WorkflowInstanceId);
 
                     break;
                 case WorkflowStage.Completed:
+                    // Verify Signed off
 
                     ValidateK2TaskForSignOff(message, k2Task);
 
-                    await UpdateWorkflowInstanceData(message.ProcessId, message.ToActivity, k2Task);
+                    await UpdateWorkflowInstanceData(message.ProcessId, string.Empty,WorkflowStage.Verify, WorkflowStatus.Completed);
 
                     // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed
                     var completeAssessment = new CompleteAssessmentCommand
@@ -229,16 +255,16 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
-        private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, WorkflowStage toActivity, K2TaskData k2Task)
+        private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, string serialNumber, WorkflowStage activityName, WorkflowStatus status)
         {
             var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == processId);
 
-            workflowInstance.SerialNumber = (toActivity == WorkflowStage.Completed) ? "" : k2Task.SerialNumber;
-            workflowInstance.ActivityName = (toActivity == WorkflowStage.Completed) ? WorkflowStage.Verify.ToString() : k2Task.ActivityName;
+            workflowInstance.SerialNumber = serialNumber; //(toActivity == WorkflowStage.Completed) ? "" : k2Task.SerialNumber;
+            workflowInstance.ActivityName = activityName.ToString(); //(toActivity == WorkflowStage.Completed) ? WorkflowStage.Verify.ToString() : k2Task.ActivityName;
 
-            workflowInstance.Status = (toActivity == WorkflowStage.Completed) ? WorkflowStatus.Completed.ToString() : WorkflowStatus.Started.ToString();
+            workflowInstance.Status = status.ToString(); //(toActivity == WorkflowStage.Completed) ? WorkflowStatus.Completed.ToString() : WorkflowStatus.Started.ToString();
             workflowInstance.ActivityChangedAt = DateTime.Today;
 
             return workflowInstance;
