@@ -141,15 +141,18 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            var workflowInstance = _dbContext.WorkflowInstance
-                .Include(wi => wi.AssessmentData)
-                .FirstOrDefault(wi => wi.ProcessId == processId);
+            ProcessId = processId;
 
-            if (workflowInstance == null)
-            {
-                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
-                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
-            }
+            // TODO: Remove
+            //var workflowInstance = _dbContext.WorkflowInstance
+            //    .Include(wi => wi.AssessmentData)
+            //    .FirstOrDefault(wi => wi.ProcessId == processId);
+
+            //if (workflowInstance == null)
+            //{
+            //    _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
+            //    throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            //}
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -163,15 +166,20 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            UpdateWorkflowInstanceAsTerminated(workflowInstance);
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
+
             await _commentsHelper.AddComment($"Terminate comment: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
                 CurrentUser.DisplayName);
-            await UpdateK2WorkflowAsTerminated(workflowInstance);
-            await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
-            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
+                WorkflowStage.Terminated);
+
+            // TODO: Move to WorkflowCoordinator
+            //await UpdateK2WorkflowAsTerminated(workflowInstance);
+            //await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+
             return StatusCode((int)HttpStatusCode.OK);
         }
 
@@ -288,7 +296,26 @@ namespace Portal.Pages.DbAssessment
 
             return StatusCode((int)HttpStatusCode.OK);
         }
+        
+        private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
+        {
+            var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
 
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
+            {
+                CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
+                ProcessId = processId,
+                FromActivity = fromActivity,
+                ToActivity = toActivity
+            };
+
+            LogContext.PushProperty("ProgressWorkflowInstanceEvent",
+                progressWorkflowInstanceEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(ProgressWorkflowInstanceEvent), progressWorkflowInstanceEvent);
+            _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+        }
 
         private async Task PersistPrimaryTask(int processId, WorkflowInstance workflowInstance)
         {
@@ -480,11 +507,15 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(WorkflowInstance workflowInstance)
+        private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {
-            workflowInstance.Status = WorkflowStatus.Terminated.ToString();
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(wi => wi.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
             workflowInstance.ActivityChangedAt = DateTime.Today;
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return workflowInstance;
         }

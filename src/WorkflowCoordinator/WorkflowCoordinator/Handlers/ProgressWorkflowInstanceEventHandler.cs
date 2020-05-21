@@ -47,9 +47,16 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
+            ValidateK2TaskPriorToProgressing(message, k2Task);
+
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
+
+                    if (k2Task.ActivityName != message.FromActivity.ToString())
+                    {
+
+                    }
                     // TODO: Terminating Review. Add code for Verifying, progressing and persisting
                     // TODO: UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
@@ -133,6 +140,7 @@ namespace WorkflowCoordinator.Handlers
             {
                 case WorkflowStage.Terminated:
                     // TODO: Terminating Review. Add code for persisting
+                    //workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, "", WorkflowStage.Review, WorkflowStatus.Terminated);
 
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
                     //break;
@@ -227,6 +235,26 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
+        private void ValidateK2TaskPriorToProgressing(ProgressWorkflowInstanceEvent message, K2TaskData k2Task)
+        {
+            if (k2Task == null)
+            {
+                _logger.LogError("Failed to get data for K2 Task with ProcessId {ProcessId} prior to progressing task from {FromActivity} to {ToActivity}");
+                throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {message.ProcessId} prior to moving task from {message.FromActivity} to {message.ToActivity}");
+            }
+
+            if (k2Task.ActivityName != message.FromActivity.ToString())
+            {
+                LogContext.PushProperty("K2Stage", k2Task.ActivityName);
+                _logger.LogError(
+                        "Workflow instance with ProcessId {ProcessId} is not at the expected step {FromActivity} in K2 but was at {K2Stage}," +
+                        " while progressing task to {ToActivity}");
+                throw new ApplicationException(
+                        $"Workflow instance with ProcessId {message.ProcessId} is not at the expected step {message.FromActivity} in K2 but was at {k2Task.ActivityName}," +
+                        $" while progressing task to {message.ToActivity}");
+            }
+        }
+
         private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataCommand message, K2TaskData k2Task)
         {
             if (k2Task != null)
@@ -257,7 +285,8 @@ namespace WorkflowCoordinator.Handlers
 
         private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, string serialNumber, WorkflowStage activityName, WorkflowStatus status)
         {
-            var workflowInstance = await _dbContext.WorkflowInstance.Include(wi => wi.ProductAction)
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(wi => wi.ProductAction)
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == processId);
 
