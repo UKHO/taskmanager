@@ -92,8 +92,6 @@ namespace Common.Helpers.Auth
             var displayName = user.Claims.FirstOrDefault(c => c.Type.Equals("name", StringComparison.OrdinalIgnoreCase))?.Value;
             var userEmail = user.Claims.FirstOrDefault(c => c.Type.Equals("preferred_username", StringComparison.OrdinalIgnoreCase))?.Value;
 
-
-
             return (displayName, userEmail);
         }
 
