@@ -61,7 +61,7 @@ namespace NCNEPortal.Helpers
         }
 
         public bool ValidateForCompletion(string assignedUser, string username, NcneTaskStageType stageType,
-            List<string> validationErrorMessages)
+            TaskRole role, List<string> validationErrorMessages)
         {
             bool isValid = true;
 
@@ -81,6 +81,25 @@ namespace NCNEPortal.Helpers
                         isValid = false;
                     }
                 }
+
+                if (stageType == NcneTaskStageType.Compile && string.IsNullOrEmpty(role.VerifierOne))
+                {
+                    validationErrorMessages.Add("Please assign a user to V1 role before completing this stage");
+                    isValid = false;
+                }
+
+                if (stageType == NcneTaskStageType.V1 && string.IsNullOrEmpty(role.VerifierTwo) && string.IsNullOrEmpty(role.Publisher))
+                {
+                    validationErrorMessages.Add("Please assign a user to either V2 role or Publisher role before completing this stage");
+                    isValid = false;
+                }
+
+                if (stageType == NcneTaskStageType.V2 && string.IsNullOrEmpty(role.Publisher))
+                {
+                    validationErrorMessages.Add("Please assign a user to Publisher role before completing this stage");
+                    isValid = false;
+                }
+
             }
 
             return isValid;

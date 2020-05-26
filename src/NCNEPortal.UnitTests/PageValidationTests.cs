@@ -481,10 +481,10 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
 
             Assert.IsFalse(result);
-            Assert.AreEqual(validationErrorMessages.Count, 1);
+
             CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage before completion");
 
         }
@@ -509,10 +509,9 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
 
             Assert.IsFalse(result);
-            Assert.AreEqual(validationErrorMessages.Count, 1);
             CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
 
         }
@@ -526,7 +525,84 @@ namespace NCNEPortal.UnitTests
             var currentStageType = NcneTaskStageType.Forms;
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, new TaskRole(), validationErrorMessages);
+
+            Assert.IsTrue(result);
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_Compile_step_if_V1_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            { Compiler = "Valid User" };
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Compile, role, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
+
+        }
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_V1_step_if_V2_and_Publisher_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            {
+                Compiler = "Valid User",
+                VerifierOne = "Valid User"
+            };
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.V1, role, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to either V2 role or Publisher role before completing this stage");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_V2_step_if_Publisher_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            {
+                Compiler = "Valid User",
+                VerifierOne = "Valid User",
+                VerifierTwo = "Valid User"
+            };
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.V2, role, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to Publisher role before completing this stage");
+
+        }
+
+        [TestCase(NcneTaskStageType.Compile)]
+        [TestCase(NcneTaskStageType.V1)]
+        [TestCase(NcneTaskStageType.V2)]
+        public void Validation_for_ValidateForCompletion_Passes_if_user_assigned_for_next_step(NcneTaskStageType currentStage)
+        {
+
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            {
+                Compiler = "Valid User",
+                VerifierOne = "Valid User",
+                VerifierTwo = "Valid User",
+                Publisher = "Valid User"
+            };
+
+            var result = _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", currentStage, role,
+                validationErrorMessages);
 
             Assert.IsTrue(result);
 

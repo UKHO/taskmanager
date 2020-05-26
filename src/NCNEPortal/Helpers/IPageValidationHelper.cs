@@ -20,7 +20,7 @@ namespace NCNEPortal.Helpers
             List<string> validationErrorMessages);
 
         public bool ValidateForCompletion(string assignedUser, string userName, NcneTaskStageType stageType,
-            List<string> validationErrorMessages);
+            TaskRole role, List<string> validationErrorMessages);
 
         public bool ValidateForRework(string assignedUser, string userName, List<string> validationErrorMessages);
 
