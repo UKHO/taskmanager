@@ -27,6 +27,7 @@ using Portal.BusinessLogic;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.HostedServices;
 using Portal.HttpClients;
 using Portal.MappingProfiles;
 using Serilog;
@@ -61,6 +62,9 @@ namespace Portal
             Configuration.GetSection("PCPEventService").Bind(startupSecretsConfig);
             Configuration.GetSection("PortalActiveDirectory").Bind(startupSecretsConfig);
 
+            services.AddOptions<AdUserUpdateServiceConfig>()
+                .Bind(Configuration.GetSection("portal"));
+
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
@@ -80,7 +84,9 @@ namespace Portal
                 .Bind(Configuration.GetSection("PortalSection"))
                 .Bind(Configuration.GetSection("K2RestApi"))
                 .Bind(Configuration.GetSection("HpdDbSection"))
-                .Bind(Configuration.GetSection("PCPEventService"))
+                .Bind(Configuration.GetSection("PCPEventService"));
+
+            services.AddOptions<AdUserUpdateServiceSecrets>()
                 .Bind(Configuration.GetSection("PortalActiveDirectory"));
 
             LoggingHelper.SetupLogging(isLocalDevelopment, startupLoggingConfig, startupSecretsConfig);
@@ -152,6 +158,7 @@ namespace Portal
 
                 });
 
+
             //  services.AddAuthorization(options => options.);
 
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
@@ -171,11 +178,12 @@ namespace Portal
             services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
             services.AddScoped<ICarisProjectNameGenerator, CarisProjectNameGenerator>();
             services.AddScoped<IWorkflowBusinessLogicService, WorkflowBusinessLogicService>();
+            services.AddScoped<IPortalUserDbService, PortalUserDbService>();
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
-
-            services.AddScoped<IAdDirectoryService,
+            //TODO refactor 
+            services.AddSingleton<IAdDirectoryService,
                 AdDirectoryService>(s => new AdDirectoryService(
                 startupSecretsConfig.ClientAzureAdSecret,
                 s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
@@ -185,8 +193,7 @@ namespace Portal
                     : s.GetService<IOptions<UriConfig>>().Value.LandingPageUrl,
                 s.GetService<HttpProvider>()));
 
-            services.AddScoped<IPortalUserDbService,
-                PortalUserDbService>(s => new PortalUserDbService(s.GetService<WorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
+            services.AddHostedService<AdUserUpdateService>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc =>
@@ -228,9 +235,7 @@ namespace Portal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<StartupSecretsConfig> secrets,
-            IPortalUserDbService userDbService,
-            WorkflowDbContext workflowDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WorkflowDbContext workflowDbContext)
         {
             app.UseSerilogRequestLogging(
                 options =>
@@ -282,8 +287,6 @@ namespace Portal
 
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 SeedWorkflowDatabase(workflowDbContext);
-
-            UpdateDbUsersFromAd(secrets.Value, userDbService);
         }
 
         private static void SeedWorkflowDatabase(WorkflowDbContext workflowDbContext)
@@ -292,22 +295,5 @@ namespace Portal
             Log.Logger.Information($"WorkflowDatabase successfully re-seeded.");
         }
 
-        private static void UpdateDbUsersFromAd(StartupSecretsConfig secrets, IPortalUserDbService userDbService)
-        {
-            var adGroupGuids = secrets.AdUserGroups.Split(',')
-                .Where(x => Guid.TryParse(x, out _))
-                .Select(Guid.Parse)
-                .ToList();
-
-            try
-            {
-                userDbService.UpdateDbFromAdAsync(adGroupGuids).Wait();
-                Log.Logger.Information($"Users successfully updated in database from AD.");
-            }
-            catch (Exception e)
-            {
-                Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
-            }
-        }
     }
 }
