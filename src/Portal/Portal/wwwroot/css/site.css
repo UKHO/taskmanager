@@ -64,6 +64,13 @@ table.task-list thead tr th {
     padding: 5px 0px 10px 15px;
 }*/
 
+td > span.overflowElipsis {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .panel {
     overflow: auto;
 }
