@@ -655,7 +655,7 @@ namespace NCNEPortal
 
             }
 
-            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher, CurrentUser.DisplayName);
+            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher);
 
             task.RepromatDate = RepromatDate;
 
@@ -685,7 +685,7 @@ namespace NCNEPortal
         }
 
         private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
-              string v1, string v2, string publisher, string us)
+              string v1, string v2, string publisher)
         {
 
 
@@ -710,6 +710,15 @@ namespace NCNEPortal
             if (!string.IsNullOrEmpty(Publisher) && task.TaskRole.Publisher != publisher)
                 await _commentsHelper.AddTaskSystemComment(NcneCommentType.PublisherChange, processId, CurrentUser.DisplayName,
                     null, Publisher, null);
+
+            if ((task.ThreePs != SentTo3Ps) || (task.SentDate3Ps != SendDate3ps)
+                                            || (task.ExpectedDate3Ps != ExpectedReturnDate3ps) ||
+                                            (task.ActualDate3Ps != ActualReturnDate3ps))
+            {
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.ThreePsChange, processId,
+                    CurrentUser.DisplayName,
+                    null, null, null);
+            }
         }
 
 

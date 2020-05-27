@@ -45,6 +45,7 @@ namespace NCNEPortal.Helpers
                 NcneCommentType.PublisherChange => "Publisher role changed to " + roleName,
                 NcneCommentType.CarisPublish => "Chart published in CARIS",
                 NcneCommentType.CompleteWorkflow => "Workflow completed",
+                NcneCommentType.ThreePsChange => "3PS Details changed",
                 _ => throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null),
             };
 

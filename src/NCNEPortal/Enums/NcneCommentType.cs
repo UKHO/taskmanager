@@ -10,7 +10,7 @@
         V2Change,
         PublisherChange,
         CarisPublish,
-        CompleteWorkflow
-
+        CompleteWorkflow,
+        ThreePsChange
     }
 }
