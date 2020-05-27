@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
-using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -239,8 +238,6 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 // TODO: Move to workflow coordinator
-                //    await CopyPrimaryAssignTaskNoteToComments(processId);
-                //    await ProcessAdditionalTasks(processId);
                 //    await PersistPrimaryTask(processId, workflowInstance);
 
                 //    LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
@@ -376,49 +373,6 @@ namespace Portal.Pages.DbAssessment
             {
                 task.ProcessId = processId;
                 await _dbContext.DbAssessmentAssignTask.AddAsync(task);
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-
-        private async Task ProcessAdditionalTasks(int processId)
-        {
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-            var correlationId = primaryDocumentStatus.CorrelationId.Value;
-
-            foreach (var task in AdditionalAssignedTasks)
-            {
-                var docRetrievalEvent = new StartWorkflowInstanceEvent
-                {
-                    CorrelationId = correlationId,
-                    WorkflowType = WorkflowType.DbAssessment,
-                    ParentProcessId = processId,
-                    AssignedTaskId = task.DbAssessmentAssignTaskId
-                };
-
-                _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
-                    docRetrievalEvent.ToJSONSerializedString());
-                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-                _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
-                    docRetrievalEvent.ToJSONSerializedString());
-            }
-        }
-
-        private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
-        {
-            var primaryAssignTask = await _dbContext.DbAssessmentReviewData
-                .FirstOrDefaultAsync(r => r.ProcessId == processId);
-
-            if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
-            {
-                await _dbContext.Comment.AddAsync(new Comment()
-                {
-                    ProcessId = processId,
-                    WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,
-                    Text = $"Assign Task: {primaryAssignTask.Notes.Trim()}",
-                    Username = CurrentUser.DisplayName,
-                    Created = DateTime.Today
-                });
-
                 await _dbContext.SaveChangesAsync();
             }
         }
