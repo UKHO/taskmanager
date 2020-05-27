@@ -140,7 +140,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -291,7 +291,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -459,7 +459,7 @@ namespace Portal.Pages.DbAssessment
                 await PersistCompletedVerify(processId, workflowInstance);
 
                 _logger.LogInformation(
-                    "{CurrentUser.DisplayName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+                    "{UserFullName} successfully progressed {ActivityName} to Completed on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
 
                 await _commentsHelper.AddComment($"Verify step completed",
                     processId,
@@ -495,7 +495,7 @@ namespace Portal.Pages.DbAssessment
 
             if (success)
             {
-                _logger.LogInformation("{CurrentUser.DisplayName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
+                _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
 
                 await PersistRejectedVerify(processId, workflowInstance);
 
@@ -706,7 +706,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
                 throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
                     ex.InnerException);
             }

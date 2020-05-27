@@ -185,7 +185,7 @@ namespace Portal.Pages
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
             LogContext.PushProperty("AssignedUser", userName);
 
             ValidationErrorMessages.Clear();

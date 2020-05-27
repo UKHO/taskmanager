@@ -68,7 +68,7 @@ namespace Portal.Pages.DbAssessment
         {
             LogContext.PushProperty("ActivityName", "HistoricalTasks");
             LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
-            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Get initial Historical Tasks");
 
@@ -117,7 +117,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "HistoricalTasks");
             LogContext.PushProperty("PortalResource", nameof(OnPostAsync));
             LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
-            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
 
