@@ -143,17 +143,6 @@ namespace Portal.Pages.DbAssessment
 
             ProcessId = processId;
 
-            // TODO: Remove
-            //var workflowInstance = _dbContext.WorkflowInstance
-            //    .Include(wi => wi.AssessmentData)
-            //    .FirstOrDefault(wi => wi.ProcessId == processId);
-
-            //if (workflowInstance == null)
-            //{
-            //    _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
-            //    throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
-            //}
-
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
             if (isWorkflowReadOnly)
@@ -175,10 +164,6 @@ namespace Portal.Pages.DbAssessment
 
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
                 WorkflowStage.Terminated);
-
-            // TODO: Move to WorkflowCoordinator
-            //await UpdateK2WorkflowAsTerminated(workflowInstance);
-            //await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -420,21 +405,6 @@ namespace Portal.Pages.DbAssessment
             currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
-        }
-
-        private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
-        {
-            try
-            {
-                await _dataServiceApiClient.MarkAssessmentAsCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
-                    nameof(_dataServiceApiClient.MarkAssessmentAsCompleted),
-                    workflowInstance.AssessmentData.PrimarySdocId,
-                    comment);
-            }
         }
 
         private async Task UpdateOnHold(int processId, bool onHold)
