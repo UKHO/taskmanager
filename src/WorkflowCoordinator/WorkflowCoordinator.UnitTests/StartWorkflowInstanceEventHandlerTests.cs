@@ -106,7 +106,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(startWorkflowInstanceEvent, _handlerContext);
 
             //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(childProcessId, childSerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(childSerialNumber))
                 .MustHaveHappened();
 
             var persistChildWorkflowDataCommand =

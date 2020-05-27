@@ -457,7 +457,7 @@ namespace WorkflowCoordinator.UnitTests
                     WorkflowInstanceID = processId
                 });
 
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                 .Returns(true);
 
             var currentWorkflowInstance = new WorkflowInstance()
@@ -483,7 +483,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(progressWorkflowInstanceEvent, _handlerContext);
 
             //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
     .MustHaveHappened();
 
             Assert.AreEqual(1, _handlerContext.SentMessages.Length);
@@ -516,7 +516,7 @@ namespace WorkflowCoordinator.UnitTests
                     WorkflowInstanceID = processId
                 });
 
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                 .Returns(false);
 
             var currentWorkflowInstance = new WorkflowInstance()
@@ -542,7 +542,7 @@ namespace WorkflowCoordinator.UnitTests
             var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
             
             //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(processId, k2SerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                                     .MustHaveHappened();
 
             Assert.AreEqual(
@@ -583,7 +583,7 @@ namespace WorkflowCoordinator.UnitTests
             var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
 
             //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
 
             Assert.AreEqual(
                 $"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}",

@@ -50,7 +50,7 @@ namespace WorkflowCoordinator.IntegrationTests.EndToEndK2WorkflowTests
         }
         private async Task<string> ProgressAndValidate(int processId, string serialNumber, string fromTask, string toTask)
         {
-            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(processId, serialNumber);
+            var success = await _workflowServiceApiClient.ProgressWorkflowInstance(serialNumber);
             Assert.IsTrue(success, $"Task has not moved from {fromTask} to {toTask}.");
 
             var count = 0;

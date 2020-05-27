@@ -67,7 +67,7 @@ namespace WorkflowCoordinator.Handlers
             _logger.LogInformation("Successfully created K2 task with ProcessId: {ProcessId} and SerialNumber: {SerialNumber} as a Child workflow to ParentProcessId: {ParentProcessId}");
             
             // Progress this new instance onto Assess
-            await _workflowServiceApiClient.ProgressWorkflowInstance(processId, serialNumber);
+            await _workflowServiceApiClient.ProgressWorkflowInstance(serialNumber);
 
             var persistChildData = new PersistChildWorkflowDataCommand
             {
