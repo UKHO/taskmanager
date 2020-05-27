@@ -223,6 +223,8 @@ namespace Portal.Pages.DbAssessment
                     }
                     catch (Exception e)
                     {
+                        await MarkWorkflowInstanceAsStarted(processId);
+
                         _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
 
                         ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
@@ -242,6 +244,8 @@ namespace Portal.Pages.DbAssessment
                     }
                     catch (Exception e)
                     {
+                        await MarkWorkflowInstanceAsStarted(processId);
+
                         _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
 
                         ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
@@ -310,6 +314,17 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
             return workflowInstance;
+        }
+
+        private async Task MarkWorkflowInstanceAsStarted(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
