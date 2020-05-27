@@ -195,17 +195,6 @@ namespace NCNEPortal
             });
 
             app.UseAzureAppConfiguration();
-
-            // Seeding
-
-            //if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
-            //    SeedWorkflowDatabase(ncneWorkflowDbContext);
-        }
-
-        private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
-        {
-            NcneTestWorkflowDatabaseSeeder.UsingDbContext(ncneWorkflowDbContext).PopulateTables().SaveChanges();
-            Log.Logger.Information($"NCNEWorkflowDatabase successfully re-seeded.");
         }
     }
 }
