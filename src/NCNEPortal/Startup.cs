@@ -102,7 +102,12 @@ namespace NCNEPortal
             services.AddScoped<IWorkflowStageHelper, WorkflowStageHelper>();
             services.AddScoped<INcneUserDbService, NcneUserDbService>();
 
+
+            // Order of these two is important
+            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
+                services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
+
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
@@ -193,8 +198,8 @@ namespace NCNEPortal
 
             // Seeding
 
-            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
-                SeedWorkflowDatabase(ncneWorkflowDbContext);
+            //if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
+            //    SeedWorkflowDatabase(ncneWorkflowDbContext);
         }
 
         private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
