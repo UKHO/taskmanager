@@ -125,7 +125,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostReviewTerminateAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -155,15 +155,23 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
+            try
+            {
+                await MarkTaskAsTerminated(processId,comment);
+            }
+            catch (Exception e)
+            {
+                await MarkWorkflowInstanceAsStarted(processId);
 
-            await _commentsHelper.AddComment($"Terminate comment: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                _logger.LogError("Unable to terminate task {ProcessId}.", e);
 
-            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
-                WorkflowStage.Terminated);
+                ValidationErrorMessages.Add($"Unable to terminate task. Please retry later: {e.Message}");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
+                };
+            }
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -174,7 +182,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -196,7 +204,7 @@ namespace Portal.Pages.DbAssessment
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -211,41 +219,37 @@ namespace Portal.Pages.DbAssessment
 
             if (action == "Done")
             {
-                var workflowInstance = await _dbContext.WorkflowInstance
-                                                                .Include(w => w.PrimaryDocumentStatus)
-                                                                .FirstAsync(w => w.ProcessId == processId);
-                workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
-                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Review", "Assess");
-
-                if (success)
+                try
                 {
-                    await CopyPrimaryAssignTaskNoteToComments(processId);
-                    await ProcessAdditionalTasks(processId);
-                    await PersistPrimaryTask(processId, workflowInstance);
-
-                    LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
-                    _logger.LogInformation("{CurrentUser.DisplayName} successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
-
-                    await _commentsHelper.AddComment($"Review step completed",
-                        processId,
-                        workflowInstance.WorkflowInstanceId,
-                        CurrentUser.DisplayName);
+                    await MarkTaskAsComplete(processId);
                 }
-                else
+                catch (Exception e)
                 {
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
-                    await _dbContext.SaveChangesAsync();
+                    await MarkWorkflowInstanceAsStarted(processId);
 
-                    _logger.LogInformation("Unable to progress task {ProcessId} from Review to Assess.");
+                    _logger.LogError("Unable to progress task {ProcessId} from Review to Assess.", e);
 
-                    ValidationErrorMessages.Add("Unable to progress task from Review to Assess. Please retry later.");
+                    ValidationErrorMessages.Add($"Unable to progress task from Review to Assess. Please retry later: {e.Message}");
 
                     return new JsonResult(this.ValidationErrorMessages)
                     {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
+                        StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
                     };
                 }
+
+                // TODO: Move to workflow coordinator
+                //    await CopyPrimaryAssignTaskNoteToComments(processId);
+                //    await ProcessAdditionalTasks(processId);
+                //    await PersistPrimaryTask(processId, workflowInstance);
+
+                //    LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+                //    _logger.LogInformation("{CurrentUser.DisplayName} successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
+
+                //    await _commentsHelper.AddComment($"Review step completed",
+                //        processId,
+                //        workflowInstance.WorkflowInstanceId,
+                //        CurrentUser.DisplayName);
             }
             else
             {
@@ -282,6 +286,42 @@ namespace Portal.Pages.DbAssessment
             return StatusCode((int)HttpStatusCode.OK);
         }
         
+        private async Task MarkTaskAsComplete(int processId)
+        {
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
+
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review, WorkflowStage.Assess);
+            
+            _logger.LogInformation(
+                "Task progression from {ActivityName} to Assess has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+
+            await _commentsHelper.AddComment("Task progression from Review to Assess has been triggered",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+        }
+        
+        private async Task MarkTaskAsTerminated(int processId, string comment)
+        {
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
+
+            await _commentsHelper.AddComment($"Terminate comment: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
+                WorkflowStage.Terminated);
+
+            _logger.LogInformation(
+                "Task termination from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+
+            await _commentsHelper.AddComment("Task termination has been triggered",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+        }
+
         private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
@@ -474,6 +514,17 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
 
             return workflowInstance;
+        }
+        
+        private async Task MarkWorkflowInstanceAsStarted(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task GetOnHoldData(int processId)
