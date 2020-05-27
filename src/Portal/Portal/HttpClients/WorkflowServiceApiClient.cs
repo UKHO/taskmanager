@@ -46,22 +46,6 @@ namespace Portal.HttpClients
 
         }
 
-        public async Task TerminateWorkflowInstance(string serialNumber)
-        {
-            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri,
-                $"{_uriConfig.Value.K2WebServiceGetTasksUri}{serialNumber}/{_uriConfig.Value.K2WebServiceTerminateWorkflowInstanceUri}");
-            var data = "";
-
-            using (var response = await _httpClient.PostAsync(fullUri, null))
-            {
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
-                                                   $"\n Message= '{data}'," +
-                                                   $"\n Url='{fullUri}'");
-            }
-
-        }
-
         public async Task<string> GetTaskCurrentStage(string serialNumber)
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri,

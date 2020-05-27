@@ -493,20 +493,6 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task UpdateK2WorkflowAsTerminated(WorkflowInstance workflowInstance)
-        {
-            try
-            {
-                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed updating {WorkflowServiceResource} with: SerialNumber: {SerialNumber};",
-                    nameof(_workflowServiceApiClient.TerminateWorkflowInstance),
-                    workflowInstance.SerialNumber);
-            }
-        }
-
         private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance
