@@ -74,7 +74,7 @@ namespace Portal.HostedServices
         private async Task UpdateDbFromAdAsync()
         {
             var adGroupMembers =
-                await _adDirectoryService.GetGroupMembersFromAdAsync(ExtractGiudsFromStr(_secrets.AdUserGroups));
+                await _adDirectoryService.GetGroupMembersFromAdAsync(ExtractGuidsFromStr(_secrets.AdUserGroups));
 
             using var scope = _serviceScopeFactory.CreateScope();
             var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
@@ -97,7 +97,7 @@ namespace Portal.HostedServices
             await workflowDbContext.SaveChangesAsync();
         }
 
-        private IEnumerable<Guid> ExtractGiudsFromStr(string adUserGroups)
+        private IEnumerable<Guid> ExtractGuidsFromStr(string adUserGroups)
         {
             var guidCollection = adUserGroups.Split(',')
                     .Where(x => Guid.TryParse(x, out _))
