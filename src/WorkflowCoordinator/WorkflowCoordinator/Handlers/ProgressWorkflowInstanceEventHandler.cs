@@ -92,6 +92,8 @@ namespace WorkflowCoordinator.Handlers
                         throw new ApplicationException($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.");
                     }
 
+                    _logger.LogInformation("Successfully completed the request to progress k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {message.FromActivity} to {message.ToActivity}");
+
                     break;
                 case WorkflowStage.Completed:
                     // TODO: Sign-off Verify. Add code for Verifying, progressing and persisting
@@ -173,9 +175,6 @@ namespace WorkflowCoordinator.Handlers
 
                         await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
                         await ProcessAdditionalTasks(message, context);
-                        // TODO:  PersistPrimaryTask(processId, workflowInstance);
-
-
                         await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
                     }
 
