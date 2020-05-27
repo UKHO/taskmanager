@@ -430,30 +430,25 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username, int stageTypeId)
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username,
+            int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
-            try
+
+            var roles = _dbContext.TaskRole.Single(r => r.ProcessId == processId);
+
+            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName,
+                (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
             {
-
-                var roles = _dbContext.TaskRole.Single(r => r.ProcessId == processId);
-
-                if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName, (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
+                return new JsonResult(this.ValidationErrorMessages)
                 {
-                    return new JsonResult(this.ValidationErrorMessages)
-                    {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
-                    };
-                }
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
 
-                return new JsonResult(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return new JsonResult(HttpStatusCode.OK);
+
         }
 
         public async Task<IActionResult> OnPostValidateReworkAsync(int processId, int stageId, string username, int stageTypeId)
