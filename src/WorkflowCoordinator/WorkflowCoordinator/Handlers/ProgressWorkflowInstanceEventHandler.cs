@@ -141,7 +141,9 @@ namespace WorkflowCoordinator.Handlers
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
             WorkflowInstance workflowInstance = null;
-            
+            CompleteAssessmentCommand completeAssessment = null;
+
+
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
@@ -150,14 +152,14 @@ namespace WorkflowCoordinator.Handlers
 
                     await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Review, WorkflowStatus.Terminated);
 
-                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed
-                    //var completeAssessment = new CompleteAssessmentCommand
-                    //{
-                    //    CorrelationId = message.CorrelationId,
-                    //    ProcessId = message.ProcessId
-                    //};
+                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed but not Assessed
+                    completeAssessment = new CompleteAssessmentCommand
+                    {
+                        CorrelationId = message.CorrelationId,
+                        ProcessId = message.ProcessId
+                    };
 
-                    //await context.SendLocal(completeAssessment).ConfigureAwait(false);
+                    await context.SendLocal(completeAssessment).ConfigureAwait(false);
 
                     _logger.LogInformation("Task with processId: {ProcessId} has been Terminated.");
                     
@@ -203,8 +205,8 @@ namespace WorkflowCoordinator.Handlers
 
                     await UpdateWorkflowInstanceData(message.ProcessId, string.Empty,WorkflowStage.Verify, WorkflowStatus.Completed);
 
-                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed
-                    var completeAssessment = new CompleteAssessmentCommand
+                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as Assessed and Completed
+                    completeAssessment = new CompleteAssessmentCommand
                     {
                         CorrelationId = message.CorrelationId,
                         ProcessId = message.ProcessId

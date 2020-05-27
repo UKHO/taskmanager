@@ -42,6 +42,7 @@ namespace WorkflowCoordinator.Handlers
             var workflowInstance = await _dbContext.WorkflowInstance
                 .Include(wi => wi.DbAssessmentVerifyData)
                 .Include(wi => wi.PrimaryDocumentStatus)
+                .Include(w => w.Comments)
                 .FirstOrDefaultAsync(wi => wi.ProcessId == message.ProcessId);
 
             if (workflowInstance == null)
@@ -52,11 +53,15 @@ namespace WorkflowCoordinator.Handlers
             }
 
             var sdocId = workflowInstance.PrimaryDocumentStatus.SdocId;
+
             var action =
                 workflowInstance.DbAssessmentVerifyData.TaskType.Equals("Simple",
                     StringComparison.InvariantCultureIgnoreCase)
                     ? "Imm Act - NM"
                     : "Longer-term Action";
+
+            var terminateComment = workflowInstance.Comments.FirstOrDefault(c => c.Text.Contains("Terminate"));
+            var comment = (terminateComment == null || string.IsNullOrWhiteSpace(terminateComment.Text)) ? "Marked Completed via TM2" : terminateComment.Text;
 
             LogContext.PushProperty("SdocId", sdocId);
 
@@ -69,18 +74,18 @@ namespace WorkflowCoordinator.Handlers
             }
 
             // Mark SDRA Assessment as Assessed first, then mark as completed
-            if (workflowInstance.PrimaryDocumentStatus.Status != SourceDocumentRetrievalStatus.Assessed.ToString() )
+            if (workflowInstance.Status != WorkflowStatus.Terminated.ToString() && workflowInstance.PrimaryDocumentStatus.Status != SourceDocumentRetrievalStatus.Assessed.ToString())
             {
                 await UpdateSdraAssessmentAsAssessed(sdocId, message.ProcessId, action);
             }
 
-            await UpdateSdraAssessmentAsCompleted(sdocId);
+            await UpdateSdraAssessmentAsCompleted(sdocId, comment);
         }
 
         private async Task UpdateSdraAssessmentAsAssessed(int sdocId, int processId, string action)
         {
             _logger.LogInformation("Marking PrimarySdocIds {SdocId} as Assessed, triggered by ProcessId {ProcessId}");
-            
+
             try
             {
                 await _dataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, "tbc");
@@ -104,13 +109,13 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
-        private async Task UpdateSdraAssessmentAsCompleted(int sdocId)
+        private async Task UpdateSdraAssessmentAsCompleted(int sdocId, string comment)
         {
             _logger.LogInformation("Marking PrimarySdocIds {SdocId} as Completed, triggered by ProcessId {ProcessId}");
 
             try
             {
-                await _dataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Assessed and Completed by TM2");
+                await _dataServiceApiClient.MarkAssessmentAsCompleted(sdocId, comment);
 
                 // Update all occurrences of this sdocId in PrimaryDocumentStatus with status SourceDocumentRetrievalStatus.Completed
                 var primaryDocuments = await _dbContext.PrimaryDocumentStatus.Where(p => p.SdocId == sdocId).ToListAsync();
