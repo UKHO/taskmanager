@@ -39,6 +39,8 @@
 
     populateTasks();
 
+    handleSelectTeam();
+
     function setMenuItems() {
         var menuItemPriosToHistoricalTaskView = sessionStorage.getItem('historicalMenuItem');
 
