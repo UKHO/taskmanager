@@ -9,12 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Portal.Configuration;
+using NCNEPortal.Configuration;
+using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
-using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
-namespace Portal.HostedServices
+
+namespace NCNEPortal.HostedServices
 {
     public class AdUserUpdateService : BackgroundService
     {
@@ -77,7 +78,7 @@ namespace Portal.HostedServices
                 await _adDirectoryService.GetGroupMembersFromAdAsync(ExtractGuidsFromStr(_secrets.AdUserGroups));
 
             using var scope = _serviceScopeFactory.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            var workflowDbContext = scope.ServiceProvider.GetRequiredService<NcneWorkflowDbContext>();
 
             var currentAdUsers = await workflowDbContext.AdUser.ToListAsync();
 
