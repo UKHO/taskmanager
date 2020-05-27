@@ -30,7 +30,6 @@ namespace WorkflowCoordinator.Handlers
             _dbContext = dbContext;
         }
 
-        // TODO: Duplicate PersistWorkflowInstanceDataEvent to a command fired by new event ProgressWorkflowInstanceEvent
         // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
 
         public async Task Handle(ProgressWorkflowInstanceEvent message, IMessageHandlerContext context)
@@ -49,20 +48,17 @@ namespace WorkflowCoordinator.Handlers
 
             ValidateK2TaskPriorToProgressing(message, k2Task);
 
+            LogContext.PushProperty("SerialNumber", k2Task.SerialNumber);
+
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
 
-                    if (k2Task.ActivityName != message.FromActivity.ToString())
-                    {
+                    _logger.LogInformation("Starting terminating k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber}");
+                    await UpdateK2WorkflowAsTerminated(k2Task.SerialNumber);
+                    _logger.LogInformation("Successfully completed the request to terminate k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber}");
 
-                    }
-                    // TODO: Terminating Review. Add code for Verifying, progressing and persisting
-                    // TODO: UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
-
-                    throw new NotImplementedException("Terminating Review has not been implemented");
-
-                //break;
+                    break;
                 case WorkflowStage.Assess:
                     // TODO: Progressing task from Review to Assess. Add code for Verifying, progressing and persisting
                     // TODO: Rejecting task from Verify to Assess. Add code for Verifying, progressing and persisting
@@ -80,7 +76,7 @@ namespace WorkflowCoordinator.Handlers
                     if (k2Task.ActivityName == WorkflowStage.Assess.ToString())
                     {
                         // progress
-                        var success = await _workflowServiceApiClient.ProgressWorkflowInstance(message.ProcessId, k2Task.SerialNumber);
+                        var success = await _workflowServiceApiClient.ProgressWorkflowInstance(k2Task.SerialNumber);
 
                         if (!success)
                         {
@@ -96,15 +92,15 @@ namespace WorkflowCoordinator.Handlers
                     }
 
                     // fire persist command
-                    var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
-                    {
-                        CorrelationId = message.CorrelationId,
-                        ProcessId = message.ProcessId,
-                        FromActivity = message.FromActivity,
-                        ToActivity = message.ToActivity
-                    };
+                    //var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
+                    //{
+                    //    CorrelationId = message.CorrelationId,
+                    //    ProcessId = message.ProcessId,
+                    //    FromActivity = message.FromActivity,
+                    //    ToActivity = message.ToActivity
+                    //};
 
-                    await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
+                    //await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
 
                     break;
                 case WorkflowStage.Completed:
@@ -115,7 +111,17 @@ namespace WorkflowCoordinator.Handlers
                 default:
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
             }
+            
+            // fire persist command
+            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
+            {
+                CorrelationId = message.CorrelationId,
+                ProcessId = message.ProcessId,
+                FromActivity = message.FromActivity,
+                ToActivity = message.ToActivity
+            };
 
+            await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
             _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
         }
 
@@ -139,11 +145,23 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
-                    // TODO: Terminating Review. Add code for persisting
-                    //workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, "", WorkflowStage.Review, WorkflowStatus.Terminated);
 
-                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
-                    //break;
+                    ValidateK2TaskForTerminationOrSignOff(message, k2Task);
+
+                    await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Review, WorkflowStatus.Terminated);
+
+                    // Fire CompleteAssessmentCommand to mark SDRA Assessment as completed
+                    //var completeAssessment = new CompleteAssessmentCommand
+                    //{
+                    //    CorrelationId = message.CorrelationId,
+                    //    ProcessId = message.ProcessId
+                    //};
+
+                    //await context.SendLocal(completeAssessment).ConfigureAwait(false);
+
+                    _logger.LogInformation("Task with processId: {ProcessId} has been Terminated.");
+                    
+                    break;
                 case WorkflowStage.Assess:
 
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
@@ -181,7 +199,7 @@ namespace WorkflowCoordinator.Handlers
                 case WorkflowStage.Completed:
                     // Verify Signed off
 
-                    ValidateK2TaskForSignOff(message, k2Task);
+                    ValidateK2TaskForTerminationOrSignOff(message, k2Task);
 
                     await UpdateWorkflowInstanceData(message.ProcessId, string.Empty,WorkflowStage.Verify, WorkflowStatus.Completed);
 
@@ -254,12 +272,27 @@ namespace WorkflowCoordinator.Handlers
                         $" while progressing task to {message.ToActivity}");
             }
         }
+        private async Task UpdateK2WorkflowAsTerminated(string k2SerialNumber)
+        {
+            try
+            {
+                await _workflowServiceApiClient.TerminateWorkflowInstance(k2SerialNumber);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed Terminating K2 task with ProcessId {ProcessId} and SerialNumber: {SerialNumber}");
 
-        private void ValidateK2TaskForSignOff(PersistWorkflowInstanceDataCommand message, K2TaskData k2Task)
+                throw new ApplicationException(
+                    $"Failed Terminating K2 task with SerialNumber: ${k2SerialNumber}{Environment.NewLine}{e.Message}");
+            }
+        }
+
+
+        private void ValidateK2TaskForTerminationOrSignOff(PersistWorkflowInstanceDataCommand message, K2TaskData k2Task)
         {
             if (k2Task != null)
             {
-                // if task is at Completed, then we expect k2Task to be null
+                // if task is at Terminated or Completed, then we expect k2Task to be null
                 _logger.LogError("K2 Task is not at expected stage {ToActivity} for ProcessId {ProcessId}; but was at " +
                                  k2Task.ActivityName);
                 throw new ApplicationException(
