@@ -291,11 +291,12 @@ namespace NCNEPortal
 
             Header = $"{taskInfo.WorkflowType}{(String.IsNullOrEmpty(taskInfo.ChartNumber) ? "" : $" - {taskInfo.ChartNumber}")}";
 
-            var inProgress = TaskStages.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
-                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
-            Header += inProgress != null
-                ? " - " + inProgress.TaskStageType.Name
-                : " - Awaiting Completion";
+            var inProgress = TaskStages.FindAll(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
+                                                     && t.TaskStageTypeId != (int)NcneTaskStageType.Forms)
+                .OrderBy(t => t.TaskStageTypeId);
+
+
+            Header += " - " + (inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion");
 
 
             //Enable complete if Forms and Publication stages are completed.
@@ -429,11 +430,16 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username, int stageTypeId)
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username,
+            int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName, (NcneTaskStageType)stageTypeId, ValidationErrorMessages)))
+
+            var roles = _dbContext.TaskRole.Single(r => r.ProcessId == processId);
+
+            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName,
+                (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -442,6 +448,7 @@ namespace NCNEPortal
             }
 
             return new JsonResult(HttpStatusCode.OK);
+
         }
 
         public async Task<IActionResult> OnPostValidateReworkAsync(int processId, int stageId, string username, int stageTypeId)
@@ -518,6 +525,14 @@ namespace NCNEPortal
             taskStages.First(t => t.TaskStageTypeId == (int)nextStage).Status =
                 NcneTaskStageStatus.InProgress.ToString();
 
+            var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStage)?
+                .AssignedUser;
+
+            var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+
+            taskInfo.AssignedUser = nextStageUser;
+            taskInfo.AssignedDate = DateTime.Now;
+
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
 
             await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, CurrentUser.DisplayName, stageName, null, null);
@@ -555,6 +570,14 @@ namespace NCNEPortal
                     taskStages.First(t => t.TaskStageTypeId == (int)stage).Status =
                         NcneTaskStageStatus.InProgress.ToString();
                 }
+
+                var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStages[0])?
+                    .AssignedUser;
+
+                var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+
+                taskInfo.AssignedUser = nextStageUser;
+                taskInfo.AssignedDate = DateTime.Now;
             }
 
             var publishInProgress = taskStages.Count(t => t.TaskStageTypeId > (int)NcneTaskStageType.Publication
@@ -650,6 +673,8 @@ namespace NCNEPortal
 
             UpdateStatus(task);
 
+            UpdateTaskUser(task);
+
             var deadLines = UpdateDeadlineDates(task);
 
             await _dbContext.SaveChangesAsync();
@@ -734,6 +759,30 @@ namespace NCNEPortal
                     _ => this.Publisher
                 };
             }
+        }
+
+        private void UpdateTaskUser(TaskInfo task)
+        {
+            var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
+                                                                 && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
+            if (taskInProgress == null)
+                task.AssignedUser = task.TaskRole.Publisher;
+            else
+            {
+                task.AssignedUser = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
+                {
+                    NcneTaskStageType.With_SDRA => task.TaskRole.Compiler,
+                    NcneTaskStageType.With_Geodesy => task.TaskRole.Compiler,
+                    NcneTaskStageType.Specification => task.TaskRole.Compiler,
+                    NcneTaskStageType.Compile => task.TaskRole.Compiler,
+                    NcneTaskStageType.V1 => task.TaskRole.VerifierOne,
+                    NcneTaskStageType.V1_Rework => task.TaskRole.Compiler,
+                    NcneTaskStageType.V2 => task.TaskRole.VerifierTwo,
+                    NcneTaskStageType.V2_Rework => task.TaskRole.Compiler,
+                    _ => task.TaskRole.Publisher
+                };
+            }
+
         }
 
         private DeadlineId UpdateDeadlineDates(TaskInfo task)
