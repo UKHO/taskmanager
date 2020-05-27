@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
@@ -20,6 +18,7 @@ using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
 using NCNEPortal.Helpers;
+using NCNEPortal.HostedServices;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
@@ -62,8 +61,7 @@ namespace NCNEPortal
             services.AddOptions<UriConfig>()
                 .Bind(Configuration.GetSection("urls"));
             services.AddOptions<StartupSecretsConfig>()
-                .Bind(Configuration.GetSection("NcnePortalSection"))
-                .Bind(Configuration.GetSection("NcneActiveDirectory"));
+                .Bind(Configuration.GetSection("NcnePortalSection"));
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddHealthChecks();
@@ -74,10 +72,16 @@ namespace NCNEPortal
             Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("ncneportal").Bind(startupConfig);
 
+            services.AddOptions<AdUserUpdateServiceConfig>()
+                .Bind(Configuration.GetSection("ncneportal"));
+            services.AddOptions<AdUserUpdateServiceSecrets>()
+                .Bind(Configuration.GetSection("NcneActiveDirectory"));
+
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
 
-            services.AddScoped<IAdDirectoryService,
+            // TODO - refactor all GetService away
+            services.AddSingleton<IAdDirectoryService,
                 AdDirectoryService>(s => new AdDirectoryService(
                 s.GetService<IOptions<StartupSecretsConfig>>().Value.ClientAzureAdSecret,
                 s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
@@ -96,6 +100,9 @@ namespace NCNEPortal
             services.AddScoped<IPageValidationHelper, PageValidationHelper>();
             services.AddScoped<IStageTypeFactory, StageTypeFactory>();
             services.AddScoped<IWorkflowStageHelper, WorkflowStageHelper>();
+            services.AddScoped<INcneUserDbService, NcneUserDbService>();
+
+            services.AddHostedService<AdUserUpdateService>();
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>
@@ -136,8 +143,6 @@ namespace NCNEPortal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app,
             IWebHostEnvironment env,
-            IOptions<StartupSecretsConfig> secrets,
-            INcneUserDbService userDbService,
             NcneWorkflowDbContext ncneWorkflowDbContext)
         {
             app.UseSerilogRequestLogging(
@@ -190,32 +195,12 @@ namespace NCNEPortal
 
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 SeedWorkflowDatabase(ncneWorkflowDbContext);
-
-            UpdateDbUsersFromAd(secrets.Value, userDbService);
         }
 
         private static void SeedWorkflowDatabase(NcneWorkflowDbContext ncneWorkflowDbContext)
         {
             NcneTestWorkflowDatabaseSeeder.UsingDbContext(ncneWorkflowDbContext).PopulateTables().SaveChanges();
             Log.Logger.Information($"NCNEWorkflowDatabase successfully re-seeded.");
-        }
-
-        private static void UpdateDbUsersFromAd(StartupSecretsConfig secrets, INcneUserDbService userDbService)
-        {
-            var adGroupGuids = secrets.AdUserGroups.Split(',')
-               .Where(x => Guid.TryParse(x, out _))
-               .Select(Guid.Parse)
-               .ToList();
-
-            try
-            {
-                userDbService.UpdateDbFromAdAsync(adGroupGuids).Wait();
-                Log.Logger.Information($"Users successfully updated in database from AD.");
-            }
-            catch (Exception e)
-            {
-                Log.Logger.Error(e, "Startup error: Failed to update users from AD.");
-            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
 using Microsoft.EntityFrameworkCore;
@@ -18,39 +17,6 @@ namespace NCNEPortal.Auth
         {
             _ncneWorkflowDbContext = ncneWorkflowDbContext;
             _adDirectoryService = adDirectoryService;
-        }
-
-        /// <summary>
-        /// Update users in database from AD
-        /// </summary>
-        /// <remarks>Bust be awaited from an async function or run with .RunSynchronously()</remarks>
-        public async Task UpdateDbFromAdAsync(IEnumerable<Guid> adGroupGuids)
-        {
-
-            var adGroupMembers = _adDirectoryService.GetGroupMembersFromAdAsync(adGroupGuids).Result;
-            var currentAdUsers = _ncneWorkflowDbContext.AdUser.ToList();
-
-            var newAdUsers = adGroupMembers.Where(m =>
-                currentAdUsers.All(c => c.UserPrincipalName != m.UserPrincipalName)).Select(n => new AdUser
-                {
-                    DisplayName = n.DisplayName,
-                    UserPrincipalName = n.UserPrincipalName,
-
-                    // This will eventually hook into checks
-                    // For now, it just records the date user was first stored in our database
-                    LastCheckedDate = DateTime.UtcNow
-                });
-
-            _ncneWorkflowDbContext.AdUser.AddRange(newAdUsers);
-
-            try
-            {
-                await _ncneWorkflowDbContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException("Error saving AD users to database.", e);
-            }
         }
 
         /// <summary>
