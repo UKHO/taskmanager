@@ -8,6 +8,10 @@ body {
     font-weight: 300;
 }
 
+div.dataTables_scrollBody {
+    overflow: visible !important;
+}
+
 /* Start chevron for notes on landing page */
 table.dataTable td.details-control i:before {
     content: '\f078';
