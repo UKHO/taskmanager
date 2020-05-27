@@ -67,6 +67,7 @@ stages:
                   DatabaseName: '$(DatabaseNameDev)'
                   aadSqlUsername: '$(SQLUsernameDev)'
                   aadSqlPassword: '$(SQLPasswordDev)'
+                  AdditionalArguments: '/p:BlockOnPossibleDataLoss=$(BlockOnPossibleDataLoss)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployUAT
