@@ -66,10 +66,6 @@ namespace WorkflowCoordinator
                 destination: nsbConfig.SourceDocumentCoordinatorName);
 
             routing.RegisterPublisher(
-                assembly: typeof(StartWorkflowInstanceEvent).Assembly,
-                publisherEndpoint: nsbConfig.EventServiceName);
-
-            routing.RegisterPublisher(
                 assembly: typeof(PersistWorkflowInstanceDataEvent).Assembly,
                 publisherEndpoint: nsbConfig.EventServiceName);
 
@@ -116,21 +112,21 @@ namespace WorkflowCoordinator
 
             // Additional config for local development
 
-            if (nsbConfig.IsLocalDevelopment)
-            {
-                var recoverability = this.Recoverability();
-                recoverability.Immediate(
-                    immediate =>
-                    {
-                        immediate.NumberOfRetries(0);
-                    });
+            //if (nsbConfig.IsLocalDevelopment)
+            //{
+            //    var recoverability = this.Recoverability();
+            //    recoverability.Immediate(
+            //        immediate =>
+            //        {
+            //            immediate.NumberOfRetries(0);
+            //        });
 
-                recoverability.Delayed(
-                    delayed =>
-                    {
-                        delayed.NumberOfRetries(0);
-                    });
-            }
+            //    recoverability.Delayed(
+            //        delayed =>
+            //        {
+            //            delayed.NumberOfRetries(0);
+            //        });
+            //}
         }
     }
 }

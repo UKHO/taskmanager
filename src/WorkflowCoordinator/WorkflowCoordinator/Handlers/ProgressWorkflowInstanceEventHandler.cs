@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -169,8 +171,8 @@ namespace WorkflowCoordinator.Handlers
                     {
                         // Review to Assess
 
-                        // TODO:  CopyPrimaryAssignTaskNoteToComments(processId);
-                        // TODO:  CreateChildTasks(processId);
+                        await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
+                        await ProcessAdditionalTasks(message, context);
                         // TODO:  PersistPrimaryTask(processId, workflowInstance);
 
 
@@ -420,8 +422,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
             }
         }
-
-
+        
         private async Task PersistWorkflowDataToVerifyFromAssess(
             int processId,
             int workflowInstanceId)
@@ -464,5 +465,48 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
             }
         }
+        
+        private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
+        {
+            var primaryAssignTask = await _dbContext.DbAssessmentReviewData
+                .FirstOrDefaultAsync(r => r.ProcessId == processId);
+
+            if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
+            {
+                await _dbContext.Comment.AddAsync(new Comment()
+                {
+                    ProcessId = processId,
+                    WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,
+                    Text = $"Assign Task: {primaryAssignTask.Notes.Trim()}",
+                    Username = primaryAssignTask.Reviewer,
+                    Created = DateTime.Today
+                });
+
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task ProcessAdditionalTasks(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
+        {
+            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == message.ProcessId).ToListAsync();
+
+            foreach (var task in additionalAssignedTasks)
+            {
+                var docRetrievalEvent = new StartChildWorkflowInstanceCommand
+                {
+                    CorrelationId = message.CorrelationId,
+                    WorkflowType = WorkflowType.DbAssessment,
+                    ParentProcessId = message.ProcessId,
+                    AssignedTaskId = task.DbAssessmentAssignTaskId
+                };
+
+                _logger.LogInformation("Publishing StartChildWorkflowInstanceCommand: {StartChildWorkflowInstanceCommand};",
+                    docRetrievalEvent.ToJSONSerializedString());
+                await context.SendLocal(docRetrievalEvent).ConfigureAwait(false);
+                _logger.LogInformation("Published StartChildWorkflowInstanceCommand: {StartChildWorkflowInstanceCommand};",
+                    docRetrievalEvent.ToJSONSerializedString());
+            }
+        }
+
     }
 }
