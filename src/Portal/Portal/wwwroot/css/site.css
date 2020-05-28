@@ -8,10 +8,6 @@ body {
     font-weight: 300;
 }
 
-div.dataTables_scrollBody {
-    overflow: visible !important;
-}
-
 a {
     color: #0062DC;
 }
