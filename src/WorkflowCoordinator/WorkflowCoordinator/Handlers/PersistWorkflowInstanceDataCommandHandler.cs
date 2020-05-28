@@ -32,7 +32,7 @@ namespace WorkflowCoordinator.Handlers
         }
 
         // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
-        
+
         public async Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
@@ -54,6 +54,7 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
+                    // Review to Terminated
 
                     ValidateK2TaskForTerminationOrSignOff(message, k2Task);
 
@@ -71,27 +72,26 @@ namespace WorkflowCoordinator.Handlers
                     _logger.LogInformation("Task with processId: {ProcessId} has been Terminated.");
 
                     break;
-                case WorkflowStage.Assess:
+                case WorkflowStage.Rejected:
+                    // Verify to Assess
 
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
 
-                    var isRejected = message.FromActivity == WorkflowStage.Verify;
+                    await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
 
-                    if (isRejected)
-                    {
-                        // Verify to Assess
-                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
-                    }
-                    else
-                    {
-                        // Review to Assess
+                    break;
+                case WorkflowStage.Assess:
+                    // Review to Assess
 
-                        await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
-                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
-                        await ProcessAdditionalTasks(message, context);
-                    }
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
+
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
+                    
+                    await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
+                    await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
+                    await ProcessAdditionalTasks(message, context);
 
                     break;
                 case WorkflowStage.Verify:
@@ -118,8 +118,6 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     await context.SendLocal(completeAssessment).ConfigureAwait(false);
-
-                    _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
 
                     break;
                 default:
@@ -297,7 +295,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
             }
         }
-        
+
         private async Task PersistWorkflowDataToVerifyFromAssess(
             int processId,
             int workflowInstanceId)
@@ -339,7 +337,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
             }
         }
-        
+
         private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
         {
             LogContext.PushProperty("CopyPrimaryAssignTaskNoteToComments", nameof(CopyPrimaryAssignTaskNoteToComments));
@@ -370,8 +368,8 @@ namespace WorkflowCoordinator.Handlers
 
             _logger.LogInformation("Entering {ProcessAdditionalTasks} with processId: {ProcessId}.");
 
-            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at => 
-                                                            at.ProcessId == message.ProcessId 
+            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at =>
+                                                            at.ProcessId == message.ProcessId
                                                             && at.Status == AssignTaskStatus.New.ToString()).ToListAsync();
 
             foreach (var task in additionalAssignedTasks)
