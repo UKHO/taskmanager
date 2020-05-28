@@ -22,14 +22,7 @@
     <notes><![CDATA[
    file name: Microsoft.VisualStudio.Web.CodeGeneration.Core.dll
    ]]></notes>
-    <packageUrl regex="true">^pkg:generic/Microsoft\.VisualStudio\.Web\.CodeGeneration\.Core@.*$</packageUrl>
     <cve>CVE-2020-1171</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: Microsoft.VisualStudio.Web.CodeGeneration.Core.dll
-   ]]></notes>
-    <packageUrl regex="true">^pkg:generic/Microsoft\.VisualStudio\.Web\.CodeGeneration\.Core@.*$</packageUrl>
     <cve>CVE-2020-1192</cve>
   </suppress>
 </suppressions>
