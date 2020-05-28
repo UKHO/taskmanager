@@ -180,7 +180,8 @@
         "verifier": "Peter Bates",
         "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
-        "Notes": "Important note"
+        "Notes": "Important note",
+        "status":  "New" 
       }
     ],
     "PrimaryDocumentStatus": {
@@ -1127,7 +1128,8 @@
         "verifier": "Peter Bates",
         "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
-        "Notes": "Important note"
+        "Notes": "Important note",
+        "status": "New"
       }
     ],
     "PrimaryDocumentStatus": {

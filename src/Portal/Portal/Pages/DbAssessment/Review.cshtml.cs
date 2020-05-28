@@ -340,6 +340,7 @@ namespace Portal.Pages.DbAssessment
             foreach (var task in AdditionalAssignedTasks)
             {
                 task.ProcessId = processId;
+                task.Status = AssignTaskStatus.New.ToString();
                 await _dbContext.DbAssessmentAssignTask.AddAsync(task);
                 await _dbContext.SaveChangesAsync();
             }
