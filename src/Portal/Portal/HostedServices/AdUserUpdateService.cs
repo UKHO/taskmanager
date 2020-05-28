@@ -46,19 +46,16 @@ namespace Portal.HostedServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"{nameof(AdUserUpdateService)}: Starting.");
+            _logger.LogInformation($"{nameof(AdUserUpdateService)}: Starting with interval of {_updateIntervalSeconds} seconds.");
 
             stoppingToken.Register(() =>
                 _logger.LogInformation($"{nameof(AdUserUpdateService)}: Stopping (received cancellation token)."));
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"{nameof(AdUserUpdateService)}: Updating users in database from AD.");
-
                 try
                 {
                     await UpdateDbFromAdAsync();
-                    _logger.LogInformation($"{nameof(AdUserUpdateService)}: Users successfully updated in database from AD.");
                 }
                 catch (Exception e)
                 {
