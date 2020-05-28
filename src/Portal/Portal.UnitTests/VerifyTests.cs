@@ -636,8 +636,8 @@ namespace Portal.UnitTests
                                                             .MustHaveHappened();
 
             A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
-                                                                                nameof(PersistWorkflowInstanceDataEvent),
-                                                                                A<PersistWorkflowInstanceDataEvent>.Ignored))
+                                                                                nameof(ProgressWorkflowInstanceEvent),
+                                                                                A<ProgressWorkflowInstanceEvent>.Ignored))
                                                             .MustHaveHappened();
         }
 

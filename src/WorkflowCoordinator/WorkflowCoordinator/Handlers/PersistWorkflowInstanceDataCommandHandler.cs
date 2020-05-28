@@ -16,8 +16,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class PersistWorkflowInstanceDataCommandHandler : IHandleMessages<PersistWorkflowInstanceDataCommand>,
-                                                            IHandleMessages<PersistWorkflowInstanceDataEvent>
+    public class PersistWorkflowInstanceDataCommandHandler : IHandleMessages<PersistWorkflowInstanceDataCommand>
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly ILogger<PersistWorkflowInstanceDataCommandHandler> _logger;
@@ -125,34 +124,6 @@ namespace WorkflowCoordinator.Handlers
             }
 
             await _dbContext.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
-
-        }
-
-        public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
-        {
-            // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
-
-            LogContext.PushProperty("MessageId", context.MessageId);
-            LogContext.PushProperty("Message", message.ToJSONSerializedString());
-            LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
-            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
-            LogContext.PushProperty("ProcessId", message.ProcessId);
-            LogContext.PushProperty("FromActivity", message.FromActivity);
-            LogContext.PushProperty("ToActivity", message.ToActivity);
-
-            _logger.LogInformation("Entering {EventName} handler with: {Message}");
-
-            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
-            {
-                CorrelationId = message.CorrelationId,
-                ProcessId = message.ProcessId,
-                FromActivity = message.FromActivity,
-                ToActivity = message.ToActivity
-            };
-
-            await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
 
             _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
 
