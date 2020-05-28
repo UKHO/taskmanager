@@ -140,7 +140,7 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, "tbc")).MustHaveHappened();
-            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Assessed and Completed by TM2")).MustHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Marked Completed via TM2")).MustHaveHappened();
 
         }
 
@@ -197,7 +197,7 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Assessed and Completed by TM2")).MustHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Marked Completed via TM2")).MustHaveHappened();
 
         }
 

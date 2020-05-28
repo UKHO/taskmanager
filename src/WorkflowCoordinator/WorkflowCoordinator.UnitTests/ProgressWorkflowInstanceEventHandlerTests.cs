@@ -200,7 +200,8 @@ namespace WorkflowCoordinator.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
 
             Assert.AreEqual(
-                $"K2Task with ProcessId {message.ProcessId} is at K2 stage {k2Task.ActivityName} and not at {message.ToActivity}, while moving task from {message.FromActivity}",
+                $"Workflow instance with ProcessId {message.ProcessId} is not at the expected step {message.FromActivity} in K2 but was at {k2Task.ActivityName}," +
+                $" while progressing task to {message.ToActivity}",
                 ex.Message);
 
             Assert.AreEqual(0, _handlerContext.SentMessages.Length);
