@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -40,7 +41,7 @@ namespace Portal.Pages.DbAssessment
                 Reviewer = currentData.Reviewer ?? "",
                 Assessor = currentData.Assessor ?? "Unknown",
                 Verifier = currentData.Verifier ?? "",
-                Verifiers = new SelectList(users),
+                Verifiers = new SelectList(users.Select(u => u.DisplayName)),
                 Reviewers = new SelectList(users)
             };
         }
