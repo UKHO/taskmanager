@@ -9,6 +9,8 @@
 
     var userFullName = $("#userFullName > strong").text();
 
+    $.fn.dataTable.moment('DD/MM/YYYY');
+
     var unassignedTasksTable = setupUnassignedTasks();
 
     $('.dropdown-menu').parent().on('shown.bs.dropdown', function () {
