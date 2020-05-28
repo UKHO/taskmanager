@@ -95,7 +95,8 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneCommentType.V2Change, "Valid User3", "V2 role changed to ")]
         [TestCase(NcneCommentType.PublisherChange, "Valid User4", "Publisher role changed to ")]
         [TestCase(NcneCommentType.DateChange, "", "Task Information dates changed")]
-        public async Task Adding_System_Comments_for_Date_or_Role_change_adds_New_Comment(NcneCommentType changeType, string roleName, string commentText)
+        [TestCase(NcneCommentType.ThreePsChange, "", "3PS Details changed")]
+        public async Task Adding_System_Comments_for_Date_or_Role_or_3PS_change_adds_New_Comment(NcneCommentType changeType, string roleName, string commentText)
         {
             //create a random processId
             var processId = 300 + (int)changeType;
