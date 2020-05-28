@@ -125,8 +125,9 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError("Failed to get K2 Task serial number for ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get K2 Task serial number for ProcessId {message.ChildProcessId}");
             }
-            
+
             // ...and create for the new child
+            additionalAssignedTaskData.Status = AssignTaskStatus.Generated.ToString();
 
             var newWorkflowInstance = await PersistChildWorkflowInstance(message, parentWorkflowInstanceData, newSn);
 

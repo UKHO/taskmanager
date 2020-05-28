@@ -89,8 +89,8 @@ namespace WorkflowCoordinator.Handlers
                         // Review to Assess
 
                         await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
-                        await ProcessAdditionalTasks(message, context);
                         await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
+                        await ProcessAdditionalTasks(message, context);
                     }
 
                     break;
@@ -370,7 +370,9 @@ namespace WorkflowCoordinator.Handlers
 
             _logger.LogInformation("Entering {ProcessAdditionalTasks} with processId: {ProcessId}.");
 
-            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == message.ProcessId).ToListAsync();
+            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at => 
+                                                            at.ProcessId == message.ProcessId 
+                                                            && at.Status == AssignTaskStatus.New.ToString()).ToListAsync();
 
             foreach (var task in additionalAssignedTasks)
             {
@@ -387,6 +389,8 @@ namespace WorkflowCoordinator.Handlers
                 await context.SendLocal(docRetrievalEvent).ConfigureAwait(false);
                 _logger.LogInformation("Published StartChildWorkflowInstanceCommand: {StartChildWorkflowInstanceCommand};",
                     docRetrievalEvent.ToJSONSerializedString());
+                task.Status = AssignTaskStatus.Started.ToString();
+                await _dbContext.SaveChangesAsync();
             }
         }
 
