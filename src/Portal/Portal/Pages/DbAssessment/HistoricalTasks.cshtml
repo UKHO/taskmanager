@@ -132,7 +132,8 @@
                         <td>
                             <a asp-page="@(task.TaskStage.ToString())" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
-                        <td>
+                        @* Use custom sort due to 'N/A' not being sortable *@
+                        <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
                             @Html.DisplayFor(model => task.DmEndDate)
                         </td>
                         <td>
