@@ -355,18 +355,23 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            if (!await MarkTaskAsRejected(processId, workflowInstance))
+            try
             {
+                await MarkTaskAsRejected(processId, comment);
+            }
+            catch (Exception e)
+            {
+                await MarkWorkflowInstanceAsStarted(processId);
+
+                _logger.LogError("Unable to reject task {ProcessId}.", e);
+
+                ValidationErrorMessages.Add($"Unable to reject task. Please retry later: {e.Message}");
+
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
                 };
             }
-
-            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
 
             return StatusCode((int)HttpStatusCode.OK);
         }
@@ -484,35 +489,24 @@ namespace Portal.Pages.DbAssessment
             return true;
         }
 
-        private async Task<bool> MarkTaskAsRejected(int processId, WorkflowInstance workflowInstance)
+        private async Task MarkTaskAsRejected(int processId, string comment)
         {
-            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            await _dbContext.SaveChangesAsync();
+            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
+                                                    processId,
+                                                    workflowInstance.WorkflowInstanceId,
+                                                    CurrentUser.DisplayName);
 
-            var success = await _workflowServiceApiClient.RejectWorkflowInstance(workflowInstance.ProcessId,
-                workflowInstance.SerialNumber, "Verify", "Assess");
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Rejected);
+            
+            _logger.LogInformation(
+                "Task rejection from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            if (success)
-            {
-                _logger.LogInformation("{UserFullName} successfully rejected task with: ProcessId: {ProcessId}; Comment: {Comment};");
-
-                await PersistRejectedVerify(processId, workflowInstance);
-
-                _logger.LogInformation("Finished Reject with: ProcessId: {ProcessId}; Action: {Action};");
-
-                return true;
-
-            }
-
-            workflowInstance.Status = WorkflowStatus.Started.ToString();
-            await _dbContext.SaveChangesAsync();
-
-            _logger.LogInformation("Unable to reject task {ProcessId} from Verify to Assess.");
-
-            ValidationErrorMessages.Add("Unable to reject task from Assess to Verify. Please retry later.");
-
-            return false;
+            await _commentsHelper.AddComment("Task rejection has been triggered",
+                                                    processId,
+                                                    workflowInstance.WorkflowInstanceId,
+                                                    CurrentUser.DisplayName);
         }
 
         private async Task PersistCompletedVerify(int processId, WorkflowInstance workflowInstance)
@@ -535,24 +529,24 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
         }
 
-        private async Task PersistRejectedVerify(int processId, WorkflowInstance workflowInstance)
+        private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
             {
                 CorrelationId = correlationId ?? Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivity = WorkflowStage.Verify,
-                ToActivity = WorkflowStage.Assess
+                FromActivity = fromActivity,
+                ToActivity = toActivity
             };
 
-            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
-                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+            LogContext.PushProperty("ProgressWorkflowInstanceEvent",
+                progressWorkflowInstanceEvent.ToJSONSerializedString());
 
-            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
-            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
-            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(ProgressWorkflowInstanceEvent), progressWorkflowInstanceEvent);
+            _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
         }
 
         private async Task UpdateOnHold(int processId, bool onHold)
@@ -751,6 +745,30 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
 
             await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
+        }
+        
+        private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(wi => wi.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
+            workflowInstance.ActivityChangedAt = DateTime.Today;
+            await _dbContext.SaveChangesAsync();
+
+            return workflowInstance;
+        }
+        
+        private async Task MarkWorkflowInstanceAsStarted(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
