@@ -4,6 +4,6 @@
     {
         New,
         Started,
-        Completed
+        Generated
     }
 }
