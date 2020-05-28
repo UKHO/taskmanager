@@ -11,5 +11,6 @@ namespace WorkflowCoordinator.HttpClients
         Task TerminateWorkflowInstance(string serialNumber);
         Task<bool> ProgressWorkflowInstance(string k2SerialNumber);
         Task<K2TaskData> GetWorkflowInstanceData(int workflowInstanceId);
+        Task<bool> RejectWorkflowInstance(string serialNumber);
     }
 }
