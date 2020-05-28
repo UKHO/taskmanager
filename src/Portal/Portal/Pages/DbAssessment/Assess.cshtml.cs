@@ -141,7 +141,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -223,6 +223,8 @@ namespace Portal.Pages.DbAssessment
                     }
                     catch (Exception e)
                     {
+                        await MarkWorkflowInstanceAsStarted(processId);
+
                         _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
 
                         ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
@@ -242,6 +244,8 @@ namespace Portal.Pages.DbAssessment
                     }
                     catch (Exception e)
                     {
+                        await MarkWorkflowInstanceAsStarted(processId);
+
                         _logger.LogError("Unable to progress task {ProcessId} from Assess to Verify.", e);
 
                         ValidationErrorMessages.Add($"Unable to progress task from Assess to Verify. Please retry later: {e.Message}");
@@ -272,7 +276,7 @@ namespace Portal.Pages.DbAssessment
 
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Verify has been triggered by {CurrentUser.DisplayName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task progression from {ActivityName} to Verify has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
             await _commentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
                                                                         processId,
@@ -310,6 +314,17 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
             return workflowInstance;
+        }
+
+        private async Task MarkWorkflowInstanceAsStarted(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task<bool> SaveTaskData(int processId, int workflowInstanceId)
@@ -442,7 +457,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for { CurrentUser.DisplayName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
                 throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
                     ex.InnerException);
             }

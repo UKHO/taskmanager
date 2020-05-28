@@ -1,9 +1,10 @@
 ﻿using System;
+using Common.Messages;
 using Common.Messages.Enums;
 
-namespace Common.Messages.Events
+namespace WorkflowCoordinator.Messages
 {
-    public class StartWorkflowInstanceEvent : ICorrelate
+    public class StartChildWorkflowInstanceCommand : ICorrelate
     {
         public Guid CorrelationId { get; set; }
         public WorkflowType WorkflowType { get; set; }

@@ -127,7 +127,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
             LogContext.PushProperty("SelectedHpdUsages", (selectedHpdUsages != null && selectedHpdUsages.Count > 0 ? string.Join(',', selectedHpdUsages) : ""));
             LogContext.PushProperty("SelectedSources", (selectedSources != null && selectedSources.Count > 0 ? string.Join(',', selectedSources) : ""));
-            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; " +
                                    "ActivityName: {ActivityName}; " +
@@ -198,7 +198,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostCreateCarisProjectAsync));
             LogContext.PushProperty("ProjectName", projectName);
             LogContext.PushProperty("CarisWorkspace", carisWorkspace);
-            LogContext.PushProperty(" CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; ActivityName: {ActivityName};");
 
@@ -340,7 +340,7 @@ namespace Portal.Pages.DbAssessment
             if (!userAssignedToTask.Equals(currentLoggedInUser, StringComparison.InvariantCultureIgnoreCase))
             {
                 LogContext.PushProperty("UserAssignedToTask", userAssignedToTask);
-                _logger.LogError("{ CurrentUser.DisplayName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
+                _logger.LogError("{UserFullName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
                 throw new InvalidOperationException($"{userAssignedToTask} is assigned to this task. Please assign the task to yourself and click Save");
             }
 
@@ -402,7 +402,7 @@ namespace Portal.Pages.DbAssessment
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for { CurrentUser.DisplayName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
                 throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
                     ex.InnerException);
             }

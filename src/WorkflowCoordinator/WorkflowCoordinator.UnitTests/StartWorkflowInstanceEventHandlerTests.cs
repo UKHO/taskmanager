@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
 using Common.Messages.Enums;
-using Common.Messages.Events;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,6 +10,7 @@ using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -19,9 +19,9 @@ namespace WorkflowCoordinator.UnitTests
     public class StartWorkflowInstanceEventHandlerTests
     {
 
-        private StartWorkflowInstanceEventHandler _handler;
+        private StartChildWorkflowInstanceCommandHandler _handler;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
-        private ILogger<StartWorkflowInstanceEventHandler> _fakeLogger;
+        private ILogger<StartChildWorkflowInstanceCommandHandler> _fakeLogger;
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
 
@@ -37,9 +37,9 @@ namespace WorkflowCoordinator.UnitTests
             _handlerContext = new TestableMessageHandlerContext();
 
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
-            _fakeLogger = A.Dummy<ILogger<StartWorkflowInstanceEventHandler>>();
+            _fakeLogger = A.Dummy<ILogger<StartChildWorkflowInstanceCommandHandler>>();
 
-            _handler = new StartWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient, _dbContext, _fakeLogger);
+            _handler = new StartChildWorkflowInstanceCommandHandler(_fakeWorkflowServiceApiClient, _dbContext, _fakeLogger);
         }
 
         [TearDown]
@@ -56,7 +56,7 @@ namespace WorkflowCoordinator.UnitTests
             var childProcessId = 456;
             var dbAssessmentWorkflowId = 8;
 
-            var startWorkflowInstanceEvent = new StartWorkflowInstanceEvent()
+            var startWorkflowInstanceEvent = new StartChildWorkflowInstanceCommand()
             {
                 CorrelationId = Guid.Empty,
                 ParentProcessId = parentProcessId,
@@ -87,7 +87,7 @@ namespace WorkflowCoordinator.UnitTests
             var dbAssessmentWorkflowId = 8;
             var childSerialNumber = "456_14";
 
-            var startWorkflowInstanceEvent = new StartWorkflowInstanceEvent()
+            var startWorkflowInstanceEvent = new StartChildWorkflowInstanceCommand()
             {
                 CorrelationId = Guid.Empty,
                 ParentProcessId = parentProcessId,
@@ -106,7 +106,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(startWorkflowInstanceEvent, _handlerContext);
 
             //Then
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(childProcessId, childSerialNumber))
+            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(childSerialNumber))
                 .MustHaveHappened();
 
             var persistChildWorkflowDataCommand =

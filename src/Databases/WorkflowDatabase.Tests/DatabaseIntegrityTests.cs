@@ -657,7 +657,8 @@ namespace WorkflowDatabase.Tests
                 TaskType = "Type 1",
                 Notes = "A note",
                 Verifier = "Ross",
-                WorkspaceAffected = "Workspace 1"
+                WorkspaceAffected = "Workspace 1",
+                Status = AssignTaskStatus.New.ToString()
             });
 
             var ex = Assert.Throws<DbUpdateException>(() => _dbContext.SaveChanges());

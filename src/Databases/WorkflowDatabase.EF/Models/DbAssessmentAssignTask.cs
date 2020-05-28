@@ -16,5 +16,6 @@ namespace WorkflowDatabase.EF.Models
         public string WorkspaceAffected { get; set; }
         [DisplayName("Notes:")]
         public string Notes { get; set; }
+        public string Status { get; set; }
     }
 }

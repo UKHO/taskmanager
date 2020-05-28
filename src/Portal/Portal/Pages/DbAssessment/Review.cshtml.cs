@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
-using Common.Messages.Enums;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -125,7 +124,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostReviewTerminateAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -141,15 +140,7 @@ namespace Portal.Pages.DbAssessment
                 throw new ArgumentException($"{nameof(processId)} is less than 1");
             }
 
-            var workflowInstance = _dbContext.WorkflowInstance
-                .Include(wi => wi.AssessmentData)
-                .FirstOrDefault(wi => wi.ProcessId == processId);
-
-            if (workflowInstance == null)
-            {
-                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
-                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
-            }
+            ProcessId = processId;
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -163,15 +154,24 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            UpdateWorkflowInstanceAsTerminated(workflowInstance);
-            await _commentsHelper.AddComment($"Terminate comment: {comment}",
-                processId,
-                workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
-            await UpdateK2WorkflowAsTerminated(workflowInstance);
-            await UpdateSdraAssessmentAsCompleted(comment, workflowInstance);
+            try
+            {
+                await MarkTaskAsTerminated(processId,comment);
+            }
+            catch (Exception e)
+            {
+                await MarkWorkflowInstanceAsStarted(processId);
 
-            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+                _logger.LogError("Unable to terminate task {ProcessId}.", e);
+
+                ValidationErrorMessages.Add($"Unable to terminate task. Please retry later: {e.Message}");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
+                };
+            }
+
             return StatusCode((int)HttpStatusCode.OK);
         }
 
@@ -181,7 +181,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -203,7 +203,7 @@ namespace Portal.Pages.DbAssessment
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)HttpStatusCode.BadRequest
+                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
                 };
             }
 
@@ -218,39 +218,22 @@ namespace Portal.Pages.DbAssessment
 
             if (action == "Done")
             {
-                var workflowInstance = await _dbContext.WorkflowInstance
-                                                                .Include(w => w.PrimaryDocumentStatus)
-                                                                .FirstAsync(w => w.ProcessId == processId);
-                workflowInstance.Status = WorkflowStatus.Updating.ToString();
 
-                var success = await _workflowServiceApiClient.ProgressWorkflowInstance(workflowInstance.ProcessId, workflowInstance.SerialNumber, "Review", "Assess");
-
-                if (success)
+                try
                 {
-                    await CopyPrimaryAssignTaskNoteToComments(processId);
-                    await ProcessAdditionalTasks(processId);
-                    await PersistPrimaryTask(processId, workflowInstance);
-
-                    LogContext.PushProperty("CurrentUser.DisplayName", CurrentUser.DisplayName);
-                    _logger.LogInformation("{CurrentUser.DisplayName} successfully progressed {ActivityName} to Assess on 'Done' button with: ProcessId: {ProcessId}; Action: {Action};");
-
-                    await _commentsHelper.AddComment($"Review step completed",
-                        processId,
-                        workflowInstance.WorkflowInstanceId,
-                        CurrentUser.DisplayName);
+                    await MarkTaskAsComplete(processId);
                 }
-                else
+                catch (Exception e)
                 {
-                    workflowInstance.Status = WorkflowStatus.Started.ToString();
-                    await _dbContext.SaveChangesAsync();
+                    await MarkWorkflowInstanceAsStarted(processId);
 
-                    _logger.LogInformation("Unable to progress task {ProcessId} from Review to Assess.");
+                    _logger.LogError("Unable to progress task {ProcessId} from Review to Assess.", e);
 
-                    ValidationErrorMessages.Add("Unable to progress task from Review to Assess. Please retry later.");
+                    ValidationErrorMessages.Add($"Unable to progress task from Review to Assess. Please retry later: {e.Message}");
 
                     return new JsonResult(this.ValidationErrorMessages)
                     {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
+                        StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
                     };
                 }
             }
@@ -288,28 +271,62 @@ namespace Portal.Pages.DbAssessment
 
             return StatusCode((int)HttpStatusCode.OK);
         }
+        
+        private async Task MarkTaskAsComplete(int processId)
+        {
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review, WorkflowStage.Assess);
+            
+            _logger.LogInformation(
+                "Task progression from {ActivityName} to Assess has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-        private async Task PersistPrimaryTask(int processId, WorkflowInstance workflowInstance)
+            await _commentsHelper.AddComment("Task progression from Review to Assess has been triggered",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+        }
+        
+        private async Task MarkTaskAsTerminated(int processId, string comment)
+        {
+            var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
+
+            await _commentsHelper.AddComment($"Terminate comment: {comment}",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
+                WorkflowStage.Terminated);
+
+            _logger.LogInformation(
+                "Task termination from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+
+            await _commentsHelper.AddComment("Task termination has been triggered",
+                processId,
+                workflowInstance.WorkflowInstanceId,
+                CurrentUser.DisplayName);
+        }
+
+        private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
         {
             var correlationId = workflowInstance.PrimaryDocumentStatus.CorrelationId;
 
-            var persistWorkflowInstanceDataEvent = new PersistWorkflowInstanceDataEvent()
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
             {
                 CorrelationId = correlationId.HasValue ? correlationId.Value : Guid.NewGuid(),
                 ProcessId = processId,
-                FromActivity = WorkflowStage.Review,
-                ToActivity = WorkflowStage.Assess
+                FromActivity = fromActivity,
+                ToActivity = toActivity
             };
 
-            LogContext.PushProperty("PersistWorkflowInstanceDataEvent",
-                persistWorkflowInstanceDataEvent.ToJSONSerializedString());
+            LogContext.PushProperty("ProgressWorkflowInstanceEvent",
+                progressWorkflowInstanceEvent.ToJSONSerializedString());
 
-            _logger.LogInformation("Publishing PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
-            await _eventServiceApiClient.PostEvent(nameof(PersistWorkflowInstanceDataEvent), persistWorkflowInstanceDataEvent);
-            _logger.LogInformation("Published PersistWorkflowInstanceDataEvent: {PersistWorkflowInstanceDataEvent};");
+            _logger.LogInformation("Publishing ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
+            await _eventServiceApiClient.PostEvent(nameof(ProgressWorkflowInstanceEvent), progressWorkflowInstanceEvent);
+            _logger.LogInformation("Published ProgressWorkflowInstanceEvent: {ProgressWorkflowInstanceEvent};");
         }
-
 
         private async Task SaveAdditionalTasks(int processId)
         {
@@ -323,50 +340,8 @@ namespace Portal.Pages.DbAssessment
             foreach (var task in AdditionalAssignedTasks)
             {
                 task.ProcessId = processId;
+                task.Status = AssignTaskStatus.New.ToString();
                 await _dbContext.DbAssessmentAssignTask.AddAsync(task);
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-
-        private async Task ProcessAdditionalTasks(int processId)
-        {
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(d => d.ProcessId == processId);
-            var correlationId = primaryDocumentStatus.CorrelationId.Value;
-
-            foreach (var task in AdditionalAssignedTasks)
-            {
-                var docRetrievalEvent = new StartWorkflowInstanceEvent
-                {
-                    CorrelationId = correlationId,
-                    WorkflowType = WorkflowType.DbAssessment,
-                    ParentProcessId = processId,
-                    AssignedTaskId = task.DbAssessmentAssignTaskId
-                };
-
-                _logger.LogInformation("Publishing StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
-                    docRetrievalEvent.ToJSONSerializedString());
-                await _eventServiceApiClient.PostEvent(nameof(StartWorkflowInstanceEvent), docRetrievalEvent);
-                _logger.LogInformation("Published StartWorkflowInstanceEvent: {StartWorkflowInstanceEvent};",
-                    docRetrievalEvent.ToJSONSerializedString());
-            }
-        }
-
-        private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
-        {
-            var primaryAssignTask = await _dbContext.DbAssessmentReviewData
-                .FirstOrDefaultAsync(r => r.ProcessId == processId);
-
-            if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
-            {
-                await _dbContext.Comment.AddAsync(new Comment()
-                {
-                    ProcessId = processId,
-                    WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,
-                    Text = $"Assign Task: {primaryAssignTask.Notes.Trim()}",
-                    Username = CurrentUser.DisplayName,
-                    Created = DateTime.Today
-                });
-
                 await _dbContext.SaveChangesAsync();
             }
         }
@@ -393,21 +368,6 @@ namespace Portal.Pages.DbAssessment
             currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
-        }
-
-        private async Task UpdateSdraAssessmentAsCompleted(string comment, WorkflowInstance workflowInstance)
-        {
-            try
-            {
-                await _dataServiceApiClient.MarkAssessmentAsCompleted(workflowInstance.AssessmentData.PrimarySdocId, comment);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed requesting DataService {DataServiceResource} with: PrimarySdocId: {PrimarySdocId}; Comment: {Comment};",
-                    nameof(_dataServiceApiClient.MarkAssessmentAsCompleted),
-                    workflowInstance.AssessmentData.PrimarySdocId,
-                    comment);
-            }
         }
 
         private async Task UpdateOnHold(int processId, bool onHold)
@@ -466,27 +426,28 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task UpdateK2WorkflowAsTerminated(WorkflowInstance workflowInstance)
+        private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {
-            try
-            {
-                await _workflowServiceApiClient.TerminateWorkflowInstance(workflowInstance.SerialNumber);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed updating {WorkflowServiceResource} with: SerialNumber: {SerialNumber};",
-                    nameof(_workflowServiceApiClient.TerminateWorkflowInstance),
-                    workflowInstance.SerialNumber);
-            }
-        }
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(wi => wi.ProcessId == processId);
 
-        private WorkflowInstance UpdateWorkflowInstanceAsTerminated(WorkflowInstance workflowInstance)
-        {
-            workflowInstance.Status = WorkflowStatus.Terminated.ToString();
+            workflowInstance.Status = WorkflowStatus.Updating.ToString();
             workflowInstance.ActivityChangedAt = DateTime.Today;
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return workflowInstance;
+        }
+        
+        private async Task MarkWorkflowInstanceAsStarted(int processId)
+        {
+            var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(w => w.PrimaryDocumentStatus)
+                .FirstAsync(w => w.ProcessId == processId);
+
+            workflowInstance.Status = WorkflowStatus.Started.ToString();
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task GetOnHoldData(int processId)

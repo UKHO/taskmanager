@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
-using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class StartWorkflowInstanceEventHandler : IHandleMessages<StartWorkflowInstanceEvent>,
+    public class StartChildWorkflowInstanceCommandHandler : IHandleMessages<StartChildWorkflowInstanceCommand>,
         IHandleMessages<PersistChildWorkflowDataCommand>
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
-        private readonly ILogger<StartWorkflowInstanceEventHandler> _logger;
+        private readonly ILogger<StartChildWorkflowInstanceCommandHandler> _logger;
 
-        public StartWorkflowInstanceEventHandler(IWorkflowServiceApiClient workflowServiceApiClient, WorkflowDbContext dbContext, ILogger<StartWorkflowInstanceEventHandler> logger)
+        public StartChildWorkflowInstanceCommandHandler(IWorkflowServiceApiClient workflowServiceApiClient, WorkflowDbContext dbContext, ILogger<StartChildWorkflowInstanceCommandHandler> logger)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _dbContext = dbContext;
@@ -34,11 +34,11 @@ namespace WorkflowCoordinator.Handlers
         /// <param name="message"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task Handle(StartWorkflowInstanceEvent message, IMessageHandlerContext context)
+        public async Task Handle(StartChildWorkflowInstanceCommand message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
             LogContext.PushProperty("Message", message.ToJSONSerializedString());
-            LogContext.PushProperty("EventName", nameof(StartWorkflowInstanceEvent));
+            LogContext.PushProperty("EventName", nameof(StartChildWorkflowInstanceCommand));
             LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
             LogContext.PushProperty("ParentProcessId", message.ParentProcessId);
             LogContext.PushProperty("WorkflowType", message.WorkflowType);
@@ -67,7 +67,7 @@ namespace WorkflowCoordinator.Handlers
             _logger.LogInformation("Successfully created K2 task with ProcessId: {ProcessId} and SerialNumber: {SerialNumber} as a Child workflow to ParentProcessId: {ParentProcessId}");
             
             // Progress this new instance onto Assess
-            await _workflowServiceApiClient.ProgressWorkflowInstance(processId, serialNumber);
+            await _workflowServiceApiClient.ProgressWorkflowInstance(serialNumber);
 
             var persistChildData = new PersistChildWorkflowDataCommand
             {
@@ -125,8 +125,9 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError("Failed to get K2 Task serial number for ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get K2 Task serial number for ProcessId {message.ChildProcessId}");
             }
-            
+
             // ...and create for the new child
+            additionalAssignedTaskData.Status = AssignTaskStatus.Generated.ToString();
 
             var newWorkflowInstance = await PersistChildWorkflowInstance(message, parentWorkflowInstanceData, newSn);
 

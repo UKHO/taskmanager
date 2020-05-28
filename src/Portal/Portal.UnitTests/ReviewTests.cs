@@ -288,7 +288,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_when_primary_assign_task_has_note_it_should_be_copied_to_comments()
+        public async Task Test_when_primary_assign_task_has_note_it_should_be_copied_to_comments_not_within_portal()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -330,7 +330,7 @@ namespace Portal.UnitTests
 
             var isExist = await _dbContext.Comment.AnyAsync(c =>
                 c.Text.Contains(primaryAssignTaskNote, StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(isExist);
+            Assert.IsFalse(isExist);
         }
 
         [Test]
