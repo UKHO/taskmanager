@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Messages.Commands;
 using Common.Messages.Enums;
-using Common.Messages.Events;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,6 +10,7 @@ using NServiceBus.Testing;
 using NUnit.Framework;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 

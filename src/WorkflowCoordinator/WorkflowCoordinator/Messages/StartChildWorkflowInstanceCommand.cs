@@ -1,7 +1,8 @@
 ﻿using System;
+using Common.Messages;
 using Common.Messages.Enums;
 
-namespace Common.Messages.Events
+namespace WorkflowCoordinator.Messages
 {
     public class StartChildWorkflowInstanceCommand : ICorrelate
     {

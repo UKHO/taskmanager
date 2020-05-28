@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Commands;
-using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
 using WorkflowCoordinator.HttpClients;
+using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
