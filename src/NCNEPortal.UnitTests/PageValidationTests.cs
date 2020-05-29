@@ -15,8 +15,6 @@ namespace NCNEPortal.UnitTests
     [TestFixture]
     public class PageValidationTests
     {
-        private NcneWorkflowDbContext _dbContext;
-        private IAdDirectoryService _fakeAdDirectoryService;
         private INcneUserDbService _fakeNcneUserDbService;
         private PageValidationHelper _pageValidationHelper;
         private List<AdUser> _validUsers;
@@ -29,9 +27,9 @@ namespace NCNEPortal.UnitTests
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
 
-            _dbContext = new NcneWorkflowDbContext(dbContextOptions);
+            new NcneWorkflowDbContext(dbContextOptions);
 
-            _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            A.Fake<IAdDirectoryService>();
             _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 
             _pageValidationHelper = new PageValidationHelper(_fakeNcneUserDbService);

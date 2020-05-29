@@ -71,6 +71,7 @@
                 $("#chartTitle").html(result[1]);
                 $("#editionNumber").html(result[2]);
                 $("#chartVersion").html(result[3]);
+                $("#btnPublish").prop("disabled", false);
 
             },
             error: function (error) {
@@ -83,6 +84,7 @@
                     $("#publishChartErrorMessage").text(responseJson);
                     $("#publishChartError").collapse("show");
                 }
+                $("#btnPublish").prop("disabled", true);
             }
         });
 
@@ -188,6 +190,7 @@
                     $("#publishChartError").collapse("show");
                 }
                 $("#PublishConfirmModal").modal("hide");
+                $("#btnPublish").prop("disabled", true);
                 $("#PublishChartModal").modal("show");
             }
         });

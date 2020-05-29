@@ -389,7 +389,7 @@
 
         <div id="CommentsSection" class="card-body p-3">
 
-            <table id="TaskCommentsTable" class="table table-striped m-2" id="generic-comments-table">
+            <table id="TaskCommentsTable" class="table table-striped m-2">
                 <tbody>
                     @if (Model.TaskComments != null)
                     {
@@ -613,7 +613,7 @@
 
             <div class="modal-footer">
                 <button type="button" id="btnPublishCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
-                <button type="button" form="frmPublish" id="btnPublish" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Publish</button>
+                <button type="button" form="frmPublish" id="btnPublish" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" disabled title="Publish">Publish</button>
             </div>
         </div>
     </div>
