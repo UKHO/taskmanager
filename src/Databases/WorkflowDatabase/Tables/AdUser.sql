@@ -8,4 +8,4 @@
 
 GO
 
-CREATE UNIQUE INDEX [IX_AdUser_ActiveDirectorySid] ON [dbo].[AdUser] ([UserPrincipalName])
+CREATE UNIQUE INDEX [IX_AdUser_UserPrincipalName] ON [dbo].[AdUser] ([UserPrincipalName])
