@@ -263,7 +263,7 @@ namespace Portal.Pages.DbAssessment
 
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
@@ -287,7 +287,7 @@ namespace Portal.Pages.DbAssessment
 
                         return new JsonResult(this.ValidationErrorMessages)
                         {
-                            StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
+                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
 
@@ -391,7 +391,7 @@ namespace Portal.Pages.DbAssessment
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                 };
             }
 
