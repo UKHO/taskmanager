@@ -1,5 +1,4 @@
-﻿using Common.Helpers.Auth;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NCNEPortal.Auth;
 using NCNEPortal.Enums;
@@ -27,9 +26,6 @@ namespace NCNEPortal.UnitTests
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
 
-            new NcneWorkflowDbContext(dbContextOptions);
-
-            A.Fake<IAdDirectoryService>();
             _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 
             _pageValidationHelper = new PageValidationHelper(_fakeNcneUserDbService);
