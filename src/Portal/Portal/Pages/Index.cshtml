@@ -43,9 +43,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th style="min-width: 3.6rem;">Days to DM End Date</th>
-                    <th style="min-width: 5.8rem;">DM End Date</th>
-                    <th style="min-width: 3.9rem;">Days On Hold</th>
+                    <th style="min-width: 3.5rem;">Days to DM End Date</th>
+                    <th style="min-width: 3.5rem;">DM End Date</th>
+                    <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
@@ -87,7 +87,9 @@
                             @task.AssessmentDataRsdraNumber
                         </td>
                         <td>
-                            @task.AssessmentDataSourceDocumentName
+                            <span class="overflowElipsis" style="max-width: 10rem;" title="@task.AssessmentDataSourceDocumentName">
+                                @task.AssessmentDataSourceDocumentName
+                            </span>
                         </td>
                         <td>
                             @task.Workspace
@@ -131,9 +133,9 @@
                 <tr>
                     <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>ID</th>
-                    <th style="min-width: 3.6rem;">Days to DM End Date</th>
-                    <th style="min-width: 5.8rem;">DM End Date</th>
-                    <th style="min-width: 3.9rem;">Days On Hold</th>
+                    <th style="min-width: 3.5rem;">Days to DM End Date</th>
+                    <th style="min-width: 3.5rem;">DM End Date</th>
+                    <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
@@ -176,7 +178,9 @@
                             @task.AssessmentDataRsdraNumber
                         </td>
                         <td>
-                            @task.AssessmentDataSourceDocumentName
+                            <span class="overflowElipsis" style="max-width: 10rem;" title="@task.AssessmentDataSourceDocumentName">
+                                @task.AssessmentDataSourceDocumentName
+                            </span>
                         </td>
                         <td>
                             @task.Workspace

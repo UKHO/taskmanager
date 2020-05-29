@@ -12,10 +12,10 @@ namespace Portal.MappingProfiles
                 .ForMember(destination => destination.TaskStage,
                     opts => opts.MapFrom(source => source.ActivityName))
                 .ForMember(destination => destination.Team,
-                    opts => opts.MapFrom(source => source.AssessmentData.TeamDistributedTo));
+                    opts => opts.MapFrom(source => source.AssessmentData.TeamDistributedTo))
+                .ForMember(destination => destination.Workspace,
+                    opts => opts.MapFrom<WorkspaceValueResolver>());
 
-            CreateMap<AssessmentData, TaskViewModel>();
-            CreateMap<DbAssessmentReviewData, TaskViewModel>();
             CreateMap<TaskNote, TaskViewModel>().ForMember(destination => destination.TaskNoteText,
                 opts=>opts.MapFrom(source=>source.Text));
         }
