@@ -74,10 +74,7 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
-            //"sScrollX": "90%",
-            //"sScrollXInner": "110%",
-            //"bScrollCollapse": true
-    });
+        });
 
     }
 
