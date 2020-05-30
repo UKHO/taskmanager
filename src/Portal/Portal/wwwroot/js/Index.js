@@ -11,6 +11,10 @@
 
     var unassignedTasksTable = setupUnassignedTasks();
 
+    $('.dropdown-menu').parent().on('shown.bs.dropdown', function () {
+        $('body').append($("div", this));
+    });
+
     var inFlightTasksTable = setupInFlightTasks();
     var selectedTeams = getTeamSelection();
 
@@ -70,7 +74,11 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
-        });
+            //"sScrollX": "90%",
+            //"sScrollXInner": "110%",
+            //"bScrollCollapse": true
+    });
+
     }
 
     function setupInFlightTasks() {
