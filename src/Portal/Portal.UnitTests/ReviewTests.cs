@@ -30,13 +30,11 @@ namespace Portal.UnitTests
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
         private ILogger<ReviewModel> _fakeLogger;
-        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
-        private IDataServiceApiClient _fakeDataServiceApiClient;
 
 
         [SetUp]
@@ -52,7 +50,6 @@ namespace Portal.UnitTests
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             ProcessId = 123;
 
@@ -322,8 +319,6 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -355,8 +350,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             var currentCommentsCount = await _dbContext.Comment.CountAsync();
 
@@ -637,8 +630,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -676,8 +667,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -711,8 +700,6 @@ namespace Portal.UnitTests
             _reviewModel.IsOnHold = true;
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -755,8 +742,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -796,8 +781,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -840,8 +823,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 

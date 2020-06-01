@@ -32,7 +32,6 @@ namespace Portal.UnitTests
         private AssessModel _assessModel;
         private int ProcessId { get; set; }
         private ILogger<AssessModel> _fakeLogger;
-        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
@@ -379,8 +378,6 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             var row = await _dbContext.DbAssessmentAssessData.FirstAsync();
             row.Assessor = "";
@@ -399,8 +396,6 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-                .Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -430,8 +425,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-                .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -465,8 +458,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-                .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -509,8 +500,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -544,8 +533,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Assess", "Verify"))
-                .Returns(true);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -718,8 +705,6 @@ namespace Portal.UnitTests
 
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "ConfirmedDone");
 
@@ -746,13 +731,6 @@ namespace Portal.UnitTests
                                                                                         A<List<string>>.Ignored))
                                                             .MustNotHaveHappened();
 
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(
-                                                                                A<int>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<string>.Ignored,
-                                                                                A<string>
-                                                                                    .Ignored))
-                                                            .MustNotHaveHappened();
 
             A.CallTo(() => _fakeEventServiceApiClient.PostEvent(
                                                                                 nameof(ProgressWorkflowInstanceEvent),
@@ -797,8 +775,6 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -824,8 +800,6 @@ namespace Portal.UnitTests
                 .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
