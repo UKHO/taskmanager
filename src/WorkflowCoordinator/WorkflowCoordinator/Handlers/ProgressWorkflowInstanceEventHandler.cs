@@ -105,6 +105,9 @@ namespace WorkflowCoordinator.Handlers
                     break;
                 case WorkflowStage.Completed:
                     // Progressing task from Verify to Completed
+
+                    _logger.LogInformation("Starting progressing k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {FromActivity} to {ToActivity}");
+
                     success = await _workflowServiceApiClient.ProgressWorkflowInstance(k2Task.SerialNumber);
 
                     if (!success)
