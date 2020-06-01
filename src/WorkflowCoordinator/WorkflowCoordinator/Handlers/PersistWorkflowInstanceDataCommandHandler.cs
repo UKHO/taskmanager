@@ -26,7 +26,7 @@ namespace WorkflowCoordinator.Handlers
                                                             IWorkflowServiceApiClient workflowServiceApiClient,
                                                             ILogger<PersistWorkflowInstanceDataCommandHandler> logger, 
                                                             WorkflowDbContext dbContext,
-                                                            IPcpEventServiceApiClient pcpEventServiceApiClient)
+                                                    IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
@@ -153,7 +153,11 @@ namespace WorkflowCoordinator.Handlers
                 throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {message.ProcessId} while moving task from {message.FromActivity} to {message.ToActivity}");
             }
 
-            if (k2Task.ActivityName != message.ToActivity.ToString())
+            var toActivity = message.ToActivity == WorkflowStage.Rejected
+                ? WorkflowStage.Assess.ToString()
+                : message.ToActivity.ToString();
+
+            if (k2Task.ActivityName != toActivity)
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);
                 _logger.LogError("K2Task with ProcessId {ProcessId} is at K2 stage {K2Stage} and not at {ToActivity}, while moving task from {FromActivity}");
