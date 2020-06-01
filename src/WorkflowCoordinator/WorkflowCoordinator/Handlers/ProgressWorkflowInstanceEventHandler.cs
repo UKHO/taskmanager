@@ -104,10 +104,18 @@ namespace WorkflowCoordinator.Handlers
 
                     break;
                 case WorkflowStage.Completed:
-                    // TODO: Sign-off Verify. Add code for Verifying, progressing and persisting
-                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
+                    // Progressing task from Verify to Completed
+                    success = await _workflowServiceApiClient.ProgressWorkflowInstance(k2Task.SerialNumber);
 
-                //break;
+                    if (!success)
+                    {
+                        _logger.LogError("Unable to progress task {ProcessId} from {FromActivity} to {ToActivity} in K2.");
+                        throw new ApplicationException($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.");
+                    }
+
+                    _logger.LogInformation("Successfully completed the request to progress k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {message.FromActivity} to {message.ToActivity}");
+
+                    break;
                 default:
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
             }
