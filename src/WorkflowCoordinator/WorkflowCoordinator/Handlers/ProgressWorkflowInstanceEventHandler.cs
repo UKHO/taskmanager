@@ -16,14 +16,12 @@ namespace WorkflowCoordinator.Handlers
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly ILogger<ProgressWorkflowInstanceEventHandler> _logger;
-        private readonly WorkflowDbContext _dbContext;
 
         public ProgressWorkflowInstanceEventHandler(IWorkflowServiceApiClient workflowServiceApiClient,
-            ILogger<ProgressWorkflowInstanceEventHandler> logger, WorkflowDbContext dbContext)
+            ILogger<ProgressWorkflowInstanceEventHandler> logger)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
-            _dbContext = dbContext;
         }
 
         public async Task Handle(ProgressWorkflowInstanceEvent message, IMessageHandlerContext context)
