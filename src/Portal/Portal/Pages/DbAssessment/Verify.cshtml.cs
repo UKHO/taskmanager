@@ -34,9 +34,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly WorkflowDbContext _dbContext;
         private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
-        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
-        private readonly IPcpEventServiceApiClient _pcpEventServiceApiClient;
 
         [BindProperty]
         public bool IsOnHold { get; set; }
@@ -95,19 +93,16 @@ namespace Portal.Pages.DbAssessment
 
         public VerifyModel(WorkflowDbContext dbContext,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
-            IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
             IAdDirectoryService adDirectoryService,
             ILogger<VerifyModel> logger,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig,
-            IPcpEventServiceApiClient pcpEventServiceApiClient)
+            IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
             _workflowBusinessLogicService = workflowBusinessLogicService;
-            _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
             _adDirectoryService = adDirectoryService;
@@ -115,7 +110,6 @@ namespace Portal.Pages.DbAssessment
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
-            _pcpEventServiceApiClient = pcpEventServiceApiClient;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -267,9 +261,6 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    // TODO: Move to WorkflowCoordinator
-                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
-
                     break;
                 case "ConfirmedSignOff":
                     
@@ -290,9 +281,6 @@ namespace Portal.Pages.DbAssessment
                             StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
                         };
                     }
-
-                    // TODO: Move to WorkflowCoordinator
-                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
 
                     break;
                 default:
@@ -680,26 +668,6 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        // TODO: Move to WorkflowCoordinator
-        /// <summary>
-        /// Posts a HdbAssessmentReadyEvent to PCP's Event Service API
-        /// </summary>
-        /// <param name="sdocId"></param>
-        /// <returns></returns>
-        private async Task PublishHdbAssessmentReadyEvent(int sdocId)
-        {
-            var hdbAssessmentReadyEvent = new UKHO.Events.HDBAssessmentReadyEvent
-            {
-                SourceDocumentAssessmentId = sdocId.ToString()
-            };
-
-            LogContext.PushProperty("HDBAssessmentReadyEvent",
-                hdbAssessmentReadyEvent.ToJSONSerializedString());
-
-            _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
-
-            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
-        }
         
         private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {

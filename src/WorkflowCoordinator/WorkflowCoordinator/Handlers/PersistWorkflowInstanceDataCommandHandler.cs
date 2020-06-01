@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Enums;
-using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -21,16 +20,19 @@ namespace WorkflowCoordinator.Handlers
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly ILogger<PersistWorkflowInstanceDataCommandHandler> _logger;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IPcpEventServiceApiClient _pcpEventServiceApiClient;
 
-        public PersistWorkflowInstanceDataCommandHandler(IWorkflowServiceApiClient workflowServiceApiClient,
-            ILogger<PersistWorkflowInstanceDataCommandHandler> logger, WorkflowDbContext dbContext)
+        public PersistWorkflowInstanceDataCommandHandler(
+                                                            IWorkflowServiceApiClient workflowServiceApiClient,
+                                                            ILogger<PersistWorkflowInstanceDataCommandHandler> logger, 
+                                                            WorkflowDbContext dbContext,
+                                                            IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
             _dbContext = dbContext;
+            _pcpEventServiceApiClient = pcpEventServiceApiClient;
         }
-
-        // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
 
         public async Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
         {
@@ -107,7 +109,7 @@ namespace WorkflowCoordinator.Handlers
 
                     ValidateK2TaskForTerminationOrSignOff(message, k2Task);
 
-                    await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Verify, WorkflowStatus.Completed);
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Verify, WorkflowStatus.Completed);
 
                     // Fire CompleteAssessmentCommand to mark SDRA Assessment as Assessed and Completed
                     completeAssessment = new CompleteAssessmentCommand
@@ -117,6 +119,8 @@ namespace WorkflowCoordinator.Handlers
                     };
 
                     await context.SendLocal(completeAssessment).ConfigureAwait(false);
+
+                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
 
                     break;
                 default:
@@ -361,6 +365,27 @@ namespace WorkflowCoordinator.Handlers
                 task.Status = AssignTaskStatus.Started.ToString();
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        // TODO: Move to WorkflowCoordinator
+        /// <summary>
+        /// Posts a HdbAssessmentReadyEvent to PCP's Event Service API
+        /// </summary>
+        /// <param name="sdocId"></param>
+        /// <returns></returns>
+        private async Task PublishHdbAssessmentReadyEvent(int sdocId)
+        {
+            var hdbAssessmentReadyEvent = new UKHO.Events.HDBAssessmentReadyEvent
+            {
+                SourceDocumentAssessmentId = sdocId.ToString()
+            };
+
+            LogContext.PushProperty("HDBAssessmentReadyEvent",
+                hdbAssessmentReadyEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
+
+            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
         }
 
     }
