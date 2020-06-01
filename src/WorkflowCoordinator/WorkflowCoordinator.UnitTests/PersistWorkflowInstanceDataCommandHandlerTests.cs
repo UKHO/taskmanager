@@ -206,6 +206,13 @@ namespace WorkflowCoordinator.UnitTests
                 ProcessId = processId
             };
             await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
+
+            var primaryDocumentStatus  = new PrimaryDocumentStatus()
+            {
+                ProcessId = processId,
+                SdocId = 1234567
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
             await _dbContext.SaveChangesAsync();
 
             //When
@@ -273,7 +280,7 @@ namespace WorkflowCoordinator.UnitTests
         {
             //Given
             var fromActivity = WorkflowStage.Verify;
-            var toActivity = WorkflowStage.Assess;
+            var toActivity = WorkflowStage.Rejected;
             var processId = 1;
             var workflowInstanceId = 1;
             var currentSerialNumber = "VERIFY_SERIAL_NUMBER";
@@ -288,7 +295,7 @@ namespace WorkflowCoordinator.UnitTests
 
             var k2TaskData = new K2TaskData()
             {
-                ActivityName = toActivity.ToString(),
+                ActivityName = WorkflowStage.Assess.ToString(),
                 SerialNumber = currentSerialNumber
             };
 
@@ -329,6 +336,7 @@ namespace WorkflowCoordinator.UnitTests
                 Ion = "Verify ION"
             };
             await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
+
             await _dbContext.SaveChangesAsync();
 
             //When
@@ -345,7 +353,7 @@ namespace WorkflowCoordinator.UnitTests
 
             Assert.AreEqual(currentSerialNumber,
                 workflowInstance.SerialNumber);
-            Assert.AreEqual(toActivity.ToString(),
+            Assert.AreEqual(WorkflowStage.Assess.ToString(),
                 workflowInstance.ActivityName);
             Assert.AreEqual(WorkflowStatus.Started.ToString(),
                 workflowInstance.Status);
@@ -425,6 +433,14 @@ namespace WorkflowCoordinator.UnitTests
                 ProcessId = processId,
                 Ion = "Verify ION"
             });
+
+            
+            var primaryDocumentStatus = new PrimaryDocumentStatus()
+            {
+                ProcessId = processId,
+                SdocId = 1234567
+            };
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
             await _dbContext.SaveChangesAsync();
 
             //When
