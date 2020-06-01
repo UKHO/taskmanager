@@ -168,6 +168,7 @@ namespace WorkflowCoordinator.Handlers
         private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, string serialNumber, WorkflowStage activityName, WorkflowStatus status)
         {
             var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(wi => wi.ProductAction)
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == processId);
