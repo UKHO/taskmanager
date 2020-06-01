@@ -59,7 +59,6 @@ namespace Portal
             Configuration.GetSection("PortalSection").Bind(startupSecretsConfig);
             Configuration.GetSection("K2RestApi").Bind(startupSecretsConfig);
             Configuration.GetSection("HpdDbSection").Bind(startupSecretsConfig);
-            Configuration.GetSection("PCPEventService").Bind(startupSecretsConfig);
             Configuration.GetSection("PortalActiveDirectory").Bind(startupSecretsConfig);
 
             services.AddOptions<AdUserUpdateServiceConfig>()
@@ -130,14 +129,6 @@ namespace Portal
 
             services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
-
-            services.AddHttpClient<IPcpEventServiceApiClient, PcpEventServiceApiClient>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                {
-                    ServerCertificateCustomValidationCallback = (message, certificate, arg3, arg4) => true,
-                    Credentials = new NetworkCredential(startupSecretsConfig.PCPEventServiceUsername, startupSecretsConfig.PCPEventServicePassword)
-                });
 
             services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))

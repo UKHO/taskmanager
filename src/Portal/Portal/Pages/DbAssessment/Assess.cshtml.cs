@@ -26,8 +26,6 @@ namespace Portal.Pages.DbAssessment
     public class AssessModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly IDataServiceApiClient _dataServiceApiClient;
-        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
         private readonly ICommentsHelper _commentsHelper;
@@ -99,8 +97,6 @@ namespace Portal.Pages.DbAssessment
         }
 
         public AssessModel(WorkflowDbContext dbContext,
-            IDataServiceApiClient dataServiceApiClient,
-            IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ILogger<AssessModel> logger,
             ICommentsHelper commentsHelper,
@@ -110,8 +106,6 @@ namespace Portal.Pages.DbAssessment
             IOptions<GeneralConfig> generalConfig)
         {
             _dbContext = dbContext;
-            _dataServiceApiClient = dataServiceApiClient;
-            _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
             _commentsHelper = commentsHelper;

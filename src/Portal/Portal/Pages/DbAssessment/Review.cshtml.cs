@@ -26,8 +26,6 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
-        private readonly IDataServiceApiClient _dataServiceApiClient;
-        private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ICommentsHelper _commentsHelper;
         private readonly IAdDirectoryService _adDirectoryService;
@@ -82,8 +80,6 @@ namespace Portal.Pages.DbAssessment
 
         public ReviewModel(WorkflowDbContext dbContext,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
-            IDataServiceApiClient dataServiceApiClient,
-            IWorkflowServiceApiClient workflowServiceApiClient,
             IEventServiceApiClient eventServiceApiClient,
             ICommentsHelper commentsHelper,
             IAdDirectoryService adDirectoryService,
@@ -92,8 +88,6 @@ namespace Portal.Pages.DbAssessment
         {
             _dbContext = dbContext;
             _workflowBusinessLogicService = workflowBusinessLogicService;
-            _dataServiceApiClient = dataServiceApiClient;
-            _workflowServiceApiClient = workflowServiceApiClient;
             _eventServiceApiClient = eventServiceApiClient;
             _commentsHelper = commentsHelper;
             _adDirectoryService = adDirectoryService;

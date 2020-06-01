@@ -5,8 +5,6 @@ namespace Portal.Configuration
 {
     public class GeneralConfig
     {
-        public string CallerCode { get; set; }
-        public string K2DBAssessmentWorkflowName { get; set; }
         public string AzureAdClientId { get; set; }
         public string TenantId { get; set; }
         public int DmEndDateDaysSimple { get; set; }
@@ -22,7 +20,6 @@ namespace Portal.Configuration
         public string CarisNewProjectType { get; set; }
         public int CarisProjectTimeoutSeconds { get; set; }
         public int CarisProjectNameCharacterLimit { get; set; }
-        public string SourceDocumentWriteableFolderName { get; set; }
         public int UsagesSelectionPageLength { get; set; }
         public int SourcesSelectionPageLength { get; set; }
         public int ExternalEndDateDays { get; set; }
