@@ -52,7 +52,6 @@ namespace Portal.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
-            _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
@@ -116,7 +115,7 @@ namespace Portal.UnitTests
             _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
         }
 
         [TearDown]
@@ -415,7 +414,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -450,7 +449,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -494,7 +493,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -529,7 +528,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -717,7 +716,7 @@ namespace Portal.UnitTests
 
             _pageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _assessModel = new AssessModel(_dbContext, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<int>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -888,8 +887,6 @@ namespace Portal.UnitTests
 
             _assessModel = new AssessModel(
                             _dbContext,
-                            null,
-                            _fakeWorkflowServiceApiClient,
                             _fakeEventServiceApiClient,
                             _fakeLogger,
                             _fakeCommentsHelper,
