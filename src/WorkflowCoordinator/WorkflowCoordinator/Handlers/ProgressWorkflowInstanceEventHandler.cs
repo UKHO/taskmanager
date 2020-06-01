@@ -165,7 +165,7 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError(e, "Failed Terminating K2 task with ProcessId {ProcessId} and SerialNumber: {SerialNumber}");
 
                 throw new ApplicationException(
-                    $"Failed Terminating K2 task with SerialNumber: ${k2SerialNumber}{Environment.NewLine}{e.Message}");
+                    $"Failed Terminating K2 task with SerialNumber: {k2SerialNumber}{Environment.NewLine}{e.Message}");
             }
         }
 
