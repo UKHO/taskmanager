@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Messages.Enums;
-using Common.Messages.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -16,23 +15,25 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.Handlers
 {
-    public class PersistWorkflowInstanceDataCommandHandler : IHandleMessages<PersistWorkflowInstanceDataCommand>,
-                                                            IHandleMessages<PersistWorkflowInstanceDataEvent>
+    public class PersistWorkflowInstanceDataCommandHandler : IHandleMessages<PersistWorkflowInstanceDataCommand>
     {
         private readonly IWorkflowServiceApiClient _workflowServiceApiClient;
         private readonly ILogger<PersistWorkflowInstanceDataCommandHandler> _logger;
         private readonly WorkflowDbContext _dbContext;
+        private readonly IPcpEventServiceApiClient _pcpEventServiceApiClient;
 
-        public PersistWorkflowInstanceDataCommandHandler(IWorkflowServiceApiClient workflowServiceApiClient,
-            ILogger<PersistWorkflowInstanceDataCommandHandler> logger, WorkflowDbContext dbContext)
+        public PersistWorkflowInstanceDataCommandHandler(
+                                                            IWorkflowServiceApiClient workflowServiceApiClient,
+                                                            ILogger<PersistWorkflowInstanceDataCommandHandler> logger, 
+                                                            WorkflowDbContext dbContext,
+                                                    IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _logger = logger;
             _dbContext = dbContext;
+            _pcpEventServiceApiClient = pcpEventServiceApiClient;
         }
 
-        // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
-        
         public async Task Handle(PersistWorkflowInstanceDataCommand message, IMessageHandlerContext context)
         {
             LogContext.PushProperty("MessageId", context.MessageId);
@@ -54,6 +55,7 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
+                    // Review to Terminated
 
                     ValidateK2TaskForTerminationOrSignOff(message, k2Task);
 
@@ -71,27 +73,26 @@ namespace WorkflowCoordinator.Handlers
                     _logger.LogInformation("Task with processId: {ProcessId} has been Terminated.");
 
                     break;
-                case WorkflowStage.Assess:
+                case WorkflowStage.Rejected:
+                    // Verify to Assess
 
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
 
-                    var isRejected = message.FromActivity == WorkflowStage.Verify;
+                    await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
 
-                    if (isRejected)
-                    {
-                        // Verify to Assess
-                        await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
-                    }
-                    else
-                    {
-                        // Review to Assess
+                    break;
+                case WorkflowStage.Assess:
+                    // Review to Assess
 
-                        await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
-                        await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
-                        await ProcessAdditionalTasks(message, context);
-                    }
+                    ValidateK2TaskForAssessAndVerify(message, k2Task);
+
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
+                    
+                    await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
+                    await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
+                    await ProcessAdditionalTasks(message, context);
 
                     break;
                 case WorkflowStage.Verify:
@@ -108,7 +109,7 @@ namespace WorkflowCoordinator.Handlers
 
                     ValidateK2TaskForTerminationOrSignOff(message, k2Task);
 
-                    await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Verify, WorkflowStatus.Completed);
+                    workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, string.Empty, WorkflowStage.Verify, WorkflowStatus.Completed);
 
                     // Fire CompleteAssessmentCommand to mark SDRA Assessment as Assessed and Completed
                     completeAssessment = new CompleteAssessmentCommand
@@ -119,7 +120,7 @@ namespace WorkflowCoordinator.Handlers
 
                     await context.SendLocal(completeAssessment).ConfigureAwait(false);
 
-                    _logger.LogInformation("Task with processId: {ProcessId} has been completed.");
+                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
 
                     break;
                 default:
@@ -127,34 +128,6 @@ namespace WorkflowCoordinator.Handlers
             }
 
             await _dbContext.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
-
-        }
-
-        public async Task Handle(PersistWorkflowInstanceDataEvent message, IMessageHandlerContext context)
-        {
-            // TODO: eventually PersistWorkflowInstanceDataEvent and its handler will me removed (when Review, Assess, and Verify are completed)
-
-            LogContext.PushProperty("MessageId", context.MessageId);
-            LogContext.PushProperty("Message", message.ToJSONSerializedString());
-            LogContext.PushProperty("EventName", nameof(PersistWorkflowInstanceDataEvent));
-            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
-            LogContext.PushProperty("ProcessId", message.ProcessId);
-            LogContext.PushProperty("FromActivity", message.FromActivity);
-            LogContext.PushProperty("ToActivity", message.ToActivity);
-
-            _logger.LogInformation("Entering {EventName} handler with: {Message}");
-
-            var persistWorkflowInstanceDataCommand = new PersistWorkflowInstanceDataCommand()
-            {
-                CorrelationId = message.CorrelationId,
-                ProcessId = message.ProcessId,
-                FromActivity = message.FromActivity,
-                ToActivity = message.ToActivity
-            };
-
-            await context.SendLocal(persistWorkflowInstanceDataCommand).ConfigureAwait(false);
 
             _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
 
@@ -180,7 +153,11 @@ namespace WorkflowCoordinator.Handlers
                 throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {message.ProcessId} while moving task from {message.FromActivity} to {message.ToActivity}");
             }
 
-            if (k2Task.ActivityName != message.ToActivity.ToString())
+            var toActivity = message.ToActivity == WorkflowStage.Rejected
+                ? WorkflowStage.Assess.ToString()
+                : message.ToActivity.ToString();
+
+            if (k2Task.ActivityName != toActivity)
             {
                 LogContext.PushProperty("K2Stage", k2Task.ActivityName);
                 _logger.LogError("K2Task with ProcessId {ProcessId} is at K2 stage {K2Stage} and not at {ToActivity}, while moving task from {FromActivity}");
@@ -191,6 +168,7 @@ namespace WorkflowCoordinator.Handlers
         private async Task<WorkflowInstance> UpdateWorkflowInstanceData(int processId, string serialNumber, WorkflowStage activityName, WorkflowStatus status)
         {
             var workflowInstance = await _dbContext.WorkflowInstance
+                .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(wi => wi.ProductAction)
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == processId);
@@ -297,7 +275,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
             }
         }
-        
+
         private async Task PersistWorkflowDataToVerifyFromAssess(
             int processId,
             int workflowInstanceId)
@@ -339,7 +317,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
             }
         }
-        
+
         private async Task CopyPrimaryAssignTaskNoteToComments(int processId)
         {
             LogContext.PushProperty("CopyPrimaryAssignTaskNoteToComments", nameof(CopyPrimaryAssignTaskNoteToComments));
@@ -370,8 +348,8 @@ namespace WorkflowCoordinator.Handlers
 
             _logger.LogInformation("Entering {ProcessAdditionalTasks} with processId: {ProcessId}.");
 
-            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at => 
-                                                            at.ProcessId == message.ProcessId 
+            var additionalAssignedTasks = await _dbContext.DbAssessmentAssignTask.Where(at =>
+                                                            at.ProcessId == message.ProcessId
                                                             && at.Status == AssignTaskStatus.New.ToString()).ToListAsync();
 
             foreach (var task in additionalAssignedTasks)
@@ -392,6 +370,27 @@ namespace WorkflowCoordinator.Handlers
                 task.Status = AssignTaskStatus.Started.ToString();
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        // TODO: Move to WorkflowCoordinator
+        /// <summary>
+        /// Posts a HdbAssessmentReadyEvent to PCP's Event Service API
+        /// </summary>
+        /// <param name="sdocId"></param>
+        /// <returns></returns>
+        private async Task PublishHdbAssessmentReadyEvent(int sdocId)
+        {
+            var hdbAssessmentReadyEvent = new UKHO.Events.HDBAssessmentReadyEvent
+            {
+                SourceDocumentAssessmentId = sdocId.ToString()
+            };
+
+            LogContext.PushProperty("HDBAssessmentReadyEvent",
+                hdbAssessmentReadyEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
+
+            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
         }
 
     }

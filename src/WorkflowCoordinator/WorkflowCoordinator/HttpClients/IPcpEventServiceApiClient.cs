@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Portal.HttpClients
+namespace WorkflowCoordinator.HttpClients
 {
     public interface IPcpEventServiceApiClient
     {

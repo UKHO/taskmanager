@@ -11,13 +11,11 @@ namespace Portal.HttpClients
 {
     public class DataServiceApiClient : IDataServiceApiClient
     {
-        private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IOptions<UriConfig> _uriConfig;
         private readonly HttpClient _httpClient;
 
-        public DataServiceApiClient(HttpClient httpClient, IOptions<GeneralConfig> generalConfig, IOptions<UriConfig> uriConfig)
+        public DataServiceApiClient(HttpClient httpClient, IOptions<UriConfig> uriConfig)
         {
-            _generalConfig = generalConfig;
             _httpClient = httpClient;
             _uriConfig = uriConfig;
         }

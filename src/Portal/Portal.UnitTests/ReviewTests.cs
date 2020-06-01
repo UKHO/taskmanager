@@ -30,13 +30,11 @@ namespace Portal.UnitTests
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
         private ILogger<ReviewModel> _fakeLogger;
-        private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
-        private IDataServiceApiClient _fakeDataServiceApiClient;
 
 
         [SetUp]
@@ -49,11 +47,9 @@ namespace Portal.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
-            _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _commentsHelper = new CommentsHelper(_dbContext);
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-            _fakeDataServiceApiClient = A.Fake<IDataServiceApiClient>();
 
             ProcessId = 123;
 
@@ -104,7 +100,7 @@ namespace Portal.UnitTests
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeDataServiceApiClient, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
                 _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
         }
 
@@ -299,7 +295,7 @@ namespace Portal.UnitTests
 
             var primaryAssignTaskNote = "Testing primary";
 
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService,
                 _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger,
                 _fakepageValidationHelper)
             {
@@ -323,8 +319,6 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -356,8 +350,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             var currentCommentsCount = await _dbContext.Comment.CountAsync();
 
@@ -638,8 +630,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -677,8 +667,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -689,7 +677,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -712,8 +700,6 @@ namespace Portal.UnitTests
             _reviewModel.IsOnHold = true;
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -732,7 +718,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -756,8 +742,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -773,7 +757,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -797,8 +781,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -817,7 +799,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, null, _fakeWorkflowServiceApiClient, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -841,8 +823,6 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(123, "123_sn", "Review", "Assess"))
-                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 

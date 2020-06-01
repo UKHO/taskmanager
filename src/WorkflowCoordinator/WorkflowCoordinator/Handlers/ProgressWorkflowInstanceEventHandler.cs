@@ -49,19 +49,35 @@ namespace WorkflowCoordinator.Handlers
             switch (message.ToActivity)
             {
                 case WorkflowStage.Terminated:
-
+                    // Terminate Review
                     _logger.LogInformation("Starting terminating k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber}");
                     await UpdateK2WorkflowAsTerminated(k2Task.SerialNumber);
                     _logger.LogInformation("Successfully completed the request to terminate k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber}");
+
+                    break;
+                case WorkflowStage.Rejected:
+                    // Reject from Review to Assess
+                    _logger.LogInformation("Starting rejecting k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {FromActivity}");
+
+                    success = await _workflowServiceApiClient.RejectWorkflowInstance(k2Task.SerialNumber);
+
+                    if (!success)
+                    {
+                        _logger.LogError("Unable to reject task {ProcessId} from {FromActivity} in K2.");
+                        throw new ApplicationException($"Unable to reject task {message.ProcessId} from {message.FromActivity} in K2.");
+                    }
+
+                    _logger.LogInformation("Successfully completed the request to reject k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {message.FromActivity}");
+
 
                     break;
                 case WorkflowStage.Assess:
                     // Progressing task from Review to Assess
 
                     _logger.LogInformation("Starting progressing k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {FromActivity} to {ToActivity}");
-
+                    
                     success = await _workflowServiceApiClient.ProgressWorkflowInstance(k2Task.SerialNumber);
-
+                    
                     if (!success)
                     {
                         _logger.LogError("Unable to progress task {ProcessId} from {FromActivity} to {ToActivity} in K2.");
@@ -88,10 +104,21 @@ namespace WorkflowCoordinator.Handlers
 
                     break;
                 case WorkflowStage.Completed:
-                    // TODO: Sign-off Verify. Add code for Verifying, progressing and persisting
-                    throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
+                    // Progressing task from Verify to Completed
 
-                //break;
+                    _logger.LogInformation("Starting progressing k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {FromActivity} to {ToActivity}");
+
+                    success = await _workflowServiceApiClient.ProgressWorkflowInstance(k2Task.SerialNumber);
+
+                    if (!success)
+                    {
+                        _logger.LogError("Unable to progress task {ProcessId} from {FromActivity} to {ToActivity} in K2.");
+                        throw new ApplicationException($"Unable to progress task {message.ProcessId} from {message.FromActivity} to {message.ToActivity} in K2.");
+                    }
+
+                    _logger.LogInformation("Successfully completed the request to progress k2 task with ProcessId {ProcessId} and SerialNumber {SerialNumber} from {message.FromActivity} to {message.ToActivity}");
+
+                    break;
                 default:
                     throw new NotImplementedException($"{message.ToActivity} has not been implemented for processId: {message.ProcessId}.");
             }

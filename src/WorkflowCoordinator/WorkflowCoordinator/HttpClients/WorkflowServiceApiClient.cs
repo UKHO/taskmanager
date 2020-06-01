@@ -156,5 +156,23 @@ namespace WorkflowCoordinator.HttpClients
 
             return tasks.Tasks.FirstOrDefault(w => w.WorkflowInstanceID == workflowInstanceId);
         }
+        
+        public async Task<bool> RejectWorkflowInstance(string serialNumber)
+        {
+
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetTasksUri + $"{serialNumber}/actions/Reject");
+
+            using (var response = await _httpClient.PostAsync(fullUri, null))
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
+                                                   $"\n Message= '{data}'," +
+                                                   $"\n Url='{fullUri}'");
+            }
+            
+            return true;
+        }
     }
 }

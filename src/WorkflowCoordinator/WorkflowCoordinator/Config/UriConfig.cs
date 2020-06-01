@@ -19,6 +19,8 @@ namespace WorkflowCoordinator.Config
         public Uri DataServicesHealthcheckUrl { get; set; }
         public string DataServicesWebServiceAssessmentCompletedUri { get; set; }
         public string DataServicesWebServiceAssessmentAssessedUri { get; set; }
+        public Uri PcpEventServiceUri { get; set; }
+        public Uri PcpEventServiceLocalUri { get; set; }
 
         public Uri BuildDataServicesUri(string callerCode, int sdocId)
         {
@@ -42,6 +44,15 @@ namespace WorkflowCoordinator.Config
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
                 $@"{DataServicesWebServiceAssessmentAssessedUri}{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}");
+        }
+        
+        public Uri BuildPcpEventServiceUri(string eventName)
+        {
+            var postUri = string.Concat("UKHO-Events-" + eventName, "/publish/");
+
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? PcpEventServiceLocalUri : PcpEventServiceUri,
+                $@"{PcpEventServiceUri}/{postUri}");
         }
 
     }

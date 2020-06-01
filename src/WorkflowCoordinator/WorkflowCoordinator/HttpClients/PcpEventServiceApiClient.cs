@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.Extensions.Options;
-using Portal.Configuration;
+using WorkflowCoordinator.Config;
 
-namespace Portal.HttpClients
+namespace WorkflowCoordinator.HttpClients
 {
     public class PcpEventServiceApiClient : IPcpEventServiceApiClient
     {

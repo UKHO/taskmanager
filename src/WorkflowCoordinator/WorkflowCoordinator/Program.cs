@@ -50,6 +50,7 @@ namespace WorkflowCoordinator
                     var startupSecretsConfig = new StartupSecretsConfig();
                     hostingContext.Configuration.GetSection("K2RestApi").Bind(startupSecretsConfig);
                     hostingContext.Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
+                    hostingContext.Configuration.GetSection("PCPEventService").Bind(startupSecretsConfig);
 
                     LoggingHelper.SetupLogging(isLocalDebugging, startupLoggingConfig, startupSecretsConfig);
 
@@ -93,6 +94,14 @@ namespace WorkflowCoordinator
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                         .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+                    services.AddHttpClient<IPcpEventServiceApiClient, PcpEventServiceApiClient>()
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = (message, certificate, arg3, arg4) => true,
+                            Credentials = new NetworkCredential(startupSecretsConfig.PCPEventServiceUsername, startupSecretsConfig.PCPEventServicePassword)
+                        });
 
                     services.AddOptions<SecretsConfig>()
                         .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
