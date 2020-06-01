@@ -34,7 +34,7 @@ namespace Portal.Pages.DbAssessment
 
         internal static async Task<_OperatorsModel> GetOperatorsDataAsync(IOperatorData currentData, WorkflowDbContext workflowDbContext)
         {
-            var users = await workflowDbContext.AdUser.ToListAsync().ConfigureAwait(false);
+            var users = await workflowDbContext.AdUser.OrderBy(a => a.DisplayName).ToListAsync().ConfigureAwait(false);
 
             return new _OperatorsModel
             {

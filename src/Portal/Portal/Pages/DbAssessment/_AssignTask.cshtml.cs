@@ -77,7 +77,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task PopulateDropDowns()
         {
-            var users = await _dbContext.AdUser.Select(u => u.DisplayName).ToListAsync();
+            var users = await _dbContext.AdUser.OrderBy(a => a.DisplayName).Select(u => u.DisplayName).ToListAsync();
 
             Assessors = new SelectList(users);
 
