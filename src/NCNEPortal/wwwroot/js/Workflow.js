@@ -112,20 +112,19 @@
     $("#btnPublishConfirm").click(function () {
         var complete = $("#Complete").val();
         var processId = $("#hdnProcessId").val();
-        var userName = $("#Publisher").val();
         if (complete === "true") {
-            completeWorkflow(processId,userName);
+            completeWorkflow(processId);
         } else {
 
             var versionNo = $("#chartVersionNo").val();
             processId = $("#hdnPublishProcessId").val();
             var stageId = $("#hdnPublishStageId").val();
-            publishCarisChart(versionNo, processId, stageId, userName);
+            publishCarisChart(versionNo, processId, stageId);
         }
 
     });
 
-    function completeWorkflow(processId, username) {
+    function completeWorkflow(processId) {
         $.ajax({
             type: "POST",
             url: "workflow/?handler=CompleteWorkflow",
@@ -134,8 +133,7 @@
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: {
-                "processId": processId,
-                "userName": username
+                "processId": processId
             },
             success: function () {
                 $("#PublishConfirmModal").modal("hide");
@@ -163,7 +161,7 @@
         });
     }
 
-    function publishCarisChart(versionNo, processId, stageId, userName) {
+    function publishCarisChart(versionNo, processId, stageId) {
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=PublishCarisChart",
@@ -174,8 +172,7 @@
             data: {
                 "versionNumber": versionNo,
                 "processId": processId,
-                "stageId": stageId,
-                "userName": userName
+                "stageId": stageId
             },
             success: function (result) {
                 formChanged = false;
@@ -206,10 +203,8 @@
             },
             data: {
                 "processId": processId,
-                "stageId": stageId,
                 "username": username,
                 "stageTypeId": stageTypeId
-
             },
 
             success: function (result) {
@@ -315,7 +310,6 @@
     $("#btnConfirm").click(function() {
         var processId = $("#hdnConfirmProcessId").val();
         var stageId = $("#hdnConfirmStageId").val();
-        var username = $("#hdnAssignedUser").val();
         var rework = $("#Rework").val();
 
         $.ajax({
@@ -328,7 +322,6 @@
             data: {
                 "processId": processId,
                 "stageId": stageId,
-                "username": username,
                 "isRework" :rework
             },
             success: function(result) {
@@ -942,7 +935,6 @@
 
 
     $("#btnComplete").click(function () {
-        var processId = $("#hdnProcessId").val();
         var userName = $("#Publisher").val();
 
         $.ajax({
@@ -953,7 +945,6 @@
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: {
-                "processId": processId,
                 "userName" : userName
 
             },

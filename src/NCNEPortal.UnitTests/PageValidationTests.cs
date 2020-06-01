@@ -22,9 +22,6 @@ namespace NCNEPortal.UnitTests
         [SetUp]
         public void Setup()
         {
-            var dbContextOptions = new DbContextOptionsBuilder<NcneWorkflowDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
-                .Options;
 
             _fakeNcneUserDbService = A.Fake<INcneUserDbService>();
 

@@ -18,10 +18,10 @@ namespace Common.Helpers
             _hpdDbContext = hpdDbContext;
         }
 
-        public async Task<(int, string, int, string)> GetValidHpdPanelInfo(int chartVersionId)
+        public async Task<(string, string, int, string)> GetValidHpdPanelInfo(int chartVersionId)
         {
 
-            (int, string, int, string) result = (0, null, 0, null);
+            (string, string, int, string) result = (null, null, 0, null);
 
             var commandText = "SELECT  pc.chtnum, pc.ctitl1, pc.ednumb, pc.version " +
                               " FROM hpdowner.paper_chart pc WHERE pc.product_status = 'Active' " +
@@ -41,7 +41,7 @@ namespace Common.Helpers
                 while (await reader.ReadAsync())
                 {
 
-                    result = (Convert.ToInt32(reader[0]),
+                    result = (reader[0].ToString(),
                         reader[1].ToString(), Convert.ToInt32(reader[2]), reader[3].ToString());
                 }
             }
@@ -67,7 +67,7 @@ namespace Common.Helpers
                     command.Transaction = await connection.BeginTransactionAsync();
 
 
-                    command.CommandText =  "BEGIN P_SAVE_MANAGER.STARTNEWSAVE(null); " +
+                    command.CommandText = "BEGIN P_SAVE_MANAGER.STARTNEWSAVE(null); " +
                                                             $"hpdowner.p_charts.publish ({carisChartId}); END;";
 
                     await command.ExecuteNonQueryAsync();
