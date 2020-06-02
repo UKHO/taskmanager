@@ -45,6 +45,13 @@ namespace Portal.TestAutomation.Framework.Setup
             keyVaultRoot.GetSection("PortalUITest").Bind(_dbConfig);
         }
 
+        [BeforeScenario(Order = 1)]
+        public void RegisterAzureConfigs()
+        {
+            _objectContainer.RegisterInstanceAs(_secrets);
+            _objectContainer.RegisterInstanceAs(_urls);
+        }
+
         [BeforeTestRun]
         public static void SetupDatabase()
         {
