@@ -13,10 +13,6 @@
 
     var unassignedTasksTable = setupUnassignedTasks();
 
-    $('.dropdown-menu').parent().on('shown.bs.dropdown', function () {
-        $('body').append($("div", this));
-    });
-
     var inFlightTasksTable = setupInFlightTasks();
     var selectedTeams = getTeamSelection();
 
