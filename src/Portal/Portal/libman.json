@@ -67,6 +67,15 @@
       ]
     },
     {
+      "library": "datatables.net-plugins@1.10.20",
+      "provider": "unpkg",
+      "destination": "wwwroot/lib/datatables.net-plugins/",
+      "files": [
+        "sorting/datetime-moment.js",
+        "License.txt"
+      ]
+    },
+    {
       "library": "font-awesome@5.13.0",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
@@ -132,6 +141,14 @@
       "files": [
         "typeahead.bundle.min.js",
         "typeahead.bundle.js"
+      ]
+    },
+    {
+      "library": "moment.js@2.26.0",
+      "destination": "wwwroot/lib/moment.js/",
+      "files": [
+        "moment.min.js",
+        "moment.js"
       ]
     }
   ]
