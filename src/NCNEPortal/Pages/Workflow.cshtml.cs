@@ -218,11 +218,16 @@ namespace NCNEPortal
 
         private TaskInfo UpdateTaskAsTerminated(int processId)
         {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateTaskAsTerminated));
+
+
             var taskInfo = _dbContext.TaskInfo.FirstOrDefault(t => t.ProcessId == processId);
 
             if (taskInfo == null)
             {
-                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table", ProcessId);
+                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table");
                 throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the TaskInfo table");
             }
 
@@ -318,7 +323,7 @@ namespace NCNEPortal
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
             LogContext.PushProperty("ProjectName", projectName);
 
-            _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {processId}");
+            _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
 
 
             if (string.IsNullOrWhiteSpace(projectName))
@@ -339,6 +344,10 @@ namespace NCNEPortal
 
         private async Task<int> CreateCarisProject(int processId, string projectName)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(CreateCarisProject));
+            LogContext.PushProperty("ProjectName", projectName);
+
 
             var carisProjectDetails =
                 await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
@@ -352,7 +361,7 @@ namespace NCNEPortal
             var hpdUser = await GetHpdUser(CurrentUser.DisplayName);
 
             _logger.LogInformation(
-                $"Creating Caris Project with ProcessId: {processId}; ProjectName: {projectName}.");
+                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
 
             var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
                 hpdUser.HpdUsername, _generalConfig.Value.CarisNcneProjectType,
@@ -365,19 +374,23 @@ namespace NCNEPortal
 
         private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateCarisProjectDetails));
+            LogContext.PushProperty("ProjectName", projectName);
+
             // If somehow the user has already created a project, remove it and create new row
             var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
             if (toRemove.Any())
             {
                 _logger.LogInformation(
-                    $"Removing the Caris project with ProcessId: {processId}; ProjectName: {projectName}.");
+                    "Removing the Caris project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
                 _dbContext.CarisProjectDetails.RemoveRange(toRemove);
                 await _dbContext.SaveChangesAsync();
             }
 
 
             _logger.LogInformation(
-                $"Adding Caris Project with ProcessId: {processId}; ProjectName: {projectName}. with new details");
+                "Adding Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}. with new details");
 
             _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
             {
@@ -393,6 +406,9 @@ namespace NCNEPortal
 
         private async Task<HpdUser> GetHpdUser(string username)
         {
+            LogContext.PushProperty("NcnePortalResource", nameof(GetHpdUser));
+            LogContext.PushProperty("Username", username);
+
             try
             {
                 return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
@@ -400,7 +416,7 @@ namespace NCNEPortal
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
+                _logger.LogError("Unable to find HPD Username for {Username} in our system.");
                 throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
                     ex.InnerException);
             }
@@ -488,10 +504,13 @@ namespace NCNEPortal
 
         public async Task<IActionResult> OnPostCompleteWorkflow(int processId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCompleteWorkflow));
+
             var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
 
             _logger.LogInformation(
-                $"Completing the workflow with ProcessId: {processId}.");
+                "Completing the workflow with ProcessId: {ProcessId}.");
 
             taskInfo.Status = NcneTaskStatus.Completed.ToString();
 
@@ -519,6 +538,10 @@ namespace NCNEPortal
 
         private async Task<bool> SendtoRework(int processId, int stageId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(SendtoRework));
+            LogContext.PushProperty("StageId", stageId);
+
             var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
@@ -528,7 +551,7 @@ namespace NCNEPortal
             currentStage.AssignedUser = CurrentUser.DisplayName;
 
             _logger.LogInformation(
-                $" stage {stageId} of task {processId} sent for rework.");
+                " stage {StageId} of task {ProcessId} sent for rework.");
 
             var nextStage =
                 _workflowStageHelper.GetNextStageForRework((NcneTaskStageType)currentStage.TaskStageTypeId);
@@ -556,7 +579,9 @@ namespace NCNEPortal
 
         private async Task<bool> CompleteStage(int processId, int stageId)
         {
-
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(CompleteStage));
+            LogContext.PushProperty("StageId", stageId);
 
             var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
 
@@ -567,7 +592,7 @@ namespace NCNEPortal
             currentStage.AssignedUser = CurrentUser.DisplayName;
 
             _logger.LogInformation(
-                $"stage {stageId} of task {processId} is completed.");
+                "stage {StageId} of task {ProcessId} is completed.");
 
 
             var v2 = taskStages.Single(t => t.ProcessId == processId &&
@@ -656,8 +681,12 @@ namespace NCNEPortal
 
         private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateTaskInformation));
+            LogContext.PushProperty("ChartType", chartType);
+
             _logger.LogInformation(
-                $" Updating Task Information for process {processId}.");
+                " Updating Task Information for process {ProcessId}.");
 
 
             var task =
@@ -706,9 +735,11 @@ namespace NCNEPortal
         private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
               string v1, string v2, string publisher)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(AddSystemComments));
 
             _logger.LogInformation(
-                $" Adding system comments for process {processId}.");
+                " Adding system comments for process {ProcessId}.");
 
 
             //update the system comment on changes
@@ -746,8 +777,11 @@ namespace NCNEPortal
 
         private void UpdateStatus(TaskInfo task)
         {
+            LogContext.PushProperty("ProcessId", task.ProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateStatus));
+
             _logger.LogInformation(
-                $" Updating task stage status for task {task.ProcessId}.");
+                " Updating task stage status for task {ProcessId}.");
 
 
             var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
@@ -773,8 +807,11 @@ namespace NCNEPortal
 
         private void UpdateRoles(TaskInfo task)
         {
+            LogContext.PushProperty("ProcessId", task.ProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateRoles));
+
             _logger.LogInformation(
-                $" Updating Roles for for task {task.ProcessId}.");
+                " Updating Roles for for task {ProcessId}.");
 
 
             task.TaskRole.Compiler = Compiler;
@@ -802,8 +839,11 @@ namespace NCNEPortal
 
         private void UpdateTaskUser(TaskInfo task)
         {
+            LogContext.PushProperty("ProcessId", task.ProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateTaskUser));
+
             _logger.LogInformation(
-                $" Updating Task stage users from roles for task {task.ProcessId}.");
+                " Updating Task stage users from roles for task {ProcessId}.");
 
 
             var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
@@ -830,9 +870,11 @@ namespace NCNEPortal
 
         private DeadlineId UpdateDeadlineDates(TaskInfo task)
         {
+            LogContext.PushProperty("ProcessId", task.ProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(UpdateDeadlineDates));
 
             _logger.LogInformation(
-                $" Updating deadline dates for task {task.ProcessId}.");
+                " Updating deadline dates for task {ProcessId}.");
 
 
             DeadlineId result = new DeadlineId();
@@ -894,12 +936,15 @@ namespace NCNEPortal
         public async Task<JsonResult> OnPostGetChartDetails(int versionNumber)
         {
 
+            LogContext.PushProperty("VersionNumber", versionNumber);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostGetChartDetails));
+
             var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
 
             if (string.IsNullOrEmpty(panelInfo.Item1))
             {
                 _logger.LogError(
-                    $" Invalid chart version number {versionNumber} entered for publish chart.");
+                    " Invalid chart version number {VersionNumber} entered for publish chart.");
 
                 return new JsonResult("Invalid Chart Version Number")
                 {
@@ -919,6 +964,11 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostPublishCarisChart));
+            LogContext.PushProperty("VersionNumber", versionNumber);
+
+
             try
             {
                 var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
@@ -928,7 +978,7 @@ namespace NCNEPortal
                     await CompleteStage(processId, stageId);
 
                     _logger.LogInformation(
-                        $" Caris chart with version {versionNumber} published for task {processId}.");
+                        " Caris chart with version {VersionNumber} published for task {ProcessId}.");
 
                     return new JsonResult(result)
                     { StatusCode = (int)HttpStatusCode.OK };
@@ -936,7 +986,7 @@ namespace NCNEPortal
                 else
                 {
                     _logger.LogError(
-                        $"Error publishing Caris chart with version {versionNumber}for task {processId}.");
+                        "Error publishing Caris chart with version {VersionNumber} for task {ProcessId}.");
 
 
                     return new JsonResult(result)
@@ -948,7 +998,7 @@ namespace NCNEPortal
             catch (Exception e)
             {
                 _logger.LogError(
-                    $"publishing Caris chart with version {versionNumber}for task {processId} failed with error {e.InnerException?.Message}.");
+                    "publishing Caris chart with version {VersionNumber} for task {ProcessId} failed with error" + e.InnerException?.Message);
 
                 return new JsonResult(e.InnerException?.Message)
                 {
@@ -960,12 +1010,17 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
+            LogContext.PushProperty("ProcessId", commentProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostTaskCommentAsync));
+            LogContext.PushProperty("Comment", txtComment);
+
+
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
             if (!string.IsNullOrEmpty(txtComment))
             {
                 _logger.LogInformation(
-                    $" Task comment added for task {commentProcessId}.");
+                    " Task comment added for task {ProcessId}.");
 
                 await _commentsHelper.AddTaskComment(txtComment, commentProcessId, CurrentUser.DisplayName);
             }
@@ -980,13 +1035,19 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)
         {
+            LogContext.PushProperty("ProcessId", commentProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostStageCommentAsync));
+            LogContext.PushProperty("Comment", txtComment);
+            LogContext.PushProperty("StageId", stageId);
+
+
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
 
             if (!string.IsNullOrEmpty(txtComment))
             {
                 _logger.LogInformation(
-                    $" Task stage comment added for task {commentProcessId} and stage {stageId}.");
+                    " Task stage comment added for task {ProcessId} and stage {StageId}.");
 
                 await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, CurrentUser.DisplayName);
                 await _dbContext.SaveChangesAsync();
