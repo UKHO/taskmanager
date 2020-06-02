@@ -152,6 +152,49 @@ stages:
           publishLocation: 'Container'
         displayName: 'Publish specs Artifact'
 
+    - job: BuildAccessibilityTests
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore AccessibilityTests'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.AccessibilityTests\\Portal.AccessibilityTests.csproj'
+          feedsToUse: 'select'
+  
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build AccessibilityTests'
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.AccessibilityTests\\Portal.AccessibilityTests.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish AccessibilityTests'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\Portal.AccessibilityTests\\Portal.AccessibilityTests.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish AccessibilityTests Artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+          ArtifactName: 'AccessibilityTests'
+          publishLocation: 'Container'
+
 
     - job: Publish_Pickles
       pool:
@@ -282,6 +325,50 @@ stages:
                   azureSubscription: 'TaskmanagerUAT-SC'
                   WebAppName: 'taskmanager-uat-web-portal'
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
+
+    - job: RunAutomatedAccessibilityTests
+      displayName: 'Run automated accessibility tests'
+      dependsOn: DeployPortalWebsiteUAT
+      pool:
+          NautilusBuild
+      steps:
+        - checkout: none
+        - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
+          inputs:
+            targetType: 'inline'
+            script: |
+              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
+              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download Build Artifacts'
+          inputs:
+            buildType: 'current'
+            downloadType: 'specific'
+            downloadPath: '$(System.ArtifactsDirectory)' 
+
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
+        - task: AzureCLI@1
+          displayName: 'Run Accessibility tests'
+          continueOnError: true
+          inputs:
+            azureSubscription: 'TaskmanagerUAT-SC'
+            scriptLocation: 'inlineScript'
+            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\AccessibilityTests\Portal.AccessibilityTests\Portal.AccessibilityTests.dll --logger:trx'
+
+        - task: PublishTestResults@2
+          displayName: 'Publish Accessibility Test Results'
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'Portal accessibility tests - $(System.StageName)'
 
     - job: RunAutomatedUITests
       displayName: 'Run automated UI tests'
