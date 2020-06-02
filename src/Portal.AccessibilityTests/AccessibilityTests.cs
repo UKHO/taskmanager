@@ -39,7 +39,7 @@ namespace Portal.AccessibilityTests
 
             _configSupport.RegisterAzureConfigs();
             _configSupport.RegisterLandingPage();
-            //_configSupport.RegisterReviewPage();
+            // TODO - add in the other pages, e.g: _configSupport.RegisterReviewPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();
