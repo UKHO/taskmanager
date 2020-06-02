@@ -12,6 +12,6 @@ namespace Common.Helpers
 
         Task<bool> PublishCarisProject(int carisChartId);
 
-        Task<(int, string, int, string)> GetValidHpdPanelInfo(int carisChartId);
+        Task<(string, string, int, string)> GetValidHpdPanelInfo(int carisChartId);
     }
 }

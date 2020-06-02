@@ -222,7 +222,7 @@ namespace NCNEPortal
 
             if (taskInfo == null)
             {
-                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table", ProcessId);
+                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table");
                 throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the TaskInfo table");
             }
 
@@ -318,7 +318,7 @@ namespace NCNEPortal
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
             LogContext.PushProperty("ProjectName", projectName);
 
-            _logger.LogInformation("Entering {PortalResource} for Workflow with: ProcessId: {ProcessId}");
+            _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
 
 
             if (string.IsNullOrWhiteSpace(projectName))
@@ -365,13 +365,20 @@ namespace NCNEPortal
 
         private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
         {
+
             // If somehow the user has already created a project, remove it and create new row
             var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
             if (toRemove.Any())
             {
+                _logger.LogInformation(
+                    "Removing the Caris project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
                 _dbContext.CarisProjectDetails.RemoveRange(toRemove);
                 await _dbContext.SaveChangesAsync();
             }
+
+
+            _logger.LogInformation(
+                "Adding Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}. with new details");
 
             _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
             {
@@ -387,6 +394,7 @@ namespace NCNEPortal
 
         private async Task<HpdUser> GetHpdUser(string username)
         {
+
             try
             {
                 return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
@@ -394,7 +402,7 @@ namespace NCNEPortal
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
+                _logger.LogError($"Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
                 throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
                     ex.InnerException);
             }
@@ -407,12 +415,12 @@ namespace NCNEPortal
             string[] result;
             if (isPublish)
             {
-                var dates = _milestoneCalculator.CalculateMilestones((DeadlineEnum)deadLine, (DateTime)dtInput);
+                var (formsDate, cisDate, commitDate) = _milestoneCalculator.CalculateMilestones((DeadlineEnum)deadLine, (DateTime)dtInput);
                 result = new[]
                 {
-                    dates.formsDate.ToShortDateString(),
-                    dates.commitDate.ToShortDateString(),
-                    dates.cisDate.ToShortDateString()
+                    formsDate.ToShortDateString(),
+                    commitDate.ToShortDateString(),
+                    cisDate.ToShortDateString()
                 };
             }
             else
@@ -430,8 +438,7 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, int stageId, string username,
-            int stageTypeId)
+        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
@@ -441,6 +448,7 @@ namespace NCNEPortal
             if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName,
                 (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
             {
+
                 return new JsonResult(this.ValidationErrorMessages)
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
@@ -451,7 +459,7 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateReworkAsync(int processId, int stageId, string username, int stageTypeId)
+        public async Task<IActionResult> OnPostValidateReworkAsync(int processId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
@@ -466,7 +474,7 @@ namespace NCNEPortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteWorkflow(int processId, string username)
+        public async Task<IActionResult> OnPostValidateCompleteWorkflow(string username)
         {
             ValidationErrorMessages.Clear();
 
@@ -480,9 +488,15 @@ namespace NCNEPortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
-        public async Task<IActionResult> OnPostCompleteWorkflow(int processId, string username)
+        public async Task<IActionResult> OnPostCompleteWorkflow(int processId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCompleteWorkflow));
+
             var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
+
+            _logger.LogInformation(
+                "Completing the workflow with ProcessId: {ProcessId}.");
 
             taskInfo.Status = NcneTaskStatus.Completed.ToString();
 
@@ -494,9 +508,12 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, string username,
-            Boolean isRework)
+        public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, bool isRework)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCompleteAsync));
+            LogContext.PushProperty("StageId", stageId);
+
             if (isRework)
             {
                 await SendtoRework(processId, stageId);
@@ -518,6 +535,9 @@ namespace NCNEPortal
             currentStage.Status = NcneTaskStageStatus.Rework.ToString();
             currentStage.DateCompleted = DateTime.Now;
             currentStage.AssignedUser = CurrentUser.DisplayName;
+
+            _logger.LogInformation(
+                " stage {StageId} of task {ProcessId} sent for rework.");
 
             var nextStage =
                 _workflowStageHelper.GetNextStageForRework((NcneTaskStageType)currentStage.TaskStageTypeId);
@@ -546,7 +566,6 @@ namespace NCNEPortal
         private async Task<bool> CompleteStage(int processId, int stageId)
         {
 
-
             var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
@@ -554,6 +573,10 @@ namespace NCNEPortal
             currentStage.Status = NcneTaskStageStatus.Completed.ToString();
             currentStage.DateCompleted = DateTime.Now;
             currentStage.AssignedUser = CurrentUser.DisplayName;
+
+            _logger.LogInformation(
+                "stage {StageId} of task {ProcessId} is completed.");
+
 
             var v2 = taskStages.Single(t => t.ProcessId == processId &&
                                             t.TaskStageTypeId == (int)NcneTaskStageType.V2);
@@ -608,6 +631,10 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {
 
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("ChartType", chartType);
+
             ValidationErrorMessages.Clear();
 
             //ValidateUsers(Compiler, Verifier1, Verifier2, Publisher);
@@ -641,6 +668,11 @@ namespace NCNEPortal
 
         private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
         {
+
+            _logger.LogInformation(
+                " Updating Task Information for process {ProcessId}.");
+
+
             var task =
                 await _dbContext.TaskInfo.Include(t => t.TaskRole)
                       .Include(s => s.TaskStage).FirstAsync(t => t.ProcessId == processId);
@@ -688,6 +720,9 @@ namespace NCNEPortal
               string v1, string v2, string publisher)
         {
 
+            _logger.LogInformation(
+                " Adding system comments for process {ProcessId}.");
+
 
             //update the system comment on changes
             if (((PublicationDate != null) && (task.PublicationDate != PublicationDate)) ||
@@ -724,6 +759,11 @@ namespace NCNEPortal
 
         private void UpdateStatus(TaskInfo task)
         {
+
+            _logger.LogInformation(
+                " Updating task stage status for task {ProcessId}.");
+
+
             var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
             var v2Rework = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2_Rework);
 
@@ -747,6 +787,11 @@ namespace NCNEPortal
 
         private void UpdateRoles(TaskInfo task)
         {
+
+            _logger.LogInformation(
+                " Updating Roles for for task {ProcessId}.");
+
+
             task.TaskRole.Compiler = Compiler;
             task.TaskRole.VerifierOne = Verifier1;
             task.TaskRole.VerifierTwo = Verifier2;
@@ -772,6 +817,11 @@ namespace NCNEPortal
 
         private void UpdateTaskUser(TaskInfo task)
         {
+
+            _logger.LogInformation(
+                " Updating Task stage users from roles for task {ProcessId}.");
+
+
             var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
                                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
             if (taskInProgress == null)
@@ -796,6 +846,10 @@ namespace NCNEPortal
 
         private DeadlineId UpdateDeadlineDates(TaskInfo task)
         {
+
+            _logger.LogInformation(
+                " Updating deadline dates for task {ProcessId}.");
+
 
             DeadlineId result = new DeadlineId();
 
@@ -855,45 +909,60 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostGetChartDetails(int versionNumber)
         {
+
+            LogContext.PushProperty("VersionNumber", versionNumber);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostGetChartDetails));
+
             var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
 
-            if (panelInfo.Item1 > 0)
+            if (string.IsNullOrEmpty(panelInfo.Item1))
             {
-                var result = new[]
-                {
-                    panelInfo.Item1.ToString(),
-                    panelInfo.Item2,
-                    panelInfo.Item3.ToString(),
-                    panelInfo.Item4
-                };
-                return new JsonResult(result);
-            }
-            else
-            {
+                _logger.LogError(
+                    " Invalid chart version number {VersionNumber} entered for publish chart.");
+
                 return new JsonResult("Invalid Chart Version Number")
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
             }
+
+            var result = new[]
+            {
+                panelInfo.Item1,
+                panelInfo.Item2,
+                panelInfo.Item3.ToString(),
+                panelInfo.Item4
+            };
+            return new JsonResult(result);
         }
 
-        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId, string userName)
+        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostPublishCarisChart));
+            LogContext.PushProperty("VersionNumber", versionNumber);
+
+
             try
             {
-
-
                 var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
 
                 if (result)
                 {
                     await CompleteStage(processId, stageId);
 
+                    _logger.LogInformation(
+                        " Caris chart with version {VersionNumber} published for task {ProcessId}.");
+
                     return new JsonResult(result)
                     { StatusCode = (int)HttpStatusCode.OK };
                 }
                 else
                 {
+                    _logger.LogError(
+                        "Error publishing Caris chart with version {VersionNumber} for task {ProcessId}.");
+
+
                     return new JsonResult(result)
                     {
                         StatusCode = (int)HttpStatusCode.InternalServerError
@@ -902,6 +971,9 @@ namespace NCNEPortal
             }
             catch (Exception e)
             {
+                _logger.LogError(
+                    "publishing Caris chart with version {VersionNumber} for task {ProcessId} failed with error" + e.InnerException?.Message);
+
                 return new JsonResult(e.InnerException?.Message)
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
@@ -912,10 +984,18 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
+            LogContext.PushProperty("ProcessId", commentProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostTaskCommentAsync));
+            LogContext.PushProperty("Comment", txtComment);
+
+
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
             if (!string.IsNullOrEmpty(txtComment))
             {
+                _logger.LogInformation(
+                    " Task comment added for task {ProcessId}.");
+
                 await _commentsHelper.AddTaskComment(txtComment, commentProcessId, CurrentUser.DisplayName);
             }
 
@@ -929,11 +1009,20 @@ namespace NCNEPortal
 
         public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)
         {
+            LogContext.PushProperty("ProcessId", commentProcessId);
+            LogContext.PushProperty("NcnePortalResource", nameof(OnPostStageCommentAsync));
+            LogContext.PushProperty("Comment", txtComment);
+            LogContext.PushProperty("StageId", stageId);
+
+
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
 
 
             if (!string.IsNullOrEmpty(txtComment))
             {
+                _logger.LogInformation(
+                    " Task stage comment added for task {ProcessId} and stage {StageId}.");
+
                 await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, CurrentUser.DisplayName);
                 await _dbContext.SaveChangesAsync();
             }
