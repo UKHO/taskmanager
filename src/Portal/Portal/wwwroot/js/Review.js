@@ -7,28 +7,34 @@
 
     initialiseOperatorsTypeaheads();
 
-    setReviewDoneHandler();
     setReviewSaveHandler();
+    setReviewDoneHandler();
+    setContinueProgressHandler();
 
     attachTerminateHandlers();
+    setUnsavedChangesHandlers();
 
     if (isReadOnly) {
         makeFormReadOnly($("#frmReviewPage"));
     }
 
     var formChanged = false;
-    $("#frmReviewPage").change(function () { formChanged = true; });
-
-    window.onbeforeunload = function () {
-        if (formChanged) {
-            return "Changes detected";
-        }
-    };
 
     if ($("#reviewErrorMessage").html().trim().length > 0) {
         $("#modalWaitReviewErrors").modal("show");
     }
+    
+    function setUnsavedChangesHandlers() {
+        $("#frmReviewPage").change(function() {
+             formChanged = true;
+        });
 
+        window.onbeforeunload = function() {
+            if (formChanged) {
+                return "Changes detected";
+            }
+        }
+    }
     function attachTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
 
@@ -100,18 +106,40 @@
     }
 
     function setReviewDoneHandler() {
-        $("#btnDone").prop("disabled", false);
-
 
         $("#btnDone").click(function (e) {
+            mainButtonsEnabled(false);
+
+            // check for unsaved changes
+            if (formChanged) {
+
+                $("#reviewErrorMessage").html("");
+
+                $("#reviewErrorMessage").append("<ul/>");
+                var unOrderedList = $("#reviewErrorMessage ul");
+                unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+
+                $("#modalWaitReviewErrors").modal("show");
+
+                mainButtonsEnabled(true);
+                return;
+            }
+
+            // display: progress warning modal
+            $("#modalReviewProgressWarning").modal("show");
+
+            mainButtonsEnabled(true);
+            
+        });
+    }
+
+    function setContinueProgressHandler() {
+        $("#btnContinueReviewProgress").click(function (e) {
             processReviewDone();
         });
     }
 
     function setReviewSaveHandler() {
-        $("#btnSave").prop("disabled", false);
-
-
         $("#btnSave").click(function (e) {
             processReviewSave();
         });
@@ -163,6 +191,8 @@
 
     function processReviewDone() {
         mainButtonsEnabled(false);
+
+        $("#modalReviewProgressWarning").modal("hide");
         $("#reviewErrorMessage").html("");
         $("#modalWaitReviewDone").modal("show");
 
@@ -355,5 +385,6 @@
         $("#btnDone").prop("disabled", !isEnabled);
         $("#btnSave").prop("disabled", !isEnabled);
         $("#btnTerminate").prop("disabled", !isEnabled);
+        $("#btnClose").prop("disabled", !isEnabled);
     }
 });
