@@ -40,11 +40,11 @@ namespace WorkflowCoordinator.IntegrationTests
             // Given
 
             //When
-            var workflowId = await _workflowServiceApiClient.CheckK2Connection();
+            var isConnected = await _workflowServiceApiClient.CheckK2Connection();
 
 
             //Then
-            Assert.IsTrue(workflowId);
+            Assert.IsTrue(isConnected);
         }
 
         private WorkflowDbContext WorkflowDbContext(SqlConnection connection)

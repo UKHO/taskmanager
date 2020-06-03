@@ -31,9 +31,7 @@ namespace WorkflowCoordinator.HttpClients
                 var data = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
-                                                   $"\n Message= '{data}'," +
-                                                   $"\n Url='{fullUri}'");
+                    return false;
 
             }
 
