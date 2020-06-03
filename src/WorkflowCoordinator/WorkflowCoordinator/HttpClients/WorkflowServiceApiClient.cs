@@ -25,11 +25,10 @@ namespace WorkflowCoordinator.HttpClients
         public async Task<bool> CheckK2Connection()
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetWorkflowsUri);
-            string data;
 
             using (var response = await _httpClient.GetAsync(fullUri))
             {
-                data = await response.Content.ReadAsStringAsync();
+                var data = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
