@@ -662,7 +662,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
