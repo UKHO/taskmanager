@@ -230,7 +230,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
-            var action = "Save";
+            var action = "Done";
             LogContext.PushProperty("Action", action);
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
