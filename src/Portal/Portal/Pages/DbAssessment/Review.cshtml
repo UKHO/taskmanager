@@ -142,7 +142,24 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitReviewDone" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitReviewDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitReviewDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Verifying Data...</li>
+                    <li>Progressing Task...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="modalWaitReviewSave" tabindex="-1" role="dialog" aria-labelledby="modalWaitReviewSave" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -159,7 +176,7 @@
 
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewDoneErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewDoneErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewErrors" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -170,12 +187,12 @@
                     <div class="col-1 mr-4">
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
-                    <div id="reviewDoneErrorMessage" class="col-11"></div>
+                    <div id="reviewErrorMessage" class="col-11"></div>
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="row col-11 justify-content-end">
-                    <div class="col-5 pr-1"><button type="button" id="btnReviewDoneErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                    <div class="col-5 pr-1"><button type="button" id="btnReviewErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Errors Processing Task">Ok</button></div>
                 </div>
             </div>
         </div>
