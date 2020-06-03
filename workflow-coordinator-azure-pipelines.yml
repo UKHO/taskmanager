@@ -40,12 +40,15 @@ stages:
           command: 'restore'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
           feedsToUse: 'select'
+          vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
+          includeNuGetOrg: true
         displayName: 'dotnet restore workflowcoordinator'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
+          arguments: "--configuration $(BuildConfiguration) --no-restore"
         displayName: 'dotnet build workflowcoordinator'
 
       - task: DotNetCoreCLI@2
@@ -53,19 +56,22 @@ stages:
           command: 'restore'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
           feedsToUse: 'select'
+          vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
+          includeNuGetOrg: true
         displayName: 'dotnet restore workflowcoordinatortests'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
+          arguments: "--configuration $(BuildConfiguration) --no-restore"
         displayName: 'dotnet build workflowcoordinatortests'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-          arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings
+          arguments: '--configuration $(BuildConfiguration)  --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings --no-build'
         displayName: 'dotnet test workflowcoordinatortests'
 
       - task: DotNetCoreCLI@2
@@ -90,7 +96,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator\\workflowcoordinator.csproj'
           zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous'
+          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\\WebJob\\App_Data\\jobs\\continuous --no-build'
         displayName: 'Publish Solution'
 
       - task: PowerShell@2
@@ -143,8 +149,24 @@ stages:
 
       - task: DotNetCoreCLI@2
         inputs:
+          command: 'restore'
+          projects: '**/workflowcoordinator.csproj'
+          feedsToUse: 'select'
+          vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
+          includeNuGetOrg: true
+        displayName: 'dotnet restore workflowcoordinator'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '**/workflowcoordinator.csproj'
+          arguments: "--configuration $(BuildConfiguration) --no-restore"
+        displayName: 'dotnet build workflowcoordinator'
+
+      - task: DotNetCoreCLI@2
+        inputs:
           command: publish
-          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output --no-build"
           projects: "**/workflowcoordinator.csproj"
           publishWebProjects: false
           modifyOutputPath: false
