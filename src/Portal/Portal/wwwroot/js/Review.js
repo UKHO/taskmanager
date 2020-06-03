@@ -126,6 +126,8 @@
             }
 
             // display: progress warning modal
+            $("#btnContinueReviewProgress").prop("disabled", false);
+            $("#btnCancelReviewProgressWarning").prop("disabled", false);
             $("#modalReviewProgressWarning").modal("show");
 
             mainButtonsEnabled(true);
@@ -191,6 +193,9 @@
 
     function processReviewDone() {
         mainButtonsEnabled(false);
+
+        $("#btnContinueReviewProgress").prop("disabled", true);
+        $("#btnCancelReviewProgressWarning").prop("disabled", true);
 
         $("#modalReviewProgressWarning").modal("hide");
         $("#reviewErrorMessage").html("");
