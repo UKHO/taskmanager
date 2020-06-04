@@ -214,6 +214,7 @@
             data: formData,
             complete: function () {
                 console.log("Done complete");
+                mainButtonsEnabled(true);
             },
             success: function (result) {
                 formChanged = false;
