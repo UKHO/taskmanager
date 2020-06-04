@@ -199,9 +199,14 @@
         $("#btnContinueReviewProgress").prop("disabled", true);
         $("#btnCancelReviewProgressWarning").prop("disabled", true);
 
-        $("#modalReviewProgressWarning").modal("hide");
+
         $("#reviewErrorMessage").html("");
-        $("#modalWaitReviewDone").modal("show");
+
+        //Hide modalReviewProgressWarning modal and show modalWaitReviewDone modal
+        $("#modalReviewProgressWarning").one("hidden.bs.modal", function () {
+            $("#modalWaitReviewDone").modal("show");
+        });
+        $("#modalReviewProgressWarning").modal("hide");
 
         var formData = $("#frmReviewPage").serialize();
 
@@ -217,7 +222,6 @@
                 mainButtonsEnabled(true);
             },
             success: function (result) {
-                formChanged = false;
                 window.location.replace("/Index");
                 console.log("Done success");
             },

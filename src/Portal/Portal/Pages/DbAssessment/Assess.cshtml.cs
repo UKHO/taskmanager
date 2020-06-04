@@ -129,6 +129,54 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
+        public async Task<IActionResult> OnPostSaveAsync(int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Assess");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+
+            var action = "Save";
+            LogContext.PushProperty("Action", action);
+
+            _logger.LogInformation("Entering Save with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
+
+            ValidationErrorMessages.Clear();
+
+            ProcessId = processId;
+
+            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+            if (!await _pageValidationHelper.CheckAssessPageForErrors(
+                action,
+                Ion,
+                ActivityCode,
+                SourceCategory,
+                TaskType,
+                ProductActioned,
+                ProductActionChangeDetails,
+                RecordProductAction,
+                DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
+                };
+            }
+
+            if (!await SaveTaskData(processId, currentAssessData.WorkflowInstanceId))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
+                };
+            }
+            
+            _logger.LogInformation("Finished Save with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
             LogContext.PushProperty("ActivityName", "Assess");
@@ -147,33 +195,6 @@ namespace Portal.Pages.DbAssessment
 
             switch (action)
             {
-                case "Save":
-                    if (!await _pageValidationHelper.CheckAssessPageForErrors(
-                        action,
-                        Ion,
-                        ActivityCode,
-                        SourceCategory,
-                        TaskType,
-                        ProductActioned,
-                        ProductActionChangeDetails,
-                        RecordProductAction,
-                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
-                        };
-                    }
-
-                    if (!await SaveTaskData(processId, currentAssessData.WorkflowInstanceId))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
-                        };
-                    }
-
-                    break;
                 case "Done":
                     if (!await _pageValidationHelper.CheckAssessPageForErrors(
                         action,
@@ -189,14 +210,6 @@ namespace Portal.Pages.DbAssessment
                         return new JsonResult(this.ValidationErrorMessages)
                         {
                             StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
-                        };
-                    }
-
-                    if (!await SaveTaskData(processId, currentAssessData.WorkflowInstanceId))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
                         };
                     }
 

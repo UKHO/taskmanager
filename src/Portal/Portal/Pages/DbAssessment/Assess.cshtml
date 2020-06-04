@@ -106,7 +106,24 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitAssessDone" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitAssessDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitAssessDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Verifying Data...</li>
+                    <li>Progressing Task...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="modalWaitAssessSave" tabindex="-1" role="dialog" aria-labelledby="modalWaitAssessSave" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -123,7 +140,7 @@
 
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitAssessDoneErrors" tabindex="-1" role="dialog" aria-labelledby="AssessDoneErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitAssessErrors" tabindex="-1" role="dialog" aria-labelledby="AssessErrors" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -134,7 +151,7 @@
                     <div class="col-1 mr-4">
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
-                    <div id="assessDoneErrorMessage" class="col-11">
+                    <div id="assessErrorMessage" class="col-11">
                         @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
                         {
                             <ul>
@@ -149,7 +166,7 @@
             </div>
             <div class="modal-footer">
                 <div class="row col-11 justify-content-end">
-                    <div class="col-5 pr-1"><button type="button" id="btnAssessDoneErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                    <div class="col-5 pr-1"><button type="button" id="btnAssessErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
                 </div>
             </div>
         </div>
@@ -190,6 +207,37 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+@* Modal for warning of unsaved form on reject *@
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalAssessProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
+    <div class="modal-dialog warning">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Progress Assess task to Verify.</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div class="col-11">
+                        <ul><li>Are you sure you want to continue?</li></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="col-4 float-left"><button type="button" id="btnCancelAssessProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Assess">Cancel</button></div>
+                                <div class="col-4 float-right"><button type="button" id="btnContinueAssessProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Assess">Continue</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
