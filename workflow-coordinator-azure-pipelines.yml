@@ -64,14 +64,14 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-          arguments: "--configuration $(BuildConfiguration) --no-restore"
+          arguments: "--configuration Debug --no-restore"
         displayName: 'dotnet build workflowcoordinatortests'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\workflowcoordinator.unittests.csproj'
-          arguments: '--configuration $(BuildConfiguration)  --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings --no-build'
+          arguments: '--collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\workflowcoordinator\\workflowcoordinator.unittests\\CodeCoverage.runsettings --no-build'
         displayName: 'dotnet test workflowcoordinatortests'
 
       - task: DotNetCoreCLI@2

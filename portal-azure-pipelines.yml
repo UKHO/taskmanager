@@ -54,12 +54,13 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
-          arguments: '/p:SourceRevisionId=$(Build.SourceVersion)'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --configuration $(BuildConfiguration) --no-restore'
         displayName: 'dotnet build portal'
   
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
+          arguments: '--configuration Debug'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
         displayName: 'dotnet build portaltests'
 
@@ -73,7 +74,7 @@ stages:
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
-          arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings
+          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings --no-build
         displayName: 'dotnet test portaltests'
 
       - task: DotNetCoreCLI@2
@@ -98,7 +99,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
           zipAfterPublish: false
-          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\portal'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\portal --no-build'
         displayName: 'Publish portal-project'
 
       - task: PublishBuildArtifacts@1
