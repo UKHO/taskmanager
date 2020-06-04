@@ -168,6 +168,7 @@
             success: function (result) {
                 formChanged = false;
                 console.log("Save Success");
+                $("#modalWaitReviewSave").modal("hide");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
