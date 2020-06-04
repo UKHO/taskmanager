@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using AutoMapper;
 using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
@@ -129,14 +127,6 @@ namespace Portal
 
             services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
-
-            services.AddHttpClient<IWorkflowServiceApiClient, WorkflowServiceApiClient>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                {
-                    ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                    Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername, startupSecretsConfig.K2RestApiPassword)
-                });
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options =>

@@ -5,6 +5,7 @@ namespace WorkflowCoordinator.HttpClients
 {
     public interface IWorkflowServiceApiClient
     {
+        Task<bool> CheckK2Connection();
         Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId);
         Task<int> GetDBAssessmentWorkflowId();
         Task<string> GetWorkflowInstanceSerialNumber(int workflowInstanceId);

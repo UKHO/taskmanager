@@ -22,6 +22,23 @@ namespace WorkflowCoordinator.HttpClients
             _httpClient = httpClient;
         }
 
+        public async Task<bool> CheckK2Connection()
+        {
+            var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceGetWorkflowsUri);
+
+            using (var response = await _httpClient.GetAsync(fullUri))
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+            }
+
+            return true;
+
+        }
+
         public async Task<int> CreateWorkflowInstance(int dbAssessmentWorkflowId)
         {
             var fullUri = new Uri(_uriConfig.Value.K2WebServiceBaseUri, _uriConfig.Value.K2WebServiceStartWorkflowInstanceUri + $"/{dbAssessmentWorkflowId}");

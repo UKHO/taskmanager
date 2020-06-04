@@ -12,7 +12,6 @@ using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.UnitTests
 {
@@ -22,7 +21,6 @@ namespace WorkflowCoordinator.UnitTests
         private ProgressWorkflowInstanceEventHandler _handler;
         private IWorkflowServiceApiClient _fakeWorkflowServiceApiClient;
         private ILogger<ProgressWorkflowInstanceEventHandler> _fakeLogger;
-        private WorkflowDbContext _dbContext;
 
         [SetUp]
         public void Setup()
@@ -31,67 +29,42 @@ namespace WorkflowCoordinator.UnitTests
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
 
-            _dbContext = new WorkflowDbContext(dbContextOptions);
-
             _fakeWorkflowServiceApiClient = A.Fake<IWorkflowServiceApiClient>();
             _fakeLogger = A.Dummy<ILogger<ProgressWorkflowInstanceEventHandler>>();
 
             _handlerContext = new TestableMessageHandlerContext();
 
-            _handler = new ProgressWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient,
-                _fakeLogger, _dbContext);
+            _handler = new ProgressWorkflowInstanceEventHandler(_fakeWorkflowServiceApiClient, _fakeLogger);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _dbContext.Database.EnsureDeleted();
-        }
-
-        [Test]
-        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_K2_Task_Returns_At_Assess_Then_Task_Is_Progressed_In_K2_And_Data_Is_Persisted()
+        [TestCase(WorkflowStage.Review, WorkflowStage.Assess)]
+        [TestCase(WorkflowStage.Assess, WorkflowStage.Verify)]
+        [TestCase(WorkflowStage.Verify, WorkflowStage.Completed)]
+        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_and_K2_Task_Is_At_FromAction_Then_Task_Is_Progressed_In_K2_And_PersistWorkflowInstanceDataCommand_is_Fired(
+                                                                                                                                        WorkflowStage fromAction,
+                                                                                                                                        WorkflowStage toAction)
         {
             var k2SerialNumber = "234_123";
             var processId = 234;
-            var workflowInstanceId = 1;
 
             var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
-                FromActivity = WorkflowStage.Assess,
-                ToActivity = WorkflowStage.Verify
+                FromActivity = fromAction,
+                ToActivity = toAction
             };
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(progressWorkflowInstanceEvent.ProcessId))
                 .Returns(new K2TaskData()
                 {
-                    ActivityName = WorkflowStage.Assess.ToString(),
+                    ActivityName = fromAction.ToString(),
                     SerialNumber = k2SerialNumber,
                     WorkflowInstanceID = processId
                 });
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                 .Returns(true);
-
-            var currentWorkflowInstance = new WorkflowInstance()
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                ActivityName = WorkflowStage.Assess.ToString(),
-                Status = WorkflowStatus.Updating.ToString(),
-                SerialNumber = k2SerialNumber
-            };
-            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
-            await _dbContext.SaveChangesAsync();
-
-            var assessData = new DbAssessmentAssessData()
-            {
-                WorkflowInstanceId = workflowInstanceId,
-                ProcessId = processId
-            };
-            await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
-            await _dbContext.SaveChangesAsync();
 
             //When
             await _handler.Handle(progressWorkflowInstanceEvent, _handlerContext);
@@ -108,24 +81,107 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_Task_To_Verify_And_Task_Failed_To_Progress_In_K2_Then_ApplicationException_Is_Thrown()
+        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_Terminating_and_K2_Task_Returns_At_Review_Then_Task_Is_Terminated_In_K2_And_PersistWorkflowInstanceDataCommand_is_Fired()
         {
             var k2SerialNumber = "234_123";
             var processId = 234;
-            var workflowInstanceId = 1;
+            var fromAction = WorkflowStage.Review;
+            var toAction = WorkflowStage.Terminated;
+
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId,
+                FromActivity = fromAction,
+                ToActivity = toAction
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(progressWorkflowInstanceEvent.ProcessId))
+                .Returns(new K2TaskData()
+                {
+                    ActivityName = fromAction.ToString(),
+                    SerialNumber = k2SerialNumber,
+                    WorkflowInstanceID = processId
+                });
+
+            //When
+            await _handler.Handle(progressWorkflowInstanceEvent, _handlerContext);
+
+            //Then
+            A.CallTo(() => _fakeWorkflowServiceApiClient.TerminateWorkflowInstance(k2SerialNumber))
+    .MustHaveHappened();
+
+            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+
+            var persistWorkflowInstanceDataCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistWorkflowInstanceDataCommand);
+            Assert.IsNotNull(persistWorkflowInstanceDataCommand, $"No message of type {nameof(PersistWorkflowInstanceDataCommand)} seen.");
+        }
+
+
+        [Test]
+        public async Task Test_Handle_ProgressWorkflowInstanceEvent_When_Rejecting_and_K2_Task_Returns_At_Verify_Then_Task_Is_Rejected_In_K2_And_PersistWorkflowInstanceDataCommand_is_Fired()
+        {
+            var k2SerialNumber = "234_123";
+            var processId = 234;
+            var fromAction = WorkflowStage.Verify;
+            var toAction = WorkflowStage.Rejected;
+
+            var progressWorkflowInstanceEvent = new ProgressWorkflowInstanceEvent()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId,
+                FromActivity = fromAction,
+                ToActivity = toAction
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(progressWorkflowInstanceEvent.ProcessId))
+                .Returns(new K2TaskData()
+                {
+                    ActivityName = fromAction.ToString(),
+                    SerialNumber = k2SerialNumber,
+                    WorkflowInstanceID = processId
+                });
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.RejectWorkflowInstance(k2SerialNumber))
+                .Returns(true);
+
+            //When
+            await _handler.Handle(progressWorkflowInstanceEvent, _handlerContext);
+
+            //Then
+            A.CallTo(() => _fakeWorkflowServiceApiClient.RejectWorkflowInstance(k2SerialNumber))
+    .MustHaveHappened();
+
+            Assert.AreEqual(1, _handlerContext.SentMessages.Length);
+
+            var persistWorkflowInstanceDataCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistWorkflowInstanceDataCommand);
+            Assert.IsNotNull(persistWorkflowInstanceDataCommand, $"No message of type {nameof(PersistWorkflowInstanceDataCommand)} seen.");
+        }
+
+        [TestCase(WorkflowStage.Review, WorkflowStage.Assess)]
+        [TestCase(WorkflowStage.Assess, WorkflowStage.Verify)]
+        [TestCase(WorkflowStage.Verify, WorkflowStage.Completed)]
+        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_Task_And_Task_Failed_To_Progress_In_K2_Then_ApplicationException_Is_Thrown(
+                                                                                                                                                    WorkflowStage fromAction,
+                                                                                                                                                    WorkflowStage toAction)
+        {
+            var k2SerialNumber = "234_123";
+            var processId = 234;
 
             var message = new ProgressWorkflowInstanceEvent()
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
-                FromActivity = WorkflowStage.Assess,
-                ToActivity = WorkflowStage.Verify
+                FromActivity = fromAction,
+                ToActivity = toAction
             };
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId))
                 .Returns(new K2TaskData()
                 {
-                    ActivityName = WorkflowStage.Assess.ToString(),
+                    ActivityName = fromAction.ToString(),
                     SerialNumber = k2SerialNumber,
                     WorkflowInstanceID = processId
                 });
@@ -133,28 +189,9 @@ namespace WorkflowCoordinator.UnitTests
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                 .Returns(false);
 
-            var currentWorkflowInstance = new WorkflowInstance()
-            {
-                ProcessId = processId,
-                WorkflowInstanceId = workflowInstanceId,
-                ActivityName = WorkflowStage.Assess.ToString(),
-                Status = WorkflowStatus.Updating.ToString(),
-                SerialNumber = k2SerialNumber
-            };
-            await _dbContext.WorkflowInstance.AddAsync(currentWorkflowInstance);
-            await _dbContext.SaveChangesAsync();
-
-            var assessData = new DbAssessmentAssessData()
-            {
-                WorkflowInstanceId = workflowInstanceId,
-                ProcessId = processId
-            };
-            await _dbContext.DbAssessmentAssessData.AddAsync(assessData);
-            await _dbContext.SaveChangesAsync();
-
             //When
             var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
-            
+
             //Then
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(k2SerialNumber))
                                     .MustHaveHappened();
@@ -171,7 +208,102 @@ namespace WorkflowCoordinator.UnitTests
         }
 
         [Test]
-        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Progressing_To_Assess_And_Task_Is_At_Review_Then_ApplicationException_Is_Thrown()
+        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Terminating_Task_And_Task_Failed_To_Terminate_In_K2_Then_ApplicationException_Is_Thrown()
+        {
+            var k2SerialNumber = "234_123";
+            var processId = 234;
+            var fromAction = WorkflowStage.Review;
+            var toAction = WorkflowStage.Terminated;
+
+            var message = new ProgressWorkflowInstanceEvent()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId,
+                FromActivity = fromAction,
+                ToActivity = toAction
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId))
+                .Returns(new K2TaskData()
+                {
+                    ActivityName = fromAction.ToString(),
+                    SerialNumber = k2SerialNumber,
+                    WorkflowInstanceID = processId
+                });
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.TerminateWorkflowInstance(k2SerialNumber))
+                .Throws<ApplicationException>();
+
+            //When
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
+
+            //Then
+            A.CallTo(() => _fakeWorkflowServiceApiClient.TerminateWorkflowInstance(k2SerialNumber))
+                                    .MustHaveHappened();
+
+            Assert.IsTrue(ex.Message.Contains($"Failed Terminating K2 task with SerialNumber: {k2SerialNumber}"));
+
+            Assert.AreEqual(0, _handlerContext.SentMessages.Length);
+
+            var persistWorkflowInstanceDataCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistWorkflowInstanceDataCommand);
+            Assert.IsNull(persistWorkflowInstanceDataCommand, $"Message of type {nameof(PersistWorkflowInstanceDataCommand)} seen.");
+        }
+
+        [Test]
+        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Rejecting_Task_And_Task_Failed_To_Reject_In_K2_Then_ApplicationException_Is_Thrown()
+        {
+            var k2SerialNumber = "234_123";
+            var processId = 234;
+            var fromAction = WorkflowStage.Verify;
+            var toAction = WorkflowStage.Rejected;
+
+            var message = new ProgressWorkflowInstanceEvent()
+            {
+                CorrelationId = Guid.Empty,
+                ProcessId = processId,
+                FromActivity = fromAction,
+                ToActivity = toAction
+            };
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId))
+                .Returns(new K2TaskData()
+                {
+                    ActivityName = fromAction.ToString(),
+                    SerialNumber = k2SerialNumber,
+                    WorkflowInstanceID = processId
+                });
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.RejectWorkflowInstance(k2SerialNumber))
+                .Returns(false);
+
+            //When
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
+
+            //Then
+            A.CallTo(() => _fakeWorkflowServiceApiClient.RejectWorkflowInstance(k2SerialNumber))
+                                    .MustHaveHappened();
+
+            Assert.AreEqual(
+                $"Unable to reject task {processId} from Verify in K2.",
+                    ex.Message);
+
+            Assert.AreEqual(0, _handlerContext.SentMessages.Length);
+
+            var persistWorkflowInstanceDataCommand = _handlerContext.SentMessages.SingleOrDefault(t =>
+                t.Message is PersistWorkflowInstanceDataCommand);
+            Assert.IsNull(persistWorkflowInstanceDataCommand, $"Message of type {nameof(PersistWorkflowInstanceDataCommand)} seen.");
+        }
+
+        [TestCase(WorkflowStage.Review, WorkflowStage.Assess, WorkflowStage.Assess)]
+        [TestCase(WorkflowStage.Assess, WorkflowStage.Verify, WorkflowStage.Verify)]
+        [TestCase(WorkflowStage.Verify, WorkflowStage.Completed, WorkflowStage.Assess)]
+        [TestCase(WorkflowStage.Review, WorkflowStage.Terminated, WorkflowStage.Assess)]
+        [TestCase(WorkflowStage.Verify, WorkflowStage.Rejected, WorkflowStage.Assess)]
+        public void Test_Handle_ProgressWorkflowInstanceEvent_When_Task_In_K2_Is_At_Wrong_Activity_Then_ApplicationException_Is_Thrown(
+                                                                                                                                            WorkflowStage fromAction,
+                                                                                                                                            WorkflowStage toAction,
+                                                                                                                                            WorkflowStage k2Action)
         {
             var processId = 234;
 
@@ -179,13 +311,13 @@ namespace WorkflowCoordinator.UnitTests
             {
                 CorrelationId = Guid.Empty,
                 ProcessId = processId,
-                FromActivity = WorkflowStage.Assess,
-                ToActivity = WorkflowStage.Verify
+                FromActivity = fromAction,
+                ToActivity = toAction
             };
 
             var k2Task = new K2TaskData()
             {
-                ActivityName = WorkflowStage.Review.ToString(),
+                ActivityName = k2Action.ToString(),
                 SerialNumber = "234_123",
                 WorkflowInstanceID = processId
             };
@@ -198,6 +330,8 @@ namespace WorkflowCoordinator.UnitTests
 
             //Then
             A.CallTo(() => _fakeWorkflowServiceApiClient.ProgressWorkflowInstance(A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
+            A.CallTo(() => _fakeWorkflowServiceApiClient.RejectWorkflowInstance(A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
+            A.CallTo(() => _fakeWorkflowServiceApiClient.TerminateWorkflowInstance(A<string>.Ignored)).WithAnyArguments().MustNotHaveHappened();
 
             Assert.AreEqual(
                 $"Workflow instance with ProcessId {message.ProcessId} is not at the expected step {message.FromActivity} in K2 but was at {k2Task.ActivityName}," +

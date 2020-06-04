@@ -1,31 +1,22 @@
-
-using Common.Helpers;
-
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-
-using NUnit.Framework;
-
-using Portal.Configuration;
-using Portal.HttpClients;
-
-using System;
 using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
+using Common.Helpers;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using NUnit.Framework;
+using WorkflowCoordinator.Config;
+using WorkflowCoordinator.HttpClients;
 using WorkflowDatabase.EF;
 
-namespace Portal.IntegrationTests
+namespace WorkflowCoordinator.IntegrationTests
 {
     public class K2DbAssessmentTests
     {
         private WorkflowServiceApiClient _workflowServiceApiClient;
-        private ILogger<WorkflowServiceApiClient> _fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -41,8 +32,6 @@ namespace Portal.IntegrationTests
             IOptionsSnapshot<UriConfig> uriConfigOptions = new OptionsSnapshotWrapper<UriConfig>(uriConfig);
 
             _workflowServiceApiClient = SetupWorkflowServiceApiClient(startupSecretsConfig, generalConfigOptions, uriConfigOptions);
-
-            _fakeLogger = A.Dummy<ILogger<WorkflowServiceApiClient>>();
         }
 
         [Test]
@@ -51,11 +40,11 @@ namespace Portal.IntegrationTests
             // Given
 
             //When
-            var workflowId = await _workflowServiceApiClient.CheckK2Connection();
+            var isConnected = await _workflowServiceApiClient.CheckK2Connection();
 
 
             //Then
-            Assert.IsTrue(workflowId);
+            Assert.IsTrue(isConnected);
         }
 
         private WorkflowDbContext WorkflowDbContext(SqlConnection connection)
@@ -88,7 +77,7 @@ namespace Portal.IntegrationTests
                         ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
                         Credentials = new NetworkCredential(startupSecretsConfig.K2RestApiUsername, startupSecretsConfig.K2RestApiPassword)
                     }
-                ), uriConfig, _fakeLogger);
+                ), generalConfigOptions, uriConfig);
         }
 
         private StartupSecretsConfig GetSecretsConfigs(IConfigurationRoot keyVaultConfigRoot)
