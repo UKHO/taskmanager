@@ -239,7 +239,7 @@
 
 @* Modal for warning of unsaved form on reject *@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalReviewProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
-    <div class="modal-dialog warning ">
+    <div class="modal-dialog warning">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Progress Review task to Assess.</h3>
@@ -254,9 +254,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="row col-11 justify-content-end">
-                        <div class="col-5 pr-1"><button type="button" id="btnCancelReviewProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Review">Cancel</button></div>
-                        <div class="col-5 pl-1 pr-0"><button type="button" id="btnContinueReviewProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Review">Continue</button></div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="col-4 float-left"><button type="button" id="btnCancelReviewProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Review">Cancel</button></div>
+                                <div class="col-4 float-right"><button type="button" id="btnContinueReviewProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Review">Continue</button></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

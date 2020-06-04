@@ -11,7 +11,7 @@
     setReviewDoneHandler();
     setContinueProgressHandler();
 
-    attachTerminateHandlers();
+    attachValidateTerminateHandlers();
     setUnsavedChangesHandlers();
 
     if (isReadOnly) {
@@ -35,7 +35,7 @@
             }
         }
     }
-    function attachTerminateHandlers() {
+    function attachValidateTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
 
             var processId = $("#hdnProcessId").serialize();
@@ -162,16 +162,12 @@
             },
             data: formData,
             complete: function () {
-                //Add a delay to account for the modalWaitReviewDone modal
-                //not being fully shown, before trying to hide it
-                window.setTimeout(function () {
-                    $("#modalWaitReviewSave").modal("hide");
-                    mainButtonsEnabled(true);
-                }, 200);
+                console.log("Save Complete");
+                mainButtonsEnabled(true);
             },
             success: function (result) {
                 formChanged = false;
-                console.log("success");
+                console.log("Save Success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
@@ -184,7 +180,12 @@
                         unOrderedList.append("<li>" + item + "</li>");
                     });
 
-                    $("#modalWaitReviewErrors").modal("show");
+                    //Hide modalWaitReviewSave modal and show modalWaitReviewErrors modal
+                    $("#modalWaitReviewSave").one("hidden.bs.modal", function () {
+                        $("#modalWaitReviewErrors").modal("show");
+                    });
+                    $("#modalWaitReviewSave").modal("hide");
+
                 }
 
             }
@@ -211,17 +212,12 @@
             },
             data: formData,
             complete: function () {
-                //Add a delay to account for the modalWaitReviewDone modal
-                //not being fully shown, before trying to hide it
-                window.setTimeout(function () {
-                    $("#modalWaitReviewDone").modal("hide");
-                    mainButtonsEnabled(true);
-                }, 200);
+                console.log("Done complete");
             },
             success: function (result) {
                 formChanged = false;
                 window.location.replace("/Index");
-                console.log("success");
+                console.log("Done success");
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
@@ -234,7 +230,12 @@
                         unOrderedList.append("<li>" + item + "</li>");
                     });
 
-                    $("#modalWaitReviewErrors").modal("show");
+                    //Hide modalWaitReviewDone modal and show modalWaitReviewErrors modal
+                    $("#modalWaitReviewDone").one("hidden.bs.modal", function () {
+                        $("#modalWaitReviewErrors").modal("show");
+                    });
+                    $("#modalWaitReviewDone").modal("hide");
+
                 }
 
             }
