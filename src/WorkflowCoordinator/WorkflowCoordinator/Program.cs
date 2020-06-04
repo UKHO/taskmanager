@@ -28,7 +28,7 @@ namespace WorkflowCoordinator
             var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
 
             var builder = new HostBuilder()
-                .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
+                .UseEnvironment(ConfigHelpers.HostBuilderEnvironment)
                 .UseSerilog()
                 .ConfigureWebJobs((context, b) => { b.AddAzureStorageCoreServices(); })
                 .ConfigureAppConfiguration((hostingContext, config) =>

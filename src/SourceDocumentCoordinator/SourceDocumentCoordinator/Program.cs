@@ -28,7 +28,7 @@ namespace SourceDocumentCoordinator
             var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
 
             var builder = new HostBuilder()
-            .UseEnvironment(Environment.GetEnvironmentVariable("ENVIRONMENT"))
+            .UseEnvironment(ConfigHelpers.HostBuilderEnvironment)
             .UseSerilog()
             .ConfigureWebJobs(b =>
             {
