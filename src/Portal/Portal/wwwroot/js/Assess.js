@@ -63,13 +63,13 @@
 
     function handlebtnContinueAssessProgress() {
         $("#btnContinueAssessProgress").on("click", function (e) {
-            processAssessDone("Done");
+            processAssessDone("Done", $("#modalAssessProgressWarning"));
         });
     }
 
     function handleContinueAssessDoneWarning() {
         $("#btnContinueAssessDoneWarning").on("click", function (e) {
-            processAssessDone("ConfirmedDone");
+            processAssessDone("ConfirmedDone", $("#modalAssessDoneWarning"));
         });
     }
     function setAssessSaveHandler() {
@@ -102,39 +102,12 @@
                 $("#modalWaitAssessSave").modal("hide");
             },
             error: function (error) {
-                var responseJson = error.responseJSON;
-                var statusCode = error.status;
-
-                if (responseJson != null) {
-                    if (statusCode === customHttpStatusCodes.FailedValidation) {
-                        $("#assessErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#assessErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                    } else {
-                        $("#assessErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#assessErrorMessage ul");
-
-                        unOrderedList.append("<li>" + responseJson + "</li>");
-
-                    }
-                } else {
-
-                    $("#assessErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#assessErrorMessage ul");
-
-                    unOrderedList.append("<li>System error. Please try again later</li>");
-                }
-
-                hideOnePopupAndShowAnother($("#modalWaitAssessSave"),$("#modalWaitAssessErrors"));
+                processErrors(error, $("#modalWaitAssessSave"));
             }
         });
     }
 
-    function processAssessDone(action) {
+    function processAssessDone(action, modalWarningPopup) {
         mainButtonsEnabled(false);
 
         $("#btnContinueAssessProgress").prop("disabled", true);
@@ -143,7 +116,7 @@
         $("#assessErrorMessage").html("");
         $("#assessDoneWarningMessages").html("");
 
-        hideOnePopupAndShowAnother($("#modalAssessProgressWarning"),$("#modalWaitAssessDone"));
+        hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitAssessDone"));
 
         var formData = $("#frmAssessPage").serialize();
 
@@ -163,53 +136,56 @@
                 console.log("Done success");
             },
             error: function (error) {
-                var responseJson = error.responseJSON;
-                var statusCode = error.status;
-
-                if (responseJson != null) {
-                    if (statusCode === customHttpStatusCodes.WarningsDetected) {
-
-                        $("#assessDoneWarningMessages").append("<ul/>");
-                        var unOrderedList = $("#assessDoneWarningMessages ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        hideOnePopupAndShowAnother($("#modalWaitAssessDone"),$("#modalAssessDoneWarning"));
-
-
-                    } else if (statusCode === customHttpStatusCodes.FailedValidation) {
-                        $("#assessErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#assessErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        hideOnePopupAndShowAnother($("#modalWaitAssessDone"),$("#modalWaitAssessErrors"));
-                    } else {
-                        $("#assessErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#assessErrorMessage ul");
-
-                        unOrderedList.append("<li>" + responseJson + "</li>");
-
-                        hideOnePopupAndShowAnother($("#modalWaitAssessDone"),$("#modalWaitAssessErrors"));
-
-                    }
-                } else {
-
-                    $("#assessErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#assessErrorMessage ul");
-
-                    unOrderedList.append("<li>System error. Please try again later</li>");
-
-                    hideOnePopupAndShowAnother($("#modalWaitAssessDone"),$("#modalWaitAssessErrors"));
-
-                }
-
+                processErrors(error, $("#modalWaitAssessDone"));
             }
         });
+    }
+
+    function processErrors(error, modalWaitPopup) {
+        var responseJson = error.responseJSON;
+        var statusCode = error.status;
+
+        if (responseJson == null) {
+            $("#assessErrorMessage").append("<ul/>");
+            var unOrderedList = $("#assessErrorMessage ul");
+
+            unOrderedList.append("<li>System error. Please try again later</li>");
+
+            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
+            return;
+        }
+
+        if (statusCode === customHttpStatusCodes.WarningsDetected) {
+
+            $("#assessDoneWarningMessages").append("<ul/>");
+            var unOrderedList = $("#assessDoneWarningMessages ul");
+
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li>" + item + "</li>");
+            });
+
+            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalAssessDoneWarning"));
+            return;
+        }
+
+        if (statusCode === customHttpStatusCodes.FailedValidation) {
+            $("#assessErrorMessage").append("<ul/>");
+            var unOrderedList = $("#assessErrorMessage ul");
+
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li>" + item + "</li>");
+            });
+
+            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
+            return;
+        }
+
+        $("#assessErrorMessage").append("<ul/>");
+        var unOrderedList = $("#assessErrorMessage ul");
+
+        unOrderedList.append("<li>" + responseJson + "</li>");
+
+        hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
     }
 
     function hideOnePopupAndShowAnother(popuptoHide, popupToShow) {
