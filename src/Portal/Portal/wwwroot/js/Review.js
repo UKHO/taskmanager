@@ -39,6 +39,24 @@
         $("#btnTerminate").on("click", function () {
             mainButtonsEnabled(false);
 
+            // check for unsaved changes
+            if (formChanged) {
+
+                $("#reviewErrorMessage").html("");
+
+                $("#reviewErrorMessage").append("<ul/>");
+                var unOrderedList = $("#reviewErrorMessage ul");
+                unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+
+                $("#modalWaitReviewErrors").modal("show");
+
+                $("#modalWaitReviewErrors").one("hidden.bs.modal", function () {
+                    mainButtonsEnabled(true);
+                });
+
+                return;
+            }
+
             $("#modalWaitReviewTerminate").modal("show");
 
             var processId = $("#hdnProcessId").serialize();
