@@ -148,7 +148,7 @@ namespace Portal.UnitTests
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 5);
             Assert.Contains($"Task Information: Ion cannot be empty", _assessModel.ValidationErrorMessages);
@@ -178,7 +178,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Verifier cannot be empty", _assessModel.ValidationErrorMessages);
@@ -204,7 +204,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("TestUser"))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Assessor cannot be empty", _assessModel.ValidationErrorMessages);
@@ -239,7 +239,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _assessModel.ValidationErrorMessages);
@@ -276,7 +276,7 @@ namespace Portal.UnitTests
             };
 
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages);
@@ -312,7 +312,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
@@ -338,7 +338,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "KnownUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages);
@@ -364,7 +364,7 @@ namespace Portal.UnitTests
             _assessModel.Assessor = "KnownUser";
             _assessModel.Verifier = "TestUser";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Save");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages);
@@ -407,7 +407,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
+        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row_On_Save()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -425,12 +425,12 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -440,7 +440,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
+        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row_On_Save()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -458,7 +458,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -472,7 +472,7 @@ namespace Portal.UnitTests
             });
             await _dbContext.SaveChangesAsync();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             var onHoldRow = await _dbContext.OnHold.FirstAsync(o => o.ProcessId == ProcessId);
 
@@ -482,7 +482,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
+        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment_On_Save()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -500,12 +500,12 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -515,7 +515,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
+        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment_On_Save()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -533,7 +533,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Done", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
@@ -548,7 +548,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -738,9 +738,8 @@ namespace Portal.UnitTests
                                                             .MustHaveHappened();
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Done()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
@@ -757,7 +756,7 @@ namespace Portal.UnitTests
             _assessModel.ProductActioned = true;
             _assessModel.ProductActionChangeDetails = "";
 
-            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, action);
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
@@ -767,9 +766,36 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Save()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "";
+
+            var response = (JsonResult)await _assessModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Done()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
@@ -787,14 +813,37 @@ namespace Portal.UnitTests
             _assessModel.ProductActioned = true;
             _assessModel.ProductActionChangeDetails = "Test change details";
 
-            await _assessModel.OnPostDoneAsync(ProcessId, action);
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+        
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Save()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Test change details";
+
+            await _assessModel.OnPostSaveAsync(ProcessId);
 
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_on_Done()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
                 .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
@@ -811,12 +860,38 @@ namespace Portal.UnitTests
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.ProductActioned = false;
 
-            await _assessModel.OnPostDoneAsync(ProcessId, action);
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
             CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
         }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_on_Save()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+                .Returns(Task.FromResult(("TestUser", "testuser@foobar.com")));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "Home Waters";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = false;
+
+            await _assessModel.OnPostSaveAsync(ProcessId);
+
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_assessModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+        }
+
 
 
         [TestCase("Done")]
