@@ -80,7 +80,6 @@
 
     function processAssessSave() {
         mainButtonsEnabled(false);
-        $("#assessErrorMessage").html("");
         $("#modalWaitAssessSave").modal("show");
 
         var formData = $("#frmAssessPage").serialize();
@@ -113,9 +112,6 @@
         $("#btnContinueAssessProgress").prop("disabled", true);
         $("#btnCancelAssessProgressWarning").prop("disabled", true);
 
-        $("#assessErrorMessage").html("");
-        $("#assessDoneWarningMessages").html("");
-
         hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitAssessDone"));
 
         var formData = $("#frmAssessPage").serialize();
@@ -145,6 +141,9 @@
         var responseJson = error.responseJSON;
         var statusCode = error.status;
 
+        $("#assessErrorMessage").html("");
+        $("#assessDoneWarningMessages").html("");
+        
         if (responseJson == null) {
             $("#assessErrorMessage").append("<ul/>");
             var unOrderedList = $("#assessErrorMessage ul");
@@ -188,11 +187,11 @@
         hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
     }
 
-    function hideOnePopupAndShowAnother(popuptoHide, popupToShow) {
-        popuptoHide.one("hidden.bs.modal", function () {
+    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
+        popupToHide.one("hidden.bs.modal", function () {
             popupToShow.modal("show");
         });
-        popuptoHide.modal("hide");
+        popupToHide.modal("hide");
 
     }
 
