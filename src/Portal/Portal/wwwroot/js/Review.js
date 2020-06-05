@@ -23,13 +23,13 @@
     if ($("#reviewErrorMessage").html().trim().length > 0) {
         $("#modalWaitReviewErrors").modal("show");
     }
-    
+
     function setUnsavedChangesHandlers() {
-        $("#frmReviewPage").change(function() {
-             formChanged = true;
+        $("#frmReviewPage").change(function () {
+            formChanged = true;
         });
 
-        window.onbeforeunload = function() {
+        window.onbeforeunload = function () {
             if (formChanged) {
                 return "Changes detected";
             }
@@ -37,6 +37,9 @@
     }
     function attachValidateTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
+            mainButtonsEnabled(false);
+
+            $("#modalWaitReviewTerminate").modal("show");
 
             var processId = $("#hdnProcessId").serialize();
 
@@ -50,10 +53,13 @@
                 success: function () {
                     $("#txtTerminateComment").val("");
                     $("#ConfirmTerminateError").html("");
-                    $("#ConfirmTerminate").modal("show");
+                    hideOnePopupAndShowAnother($("#modalWaitReviewTerminate"), $("#ConfirmTerminate"));
+
                     console.log("success");
                 },
                 error: function (error) {
+
+                    mainButtonsEnabled(true);
                     $("#reviewTerminateErrorMessage").html("");
 
                     var responseJson = error.responseJSON;
@@ -68,19 +74,16 @@
                             responseJson.forEach(function (item) {
                                 validateTerminateErrorList.append("<li>" + item + "</li>");
                             });
-
-                            $("#modalWaitReviewTerminateErrors").modal("show");
-
-                        } 
+                        }
                     } else {
 
                         $("#reviewTerminateErrorMessage").append("<ul/>");
                         var unOrderedList = $("#reviewTerminateErrorMessage ul");
 
                         unOrderedList.append("<li>System error. Please try again later</li>");
-
-                        $("#modalWaitReviewTerminateErrors").modal("show");
                     }
+
+                    hideOnePopupAndShowAnother($("#modalWaitReviewTerminate"), $("#modalWaitReviewTerminateErrors"));
                 }
             });
         });
@@ -121,7 +124,10 @@
 
                 $("#modalWaitReviewErrors").modal("show");
 
-                mainButtonsEnabled(true);
+                $("#modalWaitReviewErrors").one("hidden.bs.modal", function () {
+                    mainButtonsEnabled(true);
+                });
+
                 return;
             }
 
@@ -131,7 +137,7 @@
             $("#modalReviewProgressWarning").modal("show");
 
             mainButtonsEnabled(true);
-            
+
         });
     }
 
@@ -182,11 +188,7 @@
                     });
 
                     //Hide modalWaitReviewSave modal and show modalWaitReviewErrors modal
-                    $("#modalWaitReviewSave").one("hidden.bs.modal", function () {
-                        $("#modalWaitReviewErrors").modal("show");
-                    });
-                    $("#modalWaitReviewSave").modal("hide");
-
+                    hideOnePopupAndShowAnother($("#modalWaitReviewSave"), $("#modalWaitReviewErrors"));
                 }
 
             }
@@ -203,10 +205,7 @@
         $("#reviewErrorMessage").html("");
 
         //Hide modalReviewProgressWarning modal and show modalWaitReviewDone modal
-        $("#modalReviewProgressWarning").one("hidden.bs.modal", function () {
-            $("#modalWaitReviewDone").modal("show");
-        });
-        $("#modalReviewProgressWarning").modal("hide");
+        hideOnePopupAndShowAnother($("#modalReviewProgressWarning"), $("#modalWaitReviewDone"));
 
         var formData = $("#frmReviewPage").serialize();
 
@@ -237,11 +236,7 @@
                     });
 
                     //Hide modalWaitReviewDone modal and show modalWaitReviewErrors modal
-                    $("#modalWaitReviewDone").one("hidden.bs.modal", function () {
-                        $("#modalWaitReviewErrors").modal("show");
-                    });
-                    $("#modalWaitReviewDone").modal("hide");
-
+                    hideOnePopupAndShowAnother($("#modalWaitReviewDone"), $("#modalWaitReviewErrors"));
                 }
 
             }
@@ -249,10 +244,12 @@
     }
 
     function submitTerminateForm() {
-        var formData = $("#terminatingReview").serialize();
+        mainButtonsEnabled(false);
 
         $("#btnConfirmTerminate").prop("disabled", true);
         $("#btnCancelTerminate").prop("disabled", true);
+
+        var formData = $("#terminatingReview").serialize();
 
         $("#reviewTerminateErrorMessage").html("");
 
@@ -278,7 +275,8 @@
                 error: function (error) {
                     console.log("terminate error");
                     $("#btnConfirmTerminate").prop("disabled", false);
-                    $("#btnCancelTerminate").prop("disabled", false);
+                    $("#btnCancelTerminate").prop("disabled", false);mainButtonsEnabled(true);
+
 
                     var responseJson = error.responseJSON;
                     var statusCode = error.status;
@@ -297,23 +295,27 @@
                     }
 
                     //Hide modalWaitReviewTerminate modal and show modalWaitReviewTerminateErrors modal
-                    $("#modalWaitReviewTerminate").one("hidden.bs.modal", function () {
-                        $("#modalWaitReviewTerminateErrors").modal("show");
-                    });
-                    $("#modalWaitReviewTerminate").modal("hide");
+                    hideOnePopupAndShowAnother($("#modalWaitReviewTerminate"), $("#modalWaitReviewTerminateErrors"));
+
                 }
             });
         }
 
         //Hide ConfirmTerminate modal and show modalWaitReviewTerminate modal,
         //when modalWaitReviewTerminate modal shows, initiate AJAX
-        $("#ConfirmTerminate").one("hidden.bs.modal", function () {
-            $("#modalWaitReviewTerminate").modal("show");
-        });
+        hideOnePopupAndShowAnother($("#ConfirmTerminate"), $("#modalWaitReviewTerminate"));
         $("#modalWaitReviewTerminate").one("shown.bs.modal", function () {
             reviewTerminateAjax();
         });
-        $("#ConfirmTerminate").modal("hide");
+    }
+
+
+    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
+        popupToHide.one("hidden.bs.modal", function () {
+            popupToShow.modal("show");
+        });
+        popupToHide.modal("hide");
+
     }
 
     function initialiseOperatorsTypeaheads() {
@@ -326,7 +328,7 @@
         var users = new Bloodhound({
             datumTokenizer: function (d) {
                 return Bloodhound.tokenizers.nonword(d.displayName);
-            }, 
+            },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: "/Index/?handler=Users",
@@ -346,10 +348,10 @@
             });
 
         $('#Reviewer, #Assessor, #Verifier').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-                minLength: 3 /* Specify minimum characters required for showing result */
-            },
+            hint: true,
+            highlight: true, /* Enable substring highlighting */
+            minLength: 3 /* Specify minimum characters required for showing result */
+        },
             {
                 name: 'users',
                 source: users,
@@ -358,7 +360,7 @@
                 valueKey: 'userPrincipalName',
                 templates: {
                     empty: '<div>No results</div>',
-                    suggestion: function(users) {
+                    suggestion: function (users) {
                         return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
                     }
                 }
@@ -392,8 +394,7 @@
         fieldset.prop("disabled", true);
     }
 
-    function mainButtonsEnabled(isEnabled)
-    {
+    function mainButtonsEnabled(isEnabled) {
         $("#btnDone").prop("disabled", !isEnabled);
         $("#btnSave").prop("disabled", !isEnabled);
         $("#btnTerminate").prop("disabled", !isEnabled);
