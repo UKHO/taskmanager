@@ -14,10 +14,12 @@ namespace NCNEPortal.ViewComponents
 
         }
 
-        public IViewComponentResult Invoke(int processId, int taskStageId)
+        public IViewComponentResult Invoke(int processId, int taskStageId, bool isReadOnly)
         {
 
             var taskStage = _dbContext.TaskStage.Find(processId, taskStageId);
+
+            taskStage.IsReadOnly = isReadOnly;
 
             return View(taskStage);
         }
