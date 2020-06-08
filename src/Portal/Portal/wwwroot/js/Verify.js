@@ -6,6 +6,7 @@
     $("#Reviewer").prop("disabled", true);
 
     setVerifyDoneHandler();
+    handlebtnContinueVerifyProgress();
     setVerifySaveHandler();
     handleContinueVerifyDoneWarning();
     handleConfirmReject();
@@ -157,11 +158,39 @@
         function () {
             $("#txtRejectComment").focus();
         });
-
-
+    
     function setVerifyDoneHandler() {
         $("#btnDone").click(function (e) {
-            processVerifyDone("Done");
+            mainButtonsEnabled(false);
+
+            // check for unsaved changes
+            if (formChanged) {
+
+                $("#verifyErrorMessage").html("");
+
+                $("#verifyErrorMessage").append("<ul/>");
+                var unOrderedList = $("#verifyErrorMessage ul");
+                unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+
+                $("#modalWaitVerifyErrors").modal("show");
+
+                mainButtonsEnabled(true);
+                return;
+            }
+
+            // display: progress warning modal
+            $("#btnContinueVerifyProgress").prop("disabled", false);
+            $("#btnCancelVerifyProgressWarning").prop("disabled", false);
+            $("#modalVerifyProgressWarning").modal("show");
+
+            mainButtonsEnabled(true);
+
+        });
+    }
+
+    function handlebtnContinueVerifyProgress() {
+        $("#btnContinueVerifyProgress").on("click", function (e) {
+            processVerifyDone("Done", $("#modalVerifyProgressWarning"));
         });
     }
 
@@ -173,7 +202,7 @@
 
     function handleContinueVerifyDoneWarning() {
         $("#btnContinueVerifyDoneWarning").on("click", function (e) {
-            processVerifyDone("ConfirmedSignOff");
+            processVerifyDone("ConfirmedSignOff", $("#modalVerifyDoneWarning"));
         });
     }
 
@@ -205,18 +234,13 @@
         });
     }
 
-    function processVerifyDone(action) {
+    function processVerifyDone(action, modalWarningPopup) {
         mainButtonsEnabled(false);
 
+        $("#btnContinueVerifyProgress").prop("disabled", true);
+        $("#btnCancelVerifyProgressWarning").prop("disabled", true);
 
-
-
-        $("#modalVerifyDoneWarning").modal("hide");
-        $("#verifyErrorMessage").html("");
-        $("#verifyDoneWarningMessages").html("");
-        $("#btnDone").prop("disabled", true);
-        $("#btnSave").prop("disabled", true);
-        $("#modalWaitVerifyDone").modal("show");
+        hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitVerifyDone"));
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -228,22 +252,15 @@
             },
             data: formData,
             complete: function () {
-                //Add a delay to account for the modalWaitVerifyDone modal
-                //not being fully shown, before trying to hide it
-                window.setTimeout(function () {
-                    $("#modalWaitVerifyDone").modal("hide");
-                    $("#btnDone").prop("disabled", false);
-                    $("#btnSave").prop("disabled", false);
-                }, 200);
+                console.log("Done complete");
+                mainButtonsEnabled(true);
             },
             success: function (result) {
-                formChanged = false;
-                if (action === "Done" || action === "ConfirmedSignOff") {
-                    window.location.replace("/Index");
-                }
+                window.location.replace("/Index");
+                console.log("Done success");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitVerifySave"));
+                processErrors(error, $("#modalWaitVerifyDone"));
             }
         });
     }
