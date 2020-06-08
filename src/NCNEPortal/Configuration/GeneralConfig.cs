@@ -14,5 +14,6 @@ namespace NCNEPortal.Configuration
         public string CarisNewProjectPriority { get; set; }
         public string CarisNcneProjectType { get; set; }
         public int CarisProjectTimeoutSeconds { get; set; }
+        public int HistoricalTasksInitialNumberOfRecords { get; set; }
     }
 }

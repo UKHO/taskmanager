@@ -32,16 +32,14 @@ namespace NCNEWorkflowDatabase.EF.Models
 
         public string Status { get; set; }
 
-        [NotMapped]
+        public DateTime? StatusChangeDate { get; set; }
+
         public int FormDateStatus { get; set; }
 
-        [NotMapped]
         public int CisDateStatus { get; set; }
 
-        [NotMapped]
         public int CommitDateStatus { get; set; }
 
-        [NotMapped]
         public int PublishDateStatus { get; set; }
 
 

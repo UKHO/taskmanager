@@ -46,6 +46,44 @@
             <div class="card-body pb-0 pt-0">
                 <div class="row">
                     <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control numberOnly historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ChartType, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ChartType, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.WorkflowType, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.WorkflowType, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ChartNo, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ChartNo, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Country, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Country, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Compiler, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Compiler, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.VerifierOne, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.VerifierOne, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.VerifierTwo, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.VerifierTwo, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Publisher, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Publisher, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
                     </div>
                 </div>
                 <div class="row d-flex justify-content-start">
@@ -88,6 +126,10 @@
                     <th style="max-width: 3.6rem;">Chart Number</th>
                     <th>Country</th>
                     <th style="max-width: 4.0rem;">Workflow Type</th>
+                    <th style="max-width: 4.0rem;">Compiler</th>
+                    <th style="max-width: 4.0rem;">Verifier1</th>
+                    <th style="max-width: 4.0rem;">Verifier2</th>
+                    <th style="max-width: 4.0rem;">Publisher</th>
                     <th style="min-width: 3.9rem;">Status</th>
                     <th>Date Finished</th>
                 </tr>
@@ -112,10 +154,23 @@
                             @task.WorkflowType
                         </td>
                         <td>
+                            @task.TaskRole.Compiler
+                        </td>
+                        <td>
+                            @task.TaskRole.VerifierOne
+                        </td>
+                        <td>
+                            @task.TaskRole.VerifierTwo
+                        </td>
+                        <td>
+                            @task.TaskRole.Publisher
+                        </td>
+
+                        <td>
                             @task.Status
                         </td>
                         <td>
-                            @Html.DisplayFor(model => task.AssignedDate)
+                            @Html.DisplayFor(model => task.StatusChangeDate)
                         </td>
                     </tr>
                 }
@@ -123,4 +178,20 @@
             </tbody>
         </table>
     </div>
+</div>
+<div class="modal fade" id="modalWaitHistoricalTasks" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Getting historical data from database ...</li>
+                    <li>Populating Historical Tasks list...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>

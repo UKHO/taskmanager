@@ -230,6 +230,7 @@ namespace NCNEPortal
             }
 
             taskInfo.Status = NcneTaskStatus.Terminated.ToString();
+            taskInfo.StatusChangeDate = DateTime.Now;
             _dbContext.SaveChanges();
 
             return taskInfo;
@@ -506,6 +507,7 @@ namespace NCNEPortal
                 "Completing the workflow with ProcessId: {ProcessId}.");
 
             taskInfo.Status = NcneTaskStatus.Completed.ToString();
+            taskInfo.StatusChangeDate = DateTime.Now;
 
             await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteWorkflow, processId, CurrentUser.DisplayName, null, null, null);
 

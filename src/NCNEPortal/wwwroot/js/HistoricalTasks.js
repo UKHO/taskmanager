@@ -1,13 +1,11 @@
 ﻿$(document).ready(function () {
 
-    $.fn.dataTable.moment('DD/MM/YYYY');
-
     $('#historicalTasks').DataTable({
         "pageLength": 10,
         'sDom': 'ltipr',
         "lengthMenu": [5, 10, 25, 50],
         "scrollX": true,
-        "order": [[9, 'desc']],
+        "order": [[10, 'desc']],
         "ordering": true
     });
 

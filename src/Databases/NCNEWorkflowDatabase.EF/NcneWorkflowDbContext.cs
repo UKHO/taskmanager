@@ -45,6 +45,10 @@ namespace NCNEWorkflowDatabase.EF
 
             modelBuilder.Entity<TaskRole>().HasIndex(i => i.ProcessId).IsUnique();
             modelBuilder.Entity<TaskStage>().Ignore(l => l.IsReadOnly);
+            modelBuilder.Entity<TaskInfo>().Ignore(t => t.FormDateStatus);
+            modelBuilder.Entity<TaskInfo>().Ignore(t => t.CisDateStatus);
+            modelBuilder.Entity<TaskInfo>().Ignore(t => t.CommitDateStatus);
+            modelBuilder.Entity<TaskInfo>().Ignore(t => t.PublishDateStatus);
         }
     }
 }
