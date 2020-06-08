@@ -128,6 +128,75 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
+        public async Task<IActionResult> OnPostSaveAsync(int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Verify");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            var action = "Save";
+            LogContext.PushProperty("Action", action);
+
+
+            _logger.LogInformation("Entering Save with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
+
+            ValidationErrorMessages.Clear();
+
+            var workflowInstance = _dbContext.WorkflowInstance
+                .Include(wi => wi.PrimaryDocumentStatus)
+                .FirstOrDefault(wi => wi.ProcessId == processId);
+
+            if (workflowInstance == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the WorkflowInstance table", ProcessId);
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the WorkflowInstance table");
+            }
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been completed");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} has already been completed");
+                throw appException;
+            }
+
+            ProcessId = processId;
+
+            if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
+                Ion,
+                ActivityCode,
+                SourceCategory,
+                Verifier,
+                ProductActioned,
+                ProductActionChangeDetails,
+                RecordProductAction,
+                DataImpacts,
+                Team,
+                ValidationErrorMessages,
+                CurrentUser.DisplayName))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
+            }
+
+            if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
+                };
+            }
+
+            _logger.LogInformation("Finished Save with: ProcessId: {ProcessId}; Action: {Action};");
+
+            return StatusCode((int)HttpStatusCode.OK);
+
+        }
+
         public async Task<IActionResult> OnPostDoneAsync(int processId, [FromQuery] string action)
         {
             LogContext.PushProperty("ActivityName", "Verify");
@@ -164,35 +233,6 @@ namespace Portal.Pages.DbAssessment
 
             switch (action)
             {
-                case "Save":
-                    if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
-                        Ion,
-                        ActivityCode,
-                        SourceCategory,
-                        Verifier,
-                        ProductActioned,
-                        ProductActionChangeDetails,
-                        RecordProductAction,
-                        DataImpacts,
-                        Team,
-                        ValidationErrorMessages,
-                        CurrentUser.DisplayName))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                        };
-                    }
-
-                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
-                        };
-                    }
-
-                    break;
                 case "Done":
                     var verifyData =
                         await _dbContext.DbAssessmentVerifyData.FirstAsync(t =>
@@ -263,7 +303,7 @@ namespace Portal.Pages.DbAssessment
 
                     break;
                 case "ConfirmedSignOff":
-                    
+
                     try
                     {
                         await MarkTaskAsComplete(processId);
@@ -460,7 +500,7 @@ namespace Portal.Pages.DbAssessment
                                                     CurrentUser.DisplayName);
 
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Rejected);
-            
+
             _logger.LogInformation(
                 "Task rejection from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
@@ -668,7 +708,7 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        
+
         private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance
@@ -681,7 +721,7 @@ namespace Portal.Pages.DbAssessment
 
             return workflowInstance;
         }
-        
+
         private async Task MarkWorkflowInstanceAsStarted(int processId)
         {
             var workflowInstance = await _dbContext.WorkflowInstance
