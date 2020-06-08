@@ -879,3 +879,7 @@ h6.Inactive {
 #versionNo {
     font-weight: 600;
 }
+
+h1.workflow-page-heading > span.red {
+    color: #cd2026;
+}

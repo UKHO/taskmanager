@@ -16,7 +16,7 @@
         </td>
         <td>
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
-        || Model.Status == NcneTaskStageStatus.Rework.ToString())
+|| Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
                 @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
                 {
@@ -56,7 +56,8 @@
             }
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication)
             {
-                @if (Model.Status == NcneTaskStageStatus.InProgress.ToString())
+                @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
+            Model.IsReadOnly == false)
                 {
                     <div class="d-flex justify-content-end">
                         @if (@Model.TaskStageType.AllowRework)
@@ -88,7 +89,7 @@
                     <div class="row align-items-center">
                         <div class="col-8">
                             <button id="btnPublishInCaris"
-                                    @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
+                                    @((Model.Status == NcneTaskStageStatus.InProgress.ToString() && Model.IsReadOnly == false) ? "" : " disabled ")
                                     class="btn btn-block btn-primary btn-caris-publish"
                                     data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
                                     data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
@@ -160,7 +161,11 @@
                 </div>
                 <div class="col text-right">
                     <span class="fas fa-comment-alt mr-2"></span>
-                    <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)">Add a comment</button>
+                    <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment"
+                            data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)"
+                            @(Model.IsReadOnly ? "disabled" : "")>
+                        Add a comment
+                    </button>
                 </div>
 
             </td>

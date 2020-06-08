@@ -64,6 +64,9 @@ namespace NCNEPortal
         [DisplayName("Duration")]
         public int Dating { get; set; }
 
+        public bool IsReadOnly { get; set; }
+
+        public string TaskStatus { get; set; }
 
         [DisplayName("Repromat date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -296,16 +299,20 @@ namespace NCNEPortal
                 .OrderBy(t => t.TaskStageTypeId);
 
 
-            Header += " - " + (inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion");
-
-
             //Enable complete if Forms and Publication stages are completed.
             CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
                                                    t.Status == NcneTaskStageStatus.Completed.ToString()) &&
                                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
                                                       t.Status == NcneTaskStageStatus.Completed.ToString());
 
+            IsReadOnly = taskInfo.Status == NcneTaskStatus.Completed.ToString() ||
+                         taskInfo.Status == NcneTaskStatus.Terminated.ToString();
+            if (!IsReadOnly)
+            {
+                Header += " - " + (inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion");
+            }
 
+            TaskStatus = taskInfo.Status;
 
         }
 

@@ -15,7 +15,14 @@
         </a>
     </div>
     <div class="col-7 offset-1">
-        <h1>@Model.Header</h1>
+        <h1 class="workflow-page-heading">
+            <span>@Model.Header</span>
+
+            @if (Model.IsReadOnly)
+            {
+                <br /><span class="red">Historical Task - @Model.TaskStatus</span>
+            }
+        </h1>
     </div>
 </div>
 <div class="row pt-1 pb-1">
@@ -44,8 +51,13 @@
             <div class="col-6">
                 <div class="row justify-content-end">
                     <div class="col-auto">
-                        <button id="btnSave" class="btn btn-primary mr-2" style="min-width: 9em;">Save</button>
+                        @if (!Model.IsReadOnly)
+                        {
+                            <button id="btnSave" class="btn btn-primary mr-2" style="min-width: 9em;">Save</button>
+                        }
+
                         <button id="btnClose" class="btn btn-primary" style="min-width: 9em;">Close</button>
+
                     </div>
                 </div>
             </div>
@@ -60,7 +72,6 @@
 @*--- START WORKFLOW CARD ---*@
 <div class="card mb-4 mt-3">
     <h3>Workflow</h3>
-    <span class="wf-status wf-status-inprogress"><span class="fa fa-clock mr-1"></span>In Progress</span>
     <div>
         <table class="table" id="workflow-table">
             <thead class="mt-2">
@@ -86,351 +97,356 @@
                 </tr>
             </thead>
             <tbody class="workflow-row">
-
                 @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageTypeId))
                 {
-                    @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId });
+                    @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId, isReadOnly = Model.IsReadOnly })
+                    ;
                 }
-
             </tbody>
 
         </table>
     </div>
 </div>
 
+@if (!Model.IsReadOnly)
+{
+    <div class="d-flex justify-content-end">
 
-<div class="d-flex justify-content-end">
+        <div class="mt-3 mr-3">
+            <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
+        </div>
 
-    <div class="mt-3 mr-3">
-        <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
+        <div class="mt-3">
+            <button id="btnComplete" class="btn btn-block btn-secondary" @(Model.CompleteEnabled ? "" : "disabled") style="min-width: 139px;">Complete</button>
+        </div>
     </div>
-
-    <div class="mt-3">
-        <button id="btnComplete" class="btn btn-block btn-secondary" @(Model.CompleteEnabled ? "" : "disabled") style="min-width: 139px; ">Complete</button>
-    </div>
-</div>
-
+}
 
 <form id="frmWorkflow" method="post" asp-page-handler="save">
-    @Html.HiddenFor(m => m.IsCarisProjectCreated)
-    <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
-    <input type="hidden" asp-for="ProcessId" />
-    <input type="hidden" asp-for="ChartType" />
+    <fieldset>
+        @Html.HiddenFor(m => m.IsCarisProjectCreated)
+        <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+        <input type="hidden" asp-for="ProcessId" />
+        <input type="hidden" asp-for="ChartType" />
+        <input type="hidden" asp-for="IsReadOnly" />
 
-    <!-- #endregion -->
-    @*--- START TASK INFORMATION ---*@
-    <div class="card mb-4 mt-3">
-        <h3>Task Information</h3>
+        <!-- #endregion -->
+        @*--- START TASK INFORMATION ---*@
+        <div class="card mb-4 mt-3">
+            <h3>Task Information</h3>
 
-        <div class="col-12">
-            <div class="card-body pb-0 col-11">
-                <h4>Task information</h4>
-                <div class="row">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.WorkflowType)</div>
-                            <div>
-                                <span id="workflowType">
-                                    <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
-                                </span>
+            <div class="col-12">
+                <div class="card-body pb-0 col-11">
+                    <h4>Task information</h4>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.WorkflowType)</div>
+                                <div>
+                                    <span id="workflowType">
+                                        <h6>@Html.DisplayFor(model => model.WorkflowType, new { @class = "form-control form-text" }) </h6>
+                                    </span>
+                                </div>
                             </div>
+
                         </div>
-
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ChartType)</div>
-                            <div>
-                                <span id="chartType">
-                                    <h6>@Html.DisplayFor(model => model.ChartType, new { @class = "form-control  form-text " })</h6>
-                                </span>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ChartType)</div>
+                                <div>
+                                    <span id="chartType">
+                                        <h6>@Html.DisplayFor(model => model.ChartType, new { @class = "form-control  form-text " })</h6>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
 
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Ion, "",
-                                    new { placeholder = "ION", @maxlength = 50, @class = "form-control form-text-input" })
-                            </div>
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.ChartNo, "",
-                                    new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Ion, "",
+                                        new { placeholder = "ION", @maxlength = 50, @class = "form-control form-text-input" })
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Country, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Country, "",
-                                    new { placeholder = "Country", @maxlength = 75, @class = "form-control form-text-input" })
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.ChartNo, "",
+                                        new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                </div>
-                <hr class="mt-2 mb-4" />
-                <h4>Dates</h4>
-                <div class="row">
-                    <div class="col-3">
-
-                        <div class="row">
-                            <div class="col">
-                                @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="design-custom-select">
-                                    <div class="arrow-icon-wrap">
-                                        <span class="fa fa-chevron-down arrow-icon"></span>
-                                    </div>
-                                    @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
-                                        , "", new { @class = "form-control" })
-
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Country, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Country, "",
+                                        new { placeholder = "Country", @maxlength = 75, @class = "form-control form-text-input" })
                                 </div>
                             </div>
                         </div>
 
                     </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.PublicationDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.AnnounceDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.CommitToPrintDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.CISDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
+                    <hr class="mt-2 mb-4" />
+                    <h4>Dates</h4>
+                    <div class="row">
+                        <div class="col-3">
 
-                </div>
+                            <div class="row">
+                                <div class="col">
+                                    @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
+                                        <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
+                                            <span class=@(Model.IsReadOnly ? "" : "fa fa-chevron-down arrow-icon")></span>
+                                        </div>
+                                        @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
+                                            , "", new { @class = "form-control" })
 
-                <hr class="mt-2 mb-4" />
-                <h4>Job roles</h4>
-                <div class="row">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Compiler, "",
-                                new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.PublicationDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Verifier1, "",
-                                new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.AnnounceDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Verifier2, "",
-                                new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.CommitToPrintDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
-                            <div>
-                                @Html.TextBoxFor(model => model.Publisher, "",
-                                new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.CISDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <hr class="mt-2 mb-4" />
-                <div class="row" align="center">
-                    <h4>3PS</h4>
 
-                    <label class="switch ml-2 mb-auto">
-                        <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="row">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.SendDate3ps, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.SendDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
                     </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.ExpectedReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <div>@Html.LabelFor(model => model.ActualReturnDate3ps, new { @class = "col-form-label" })</div>
-                            <div>@Html.TextBoxFor(model => model.ActualReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="mt-2 mb-4" />
 
+                    <hr class="mt-2 mb-4" />
+                    <h4>Job roles</h4>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Compiler, "",
+                                        new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Verifier1, "",
+                                        new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Verifier2, "",
+                                        new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Publisher, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Publisher, "",
+                                        new { placeholder = "Publisher", id = "Publisher", autocomplete = false, spellcheck = false, @class = "ta_publisher tt-query form-text-input" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mt-2 mb-4" />
+                    <div class="row" align="center">
+                        <h4>3PS</h4>
+
+                        <label class="switch ml-2 mb-auto">
+                            <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.SendDate3ps, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.SendDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.ExpectedReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ActualReturnDate3ps, new { @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.ActualReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mt-2 mb-4" />
+
+                </div>
             </div>
         </div>
-    </div>
-    @*--- END TASK INFORMATION ---*@
+
+        @*--- END TASK INFORMATION ---*@
 
 
-    @*--- START EDIT DATABASE ---*@
-    <div class="card mb-4 mt-3">
-        <h3>Edit Database</h3>
-        <div class="col-12">
-            <div class="card-body pb-2 col-11">
-                <h4>CARIS</h4>
+        @*--- START EDIT DATABASE ---*@
+        <div class="card mb-4 mt-3">
+            <h3>Edit Database</h3>
+            <div class="col-12">
+                <div class="card-body pb-2 col-11">
+                    <h4>CARIS</h4>
 
-                <div class="row align-items-end">
-                    <div class="col-12 mb-2 col-lg-4 mb-lg-0">
-                        <div class="row">
-                            <div class="col">
-                                @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+                    <div class="row align-items-end">
+                        <div class="col-12 mb-2 col-lg-4 mb-lg-0">
+                            <div class="row">
+                                <div class="col">
+                                    @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    @Html.TextBoxFor(model => model.CarisProjectName, "",
+                                        new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                @Html.TextBoxFor(model => model.CarisProjectName, "",
-                                    new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                        <div class="col-auto">
+                            <div class="row">
+                                <div class="col">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                        <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                                        Create CARIS Project
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
+
                     </div>
-                    <div class="col-auto">
-                        <div class="row">
-                            <div class="col">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
-                                    <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
-                                    Create CARIS Project
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
 
-
+                    <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                        <h5>
+                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                            <span>Caris project successfully created</span>
+                        </h5>
+                    </section>
                 </div>
-                <section id="createCarisProjectError" class="dialog error collapse mt-3">
-                    <h5>
-                        <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                        <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
-                    </h5>
-                </section>
-
-                <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
-                    <h5>
-                        <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
-                        <span>Caris project successfully created</span>
-                    </h5>
-                </section>
             </div>
         </div>
-    </div>
-    @*--- END EDIT DATABASE ---*@
+
+        @*--- END EDIT DATABASE ---*@
 
 
-    @*--- START TASK COMMENTS ---*@
-    <div class="card mb-4 mt-3">
-        <h3>
-            <div class="row">
-                <div class="col">
-                    Task Comments
+        @*--- START TASK COMMENTS ---*@
+        <div class="card mb-4 mt-3">
+            <h3>
+                <div class="row">
+                    <div class="col">
+                        Task Comments
+                    </div>
+                    <div class="col text-right">
+                        <span class="fas fa-comment-alt mr-2"></span>
+                        <button type="button" style="color: white; padding-left: 0; padding-top: 0" class="btn btn-link btnAddTaskcomment" data-processid="@(Model.ProcessId)">Add a comment</button>
+                    </div>
                 </div>
-                <div class="col text-right">
-                    <span class="fas fa-comment-alt mr-2"></span>
-                    <button type="button" style="color: white; padding-left: 0; padding-top:0" class="btn btn-link btnAddTaskcomment" data-processid="@(Model.ProcessId)">Add a comment</button>
-                </div>
-            </div>
-        </h3>
+            </h3>
 
-        <div id="CommentsSection" class="card-body p-3">
+            <div id="CommentsSection" class="card-body p-3">
 
-            <table id="TaskCommentsTable" class="table table-striped m-2">
-                <tbody>
-                    @if (Model.TaskComments != null)
-                    {
-                        @foreach (var comment in Model.TaskComments)
+                <table id="TaskCommentsTable" class="table table-striped m-2">
+                    <tbody>
+                        @if (Model.TaskComments != null)
                         {
-                            <tr>
-                                <td style="width:200px">
-                                    <div class="mb-2">
-                                        <strong>@comment.Username</strong>
-                                    </div>
-                                    <div>
-                                        @comment.Created.ToLongDateString()
-                                    </div>
-                                </td>
-                                <td style="width:20px">
-                                    @if (@comment.ActionIndicator)
-                                    {
-                                        <span class="fa fa-edit" style="color: #EF8123"> </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="fas fa-comment-alt"></span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (@comment.ActionIndicator)
-                                    {
-                                        <span style="color: #ef8123">@comment.Comment</span>
-                                    }
-                                    else
-                                    {
-                                        <div class="d-inline">@comment.Comment</div>
-                                    }
-                                </td>
-                            </tr>
+                            @foreach (var comment in Model.TaskComments)
+                            {
+                                <tr>
+                                    <td style="width: 200px">
+                                        <div class="mb-2">
+                                            <strong>@comment.Username</strong>
+                                        </div>
+                                        <div>
+                                            @comment.Created.ToLongDateString()
+                                        </div>
+                                    </td>
+                                    <td style="width: 20px">
+                                        @if (@comment.ActionIndicator)
+                                        {
+                                            <span class="fa fa-edit" style="color: #EF8123"> </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fas fa-comment-alt"></span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (@comment.ActionIndicator)
+                                        {
+                                            <span style="color: #ef8123">@comment.Comment</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-inline">@comment.Comment</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
                         }
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </fieldset>
     @*--- END TASK COMMENTS ---*@
 </form>
 

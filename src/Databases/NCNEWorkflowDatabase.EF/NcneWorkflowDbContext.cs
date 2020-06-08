@@ -1,8 +1,8 @@
-﻿using System;
-using System.Data.SqlClient;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
+using System;
+using System.Data.SqlClient;
 
 namespace NCNEWorkflowDatabase.EF
 {
@@ -44,6 +44,7 @@ namespace NCNEWorkflowDatabase.EF
 
 
             modelBuilder.Entity<TaskRole>().HasIndex(i => i.ProcessId).IsUnique();
+            modelBuilder.Entity<TaskStage>().Ignore(l => l.IsReadOnly);
         }
     }
 }

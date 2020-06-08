@@ -22,7 +22,7 @@ namespace NCNEWorkflowDatabase.EF.Models
 
         public virtual TaskStageType TaskStageType { get; set; }
 
-
+        public virtual bool IsReadOnly { get; set; } = false;
     }
 
 }

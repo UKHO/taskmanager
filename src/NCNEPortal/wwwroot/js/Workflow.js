@@ -1,8 +1,13 @@
 ﻿$(document).ready(function () {
+    var isReadOnly = $("#IsReadOnly").val() === "True";
 
+    if (isReadOnly) {
+        makeFormReadOnly($("#frmWorkflow"));
+    }
 
     var formChanged = false;
     $("#frmWorkflow").change(function () { formChanged = true; });
+    
 
     $(".allcommentslider").click(function() {
         var check = $("#allcommentscheck").prop('checked');
@@ -753,7 +758,10 @@
         });
 
     $("#btnClose").on("click",
-        function() {
+        function () {
+            if (isReadOnly === true)
+                window.location.href = '/HistoricalTasks';
+                else
             window.location.href = '/Index';
         });
 
@@ -882,6 +890,11 @@
                 }
             });
 
+    }
+
+    function makeFormReadOnly(formElement) {
+        var fieldset = $(formElement).children("fieldset");
+        fieldset.prop("disabled", true);
     }
 
 

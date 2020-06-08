@@ -12,6 +12,7 @@
     handleTeamTasks();
    
     setMenuItemSelection();
+    handleHistoricalTasks();
 
     function setupInFlightTasks() {
 
@@ -102,6 +103,14 @@
         );
     }
 
+    function handleHistoricalTasks() {
+        $("#btnHistoricalTasks").click(function () {
+
+            //sessionStorage.setItem('historicalMenuItem', menuItem);
+            window.location.href = "/HistoricalTasks";
+
+        });
+    }
 
     function filterMyAssignedTasksList(rowData) {
 
