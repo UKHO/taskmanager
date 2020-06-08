@@ -50,21 +50,21 @@
     <div class="row justify-content-end btn-size">
         @if (Model.IsReadOnly)
         {
-            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/DbAssessment/HistoricalTasks'"/></div>
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/DbAssessment/HistoricalTasks'" /></div>
         }
         else
         {
             <div class="col-2"><button id="btnReject" class="btn btn-primary btn-block">Reject</button></div>
-            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'"/></div>
+            <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
             <div class="col-2"><button id="btnSave" class="btn btn-primary btn-block">Save</button></div>
             <div class="col-2">
 
-                <input type="hidden" asp-for="ProcessId"/>
+                <input type="hidden" asp-for="ProcessId" />
                 <button id="btnDone" class="btn btn-primary btn-block" type="button">Sign Off</button>
 
             </div>
         }
-        
+
     </div>
 </div>
 
@@ -125,7 +125,23 @@
 </div>
 
 
-<div class="modal fade" id="modalWaitVerifyDone" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitVerifyDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifyDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Verifying Data...</li>
+                    <li>Signing-off Task...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalWaitVerifySave" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifySave" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -182,7 +198,7 @@
     </div>
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitVerifyDoneErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyDoneErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitVerifyErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyDoneErrors" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -193,7 +209,7 @@
                     <div class="col-1 mr-4">
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
-                    <div id="verifyDoneErrorMessage" class="col-11">
+                    <div id="verifyErrorMessage" class="col-11">
                         @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
                         {
                             <ul>
@@ -252,12 +268,12 @@
     </div>
 </div>
 
-@* Modal for warning of unsaved form on reject *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalUnsavedWarning" tabindex="-1" role="dialog" aria-labelledby="UnsavedWarning" aria-hidden="true">
-    <div class="modal-dialog warning ">
+@* Modal for warning of unsaved form when progressing *@
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
+    <div class="modal-dialog warning">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Unsaved changes detected.</h3>
+                <h3>Sign-off Verify task.</h3>
             </div>
             <div class="modal-body">
                 <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
@@ -265,13 +281,17 @@
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
                     <div class="col-11">
-                        <ul><li>Continue rejecting task?</li></ul>
+                        <ul><li>Are you sure you want to continue?</li></ul>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="row col-11 justify-content-end">
-                        <div class="col-5 pr-1"><button type="button" id="btnCancelUnsavedWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Rejection">Cancel</button></div>
-                        <div class="col-5 pl-1 pr-0"><button type="button" id="btnContinueRejection" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue With Rejection">Continue Reject</button></div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="col-4 float-left"><button type="button" id="btnCancelVerifyProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Verify">Cancel</button></div>
+                                <div class="col-4 float-right"><button type="button" id="btnContinueVerifyProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Verify">Continue</button></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
