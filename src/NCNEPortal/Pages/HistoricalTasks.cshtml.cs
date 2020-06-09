@@ -29,8 +29,6 @@ namespace NCNEPortal.Pages
         [BindProperty(SupportsGet = true)]
         public HistoricalTasksSearchParameters SearchParameters { get; set; }
 
-        public List<HistoricalTasksData> HistoricalTasks { get; set; }
-
         public List<string> ErrorMessages { get; set; }
         public List<TaskInfo> NcneTasks { get; set; }
 
