@@ -694,7 +694,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
+        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -716,7 +716,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(Task.FromResult(true));
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostSaveAsync(ProcessId);
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -726,7 +726,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
+        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
@@ -758,7 +758,7 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, "Save");
+            await _verifyModel.OnPostSaveAsync(ProcessId);
 
             var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
@@ -806,9 +806,8 @@ namespace Portal.UnitTests
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Save()
         {
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -819,16 +818,34 @@ namespace Portal.UnitTests
             _verifyModel.ProductActionChangeDetails = "";
             _verifyModel.Team = "Home Waters";
 
-            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, action);
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Done()
+        {
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = "";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "";
+            _verifyModel.Team = "Home Waters";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Save()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -844,14 +861,35 @@ namespace Portal.UnitTests
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+            await _verifyModel.OnPostSaveAsync(ProcessId);
 
             CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
         }
 
-        [TestCase("Done")]
-        [TestCase("Save")]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present(string action)
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Done()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "Home Waters";
+            _verifyModel.Verifier = "TestUser";
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Test change details";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_On_Done()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -866,7 +904,7 @@ namespace Portal.UnitTests
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
 
-            await _verifyModel.OnPostDoneAsync(ProcessId, action);
+            await _verifyModel.OnPostSaveAsync(ProcessId);
 
             CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
             CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
