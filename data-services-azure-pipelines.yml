@@ -45,6 +45,7 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
+          arguments: "--configuration $(BuildConfiguration) --no-restore"
           projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
         displayName: 'dotnet build dataservices'
 
@@ -58,12 +59,14 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
+          arguments: "--configuration Debug --no-restore"
           projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
         displayName: 'dotnet build dataservicestests'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
+          arguments: "--no-build"
           projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices.unittests\\dataservices.unittests.csproj'
         displayName: 'dotnet test dataservicestests'
 
@@ -85,7 +88,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\dataservices\\dataservices\\dataservices.csproj'
           zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\dataservices'
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\dataservices --no-build'
         displayName: 'Publish Solution'
 
       - task: PublishBuildArtifacts@1

@@ -46,6 +46,7 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
+          arguments: "--configuration $(BuildConfiguration) --no-restore"
           projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
         displayName: 'dotnet build eventservice'
 
@@ -60,12 +61,14 @@ stages:
         inputs:
           command: 'build'
           projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
+          arguments: "--configuration Debug --no-restore"
         displayName: 'dotnet build eventservicetests'
 
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice.unittests\\eventservice.unittests.csproj'
+          arguments: "--no-build"
         displayName: 'dotnet test eventservicetests'
 
       - task: Maven@3
@@ -86,7 +89,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\eventservices\\eventservice\\eventservice.csproj'
           zipAfterPublish: false
-          arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice'
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\eventservice --no-build'
         displayName: 'Publish Solution'
 
       - task: PublishBuildArtifacts@1
