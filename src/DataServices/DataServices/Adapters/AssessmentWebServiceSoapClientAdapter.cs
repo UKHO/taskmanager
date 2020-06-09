@@ -37,7 +37,7 @@ namespace DataServices.Adapters
 
                 client.ClientCredentials.UserName.UserName = _secretsConfig.Value.SdraWebserviceUsername;
                 client.ClientCredentials.UserName.Password = _secretsConfig.Value.SdraWebservicePassword;
-
+                //
                 client.ClientCredentials.ServiceCertificate.SslCertificateAuthentication =
                     new X509ServiceCertificateAuthentication
                     {
