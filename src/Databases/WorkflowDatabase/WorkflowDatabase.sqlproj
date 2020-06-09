@@ -59,6 +59,7 @@
     <Folder Include="Tables" />
     <Folder Include="Scripts" />
     <Folder Include="Scripts\Post Deployment" />
+    <Folder Include="Views" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\WorkflowInstance.sql" />
@@ -83,6 +84,7 @@
     <Build Include="Tables\DbAssessmentVerifyData.sql" />
     <Build Include="Tables\CarisProjectDetails.sql" />
     <Build Include="Tables\AdUser.sql" />
+    <Build Include="Views\DatabaseAssessmentWorkflowData.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
