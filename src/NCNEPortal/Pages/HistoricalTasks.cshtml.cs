@@ -1,13 +1,17 @@
+using Common.Helpers;
 using Common.Helpers.Auth;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NCNEPortal.Configuration;
 using NCNEPortal.Enums;
+using NCNEPortal.Models;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +25,9 @@ namespace NCNEPortal.Pages
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<HistoricalTasksModel> _logger;
+
+        [BindProperty(SupportsGet = true)]
+        public HistoricalTasksSearchParameters SearchParameters { get; set; }
 
         public List<string> ErrorMessages { get; set; }
         public List<TaskInfo> NcneTasks { get; set; }
@@ -57,14 +64,67 @@ namespace NCNEPortal.Pages
 
             _logger.LogInformation("Entering Get initial Historical Tasks");
 
-            NcneTasks = await _dbContext.TaskInfo
-                .Include(c => c.TaskRole)
-                .OrderByDescending(t => t.AssignedDate)
-                .Where(t => t.Status == NcneTaskStatus.Completed.ToString() ||
-                                 t.Status == NcneTaskStatus.Terminated.ToString())
-                .Take(20)
-                .ToListAsync();
+            try
+            {
+                NcneTasks = await _dbContext.TaskInfo
+                    .Include(c => c.TaskRole)
+                    .OrderByDescending(t => t.StatusChangeDate)
+                    .Where(t => t.Status == NcneTaskStatus.Completed.ToString() ||
+                                t.Status == NcneTaskStatus.Terminated.ToString())
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting Historical Tasks from database", e);
+            }
+
 
         }
+
+
+        public async Task OnPostAsync()
+        {
+            LogContext.PushProperty("ActivityName", "HistoricalTasks");
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostAsync));
+            LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
+            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+
+            _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
+
+            try
+            {
+                NcneTasks = await _dbContext.TaskInfo
+                    .Include(t => t.TaskRole)
+                    .Where(t =>
+                        (t.Status == NcneTaskStatus.Completed.ToString() || t.Status == NcneTaskStatus.Terminated.ToString())
+                        && (
+                            (!SearchParameters.ProcessId.HasValue || t.ProcessId == SearchParameters.ProcessId.Value)
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Country) || t.Country.ToUpper().Contains(SearchParameters.Country.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.ChartType) || t.ChartType.ToUpper().Contains(SearchParameters.ChartType.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.WorkflowType) || t.WorkflowType.ToUpper().Contains(SearchParameters.WorkflowType.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.ChartNo) || t.ChartNumber.ToUpper().Contains(SearchParameters.ChartNo.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Compiler) || t.TaskRole.Compiler.ToUpper().Contains(SearchParameters.Compiler.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierOne) || t.TaskRole.VerifierOne.ToUpper().Contains(SearchParameters.VerifierOne.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierTwo) || t.TaskRole.VerifierTwo.ToUpper().Contains(SearchParameters.VerifierTwo.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Publisher) || t.TaskRole.Publisher.ToUpper().Contains(SearchParameters.Publisher.ToUpper()))
+                            ))
+                    .OrderByDescending(t => t.StatusChangeDate)
+                    .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)
+                    .ToListAsync();
+
+                _logger.LogInformation("Successfully returned filtered data from database");
+
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add($"Error occurred while getting filtered Historical Tasks from database: {e.Message}");
+                _logger.LogError("Error occurred while getting filtered Historical Tasks from database with parameters {HistoricalTasksSearchParameters}", e);
+
+            }
+
+        }
+
     }
 }
