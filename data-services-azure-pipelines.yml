@@ -155,6 +155,7 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployDataServiceDev
       displayName: Deploy dataservices Api
@@ -174,6 +175,7 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployDataServiceUAT
       displayName: Deploy dataservices Api
@@ -193,6 +195,7 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployDataServicePre
       displayName: Deploy dataservices Api
