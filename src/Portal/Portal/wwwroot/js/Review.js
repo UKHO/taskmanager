@@ -11,7 +11,7 @@
     setReviewDoneHandler();
     setContinueProgressHandler();
 
-    attachValidateTerminateHandlers();
+    attachTerminateHandlers();
     setUnsavedChangesHandlers();
 
     if (isReadOnly) {
@@ -35,7 +35,8 @@
             }
         }
     }
-    function attachValidateTerminateHandlers() {
+
+    function attachTerminateHandlers() {
         $("#btnTerminate").on("click", function () {
             mainButtonsEnabled(false);
 
@@ -122,6 +123,10 @@
 
         $("#ConfirmTerminate").on("shown.bs.modal", function () {
             $("#txtTerminateComment").focus();
+        });
+        
+        $("#ConfirmTerminate").on("hidden.bs.modal", function () {
+            mainButtonsEnabled(true);
         });
 
     }
