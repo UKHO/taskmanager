@@ -183,7 +183,7 @@ namespace Common.Helpers
                     if (error != null) throw error;
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;
@@ -283,7 +283,7 @@ namespace Common.Helpers
                     carisProjectId = (await _hpdDbContext.CarisProjectData.SingleAsync(p =>
                         p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase))).ProjectId;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;
@@ -347,7 +347,7 @@ namespace Common.Helpers
                     if (error != null) throw error;
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;
