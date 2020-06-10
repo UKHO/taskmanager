@@ -16,15 +16,16 @@ namespace EventService.Attributes
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             // Per https://blog.markvincze.com/how-to-validate-action-parameters-with-dataannotation-attributes/
-            var descriptor = context.ActionDescriptor as ControllerActionDescriptor;
-            if (descriptor != null)
+            if (context.ActionDescriptor is ControllerActionDescriptor descriptor)
             {
                 foreach (var parameter in descriptor.MethodInfo.GetParameters())
                 {
                     object args = null;
-                    if (context.ActionArguments.ContainsKey(parameter.Name))
+                    var paramName = parameter.Name ?? "";
+
+                    if (context.ActionArguments.ContainsKey(paramName))
                     {
-                        args = context.ActionArguments[parameter.Name];
+                        args = context.ActionArguments[paramName];
                     }
 
                     ValidateAttributes(parameter, args, context.ModelState);
@@ -43,8 +44,7 @@ namespace EventService.Attributes
             {
                 var attributeInstance = parameter.GetCustomAttribute(attributeData.AttributeType);
 
-                var validationAttribute = attributeInstance as ValidationAttribute;
-                if (validationAttribute != null)
+                if (attributeInstance is ValidationAttribute validationAttribute)
                 {
                     var isValid = validationAttribute.IsValid(args);
                     if (!isValid)
