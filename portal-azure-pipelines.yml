@@ -100,7 +100,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal\\portal.csproj'
           zipAfterPublish: false
-          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\portal --no-build'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\portal --configuration $(BuildConfiguration) --no-build'
         displayName: 'Publish portal-project'
 
       - task: PublishBuildArtifacts@1
