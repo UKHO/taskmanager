@@ -1,14 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Configuration;
 using Portal.Helpers;
-using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
+
+// Disabled async warnings
+#pragma warning disable 1998
 
 namespace Portal.UnitTests
 {

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +15,6 @@ using NCNEPortal.Models;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NCNEPortal.Pages
 {
@@ -38,7 +38,7 @@ namespace NCNEPortal.Pages
         {
             get
             {
-                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetails(this.User);
                 return _currentUser;
             }
         }
