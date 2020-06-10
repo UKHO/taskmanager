@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
@@ -206,6 +207,10 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
+
+            // TODO:
+
+            Thread.Sleep(1000);
 
             ValidationErrorMessages.Clear();
 
@@ -471,7 +476,10 @@ namespace Portal.Pages.DbAssessment
         {
             var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Completed);
+            // TODO:
+            Thread.Sleep(1000);
+
+            //TODO: await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Completed);
 
             _logger.LogInformation(
                 "Task sign-off from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");

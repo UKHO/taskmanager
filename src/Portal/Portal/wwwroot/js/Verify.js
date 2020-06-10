@@ -130,7 +130,12 @@
 
     function handlebtnContinueVerifyProgress() {
         $("#btnContinueVerifyProgress").on("click", function (e) {
-            processVerifyDone("Done", $("#modalVerifyProgressWarning"));
+
+            $("#modalVerifyProgressWarning").modal("hide");
+
+            $("#modalVerifyDone").modal("show");
+
+            processVerifyDone("Done");
         });
     }
 
@@ -142,9 +147,23 @@
 
     function handleContinueVerifyDoneWarning() {
         $("#btnContinueVerifyDoneWarning").on("click", function (e) {
-            processVerifyDone("ConfirmedSignOff", $("#modalVerifyDoneWarning"));
+
+
+            $("#modalVerifyDoneWarning").modal("hide");
+            processVerifyDone("ConfirmedSignOff");
+        });
+
+        $("#btnVerifyDoneWarningContinue").on("click", function (e) {
+
+            $("#btnVerifyDoneWarningCancel").prop("disabled", true);
+            $("#btnVerifyDoneWarningContinue").prop("disabled", true);
+
+            $("#modalVerifyDoneWarnings").collapse("hide");
+
+            processVerifyDone("ConfirmedSignOff");
         });
     }
+    
 
     function processVerifySave() {
         mainButtonsEnabled(false);
@@ -174,13 +193,11 @@
         });
     }
 
-    function processVerifyDone(action, modalWarningPopup) {
+    function processVerifyDone(action) {
         mainButtonsEnabled(false);
 
-        $("#btnContinueVerifyProgress").prop("disabled", true);
-        $("#btnCancelVerifyProgressWarning").prop("disabled", true);
+        $("#modalVerifyDoneWait").collapse("show");
 
-        hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitVerifyDone"));
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -200,9 +217,62 @@
                 console.log("Done success");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitVerifyDone"));
+                processErrors1(error);
             }
         });
+    }
+
+    function processErrors1(error) {
+        var responseJson = error.responseJSON;
+        var statusCode = error.status;
+
+        $("#modalVerifyDoneErrorMessage").html("");
+        $("#modalVerifyDoneWarningMessage").html("");
+
+        $("#modalVerifyDoneWait").collapse("hide");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+        if (responseJson == null) {
+            $("#modalVerifyDoneErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+
+            unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
+            $("#modalVerifyDoneErrors").collapse("show");
+            return;
+        }
+
+        if (statusCode === customHttpStatusCodes.WarningsDetected) {
+
+            $("#modalVerifyDoneWarningMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyDoneWarningMessage ul");
+
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
+            });
+
+            $("#modalVerifyDoneWarnings").collapse("show");
+            return;
+        }
+
+        if (statusCode === customHttpStatusCodes.FailedValidation) {
+            $("#modalVerifyDoneErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
+            });
+
+            $("#modalVerifyDoneErrors").collapse("show");
+            return;
+        }
+
+        $("#modalVerifyDoneErrorMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >" + responseJson + "</li>");
+
+        $("#modalVerifyDoneErrors").collapse("show");
     }
 
     function processErrors(error, modalWaitPopup) {
@@ -274,6 +344,13 @@
         popupToHide.modal("hide");
 
     }
+
+    $("#modalVerifyDone").on("hidden.bs.modal", function () {
+        $("#modalVerifyDoneWait").collapse("hide");
+        $("#modalVerifyDoneErrors").collapse("hide");
+        $("#modalVerifyDoneWarnings").collapse("hide");
+        
+    });
 
     function hasUnsavedChanges() {
         if (formChanged) {

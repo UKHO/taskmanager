@@ -156,13 +156,13 @@ h1, .h1 {
     font-size: 2.1rem;
 }
 
-h1.workflow-page-heading {
-    text-align: center;
-}
+    h1.workflow-page-heading {
+        text-align: center;
+    }
 
-h1.workflow-page-heading > span.red {
-    color: #cd2026;
-}
+        h1.workflow-page-heading > span.red {
+            color: #cd2026;
+        }
 
 h2, .h2 {
     font-size: 1.6rem;
@@ -343,9 +343,11 @@ table > tbody > tr > th {
 .onHoldRedCircle {
     color: #cd2026;
 }
+
 .onHoldAmberCircle {
     color: #ff8c00;
 }
+
 .onHoldGreenCircle {
     color: #008000;
 }
@@ -539,8 +541,6 @@ body, .sticky-footer-wrapper {
     border-left: 5px solid #e20d0d;
 }
 
-
-
     .modal-dialog.error h3 {
         color: #e20d0d;
     }
@@ -549,12 +549,9 @@ body, .sticky-footer-wrapper {
         color: #e20d0d;
     }
 
-/* Start UKHO design system warning dialog stuff*/
 .modal-dialog.warning {
     border-left: 5px solid #ef8123;
 }
-
-
 
     .modal-dialog.warning h3 {
         color: #ef8123;
@@ -629,6 +626,11 @@ body, .sticky-footer-wrapper {
                 margin-left: 0.6rem;
             }
 
+
+        .dialog.error i.fa.fa-info-circle {
+            color: #e20d0d;
+        }
+
     .dialog.success {
         border-left: 5px solid #4aab37;
     }
@@ -645,10 +647,18 @@ body, .sticky-footer-wrapper {
             color: #ef8123;
         }
 
+        .dialog.warning h6 {
+            color: #ef8123;
+        }
 
-#assessDoneErrorMessage > ul {
-    display: inline;
-}
+        .dialog.warning i.fa.fa-info-circle {
+            color: #ef8123;
+        }
+
+
+        #assessDoneErrorMessage > ul {
+            display: inline;
+        }
 
 .modal-dialog.error li:not(:last-child), .modal-dialog.warning li:not(:last-child) {
     margin-bottom: 8px;
@@ -711,14 +721,14 @@ span.twitter-typeahead {
         color: #FFFFFF;
     }
 
-.tt-suggestion .displayName {
-    font-size: 14pt;
+    .tt-suggestion .displayName {
+        font-size: 14pt;
+    }
 
-}
-.tt-suggestion .email {
-    font-size: 12pt;
-    font-style: italic;
-}
+    .tt-suggestion .email {
+        font-size: 12pt;
+        font-style: italic;
+    }
 /* TYPEAHEAD END */
 
 /* 
@@ -786,31 +796,31 @@ ol.error-list {
     line-height: 24px;
 }
 
-.checkbox-wrapper label::before,
-.checkbox-wrapper label::after {
-    position: absolute;
-    content: "";
-    display: inline-block;
-}
+    .checkbox-wrapper label::before,
+    .checkbox-wrapper label::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+    }
 
-.checkbox-wrapper label::before {
-    height: 22px;
-    width: 22px;
-    border: 2px solid #03284F;
-    left: 0;
-    top: 0;
-}
+    .checkbox-wrapper label::before {
+        height: 22px;
+        width: 22px;
+        border: 2px solid #03284F;
+        left: 0;
+        top: 0;
+    }
 
-.checkbox-wrapper label::after {
-    color: #09315b;
-    height: 6px;
-    width: 13px;
-    border-left: 3px solid;
-    border-bottom: 3px solid;
-    transform: rotate(-45deg);
-    left: 5px;
-    top: 7px;
-}
+    .checkbox-wrapper label::after {
+        color: #09315b;
+        height: 6px;
+        width: 13px;
+        border-left: 3px solid;
+        border-bottom: 3px solid;
+        transform: rotate(-45deg);
+        left: 5px;
+        top: 7px;
+    }
 
 .checkbox-wrapper input[type=checkbox] + label::after {
     content: none;
@@ -842,18 +852,18 @@ ol.error-list {
     max-width: max-content;
 }
 
-.selectedUsage > .fa.fa-check, .selectedSource > .fa.fa-check {
-    color: #09315b;
-}
+    .selectedUsage > .fa.fa-check, .selectedSource > .fa.fa-check {
+        color: #09315b;
+    }
 
-.selectedUsage > span, .selectedSource > span {
-    word-break: break-word;
-}
+    .selectedUsage > span, .selectedSource > span {
+        word-break: break-word;
+    }
 
-.selectedUsage > .fa.fa-times-circle, .selectedSource > .fa.fa-times-circle {
-    color: red;
-    cursor: pointer;
-}
+    .selectedUsage > .fa.fa-times-circle, .selectedSource > .fa.fa-times-circle {
+        color: red;
+        cursor: pointer;
+    }
 
 .sourceDocumentName, .hpdUsageName {
     cursor: pointer;
