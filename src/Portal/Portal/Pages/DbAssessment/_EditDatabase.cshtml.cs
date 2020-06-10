@@ -66,7 +66,7 @@ namespace Portal.Pages.DbAssessment
         {
             get
             {
-                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetails(this.User);
                 return _currentUser;
             }
         }

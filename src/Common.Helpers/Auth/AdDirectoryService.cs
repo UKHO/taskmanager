@@ -87,7 +87,7 @@ namespace Common.Helpers.Auth
             }
         }
 
-        public async Task<(string DisplayName, string UserEmail)> GetUserDetailsAsync(ClaimsPrincipal user)
+        public (string DisplayName, string UserEmail) GetUserDetails(ClaimsPrincipal user)
         {
             var displayName = user.Claims.FirstOrDefault(c => c.Type.Equals("name", StringComparison.OrdinalIgnoreCase))?.Value;
             var userEmail = user.Claims.FirstOrDefault(c => c.Type.Equals("preferred_username", StringComparison.OrdinalIgnoreCase))?.Value;

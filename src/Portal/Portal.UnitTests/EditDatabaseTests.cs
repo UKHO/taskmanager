@@ -59,7 +59,7 @@ namespace Portal.UnitTests
             UserEmail = "testuser@foobar.com";
             _generalConfig.Value.SessionFilename = "Testing.ext";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((UserFullName, UserEmail));
 
             _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
@@ -104,8 +104,8 @@ namespace Portal.UnitTests
             _dbContext.DbAssessmentAssessData.Add(setupAssessData);
             await _dbContext.SaveChangesAsync();
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult((userWithHpdUserRecord, userWithHpdUserRecordEmail)));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((userWithHpdUserRecord, userWithHpdUserRecordEmail));
 
             A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
                     A<int>.Ignored, A<string>.Ignored,

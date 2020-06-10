@@ -1,4 +1,11 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,13 +23,6 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -151,7 +151,7 @@ namespace NCNEPortal
         {
             get
             {
-                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetailsAsync(this.User).Result;
+                if (_currentUser == default) _currentUser = _adDirectoryService.GetUserDetails(this.User);
                 return _currentUser;
             }
         }
@@ -418,7 +418,7 @@ namespace NCNEPortal
         }
 
 
-        public async Task<JsonResult> OnPostCalcMilestonesAsync(int deadLine, DateTime dtInput, Boolean isPublish)
+        public JsonResult OnPostCalcMilestones(int deadLine, DateTime dtInput, bool isPublish)
         {
             string[] result;
             if (isPublish)
@@ -446,7 +446,7 @@ namespace NCNEPortal
 
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteAsync(int processId, string username, int stageTypeId)
+        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
@@ -464,10 +464,9 @@ namespace NCNEPortal
             }
 
             return new JsonResult(HttpStatusCode.OK);
-
         }
 
-        public async Task<IActionResult> OnPostValidateReworkAsync(int processId, string username, int stageTypeId)
+        public IActionResult OnPostValidateRework(int processId, string username, int stageTypeId)
         {
             ValidationErrorMessages.Clear();
 
@@ -482,7 +481,7 @@ namespace NCNEPortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
-        public async Task<IActionResult> OnPostValidateCompleteWorkflow(string username)
+        public IActionResult OnPostValidateCompleteWorkflow(string username)
         {
             ValidationErrorMessages.Clear();
 
@@ -514,7 +513,6 @@ namespace NCNEPortal
             await _dbContext.SaveChangesAsync();
 
             return new JsonResult(HttpStatusCode.OK);
-
         }
 
         public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, bool isRework)
@@ -922,7 +920,7 @@ namespace NCNEPortal
             LogContext.PushProperty("VersionNumber", versionNumber);
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostGetChartDetails));
 
-            var panelInfo = _carisProjectHelper.GetValidHpdPanelInfo(versionNumber).Result;
+            var panelInfo = await _carisProjectHelper.GetValidHpdPanelInfo(versionNumber);
 
             if (string.IsNullOrEmpty(panelInfo.Item1))
             {

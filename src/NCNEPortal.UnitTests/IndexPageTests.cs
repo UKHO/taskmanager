@@ -192,7 +192,7 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task OnGetAsync_sets_UserFullName_from_userIdentityService()
         {
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("The User's Full Name", "user email"));
 
             await _indexModel.OnGetAsync();

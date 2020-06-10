@@ -317,8 +317,8 @@ namespace Portal.UnitTests
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -348,8 +348,8 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("This User", "thisuser@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("This User", "thisuser@foobar.com"));
 
             var currentCommentsCount = await _dbContext.Comment.CountAsync();
 
@@ -628,8 +628,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -665,8 +665,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -698,8 +698,8 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "TestUser2";
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -740,8 +740,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -779,8 +779,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = true;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
@@ -821,8 +821,8 @@ namespace Portal.UnitTests
             _reviewModel.Team = "Home Waters";
             _reviewModel.IsOnHold = false;
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetailsAsync(A<ClaimsPrincipal>.Ignored))
-                .Returns(Task.FromResult(("TestUser2", "testuser2@foobar.com")));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 

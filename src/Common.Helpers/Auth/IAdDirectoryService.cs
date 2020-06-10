@@ -13,6 +13,6 @@ namespace Common.Helpers.Auth
         Task<IEnumerable<(string DisplayName, string UserPrincipalName)>> GetGroupMembersFromAdAsync(
             IEnumerable<Guid> adGroupGuids);
 
-        Task<(string DisplayName, string UserEmail)> GetUserDetailsAsync(ClaimsPrincipal user);
+        (string DisplayName, string UserEmail) GetUserDetails(ClaimsPrincipal user);
     }
 }
