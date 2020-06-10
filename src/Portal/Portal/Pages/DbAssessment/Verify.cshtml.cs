@@ -617,7 +617,7 @@ namespace Portal.Pages.DbAssessment
             var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
 
             currentVerify.ProductActioned = ProductActioned;
-            currentVerify.ProductActionChangeDetails = ProductActionChangeDetails;
+            currentVerify.ProductActionChangeDetails = ProductActionChangeDetails.Trim();
 
             var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.ProductAction.RemoveRange(toRemove);

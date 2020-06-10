@@ -43,6 +43,7 @@ namespace WorkflowCoordinator.Handlers
                 .Include(wi => wi.DbAssessmentVerifyData)
                 .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(w => w.Comments)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(wi => wi.ProcessId == message.ProcessId);
 
             if (workflowInstance == null)
@@ -82,8 +83,9 @@ namespace WorkflowCoordinator.Handlers
                                                                                    StringComparison.InvariantCultureIgnoreCase)
                                                                                    ? "Imm Act - NM"
                                                                                    : "Longer-term Action";
+                var change = string.IsNullOrWhiteSpace(workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails) ? "n/a" : workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails;
 
-                await _dataServiceApiClient.MarkAssessmentAsAssessed(workflowInstance.ProcessId.ToString(), sdocId, action, "tbc");
+                await _dataServiceApiClient.MarkAssessmentAsAssessed(workflowInstance.ProcessId.ToString(), sdocId, action, change);
 
                 // Update all occurrences of this sdocId in PrimaryDocumentStatus with status SourceDocumentRetrievalStatus.Assessed
                 var primaryDocuments = await _dbContext.PrimaryDocumentStatus.Where(p => p.SdocId == sdocId).ToListAsync();
