@@ -396,7 +396,7 @@ namespace Portal.Pages.DbAssessment
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
             currentAssess.ProductActioned = ProductActioned;
-            currentAssess.ProductActionChangeDetails = ProductActionChangeDetails.Trim();
+            currentAssess.ProductActionChangeDetails = ProductActionChangeDetails;
 
             var toRemove = await _dbContext.ProductAction.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.ProductAction.RemoveRange(toRemove);
