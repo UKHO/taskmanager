@@ -259,14 +259,6 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    if (!await SaveTaskData(processId, workflowInstance.WorkflowInstanceId))
-                    {
-                        return new JsonResult(this.ValidationErrorMessages)
-                        {
-                            StatusCode = (int)VerifyCustomHttpStatusCode.FailuresDetected
-                        };
-                    }
-
                     var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))

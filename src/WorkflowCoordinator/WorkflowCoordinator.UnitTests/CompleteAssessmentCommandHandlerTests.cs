@@ -95,6 +95,7 @@ namespace WorkflowCoordinator.UnitTests
             var processId = 123;
             var workflowInstanceId = 1;
             var sdocId = 1;
+            var productActionChangeDetails = "Testing";
 
             var currentWorkflowInstance = new WorkflowInstance()
             {
@@ -111,7 +112,8 @@ namespace WorkflowCoordinator.UnitTests
             {
                 WorkflowInstanceId = workflowInstanceId,
                 ProcessId = processId,
-                TaskType = taskType
+                TaskType = taskType,
+                ProductActionChangeDetails = productActionChangeDetails
             };
             await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
 
@@ -139,7 +141,7 @@ namespace WorkflowCoordinator.UnitTests
             await _handler.Handle(completeAssessmentCommand, _handlerContext);
 
             //Then
-            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, "tbc")).MustHaveHappened();
+            A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsAssessed(processId.ToString(), sdocId, action, productActionChangeDetails)).MustHaveHappened();
             A.CallTo(() => _fakeDataServiceApiClient.MarkAssessmentAsCompleted(sdocId, "Marked Completed via TM2")).MustHaveHappened();
 
         }
