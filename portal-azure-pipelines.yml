@@ -48,6 +48,7 @@ stages:
           feedsToUse: 'select'
           vstsFeed: '723dbddb-f125-4104-aa0e-de467e74d75b/3479b688-97eb-49d4-9251-08ddaa328155'
           includeNuGetOrg: true
+          arguments: '--configuration $(BuildConfiguration)'
         displayName: 'dotnet restore portal'
     
       - task: DotNetCoreCLI@2
@@ -60,7 +61,7 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
-          arguments: '--configuration Debug'
+          arguments: '--configuration $(BuildConfiguration)'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
         displayName: 'dotnet build portaltests'
 
@@ -74,7 +75,7 @@ stages:
         inputs:
           command: 'test'
           projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
-          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings --no-build
+          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings --configuration $(BuildConfiguration) --no-build
         displayName: 'dotnet test portaltests'
 
       - task: DotNetCoreCLI@2

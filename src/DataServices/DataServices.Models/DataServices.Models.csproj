@@ -4,8 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>0472</NoWarn>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <NoWarn>CS0472</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
