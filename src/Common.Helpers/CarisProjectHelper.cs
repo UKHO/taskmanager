@@ -1,11 +1,11 @@
-﻿using HpdDatabase.EF.Models;
-using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using HpdDatabase.EF.Models;
+using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
 
 namespace Common.Helpers
 {
@@ -45,10 +45,10 @@ namespace Common.Helpers
                         reader[1].ToString(), Convert.ToInt32(reader[2]), reader[3].ToString());
                 }
             }
-            catch (Exception e)
+            catch (OracleException e)
             {
-                Console.WriteLine(e);
-                throw;
+                var error = FormatOracleError(e);
+                throw error;
             }
 
             return result;
