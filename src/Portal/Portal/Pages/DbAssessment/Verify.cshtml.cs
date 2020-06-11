@@ -208,10 +208,6 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
-            // TODO:
-
-            Thread.Sleep(1000);
-
             ValidationErrorMessages.Clear();
 
             var workflowInstance = _dbContext.WorkflowInstance
