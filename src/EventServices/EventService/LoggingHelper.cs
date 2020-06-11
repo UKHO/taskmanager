@@ -6,6 +6,7 @@ using EventService.Config;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 
 namespace EventService
 {
@@ -43,15 +44,15 @@ namespace EventService
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingEventServices",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true,
-                    columnOptions)
+                .WriteTo.MSSqlServer(
+                    connectionString: loggingConnectionString,
+                    sinkOptions: new SinkOptions
+                    {
+                        TableName = "LoggingEventServices",
+                        AutoCreateSqlTable = true
+
+                    },
+                    columnOptions: columnOptions)
                 .CreateLogger();
         }
     }

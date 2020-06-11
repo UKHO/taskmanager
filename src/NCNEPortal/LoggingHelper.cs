@@ -1,11 +1,12 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Data;
+using Common.Helpers;
 using NCNEPortal.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 
 namespace NCNEPortal
 {
@@ -46,15 +47,15 @@ namespace NCNEPortal
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingNcnePortal",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true,
-                    columnOptions)
+                .WriteTo.MSSqlServer(
+                    connectionString: loggingConnectionString,
+                    sinkOptions: new SinkOptions
+                    {
+                        TableName = "LoggingNcnePortal",
+                        AutoCreateSqlTable = true
+
+                    },
+                    columnOptions: columnOptions)
                 .CreateLogger();
         }
     }

@@ -5,6 +5,7 @@ using Common.Helpers;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 using WorkflowCoordinator.Config;
 
 namespace WorkflowCoordinator
@@ -40,19 +41,19 @@ namespace WorkflowCoordinator
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingWorkflowCoordinator",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true,
-                    columnOptions)
+                .WriteTo.MSSqlServer(
+                    connectionString: loggingConnectionString,
+                    sinkOptions: new SinkOptions
+                    {
+                        TableName = "LoggingWorkflowCoordinator",
+                        AutoCreateSqlTable = true
+
+                    },
+                    columnOptions: columnOptions)
                 .CreateLogger();
         }
     }
