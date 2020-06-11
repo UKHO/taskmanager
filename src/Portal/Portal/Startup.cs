@@ -188,35 +188,10 @@ namespace Portal
             services.AddHealthChecks();
 
             services.AddSingleton<AppVersionInfo>();
-
-            using (var sp = services.BuildServiceProvider())
-            using (var workflowDbContext = sp.GetRequiredService<WorkflowDbContext>())
-            using (var hpdDbContext = sp.GetRequiredService<HpdDbContext>())
-            {
-                try
-                {
-                    var workspaces = hpdDbContext.CarisWorkspaces
-                        .Select(cw => cw.Name.Trim()) //trim to prevent unique constraint errors
-                        .Distinct()
-                        .Select(cw => new CachedHpdWorkspace { Name = cw })
-                        .OrderBy(cw => cw.Name)
-                        .ToList();
-
-                    workflowDbContext.Database.ExecuteSqlCommand("Truncate Table [CachedHpdWorkspace]");
-
-                    workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
-                    workflowDbContext.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
-                }
-
-            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WorkflowDbContext workflowDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WorkflowDbContext workflowDbContext, HpdDbContext hpdDbContext)
         {
             app.UseSerilogRequestLogging(
                 options =>
@@ -263,6 +238,25 @@ namespace Portal
             });
 
             app.UseAzureAppConfiguration();
+
+            try
+            {
+                var workspaces = hpdDbContext.CarisWorkspaces
+                    .Select(cw => cw.Name.Trim()) //trim to prevent unique constraint errors
+                    .Distinct()
+                    .Select(cw => new CachedHpdWorkspace { Name = cw })
+                    .OrderBy(cw => cw.Name)
+                    .ToList();
+
+                workflowDbContext.Database.ExecuteSqlCommand("Truncate Table [CachedHpdWorkspace]");
+
+                workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
+                workflowDbContext.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
+            }
 
             // Seeding
 
