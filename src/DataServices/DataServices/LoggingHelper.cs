@@ -6,6 +6,7 @@ using DataServices.Config;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 
 namespace DataServices
 {
@@ -42,15 +43,15 @@ namespace DataServices
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingDataServices",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true,
-                    columnOptions)
+                .WriteTo.MSSqlServer(
+                    connectionString: loggingConnectionString,
+                    sinkOptions: new SinkOptions
+                    {
+                        TableName = "LoggingDataServices",
+                        AutoCreateSqlTable = true
+
+                    },
+                    columnOptions: columnOptions)
                 .CreateLogger();
         }
     }

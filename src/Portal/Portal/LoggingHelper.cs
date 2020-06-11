@@ -6,6 +6,7 @@ using Portal.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 
 namespace Portal
 {
@@ -39,22 +40,22 @@ namespace Portal
             };
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.MSSqlServer(loggingConnectionString,
-                    "LoggingPortal",
-                    null, //default
-                    LogEventLevel.Verbose, //default
-                    50, //default
-                    null, //default
-                    null, //default
-                    true,
-                    columnOptions)
-                .CreateLogger();
+                           .MinimumLevel.Is(logLevel)
+                           .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                           .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                           .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+                           .Enrich.FromLogContext()
+                           .WriteTo.Console()
+                           .WriteTo.MSSqlServer(
+                               connectionString: loggingConnectionString,
+                               sinkOptions: new SinkOptions
+                               {
+                                   TableName = "LoggingPortal",
+                                   AutoCreateSqlTable = true
+
+                               },
+                               columnOptions: columnOptions)
+                           .CreateLogger();
         }
     }
 }
