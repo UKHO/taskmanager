@@ -167,7 +167,8 @@
 
     function processVerifySave() {
         mainButtonsEnabled(false);
-        $("#modalWaitVerifySave").modal("show");
+        populateAndShowWaitPopupForSave();
+        $("#modalVerifyPopup").modal("show");
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -185,10 +186,10 @@
             success: function (result) {
                 formChanged = false;
                 console.log("Save Success");
-                $("#modalWaitVerifySave").modal("hide");
+                $("#modalVerifyPopup").modal("hide");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitVerifySave"));
+                processErrors1(error);
             }
         });
     }
@@ -274,6 +275,8 @@
     }
     
     function populateAndShowWaitPopupForDone() {
+        $("#modalVerifyPopup h4.modal-title").text("Signing off task");
+
 
         $("#modalVerifyWaitMessage").html("");
 
@@ -285,6 +288,24 @@
 
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Signing-off Task...</li>");
+
+        $("#modalVerifyWait").collapse("show");
+    }
+
+    function populateAndShowWaitPopupForSave() {
+
+        $("#modalVerifyPopup h4.modal-title").text("Saving task data");
+
+        $("#modalVerifyWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalVerifyWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Saving Data...</li>");
 
         $("#modalVerifyWait").collapse("show");
     }
