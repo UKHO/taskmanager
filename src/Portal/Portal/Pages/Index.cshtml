@@ -106,9 +106,11 @@
                         </td>
                         <td>
                             <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
+                                    <i class="fas fa-cog" style="color: initial;"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
                                         <i class="far fa-user">
                                         </i>
                                         Assign Task
@@ -204,14 +206,16 @@
                         </td>
                         <td>
                             <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
+                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
+                                    <i class="fas fa-cog" style="color: initial;"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
                                     </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
                                         <i class="far fa-user">
                                         </i>
                                         Assign Task
