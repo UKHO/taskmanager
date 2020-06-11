@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Hosting;
 using NCNEPortal.Helpers;
@@ -21,19 +20,19 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public async Task Test_GitHash_set_To_LOCALBUILD_when_no_InformationalVersion_value_exists()
+        public void Test_GitHash_set_To_LOCALBUILD_when_no_InformationalVersion_value_exists()
         {
-            Assert.AreEqual("LOCALBUILD",_appVersionInfo.GitHash);
+            Assert.AreEqual("LOCALBUILD", _appVersionInfo.GitHash);
         }
 
         [Test]
-        public async Task Test_ShortGitHash_set_to_LBUILD_when_no_InformationalVersion_value_exists()
+        public void Test_ShortGitHash_set_to_LBUILD_when_no_InformationalVersion_value_exists()
         {
             Assert.AreEqual("LBUILD", _appVersionInfo.ShortGitHash);
         }
 
         [Test]
-        public async Task Test_BuildNumber_set_to_today()
+        public void Test_BuildNumber_set_to_today()
         {
             var today = DateTime.UtcNow.ToString("yyyyMMdd");
             StringAssert.Contains(today, _appVersionInfo.BuildNumber);
