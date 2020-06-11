@@ -133,7 +133,7 @@
 
             $("#modalVerifyProgressWarning").modal("hide");
 
-            $("#modalVerifyDone").modal("show");
+            $("#modalVerifyPopup").modal("show");
 
             processVerifyDone("Done");
         });
@@ -153,12 +153,12 @@
             processVerifyDone("ConfirmedSignOff");
         });
 
-        $("#btnVerifyDoneWarningContinue").on("click", function (e) {
+        $("#btnVerifyWarningContinue").on("click", function (e) {
 
-            $("#btnVerifyDoneWarningCancel").prop("disabled", true);
-            $("#btnVerifyDoneWarningContinue").prop("disabled", true);
+            $("#btnVerifyWarningCancel").prop("disabled", true);
+            $("#btnVerifyWarningContinue").prop("disabled", true);
 
-            $("#modalVerifyDoneWarnings").collapse("hide");
+            $("#modalVerifyWarnings").collapse("hide");
 
             processVerifyDone("ConfirmedSignOff");
         });
@@ -195,9 +195,7 @@
 
     function processVerifyDone(action) {
         mainButtonsEnabled(false);
-
-        $("#modalVerifyDoneWait").collapse("show");
-
+        populateAndShowWaitPopupForDone();
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -226,53 +224,69 @@
         var responseJson = error.responseJSON;
         var statusCode = error.status;
 
-        $("#modalVerifyDoneErrorMessage").html("");
-        $("#modalVerifyDoneWarningMessage").html("");
+        $("#modalVerifyErrorMessage").html("");
+        $("#modalVerifyWarningMessage").html("");
 
-        $("#modalVerifyDoneWait").collapse("hide");
+        $("#modalVerifyWait").collapse("hide");
 
         ulTag = "<ul class=\"mb-0 pb-0\" />";
 
         if (responseJson == null) {
-            $("#modalVerifyDoneErrorMessage").append(ulTag);
-            var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+            $("#modalVerifyErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyErrorMessage ul");
 
             unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
-            $("#modalVerifyDoneErrors").collapse("show");
+            $("#modalVerifyErrors").collapse("show");
             return;
         }
 
         if (statusCode === customHttpStatusCodes.WarningsDetected) {
 
-            $("#modalVerifyDoneWarningMessage").append(ulTag);
-            var unOrderedList = $("#modalVerifyDoneWarningMessage ul");
+            $("#modalVerifyWarningMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyWarningMessage ul");
 
             responseJson.forEach(function (item) {
                 unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            $("#modalVerifyDoneWarnings").collapse("show");
+            $("#modalVerifyWarnings").collapse("show");
             return;
         }
 
         if (statusCode === customHttpStatusCodes.FailedValidation) {
-            $("#modalVerifyDoneErrorMessage").append(ulTag);
-            var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+            $("#modalVerifyErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyErrorMessage ul");
 
             responseJson.forEach(function (item) {
                 unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            $("#modalVerifyDoneErrors").collapse("show");
+            $("#modalVerifyErrors").collapse("show");
             return;
         }
 
-        $("#modalVerifyDoneErrorMessage").append(ulTag);
-        var unOrderedList = $("#modalVerifyDoneErrorMessage ul");
+        $("#modalVerifyErrorMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyErrorMessage ul");
 
         unOrderedList.append("<li class=\"pt-1 pb-1\" >" + responseJson + "</li>");
 
-        $("#modalVerifyDoneErrors").collapse("show");
+        $("#modalVerifyErrors").collapse("show");
+    }
+    
+    function populateAndShowWaitPopupForDone() {
+
+        $("#modalVerifyWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalVerifyWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Signing-off Task...</li>");
+
+        $("#modalVerifyWait").collapse("show");
     }
 
     function processErrors(error, modalWaitPopup) {
@@ -345,10 +359,10 @@
 
     }
 
-    $("#modalVerifyDone").on("hidden.bs.modal", function () {
-        $("#modalVerifyDoneWait").collapse("hide");
-        $("#modalVerifyDoneErrors").collapse("hide");
-        $("#modalVerifyDoneWarnings").collapse("hide");
+    $("#modalVerifyPopup").on("hidden.bs.modal", function () {
+        $("#modalVerifyWait").collapse("hide");
+        $("#modalVerifyErrors").collapse("hide");
+        $("#modalVerifyWarnings").collapse("hide");
         
     });
 

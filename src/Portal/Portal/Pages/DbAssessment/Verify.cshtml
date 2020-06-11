@@ -124,7 +124,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalVerifyDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifyDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifyDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,16 +132,14 @@
             </div>
             <div class="modal-body">
                 @* Wait dialog *@
-                <section id="modalVerifyDoneWait" class="dialog collapse">
+                <section id="modalVerifyWait" class="dialog collapse">
                     <h5><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h5>
-                    <ul>
-                        <li>Verifying Data...</li>
-                        <li>Signing-off Task...</li>
-                    </ul>
+                    
+                    <div id="modalVerifyWaitMessage"></div>
                 </section>
 
                 @* Errors dialog *@
-                <section id="modalVerifyDoneErrors" class="dialog error collapse">
+                <section id="modalVerifyErrors" class="dialog error collapse">
                     <h5>Errors while processing task</h5>
 
                     <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
@@ -149,18 +147,18 @@
                             <i class="fa fa-info-circle" style="font-size: 1.50rem"></i>
                         </div>
 
-                        <div id="modalVerifyDoneErrorMessage"></div>
+                        <div id="modalVerifyErrorMessage"></div>
 
                     </div>
                     <hr />
                     <div class="row justify-content-end">
-                        <div class="col-4 pr-1"><button type="button" id="btnVerifyDoneErrors" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                        <div class="col-4 pr-1"><button type="button" id="btnVerifyErrorsOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
                     </div>
 
                 </section>
 
                 @* Warnings dialog *@
-            <section id="modalVerifyDoneWarnings" class="dialog warning collapse">
+            <section id="modalVerifyWarnings" class="dialog warning collapse">
                 <h5>Warnings while processing task</h5>
                 <div>
                     <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
@@ -168,7 +166,7 @@
                             <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                         </div>
 
-                        <div id="modalVerifyDoneWarningMessage"></div>
+                        <div id="modalVerifyWarningMessage"></div>
                     </div>
                 </div>
 
@@ -180,8 +178,8 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12">
-                                <div class="col-4 float-left"><button type="button" id="btnVerifyDoneWarningCancel" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
-                                <div class="col-4 float-right"><button type="button" id="btnVerifyDoneWarningContinue" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
+                                <div class="col-4 float-left"><button type="button" id="btnVerifyWarningCancel" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
+                                <div class="col-4 float-right"><button type="button" id="btnVerifyWarningContinue" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
                             </div>
                         </div>
                     </div>
