@@ -476,10 +476,7 @@ namespace Portal.Pages.DbAssessment
         {
             var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            // TODO:
-            Thread.Sleep(1000);
-
-            //TODO: await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Completed);
+            await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Completed);
 
             _logger.LogInformation(
                 "Task sign-off from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
