@@ -124,7 +124,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifyDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+@* modal popup used when Sign-off, Save, and Reject *@
+<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-labelledby="modalVerifyPopup" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -191,54 +192,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitVerifyDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifyDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
-            </div>
-            <div class="modal-body">
-                <ul>
-                    <li>Verifying Data...</li>
-                    <li>Signing-off Task...</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalWaitVerifySave" tabindex="-1" role="dialog" aria-labelledby="modalWaitVerifySave" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
-            </div>
-            <div class="modal-body">
-                <ul>
-                    <li>Verifying Data...</li>
-                    <li>Saving Data...</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalWaitVerifyReject" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
-            </div>
-            <div class="modal-body">
-                <ul>
-                    <li>Rejecting Task...</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 @* Modal Add Rejection comment *@
 <div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-labelledby="ConfirmReject" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
@@ -264,7 +217,8 @@
     </div>
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitVerifyErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyDoneErrors" aria-hidden="true">
+@* Unsaved changes *@
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyUnsavedChangesErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyUnsavedChangesErrors" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -275,17 +229,7 @@
                     <div class="col-1 mr-4">
                         <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                     </div>
-                    <div id="verifyErrorMessage" class="col-11">
-                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
-                        {
-                            <ul>
-                                @foreach (var message in Model.ValidationErrorMessages)
-                                {
-                                    <li>@message</li>
-                                }
-                            </ul>
-                        }
-                    </div>
+                    <div id="verifyErrorMessage" class="col-11"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -297,44 +241,7 @@
     </div>
 </div>
 
-@* Modal for warnings while signing off the task *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyDoneWarning" tabindex="-1" role="dialog" aria-labelledby="VerifyDoneWarning" aria-hidden="true">
-    <div class="modal-dialog warning ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="m-0">Warnings while processing task</h3>
-            </div>
-            <div class="modal-body">
-                <div class="col-12">
-                    <div class="row mb-3">
-                        <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
-                            <div class="col-1 mr-4">
-                                <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
-                            </div>
-                            <div id="verifyDoneWarningMessages" class="col-11 pl-0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <h6 class="m-0">Continue signing off task?</h6>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="col-4 float-left"><button type="button" id="btnCancelVerifyDoneWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
-                            <div class="col-4 float-right"><button type="button" id="btnContinueVerifyDoneWarning" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Modal for warning of unsaved form when progressing *@
+@* Modal for warning for progressing *@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
     <div class="modal-dialog warning">
         <div class="modal-content">
