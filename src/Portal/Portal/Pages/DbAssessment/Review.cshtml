@@ -90,7 +90,7 @@
 </form>
 
 @* Modal On Hold error comment *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="OnHoldError" tabindex="-1" role="dialog" aria-label="On Hold Error Modal Dialog" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <form id="frmOnHoldError">
@@ -115,7 +115,7 @@
 </div>
 
 @* Modal Add Termination comment *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-label="Confirm Review Terminate Modal Dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="terminatingReview">
@@ -126,7 +126,7 @@
                     <p>Provide a reason for terminating this Database Assessment?</p>
                     <div id="modal-body">
                         <input type="hidden" asp-for="ProcessId" />
-                        <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
+                        <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control" aria-label="Terminate Comment Textbox"></textarea>
                         <br />
                         <div id="ConfirmTerminateError"></div>
                     </div>
@@ -142,7 +142,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitReviewDone" tabindex="-1" role="dialog" aria-labelledby="modalWaitReviewDone" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitReviewDone" tabindex="-1" role="dialog" aria-label="Please Wait Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -159,7 +159,7 @@
 
 </div>
 
-<div class="modal fade" id="modalWaitReviewSave" tabindex="-1" role="dialog" aria-labelledby="modalWaitReviewSave" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitReviewSave" tabindex="-1" role="dialog" aria-label="Please Wait Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -176,7 +176,7 @@
 
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewErrors" tabindex="-1" role="dialog" aria-label="Review Errors Modal Dialog" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -199,7 +199,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitReviewTerminate" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalWaitReviewTerminate" tabindex="-1" role="dialog" aria-label="Please Wait Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -214,7 +214,7 @@
     </div>
 </div>
 
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewTerminateErrors" tabindex="-1" role="dialog" aria-labelledby="ReviewTerminateErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalWaitReviewTerminateErrors" tabindex="-1" role="dialog" aria-label="Review Terminate Errors Modal Dialog" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -238,7 +238,7 @@
 </div>
 
 @* Modal for warning of unsaved form when progressing *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalReviewProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalReviewProgressWarning" tabindex="-1" role="dialog" aria-label="Review Progression Warning Modal Dialog" aria-hidden="true">
     <div class="modal-dialog warning">
         <div class="modal-content">
             <div class="modal-header">

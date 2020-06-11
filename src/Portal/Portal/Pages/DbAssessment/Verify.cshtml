@@ -100,7 +100,7 @@
 </form>
 
 @* Modal On Hold error comment *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="OnHoldError" tabindex="-1" role="dialog" aria-labelledby="OnHoldError" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="OnHoldError" tabindex="-1" role="dialog" aria-label="On Hold Error Modal Dialog" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <form id="frmOnHoldError">
@@ -125,7 +125,7 @@
 </div>
 
 @* modal popup used when Sign-off, Save, and Reject *@
-<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-labelledby="modalVerifyPopup" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-label="Verify Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -193,7 +193,7 @@
 </div>
 
 @* Modal Add Rejection comment *@
-<div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-labelledby="ConfirmReject" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-label="Confirm Verify Reject Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -202,7 +202,7 @@
             <div class="modal-body">
                 <p>Provide a reason for rejecting this Database Assessment</p>
                 <div id="modal-body">
-                    <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control"></textarea>
+                    <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control" aria-label="Reject Comment Textbox"></textarea>
                     <br />
                     <div id="ConfirmRejectError"></div>
                 </div>
@@ -218,7 +218,7 @@
 </div>
 
 @* Unsaved changes *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyUnsavedChangesErrors" tabindex="-1" role="dialog" aria-labelledby="VerifyUnsavedChangesErrors" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyUnsavedChangesErrors" tabindex="-1" role="dialog" aria-label="Verify Progression Warning Modal Dialog" aria-hidden="true">
     <div class="modal-dialog error ">
         <div class="modal-content">
             <div class="modal-header">
@@ -242,7 +242,7 @@
 </div>
 
 @* Modal for warning for progressing *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyProgressWarning" tabindex="-1" role="dialog" aria-labelledby="ProgressWarning" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyProgressWarning" tabindex="-1" role="dialog" aria-label="Verify Progression Warning Modal Dialog" aria-hidden="true">
     <div class="modal-dialog warning">
         <div class="modal-content">
             <div class="modal-header">
