@@ -120,7 +120,7 @@ namespace Portal.Pages.DbAssessment
 
             IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
-            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.AsNoTracking().FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentVerifyData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
             SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<VerifyCustomHttpStatusCode>();
@@ -230,6 +230,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProcessId = processId;
+            await GetOnHoldData(processId);
 
             switch (action)
             {
@@ -250,7 +251,7 @@ namespace Portal.Pages.DbAssessment
                         Team,
                         ValidationErrorMessages,
                         CurrentUser.DisplayName,
-                        verifyData.Verifier)) // from database
+                        verifyData.Verifier, IsOnHold)) // from database
 
                     {
                         return new JsonResult(this.ValidationErrorMessages)
@@ -580,7 +581,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetOnHoldData(int processId)
         {
-            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
+            var onHoldRows = await _dbContext.OnHold.AsNoTracking().Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
 
