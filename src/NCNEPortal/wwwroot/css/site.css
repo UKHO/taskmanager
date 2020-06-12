@@ -883,3 +883,9 @@ h6.Inactive {
 h1.workflow-page-heading > span.red {
     color: #cd2026;
 }
+
+.numberOnly::-webkit-inner-spin-button,
+.numberOnly::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
