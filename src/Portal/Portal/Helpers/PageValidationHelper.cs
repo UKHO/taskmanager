@@ -198,14 +198,15 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="formDataAssignedVerifier"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
         /// <param name="team"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="productActionChangeDetails"></param>
+        /// <param name="isOnHold"></param>
         /// <returns></returns>
         public async Task<bool> CheckVerifyPageForErrors(string action,
             string ion,
@@ -219,7 +220,8 @@ namespace Portal.Helpers
             string team,
             List<string> validationErrorMessages,
             string currentUsername,
-            string currentAssignedVerifierInDb = "")
+            string currentAssignedVerifierInDb = "",
+            bool isOnHold = false)
         {
             var isValid = true;
 
@@ -233,6 +235,12 @@ namespace Portal.Helpers
                 else if (!currentUsername.Equals(currentAssignedVerifierInDb, StringComparison.InvariantCultureIgnoreCase))
                 {
                     validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    isValid = false;
+                }
+                
+                if (isOnHold)
+                {
+                    validationErrorMessages.Add("Task Information: Unable to Sign-off task.Take task off hold before signing-off and click Save.");
                     isValid = false;
                 }
             }

@@ -92,21 +92,22 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedVerifierInDb"></param>
+        /// <param name="isOnHold"></param>
         /// <returns></returns>
-        Task<bool> CheckVerifyPageForErrors(
-                                            string action,
-                                            string ion,
-                                            string activityCode,
-                                            string sourceCategory,
-                                            string formDataAssignedVerifier,
-                                            bool productActioned,
-                                            string ProductActionChangeDetails,
-                                            List<ProductAction> recordProductAction,
-                                            List<DataImpact> dataImpacts,
-                                            string team,
-                                            List<string> validationErrorMessages,
-                                            string currentUsername,
-                                            string currentAssignedVerifierInDb = "");
+        Task<bool> CheckVerifyPageForErrors(string action,
+            string ion,
+            string activityCode,
+            string sourceCategory,
+            string formDataAssignedVerifier,
+            bool productActioned,
+            string ProductActionChangeDetails,
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
+            string team,
+            List<string> validationErrorMessages,
+            string currentUsername,
+            string currentAssignedVerifierInDb = "",
+            bool isOnHold = false);
 
         /// <summary>
         /// Check for warnings
