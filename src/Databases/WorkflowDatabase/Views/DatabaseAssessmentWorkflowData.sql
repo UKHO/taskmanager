@@ -1,4 +1,4 @@
-﻿CREATE VIEW DatabaseAssessmentWorkflowData
+﻿CREATE VIEW [dbo].[DatabaseAssessmentWorkflowData]
 
 AS
 
@@ -64,14 +64,17 @@ case
 	when wi.ActivityName = assessStage then ISNULL(daad.Assessor, '')
 	when wi.ActivityName = verifyStage then ISNULL(davd.Assessor, '')
 end as [DB COMPILER],
-'?' as [COMP TIME],
+'Unknown' as [COMP TIME],
 case 
 	when wi.ActivityName = reviewStage then ISNULL(dard.Verifier, '')
 	when wi.ActivityName = assessStage then ISNULL(daad.Verifier, '')
 	when wi.ActivityName = verifyStage then ISNULL(davd.Verifier, '')
 end as [DB VERIFIER],
-'?' as [VERIF TIME],
-'?' as [TOTAL TIME],
+'Unknown' as [VERIF TIME],
+case
+	when wi.[Status] = completedStatus then DATEDIFF(dd, wi.StartedAt, wi.ActivityChangedAt)
+	else ''
+end as [TOTAL TIME],
 case 
 	when wi.[Status] = completedStatus then CONVERT(nvarchar(20), wi.ActivityChangedAt, 103)
 	else ''
