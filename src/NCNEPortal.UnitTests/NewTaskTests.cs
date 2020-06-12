@@ -39,7 +39,8 @@ namespace NCNEPortal.UnitTests
 
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _fakeLogger = A.Fake<ILogger<NewTaskModel>>();
-
+            _fakencneUserDbService = A.Fake<INcneUserDbService>();
+            _milestoneCalculator = A.Fake<IMilestoneCalculator>();
             _fakeStageTypeFactory = A.Fake<IStageTypeFactory>();
 
             _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakencneUserDbService, _fakeStageTypeFactory, _fakePageValidationHelper);
