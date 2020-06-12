@@ -796,10 +796,31 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
-            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Done");
+            await _verifyModel.OnPostDoneAsync(ProcessId,"Done");
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_That_Task_Fails_Validation_If_OnHold_At_Done()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser2@foobar.com"));
+
+            await _dbContext.OnHold.AddAsync(new OnHold
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now,
+                OffHoldUser = "TestUser",
+                WorkflowInstanceId = 1
+            });
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Task Information: Unable to Sign-off task.Take task off hold before signing-off and click Save.", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
