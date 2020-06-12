@@ -8,9 +8,6 @@ namespace Portal.Configuration
         public Uri ContentServiceBaseUrl { get; set; }
         public Uri DataAccessLocalhostBaseUri { get; set; }
         public Uri DataServicesWebServiceBaseUri { get; set; }
-        public Uri K2WebServiceBaseUri { get; set; }
-        public Uri K2WebServiceGetTasksUri { get; set; }
-        public Uri K2WebServiceGetWorkflowsUri { get; set; }
         public Uri EventServiceLocalhostBaseUri { get; set; }
         public Uri EventServiceWebServiceBaseUri { get; set; }
         public Uri EventServiceWebServicePostEventUrl { get; set; }

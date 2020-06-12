@@ -6,19 +6,16 @@
     $("#Reviewer").prop("disabled", true);
 
     setVerifyDoneHandler();
-    handlebtnContinueVerifyProgress();
+    setContinueVerifyProgressHandler();
     setVerifySaveHandler();
-    handleContinueVerifyDoneWarning();
-    handleRejectEvents();
-    handleConfirmReject();
+    setContinueVerifyDoneWarningHandler();
+    setRejectEventsHandlers();
+    setConfirmRejectHandler();
     setUnsavedChangesHandlers();
+    setModalVerifyPopupHiddenHandler();
 
     if (isReadOnly) {
         makeFormReadOnly($("#frmVerifyPage"));
-    }
-
-    if ($("#verifyErrorMessage").html().trim().length > 0) {
-        $("#modalWaitVerifyErrors").modal("show");
     }
 
     var formChanged = false;
@@ -35,7 +32,7 @@
         }
     }
 
-    function handleRejectEvents() {
+    function setRejectEventsHandlers() {
 
         $("#btnReject").on("click", function () {
             mainButtonsEnabled(false);
@@ -66,7 +63,7 @@
 
     }
 
-    function handleConfirmReject() {
+    function setConfirmRejectHandler() {
         $("#btnConfirmReject").on("click",
             function (event) {
                 $("#btnConfirmReject").prop("disabled", true);
@@ -81,8 +78,11 @@
                     return;
                 }
 
-                hideOnePopupAndShowAnother($("#ConfirmReject"), $("#modalWaitVerifyReject"));
+                $("#ConfirmReject").modal("hide");
 
+                populateAndShowWaitPopupForReject();
+                $("#modalVerifyPopup").modal("show");
+                
                 var processId = Number($("#ProcessId").val());
                 var comment = $("#txtRejectComment").val();
 
@@ -103,7 +103,7 @@
                         console.log("Reject success");
                     },
                     error: function (error) {
-                        processErrors(error, $("#modalWaitVerifyReject"));
+                        processErrors(error);
                     }
                 });
             });
@@ -128,9 +128,14 @@
         });
     }
 
-    function handlebtnContinueVerifyProgress() {
+    function setContinueVerifyProgressHandler() {
         $("#btnContinueVerifyProgress").on("click", function (e) {
-            processVerifyDone("Done", $("#modalVerifyProgressWarning"));
+
+            $("#modalVerifyProgressWarning").modal("hide");
+
+            $("#modalVerifyPopup").modal("show");
+
+            processVerifyDone("Done");
         });
     }
 
@@ -140,15 +145,22 @@
         });
     }
 
-    function handleContinueVerifyDoneWarning() {
-        $("#btnContinueVerifyDoneWarning").on("click", function (e) {
-            processVerifyDone("ConfirmedSignOff", $("#modalVerifyDoneWarning"));
+    function setContinueVerifyDoneWarningHandler() {
+        $("#btnVerifyWarningContinue").on("click", function (e) {
+
+            $("#btnVerifyWarningCancel").prop("disabled", true);
+            $("#btnVerifyWarningContinue").prop("disabled", true);
+
+            $("#modalVerifyWarnings").collapse("hide");
+
+            processVerifyDone("ConfirmedSignOff");
         });
     }
-
+    
     function processVerifySave() {
         mainButtonsEnabled(false);
-        $("#modalWaitVerifySave").modal("show");
+        populateAndShowWaitPopupForSave();
+        $("#modalVerifyPopup").modal("show");
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -166,21 +178,17 @@
             success: function (result) {
                 formChanged = false;
                 console.log("Save Success");
-                $("#modalWaitVerifySave").modal("hide");
+                $("#modalVerifyPopup").modal("hide");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitVerifySave"));
+                processErrors(error);
             }
         });
     }
 
-    function processVerifyDone(action, modalWarningPopup) {
+    function processVerifyDone(action) {
         mainButtonsEnabled(false);
-
-        $("#btnContinueVerifyProgress").prop("disabled", true);
-        $("#btnCancelVerifyProgressWarning").prop("disabled", true);
-
-        hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitVerifyDone"));
+        populateAndShowWaitPopupForDone();
 
         var formData = $('#frmVerifyPage').serialize();
 
@@ -200,59 +208,116 @@
                 console.log("Done success");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitVerifyDone"));
+                processErrors(error);
             }
         });
     }
 
-    function processErrors(error, modalWaitPopup) {
+    function processErrors(error) {
         var responseJson = error.responseJSON;
         var statusCode = error.status;
 
-        $("#verifyErrorMessage").html("");
-        $("#verifyDoneWarningMessages").html("");
+        $("#modalVerifyErrorMessage").html("");
+        $("#modalVerifyWarningMessage").html("");
+
+        $("#modalVerifyWait").collapse("hide");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
 
         if (responseJson == null) {
-            $("#verifyErrorMessage").append("<ul/>");
-            var unOrderedList = $("#verifyErrorMessage ul");
+            $("#modalVerifyErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyErrorMessage ul");
 
-            unOrderedList.append("<li>System error. Please try again later</li>");
-
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitVerifyErrors"));
+            unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
+            $("#modalVerifyErrors").collapse("show");
             return;
         }
 
         if (statusCode === customHttpStatusCodes.WarningsDetected) {
 
-            $("#verifyDoneWarningMessages").append("<ul/>");
-            var unOrderedList = $("#verifyDoneWarningMessages ul");
+            $("#modalVerifyWarningMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyWarningMessage ul");
 
             responseJson.forEach(function (item) {
-                unOrderedList.append("<li>" + item + "</li>");
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalVerifyDoneWarning"));
+            $("#modalVerifyWarnings").collapse("show");
             return;
         }
 
         if (statusCode === customHttpStatusCodes.FailedValidation) {
-            $("#verifyErrorMessage").append("<ul/>");
-            var unOrderedList = $("#verifyErrorMessage ul");
+            $("#modalVerifyErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalVerifyErrorMessage ul");
 
             responseJson.forEach(function (item) {
-                unOrderedList.append("<li>" + item + "</li>");
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitVerifyErrors"));
+            $("#modalVerifyErrors").collapse("show");
             return;
         }
 
-        $("#verifyErrorMessage").append("<ul/>");
-        var unOrderedList = $("#verifyErrorMessage ul");
+        $("#modalVerifyErrorMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyErrorMessage ul");
 
-        unOrderedList.append("<li>" + responseJson + "</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >" + responseJson + "</li>");
 
-        hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitVerifyErrors"));
+        $("#modalVerifyErrors").collapse("show");
+    }
+    
+    function populateAndShowWaitPopupForDone() {
+        $("#modalVerifyPopup h4.modal-title").text("Signing off task");
+
+
+        $("#modalVerifyWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalVerifyWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Signing-off Task...</li>");
+
+        $("#modalVerifyWait").collapse("show");
+    }
+
+    function populateAndShowWaitPopupForSave() {
+
+        $("#modalVerifyPopup h4.modal-title").text("Saving task data");
+
+        $("#modalVerifyWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalVerifyWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Saving Data...</li>");
+
+        $("#modalVerifyWait").collapse("show");
+    }
+
+    function populateAndShowWaitPopupForReject() {
+        $("#modalVerifyPopup h4.modal-title").text("Rejecting task");
+
+
+        $("#modalVerifyWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalVerifyWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalVerifyWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Rejecting Task...</li>");
+
+        $("#modalVerifyWait").collapse("show");
     }
 
     function makeFormReadOnly(formElement) {
@@ -267,12 +332,14 @@
         $("#btnClose").prop("disabled", !isEnabled);
     }
 
-    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
-        popupToHide.one("hidden.bs.modal", function () {
-            popupToShow.modal("show");
-        });
-        popupToHide.modal("hide");
+    function setModalVerifyPopupHiddenHandler() {
+        $("#modalVerifyPopup").on("hidden.bs.modal",
+            function() {
+                $("#modalVerifyWait").collapse("hide");
+                $("#modalVerifyErrors").collapse("hide");
+                $("#modalVerifyWarnings").collapse("hide");
 
+            });
     }
 
     function hasUnsavedChanges() {
@@ -284,7 +351,7 @@
             var unOrderedList = $("#verifyErrorMessage ul");
             unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
 
-            $("#modalWaitVerifyErrors").modal("show");
+            $("#modalVerifyUnsavedChangesErrors").modal("show");
 
             mainButtonsEnabled(true);
             return true;
