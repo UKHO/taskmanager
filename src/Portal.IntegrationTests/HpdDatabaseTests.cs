@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Common.Helpers;
 using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +14,7 @@ namespace Portal.IntegrationTests
         private DbContextOptions<HpdDbContext> _dbContextOptions;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
             var config = SetStartupSecretsConfig(keyVaultConfigRoot);

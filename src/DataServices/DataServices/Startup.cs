@@ -54,7 +54,7 @@ namespace DataServices
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter
                 {
-                    CamelCaseText = true
+                    NamingStrategy = new CamelCaseNamingStrategy()
                 });
             });
 
