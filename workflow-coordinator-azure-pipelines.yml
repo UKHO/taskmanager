@@ -245,3 +245,22 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'taskmanager-pre-nsb-workflowcoordinator'
                   packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
+
+- stage: DeployPrd
+  dependsOn:
+    - Build
+  jobs:
+    - deployment: DeployWorkflowCoordinatorPrd
+      displayName: Deploy Workflowcoordinator NSB Service to Prd
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'taskmanager-prd-nsb-workflowcoordinator'
+                  packageForLinux: '$(Pipeline.Workspace)/workflowcoordinator/WebJob'
