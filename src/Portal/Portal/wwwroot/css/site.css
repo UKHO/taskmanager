@@ -69,6 +69,7 @@ td > span.overflowElipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: bottom;
 }
 
 .panel {

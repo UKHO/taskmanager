@@ -106,9 +106,11 @@
                         </td>
                         <td>
                             <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
+                                    <i class="fas fa-cog" style="color: initial;"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
                                         <i class="far fa-user">
                                         </i>
                                         Assign Task
@@ -204,14 +206,16 @@
                         </td>
                         <td>
                             <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText">
+                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
+                                    <i class="fas fa-cog" style="color: initial;"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#">
                                         <i class="far fa-edit">
                                         </i>
                                         Edit Task Note
                                     </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage">
+                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
                                         <i class="far fa-user">
                                         </i>
                                         Assign Task
@@ -231,7 +235,7 @@
 </div>
 
 @* Modal Edit task note *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskNote" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-label="Edit Task Note Modal Dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" id="frmTaskNote" asp-page-handler="TaskNote">
@@ -240,7 +244,7 @@
                 </div>
                 <div class="modal-body">
                     <div id="modal-body">
-                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control"></textarea>
+                        <textarea style="height: 100px;" id="txtNote" name="taskNote" class="form-control" aria-label="Task Note Textbox"></textarea>
                         <input type="hidden" id="hdnProcessId" name="processId" />
                         <br />
                         <div id="editTaskNoteError"></div>
@@ -257,7 +261,7 @@
 </div>
 
 @* Modal Assign task to user *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="assignTaskModal" tabindex="-1" role="dialog" aria-labelledby="AssignTaskToUser" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="assignTaskModal" tabindex="-1" role="dialog" aria-label="Assign Task Modal Dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -267,7 +271,7 @@
                 <div id="assignTaskModal-body">
                     <div id="assignTaskTypeahead">
                         <div class="text-input-wrap">
-                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false" aria-label="Username Textbox">
                         </div>
                         <div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
                             <h5 class="mb-3">
@@ -290,7 +294,7 @@
 </div>
 
 @* Modal Select Team to filter by *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="selectTeamsModal" tabindex="-1" role="dialog" aria-labelledby="SelectTeams" aria-hidden="true">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="selectTeamsModal" tabindex="-1" role="dialog" aria-label="Select Teams Modal Dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
