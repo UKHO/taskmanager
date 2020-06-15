@@ -208,3 +208,22 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'TaskManager-Pre-api-Dataservice'
                   packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
+
+- stage: DeployPrd
+  dependsOn: 
+    - Build
+  jobs:
+    - deployment: DeployDataServicePrd
+      displayName: Deploy dataservices Api to Prd
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'TaskManager-Prd-api-Dataservice'
+                  packageForLinux: '$(Pipeline.Workspace)/dataservices/dataservices'
