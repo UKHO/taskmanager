@@ -249,10 +249,3 @@ stages:
                   azureSubscription: 'TaskmanagerPrd-SC'
                   WebAppName: 'TaskManager-Prd-api-Eventservice'
                   packageForLinux: '$(Pipeline.Workspace)/eventservice/eventservice'
-              - task: Maven@3
-                displayName: 'Run Event Service API Tests'
-                inputs:
-                  mavenPomFile: '$(Pipeline.Workspace)/eventservices.apitests/pom.xml'
-                  goals: test
-                  testResultsFiles: '$(Pipeline.Workspace)/eventservices.apitests/target/surefire-reports/TEST-*.xml'
-                  testRunTitle: 'Event Service API Tests'
