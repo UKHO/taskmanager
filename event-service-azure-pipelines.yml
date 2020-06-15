@@ -230,3 +230,22 @@ stages:
                   goals: test
                   testResultsFiles: '$(Pipeline.Workspace)/eventservices.apitests/target/surefire-reports/TEST-*.xml'
                   testRunTitle: 'Event Service API Tests'
+
+- stage: DeployPrd
+  dependsOn: 
+    - Build
+  jobs:
+    - deployment: DeployEventServicePrd
+      displayName: Deploy Eventservice Api to Prd
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'TaskManager-Prd-api-Eventservice'
+                  packageForLinux: '$(Pipeline.Workspace)/eventservice/eventservice'
