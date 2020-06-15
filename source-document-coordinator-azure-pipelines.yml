@@ -225,3 +225,22 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'taskmanager-pre-nsb-sdoccoordinator'
                   packageForLinux: '$(Pipeline.Workspace)/sourcedocumentcoordinator/WebJob'
+
+- stage: DeployPrd
+  dependsOn: 
+    - Build
+  jobs:
+    - deployment: DeploySourceDocumentCoordinatorPrd
+      displayName: Deploy SourceDocumentCoordinator NSB Service to Prd
+      pool: "UKHO Windows 2019"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'taskmanager-prd-nsb-sdoccoordinator'
+                  packageForLinux: '$(Pipeline.Workspace)/sourcedocumentcoordinator/WebJob'
