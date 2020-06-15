@@ -99,7 +99,7 @@
       ]
     },
     {
-      "provider": "unpkg",
+      "provider": "jsdelivr",
       "library": "bootstrap@4.4.1",
       "destination": "wwwroot/lib/bootstrap4/",
       "files": [
