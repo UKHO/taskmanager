@@ -434,3 +434,22 @@ stages:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'taskmanager-pre-web-portal'
                   packageForLinux: '$(Pipeline.Workspace)/portal/portal'
+
+- stage: DeployPrd
+  dependsOn: 
+    - Build
+  jobs:    
+    - deployment: DeployPortalWebsitePrd
+      displayName: Deploy portal website to Prd
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'taskmanager-prd-web-portal'
+                  packageForLinux: '$(Pipeline.Workspace)/portal/portal'

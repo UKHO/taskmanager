@@ -278,10 +278,8 @@ stages:
     - deployment: DeployNCNEPortalWebsiteDev
       displayName: Deploy ncneportal website
       pool: "UKHO Ubuntu 1804"
-        # creates an environment if it doesn't exist
       environment: 'TaskmanagerDev'
       strategy:
-        # default deployment strategy, more coming...
         runOnce:
           deploy:
             steps:
@@ -299,7 +297,6 @@ stages:
     - deployment: DeployNCNEPortalWebsiteUAT
       displayName: Deploy ncneportal website
       pool: "UKHO Ubuntu 1804"
-        # creates an environment if it doesn't exist
       environment: 'TaskmanagerUAT_UI'
       strategy:
         runOnce:
@@ -408,10 +405,8 @@ stages:
     - deployment: DeployNCNEPortalWebsitePre
       displayName: Deploy ncneportal website
       pool: "UKHO Ubuntu 1804"
-        # creates an environment if it doesn't exist
       environment: 'TaskmanagerPre'
       strategy:
-        # default deployment strategy, more coming...
         runOnce:
           deploy:
             steps:
@@ -420,4 +415,22 @@ stages:
                 inputs:
                   azureSubscription: 'TaskmanagerPre-SC'
                   WebAppName: 'taskmanager-pre-web-ncneportal'
+                  packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
+
+- stage: DeployPrd
+  dependsOn: Build
+  jobs:    
+    - deployment: DeployNCNEPortalWebsitePrd
+      displayName: Deploy ncneportal website to Prd
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'taskmanager-prd-web-ncneportal'
                   packageForLinux: '$(Pipeline.Workspace)/ncneportal/ncneportal'
