@@ -52,9 +52,9 @@
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
-            "pageLength": 1,
+            "pageLength": 5,
             'sDom': 'ltipr',
-            "lengthMenu": [1, 5, 10, 25, 50],
+            "lengthMenu": [5, 10, 25, 50],
             'columnDefs': [
                 {
                     'targets': [12],
@@ -78,8 +78,8 @@
 
     function setupInFlightTasks() {
         return $('#inFlightTasks').DataTable({
-            "pageLength": 1,
-            "lengthMenu": [1, 5, 10, 25, 50],
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 25, 50],
             'sDom': 'ltipr',
             'autoWidth': true,
             'columnDefs': [
