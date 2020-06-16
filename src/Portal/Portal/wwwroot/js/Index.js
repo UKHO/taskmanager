@@ -288,7 +288,8 @@
 
     function handleTaskNotes() {
         $(".taskNoteItem").on("click",
-            function() {
+            function(e) {
+                e.preventDefault();
 
                 $("#btnPostTaskNote").prop("disabled", false);
                 $("#editTaskNoteError").html("");
@@ -321,8 +322,8 @@
 
     function handleAssignTask() {
         $(".assignTaskItem").on("click",
-            function() {
-                //$("#btnAssignTaskToUser").prop("disabled", false);
+            function(e) {
+                e.preventDefault();
 
                 var processId = $(this).data("processid");
                 $("#hdnAssignTaskProcessId").val(processId);
