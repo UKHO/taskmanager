@@ -43,7 +43,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to DM End Date</th>
+                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
                     <th style="min-width: 3.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
@@ -105,17 +105,10 @@
                             @task.Team
                         </td>
                         <td>
-                            <div class="dropdown" style="cursor: pointer;">
-                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
-                                    <i class="fas fa-cog" style="color: initial;"></i>
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
-                                        <i class="far fa-user">
-                                        </i>
-                                        Assign Task
-                                    </a>
-                                </div>
                             </div>
                         </td>
                         <td>
@@ -136,7 +129,7 @@
                 <tr>
                     <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to DM End Date</th>
+                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
                     <th style="min-width: 3.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
@@ -147,7 +140,8 @@
                     <th>Assessor</th>
                     <th>Verifier</th>
                     <th>Team</th>
-                    <th><span class="screen-reader-only">Assign Tasks/Edit Task Notes</span></th>
+                    <th><span class="screen-reader-only">Assign Tasks</span></th>
+                    <th><span class="screen-reader-only">Edit Task Notes</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -205,22 +199,17 @@
                             @task.Team
                         </td>
                         <td>
-                            <div class="dropdown" style="cursor: pointer;">
-                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu for ID @task.ProcessId" href="#">
-                                    <i class="fas fa-cog" style="color: initial;"></i>
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#">
-                                        <i class="far fa-edit">
-                                        </i>
-                                        Edit Task Note
-                                    </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#">
-                                        <i class="far fa-user">
-                                        </i>
-                                        Assign Task
-                                    </a>
-                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div data-toggle="tooltip" data-placement="top" title="Task Notes">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                    <i class="far fa-edit"></i>
+                                </a>
                             </div>
                         </td>
                         <td>
