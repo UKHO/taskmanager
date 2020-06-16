@@ -43,7 +43,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to<br/>DM End Date</th>
+                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
                     <th style="min-width: 3.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
@@ -105,9 +105,11 @@
                             @task.Team
                         </td>
                         <td>
-                            <a class="assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
-                                <i class="far fa-user"></i>
-                            </a>
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
+                                </a>
+                            </div>
                         </td>
                         <td>
                             @task.TaskNoteText
@@ -127,7 +129,7 @@
                 <tr>
                     <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to<br/>DM End Date</th>
+                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
                     <th style="min-width: 3.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
@@ -145,71 +147,75 @@
             <tbody>
                 @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
                 {
-                <tr>
-                    <td class="details-control"><i class="fa"></i></td>
-                    <td>
-                        <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
-                    </td>
-                    <td>
-                        <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                            @Html.DisplayFor(model => task.DaysToDmEndDate)
-                        </div>
-                    </td>
-                    @* Use custom sort due to 'N/A' not being sortable *@
-                    <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
-                        @Html.DisplayFor(model => task.DmEndDate)
-                    </td>
-                    <td>
-                        <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
-                        <span class="float-right mr-2">
-                            @if (task.IsOnHold)
-                            {
-                                <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
-                                <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
-                                <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
-                            }
-                        </span>
-                    </td>
-                    <td>
-                        @task.AssessmentDataRsdraNumber
-                    </td>
-                    <td>
-                        <span class="overflowElipsis" style="max-width: 10rem;" title="@task.AssessmentDataSourceDocumentName">
-                            @task.AssessmentDataSourceDocumentName
-                        </span>
-                    </td>
-                    <td>
-                        @task.Workspace
-                    </td>
-                    <td>
-                        @task.TaskStage
-                    </td>
-                    <td>
-                        @task.Reviewer
-                    </td>
-                    <td>
-                        @task.Assessor
-                    </td>
-                    <td>
-                        @task.Verifier
-                    </td>
-                    <td>
-                        @task.Team
-                    </td>
-                    <td>
-                        <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
-                            <i class="far fa-user"></i>
-                        </a>
-                    </td>
-                    <td>
-                        <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
-                            <i class="far fa-edit"></i>
-                        </a>
-                    </td>
-                    <td>
-                        @task.TaskNoteText
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="details-control"><i class="fa"></i></td>
+                        <td>
+                            <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                @Html.DisplayFor(model => task.DaysToDmEndDate)
+                            </div>
+                        </td>
+                        @* Use custom sort due to 'N/A' not being sortable *@
+                        <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
+                            @Html.DisplayFor(model => task.DmEndDate)
+                        </td>
+                        <td>
+                            <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
+                            <span class="float-right mr-2">
+                                @if (task.IsOnHold)
+                                {
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysGreen ? "onHoldGreenCircle" : "") @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle": "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysAmber ? "onHoldAmberCircle" : "") @(task.OnHoldDaysRed ? "onHoldRedCircle" : "")" style="@(task.OnHoldDaysGreen ? "display: none" : "")"></i>
+                                    <i class="fa fa-circle fa-sm @(task.OnHoldDaysRed ? "onHoldRedCircle": "")" style="@(task.OnHoldDaysRed ? "" : "display: none")"></i>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @task.AssessmentDataRsdraNumber
+                        </td>
+                        <td>
+                            <span class="overflowElipsis" style="max-width: 10rem;" title="@task.AssessmentDataSourceDocumentName">
+                                @task.AssessmentDataSourceDocumentName
+                            </span>
+                        </td>
+                        <td>
+                            @task.Workspace
+                        </td>
+                        <td>
+                            @task.TaskStage
+                        </td>
+                        <td>
+                            @task.Reviewer
+                        </td>
+                        <td>
+                            @task.Assessor
+                        </td>
+                        <td>
+                            @task.Verifier
+                        </td>
+                        <td>
+                            @task.Team
+                        </td>
+                        <td>
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div data-toggle="tooltip" data-placement="top" title="Task Notes">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNoteText" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                    <i class="far fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            @task.TaskNoteText
+                        </td>
+                    </tr>
                 }
 
             </tbody>
