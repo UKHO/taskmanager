@@ -35,8 +35,6 @@
     setupFilterTasksByTeamButtonStyle();
 
     handleGlobalSearch();
-    handleTaskNotes();
-    handleAssignTask();
     handleSelectAllTeams();
 
     populateTasks();
@@ -223,6 +221,9 @@
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
 
+            handleTaskNotes();
+            handleAssignTask();
+
         });
     }
 
@@ -239,6 +240,9 @@
 
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
+
+            handleTaskNotes();
+            handleAssignTask();
 
         });
     }
