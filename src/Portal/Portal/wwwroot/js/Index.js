@@ -52,9 +52,9 @@
 
     function setupUnassignedTasks() {
         return $('#unassignedTasks').DataTable({
-            "pageLength": 5,
+            "pageLength": 1,
             'sDom': 'ltipr',
-            "lengthMenu": [5, 10, 25, 50],
+            "lengthMenu": [1, 5, 10, 25, 50],
             'columnDefs': [
                 {
                     'targets': [12],
@@ -70,14 +70,16 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
+        }).on("draw", function () {
+            handleAssignTask();
         });
 
     }
 
     function setupInFlightTasks() {
         return $('#inFlightTasks').DataTable({
-            "pageLength": 10,
-            "lengthMenu": [5, 10, 25, 50],
+            "pageLength": 1,
+            "lengthMenu": [1, 5, 10, 25, 50],
             'sDom': 'ltipr',
             'autoWidth': true,
             'columnDefs': [
@@ -110,6 +112,9 @@
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
+        }).on("draw", function () {
+            handleTaskNotes();
+            handleAssignTask();
         });
     }
 
@@ -220,10 +225,6 @@
             $('#txtGlobalSearch').val("");
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
-
-            handleTaskNotes();
-            handleAssignTask();
-
         });
     }
 
@@ -240,10 +241,6 @@
 
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
-
-            handleTaskNotes();
-            handleAssignTask();
-
         });
     }
 
