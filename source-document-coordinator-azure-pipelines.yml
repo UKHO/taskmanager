@@ -172,6 +172,7 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeploySourceDocumentCoordinatorDev
       displayName: Deploy SourceDocumentCoordinator NSB Service
@@ -191,6 +192,7 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeploySourceDocumentCoordinatorUAT
       displayName: Deploy SourceDocumentCoordinator NSB Service
@@ -210,6 +212,7 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeploySourceDocumentCoordinatorPre
       displayName: Deploy SourceDocumentCoordinator NSB Service
@@ -229,6 +232,7 @@ stages:
 - stage: DeployPrd
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeploySourceDocumentCoordinatorPrd
       displayName: Deploy SourceDocumentCoordinator NSB Service to Prd

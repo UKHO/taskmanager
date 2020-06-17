@@ -50,6 +50,7 @@ stages:
 
 - stage: DeployDev
   dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowDatabaseDev
       displayName: Deploy WorkflowDatabase
@@ -72,6 +73,7 @@ stages:
 
 - stage: DeployUAT
   dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowDatabaseUAT
       displayName: Deploy WorkflowDatabase
@@ -93,6 +95,7 @@ stages:
 
 - stage: DeployPre
   dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowDatabasePre
       displayName: Deploy WorkflowDatabase
@@ -114,6 +117,7 @@ stages:
 
 - stage: DeployPrd
   dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowDatabasePrd
       displayName: Deploy WorkflowDatabase
