@@ -68,7 +68,7 @@
     },
     {
       "library": "datatables.net-plugins@1.10.20",
-      "provider": "unpkg",
+      "provider": "jsdelivr",
       "destination": "wwwroot/lib/datatables.net-plugins/",
       "files": [
         "sorting/datetime-moment.js",
