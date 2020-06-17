@@ -72,8 +72,8 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
-        }).on("click", ".assignTaskItem", function (e) {
-            showAssignTaskModal(e);
+        }).on("click", ".assignTaskItem", function (event) {
+            showAssignTaskModal(event);
         });
 
     }
@@ -114,34 +114,45 @@
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
-        }).on("click", ".taskNoteItem", function (e) {
-            e.preventDefault();
+        }).on("click", ".taskNoteItem", function (event) {
+            event.preventDefault();
 
-            $("#btnPostTaskNote").prop("disabled", false);
-            $("#editTaskNoteError").html("");
+            var target = $(event.currentTarget);
 
-            var processId = $(this).data("processid");
-            $("#hdnProcessId").val(processId);
+            if (target.is("a")) {
 
-            var taskNote = $(this).data("tasknote");
-            $("#txtNote").val(taskNote);
+                $("#btnPostTaskNote").prop("disabled", false);
+                $("#editTaskNoteError").html("");
 
-            $("#editTaskNoteModal").modal("show");
-        }).on("click", ".assignTaskItem", function (e) {
-            showAssignTaskModal(e);
+                var processId = $(this).data("processid");
+                $("#hdnProcessId").val(processId);
+
+                var taskNote = $(this).data("tasknote");
+                $("#txtNote").val(taskNote);
+
+                $("#editTaskNoteModal").modal("show");
+            }
+        }).on("click", "a.assignTaskItem", function (event) {
+            showAssignTaskModal(event);
         });
     }
 
-    function showAssignTaskModal(e) {
-        e.preventDefault();
+    function showAssignTaskModal(event) {
 
-        var processId = $(this).data("processid");
-        $("#hdnAssignTaskProcessId").val(processId);
+        event.preventDefault();
 
-        var taskStage = $(this).data("taskstage");
-        $("#hdnAssignTaskStage").val(taskStage);
+        var target = $(event.currentTarget);
 
-        $("#assignTaskModal").modal("show");
+        if (target.is("a")) {
+
+            var processId = target.data("processid");
+            $("#hdnAssignTaskProcessId").val(processId);
+
+            var taskStage = target.data("taskstage");
+            $("#hdnAssignTaskStage").val(taskStage);
+
+            $("#assignTaskModal").modal("show");
+        }
     }
 
     function format(data) {
