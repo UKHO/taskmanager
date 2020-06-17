@@ -75,6 +75,10 @@
                     $("#ConfirmRejectError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
                     $("#txtRejectComment").focus();
+
+
+                    $("#btnConfirmReject").prop("disabled", false);
+                    $("#btnCancelReject").prop("disabled", false);
                     return;
                 }
 
