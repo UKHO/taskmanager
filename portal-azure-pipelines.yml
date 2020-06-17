@@ -291,6 +291,7 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployPortalWebsiteDev
       displayName: Deploy portal website
@@ -312,6 +313,7 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployPortalWebsiteUAT
       displayName: Deploy portal website
@@ -419,6 +421,7 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployPortalWebsitePre
       displayName: Deploy portal website
@@ -438,6 +441,7 @@ stages:
 - stage: DeployPrd
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployPortalWebsitePrd
       displayName: Deploy portal website to Prd

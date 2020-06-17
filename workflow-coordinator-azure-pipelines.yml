@@ -192,6 +192,7 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowCoordinatorDev
       displayName: Deploy Workflowcoordinator NSB Service
@@ -211,6 +212,7 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowCoordinatorUAT
       displayName: Deploy Workflowcoordinator NSB Service
@@ -230,6 +232,7 @@ stages:
 - stage: DeployPre
   dependsOn:
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowCoordinatorPre
       displayName: Deploy Workflowcoordinator NSB Service
@@ -249,6 +252,7 @@ stages:
 - stage: DeployPrd
   dependsOn:
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployWorkflowCoordinatorPrd
       displayName: Deploy Workflowcoordinator NSB Service to Prd

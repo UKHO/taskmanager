@@ -156,6 +156,7 @@ stages:
 - stage: DeployDev
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployEventServiceDev
       displayName: Deploy Eventservice Api
@@ -182,6 +183,7 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployEventServiceUAT
       displayName: Deploy Eventservice Api
@@ -208,6 +210,7 @@ stages:
 - stage: DeployPre
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployEventServicePre
       displayName: Deploy Eventservice Api
@@ -234,6 +237,7 @@ stages:
 - stage: DeployPrd
   dependsOn: 
     - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
     - deployment: DeployEventServicePrd
       displayName: Deploy Eventservice Api to Prd
