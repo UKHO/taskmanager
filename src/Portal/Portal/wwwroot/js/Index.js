@@ -36,6 +36,8 @@
 
     handleGlobalSearch();
     handleSelectAllTeams();
+    handleTaskNotes();
+    handleAssignTask();
 
     populateTasks();
 
@@ -70,8 +72,8 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
-        }).on("draw", function () {
-            handleAssignTask();
+        }).on("click", ".assignTaskItem", function (e) {
+            showAssignTaskModal(e);
         });
 
     }
@@ -112,10 +114,34 @@
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
-        }).on("draw", function () {
-            handleTaskNotes();
-            handleAssignTask();
+        }).on("click", ".taskNoteItem", function (e) {
+            e.preventDefault();
+
+            $("#btnPostTaskNote").prop("disabled", false);
+            $("#editTaskNoteError").html("");
+
+            var processId = $(this).data("processid");
+            $("#hdnProcessId").val(processId);
+
+            var taskNote = $(this).data("tasknote");
+            $("#txtNote").val(taskNote);
+
+            $("#editTaskNoteModal").modal("show");
+        }).on("click", ".assignTaskItem", function (e) {
+            showAssignTaskModal(e);
         });
+    }
+
+    function showAssignTaskModal(e) {
+        e.preventDefault();
+
+        var processId = $(this).data("processid");
+        $("#hdnAssignTaskProcessId").val(processId);
+
+        var taskStage = $(this).data("taskstage");
+        $("#hdnAssignTaskStage").val(taskStage);
+
+        $("#assignTaskModal").modal("show");
     }
 
     function format(data) {
@@ -287,21 +313,6 @@
     }
 
     function handleTaskNotes() {
-        $(".taskNoteItem").on("click",
-            function(e) {
-                e.preventDefault();
-
-                $("#btnPostTaskNote").prop("disabled", false);
-                $("#editTaskNoteError").html("");
-
-                var processId = $(this).data("processid");
-                $("#hdnProcessId").val(processId);
-
-                var taskNote = $(this).data("tasknote");
-                $("#txtNote").val(taskNote);
-
-                $("#editTaskNoteModal").modal("show");
-            });
 
         $("#editTaskNoteModal").on("shown.bs.modal",
             function() {
@@ -321,18 +332,6 @@
     }
 
     function handleAssignTask() {
-        $(".assignTaskItem").on("click",
-            function(e) {
-                e.preventDefault();
-
-                var processId = $(this).data("processid");
-                $("#hdnAssignTaskProcessId").val(processId);
-
-                var taskStage = $(this).data("taskstage");
-                $("#hdnAssignTaskStage").val(taskStage);
-
-                $("#assignTaskModal").modal("show");
-            });
 
         $("#assignTaskModal").on("shown.bs.modal",
             function() {
