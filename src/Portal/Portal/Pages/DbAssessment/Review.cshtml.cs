@@ -112,15 +112,17 @@ namespace Portal.Pages.DbAssessment
             await GetOnHoldData(processId);
         }
 
-        public async Task<IActionResult> OnPostReviewTerminateAsync(string comment, int processId)
+        public async Task<IActionResult> OnPostTerminateAsync(string comment, int processId)
         {
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("PortalResource", nameof(OnPostReviewTerminateAsync));
+            LogContext.PushProperty("PortalResource", nameof(OnPostTerminateAsync));
             LogContext.PushProperty("Comment", comment);
             LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
+
+            ValidationErrorMessages.Clear();
 
             if (string.IsNullOrWhiteSpace(comment))
             {
@@ -135,6 +137,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             ProcessId = processId;
+            await GetOnHoldData(processId);
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -144,6 +147,16 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(appException,
                     "Workflow Instance for ProcessId {ProcessId} has already been terminated");
                 throw appException;
+            }
+
+            if (IsOnHold)
+            {
+                ValidationErrorMessages.Add("Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
             }
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
@@ -280,28 +293,6 @@ namespace Portal.Pages.DbAssessment
             }
 
             _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
-
-            return StatusCode((int)HttpStatusCode.OK);
-        }
-
-        public async Task<IActionResult> OnPostValidateTerminateAsync(int processId)
-        {
-            LogContext.PushProperty("ActivityName", "Review");
-            LogContext.PushProperty("ProcessId", processId);
-
-            _logger.LogInformation("Entering ValidateTerminate with: ProcessId: {ProcessId}; Action: {Action};");
-
-            await GetOnHoldData(processId);
-
-            if (IsOnHold)
-            {
-                ValidationErrorMessages.Add("Unable to Terminate task. Take task off hold before terminating.");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
-            }
 
             return StatusCode((int)HttpStatusCode.OK);
         }

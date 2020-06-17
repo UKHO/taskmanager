@@ -58,53 +58,7 @@
                 return;
             }
 
-            $("#modalWaitReviewTerminate").modal("show");
-
-            var processId = $("#hdnProcessId").serialize();
-
-            $.ajax({
-                type: "POST",
-                url: "Review/?handler=ValidateTerminate",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                data: processId,
-                success: function () {
-                    $("#txtTerminateComment").val("");
-                    $("#ConfirmTerminateError").html("");
-                    hideOnePopupAndShowAnother($("#modalWaitReviewTerminate"), $("#ConfirmTerminate"));
-
-                    console.log("success");
-                },
-                error: function (error) {
-
-                    mainButtonsEnabled(true);
-                    $("#reviewTerminateErrorMessage").html("");
-
-                    var responseJson = error.responseJSON;
-                    var statusCode = error.status;
-
-                    if (responseJson != null) {
-                        if (statusCode === customHttpStatusCodes.FailedValidation) {
-
-                            $("#reviewTerminateErrorMessage").append("<ul/>");
-                            var validateTerminateErrorList = $("#reviewTerminateErrorMessage ul");
-
-                            responseJson.forEach(function (item) {
-                                validateTerminateErrorList.append("<li>" + item + "</li>");
-                            });
-                        }
-                    } else {
-
-                        $("#reviewTerminateErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#reviewTerminateErrorMessage ul");
-
-                        unOrderedList.append("<li>System error. Please try again later</li>");
-                    }
-
-                    hideOnePopupAndShowAnother($("#modalWaitReviewTerminate"), $("#modalWaitReviewTerminateErrors"));
-                }
-            });
+            $("#ConfirmTerminate").modal("show");
         });
 
         $("#txtTerminateComment").keydown(function (e) {
@@ -280,7 +234,7 @@
         var reviewTerminateAjax = function () {
             $.ajax({
                 type: "POST",
-                url: "Review/?handler=ReviewTerminate",
+                url: "Review/?handler=Terminate",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
