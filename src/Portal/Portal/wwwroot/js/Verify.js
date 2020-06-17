@@ -226,7 +226,7 @@
 
         $("#modalVerifyWait").collapse("hide");
 
-        ulTag = "<ul class=\"mb-0 pb-0\" />";
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
 
         if (responseJson == null) {
             $("#modalVerifyErrorMessage").append(ulTag);
