@@ -70,6 +70,8 @@
             "scrollX": true,
             "order": [[1, 'asc']],
             "ordering": true
+        }).on("draw", function () {
+            handleAssignTask();
         });
 
     }
@@ -110,6 +112,9 @@
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
+        }).on("draw", function () {
+            handleTaskNotes();
+            handleAssignTask();
         });
     }
 
@@ -220,10 +225,6 @@
             $('#txtGlobalSearch').val("");
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
-
-            handleTaskNotes();
-            handleAssignTask();
-
         });
     }
 
@@ -240,10 +241,6 @@
 
             unassignedTasksTable.search("").draw();
             inFlightTasksTable.search("").draw();
-
-            handleTaskNotes();
-            handleAssignTask();
-
         });
     }
 
@@ -291,7 +288,8 @@
 
     function handleTaskNotes() {
         $(".taskNoteItem").on("click",
-            function() {
+            function(e) {
+                e.preventDefault();
 
                 $("#btnPostTaskNote").prop("disabled", false);
                 $("#editTaskNoteError").html("");
@@ -324,8 +322,8 @@
 
     function handleAssignTask() {
         $(".assignTaskItem").on("click",
-            function() {
-                //$("#btnAssignTaskToUser").prop("disabled", false);
+            function(e) {
+                e.preventDefault();
 
                 var processId = $(this).data("processid");
                 $("#hdnAssignTaskProcessId").val(processId);
