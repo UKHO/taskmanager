@@ -90,8 +90,8 @@
       ]
     },
     {
-      "provider": "unpkg",
-      "library": "bootstrap@4.3.1",
+      "provider": "jsdelivr",
+      "library": "bootstrap@4.4.1",
       "destination": "wwwroot/lib/bootstrap4/",
       "files": [
         "dist/css/bootstrap-grid.css",
