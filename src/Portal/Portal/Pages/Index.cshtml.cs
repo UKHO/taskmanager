@@ -225,10 +225,9 @@ namespace Portal.Pages
                     assess.Assessor = userName;
                     break;
                 case "Verify":
-                    throw new NotImplementedException($"'{taskStage}' not implemented");
-                // TODO: implement Verify Data
-                //var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
-                //verify.Verifier = userName;
+                    var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+                    verify.Verifier = userName;
+                    break;
                 default:
                     throw new NotImplementedException($"'{taskStage}' not implemented");
             }
