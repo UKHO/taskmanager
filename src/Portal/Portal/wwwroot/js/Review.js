@@ -131,8 +131,9 @@
 
     function processReviewSave() {
         mainButtonsEnabled(false);
-        $("#reviewErrorMessage").html("");
-        $("#modalWaitReviewSave").modal("show");
+
+        populateAndShowWaitPopupForSave();
+        $("#modalReviewPopup").modal("show");
 
         var formData = $("#frmReviewPage").serialize();
 
@@ -150,23 +151,10 @@
             success: function (result) {
                 formChanged = false;
                 console.log("Save Success");
-                $("#modalWaitReviewSave").modal("hide");
+                $("#modalReviewPopup").modal("hide");
             },
             error: function (error) {
-                var responseJson = error.responseJSON;
-
-                if (responseJson != null) {
-                    $("#reviewErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#reviewErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    //Hide modalWaitReviewSave modal and show modalWaitReviewErrors modal
-                    hideOnePopupAndShowAnother($("#modalWaitReviewSave"), $("#modalWaitReviewErrors"));
-                }
-
+                processErrors(error);
             }
         });
     }
@@ -421,6 +409,24 @@
 
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Terminating Task...</li>");
+
+        $("#modalReviewWait").collapse("show");
+    }
+
+    function populateAndShowWaitPopupForSave() {
+
+        $("#modalReviewPopup h4.modal-title").text("Saving task data");
+
+        $("#modalReviewWaitMessage").html("");
+
+        ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalReviewWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalReviewWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Reviewing Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Saving Data...</li>");
 
         $("#modalReviewWait").collapse("show");
     }
