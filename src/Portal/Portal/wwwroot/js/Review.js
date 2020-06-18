@@ -13,7 +13,7 @@
     setTerminateHandlers();
     setUnsavedChangesHandlers();
     setModalReviewPopupHiddenHandler();
-    intialisePopup();
+    initialisePopup();
 
     if (isReadOnly) {
         makeFormReadOnly($("#frmReviewPage"));
@@ -144,9 +144,6 @@
 
         populateAndShowWaitPopupForContinueDone();
 
-        //Hide modalReviewProgressWarning modal and show modalWaitReviewDone modal
-        hideOnePopupAndShowAnother($("#modalReviewProgressWarning"), $("#modalWaitReviewDone"));
-
         var formData = $("#frmReviewPage").serialize();
 
         $.ajax({
@@ -242,15 +239,7 @@
         $("#modalReviewErrors").show();
     }
 
-    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
-        popupToHide.one("hidden.bs.modal", function () {
-            popupToShow.modal("show");
-        });
-        popupToHide.modal("hide");
-
-    }
-
-    function intialisePopup() {
+    function initialisePopup() {
         $("#modalReviewWait").hide();
         $("#modalReviewErrors").hide();
         $("#modalReviewProgressWarning").hide();
