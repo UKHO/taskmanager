@@ -162,6 +162,9 @@
             responseJson.forEach(function (item) {
                 unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
+            
+            $("#btnAssessWarningCancel").prop("disabled", false);
+            $("#btnAssessWarningContinue").prop("disabled", false);
 
             $("#modalAssessWarnings").show();
             return;
