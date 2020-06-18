@@ -858,7 +858,7 @@ namespace Portal.UnitTests
 
             await _dbContext.SaveChangesAsync();
 
-            await _reviewModel.OnPostReviewTerminateAsync("Testing", processId);
+            await _reviewModel.OnPostTerminateAsync("Testing", processId);
 
             // Assert
             var workflowInstance = _dbContext.WorkflowInstance.SingleOrDefault(w => w.ProcessId == processId);
@@ -871,10 +871,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_Terminating_On_Hold_Task_Results_In_Validation_Error_Message()
         {
-            await _reviewModel.OnPostValidateTerminateAsync(ProcessId);
+            await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Unable to Terminate task. Take task off hold before terminating.", _reviewModel.ValidationErrorMessages);
+            Assert.Contains("Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.", _reviewModel.ValidationErrorMessages);
 
         }
 
@@ -887,7 +887,7 @@ namespace Portal.UnitTests
 
             await _dbContext.SaveChangesAsync();
 
-            await _reviewModel.OnPostValidateTerminateAsync(ProcessId);
+            await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 0);
         }
