@@ -9,9 +9,11 @@
 
     setAssessDoneHandler();
     setAssessSaveHandler();
-    handleContinueAssessDoneWarning();
+    setAssessWarningContinueHandler();
     setUnsavedChangesHandlers();
-    handlebtnContinueAssessProgress();
+    setContinueAssessProgressHandler();
+    initialisePopup();
+    setModalAssessPopupHiddenHandler();
 
     var formChanged = false;
 
@@ -27,49 +29,43 @@
         }
     }
 
-    if ($("#assessErrorMessage").html().trim().length > 0) {
-        $("#modalWaitAssessErrors").modal("show");
-    }
-
     function setAssessDoneHandler() {
         $("#btnDone").click(function (e) {
 
             mainButtonsEnabled(false);
 
+            $("#modalAssessPopup").modal("show");
+
             // check for unsaved changes
-            if (formChanged) {
-
-                $("#assessErrorMessage").html("");
-
-                $("#assessErrorMessage").append("<ul/>");
-                var unOrderedList = $("#assessErrorMessage ul");
-                unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
-
-                $("#modalWaitAssessErrors").modal("show");
-
-                mainButtonsEnabled(true);
+            if (hasUnsavedChanges()) {
                 return;
             }
 
-            // display: progress warning modal
-            $("#btnContinueAssessProgress").prop("disabled", false);
-            $("#btnCancelAssessProgressWarning").prop("disabled", false);
-            $("#modalAssessProgressWarning").modal("show");
-
-            mainButtonsEnabled(true);
+            populateAndShowWaitPopupForDone();
 
         });
     }
 
-    function handlebtnContinueAssessProgress() {
+    function setContinueAssessProgressHandler() {
         $("#btnContinueAssessProgress").on("click", function (e) {
-            processAssessDone("Done", $("#modalAssessProgressWarning"));
+
+            $("#btnCancelAssessProgressWarning").prop("disabled", true);
+            $("#btnContinueAssessProgress").prop("disabled", true);
+            $("#modalAssessProgressWarning").hide();
+
+            processAssessDone("Done");
         });
     }
 
-    function handleContinueAssessDoneWarning() {
-        $("#btnContinueAssessDoneWarning").on("click", function (e) {
-            processAssessDone("ConfirmedDone", $("#modalAssessDoneWarning"));
+    function setAssessWarningContinueHandler() {
+        $("#btnAssessWarningContinue").on("click", function (e) {
+
+            $("#btnAssessWarningCancel").prop("disabled", true);
+            $("#btnAssessWarningContinue").prop("disabled", true);
+
+            $("#modalAssessWarnings").hide();
+
+            processAssessDone("ConfirmedDone");
         });
     }
     function setAssessSaveHandler() {
@@ -80,7 +76,10 @@
 
     function processAssessSave() {
         mainButtonsEnabled(false);
-        $("#modalWaitAssessSave").modal("show");
+
+        populateAndShowWaitPopupForSave();
+
+        $("#modalAssessPopup").modal("show");
 
         var formData = $("#frmAssessPage").serialize();
 
@@ -98,22 +97,19 @@
             success: function (result) {
                 formChanged = false;
                 console.log("Save Success");
-                $("#modalWaitAssessSave").modal("hide");
+                $("#modalAssessPopup").modal("hide");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitAssessSave"));
+                processErrors(error);
             }
         });
     }
 
-    function processAssessDone(action, modalWarningPopup) {
+    function processAssessDone(action) {
         mainButtonsEnabled(false);
 
-        $("#btnContinueAssessProgress").prop("disabled", true);
-        $("#btnCancelAssessProgressWarning").prop("disabled", true);
-
-        hideOnePopupAndShowAnother(modalWarningPopup, $("#modalWaitAssessDone"));
-
+        populateAndShowWaitPopupForContinueDone();
+        
         var formData = $("#frmAssessPage").serialize();
 
         $.ajax({
@@ -132,67 +128,81 @@
                 console.log("Done success");
             },
             error: function (error) {
-                processErrors(error, $("#modalWaitAssessDone"));
+                processErrors(error);
             }
         });
     }
 
-    function processErrors(error, modalWaitPopup) {
+    function processErrors(error) {
         var responseJson = error.responseJSON;
         var statusCode = error.status;
 
-        $("#assessErrorMessage").html("");
-        $("#assessDoneWarningMessages").html("");
+        $("#modalAssessErrorMessage").html("");
+        $("#modalAssessWarningMessage").html("");
+
+        $("#modalAssessWait").hide();
+
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
         
         if (responseJson == null) {
-            $("#assessErrorMessage").append("<ul/>");
-            var unOrderedList = $("#assessErrorMessage ul");
+            $("#modalAssessErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalAssessErrorMessage ul");
 
-            unOrderedList.append("<li>System error. Please try again later</li>");
+            unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
 
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
+            $("#modalAssessErrors").show();
             return;
         }
 
         if (statusCode === customHttpStatusCodes.WarningsDetected) {
 
-            $("#assessDoneWarningMessages").append("<ul/>");
-            var unOrderedList = $("#assessDoneWarningMessages ul");
+            $("#modalAssessWarningMessage").append(ulTag);
+            var unOrderedList = $("#modalAssessWarningMessage ul");
 
             responseJson.forEach(function (item) {
-                unOrderedList.append("<li>" + item + "</li>");
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalAssessDoneWarning"));
+            $("#modalAssessWarnings").show();
             return;
         }
 
         if (statusCode === customHttpStatusCodes.FailedValidation) {
-            $("#assessErrorMessage").append("<ul/>");
-            var unOrderedList = $("#assessErrorMessage ul");
+            $("#modalAssessErrorMessage").append(ulTag);
+            var unOrderedList = $("#modalAssessErrorMessage ul");
 
             responseJson.forEach(function (item) {
-                unOrderedList.append("<li>" + item + "</li>");
+                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
+            $("#modalAssessErrors").show();
             return;
         }
 
-        $("#assessErrorMessage").append("<ul/>");
-        var unOrderedList = $("#assessErrorMessage ul");
+        $("#modalAssessErrorMessage").append("<ul/>");
+        var unOrderedList = $("#modalAssessErrorMessage ul");
 
         unOrderedList.append("<li>" + responseJson + "</li>");
 
-        hideOnePopupAndShowAnother(modalWaitPopup, $("#modalWaitAssessErrors"));
+        $("#modalAssessErrors").show();
     }
 
-    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
-        popupToHide.one("hidden.bs.modal", function () {
-            popupToShow.modal("show");
-        });
-        popupToHide.modal("hide");
+    function initialisePopup() {
+        $("#modalAssessWait").hide();
+        $("#modalAssessErrors").hide();
+        $("#modalAssessProgressWarning").hide();
+        $("#modalAssessWarnings").hide();
+    }
 
+    function setModalAssessPopupHiddenHandler() {
+        $("#modalAssessPopup").on("hidden.bs.modal",
+            function () {
+                $("#modalAssessWait").hide();
+                $("#modalAssessErrors").hide();
+                $("#modalAssessProgressWarning").hide();
+                $("#modalAssessWarnings").hide();
+                mainButtonsEnabled(true);
+            });
     }
 
     function initialiseOperatorsTypeaheads() {
@@ -253,6 +263,69 @@
         $("#btnDone").prop("disabled", !isEnabled);
         $("#btnSave").prop("disabled", !isEnabled);
         $("#btnClose").prop("disabled", !isEnabled);
+    }
+    
+    function populateAndShowWaitPopupForDone() {
+        $("#modalAssessPopup h4.modal-title").text("Progressing task");
+
+        $("#btnCancelAssessProgressWarning").prop("disabled", false);
+        $("#btnContinueAssessProgress").prop("disabled", false);
+
+        $("#modalAssessProgressWarning").show();
+    }
+    
+    function populateAndShowWaitPopupForContinueDone() {
+
+        $("#modalAssessPopup h4.modal-title").text("Progressing task");
+
+
+        $("#modalAssessWaitMessage").html("");
+
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalAssessWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalAssessWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Progressing Task...</li>");
+
+        $("#modalAssessWait").show();
+    }
+
+    function populateAndShowWaitPopupForSave() {
+
+        $("#modalAssessPopup h4.modal-title").text("Saving task data");
+
+        $("#modalAssessWaitMessage").html("");
+
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+
+        $("#modalAssessWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalAssessWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Saving Data...</li>");
+
+        $("#modalAssessWait").show();
+    }
+    
+    function hasUnsavedChanges() {
+        if (formChanged) {
+
+            $("#modalAssessErrorMessage").html("");
+
+            $("#modalAssessErrorMessage").append("<ul/>");
+            var unOrderedList = $("#modalAssessErrorMessage ul");
+            unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+
+            $("#modalAssessErrors").show();
+
+            mainButtonsEnabled(true);
+            return true;
+        }
+        return false;
     }
 
 });
