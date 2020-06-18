@@ -124,23 +124,23 @@
     </div>
 </div>
 
-@* modal popup used when Sign-off, Save, and Reject *@
-<div class="modal fade" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-label="Verify Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+@* modal popup used when Done, Save, and Reject *@
+<div class="modal" id="modalVerifyPopup" tabindex="-1" role="dialog" aria-label="Verify Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Signing off task</h4>
+                <h4 class="modal-title">Progressing task</h4>
             </div>
             <div class="modal-body">
                 @* Wait dialog *@
-                <section id="modalVerifyWait" class="dialog collapse">
+                <section id="modalVerifyWait" class="dialog">
                     <h5><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h5>
 
                     <div id="modalVerifyWaitMessage"></div>
                 </section>
 
                 @* Errors dialog *@
-                <section id="modalVerifyErrors" class="dialog error collapse">
+                <section id="modalVerifyErrors" class="dialog error">
                     <h5>Errors while processing task</h5>
 
                     <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
@@ -153,120 +153,70 @@
                     </div>
                     <hr />
                     <div class="row justify-content-end">
-                        <div class="col-4 pr-1"><button type="button" id="btnVerifyErrorsOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                        <div class="col-4 pr-1"><button type="button" id="btnVerifyErrorsOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Processing Task">Ok</button></div>
                     </div>
 
                 </section>
 
-                @* Warnings dialog *@
-                <section id="modalVerifyWarnings" class="dialog warning collapse">
-                    <h5>Warnings while processing task</h5>
+                @* Progress Warnings dialog *@
+                <section id="modalVerifyProgressWarning" class="dialog warning">
+                    <h5>Progress Verify task to Assess.</h5>
                     <div>
                         <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
                             <div class="col-1 p-0">
                                 <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
                             </div>
 
-                            <div id="modalVerifyWarningMessage"></div>
+                            <div class="col-11">
+                                <ul><li>Are you sure you want to continue?</li></ul>
+                            </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <h6 class="pt-1 m-0">Continue signing off task?</h6>
                     </div>
                     <hr />
                     <div>
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="col-4 float-left"><button type="button" id="btnVerifyWarningCancel" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
-                                    <div class="col-4 float-right"><button type="button" id="btnVerifyWarningContinue" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
+                                    <div class="col-4 float-left"><button type="button" id="btnCancelVerifyProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Verify">Cancel</button></div>
+                                    <div class="col-4 float-right"><button type="button" id="btnContinueVerifyProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Verify">Continue</button></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                 </section>
-            </div>
-        </div>
-    </div>
-</div>
 
-@* Modal Add Rejection comment *@
-<div class="modal fade" id="ConfirmReject" tabindex="-1" role="dialog" aria-label="Confirm Verify Reject Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Reject Database Assessment</h4>
-            </div>
-            <div class="modal-body">
-                <p>Provide a reason for rejecting this Database Assessment</p>
-                <div id="modal-body">
-                    <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control" aria-label="Reject Comment Textbox"></textarea>
-                    <br />
-                    <div id="ConfirmRejectError"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="row col-11 justify-content-end">
-                    <div class="col-5 pr-1"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
-                    <div class="col-5 pl-1 pr-0"><button type="button" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Unsaved changes *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyUnsavedChangesErrors" tabindex="-1" role="dialog" aria-label="Verify Progression Warning Modal Dialog" aria-hidden="true">
-    <div class="modal-dialog error ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Errors while processing task</h3>
-            </div>
-            <div class="modal-body">
-                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
-                    <div class="col-1 mr-4">
-                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
-                    </div>
-                    <div id="verifyErrorMessage" class="col-11"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="row col-11 justify-content-end">
-                    <div class="col-5 pr-1"><button type="button" id="btnVerifyDoneErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Modal for warning for progressing *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalVerifyProgressWarning" tabindex="-1" role="dialog" aria-label="Verify Progression Warning Modal Dialog" aria-hidden="true">
-    <div class="modal-dialog warning">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Sign-off Verify task.</h3>
-            </div>
-            <div class="modal-body">
-                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
-                    <div class="col-1 mr-4">
-                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
-                    </div>
-                    <div class="col-11">
-                        <ul><li>Are you sure you want to continue?</li></ul>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="col-4 float-left"><button type="button" id="btnCancelVerifyProgressWarning" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Progress Verify">Cancel</button></div>
-                                <div class="col-4 float-right"><button type="button" id="btnContinueVerifyProgress" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Continue Progress Verify">Continue</button></div>
+                @* Reject Warnings dialog *@
+                <section id="ConfirmReject" class="dialog warning">
+                    <h5>Provide a reason for rejecting this task</h5>
+                    <div>
+                        <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
+                            <div class="col-1 p-0">
+                                <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                            </div>
+                            <div class="col-11">
+                                <div>
+                                    <input type="hidden" asp-for="ProcessId" />
+                                    <textarea style="height: 100px;" id="txtRejectComment" name="comment" class="form-control" aria-label="Reject Comment Textbox"></textarea>
+                                    <br />
+                                    <div id="ConfirmRejectError"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <hr />
+                    <div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="col-4 float-left"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
+                                    <div class="col-4 float-right"><button type="button" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
             </div>
         </div>
     </div>
