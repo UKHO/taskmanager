@@ -90,7 +90,7 @@
 </form>
 
 @* modal popup used when Done, Save, and Terminate *@
-<div class="modal fade" id="modalReviewPopup" tabindex="-1" role="dialog" aria-label="Review Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal" id="modalReviewPopup" tabindex="-1" role="dialog" aria-label="Review Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -98,14 +98,14 @@
             </div>
             <div class="modal-body">
                 @* Wait dialog *@
-                <section id="modalReviewWait" class="dialog collapse">
+                <section id="modalReviewWait" class="dialog">
                     <h5><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h5>
 
                     <div id="modalReviewWaitMessage"></div>
                 </section>
 
                 @* Errors dialog *@
-                <section id="modalReviewErrors" class="dialog error collapse">
+                <section id="modalReviewErrors" class="dialog error">
                     <h5>Errors while processing task</h5>
 
                     <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
@@ -124,7 +124,7 @@
                 </section>
 
                 @* Progress Warnings dialog *@
-                <section id="modalReviewProgressWarning" class="dialog warning collapse">
+                <section id="modalReviewProgressWarning" class="dialog warning">
                     <h5>Progress Review task to Assess.</h5>
                     <div>
                         <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
@@ -152,7 +152,7 @@
                 </section>
 
                 @* Terminate Warnings dialog *@
-                <section id="ConfirmTerminate" class="dialog warning collapse">
+                <section id="ConfirmTerminate" class="dialog warning">
                     <h5>Provide a reason for terminating this task</h5>
                     <div>
                         <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">

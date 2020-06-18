@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     var isReadOnly = $("#IsReadOnly").val() === "True";
     var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
 
@@ -14,6 +13,7 @@
     setTerminateHandlers();
     setUnsavedChangesHandlers();
     setModalReviewPopupHiddenHandler();
+    initialisePopup();
 
     if (isReadOnly) {
         makeFormReadOnly($("#frmReviewPage"));
@@ -144,9 +144,6 @@
 
         populateAndShowWaitPopupForContinueDone();
 
-        //Hide modalReviewProgressWarning modal and show modalWaitReviewDone modal
-        hideOnePopupAndShowAnother($("#modalReviewProgressWarning"), $("#modalWaitReviewDone"));
-
         var formData = $("#frmReviewPage").serialize();
 
         $.ajax({
@@ -209,7 +206,7 @@
 
         $("#modalReviewErrorMessage").html("");
 
-        $("#modalReviewWait").collapse("hide");
+        $("#modalReviewWait").hide();
 
         var ulTag = "<ul class=\"mb-0 pb-0\" />";
 
@@ -218,7 +215,7 @@
             var unOrderedList = $("#modalReviewErrorMessage ul");
 
             unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
-            $("#modalReviewErrors").collapse("show");
+            $("#modalReviewErrors").show();
             return;
         }
 
@@ -230,7 +227,7 @@
                 unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
             });
 
-            $("#modalReviewErrors").collapse("show");
+            $("#modalReviewErrors").show();
             return;
         }
 
@@ -239,15 +236,14 @@
 
         unOrderedList.append("<li class=\"pt-1 pb-1\" >" + responseJson + "</li>");
 
-        $("#modalReviewErrors").collapse("show");
+        $("#modalReviewErrors").show();
     }
 
-    function hideOnePopupAndShowAnother(popupToHide, popupToShow) {
-        popupToHide.one("hidden.bs.modal", function () {
-            popupToShow.modal("show");
-        });
-        popupToHide.modal("hide");
-
+    function initialisePopup() {
+        $("#modalReviewWait").hide();
+        $("#modalReviewErrors").hide();
+        $("#modalReviewProgressWarning").hide();
+        $("#ConfirmTerminate").hide();
     }
 
     function initialiseOperatorsTypeaheads() {
@@ -313,11 +309,11 @@
             });
         }
 
-        $("#operatorsErrorMessages").collapse("show");
+        $("#operatorsErrorMessages").show();
     }
 
     function removeOperatorsInitialiseErrors() {
-        $("#operatorsErrorMessages").collapse("hide");
+        $("#operatorsErrorMessages").hide();
         $("#operatorsErrorList").empty();
     }
 
@@ -336,10 +332,10 @@
     function setModalReviewPopupHiddenHandler() {
         $("#modalReviewPopup").on("hidden.bs.modal",
             function () {
-                $("#modalReviewWait").collapse("hide");
-                $("#modalReviewErrors").collapse("hide");
-                $("#modalReviewProgressWarning").collapse("hide");
-                $("#ConfirmTerminate").collapse("hide");
+                $("#modalReviewWait").hide();
+                $("#modalReviewErrors").hide();
+                $("#modalReviewProgressWarning").hide();
+                $("#ConfirmTerminate").hide();
                 mainButtonsEnabled(true);
             });
     }
@@ -353,12 +349,12 @@
         $("#ConfirmTerminateError").html("");
         $("#txtTerminateComment").val("");
 
-        $("#ConfirmTerminate").collapse("show");
+        $("#ConfirmTerminate").show();
     }
 
     function populateAndShowWaitPopupForContinueTerminate() {
 
-        $("#ConfirmTerminate").collapse("hide");
+        $("#ConfirmTerminate").hide();
 
         $("#modalReviewPopup h4.modal-title").text("Terminating task");
 
@@ -373,7 +369,7 @@
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Terminating Task...</li>");
 
-        $("#modalReviewWait").collapse("show");
+        $("#modalReviewWait").show();
     }
 
     function populateAndShowWaitPopupForDone() {
@@ -382,11 +378,11 @@
         $("#btnCancelReviewProgressWarning").prop("disabled", false);
         $("#btnContinueReviewProgress").prop("disabled", false);
 
-        $("#modalReviewProgressWarning").collapse("show");
+        $("#modalReviewProgressWarning").show();
     }
     
     function populateAndShowWaitPopupForContinueDone() {
-        $("#modalReviewProgressWarning").collapse("hide");
+        $("#modalReviewProgressWarning").hide();
 
         $("#modalReviewPopup h4.modal-title").text("Progressing task");
 
@@ -402,7 +398,7 @@
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Progressing Task...</li>");
 
-        $("#modalReviewWait").collapse("show");
+        $("#modalReviewWait").show();
     }
 
     function populateAndShowWaitPopupForSave() {
@@ -420,7 +416,7 @@
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
         unOrderedList.append("<li class=\"pt-1 pb-1\" >Saving Data...</li>");
 
-        $("#modalReviewWait").collapse("show");
+        $("#modalReviewWait").show();
     }
 
     function hasUnsavedChanges() {
@@ -432,7 +428,7 @@
             var unOrderedList = $("#modalReviewErrorMessage ul");
             unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
 
-            $("#modalReviewErrors").collapse("show");
+            $("#modalReviewErrors").show();
 
             mainButtonsEnabled(true);
             return true;
