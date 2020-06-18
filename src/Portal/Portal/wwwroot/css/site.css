@@ -674,7 +674,7 @@ body, .sticky-footer-wrapper {
     margin-bottom: 0;
 }
 
-.modal-dialog.error .modal-body, .modal-dialog.warning .modal-body {
+.modal-dialog .modal-body, .modal-dialog.error .modal-body, .modal-dialog.warning .modal-body {
     padding: 8px;
 }
 
