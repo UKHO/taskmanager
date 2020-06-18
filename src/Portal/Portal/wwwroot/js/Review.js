@@ -53,7 +53,7 @@
 
         $("#btnConfirmTerminate").on("click", function () {
 
-            $("#btnConfirmReject").prop("disabled", true);
+            $("#btnCancelTerminate").prop("disabled", true);
             $("#btnConfirmTerminate").prop("disabled", true);
 
             if ($("#txtTerminateComment").val() === "") {
@@ -62,7 +62,7 @@
                 $("#txtTerminateComment").focus();
 
 
-                $("#btnConfirmReject").prop("disabled", false);
+                $("#btnCancelTerminate").prop("disabled", false);
                 $("#btnConfirmTerminate").prop("disabled", false);
                 return;
             }
