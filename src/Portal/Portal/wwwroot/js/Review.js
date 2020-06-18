@@ -364,7 +364,7 @@
 
         $("#modalReviewWaitMessage").html("");
 
-        ulTag = "<ul class=\"mb-0 pb-0\" />";
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
 
 
         $("#modalReviewWaitMessage").append(ulTag);
@@ -393,7 +393,7 @@
 
         $("#modalReviewWaitMessage").html("");
 
-        ulTag = "<ul class=\"mb-0 pb-0\" />";
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
 
 
         $("#modalReviewWaitMessage").append(ulTag);
@@ -411,7 +411,7 @@
 
         $("#modalReviewWaitMessage").html("");
 
-        ulTag = "<ul class=\"mb-0 pb-0\" />";
+        var ulTag = "<ul class=\"mb-0 pb-0\" />";
 
 
         $("#modalReviewWaitMessage").append(ulTag);
