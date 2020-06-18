@@ -316,9 +316,12 @@
 
             $("#modalAssessErrorMessage").html("");
 
-            $("#modalAssessErrorMessage").append("<ul/>");
+            var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+            $("#modalAssessErrorMessage").append(ulTag);
+
             var unOrderedList = $("#modalAssessErrorMessage ul");
-            unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+            unOrderedList.append("<li class=\"pt-1 pb-1\">Unsaved changes detected, please Save first.</li>");
 
             $("#modalAssessErrors").show();
 

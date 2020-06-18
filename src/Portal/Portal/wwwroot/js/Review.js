@@ -421,9 +421,11 @@
 
             $("#modalReviewErrorMessage").html("");
 
-            $("#modalReviewErrorMessage").append("<ul/>");
+            var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+            $("#modalReviewErrorMessage").append(ulTag);
             var unOrderedList = $("#modalReviewErrorMessage ul");
-            unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+            unOrderedList.append("<li class=\"pt-1 pb-1\" >Unsaved changes detected, please Save first.</li>");
 
             $("#modalReviewErrors").show();
 
