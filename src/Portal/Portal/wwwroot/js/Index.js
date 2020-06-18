@@ -132,7 +132,7 @@
 
                 $("#editTaskNoteModal").modal("show");
             }
-        }).on("click", "a.assignTaskItem", function (event) {
+        }).on("click", ".assignTaskItem", function (event) {
             showAssignTaskModal(event);
         });
     }
