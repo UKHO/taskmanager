@@ -343,9 +343,10 @@
 
         $("#ConfirmTerminateError").html("");
         $("#txtTerminateComment").val("");
-        $("#txtTerminateComment").focus();
 
         $("#ConfirmTerminate").show();
+
+        $("#txtTerminateComment").focus();
     }
 
     function populateAndShowWaitPopupForContinueTerminate() {
