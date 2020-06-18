@@ -95,6 +95,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DbUpdate", "DbUpdate", "{36
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbUpdatePortal", "DbUpdatePortal\DbUpdatePortal.csproj", "{90C54CC2-F28B-4697-BD86-1C7FAFB71E9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbUpdatePortal.UnitTests", "DbUpdatePortal.UnitTests\DbUpdatePortal.UnitTests.csproj", "{5412D312-DB1D-4AB5-8E85-9EDE73BC6033}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -253,6 +255,10 @@ Global
 		{90C54CC2-F28B-4697-BD86-1C7FAFB71E9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90C54CC2-F28B-4697-BD86-1C7FAFB71E9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90C54CC2-F28B-4697-BD86-1C7FAFB71E9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5412D312-DB1D-4AB5-8E85-9EDE73BC6033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5412D312-DB1D-4AB5-8E85-9EDE73BC6033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5412D312-DB1D-4AB5-8E85-9EDE73BC6033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5412D312-DB1D-4AB5-8E85-9EDE73BC6033}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -295,6 +301,7 @@ Global
 		{8DAC4D63-1AF2-4DD5-AAD3-A201798FF791} = {DB5D8B0D-04B0-4929-A5B8-BE892037D846}
 		{728D8DC0-FC95-47E9-9FF7-D34E6C6C7253} = {1090BDD0-981C-477F-88CB-9C6EF85D568C}
 		{90C54CC2-F28B-4697-BD86-1C7FAFB71E9E} = {368D615C-212A-4679-8831-EBFEAF496047}
+		{5412D312-DB1D-4AB5-8E85-9EDE73BC6033} = {368D615C-212A-4679-8831-EBFEAF496047}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}
