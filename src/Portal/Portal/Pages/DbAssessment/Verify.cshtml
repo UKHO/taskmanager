@@ -160,7 +160,7 @@
 
                 @* Progress Warnings dialog *@
                 <section id="modalVerifyProgressWarning" class="dialog warning">
-                    <h5>Progress Verify task to Assess.</h5>
+                    <h5>Progress Verify task to Sign Off.</h5>
                     <div>
                         <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
                             <div class="col-1 p-0">
@@ -211,6 +211,36 @@
                                 <div class="col-12">
                                     <div class="col-4 float-left"><button type="button" id="btnCancelReject" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Reject">Cancel</button></div>
                                     <div class="col-4 float-right"><button type="button" id="btnConfirmReject" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Reject">Reject</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                @* Warnings dialog *@
+                <section id="modalVerifyWarnings" class="dialog warning collapse">
+                    <h5>Warnings while processing task</h5>
+                    <div>
+                        <div class="d-flex align-items-center align-content-center justify-content-center" style="overflow: hidden;">
+                            <div class="col-1 p-0">
+                                <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                            </div>
+
+                            <div id="modalVerifyWarningMessage"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="pt-1 m-0">Continue signing off task?</h6>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="col-4 float-left"><button type="button" id="btnVerifyWarningCancel" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Sign Off">Cancel</button></div>
+                                    <div class="col-4 float-right"><button type="button" id="btnVerifyWarningContinue" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Sign Off">Sign Off</button></div>
                                 </div>
                             </div>
                         </div>
