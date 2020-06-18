@@ -69,15 +69,6 @@
 
             submitTerminateForm();
         });
-
-        $("#ConfirmTerminate").on("shown.bs.modal", function () {
-            $("#txtTerminateComment").focus();
-        });
-
-        $("#ConfirmTerminate").on("hidden.bs.modal", function () {
-            mainButtonsEnabled(true);
-        });
-
     }
 
     function setReviewDoneHandler() {
@@ -352,6 +343,7 @@
 
         $("#ConfirmTerminateError").html("");
         $("#txtTerminateComment").val("");
+        $("#txtTerminateComment").focus();
 
         $("#ConfirmTerminate").show();
     }
