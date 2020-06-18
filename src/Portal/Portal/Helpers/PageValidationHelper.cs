@@ -74,7 +74,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
+            if (!await ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -407,7 +407,7 @@ namespace Portal.Helpers
         /// <param name="additionalAssignedTasks"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private bool ValidateUsers(
+        private async Task<bool> ValidateUsers(
                                     DbAssessmentReviewData primaryAssignedTask,
                                     List<DbAssessmentAssignTask> additionalAssignedTasks,
                                     List<string> validationErrorMessages)
@@ -418,12 +418,44 @@ namespace Portal.Helpers
                 return false;
             }
 
-            var assessor = additionalAssignedTasks.Select(st => st.Assessor).ToList();
-
-            if (assessor.Any(s => string.IsNullOrEmpty(s)))
+            if (!await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Assessor))
             {
-                validationErrorMessages.Add($"Additional Assign Task: Assessor is required");
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Assessor to unknown user {primaryAssignedTask.Assessor}");
                 return false;
+            }
+
+            if (!string.IsNullOrEmpty(primaryAssignedTask.Verifier) &&
+                !await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Verifier))
+            {
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Verifier to unknown user {primaryAssignedTask.Verifier}");
+                return false;
+            }
+
+            var additionalAssignedTaskAssessors = additionalAssignedTasks.Select(st => st.Assessor).ToList();
+            foreach (var assessor in additionalAssignedTaskAssessors)
+            {
+                if (string.IsNullOrEmpty(assessor))
+                {
+                    validationErrorMessages.Add($"Additional Assign Task: Assessor is required");
+                    return false;
+                }
+                
+                if (!await _portalAduserDbService.ValidateUserAsync(assessor))
+                {
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Assessor to unknown user {assessor}");
+                    return false;
+                }
+            }
+
+            var additionalAssignedTaskVerifiers = additionalAssignedTasks.Select(st => st.Verifier).ToList();
+            foreach (var verifier in additionalAssignedTaskVerifiers)
+            {
+                if (!string.IsNullOrEmpty(verifier) &&
+                    !await _portalAduserDbService.ValidateUserAsync(verifier))
+                {
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Verifier to unknown user {verifier}");
+                    return false;
+                }
             }
 
             return true;
