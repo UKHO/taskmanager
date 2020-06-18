@@ -99,6 +99,10 @@
 
     function setContinueProgressHandler() {
         $("#btnContinueReviewProgress").click(function (e) {
+
+            $("#btnCancelReviewProgressWarning").prop("disabled", true);
+            $("#btnContinueReviewProgress").prop("disabled", true);
+
             processReviewDone();
         });
     }
