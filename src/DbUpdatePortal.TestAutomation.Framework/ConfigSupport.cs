@@ -32,7 +32,7 @@ namespace DbUpdatePortal.TestAutomation.Framework
             _urls = new UrlsConfig();
 
             appConfigRoot.GetSection("urls").Bind(_urls);
-            keyVaultRoot.GetSection("NCNEPortalUITest").Bind(_secrets);
+            keyVaultRoot.GetSection("DbUpdatePortalUITest").Bind(_secrets);
         }
 
         [BeforeScenario(Order = 1)]
