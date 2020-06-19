@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using BoDi;
 using Common.TestAutomation.Framework;
 using Common.TestAutomation.Framework.Axe;
 using Common.TestAutomation.Framework.Logging;
+using DbUpdatePortal.TestAutomation.Framework;
+using DbUpdatePortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;
-using Portal.TestAutomation.Framework.Pages;
-using Portal.TestAutomation.Framework.Setup;
 
-namespace Portal.AccessibilityTests
+namespace DbUpdatePortal.AccessibilityTests
 {
     [TestFixture]
     public sealed class AccessibilityTests : IDisposable
@@ -39,7 +39,6 @@ namespace Portal.AccessibilityTests
 
             _configSupport.RegisterAzureConfigs();
             _configSupport.RegisterLandingPage();
-            // TODO - add in the other pages, e.g: _configSupport.RegisterReviewPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();

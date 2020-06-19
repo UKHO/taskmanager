@@ -14,4 +14,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Common.TestAutomation.Framework\Common.TestAutomation.Framework.csproj" />
+    <ProjectReference Include="..\DbUpdatePortal.TestAutomation.Framework\DbUpdatePortal.TestAutomation.Framework.csproj" />
+  </ItemGroup>
+
 </Project>

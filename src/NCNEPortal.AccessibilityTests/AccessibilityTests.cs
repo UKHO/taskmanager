@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace NCNEPortal.AccessibilityTests
 {
     [TestFixture]
-    public class AccessibilityTests : IDisposable
+    public sealed class AccessibilityTests : IDisposable
     {
         private readonly ConfigSupport _configSupport;
         private readonly IObjectContainer _objectContainer;
