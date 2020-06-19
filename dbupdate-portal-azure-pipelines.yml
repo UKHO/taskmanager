@@ -1,0 +1,440 @@
+trigger:
+  branches:
+    include:
+    - features/*
+  paths:
+    include:
+    - src/DbUpdatePortal*
+    - src/Databases/DbUpdateWorkflowDatabase.EF/*
+    - src/Common*
+    - src/HpdDatabase.EF/*    
+
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - src/DbUpdatePortal*
+    - src/Databases/DbUpdateWorkflowDatabase.EF/*
+    - src/Common*
+    - src/HpdDatabase.EF/*       
+
+variables:
+  MSBUILDSINGLELOADCONTEXT: '1'
+  # This is a workaround for an issue building SpecFlow projects using the .NET Core SDK 3.1.200 https://github.com/SpecFlowOSS/SpecFlow/issues/1912
+
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+    
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          arguments: "--configuration $(BuildConfiguration) /p:SourceRevisionId=$(Build.SourceVersion)"
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdate\\DbUpdatePortal.csproj'
+        displayName: 'dotnet build DbUpdatePortal'
+  
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          arguments: "--configuration Debug"
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.UnitTests\\DbUpdatePortal.unittests.csproj'
+        displayName: 'dotnet build DbUpdatePortal tests'
+
+      # Write build number and Id to text file
+      - script: '(echo $(Build.BuildNumber) && echo $(Build.BuildId)) > .buildinfo.json'
+        displayName: "Emit build number"
+        workingDirectory: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal'
+        failOnStderr: true
+  
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.UnitTests\\DbUpdatePortal.unittests.csproj'
+          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\DbUpdatePortal.UnitTests\\CodeCoverage.runsettings --no-build
+        displayName: 'dotnet test DbUpdatePortal tests'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: custom
+          custom: tool
+          arguments: install --tool-path . dotnet-reportgenerator-globaltool
+        displayName: Install ReportGenerator tool
+
+      - script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+        displayName: Create reports
+  
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage'
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal\\DbUpdatePortal.csproj'
+          zipAfterPublish: false
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\DbUpdatePortal --no-build'
+        displayName: 'Publish DbUpdatePortal-project'
+  
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\DbUpdatePortal'
+          ArtifactName: 'DbUpdatePortal'
+          publishLocation: 'Container'
+        displayName: 'Publish DbUpdatePortal Artifact'
+
+
+    - job: BuildSpecs
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore portalspecs'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.TestAutomation.Specs\\DbUpdatePortal.TestAutomation.Specs.csproj'
+          feedsToUse: 'select'
+  
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build portalspecs'
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.TestAutomation.Specs\\DbUpdatePortal.TestAutomation.Specs.csproj'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.TestAutomation.Specs\\DbUpdatePortal.TestAutomation.Specs.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\Specs'
+        displayName: 'Publish specs-project'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\specs'
+          ArtifactName: 'specs'
+          publishLocation: 'Container'
+        displayName: 'Publish specs Artifact'
+
+
+    - job: BuildAccessibilityTests
+      pool: "UKHO Windows 2019"
+      
+      workspace:
+          clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore AccessibilityTests'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.AccessibilityTests\\DbUpdatePortal.AccessibilityTests.csproj'
+          feedsToUse: 'select'
+  
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build AccessibilityTests'
+        inputs:
+          command: 'build'
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.AccessibilityTests\\DbUpdatePortal.AccessibilityTests.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish AccessibilityTests'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(Build.SourcesDirectory)\\src\\DbUpdatePortal.AccessibilityTests\\DbUpdatePortal.AccessibilityTests.csproj'
+          zipAfterPublish: false
+          arguments: '--output $(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish AccessibilityTests Artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)\\AccessibilityTests'
+          ArtifactName: 'AccessibilityTests'
+          publishLocation: 'Container'
+
+
+    - job: Publish_Pickles
+      pool:
+          NautilusBuild
+
+      workspace:
+          clean: all
+
+      steps:
+
+      - task: CmdLine@2
+        displayName: Install Pickles
+        inputs:
+          script: 'choco install pickles'
+  
+      - task: CmdLine@2
+        displayName: Generate Pickles Documentation
+        inputs:
+          script: 'pickles --feature-directory=$(System.DefaultWorkingDirectory)\src\DbUpdatePortal.TestAutomation.Specs --output-directory=$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation --system-under-test-name="Task Manager - DbUpdatePortal" --documentation-format=dhtml'
+  
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Pickles Artifact
+        inputs:
+          PathtoPublish: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+      - task: AzureFileCopy@3
+        displayName: Publish Pickles Artifact to Azure Blob Storage
+        inputs:
+          SourcePath: '$(System.DefaultWorkingDirectory)\src\Pickles.GeneratedDocumentation'
+          azureSubscription: 'TestEngineering-Live'
+          Destination: 'AzureBlob'
+          storage: '$(PicklesAzureStorageAccount)'
+          ContainerName: '$web/$(Build.Repository.Name)DbUpdatePortal'
+          
+    - job: DependencyCheck
+      pool: NautilusBuild
+
+      workspace:
+        clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 2.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 2.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: publish
+          arguments: "--output $(System.DefaultWorkingDirectory)/publish_output"
+          projects: "**/DbUpdatePortal.csproj"
+          publishWebProjects: false
+          modifyOutputPath: false
+          zipAfterPublish: false
+
+      - task: CmdLine@2
+        inputs:
+          script: 'dependency-check --project "DbUpdatePortal - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
+        displayName: "Run NVD Checker"
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)\DCReport'
+          artifact: "NVD report"
+          publishLocation: "pipeline"
+
+      - task: PowerShell@2
+        displayName: "Fail build if dependency checker has vulnerabilities"
+        inputs:
+          targetType: inline
+          script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+
+- stage: DeployDev
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:    
+    - deployment: DeployDbUpdatePortalWebsiteDev
+      displayName: Deploy DbUpdatePortal website
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerDev'
+                  WebAppName: 'taskmanager-dev-web-dbupdate'
+                  packageForLinux: '$(Pipeline.Workspace)/DbUpdatePortal/DbUpdatePortal'
+
+
+- stage: DeployUAT
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:    
+    - deployment: DeployDbUpdatePortalWebsiteUAT
+      displayName: Deploy DbUpdatePortal website
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerUAT_UI'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerUAT-SC'
+                  WebAppName: 'taskmanager-uat-web-dbupdate'
+                  packageForLinux: '$(Pipeline.Workspace)/DbUpdatePortal/DbUpdatePortal'
+
+
+    - job: RunAutomatedAccessibilityTests
+      displayName: 'Run automated accessibility tests'
+      dependsOn: DeployDbUpdatePortalWebsiteUAT
+      pool:
+          NautilusBuild
+      steps:
+        - checkout: none
+        - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
+          inputs:
+            targetType: 'inline'
+            script: |
+              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
+              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download Build Artifacts'
+          inputs:
+            buildType: 'current'
+            downloadType: 'specific'
+            downloadPath: '$(System.ArtifactsDirectory)' 
+
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
+        - task: AzureCLI@1
+          displayName: 'Run Accessibility tests'
+          continueOnError: true
+          inputs:
+            azureSubscription: 'TaskmanagerUAT-SC'
+            scriptLocation: 'inlineScript'
+            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\AccessibilityTests\DbUpdatePortal.AccessibilityTests\DbUpdatePortal.AccessibilityTests.dll --logger:trx'
+
+        - task: PublishTestResults@2
+          displayName: 'Publish Accessibility Test Results'
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'DbUpdate Portal accessibility tests - $(System.StageName)'
+
+
+    - job: RunAutomatedUITests
+      displayName: 'Run automated UI tests'
+      dependsOn: DeployDbUpdatePortalWebsiteUAT
+      pool:
+          NautilusBuild
+      steps:
+        - checkout: none
+        - task: PowerShell@2
+          displayName: 'Update ChromeDriver'
+          inputs:
+            targetType: 'inline'
+            script: |
+              Install-Module -Name "UKHO.ChromeDriver.BinarySync"  -Repository "ukho.psgallery"
+              Update-ChromeDriver -ChromeDriverDownloads \\mgmt.local\dfs\DML-SW-Engineering\Chrome\ChromeDriver -IncludeBeta
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download Build Artifacts'
+          inputs:
+            buildType: 'current'
+            downloadType: 'specific'
+            downloadPath: '$(System.ArtifactsDirectory)' 
+
+        - task: UseDotNet@2
+          displayName: 'Get latest dotnet runtime'
+          inputs:
+            packageType: 'runtime'
+            version: '3.x'
+
+        - task: AzureCLI@1
+          displayName: 'Run SpecFlow tests'
+          inputs:
+            azureSubscription: 'TaskmanagerUAT-SC'
+            scriptLocation: 'inlineScript'
+            inlineScript: 'call dotnet vstest $(System.ArtifactsDirectory)\specs\DbUpdatePortal.TestAutomation.Specs\DbUpdatePortal.TestAutomation.Specs.dll --logger:trx'
+
+        - task: PublishTestResults@2
+          displayName: 'Publish SpecFlowTestResults'
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'VSTest'
+            testResultsFiles: '**/*.trx'
+            testRunTitle: 'DbUpdate Portal UI tests - $(System.StageName)'
+
+
+- stage: DeployPre
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:    
+    - deployment: DeployDbUpdatePortalWebsitePre
+      displayName: Deploy DbUpdatePortal website
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPre-SC'
+                  WebAppName: 'taskmanager-pre-web-dbupdate'
+                  packageForLinux: '$(Pipeline.Workspace)/DbUpdatePortal/DbUpdatePortal'
+
+- stage: DeployPrd
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:    
+    - deployment: DeployDbUpdatePortalWebsitePrd
+      displayName: Deploy DbUpdatePortal website to Prd
+      pool: "UKHO Ubuntu 1804"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Azure App Service Deploy'
+                inputs:
+                  azureSubscription: 'TaskmanagerPrd-SC'
+                  WebAppName: 'taskmanager-prd-web-dbupdate'
+                  packageForLinux: '$(Pipeline.Workspace)/DbUpdatePortal/DbUpdatePortal'
