@@ -1,0 +1,37 @@
+﻿@using DbUpdatePortal.Helpers
+@inject AppVersionInfo appInfo
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Database Update Portal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+
+    <div class="d-flex flex-column sticky-footer-wrapper">
+        <div class="container body-content flex-fill">
+            @RenderBody()
+        </div>
+
+        <footer>
+            <div class="row">
+                <div class="col-4 justify-content-start">&copy; Crown copyright @ViewData["Year"] UK Hydrographic Office</div>
+                <div class="col-8 versioning">
+                    Deployed from commit <a href="https://github.com/UKHO/taskmanager/commit/@appInfo.GitHash" target="_blank">@appInfo.ShortGitHash</a>
+                    via build <a href="https://ukhogov.visualstudio.com/Pipelines/_build/results?buildId=@appInfo.BuildId&view=results" target="_blank">@appInfo.BuildNumber</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap4/dist/js/bootstrap.js" asp-append-version="true"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+
+        @RenderSection("Scripts", required: false)
+    </div>
+</body>
+</html>
