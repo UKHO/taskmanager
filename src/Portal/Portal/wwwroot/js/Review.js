@@ -53,7 +53,7 @@
 
         $("#btnConfirmTerminate").on("click", function () {
 
-            $("#btnConfirmReject").prop("disabled", true);
+            $("#btnCancelTerminate").prop("disabled", true);
             $("#btnConfirmTerminate").prop("disabled", true);
 
             if ($("#txtTerminateComment").val() === "") {
@@ -62,22 +62,13 @@
                 $("#txtTerminateComment").focus();
 
 
-                $("#btnConfirmReject").prop("disabled", false);
+                $("#btnCancelTerminate").prop("disabled", false);
                 $("#btnConfirmTerminate").prop("disabled", false);
                 return;
             }
 
             submitTerminateForm();
         });
-
-        $("#ConfirmTerminate").on("shown.bs.modal", function () {
-            $("#txtTerminateComment").focus();
-        });
-
-        $("#ConfirmTerminate").on("hidden.bs.modal", function () {
-            mainButtonsEnabled(true);
-        });
-
     }
 
     function setReviewDoneHandler() {
@@ -354,6 +345,8 @@
         $("#txtTerminateComment").val("");
 
         $("#ConfirmTerminate").show();
+
+        $("#txtTerminateComment").focus();
     }
 
     function populateAndShowWaitPopupForContinueTerminate() {
@@ -428,9 +421,11 @@
 
             $("#modalReviewErrorMessage").html("");
 
-            $("#modalReviewErrorMessage").append("<ul/>");
+            var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+            $("#modalReviewErrorMessage").append(ulTag);
             var unOrderedList = $("#modalReviewErrorMessage ul");
-            unOrderedList.append("<li>Unsaved changes detected, please Save first.</li>");
+            unOrderedList.append("<li class=\"pt-1 pb-1\" >Unsaved changes detected, please Save first.</li>");
 
             $("#modalReviewErrors").show();
 
