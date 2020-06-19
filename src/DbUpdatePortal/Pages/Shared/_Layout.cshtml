@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using DbUpdatePortal.Helpers
+@inject AppVersionInfo appInfo
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,23 +11,27 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-   
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="d-flex flex-column sticky-footer-wrapper">
+        <div class="container body-content flex-fill">
             @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - DbUpdatePortal
         </div>
-    </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+        <footer>
+            <div class="row">
+                <div class="col-4 justify-content-start">&copy; Crown copyright @ViewData["Year"] UK Hydrographic Office</div>
+                <div class="col-8 versioning">
+                    Deployed from commit <a href="https://github.com/UKHO/taskmanager/commit/@appInfo.GitHash" target="_blank">@appInfo.ShortGitHash</a>
+                    via build <a href="https://ukhogov.visualstudio.com/Pipelines/_build/results?buildId=@appInfo.BuildId&view=results" target="_blank">@appInfo.BuildNumber</a>
+                </div>
+            </div>
+        </footer>
 
-    @RenderSection("Scripts", required: false)
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+
+        @RenderSection("Scripts", required: false)
+    </div>
 </body>
 </html>

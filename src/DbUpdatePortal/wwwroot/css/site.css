@@ -62,10 +62,40 @@ body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+
+/* Footer start */
+footer {
+    bottom: 0;
+    width: 100%;
+    font-size: 16px;
+    color: #09315B;
+    background-color: #b3bcc8;
+    font-weight: normal;
+    height: 60px;
+    line-height: 60px;
+    padding: 0 20px;
+    margin-top: 60px;
 }
+
+@media (max-width: 1023px) {
+    footer {
+        font-size: 14px;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 10px;
+    }
+}
+
+body, .sticky-footer-wrapper {
+    min-height: 100vh;
+}
+
+.flex-fill {
+    flex: 1 1 auto;
+}
+
+.versioning {
+    text-align: right;
+    font-size: 11px;
+}
+/* Footer end */

@@ -1,3 +1,4 @@
+using DbUpdatePortal.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,8 @@ namespace DbUpdatePortal
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddSingleton<AppVersionInfo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
