@@ -91,7 +91,7 @@ stages:
           publishWebProjects: false
           projects: '$(Build.SourcesDirectory)\\src\\ncneportal\\ncneportal.csproj'
           zipAfterPublish: false
-          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\ncneportal --no-build'
+          arguments: '/p:SourceRevisionId=$(Build.SourceVersion) --output $(Build.ArtifactStagingDirectory)\\ncneportal'
         displayName: 'Publish ncneportal-project'
   
       - task: PublishBuildArtifacts@1
