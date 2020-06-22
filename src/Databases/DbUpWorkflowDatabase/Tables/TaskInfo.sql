@@ -3,7 +3,7 @@
 	[ProcessId] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Name] NVARCHAR(50) NULL,
     [UpdateType] NVARCHAR(50) NULL, 
-    [ChartArea] NVARCHAR(50) NULL,
+    [ChartingArea] NVARCHAR(50) NULL,
     [TargetDate] DATETIME2 NULL, 
     [AssignedUser] NVARCHAR(255) NULL, 
     [AssignedDate] DATETIME2 NULL, 
