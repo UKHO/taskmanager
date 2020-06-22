@@ -1,0 +1,149 @@
+trigger:
+  branches:
+    include:
+    - master
+    - features/*
+  paths:
+    include:
+    - src/Databases/DbUpdateWorkflowDatabase*
+
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - src/Databases/DbUpdateWorkflowDatabase*
+    
+stages:
+- stage: Build
+  jobs:
+    - job: RestoreBuildAndDeploy
+      pool: "UKHO Windows 2019"
+
+      workspace:
+          clean: all
+
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1 sdk'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet       
+
+      - task: VSBuild@1
+        inputs:
+          solution: '$(Build.SourcesDirectory)\\src\\Databases\\DbUpWorkflowDatabase\\DbUpdateWorkflowDatabase.sqlproj'
+          msbuildArgs: /t:Build;Publish /p:SqlPublishProfilePath=DbUpdateWorkflowDatabase.publish.xml
+        displayName: 'Build DbUpdate WorkflowDatabase and publish to LocalDb'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(Build.SourcesDirectory)\\src\\Databases\\DbUpdateWorkflowDatabase.Tests\\DbUpdateWorkflowDatabase.Tests.csproj'
+        displayName: 'dotnet test LocalDb instance of database'
+
+      - task: VSBuild@1
+        inputs:
+          solution: '$(Build.SourcesDirectory)\\src\\Databases\\DbUpWorkflowDatabase\\DbUpdateWorkflowDatabase.sqlproj'
+        displayName: 'Build DbUpdate WorkflowDatabase Dacpac'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)\\src\\Databases\\DbUpWorkflowDatabase\\bin\\debug\\DbUpdateWorkflowDatabase.dacpac'
+          ArtifactName: 'dbupdateworkflowdatabase'
+          publishLocation: 'Container'
+        displayName: 'Publish DbUpdate WorkflowDatabase'
+
+- stage: DeployDev
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeployDbUpdateWorkflowDatabaseDev
+      displayName: Deploy DbUpdateWorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNameDev)'
+                  DatabaseName: '$(DatabaseNameDev)'
+                  aadSqlUsername: '$(SQLUsernameDev)'
+                  aadSqlPassword: '$(SQLPasswordDev)'
+                  DacpacFile: '$(Pipeline.Workspace)/dbupdateworkflowdatabase/DbUpdateWorkflowDatabase.dacpac'
+
+- stage: DeployUAT
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeployDbUpdateWorkflowDatabaseUAT
+      displayName: Deploy DbUpdateWorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNameUAT)'
+                  DatabaseName: '$(DatabaseNameUAT)'
+                  aadSqlUsername: '$(SQLUsernameUAT)'
+                  aadSqlPassword: '$(SQLPasswordUAT)'
+                  DacpacFile: '$(Pipeline.Workspace)/dbupdateworkflowdatabase/DbUpdateWorkflowDatabase.dacpac'
+
+- stage: DeployPre
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeployDbUpdateWorkflowDatabasePre
+      displayName: Deploy DbUpdateWorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPre'
+                  ServerName: '$(ServerNamePre)'
+                  DatabaseName: '$(DatabaseNamePre)'
+                  aadSqlUsername: '$(SQLUsernamePre)'
+                  aadSqlPassword: '$(SQLPasswordPre)'
+                  DacpacFile: '$(Pipeline.Workspace)/dbupdateworkflowdatabase/DbUpdateWorkflowDatabase.dacpac'
+
+- stage: DeployPrd
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeployDbUpdateWorkflowDatabasePrd
+      displayName: Deploy DbUpdateWorkflowDatabase
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: SqlAzureDacpacDeployment@1
+                inputs:
+                  # azureSubscription: 'TM2 Dev/Test Sub Dev RG'
+                  AuthenticationType: aadAuthenticationPassword
+                  azureSubscription: 'SharedServicesPrd'
+                  ServerName: '$(ServerNamePrd)'
+                  DatabaseName: '$(DatabaseNamePrd)'
+                  aadSqlUsername: '$(SQLUsernamePrd)'
+                  aadSqlPassword: '$(SQLPasswordPrd)'
+                  DacpacFile: '$(Pipeline.Workspace)/dbupdateworkflowdatabase/DbUpdateWorkflowDatabase.dacpac'
