@@ -1,0 +1,20 @@
+﻿{
+  "bindingCulture": {
+    "language": "en-us"
+  },
+  "language": {
+    "feature": "en-us"
+  },
+  "plugins": [],
+  "stepAssemblies": [
+    {
+      "assembly": "DbUpdatePortal.TestAutomation.Steps"
+    },
+    {
+      "assembly": "DbUpdatePortal.TestAutomation.Framework"
+    },
+    {
+       "assembly": "Common.TestAutomation.Framework"
+    }
+  ]
+}

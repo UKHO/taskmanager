@@ -15,4 +15,8 @@
     <PackageReference Include="SpecFlow" Version="3.1.97" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DbUpdatePortal.TestAutomation.Framework\DbUpdatePortal.TestAutomation.Framework.csproj" />
+  </ItemGroup>
+
 </Project>
