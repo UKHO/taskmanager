@@ -156,6 +156,60 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_entering_an_invalid_primary_assessor_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "test workspace",
+                Assessor = "THIS ASSESSOR DOES NOT EXIST"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            await _reviewModel.OnPostDoneAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Assessor to unknown user THIS ASSESSOR DOES NOT EXIST"));
+        }
+
+        [Test]
+        public async Task Test_entering_an_invalid_primary_verifier_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "test workspace",
+                Assessor = "Test User",
+                Verifier = "THIS VERIFIER DOES NOT EXIST"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Verifier to unknown user THIS VERIFIER DOES NOT EXIST"));
+        }
+
+        [Test]
         public async Task Test_entering_an_empty_primary_assessor_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
@@ -250,6 +304,81 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_entering_an_invalid_additional_assessor_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
+            {
+                new DbAssessmentAssignTask
+                {
+                    ProcessId = ProcessId,
+                    TaskType = "Simple",
+                    WorkspaceAffected = "test workspace",
+                    Assessor = "THIS ASSESSOR DOES NOT EXIST"
+                }
+            };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(
+                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Assessor to unknown user THIS ASSESSOR DOES NOT EXIST"));
+        }
+
+        [Test]
+        public async Task Test_entering_an_invalid_additional_verifier_results_in_validation_error_message()
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = "Test User"
+            };
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
+            {
+                new DbAssessmentAssignTask
+                {
+                    ProcessId = ProcessId,
+                    TaskType = "Simple",
+                    WorkspaceAffected = "test workspace",
+                    Assessor = "Test User",
+                    Verifier = "THIS VERIFIER DOES NOT EXIST"
+                }
+            };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+                .Returns(true);
+
+            await _reviewModel.OnPostDoneAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.IsTrue(
+                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Verifier to unknown user THIS VERIFIER DOES NOT EXIST"));
+        }
+
+        [Test]
         public async Task Test_entering_an_empty_additional_assessor_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
@@ -275,6 +404,9 @@ namespace Portal.UnitTests
                     Assessor = ""
                 }
             };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 

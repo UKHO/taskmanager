@@ -77,13 +77,16 @@ namespace Portal.Pages.DbAssessment
 
         private async Task PopulateDropDowns()
         {
-            var users = await _dbContext.AdUser.OrderBy(a => a.DisplayName).Select(u => u.DisplayName).ToListAsync();
+            var users = await _dbContext.AdUser.OrderBy(a => a.DisplayName)
+                                                         .Select(u => u.DisplayName)
+                                                         .ToListAsync().ConfigureAwait(false);
 
             Assessors = new SelectList(users);
 
             Verifiers = new SelectList(users);
 
-            var assignedTaskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name).ToListAsync();
+            var assignedTaskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name)
+                                                                               .ToListAsync().ConfigureAwait(false);
 
             AssignedTaskTypes = new SelectList(assignedTaskTypes);
         }

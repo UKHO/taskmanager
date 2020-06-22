@@ -5,6 +5,8 @@
 
     $("#Reviewer").prop("disabled", true);
 
+    initialiseOperatorsTypeaheads();
+
     setVerifyDoneHandler();
     setContinueVerifyProgressHandler();
     setVerifySaveHandler();
