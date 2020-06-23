@@ -141,7 +141,7 @@ namespace Portal.UnitTests
             _verifyModel.Verifier = "TestUser";
             _verifyModel.DataImpacts = new List<DataImpact>();
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -161,7 +161,7 @@ namespace Portal.UnitTests
             _verifyModel.Verifier = "";
             _verifyModel.DataImpacts = new List<DataImpact>();
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -179,7 +179,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             _verifyModel.Verifier = "TestUser";
 
@@ -212,7 +212,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 1, HpdUsage = hpdUsage, ProcessId = 123}
             };
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -243,7 +243,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
             };
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -276,7 +276,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1234", ProductActionTypeId = 1}
             };
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -311,7 +311,7 @@ namespace Portal.UnitTests
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
             };
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -363,7 +363,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 2, HpdUsage = hpdUsage2, ProcessId = 123}
             };
 
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -389,7 +389,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.Verifier = "TestUser";
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
@@ -438,7 +438,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             _verifyModel.Verifier = "TestUser";
 
@@ -478,7 +478,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             _verifyModel.Verifier = "TestUser";
 
@@ -513,7 +513,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             _verifyModel.Verifier = aduser;
 
@@ -555,7 +555,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             _verifyModel.Verifier = "TestUser";
 
@@ -625,7 +625,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -657,7 +657,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -698,7 +698,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -730,7 +730,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = "TestUser2";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -833,7 +833,7 @@ namespace Portal.UnitTests
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -852,7 +852,7 @@ namespace Portal.UnitTests
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
 
             var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -870,7 +870,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.Verifier = "TestUser";
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Test change details";
@@ -892,7 +892,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.Verifier = "TestUser";
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Test change details";
@@ -914,7 +914,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Team = "Home Waters";
+            _verifyModel.Team = "HW";
             _verifyModel.Verifier = "TestUser";
             _verifyModel.ProductActioned = false;
 

@@ -248,7 +248,7 @@
       "receiptDate": "2020-01-01T00:00:00",
       "toSdoDate": null,
       "effectiveStartDate": "2020-01-01T00:00:00",
-      "teamDistributedTo": "Primary Responsibility",
+      "teamDistributedTo": "PC",
       "sourceDocumentType": "Source NM Block",
       "sourceNature": "Graphical",
       "datum": "WGS84",
@@ -374,7 +374,7 @@
       "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
       "toSdoDate": null,
       "effectiveStartDate": "2020-02-15", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": "Home Waters",
+      "teamDistributedTo": "HW",
       "sourceDocumentType": "Photographic Sortie",
       "sourceNature": "Graphical",
       "datum": null,
@@ -1385,7 +1385,7 @@
       "receiptDate": "2020-01-03T00:00:00",
       "toSdoDate": null,
       "effectiveStartDate": "2019-01-03T00:00:00",
-      "teamDistributedTo": "HW",
+      "teamDistributedTo": "PC",
       "sourceDocumentType": "Chart - Navigational",
       "sourceNature": "Graphical",
       "datum": null,
