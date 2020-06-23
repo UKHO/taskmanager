@@ -168,19 +168,21 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWaitHistoricalTasks" tabindex="-1" role="dialog" aria-label="Please Wait Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+@* modal popup used when applying search filters to historical tasks *@
+<div class="modal" id="modalHistoricalPopup" tabindex="-1" role="dialog" aria-label="Historical Modal Dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+                <h4 class="modal-title">Searching tasks</h4>
             </div>
             <div class="modal-body">
-                <ul>
-                    <li>Getting historical data from database ...</li>
-                    <li>Populating Historical Tasks list...</li>
-                </ul>
+                @* Wait dialog *@
+                <section id="modalHistoricalWait" class="dialog">
+                    <h5><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h5>
+
+                    <div id="modalHistoricalWaitMessage"></div>
+                </section>
             </div>
         </div>
     </div>
-
 </div>
