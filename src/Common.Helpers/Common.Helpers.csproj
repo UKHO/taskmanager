@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Databases\DbUpdateWorkflowDatabase.EF\DbUpdateWorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\Databases\NCNEWorkflowDatabase.EF\NCNEWorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\Databases\WorkflowDatabase.EF\WorkflowDatabase.EF.csproj" />
     <ProjectReference Include="..\HpdDatabase.EF\HpdDatabase.EF.csproj" />

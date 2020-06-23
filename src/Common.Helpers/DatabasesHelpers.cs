@@ -1,8 +1,9 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using DbUpdateWorkflowDatabase.EF;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
+using System;
+using System.Data.SqlClient;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -118,6 +119,38 @@ namespace Common.Helpers
         }
 
         private static void ReSeedNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
+        {
+            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
+        }
+
+        public static void ClearDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext,
+            bool reseedIdentity = true)
+        {
+            dbContext.TaskStageComment.RemoveRange(dbContext.TaskStageComment);
+            dbContext.TaskComment.RemoveRange(dbContext.TaskComment);
+            dbContext.TaskRole.RemoveRange(dbContext.TaskRole);
+            dbContext.TaskStage.RemoveRange(dbContext.TaskStage);
+
+            //Enforce the deletion of taskStage before taskStageType
+            dbContext.SaveChanges();
+
+            dbContext.TaskNote.RemoveRange(dbContext.TaskNote);
+            dbContext.CarisProjectDetails.RemoveRange(dbContext.CarisProjectDetails);
+            dbContext.TaskInfo.RemoveRange(dbContext.TaskInfo);
+            dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
+            dbContext.ChartingArea.RemoveRange(dbContext.ChartingArea);
+            dbContext.UpdateType.RemoveRange(dbContext.UpdateType);
+
+            dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
+
+            if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);
+
+
+            dbContext.SaveChanges();
+        }
+
+        private static void ReseedDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext)
         {
             dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
         }
