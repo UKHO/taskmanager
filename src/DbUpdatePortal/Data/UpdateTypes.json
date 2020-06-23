@@ -1,0 +1,22 @@
+[
+  {
+    "UpdateTypeId": 1,
+    "Name": "Steady state"
+  },
+  {
+    "UpdateTypeId": 2,
+    "Name": "Update from source"
+  },
+  {
+    "UpdateTypeId": 3,
+    "Name": "Initial population"
+  },
+  {
+    "UpdateTypeId": 4,
+    "Name": "Wrecks"
+  },
+  {
+    "UpdateTypeId": 5,
+    "Name": "Continuous improvement"
+  }
+]
