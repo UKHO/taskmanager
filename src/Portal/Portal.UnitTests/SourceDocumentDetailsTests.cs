@@ -106,7 +106,7 @@ namespace Portal.UnitTests
                 SourceNature = "Au naturale",
                 Datum = "What",
                 SourceDocumentType = "This",
-                TeamDistributedTo = "HW"
+                TeamDistributedTo = "Home Waters"
             });
             _dbContext.SaveChanges();
 

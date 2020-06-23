@@ -41,7 +41,7 @@ namespace Portal.UnitTests
 
             var generalConfigOptionsSnapshot = A.Fake<IOptionsSnapshot<GeneralConfig>>();
 
-            var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "HW,PR", ExternalEndDateDays = 20, DmEndDateDaysSimple = 14, DmEndDateDaysLTA = 72 };
+            var generalConfig = new GeneralConfig { TeamsUnassigned = "Unassigned", TeamsAsCsv = "Home Waters,Primary Charting", ExternalEndDateDays = 20, DmEndDateDaysSimple = 14, DmEndDateDaysLTA = 72 };
             A.CallTo(() => generalConfigOptionsSnapshot.Value).Returns(generalConfig);
 
             _dmEndDateCalculator = new DmEndDateCalculator(generalConfigOptionsSnapshot);

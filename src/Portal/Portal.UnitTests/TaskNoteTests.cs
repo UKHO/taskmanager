@@ -90,7 +90,7 @@ namespace Portal.UnitTests
                 RsdraNumber = "RSDRA1234567",
                 EffectiveStartDate = DateTime.Now,
                 Datum = "12345",
-                TeamDistributedTo = "HW",
+                TeamDistributedTo = "Home Waters",
                 PrimarySdocId = 12345,
                 SourceNature = "Outside"
             });
