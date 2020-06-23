@@ -34,10 +34,10 @@
                         <div class="form-group row justify-content-between">
                             <div class="col-5 p-0">@Html.LabelFor(model => model.OnHoldDays)</div>
                             <div class="col-7" style="padding-left: 0;">
-                                <label class="switch ml-2 mb-auto">
-                                    <input type="checkbox" id="onHoldToggle" name="IsOnHold" class="success" @(Model.IsOnHold ? "checked" : "") value="true">
+                                <div class="switch ml-2 mb-auto">
+                                    <input type="checkbox" id="onHoldToggle" name="IsOnHold" class="success" @(Model.IsOnHold ? "checked" : "") value="true" aria-label="On Hold">
                                     <span class="slider"></span>
-                                </label>
+                                </div>
                                 @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
 
                                 @if (Model.IsOnHold)

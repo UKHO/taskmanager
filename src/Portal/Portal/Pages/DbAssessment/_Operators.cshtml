@@ -17,11 +17,11 @@
 
                                 @if (Model.ParentPage == WorkflowStage.Review)
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false" })
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_label = "Reviewer" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "form-text-input" })
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "form-text-input", aria_label = "Reviewer" })
                                 }
                             </div>
                         </div>
@@ -32,15 +32,15 @@
                     <div class="row justify-content-start">
                         <div class="col-3 d-flex justify-content-start pr-0">@Html.LabelFor(model => model.Assessor, new { @class = "col-form-label" })</div>
                         <div class="col-8">
-                            <div class="text-input-wrap">
+                            <div class="text-input-wrap" >
 
                                 @if (Model.ParentPage == WorkflowStage.Assess)
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false" })
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_label = "Assessor" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "form-text-input" })
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "form-text-input", aria_label = "Assessor" })
                                 }
                             </div>
                         </div>
@@ -55,11 +55,11 @@
                                 @if (Model.ParentPage == WorkflowStage.Assess ||
                                      Model.ParentPage == WorkflowStage.Verify)
                                 {
-                                    @Html.TextBoxFor(model => model.Verifier, "", new {@class = "form-text-input", autocomplete = "off", spellcheck = "false"})
+                                    @Html.TextBoxFor(model => model.Verifier, "", new {@class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_label = "Verifier" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Verifier, "", new {@disabled = "disabled", @class = "form-text-input"})
+                                    @Html.TextBoxFor(model => model.Verifier, "", new {@disabled = "disabled", @class = "form-text-input", aria_label = "Verifier" })
                                 }
                             </div>
                         </div>
