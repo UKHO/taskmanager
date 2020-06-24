@@ -107,22 +107,12 @@
         $(".assignTask").each(function (index, element) {
             var id = index - 1;
 
-            if (index > 0) {            //Set Form Control Names
+            if (index > 0) {
 
-                $(element).find("[id]").each(function () {
-                    var newId = $(this).attr("id").replace("PrimaryAssignedTask_", "") + id;
-                    newId = "AdditionalAssignedTask_" + newId;
-                    $(this).attr("id", newId);
+                // Assign unique id for inputs, and link its label 'for' to the new id
+                assignNewIdForAdditionalAssignedTasks($(element), id);
 
-                });
-
-                $(element).find("[for]").each(function () {
-                    var newAttr = $(this).attr("for").replace("PrimaryAssignedTask_", "") + id;
-                    newAttr = "AdditionalAssignedTask_" + newAttr;
-                    $(this).attr("for", newAttr);
-                });
-
-
+                //Set Form Control Names
                 $(element).find($(".assignTaskAssessor:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor");
                 $(element).find($(".assignTaskVerifier:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier");
                 $(element).find($(".assignTaskType")).prop("name", "AdditionalAssignedTasks[" + id + "].TaskType");
@@ -134,18 +124,41 @@
 
                 setDeleteHandler($(element).find(".deleteAssignTask"));
             }
-            
-            assignAriaLabelledby($(element), ".assignTaskAssessor.tt-hint");
-            assignAriaLabelledby($(element), ".assignTaskVerifier.tt-hint");
+
+            // Assign aria-labelledBy to type-ahead tt-hint
+            assignAriaLabelledBy($(element), ".assignTaskAssessor.tt-hint");
+            assignAriaLabelledBy($(element), ".assignTaskVerifier.tt-hint");
         });
     };
 
-    function assignAriaLabelledby(element, selector) {
+    function assignAriaLabelledBy(element, selector) {
         var currentInput = $(element).find(selector)[0];
         var currentParent = $(currentInput).closest(".form-row")[0];
         var currentLabel = $(currentParent).find(".col-form-label").first();
         var labelForValue = $(currentLabel).attr("for");
         $(currentInput).attr("aria-labelledby", labelForValue);
+    }
+
+    function assignNewIdForAdditionalAssignedTasks(element, id) {
+        $(element).find("[id]").each(function () {
+            var newId = $(this).attr("id");
+
+            if (newId.indexOf("AdditionalAssignedTask_") < 0) {
+                newId = newId.replace("PrimaryAssignedTask_", "") + id;
+                newId = "AdditionalAssignedTask_" + newId;
+                $(this).attr("id", newId);
+            }
+        });
+
+        $(element).find("[for]").each(function () {
+            var newAttr = $(this).attr("for"); 
+
+            if (newAttr.indexOf("AdditionalAssignedTask_") < 0) {
+                newAttr = newAttr.replace("PrimaryAssignedTask_", "") + id;
+                newAttr = "AdditionalAssignedTask_" + newAttr;
+                $(this).attr("for", newAttr);
+            }
+        });
     }
 
     function setCreateHandler() {
