@@ -366,12 +366,21 @@ table > tbody > tr > th {
     text-align: center;
 }
 
+.alertText.right {
+    float: right;
+    text-align: right;
+}
+
 .alertText.red {
     background-color: #cd2026;
 }
 
 .alertText.amber {
     background-color: #ffbf00;
+}
+
+.alertText.green {
+    background-color: #008000;
 }
 
 /* Footer start */

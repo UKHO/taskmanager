@@ -58,6 +58,17 @@ namespace Portal.UnitTests
             Assert.AreEqual(false, result.redAlert);
         }
 
+        [TestCase(3)]
+        [TestCase(short.MaxValue)]
+        public void Test_DetermineDaysToDmEndDateAlerts_Returns_Green_Alert_Only(short daysToDmEndDate)
+        { 
+            var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
+
+            Assert.AreEqual(true, result.greenAlert);
+            Assert.AreEqual(false, result.amberAlert);
+            Assert.AreEqual(false, result.redAlert);
+        }
+
         [TestCase(2)]
         [TestCase(1)]
         public void Test_DetermineDaysToDmEndDateAlerts_Returns_Amber_Alert_Only(short daysToDmEndDate)
@@ -65,6 +76,7 @@ namespace Portal.UnitTests
             var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
 
             Assert.AreEqual(true, result.amberAlert);
+            Assert.AreEqual(false, result.greenAlert);
             Assert.AreEqual(false, result.redAlert);
         }
 
@@ -75,6 +87,7 @@ namespace Portal.UnitTests
             var result = _dmEndDateCalculator.DetermineDaysToDmEndDateAlerts(daysToDmEndDate);
 
             Assert.AreEqual(true, result.redAlert);
+            Assert.AreEqual(false, result.greenAlert);
             Assert.AreEqual(false, result.amberAlert);
         }
     }
