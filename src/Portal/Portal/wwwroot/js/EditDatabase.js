@@ -151,8 +151,19 @@
                     notFound: '<div>No results</div>'
                 }
             });
+
+        // Assign aria-labelledBy to type-ahead tt-query
+        assignAriaLabelledBy($("#workspacesTypeahead"), ".tt-query.tt-hint");
     }
 });
+
+function assignAriaLabelledBy(element, selector) {
+    var currentInput = $(element).find(selector)[0];
+    var currentParent = $(currentInput).closest(".form-row")[0];
+    var currentLabel = $(currentParent).find(".col-form-label").first();
+    var labelForValue = $(currentLabel).attr("for");
+    $(currentInput).attr("aria-labelledby", labelForValue);
+}
 
 function hideDialogBoxes() {
 
