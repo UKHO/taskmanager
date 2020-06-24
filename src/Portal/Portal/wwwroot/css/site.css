@@ -355,6 +355,8 @@ table > tbody > tr > th {
 /* DAYS ON HOLD WARNING END */
 
 .alertText {
+    display: inline-block;
+    padding: 0 0.5rem 0 0.5rem;
     border-radius: .25rem;
     color: white;
     font-weight: 400;
@@ -364,13 +366,13 @@ table > tbody > tr > th {
     text-align: center;
 }
 
-    .alertText.red {
-        background-color: #cd2026;
-    }
+.alertText.red {
+    background-color: #cd2026;
+}
 
-    .alertText.amber {
-        background-color: #ffbf00;
-    }
+.alertText.amber {
+    background-color: #ffbf00;
+}
 
 /* Footer start */
 footer {

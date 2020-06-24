@@ -59,12 +59,12 @@
             "lengthMenu": [5, 10, 25, 50],
             'columnDefs': [
                 {
-                    'targets': [12],
+                    'targets': [11],
                     'orderable': false,
                     'searchable': false
                 },
                 {
-                    'targets': [13],
+                    'targets': [12],
                     'visible': false,
                     'searchable': false
                 }
@@ -91,17 +91,17 @@
                     'searchable': false
                 },
                 {
+                    'targets': [12],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
                     'targets': [13],
                     'orderable': false,
                     'searchable': false
                 },
                 {
                     'targets': [14],
-                    'orderable': false,
-                    'searchable': false
-                },
-                {
-                    'targets': [15],
                     'visible': false,
                     'searchable': false
                 }
@@ -109,7 +109,7 @@
             "order": [[2, 'asc']],
             "scrollX": true,
             "createdRow": function (row, data, dataIndex) {
-                if (data[15] === "") {
+                if (data[14] === "") {
                     $("td.details-control", row).removeClass("details-control");
                     $("td.details-control i", row).removeClass("fa");
                 }
@@ -156,7 +156,7 @@
     }
 
     function format(data) {
-        return '<span class="note-formatting">' + data[15] + '</span>';
+        return '<span class="note-formatting">' + data[14] + '</span>';
     }
 
     function handleDisplayTaskNotes() {
@@ -195,11 +195,11 @@
                 // Team tasks list
                 if (menuItem === 1) {
                     if (settings.sTableId === "unassignedTasks") {
-                        return filterSelectedTeamsList(rowData[11]);
+                        return filterSelectedTeamsList(rowData[10]);
                     }
 
                     if (settings.sTableId === "inFlightTasks") {
-                        return filterSelectedTeamsList(rowData[12]);
+                        return filterSelectedTeamsList(rowData[11]);
                     }
 
                     return true;
@@ -213,25 +213,25 @@
 
     function filterMyAssignedTasksList(rowData) {
 
-        var taskStage = rowData[8];
+        var taskStage = rowData[7];
 
         switch (taskStage) {
             case "Review":
-                var reviewer = rowData[9];
+                var reviewer = rowData[8];
 
                 if (reviewer !== userFullName) {
                     return false;
                 }
                 break;
             case "Assess":
-                var assessor = rowData[10];
+                var assessor = rowData[9];
 
                 if (assessor !== userFullName) {
                     return false;
                 }
                 break;
             case "Verify":
-                var verifier = rowData[11];
+                var verifier = rowData[10];
 
                 if (verifier !== userFullName) {
                     return false;

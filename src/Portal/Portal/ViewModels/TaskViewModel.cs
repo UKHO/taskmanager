@@ -11,7 +11,6 @@ namespace Portal.ViewModels
         public int ProcessId { get; set; }
         [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? DmEndDate { get; set; }
-        [DisplayFormat(NullDisplayText = "N/A")]
         public short? DaysToDmEndDate { get; set; }
         public bool DaysToDmEndDateAmberAlert { get; set; }
         public bool DaysToDmEndDateRedAlert { get; set; }
