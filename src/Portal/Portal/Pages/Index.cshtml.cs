@@ -117,6 +117,7 @@ namespace Portal.Pages
                     task.DaysToDmEndDate = result.daysToDmEndDate;
 
                     var alerts = _indexFacade.DetermineDaysToDmEndDateAlerts(task.DaysToDmEndDate.Value);
+                    task.DaysToDmEndDateGreenAlert = alerts.greenAlert;
                     task.DaysToDmEndDateAmberAlert = alerts.amberAlert;
                     task.DaysToDmEndDateRedAlert = alerts.redAlert;
                 }

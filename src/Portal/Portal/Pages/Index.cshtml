@@ -43,8 +43,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
-                    <th style="min-width: 3.5rem;">DM End Date</th>
+                    <th style="min-width: 6.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
@@ -64,14 +63,21 @@
                         <td>
                             <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
-                        <td>
-                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                                @Html.DisplayFor(model => task.DaysToDmEndDate)
-                            </div>
-                        </td>
                         @* Use custom sort due to 'N/A' not being sortable *@
                         <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
                             @Html.DisplayFor(model => task.DmEndDate)
+
+                            @if (task.DaysToDmEndDateRedAlert ||
+                                 task.DaysToDmEndDateAmberAlert ||
+                                 task.DaysToDmEndDateGreenAlert)
+                            {
+                                <div class="right mr-1 
+                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
+                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
+                                 @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                    @Html.DisplayFor(model => task.DaysToDmEndDate)
+                                </div>
+                            }
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
@@ -129,8 +135,7 @@
                 <tr>
                     <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>ID</th>
-                    <th style="min-width: 3.5rem;">Days to<br />DM End Date</th>
-                    <th style="min-width: 3.5rem;">DM End Date</th>
+                    <th style="min-width: 6.5rem;">DM End Date</th>
                     <th style="min-width: 4.0rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
@@ -152,14 +157,21 @@
                         <td>
                             <a asp-page="DbAssessment/@task.TaskStage" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
-                        <td>
-                            <div class="@(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                                @Html.DisplayFor(model => task.DaysToDmEndDate)
-                            </div>
-                        </td>
                         @* Use custom sort due to 'N/A' not being sortable *@
                         <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
                             @Html.DisplayFor(model => task.DmEndDate)
+
+                            @if (task.DaysToDmEndDateRedAlert ||
+                                 task.DaysToDmEndDateAmberAlert ||
+                                 task.DaysToDmEndDateGreenAlert)
+                            {
+                                <div class="right mr-1 
+                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
+                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
+                                 @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
+                                    @Html.DisplayFor(model => task.DaysToDmEndDate)
+                                </div>
+                            }
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>

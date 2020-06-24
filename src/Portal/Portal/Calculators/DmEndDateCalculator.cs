@@ -28,12 +28,18 @@ namespace Portal.Calculators
             return (dmEndDate: dmEndDate, daysToDmEndDate: daysToDmEndDate);
         }
 
-        public (bool redAlert, bool amberAlert) DetermineDaysToDmEndDateAlerts(short daysToDmEndDate)
+        public (bool redAlert, bool amberAlert, bool greenAlert) DetermineDaysToDmEndDateAlerts(short daysToDmEndDate)
         {
+            if (daysToDmEndDate > 999 || daysToDmEndDate < -999)
+            {
+                return (redAlert: false, amberAlert: false, greenAlert: false);
+            }
+
             var redAlert = daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc; 
             var amberAlert = !redAlert && daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc;
+            var greenAlert = !redAlert && !amberAlert;
 
-            return (redAlert: redAlert, amberAlert: amberAlert);
+            return (redAlert: redAlert, amberAlert: amberAlert, greenAlert: greenAlert);
         }
     }
 }
