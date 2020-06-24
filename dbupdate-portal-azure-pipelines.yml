@@ -292,7 +292,6 @@ stages:
 
 - stage: DeployUAT
   dependsOn: Build
-  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployDbUpdatePortalWebsiteUAT
       displayName: Deploy DbUpdatePortal website
