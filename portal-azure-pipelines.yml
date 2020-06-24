@@ -317,7 +317,7 @@ stages:
     - deployment: DeployPortalWebsiteUAT
       displayName: Deploy portal website
       pool: "UKHO Ubuntu 1804"
-      environment: 'TaskmanagerUAT'
+      environment: 'TaskmanagerUAT_UI'
       strategy:
         runOnce:
           deploy:
