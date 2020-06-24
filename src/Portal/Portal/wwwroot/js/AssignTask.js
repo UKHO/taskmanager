@@ -66,19 +66,19 @@
             highlight: true, /* Enable substring highlighting */
             minLength: 3 /* Specify minimum characters required for showing result */
         },
-        {
-            name: 'users',
-            source: users,
-            limit: 100,
-            displayKey: 'displayName',
-            valueKey: 'userPrincipalName',
-            templates: {
-                empty: '<div>No results</div>',
-                suggestion: function (users) {
-                    return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+            {
+                name: 'users',
+                source: users,
+                limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
+                templates: {
+                    empty: '<div>No results</div>',
+                    suggestion: function (users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
                 }
-            }
-        });
+            });
     }
 
     function displayTypeaheadsInitialiseErrors(errorStringArray) {
@@ -108,6 +108,21 @@
             var id = index - 1;
 
             if (index > 0) {            //Set Form Control Names
+
+                $(element).find("[id]").each(function () {
+                    var newId = $(this).attr("id").replace("PrimaryAssignedTask_", "") + id;
+                    newId = "AdditionalAssignedTask_" + newId;
+                    $(this).attr("id", newId);
+
+                });
+
+                $(element).find("[for]").each(function () {
+                    var newAttr = $(this).attr("for").replace("PrimaryAssignedTask_", "") + id;
+                    newAttr = "AdditionalAssignedTask_" + newAttr;
+                    $(this).attr("for", newAttr);
+                });
+
+
                 $(element).find($(".assignTaskAssessor:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor");
                 $(element).find($(".assignTaskVerifier:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier");
                 $(element).find($(".assignTaskType")).prop("name", "AdditionalAssignedTasks[" + id + "].TaskType");
@@ -119,9 +134,19 @@
 
                 setDeleteHandler($(element).find(".deleteAssignTask"));
             }
-
+            
+            assignAriaLabelledby($(element), ".assignTaskAssessor.tt-hint");
+            assignAriaLabelledby($(element), ".assignTaskVerifier.tt-hint");
         });
     };
+
+    function assignAriaLabelledby(element, selector) {
+        var currentInput = $(element).find(selector)[0];
+        var currentParent = $(currentInput).closest(".form-row")[0];
+        var currentLabel = $(currentParent).find(".col-form-label").first();
+        var labelForValue = $(currentLabel).attr("for");
+        $(currentInput).attr("aria-labelledby", labelForValue);
+    }
 
     function setCreateHandler() {
         $("#btnCreateTask").on("click", function (e) {

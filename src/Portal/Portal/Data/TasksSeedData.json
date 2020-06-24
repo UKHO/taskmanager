@@ -179,10 +179,20 @@
         "assessor": "Matthew Stoodley",
         "verifier": "Peter Bates",
         "TaskType": "LTA",
-        "WorkspaceAffected": "2054_4",
-        "Notes": "Important note",
-        "status":  "New" 
+        "WorkspaceAffected": "2054_1",
+        "Notes": "Child1",
+        "status": "New"
+      },
+      {
+        "processId": 123,
+        "assessor": "Stuart Barzey",
+        "verifier": "Rossall Sandford",
+        "TaskType": "Simple",
+        "WorkspaceAffected": "2054_2",
+        "Notes": "Child2",
+        "status": "New"
       }
+
     ],
     "PrimaryDocumentStatus": {
       "processId": 123,
