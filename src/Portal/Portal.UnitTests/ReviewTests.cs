@@ -448,7 +448,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
@@ -513,7 +513,7 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -540,7 +540,7 @@ namespace Portal.UnitTests
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -567,7 +567,7 @@ namespace Portal.UnitTests
             _reviewModel.Reviewer = "";
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -650,7 +650,7 @@ namespace Portal.UnitTests
             _reviewModel.Ion = "Ion";
             _reviewModel.ActivityCode = "ActivityCode";
             _reviewModel.SourceCategory = "SourceCategory";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             _reviewModel.Reviewer = "TestUser";
 
@@ -684,7 +684,7 @@ namespace Portal.UnitTests
             _reviewModel.Ion = "Ion";
             _reviewModel.ActivityCode = "ActivityCode";
             _reviewModel.SourceCategory = "SourceCategory";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             _reviewModel.Reviewer = "";
 
@@ -758,7 +758,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
@@ -795,7 +795,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
@@ -828,7 +828,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
@@ -869,7 +869,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
@@ -908,7 +908,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
@@ -950,7 +950,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _reviewModel.Reviewer = "TestUser2";
-            _reviewModel.Team = "Home Waters";
+            _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))

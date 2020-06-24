@@ -168,7 +168,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Assessor = "TestUser";
 
             _assessModel.Verifier = "";
@@ -195,7 +195,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Verifier = "TestUser";
 
             _assessModel.Assessor = "";
@@ -223,7 +223,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
 
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
@@ -264,7 +264,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
             _assessModel.ProductActioned = true;
@@ -300,7 +300,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "TestUser";
             _assessModel.DataImpacts = new List<DataImpact>();
@@ -334,7 +334,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Assessor = "TestUser";
             _assessModel.Verifier = "KnownUser";
 
@@ -360,7 +360,7 @@ namespace Portal.UnitTests
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.Assessor = "KnownUser";
             _assessModel.Verifier = "TestUser";
 
@@ -415,7 +415,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -448,7 +448,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -490,7 +490,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -523,7 +523,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             _assessModel.Assessor = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -577,7 +577,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
 
             _assessModel.RecordProductAction = new List<ProductAction>()
@@ -602,7 +602,7 @@ namespace Portal.UnitTests
                 new DataImpact() {DataImpactId = 2, HpdUsageId = 2, HpdUsage = hpdUsage2, ProcessId = 123}
             };
 
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
 
             var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -643,7 +643,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
 
             _assessModel.RecordProductAction = new List<ProductAction>()
@@ -679,7 +679,7 @@ namespace Portal.UnitTests
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
 
             _assessModel.Verifier = "TestUser";
 
@@ -751,7 +751,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.ProductActioned = true;
             _assessModel.ProductActionChangeDetails = "";
@@ -779,7 +779,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.ProductActioned = true;
             _assessModel.ProductActionChangeDetails = "";
@@ -807,7 +807,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.ProductActioned = true;
@@ -831,7 +831,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.ProductActioned = true;
@@ -855,7 +855,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.ProductActioned = false;
@@ -880,7 +880,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.Assessor = "TestUser2";
             _assessModel.Verifier = "TestUser2";
-            _assessModel.Team = "Home Waters";
+            _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.ProductActioned = false;
