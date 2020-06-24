@@ -66,12 +66,18 @@
                         @* Use custom sort due to 'N/A' not being sortable *@
                         <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
                             @Html.DisplayFor(model => task.DmEndDate)
-                            <div class="right mr-1 
+
+                            @if (task.DaysToDmEndDateRedAlert ||
+                                 task.DaysToDmEndDateAmberAlert ||
+                                 task.DaysToDmEndDateGreenAlert)
+                            {
+                                <div class="right mr-1 
                                  @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
                                  @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
                                  @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                                @Html.DisplayFor(model => task.DaysToDmEndDate)
-                            </div>
+                                    @Html.DisplayFor(model => task.DaysToDmEndDate)
+                                </div>
+                            }
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
@@ -154,12 +160,18 @@
                         @* Use custom sort due to 'N/A' not being sortable *@
                         <td data-sort="@(task.DmEndDate.HasValue ? task.DmEndDate.Value.Ticks : 0)">
                             @Html.DisplayFor(model => task.DmEndDate)
-                            <div class="right mr-1 
+
+                            @if (task.DaysToDmEndDateRedAlert ||
+                                 task.DaysToDmEndDateAmberAlert ||
+                                 task.DaysToDmEndDateGreenAlert)
+                            {
+                                <div class="right mr-1 
                                  @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
                                  @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
                                  @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
-                                @Html.DisplayFor(model => task.DaysToDmEndDate)
-                            </div>
+                                    @Html.DisplayFor(model => task.DaysToDmEndDate)
+                                </div>
+                            }
                         </td>
                         <td>
                             <span>@Html.DisplayFor(model => task.OnHoldDays)</span>
