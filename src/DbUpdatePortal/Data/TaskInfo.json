@@ -1,0 +1,74 @@
+[
+  {
+    "Name": "Name",
+    "chartingArea": "Home Waters",
+    "UpdateType": "Update Type",
+    "TargetDate": "2020-01-10T00:00:00",
+    "AssignedUser": "SVC_TMNCNEPrtlUITest",
+    "AssignedDate": "2020-01-06",
+    "Status": "InProgress",
+  
+    "TaskRole": {
+      "compiler": "Amanda Bowery",
+      "verifier": "StoodleyM"
+    },
+    "TaskNote": {
+      "Text": "Important note on first task",
+      "Created": "2020-01-10T00:00:00",
+      "CreatedByUsername": "StoodleyM",
+      "LastModified": "2020-01-10T00:00:00",
+      "LastModifiedByUsername": "StoodleyM"
+    },
+    "TaskComment": [
+      {
+        "Comment": "This is a very important comment that will eventually reach a, not insignificant character count",
+        "Username": "StoodleyM",
+        "Created": "2020-01-28T00:00:00",
+        "ActionIndicator": false,
+        "ActionRole": null
+      },
+      {
+        "Comment": "",
+        "Username": "StoodleyM",
+        "Created": "2020-01-28T00:00:00",
+        "ActionIndicator": true,
+        "ActionRole": "Compiler"
+      }
+    ],
+
+    "TaskStage": [
+      {
+        "TaskStageTypeId": 1,
+        "DateExpected": null,
+        "DateCompleted": "2020-01-15T00:00:00",
+        "Status": "Completed",
+        "TaskStageComment": [
+          {
+            "Comment": "First comment for Compilation stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          },
+          {
+            "Comment": "One more comment on Compilation stage",
+            "Username": "Amanda Bowery",
+            "Created": "2020-01-15T12:32:32"
+          }
+        ]
+
+      },
+      {
+        "TaskStageTypeId": 2,
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "InProgress"
+      },
+      {
+        "TaskStageTypeId": 3,
+        "DateExpected": null,
+        "DateCompleted": null,
+        "Status": "Open"
+      }
+    ]
+
+  }
+]

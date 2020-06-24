@@ -1,0 +1,32 @@
+[
+ {
+    "TaskStageTypeId": 1,
+    "Name": "Compile Chart",
+    "SequenceNumber": 1,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 2,
+    "Name": "V1",
+    "SequenceNumber": 2,
+    "AllowRework": true
+  },
+  {
+    "TaskStageTypeId": 3,
+    "Name": "V1 Rework",
+    "SequenceNumber": 3,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 4,
+    "Name": "CPT",
+    "SequenceNumber": 4,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 5,
+    "Name": "DCPT",
+    "SequenceNumber": 5,
+    "AllowRework": false
+  }
+]
