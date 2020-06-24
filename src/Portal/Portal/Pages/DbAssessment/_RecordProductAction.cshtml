@@ -16,12 +16,12 @@
         </div>
         <div class="form-group card-body p-0">
             <div class="row justify-content-start align-items-center mb-1">
-                <div class="col-2">@Html.LabelFor(model => model.ProductActioned, new { @class = "col-form-label" })</div>
+                <div class="col-2"><label class="col-form-label">@Html.DisplayNameFor(model => model.ProductActioned)</label></div>
                 <div class="col-1">
                     @Html.HiddenFor(m => m.ProductActioned, new { @id = "hdnProductActioned" })
                     <div class="checkbox-wrapper">
                         <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "") value="true">
-                        <label for="ProductActioned"></label>
+                        <label for="ProductActioned"><span class="screen-reader-only">Action</span></label>
                     </div>
                 </div>
             </div>
