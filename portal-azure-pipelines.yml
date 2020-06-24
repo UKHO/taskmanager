@@ -313,7 +313,6 @@ stages:
 - stage: DeployUAT
   dependsOn: 
     - Build
-  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployPortalWebsiteUAT
       displayName: Deploy portal website

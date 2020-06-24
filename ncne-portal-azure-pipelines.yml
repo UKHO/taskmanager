@@ -294,7 +294,6 @@ stages:
 
 - stage: DeployUAT
   dependsOn: Build
-  condition: eq(variables['Build.Reason'], 'Manual')
   jobs:    
     - deployment: DeployNCNEPortalWebsiteUAT
       displayName: Deploy ncneportal website
