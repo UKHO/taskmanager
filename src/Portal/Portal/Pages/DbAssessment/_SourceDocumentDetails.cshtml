@@ -93,8 +93,7 @@
                         foreach (var attachedLinkedDocument in Model.AttachedLinkedDocuments)
                         {
                             <tr>
-                                <td>
-                                </td>
+                                <td></td>
                                 <td>
                                     @{
                                         if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
@@ -123,26 +122,26 @@
                         foreach (var databaseDocument in Model.DatabaseDocuments)
                         {
                             <tr>
-                                <td>
-                                </td>
                                 <td></td>
-                                <td>@databaseDocument.SdocId</td>
                                 <td>
                                     @{
                                         if (databaseDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
-                                            <a href="@databaseDocument.ContentServiceUri" target="_blank"></a>
+                                            <a href="@databaseDocument.ContentServiceUri" target="_blank">@databaseDocument.ParsedRsdraNumber</a>
                                         }
                                         else
                                         {
-                                            @databaseDocument.SourceDocumentName
+                                            @databaseDocument.ParsedRsdraNumber
                                         }
                                     }
+
                                 </td>
-                                <td></td>
+                                <td>@databaseDocument.SdocId</td>
+                                <td>@databaseDocument.SourceDocumentName</td>
+                                <td>@databaseDocument.ReceiptDate</td>
                                 <td>@databaseDocument.SourceDocumentType</td>
-                                <td></td>
-                                <td></td>
+                                <td>@databaseDocument.Datum</td>
+                                <td>@databaseDocument.SourceNature</td>
                                 <td><i class="fa fa-times-circle" style="color: red"></i></td>
                             </tr>
                         }
@@ -165,14 +164,14 @@
                 </div>
             </div>
             <div id="sourceDocumentsError"></div>
-            
+
             <section class="dialog error collapse mt-3">
                 <h5>
                     <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
                     <span id="addSourceErrorMessage">Failed to load Source Documents</span>
                 </h5>
             </section>
-            
+
             <section class="dialog warning collapse mt-3">
                 <h5>
                     <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
