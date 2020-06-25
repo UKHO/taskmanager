@@ -98,4 +98,10 @@ body, .sticky-footer-wrapper {
     text-align: right;
     font-size: 11px;
 }
+
+/* Site link colour has reduced contrast over footer */
+.versioning a {
+    color: #09315B;
+    text-decoration: underline;
+}
 /* Footer end */
