@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +8,8 @@ using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NCNEPortal.UnitTests
 {
@@ -34,6 +34,8 @@ namespace NCNEPortal.UnitTests
 
 
             _dbContext = new NcneWorkflowDbContext(dbContextOptions);
+
+
 
             ProcessId = 123;
 
@@ -89,6 +91,32 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task OnPostSaveAsync_returns_200_when_valid()
         {
+            _dbContext.TaskStageType.AddRange(new TaskStageType()
+            {
+                AllowRework = false,
+                Name = "With SDRA",
+                SequenceNumber = 1,
+                TaskStageTypeId = 1
+            },
+                new TaskStageType()
+                {
+                    AllowRework = false,
+                    Name = "With Geodesy",
+                    SequenceNumber = 2,
+                    TaskStageTypeId = 2
+
+                }, new TaskStageType()
+                {
+                    AllowRework = false,
+                    Name = "Specification",
+                    SequenceNumber = 3,
+                    TaskStageTypeId = 3
+
+                }
+            );
+
+            _dbContext.SaveChanges();
+
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored)).Returns(true);
 

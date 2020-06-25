@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,6 +16,13 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -295,11 +295,6 @@ namespace NCNEPortal
 
             Header = $"{taskInfo.WorkflowType}{(String.IsNullOrEmpty(taskInfo.ChartNumber) ? "" : $" - {taskInfo.ChartNumber}")}";
 
-            var inProgress = TaskStages.FindAll(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
-                                                     && t.TaskStageTypeId != (int)NcneTaskStageType.Forms)
-                .OrderBy(t => t.TaskStageTypeId);
-
-
             //Enable complete if Forms and Publication stages are completed.
             CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
                                                    t.Status == NcneTaskStageStatus.Completed.ToString()) &&
@@ -310,7 +305,7 @@ namespace NCNEPortal
                          taskInfo.Status == NcneTaskStatus.Terminated.ToString();
             if (!IsReadOnly)
             {
-                Header += " - " + (inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion");
+                Header += " - " + GetCurrentStage(TaskStages);
             }
 
             TaskStatus = taskInfo.Status;
@@ -535,7 +530,7 @@ namespace NCNEPortal
 
         private async Task<bool> SendtoRework(int processId, int stageId)
         {
-            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
+            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId).Include(t => t.TaskStageType); ;
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
@@ -559,6 +554,7 @@ namespace NCNEPortal
 
             taskInfo.AssignedUser = nextStageUser;
             taskInfo.AssignedDate = DateTime.Now;
+            taskInfo.CurrentStage = taskStages.First(t => t.TaskStageTypeId == (int)nextStage).TaskStageType.Name;
 
             var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
 
@@ -573,7 +569,7 @@ namespace NCNEPortal
         private async Task<bool> CompleteStage(int processId, int stageId)
         {
 
-            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId);
+            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId).Include(t => t.TaskStageType);
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
@@ -593,6 +589,7 @@ namespace NCNEPortal
 
             var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId, v2Available);
 
+            var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
             if (nextStages.Count > 0)
             {
                 foreach (var stage in nextStages)
@@ -603,8 +600,6 @@ namespace NCNEPortal
 
                 var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStages[0])?
                     .AssignedUser;
-
-                var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
 
                 taskInfo.AssignedUser = nextStageUser;
                 taskInfo.AssignedDate = DateTime.Now;
@@ -629,11 +624,21 @@ namespace NCNEPortal
             await _commentsHelper.AddTaskSystemComment(currentStage.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart ? NcneCommentType.CarisPublish : NcneCommentType.CompleteStage,
                 processId, CurrentUser.DisplayName, stageName, null, null);
 
+            taskInfo.CurrentStage = GetCurrentStage(new List<TaskStage>(taskStages));
+
             await _dbContext.SaveChangesAsync();
 
             return true;
         }
 
+        private string GetCurrentStage(List<TaskStage> taskStages)
+        {
+            var inProgress = taskStages.FindAll(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
+                                                     && t.TaskStageTypeId != (int)NcneTaskStageType.Forms)
+                .OrderBy(t => t.TaskStageTypeId);
+
+            return inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion";
+        }
 
         public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
         {

@@ -19,6 +19,7 @@
     [ActualDate3Ps] DATETIME2 NULL, 
     [AssignedUser] NVARCHAR(255) NULL, 
     [AssignedDate] DATETIME2 NULL, 
+    [CurrentStage] NVARCHAR(25) NULL,
     [Status] NVARCHAR(10) NOT NULL, 
     [StatusChangeDate] DATETIME2 NULL
 )

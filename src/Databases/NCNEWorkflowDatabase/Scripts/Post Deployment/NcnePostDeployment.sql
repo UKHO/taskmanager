@@ -19,8 +19,7 @@ using (
 				(2, 'NC'),
 				(3, 'CME'),
                 (4, 'UNE'),
-                (5, 'Refresh'),
-                (6, 'Fleet')
+                (5, 'Refresh')
 ) as source ([WorkflowTypeId], [Name])
 on (target.[WorkflowTypeId] = source.[WorkflowTypeId])
 when matched THEN
@@ -38,7 +37,8 @@ using (
 				(1,'Primary'),
 				(2, 'Adoption'),
 				(3, 'Derived'),
-                (4, 'Thematics')
+                (4, 'Thematics'),
+                (5, 'Fleet')
 ) as source ([ChartTypeId], [Name])
 on (target.[ChartTypeId] = source.[ChartTypeId])
 when matched THEN
