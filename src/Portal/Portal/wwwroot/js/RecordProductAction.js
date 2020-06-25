@@ -48,6 +48,8 @@
     function update() {
 
         $(".recordProductAction").each(function (index, element) {
+            
+
             if (index > 0) {
                 $(element).find(".deleteAction").show();
             } else {
@@ -60,10 +62,8 @@
                 .prop("name", "RecordProductAction[" + index + "].ProductActionTypeId");
             $(element).find($(".productActionVerified")).prop("name", "RecordProductAction[" + index + "].Verified");
 
-            // Additional required markup settings for checkboxes...
-            $(element).find($(".productActionVerified")).prop("id", "ProductActionVerified-" + index);
-            $(element).find($(".productActionVerifiedLabel")).prop("id", "ProductActionVerified-" + index);
-            $(element).find($(".productActionVerifiedLabel")).prop("for", "ProductActionVerified-" + index);
+            // Assign unique id
+            assignUniqueIds($(element), index);
 
             if (index > 0) {
                 setDeleteHandler($(element).find(".deleteAction"));
@@ -78,6 +78,21 @@
 
         });
     };
+
+    function assignUniqueIds(element, index) {
+        $(element).find($(".productActionImpactedProduct")).prop("id", "impactedProduct-" + index);
+        $(element).find($(".productActionImpactedProductLabel")).prop("id", "impactedProductLabel-" + index);
+        $(element).find($(".productActionImpactedProductLabel")).prop("for", "impactedProduct-" + index);
+
+        $(element).find($(".productActionType")).prop("id", "productActionType-" + index);
+        $(element).find($(".productActionTypeLabel")).prop("id", "productActionTypeLabel-" + index);
+        $(element).find($(".productActionTypeLabel")).prop("for", "productActionType-" + index);
+
+        $(element).find($(".productActionVerified")).prop("id", "productActionVerified-" + index);
+        $(element).find($(".productActionVerifiedLabel")).prop("id", "productActionVerifiedLabel-" + index);
+        $(element).find($(".productActionVerifiedLabel")).prop("for", "productActionVerified-" + index);
+
+    }
 
     function setCreateHandler() {
         $("#btnAddImpact").on("click",
