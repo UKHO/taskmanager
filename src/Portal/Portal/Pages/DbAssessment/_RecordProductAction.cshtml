@@ -16,12 +16,12 @@
         </div>
         <div class="form-group card-body p-0">
             <div class="row justify-content-start align-items-center mb-1">
-                <div class="col-2">@Html.LabelFor(model => model.ProductActioned, new { @class = "col-form-label" })</div>
+                <div class="col-2"><label class="col-form-label">@Html.DisplayNameFor(model => model.ProductActioned)</label></div>
                 <div class="col-1">
                     @Html.HiddenFor(m => m.ProductActioned, new { @id = "hdnProductActioned" })
                     <div class="checkbox-wrapper">
                         <input type="checkbox" name="ProductActioned" id="ProductActioned" @(Model.ProductActioned ? "checked" : "") value="true">
-                        <label for="ProductActioned"></label>
+                        <label for="ProductActioned"><span class="screen-reader-only">Action</span></label>
                     </div>
                 </div>
             </div>
@@ -30,17 +30,17 @@
                 @foreach (var row in Model.ProductActions)
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
-                        <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label" })</div>
+                        <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label productActionImpactedProductLabel" })</div>
                         <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control productActionImpactedProduct" })</div>
 
                         <div class="row col-8 align-items-center">
-                            <div class="col-3">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label" })</div>
+                            <div class="col-3">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label productActionTypeLabel" })</div>
                             <div class="col-3">@Html.DropDownListFor(model => row.ProductActionTypeId, Model.ProductActionTypes, "", new { @class = "form-control productActionType" })</div>
-                            <div class="col-2">@Html.LabelFor(model => row.Verified, new { @class = "col-form-label" })</div>
+                            <div class="col-2"><label class="col-form-label">@Html.DisplayNameFor(model => row.Verified)</label></div>
                             <div class="col-1">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input productActionVerified" id="ProductActionVerified-0" @(row.Verified ? "checked" : "") value="true">
-                                    <label class="custom-control-label productActionVerifiedLabel" for="ProductActionVerified-0"></label>
+                                    <label class="custom-control-label productActionVerifiedLabel" for="ProductActionVerified-0"><span class="screen-reader-only">Verified</span></label>
                                 </div>
                             </div>
 

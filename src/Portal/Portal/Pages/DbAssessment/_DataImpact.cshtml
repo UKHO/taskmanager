@@ -13,11 +13,11 @@
             <div class="row" id="dataImpactContainer">
                 <div class="col-12">
                     <div class="form-row justify-content-start mb-0">
-                        <div class="col-2 p-0 m-0"><label>Usage</label></div>
-                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Edited</label></div>
-                        <div class="col-5 p-0 m-0"><label>Comments</label></div>
-                        <div class="col-2 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Submitted</label></div>
-                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Verified</label></div>
+                        <div id="usageColumnHeader" class="col-2 p-0 m-0"><label>Usage</label></div>
+                        <div id="editedColumnHeader" class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Edited</label></div>
+                        <div id="commentsColumnHeader" class="col-5 p-0 m-0"><label>Comments</label></div>
+                        <div id="featureSubmittedColumnHeader" class="col-2 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Submitted</label></div>
+                        <div id="featureVerifuedColumnHeader" class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Features Verified</label></div>
                     </div>
                 </div>
                 @foreach (var m in Model.DataImpacts)
@@ -26,25 +26,25 @@
                         <div class="form-row align-items-center">
                             <div class="col-2 p-0 m-0">
                                 @Html.DropDownListFor(model => m.HpdUsageId, Model.Usages, "",
-                                    new { @class = "form-control dataImpactUsage" })
+                                    new { @class = "form-control dataImpactUsage", aria_labelledby = "usageColumnHeader" })
                             </div>
                             <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-0" @(m.Edited ? "checked" : "") value="true">
-                                    <label class="custom-control-label dataImpactEditedLabel"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactEdited" id="UsageEdited-0" @(m.Edited ? "checked" : "") value="true" aria-labelledby="editedColumnHeader">
+                                    <label class="custom-control-label dataImpactEditedLabel"><span class="screen-reader-only">Edited</span></label>
                                 </div>
                             </div>
-                            <div class="col-5 p-0 m-0">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments" })</div>
+                            <div class="col-5 p-0 m-0">@Html.TextBoxFor(model => m.Comments, new { @class = "form-control dataImpactComments", aria_labelledby = "commentsColumnHeader" })</div>
                             <div class="col-2 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactFeaturesSubmitted" id="usageFeaturesSubmitted-0" @(m.FeaturesSubmitted ? "checked" : "") value="true">
-                                    <label class="custom-control-label dataImpactFeaturesSubmittedLabel"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactFeaturesSubmitted" id="usageFeaturesSubmitted-0" @(m.FeaturesSubmitted ? "checked" : "") value="true" aria-labelledby="featureSubmittedColumnHeader">
+                                    <label class="custom-control-label dataImpactFeaturesSubmittedLabel"><span class="screen-reader-only">Feature Submitted</span></label>
                                 </div>
                             </div>
                             <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input dataImpactFeaturesVerified" id="usageFeaturesVerified-0" @(m.FeaturesVerified ? "checked" : "") value="true">
-                                    <label class="custom-control-label dataImpactFeaturesVerifiedLabel"></label>
+                                    <input type="checkbox" class="custom-control-input dataImpactFeaturesVerified" id="usageFeaturesVerified-0" @(m.FeaturesVerified ? "checked" : "") value="true" aria-labelledby="featureVerifuedColumnHeader">
+                                    <label class="custom-control-label dataImpactFeaturesVerifiedLabel"><span class="screen-reader-only">Feature Verified</span></label>
                                 </div>
                             </div>
                             <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><i class="fa fa-times-circle deleteUsage" style="color: red;"></i></div>
