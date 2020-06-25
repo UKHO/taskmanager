@@ -161,8 +161,6 @@
             $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
 
             var sdocId = Number($("#addSourceSdocId").text());
-            var sourceName = $("#addSourceName").text();
-            var docType = $("#addSourceDocType").text();
             var correlationId = $(this).data("correlationid");
 
             $.ajax({
@@ -173,8 +171,6 @@
                 },
                 data: {
                     "sdocId": sdocId,
-                    "docName": sourceName,
-                    "docType": docType,
                     "processId": processId,
                     "correlationId": correlationId
                 },

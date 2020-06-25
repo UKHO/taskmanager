@@ -77,7 +77,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -224,7 +228,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -350,7 +358,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -475,7 +487,11 @@
         "created": "2020-01-01T00:00:00",
         "Status": "FileGenerated",
         "Filename": "RSDRA2018000030860_1.TIF",
-        "Filepath": "<add path>"
+        "Filepath": "<add path>",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -703,7 +719,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -814,7 +834,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [
@@ -935,7 +959,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [
@@ -1056,7 +1084,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [
@@ -1158,7 +1190,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -1269,7 +1305,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [
@@ -1361,7 +1401,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -1443,7 +1487,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ]
   },
@@ -1554,7 +1602,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [
@@ -1675,7 +1727,11 @@
         "sourceDocumentType": "Chart Panel Navigational or Repromat",
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
+        "created": "2020-01-01T00:00:00",
+        "rsdraNumber": "RSDRA2007000067413",
+        "receiptDate": "2007-09-17T00:00:00",
+        "sourceNature": "Textual",
+        "datum": null
       }
     ],
     "DataImpact": [

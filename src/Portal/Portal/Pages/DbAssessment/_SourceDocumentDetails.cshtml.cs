@@ -226,11 +226,11 @@ namespace Portal.Pages.DbAssessment
         /// <param name="processId"></param>
         /// <param name="correlationId"></param>
         /// <returns></returns>
-        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, string docName, string docType, int processId, Guid correlationId)
+        public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, int processId, Guid correlationId)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostAddSourceFromSdraAsync));
-            
+
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
             if (isWorkflowReadOnly)
@@ -241,19 +241,34 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
+
+
             if (_dbContext.DatabaseDocumentStatus.Any(dds => dds.SdocId == sdocId && dds.ProcessId == processId))
             {
                 // Method not allowed - Sdoc Id already added previously
                 return StatusCode(405);
             }
 
+            var sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
+
+            await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
+            {
+                ProcessId = processId,
+                SdocId = sourceDocumentData.SdocId,
+                RsdraNumber = sourceDocumentData.SourceName,
+                SourceDocumentName = sourceDocumentData.Name,
+                ReceiptDate = sourceDocumentData.ReceiptDate,
+                SourceDocumentType = sourceDocumentData.DocumentType,
+                SourceNature = sourceDocumentData.SourceName,
+                Datum = sourceDocumentData.Datum,
+                Status = SourceDocumentRetrievalStatus.Started.ToString(),
+                Created = DateTime.Now,
+
+            });
+
+            await _dbContext.SaveChangesAsync();
+
             // Update DB first
-            await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                _documentStatusFactory,
-                processId,
-                sdocId,
-                SourceDocumentRetrievalStatus.Started,
-                SourceType.Database, correlationId, docName, docType);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
