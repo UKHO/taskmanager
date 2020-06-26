@@ -550,13 +550,13 @@ namespace NCNEPortal
             var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStage)?
                 .AssignedUser;
 
-            var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+            var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
 
             taskInfo.AssignedUser = nextStageUser;
             taskInfo.AssignedDate = DateTime.Now;
-            taskInfo.CurrentStage = taskStages.First(t => t.TaskStageTypeId == (int)nextStage).TaskStageType.Name;
+            taskInfo.CurrentStage = taskStages.FirstAsync(t => t.TaskStageTypeId == (int)nextStage).Result.TaskStageType.Name;
 
-            var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
+            var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;
 
             await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, CurrentUser.DisplayName, stageName, null, null);
 
@@ -581,7 +581,7 @@ namespace NCNEPortal
                 "stage {StageId} of task {ProcessId} is completed.");
 
 
-            var v2 = taskStages.Single(t => t.ProcessId == processId &&
+            var v2 = await taskStages.SingleAsync(t => t.ProcessId == processId &&
                                             t.TaskStageTypeId == (int)NcneTaskStageType.V2);
 
             bool v2Available = (v2.Status != NcneTaskStageStatus.Inactive.ToString());
@@ -609,7 +609,7 @@ namespace NCNEPortal
                                                             && t.TaskStageTypeId != currentStage.TaskStageTypeId
                                                             && t.Status != NcneTaskStageStatus.Completed.ToString());
 
-            var publishStage = taskStages.Single(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication);
+            var publishStage = taskStages.SingleAsync(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication).Result;
 
             if (publishInProgress == 0 && publishStage.Status == NcneTaskStageStatus.InProgress.ToString())
             {
@@ -619,7 +619,7 @@ namespace NCNEPortal
                 publishStage.AssignedUser = CurrentUser.DisplayName;
             }
 
-            var stageName = _dbContext.TaskStageType.Single(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Name;
+            var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;
 
             await _commentsHelper.AddTaskSystemComment(currentStage.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart ? NcneCommentType.CarisPublish : NcneCommentType.CompleteStage,
                 processId, CurrentUser.DisplayName, stageName, null, null);
