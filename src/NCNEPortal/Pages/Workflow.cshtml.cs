@@ -589,7 +589,7 @@ namespace NCNEPortal
 
             var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId, v2Available);
 
-            var taskInfo = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+            var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
             if (nextStages.Count > 0)
             {
                 foreach (var stage in nextStages)
