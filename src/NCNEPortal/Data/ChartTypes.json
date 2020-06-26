@@ -1,5 +1,5 @@
 [
- 
+
 
   {
     "ChartTypeId": 1,
@@ -16,6 +16,10 @@
   {
     "ChartTypeId": 4,
     "Name": "Thematics"
+  },
+  {
+    "ChartTypeId": 5,
+    "Name": "Fleet"
   }
 
 ]

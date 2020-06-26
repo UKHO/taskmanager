@@ -30,6 +30,8 @@ namespace NCNEWorkflowDatabase.EF.Models
         public string AssignedUser { get; set; }
         public DateTime AssignedDate { get; set; }
 
+        public string CurrentStage { get; set; }
+
         public string Status { get; set; }
 
         public DateTime? StatusChangeDate { get; set; }

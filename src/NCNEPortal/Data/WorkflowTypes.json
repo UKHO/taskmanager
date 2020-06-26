@@ -18,9 +18,5 @@
   {
     "WorkflowTypeId": 5,
     "Name": "Refresh"
-  },
-  {
-    "WorkflowTypeId": 6,
-    "Name": "Fleet"
   }
 ]
