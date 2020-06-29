@@ -339,8 +339,8 @@ namespace WorkflowCoordinator.Handlers
 
             if (parentLinkedDocumentsData == null || parentLinkedDocumentsData.Count == 0)
             {
-                _logger.LogError("Failed to update children LinkedDocument table with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get parent data from LinkedDocument for ChildProcessId {childProcessId}");
+                _logger.LogInformation("Child, with ProcessId {ProcessId}, LinkedDocument table was not updated as parent, with ProcessId {ParentProcessId}, did not have linked document");
+                return;
             }
 
             LogContext.PushProperty("ParentLinkedDocumentCount", parentLinkedDocumentsData.Count);
@@ -399,8 +399,8 @@ namespace WorkflowCoordinator.Handlers
 
             if (parentDatabaseDocumentsData == null || parentDatabaseDocumentsData.Count == 0)
             {
-                _logger.LogError("Failed to update children DatabaseDocumentStatus table with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
-                throw new ApplicationException($"Failed to get parent data from DatabaseDocumentStatus for ChildProcessId {childProcessId}");
+                _logger.LogInformation("Child, with ProcessId {ProcessId}, DatabaseDocumentStatus table was not updated as parent, with ProcessId {ParentProcessId}, did not have documents from SDRA");
+                return;
             }
 
             LogContext.PushProperty("ParentDatabaseDocumentStatusCount", parentDatabaseDocumentsData.Count);
