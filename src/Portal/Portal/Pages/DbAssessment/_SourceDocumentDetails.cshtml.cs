@@ -166,7 +166,7 @@ namespace Portal.Pages.DbAssessment
             if (LinkedDocuments != null && LinkedDocuments.Any())
             {
                 AttachedLinkedDocuments = LinkedDocuments.Where(l =>
-                    !l.Status.Equals(LinkedDocumentRetrievalStatus.NotAttached.ToString(),
+                    !l.Status.Equals(SourceDocumentRetrievalStatus.NotAttached.ToString(),
                         StringComparison.OrdinalIgnoreCase));
 
                 foreach (var attachedLinkedDocument in AttachedLinkedDocuments)

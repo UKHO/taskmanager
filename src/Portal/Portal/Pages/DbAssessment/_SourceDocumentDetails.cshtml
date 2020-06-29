@@ -70,7 +70,7 @@
                                 <td>@linkedDocument.Datum</td>
                                 <td>@linkedDocument.SourceNature</td>
                                 <td>
-                                    @if (linkedDocument.Status == LinkedDocumentRetrievalStatus.NotAttached.ToString())
+                                    @if (linkedDocument.Status == SourceDocumentRetrievalStatus.NotAttached.ToString())
                                     {
                                         <div class="attachLinkedDocumentButtonContainer">
                                             <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
@@ -96,7 +96,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (attachedLinkedDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (attachedLinkedDocument.Status.Equals(SourceDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
                                             <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
                                         }
@@ -125,7 +125,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (databaseDocument.Status.Equals(LinkedDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (databaseDocument.Status.Equals(SourceDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
                                             <a href="@databaseDocument.ContentServiceUri" target="_blank">@databaseDocument.ParsedRsdraNumber</a>
                                         }

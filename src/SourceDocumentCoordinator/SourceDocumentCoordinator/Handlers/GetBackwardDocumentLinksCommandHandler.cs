@@ -108,7 +108,7 @@ namespace SourceDocumentCoordinator.Handlers
                     linkedDocument.SourceNature = documentAssessmentData.SourceName;
                     linkedDocument.Datum = documentAssessmentData.Datum;
                     linkedDocument.LinkType = DocumentLinkType.Backward.ToString();
-                    linkedDocument.Status = LinkedDocumentRetrievalStatus.NotAttached.ToString();
+                    linkedDocument.Status = SourceDocumentRetrievalStatus.NotAttached.ToString();
                     linkedDocument.Created = DateTime.Now;
 
                     if (isNew)
