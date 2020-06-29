@@ -319,6 +319,8 @@ namespace WorkflowCoordinator.Handlers
             childPrimaryDocumentStatus.Status = parentPrimarySourceData.Status;
             childPrimaryDocumentStatus.StartedAt = parentPrimarySourceData.StartedAt;
             childPrimaryDocumentStatus.ContentServiceId = parentPrimarySourceData.ContentServiceId;
+            childPrimaryDocumentStatus.Filename = parentPrimarySourceData.Filename;
+            childPrimaryDocumentStatus.Filepath = parentPrimarySourceData.Filepath;
 
             if (isNew)
             {
@@ -375,7 +377,6 @@ namespace WorkflowCoordinator.Handlers
                 childLinkedDocument.ContentServiceId = parentLinkedDocument.ContentServiceId;
                 childLinkedDocument.Status = parentLinkedDocument.Status;
                 childLinkedDocument.Created = parentLinkedDocument.Created;
-                childLinkedDocument.ContentServiceUri = parentLinkedDocument.ContentServiceUri;
                 childLinkedDocument.Filename = parentLinkedDocument.Filename;
                 childLinkedDocument.Filepath = parentLinkedDocument.Filepath;
 
@@ -433,7 +434,6 @@ namespace WorkflowCoordinator.Handlers
                 childDatabaseDocument.Status = parentDatabaseDocument.Status;
                 childDatabaseDocument.Created = parentDatabaseDocument.Created;
                 childDatabaseDocument.ContentServiceId = parentDatabaseDocument.ContentServiceId;
-                childDatabaseDocument.ContentServiceUri = parentDatabaseDocument.ContentServiceUri;
                 childDatabaseDocument.Filename = parentDatabaseDocument.Filename;
                 childDatabaseDocument.Filepath = parentDatabaseDocument.Filepath;
 
