@@ -83,6 +83,7 @@ namespace WorkflowCoordinator.Sagas
 
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, Data.SourceDocumentId, serialNumber, WorkflowStatus.Started);
             await UpdateDbAssessmentReviewTable(Data.ProcessId, workflowInstanceId);
+            await UpdatePrimaryDocumentStatus(Data.ProcessId, Data.SourceDocumentId, Data.CorrelationId, SourceDocumentRetrievalStatus.Started);
 
             _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");
             await context.SendLocal(new RetrieveAssessmentDataCommand
@@ -173,6 +174,27 @@ namespace WorkflowCoordinator.Sagas
 
             var newId = workflowInstance.WorkflowInstanceId;
             return newId;
+        }
+
+        private async Task UpdatePrimaryDocumentStatus(int processId, int sourceDocumentId, Guid correlationId, SourceDocumentRetrievalStatus status)
+        {
+            var existingInstance = await _dbContext.PrimaryDocumentStatus
+                                                                    .SingleOrDefaultAsync(r => r.ProcessId == processId
+                                                                                                                        && r.SdocId == sourceDocumentId);
+
+            if (existingInstance != null) return;
+
+            var primaryDocumentStatus = new PrimaryDocumentStatus()
+            {
+                CorrelationId = correlationId,
+                ProcessId = processId,
+                SdocId = sourceDocumentId,
+                Status = status.ToString(),
+                StartedAt = DateTime.Now
+            };
+
+            await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateDbAssessmentReviewTable(int processId, int workflowInstanceId)

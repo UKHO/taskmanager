@@ -28,7 +28,7 @@ namespace Common.Factories.DocumentStatusFactory
 
             if (row == null)
             {
-                throw new ApplicationException($"Could not find linked document row for SdocId: {sourceDocumentId}");
+                throw new ApplicationException($"Could not find linked document row for ProcessId {processId} and SdocId: {sourceDocumentId}");
             }
 
             // update

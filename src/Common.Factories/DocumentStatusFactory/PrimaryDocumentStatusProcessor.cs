@@ -29,19 +29,7 @@ namespace Common.Factories.DocumentStatusFactory
 
             if (row == null)
             {
-                // add
-                var primaryDocumentStatus = new PrimaryDocumentStatus
-                {
-                    CorrelationId = correlationId,
-                    ProcessId = processId,
-                    SdocId = sourceDocumentId,
-                    Status = status.ToString(),
-                    StartedAt = DateTime.Now
-                };
-
-                await _dbContext.PrimaryDocumentStatus.AddAsync(primaryDocumentStatus);
-                await _dbContext.SaveChangesAsync();
-                return primaryDocumentStatus.PrimaryDocumentStatusId;
+                throw new ApplicationException($"Could not find primary document row for ProcessId: {processId} and SdocId: {sourceDocumentId}");
             }
 
             // update

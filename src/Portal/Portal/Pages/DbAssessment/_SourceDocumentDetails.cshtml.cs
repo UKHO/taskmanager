@@ -199,7 +199,7 @@ namespace Portal.Pages.DbAssessment
                                                                     processId,
                                                                     linkedSdocId,
                                                                     SourceDocumentRetrievalStatus.Started,
-                                                                    SourceType.Linked, correlationId);
+                                                                    SourceType.Linked);
 
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
