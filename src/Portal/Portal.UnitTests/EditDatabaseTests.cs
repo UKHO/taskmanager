@@ -462,7 +462,7 @@ namespace Portal.UnitTests
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
                 ProcessId = ProcessId,
-                Status = LinkedDocumentRetrievalStatus.NotAttached.ToString()
+                Status = SourceDocumentRetrievalStatus.NotAttached.ToString()
             });
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
