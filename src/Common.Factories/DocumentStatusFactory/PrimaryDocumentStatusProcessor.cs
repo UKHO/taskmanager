@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Common.Factories.DocumentStatusFactory
 {
