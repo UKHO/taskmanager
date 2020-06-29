@@ -127,7 +127,7 @@ namespace NCNEWorkflowDatabase.Tests
             {
                 ProcessId = 99999,
                 Compiler = "Rajan",
-                Publisher = "Rajan",
+                HundredPercentCheck = "Rajan",
                 VerifierOne = "Rajan"
             });
 
@@ -160,7 +160,7 @@ namespace NCNEWorkflowDatabase.Tests
                     Compiler = "Hannah Kent",
                     VerifierOne = "Rajan",
                     VerifierTwo = "StoodleyM",
-                    Publisher = "StoodleyM"
+                    HundredPercentCheck = "StoodleyM"
 
                 }
             });
@@ -176,7 +176,7 @@ namespace NCNEWorkflowDatabase.Tests
                 Compiler = "Hannah Kent",
                 VerifierOne = "Rajan",
                 VerifierTwo = "StoodleyM",
-                Publisher = "StoodleyM"
+                HundredPercentCheck = "StoodleyM"
             });
 
 

@@ -108,7 +108,7 @@ namespace NCNEPortal.Pages
                             && (string.IsNullOrWhiteSpace(SearchParameters.Compiler) || t.TaskRole.Compiler.ToUpper().Contains(SearchParameters.Compiler.ToUpper()))
                             && (string.IsNullOrWhiteSpace(SearchParameters.VerifierOne) || t.TaskRole.VerifierOne.ToUpper().Contains(SearchParameters.VerifierOne.ToUpper()))
                             && (string.IsNullOrWhiteSpace(SearchParameters.VerifierTwo) || t.TaskRole.VerifierTwo.ToUpper().Contains(SearchParameters.VerifierTwo.ToUpper()))
-                            && (string.IsNullOrWhiteSpace(SearchParameters.Publisher) || t.TaskRole.Publisher.ToUpper().Contains(SearchParameters.Publisher.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.HundredPercentCheck) || t.TaskRole.HundredPercentCheck.ToUpper().Contains(SearchParameters.HundredPercentCheck.ToUpper()))
                             ))
                     .OrderByDescending(t => t.StatusChangeDate)
                     .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)

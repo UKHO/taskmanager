@@ -81,8 +81,8 @@
                             <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.VerifierTwo, new { @class = "form-control historicalTaskSearchField" })</div>
                         </div>
                         <div class="form-row d-flex justify-content-start">
-                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Publisher, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Publisher, new { @class = "form-control historicalTaskSearchField" })</div>
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.HundredPercentCheck, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.HundredPercentCheck, new { @class = "form-control historicalTaskSearchField" })</div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                     <th style="max-width: 4.0rem;">Compiler</th>
                     <th style="max-width: 4.0rem;">Verifier1</th>
                     <th style="max-width: 4.0rem;">Verifier2</th>
-                    <th style="max-width: 4.0rem;">Publisher</th>
+                    <th style="max-width: 4.0rem;">100% Check</th>
                     <th style="min-width: 3.9rem;">Status</th>
                     <th>Date Finished</th>
                 </tr>
@@ -163,7 +163,7 @@
                             @task.TaskRole.VerifierTwo
                         </td>
                         <td>
-                            @task.TaskRole.Publisher
+                            @task.TaskRole.HundredPercentCheck
                         </td>
 
                         <td>

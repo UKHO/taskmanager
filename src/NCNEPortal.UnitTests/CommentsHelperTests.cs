@@ -93,7 +93,7 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneCommentType.CompilerChange, "Valid User1", "Compiler role changed to ")]
         [TestCase(NcneCommentType.V1Change, "Valid User2", "V1 role changed to ")]
         [TestCase(NcneCommentType.V2Change, "Valid User3", "V2 role changed to ")]
-        [TestCase(NcneCommentType.PublisherChange, "Valid User4", "Publisher role changed to ")]
+        [TestCase(NcneCommentType.HundredPcChange, "Valid User4", "100% Check role changed to ")]
         [TestCase(NcneCommentType.DateChange, "", "Task Information dates changed")]
         [TestCase(NcneCommentType.ThreePsChange, "", "3PS Details changed")]
         public async Task Adding_System_Comments_for_Date_or_Role_or_3PS_change_adds_New_Comment(NcneCommentType changeType, string roleName, string commentText)

@@ -111,9 +111,9 @@ namespace NCNEPortal
 
 
 
-        [DisplayName("Publication")]
+        [DisplayName("100% Check")]
         [BindProperty]
-        public string Publisher { get; set; }
+        public string HundredPercentCheck { get; set; }
 
         [BindProperty] public bool SentTo3Ps { get; set; }
 
@@ -277,7 +277,7 @@ namespace NCNEPortal
             Compiler = taskInfo.TaskRole.Compiler;
             Verifier1 = taskInfo.TaskRole.VerifierOne;
             Verifier2 = taskInfo.TaskRole.VerifierTwo;
-            Publisher = taskInfo.TaskRole.Publisher;
+            HundredPercentCheck = taskInfo.TaskRole.HundredPercentCheck;
 
             TaskStages = taskInfo.TaskStage;
 
@@ -649,14 +649,14 @@ namespace NCNEPortal
 
             ValidationErrorMessages.Clear();
 
-            //ValidateUsers(Compiler, Verifier1, Verifier2, Publisher);
+
             var role = new TaskRole()
             {
                 Compiler = Compiler,
                 ProcessId = processId,
                 VerifierOne = Verifier1,
                 VerifierTwo = Verifier2,
-                Publisher = Publisher
+                HundredPercentCheck = HundredPercentCheck
             };
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
@@ -699,7 +699,7 @@ namespace NCNEPortal
 
             }
 
-            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, Publisher);
+            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, HundredPercentCheck);
 
             task.RepromatDate = RepromatDate;
 
@@ -729,7 +729,7 @@ namespace NCNEPortal
         }
 
         private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
-              string v1, string v2, string publisher)
+              string v1, string v2, string hundredPercentCheck)
         {
 
             _logger.LogInformation(
@@ -754,9 +754,9 @@ namespace NCNEPortal
             if (!string.IsNullOrEmpty(Verifier2) && task.TaskRole.VerifierTwo != v2)
                 await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, CurrentUser.DisplayName,
                     null, Verifier2, null);
-            if (!string.IsNullOrEmpty(Publisher) && task.TaskRole.Publisher != publisher)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.PublisherChange, processId, CurrentUser.DisplayName,
-                    null, Publisher, null);
+            if (!string.IsNullOrEmpty(hundredPercentCheck) && task.TaskRole.HundredPercentCheck != hundredPercentCheck)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.HundredPcChange, processId, CurrentUser.DisplayName,
+                    null, hundredPercentCheck, null);
 
             if ((task.ThreePs != SentTo3Ps) || (task.SentDate3Ps != SendDate3ps)
                                             || (task.ExpectedDate3Ps != ExpectedReturnDate3ps) ||
@@ -807,7 +807,7 @@ namespace NCNEPortal
             task.TaskRole.Compiler = Compiler;
             task.TaskRole.VerifierOne = Verifier1;
             task.TaskRole.VerifierTwo = Verifier2;
-            task.TaskRole.Publisher = Publisher;
+            task.TaskRole.HundredPercentCheck = HundredPercentCheck;
 
             foreach (var taskStage in task.TaskStage.Where
                 (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
@@ -820,9 +820,9 @@ namespace NCNEPortal
                     NcneTaskStageType.Compile => this.Compiler,
                     NcneTaskStageType.V1_Rework => this.Compiler,
                     NcneTaskStageType.V2_Rework => this.Compiler,
-                    NcneTaskStageType.V1 => this.Verifier1,
                     NcneTaskStageType.V2 => this.Verifier2,
-                    _ => this.Publisher
+                    NcneTaskStageType.Hundred_Percent_Check => HundredPercentCheck,
+                    _ => this.Verifier1
                 };
             }
         }
@@ -837,7 +837,7 @@ namespace NCNEPortal
             var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
                                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
             if (taskInProgress == null)
-                task.AssignedUser = task.TaskRole.Publisher;
+                task.AssignedUser = task.TaskRole.HundredPercentCheck;
             else
             {
                 task.AssignedUser = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
@@ -850,7 +850,7 @@ namespace NCNEPortal
                     NcneTaskStageType.V1_Rework => task.TaskRole.Compiler,
                     NcneTaskStageType.V2 => task.TaskRole.VerifierTwo,
                     NcneTaskStageType.V2_Rework => task.TaskRole.Compiler,
-                    _ => task.TaskRole.Publisher
+                    _ => task.TaskRole.HundredPercentCheck
                 };
             }
 

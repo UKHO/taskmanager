@@ -8,7 +8,7 @@
         CompilerChange,
         V1Change,
         V2Change,
-        PublisherChange,
+        HundredPcChange,
         CarisPublish,
         CompleteWorkflow,
         ThreePsChange

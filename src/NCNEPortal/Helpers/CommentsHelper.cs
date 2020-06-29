@@ -42,7 +42,7 @@ namespace NCNEPortal.Helpers
                 NcneCommentType.CompilerChange => "Compiler role changed to " + roleName,
                 NcneCommentType.V1Change => "V1 role changed to " + roleName,
                 NcneCommentType.V2Change => "V2 role changed to " + roleName,
-                NcneCommentType.PublisherChange => "Publisher role changed to " + roleName,
+                NcneCommentType.HundredPcChange => "100% Check role changed to " + roleName,
                 NcneCommentType.CarisPublish => "Chart published in CARIS",
                 NcneCommentType.CompleteWorkflow => "Workflow completed",
                 NcneCommentType.ThreePsChange => "3PS Details changed",
