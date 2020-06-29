@@ -21,8 +21,7 @@ namespace Common.Factories.DocumentStatusFactory
             throw new NotImplementedException();
         }
 
-        public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
-            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
+        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status)
         {
             var row = await _dbContext.PrimaryDocumentStatus
                 .SingleOrDefaultAsync(r => r.ProcessId == processId

@@ -14,7 +14,7 @@ namespace Common.Factories
             string sourceDocumentName = null, string sourceDocumentType = null)
         {
             var documentStatusProcessor = documentStatusFactory.GetDocumentStatusProcessor(sourceType);
-            return await documentStatusProcessor.Update(processId, sourceDocumentId, sourceDocumentName, sourceDocumentType, status, correlationId);
+            return await documentStatusProcessor.Update(processId, sourceDocumentId, status);
         }
 
         public static async Task<int> UpdateSourceDocumentFileLocation(IDocumentFileLocationFactory documentFileLocationFactory,
