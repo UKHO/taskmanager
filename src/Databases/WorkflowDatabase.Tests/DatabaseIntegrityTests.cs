@@ -298,7 +298,7 @@ namespace WorkflowDatabase.Tests
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
                 Created = DateTime.Now,
-                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
             });
 
             var ex = Assert.ThrowsAsync<DbUpdateException>(() => _dbContext.SaveChangesAsync());
@@ -328,7 +328,7 @@ namespace WorkflowDatabase.Tests
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
                 Created = DateTime.Now,
-                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -342,7 +342,7 @@ namespace WorkflowDatabase.Tests
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
                 Created = DateTime.Now,
-                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
             });
 
             var ex = Assert.ThrowsAsync<DbUpdateException>(() => _dbContext.SaveChangesAsync());
@@ -373,7 +373,7 @@ namespace WorkflowDatabase.Tests
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
                 Created = DateTime.Now,
-                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
             });
 
             await _dbContext.SaveChangesAsync();
@@ -387,7 +387,7 @@ namespace WorkflowDatabase.Tests
                 LinkedSdocId = 5678,
                 SourceDocumentName = "terstingf",
                 Created = DateTime.Now,
-                Status = LinkedDocumentRetrievalStatus.Started.ToString()
+                Status = SourceDocumentRetrievalStatus.Started.ToString()
             });
 
             Assert.DoesNotThrowAsync(() => _dbContext.SaveChangesAsync());

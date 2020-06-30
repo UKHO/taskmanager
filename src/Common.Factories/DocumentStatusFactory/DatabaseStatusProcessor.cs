@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Common.Factories.DocumentStatusFactory
 {
@@ -21,8 +20,7 @@ namespace Common.Factories.DocumentStatusFactory
             throw new NotImplementedException();
         }
 
-        public async Task<int> Update(int processId, int sourceDocumentId, string sourceDocumentName,
-            string sourceDocumentType, SourceDocumentRetrievalStatus status, Guid? correlationId = null)
+        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status)
         {
             var row = await _dbContext.DatabaseDocumentStatus
                 .SingleOrDefaultAsync(r => r.ProcessId == processId
@@ -30,20 +28,7 @@ namespace Common.Factories.DocumentStatusFactory
 
             if (row == null)
             {
-                // add
-                var databaseDocumentStatus = new DatabaseDocumentStatus
-                {
-                    ProcessId = processId,
-                    SdocId = sourceDocumentId,
-                    SourceDocumentName = sourceDocumentName,
-                    SourceDocumentType = sourceDocumentType,
-                    Status = status.ToString(),
-                    Created = DateTime.Now
-                };
-
-                await _dbContext.DatabaseDocumentStatus.AddAsync(databaseDocumentStatus);
-                await _dbContext.SaveChangesAsync();
-                return databaseDocumentStatus.DatabaseDocumentStatusId;
+                throw new ApplicationException($"Could not find database document row for ProcessId {processId} and SdocId: {sourceDocumentId}");
             }
 
             // update

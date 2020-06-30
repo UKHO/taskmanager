@@ -50,7 +50,7 @@ namespace WorkflowCoordinator.Handlers
 
             // We get the Process Id back...
             var processId = await _workflowServiceApiClient.CreateWorkflowInstance(dbAssessmentWorkflowId);
-            
+
             LogContext.PushProperty("ProcessId", processId);
 
             // Get the instance serial no
@@ -61,11 +61,11 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError("Failed to get K2 Task serial number for ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get K2 Task serial number for ProcessId {processId}");
             }
-            
+
             LogContext.PushProperty("SerialNumber", serialNumber);
 
             _logger.LogInformation("Successfully created K2 task with ProcessId: {ProcessId} and SerialNumber: {SerialNumber} as a Child workflow to ParentProcessId: {ParentProcessId}");
-            
+
             // Progress this new instance onto Assess
             await _workflowServiceApiClient.ProgressWorkflowInstance(serialNumber);
 
@@ -100,13 +100,16 @@ namespace WorkflowCoordinator.Handlers
             LogContext.PushProperty("AssignedTaskId", message.AssignedTaskId);
 
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
-            
+
             // Get the parent's data... 
             var parentWorkflowInstanceData =
                 await _dbContext.WorkflowInstance
                     .Include(w => w.DbAssessmentReviewData)
                     .Include(w => w.AssessmentData)
                     .Include(w => w.PrimaryDocumentStatus)
+                    .Include(w => w.LinkedDocument)
+                    .Include(w => w.DatabaseDocumentStatus)
+                    .AsNoTracking()
                     .FirstAsync(w => w.ProcessId == message.ParentProcessId);
 
             if (parentWorkflowInstanceData == null)
@@ -114,9 +117,11 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError("Failed to get parent data from WorkflowInstance with ParentProcessId {ParentProcessId} for ChildProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get parent data from WorkflowInstance with ParentProcessId {message.ParentProcessId} for ChildProcessId {message.ChildProcessId}");
             }
-            
+
             var additionalAssignedTaskData =
-                await _dbContext.DbAssessmentAssignTask.FirstAsync(d => d.DbAssessmentAssignTaskId == message.AssignedTaskId);
+                await _dbContext.DbAssessmentAssignTask
+                                    .AsNoTracking()
+                                    .FirstAsync(d => d.DbAssessmentAssignTaskId == message.AssignedTaskId);
 
             var newSn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(message.ChildProcessId);
 
@@ -132,11 +137,21 @@ namespace WorkflowCoordinator.Handlers
             var newWorkflowInstance = await PersistChildWorkflowInstance(message, parentWorkflowInstanceData, newSn);
 
             await PersistAssessmentDataFromParent(message.ChildProcessId, parentWorkflowInstanceData.AssessmentData);
+
             await PersistPrimaryDocumentFromParent(
                                                     message.ChildProcessId,
                                                     message.CorrelationId,
                                                     parentWorkflowInstanceData.AssessmentData.PrimarySdocId,
                                                     parentWorkflowInstanceData.PrimaryDocumentStatus);
+
+            await PersistLinkedDocumentFromParent(
+                                                    message.ChildProcessId,
+                                                    parentWorkflowInstanceData.AssessmentData.PrimarySdocId,
+                                                    parentWorkflowInstanceData.LinkedDocument);
+
+            await PersistDatabaseDocumentFromParent(
+                                                    message.ChildProcessId,
+                                                    parentWorkflowInstanceData.DatabaseDocumentStatus);
 
             await _dbContext.SaveChangesAsync();
 
@@ -242,7 +257,7 @@ namespace WorkflowCoordinator.Handlers
                 _logger.LogError("Failed to get parent data from DbAssessmentAssignTask with ParentProcessId {ParentProcessId} for ChildProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get parent data from DbAssessmentAssignTask for ChildProcessId {childProcessId}");
             }
-            
+
             var childAssessData =
                 await _dbContext.DbAssessmentAssessData.FirstOrDefaultAsync(a => a.ProcessId == childProcessId);
 
@@ -304,6 +319,8 @@ namespace WorkflowCoordinator.Handlers
             childPrimaryDocumentStatus.Status = parentPrimarySourceData.Status;
             childPrimaryDocumentStatus.StartedAt = parentPrimarySourceData.StartedAt;
             childPrimaryDocumentStatus.ContentServiceId = parentPrimarySourceData.ContentServiceId;
+            childPrimaryDocumentStatus.Filename = parentPrimarySourceData.Filename;
+            childPrimaryDocumentStatus.Filepath = parentPrimarySourceData.Filepath;
 
             if (isNew)
             {
@@ -314,7 +331,124 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistAssessmentDataFromParent(int childProcessId, AssessmentData parentAssessmentData)
+        private async Task PersistLinkedDocumentFromParent(
+                                                        int childProcessId,
+                                                        int primarySdocId,
+                                                        IReadOnlyCollection<LinkedDocument> parentLinkedDocumentsData)
+        {
+            _logger.LogInformation("Entering PersistLinkedDocumentFromParent method with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+            if (parentLinkedDocumentsData == null || parentLinkedDocumentsData.Count == 0)
+            {
+                _logger.LogInformation("Child, with ProcessId {ProcessId}, LinkedDocument table was not updated as parent, with ProcessId {ParentProcessId}, did not have linked document");
+                return;
+            }
+
+            LogContext.PushProperty("ParentLinkedDocumentCount", parentLinkedDocumentsData.Count);
+
+            _logger.LogInformation("Starting to update child LinkedDocument table with {ParentLinkedDocumentCount} records" +
+                                            " from parent with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+            foreach (var parentLinkedDocument in parentLinkedDocumentsData)
+            {
+
+                var childLinkedDocument =
+                    await _dbContext.LinkedDocument.SingleOrDefaultAsync(p => 
+                                                                p.LinkedSdocId == parentLinkedDocument.LinkedSdocId
+                                                                && p.ProcessId == childProcessId);
+
+                var isNew = childLinkedDocument == null;
+
+                if (isNew)
+                {
+                    childLinkedDocument = new LinkedDocument();
+                }
+
+                childLinkedDocument.ProcessId = childProcessId;
+                childLinkedDocument.PrimarySdocId = primarySdocId;
+                childLinkedDocument.LinkedSdocId = parentLinkedDocument.LinkedSdocId;
+                childLinkedDocument.LinkType = parentLinkedDocument.LinkType;
+                childLinkedDocument.RsdraNumber = parentLinkedDocument.RsdraNumber;
+                childLinkedDocument.SourceDocumentName = parentLinkedDocument.SourceDocumentName;
+                childLinkedDocument.ReceiptDate = parentLinkedDocument.ReceiptDate;
+                childLinkedDocument.SourceDocumentType = parentLinkedDocument.SourceDocumentType;
+                childLinkedDocument.SourceNature = parentLinkedDocument.SourceNature;
+                childLinkedDocument.Datum = parentLinkedDocument.Datum;
+                childLinkedDocument.ContentServiceId = parentLinkedDocument.ContentServiceId;
+                childLinkedDocument.Status = parentLinkedDocument.Status;
+                childLinkedDocument.Created = parentLinkedDocument.Created;
+                childLinkedDocument.Filename = parentLinkedDocument.Filename;
+                childLinkedDocument.Filepath = parentLinkedDocument.Filepath;
+
+                if (isNew)
+                {
+                    await _dbContext.LinkedDocument.AddAsync(childLinkedDocument);
+                }
+            }
+
+            _logger.LogInformation("Successfully updated child LinkedDocument table with {ParentLinkedDocumentCount} records" +
+                                                " from parent with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+        }
+
+        private async Task PersistDatabaseDocumentFromParent(
+                                                        int childProcessId,
+                                                        IReadOnlyCollection<DatabaseDocumentStatus> parentDatabaseDocumentsData)
+        {
+            _logger.LogInformation("Entering PersistDatabaseDocumentFromParent method with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+            if (parentDatabaseDocumentsData == null || parentDatabaseDocumentsData.Count == 0)
+            {
+                _logger.LogInformation("Child, with ProcessId {ProcessId}, DatabaseDocumentStatus table was not updated as parent, with ProcessId {ParentProcessId}, did not have documents from SDRA");
+                return;
+            }
+
+            LogContext.PushProperty("ParentDatabaseDocumentStatusCount", parentDatabaseDocumentsData.Count);
+
+            _logger.LogInformation("Starting to update child DatabaseDocumentStatus table with {ParentDatabaseDocumentStatusCount} records" +
+                                            " from parent with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+            foreach (var parentDatabaseDocument in parentDatabaseDocumentsData)
+            {
+
+                var childDatabaseDocument =
+                    await _dbContext.DatabaseDocumentStatus.SingleOrDefaultAsync(p =>
+                                                                p.SdocId == parentDatabaseDocument.SdocId
+                                                                && p.ProcessId == childProcessId);
+
+                var isNew = childDatabaseDocument == null;
+
+                if (isNew)
+                {
+                    childDatabaseDocument = new DatabaseDocumentStatus();
+                }
+
+                childDatabaseDocument.ProcessId = childProcessId;
+                childDatabaseDocument.SdocId = parentDatabaseDocument.SdocId;
+                childDatabaseDocument.SourceDocumentName = parentDatabaseDocument.SourceDocumentName;
+                childDatabaseDocument.SourceDocumentType = parentDatabaseDocument.SourceDocumentType;
+                childDatabaseDocument.RsdraNumber = parentDatabaseDocument.RsdraNumber;
+                childDatabaseDocument.ReceiptDate = parentDatabaseDocument.ReceiptDate;
+                childDatabaseDocument.SourceNature = parentDatabaseDocument.SourceNature;
+                childDatabaseDocument.Datum = parentDatabaseDocument.Datum;
+                childDatabaseDocument.Status = parentDatabaseDocument.Status;
+                childDatabaseDocument.Created = parentDatabaseDocument.Created;
+                childDatabaseDocument.ContentServiceId = parentDatabaseDocument.ContentServiceId;
+                childDatabaseDocument.Filename = parentDatabaseDocument.Filename;
+                childDatabaseDocument.Filepath = parentDatabaseDocument.Filepath;
+
+                if (isNew)
+                {
+                    await _dbContext.DatabaseDocumentStatus.AddAsync(childDatabaseDocument);
+                }
+            }
+
+            _logger.LogInformation("Successfully updated child DatabaseDocumentStatus table with {ParentDatabaseDocumentStatusCount} records" +
+                                                " from parent with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
+
+    }
+
+    private async Task PersistAssessmentDataFromParent(int childProcessId, AssessmentData parentAssessmentData)
         {
             _logger.LogInformation("Entering PersistAssessmentDataFromParent method with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
 

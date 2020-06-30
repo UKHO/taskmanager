@@ -68,7 +68,7 @@ namespace SourceDocumentCoordinator.Handlers
                                                                     message.ProcessId,
                                                                     message.SourceDocumentId,
                                                                     SourceDocumentRetrievalStatus.FileGenerated,
-                                                                    message.SourceType, message.CorrelationId);
+                                                                    message.SourceType);
             
             await SourceDocumentHelper.UpdateSourceDocumentFileLocation(
                                                                         _documentFileLocationFactory,
