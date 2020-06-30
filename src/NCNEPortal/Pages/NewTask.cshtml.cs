@@ -92,8 +92,8 @@ namespace NCNEPortal
 
 
         [BindProperty]
-        [DisplayName("Publication")]
-        public string Publisher { get; set; }
+        [DisplayName("100% Check")]
+        public string HundredPercentCheck { get; set; }
 
 
         public List<string> ValidationErrorMessages { get; set; }
@@ -155,13 +155,12 @@ namespace NCNEPortal
                 ValidationErrorMessages.Clear();
 
 
-                //ValidateUsers(Compiler, Verifier1, Verifier2, Publisher);
                 var role = new TaskRole()
                 {
                     Compiler = Compiler,
                     VerifierOne = Verifier1,
                     VerifierTwo = Verifier2,
-                    Publisher = Publisher
+                    HundredPercentCheck = HundredPercentCheck
                 };
 
                 if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
@@ -221,7 +220,7 @@ namespace NCNEPortal
                     Compiler = this.Compiler,
                     VerifierOne = this.Verifier1,
                     VerifierTwo = this.Verifier2,
-                    Publisher = this.Publisher
+                    HundredPercentCheck = this.HundredPercentCheck
                 }
 
             });
@@ -286,9 +285,9 @@ namespace NCNEPortal
                     NcneTaskStageType.Compile => this.Compiler,
                     NcneTaskStageType.V1_Rework => this.Compiler,
                     NcneTaskStageType.V2_Rework => this.Compiler,
-                    NcneTaskStageType.V1 => this.Verifier1,
                     NcneTaskStageType.V2 => this.Verifier2,
-                    _ => this.Publisher
+                    NcneTaskStageType.Hundred_Percent_Check => HundredPercentCheck,
+                    _ => this.Verifier1
                 };
 
 

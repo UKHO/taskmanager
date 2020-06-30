@@ -363,7 +363,7 @@ namespace NCNEPortal.UnitTests
                     Compiler = "Peter Bates",
                     VerifierOne = "Matthew Stoodley",
                     VerifierTwo = "Gareth Evans",
-                    Publisher = "Greg Williams"
+                    HundredPercentCheck = "Greg Williams"
                 }
             };
 
@@ -382,7 +382,7 @@ namespace NCNEPortal.UnitTests
                     Compiler = "Peter Bates",
                     VerifierOne = "Matthew Stoodley",
                     VerifierTwo = "Gareth Evans",
-                    Publisher = "Greg Williams"
+                    HundredPercentCheck = "Greg Williams"
                 }
             };
 
@@ -403,7 +403,7 @@ namespace NCNEPortal.UnitTests
                     {
                         Compiler = "Rajan Shunmuga",
                         VerifierOne = "Rossall Sandford",
-                        Publisher = "Samir Hassoun"
+                        HundredPercentCheck = "Samir Hassoun"
                     }
                 },
                 terminatedTask2,
@@ -420,7 +420,7 @@ namespace NCNEPortal.UnitTests
                     TaskRole = new TaskRole()
                     {   Compiler = "Rajan Shunmuga",
                         VerifierOne = "Rossall Sandford",
-                        Publisher = "Samir Hassoun"
+                        HundredPercentCheck = "Samir Hassoun"
                     }
                 }
 
@@ -433,7 +433,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Pet",
                 VerifierOne = "Matt",
                 VerifierTwo = "G",
-                Publisher = "Greg"
+                HundredPercentCheck = "Greg"
 
             };
 

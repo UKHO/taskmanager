@@ -12,6 +12,6 @@ namespace NCNEWorkflowDatabase.EF.Models
         public string Compiler { get; set; }
         public string VerifierOne { get; set; }
         public string VerifierTwo { get; set; }
-        public string Publisher { get; set; }
+        public string HundredPercentCheck { get; set; }
     }
 }

@@ -117,10 +117,10 @@
         }
     });
 
-    $("#Publisher").on('focus',function() {
+    $("#100pCheck").on('focus',function() {
         if ($(this).val === "") {
-            $('.ta_publisher').typeahead('val', "");
-            $('.ta_publisher').typeahead('close');
+            $('.ta_100pCheck').typeahead('val', "");
+            $('.ta_100pCheck').typeahead('close');
         }
     });
 
@@ -171,7 +171,7 @@
             });
 
         // Initializing the typeahead
-        $('.ta_compiler').add('.ta_v1').add('.ta_v2').add('.ta_publisher').typeahead({
+        $('.ta_compiler').add('.ta_v1').add('.ta_v2').add('.ta_100pCheck').typeahead({
                 hint: true,
                 highlight: true, /* Enable substring highlighting */
                 minLength: 3 /* Specify minimum characters required for showing result */

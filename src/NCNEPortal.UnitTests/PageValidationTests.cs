@@ -1,9 +1,7 @@
 ﻿using FakeItEasy;
-using Microsoft.EntityFrameworkCore;
 using NCNEPortal.Auth;
 using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
-using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NUnit.Framework;
 using System;
@@ -116,7 +114,7 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public void Validation_for_ValidateNewTaskPage_invalid_V1_V2_Publisher_fails()
+        public void Validation_for_ValidateNewTaskPage_invalid_V1_V2_100pCheck_fails()
         {
             var validationErrorMessages = new List<string>();
 
@@ -129,7 +127,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "InValid User",
                 VerifierTwo = "InValid User",
-                Publisher = "InValid User"
+                HundredPercentCheck = "InValid User"
             };
 
             var result =
@@ -139,7 +137,7 @@ namespace NCNEPortal.UnitTests
             Assert.AreEqual(validationErrorMessages.Count, 3);
             CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier1 role to unknown user InValid User");
             CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier2 role to unknown user InValid User");
-            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Publisher role to unknown user InValid User");
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign 100% Check role to unknown user InValid User");
         }
 
         [Test]
@@ -180,7 +178,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             var result =
@@ -205,7 +203,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? nulldate = null;
@@ -238,7 +236,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? nulldate = null;
@@ -273,7 +271,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? invalidDate = null;
@@ -308,7 +306,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? invalidDate = null;
@@ -343,7 +341,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? invalidDate = null;
@@ -376,7 +374,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? invalidDate = null;
@@ -407,7 +405,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? publicationDate = null;
@@ -437,7 +435,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User1",
                 VerifierOne = "Valid User2",
                 VerifierTwo = "Valid User1",
-                Publisher = "Valid User2"
+                HundredPercentCheck = "Valid User2"
             };
 
             DateTime? publicationDate = null;
@@ -538,26 +536,7 @@ namespace NCNEPortal.UnitTests
 
         }
         [Test]
-        public void Validation_for_ValidateForCompletion_fails_for_V1_step_if_V2_and_Publisher_not_assigned()
-        {
-            var validationErrorMessages = new List<string>();
-
-            var role = new TaskRole()
-            {
-                Compiler = "Valid User",
-                VerifierOne = "Valid User"
-            };
-
-            var result =
-                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.V1, role, validationErrorMessages);
-
-            Assert.IsFalse(result);
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to either V2 role or Publisher role before completing this stage");
-
-        }
-
-        [Test]
-        public void Validation_for_ValidateForCompletion_fails_for_V2_step_if_Publisher_not_assigned()
+        public void Validation_for_ValidateForCompletion_fails_for_FinalUpdate_step_if_100pCheck_not_assigned()
         {
             var validationErrorMessages = new List<string>();
 
@@ -569,10 +548,30 @@ namespace NCNEPortal.UnitTests
             };
 
             var result =
-                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.V2, role, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Final_Updating, role, validationErrorMessages);
 
             Assert.IsFalse(result);
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to Publisher role before completing this stage");
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to 100% Check role before completing this stage");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_100pCheck_step_if_V1_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            {
+                Compiler = "Valid User",
+                VerifierTwo = "Valid User",
+                HundredPercentCheck = "Valid User"
+            };
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Hundred_Percent_Check, role, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
 
         }
 
@@ -589,7 +588,7 @@ namespace NCNEPortal.UnitTests
                 Compiler = "Valid User",
                 VerifierOne = "Valid User",
                 VerifierTwo = "Valid User",
-                Publisher = "Valid User"
+                HundredPercentCheck = "Valid User"
             };
 
             var result = _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", currentStage, role,
@@ -616,8 +615,8 @@ namespace NCNEPortal.UnitTests
 
         }
 
-        [TestCase("", "Valid User1", "Please assign a user to the publisher role before completing the workflow")]
-        [TestCase("Valid User2", "Valid User1", "Only users assigned to the publisher role are allowed to complete the workflow.")]
+        [TestCase("", "Valid User1", "Please assign a user to the V1 role before completing the workflow")]
+        [TestCase("Valid User2", "Valid User1", "Only users assigned to the V1 role are allowed to complete the workflow.")]
         public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
         {
             var validationErrorMessages = new List<string>();

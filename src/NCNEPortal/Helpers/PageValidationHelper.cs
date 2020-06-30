@@ -88,18 +88,17 @@ namespace NCNEPortal.Helpers
                     isValid = false;
                 }
 
-                if (stageType == NcneTaskStageType.V1 && string.IsNullOrEmpty(role.VerifierTwo) && string.IsNullOrEmpty(role.Publisher))
+                if (stageType == NcneTaskStageType.Final_Updating && string.IsNullOrEmpty(role.HundredPercentCheck))
                 {
-                    validationErrorMessages.Add("Please assign a user to either V2 role or Publisher role before completing this stage");
+                    validationErrorMessages.Add("Please assign a user to 100% Check role before completing this stage");
                     isValid = false;
                 }
 
-                if (stageType == NcneTaskStageType.V2 && string.IsNullOrEmpty(role.Publisher))
+                if (stageType == NcneTaskStageType.Hundred_Percent_Check && string.IsNullOrEmpty(role.VerifierOne))
                 {
-                    validationErrorMessages.Add("Please assign a user to Publisher role before completing this stage");
+                    validationErrorMessages.Add("Please assign a user to V1 role before completing this stage");
                     isValid = false;
                 }
-
             }
 
             return isValid;
@@ -138,7 +137,7 @@ namespace NCNEPortal.Helpers
 
             if (string.IsNullOrEmpty(assignedUser))
             {
-                validationErrorMessages.Add("Please assign a user to the publisher role before completing the workflow");
+                validationErrorMessages.Add("Please assign a user to the V1 role before completing the workflow");
                 isValid = false;
 
             }
@@ -146,7 +145,7 @@ namespace NCNEPortal.Helpers
             {
                 if ((assignedUser != username))
                 {
-                    validationErrorMessages.Add("Only users assigned to the publisher role are allowed to complete the workflow.");
+                    validationErrorMessages.Add("Only users assigned to the V1 role are allowed to complete the workflow.");
                     isValid = false;
                 }
             }
@@ -277,11 +276,11 @@ namespace NCNEPortal.Helpers
                 }
             }
 
-            if (!string.IsNullOrEmpty(taskRole.Publisher))
+            if (!string.IsNullOrEmpty(taskRole.HundredPercentCheck))
             {
-                if (userList.All(a => a != taskRole.Publisher))
+                if (userList.All(a => a != taskRole.HundredPercentCheck))
                 {
-                    validationErrorMessages.Add($"Task Information: Unable to assign Publisher role to unknown user {taskRole.Publisher}");
+                    validationErrorMessages.Add($"Task Information: Unable to assign 100% Check role to unknown user {taskRole.HundredPercentCheck}");
                     isValid = false;
                 }
             }

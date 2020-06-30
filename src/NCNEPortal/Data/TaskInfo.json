@@ -25,7 +25,7 @@
       "compiler": "Amanda Bowery",
       "verifierOne": "StoodleyM",
       "verifierTwo": "StoodleyM",
-      "publisher": "StoodleyM"
+      "HundredPercentCheck": "StoodleyM"
     },
     "TaskNote": {
       "Text": "Important note on first task",
@@ -185,7 +185,7 @@
       "compiler": "StoodleyM",
       "verifierOne": "Andrew Slater",
       "verifierTwo": "StoodleyM",
-      "publisher": "StoodleyM"
+      "HundredPercentCheck": "StoodleyM"
     },
 
     "TaskStage": [
@@ -320,7 +320,7 @@
       "compiler": "Kate Rabey",
       "verifierOne": "StoodleyM",
       "verifierTwo": "James Gates",
-      "publisher": "StoodleyM"
+      "HundredPercentCheck": "StoodleyM"
     },
 
     "TaskStage": [
@@ -455,7 +455,7 @@
       "compiler": "Hannah Kent",
       "verifierOne": "StoodleyM",
       "verifierTwo": "StoodleyM",
-      "publisher": "StoodleyM"
+      "HundredPercentCheck": "StoodleyM"
     },
 
     "TaskStage": [
@@ -591,7 +591,7 @@
       "compiler": "StoodleyM",
       "verifierOne": "StoodleyM",
       "verifierTwo": null,
-      "publisher": "Ralph Dyson"
+      "HundredPercentCheck": "Ralph Dyson"
     },
 
     "TaskStage": [

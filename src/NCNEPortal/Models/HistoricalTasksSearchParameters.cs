@@ -21,7 +21,7 @@ namespace NCNEPortal.Models
 
         [DisplayName("Verifier 2")] public string VerifierTwo { get; set; }
 
-        [DisplayName("Publisher")] public string Publisher { get; set; }
+        [DisplayName("100% Check")] public string HundredPercentCheck { get; set; }
 
     }
 }
