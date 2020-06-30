@@ -16,7 +16,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.UnitTests
 {
-    public class StartWorkflowInstanceEventHandlerTests
+    public class StartChildWorkflowInstanceCommandHandlerTests
     {
 
         private StartChildWorkflowInstanceCommandHandler _handler;
