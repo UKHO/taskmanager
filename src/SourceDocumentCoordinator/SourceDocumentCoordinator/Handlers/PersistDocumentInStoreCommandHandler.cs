@@ -85,6 +85,7 @@ namespace SourceDocumentCoordinator.Handlers
                 primaryDocument.ContentServiceId = newGuid;
                 primaryDocument.Filename = Path.GetFileName(message.Filepath)?.Trim();
                 primaryDocument.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
+                primaryDocument.Status = SourceDocumentRetrievalStatus.FileGenerated.ToString();
             }
         }
 
@@ -104,6 +105,7 @@ namespace SourceDocumentCoordinator.Handlers
                 linkedDocument.ContentServiceId = newGuid;
                 linkedDocument.Filename = Path.GetFileName(message.Filepath)?.Trim();
                 linkedDocument.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
+                linkedDocument.Status = SourceDocumentRetrievalStatus.FileGenerated.ToString();
             }
         }
 
@@ -122,6 +124,7 @@ namespace SourceDocumentCoordinator.Handlers
                 databaseDocumentStatus.ContentServiceId = newGuid;
                 databaseDocumentStatus.Filename = Path.GetFileName(message.Filepath)?.Trim();
                 databaseDocumentStatus.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
+                databaseDocumentStatus.Status = SourceDocumentRetrievalStatus.FileGenerated.ToString();
             }
         }
     }
