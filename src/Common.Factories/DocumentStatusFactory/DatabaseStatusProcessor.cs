@@ -15,11 +15,6 @@ namespace Common.Factories.DocumentStatusFactory
             this._dbContext = dbContext;
         }
 
-        private int Add()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status)
         {
             var row = await _dbContext.DatabaseDocumentStatus
