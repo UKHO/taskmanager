@@ -16,7 +16,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace WorkflowCoordinator.UnitTests
 {
-    public class StartWorkflowInstanceEventHandlerTests
+    public class StartChildWorkflowInstanceCommandHandlerTests
     {
 
         private StartChildWorkflowInstanceCommandHandler _handler;
@@ -124,6 +124,7 @@ namespace WorkflowCoordinator.UnitTests
             var childSerialNumber = "456_14";
             var assignedTaskId = 1;
             var primarySdocId = 1888403;
+            var linkedDocumentSdocId = 11223344;
 
             var parentWorkflowinstanceData = new WorkflowInstance()
             {
@@ -176,7 +177,6 @@ namespace WorkflowCoordinator.UnitTests
 
             var parentPrimarydocument = new PrimaryDocumentStatus()
             {
-                //PrimaryDocumentStatusId = 1,
                 ContentServiceId = Guid.NewGuid(),
                 CorrelationId = Guid.NewGuid(),
                 ProcessId = parentProcessId,
@@ -186,7 +186,31 @@ namespace WorkflowCoordinator.UnitTests
             };
             await _dbContext.PrimaryDocumentStatus.AddAsync(parentPrimarydocument);
 
+            var parentLinkedDocument = new LinkedDocument()
+            {
+                ContentServiceId = Guid.NewGuid(),
+                ProcessId = parentProcessId,
+                LinkedSdocId = linkedDocumentSdocId,
+                PrimarySdocId = primarySdocId,
+                LinkType = DocumentLinkType.Forward.ToString(),
+                Created = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+            };
+            await _dbContext.LinkedDocument.AddAsync(parentLinkedDocument);
+
+            var parentDatabaseDocumentStatus = new DatabaseDocumentStatus()
+            {
+                ContentServiceId = Guid.NewGuid(),
+                ProcessId = parentProcessId,
+                SdocId = linkedDocumentSdocId,
+                Created = DateTime.Today,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+            };
+            await _dbContext.DatabaseDocumentStatus.AddAsync(parentDatabaseDocumentStatus);
+
             await _dbContext.SaveChangesAsync();
+
+
 
             A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(childProcessId))
                 .Returns(childSerialNumber);
@@ -219,6 +243,22 @@ namespace WorkflowCoordinator.UnitTests
             Assert.IsNotNull(childPrimaryDocumentStatus);
             Assert.AreEqual(parentPrimarydocument.ContentServiceId, childPrimaryDocumentStatus.ContentServiceId);
             Assert.AreEqual(parentPrimarydocument.SdocId, childPrimaryDocumentStatus.SdocId);
+
+            // Assert LinkedDocument
+            var childLinkedDocument =
+                await _dbContext.LinkedDocument.SingleOrDefaultAsync(ad => ad.ProcessId == childProcessId);
+
+            Assert.IsNotNull(childLinkedDocument);
+            Assert.AreEqual(parentLinkedDocument.ContentServiceId, childLinkedDocument.ContentServiceId);
+            Assert.AreEqual(parentLinkedDocument.LinkedSdocId, childLinkedDocument.LinkedSdocId);
+
+            // Assert DatabaseDocumentStatus
+            var childDatabaseDocumentStatus =
+                await _dbContext.DatabaseDocumentStatus.SingleOrDefaultAsync(ad => ad.ProcessId == childProcessId);
+
+            Assert.IsNotNull(childDatabaseDocumentStatus);
+            Assert.AreEqual(parentDatabaseDocumentStatus.ContentServiceId, childDatabaseDocumentStatus.ContentServiceId);
+            Assert.AreEqual(parentDatabaseDocumentStatus.SdocId, childDatabaseDocumentStatus.SdocId);
 
             // Assert Parent Review and AssignedTasks persisted into child Assess data
             var childDbAssessmentAssessData =

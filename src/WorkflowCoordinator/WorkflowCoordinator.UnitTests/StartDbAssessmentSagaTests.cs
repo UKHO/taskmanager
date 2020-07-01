@@ -75,7 +75,7 @@ namespace WorkflowCoordinator.UnitTests
             var sourceDocumentId = 99;
 
             //When
-            A.CallTo(()=> _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns("1234");
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns("1234");
             await _saga.Handle(new StartDbAssessmentCommand
             {
                 CorrelationId = correlationId,
@@ -161,7 +161,7 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_StartDbAssessmentCommand_Sends_1_Messages()
         {
             //Given
-            
+
             //When
             await _saga.Handle(A.Dummy<StartDbAssessmentCommand>(), _handlerContext);
 
@@ -173,7 +173,7 @@ namespace WorkflowCoordinator.UnitTests
         public async Task Test_StartDbAssessmentCommand_Publishes_1_Messages()
         {
             //Given
-            
+
             //When
             await _saga.Handle(A.Dummy<StartDbAssessmentCommand>(), _handlerContext);
 
@@ -204,7 +204,7 @@ namespace WorkflowCoordinator.UnitTests
                 }));
 
             A.CallTo(() => _fakeMapper.Map<DocumentAssessmentData, AssessmentData>(A<DocumentAssessmentData>.Ignored))
-                .Returns(new AssessmentData() {PrimarySdocId = sourceDocumentId} );
+                .Returns(new AssessmentData() { PrimarySdocId = sourceDocumentId });
 
             //Act
             await _saga.Handle(retrieveAssessmentDataCommand, _handlerContext);
@@ -240,7 +240,7 @@ namespace WorkflowCoordinator.UnitTests
                 }));
 
             A.CallTo(() => _fakeMapper.Map<DocumentAssessmentData, AssessmentData>(A<DocumentAssessmentData>.Ignored))
-                .Returns(new AssessmentData() {PrimarySdocId = sourceDocumentId} );
+                .Returns(new AssessmentData() { PrimarySdocId = sourceDocumentId });
 
             //Act
             await _saga.Handle(retrieveAssessmentDataCommand, _handlerContext);
@@ -276,6 +276,38 @@ namespace WorkflowCoordinator.UnitTests
 
             Assert.IsNotNull(workflowInstance);
             Assert.AreEqual(DateTime.Today, workflowInstance.ActivityChangedAt);
+
+        }
+
+        [Test]
+        public async Task Test_StartDbAssessmentCommand_When_Creating_New_workflowInstance_then_data_is_saved_to_DB()
+        {
+            //Given
+            var correlationId = Guid.NewGuid();
+            var sourceDocumentId = 99;
+            var processId = 1234;
+            var k2WorkflowinstanceId = 8;
+            var k2SerialNumber = "1234_14";
+
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetDBAssessmentWorkflowId()).Returns(k2WorkflowinstanceId);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.CreateWorkflowInstance(k2WorkflowinstanceId)).Returns(processId);
+            A.CallTo(() => _fakeWorkflowServiceApiClient.GetWorkflowInstanceSerialNumber(A<int>.Ignored)).Returns(k2SerialNumber);
+
+            //When
+            await _saga.Handle(new StartDbAssessmentCommand
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = sourceDocumentId
+            }, _handlerContext);
+
+            // Assert
+            var workflowInstance = _dbContext.WorkflowInstance.SingleOrDefault(w => w.ProcessId == processId);
+            var reviewData = _dbContext.DbAssessmentReviewData.SingleOrDefault(w => w.ProcessId == processId);
+            var primaryDocumentStatus = _dbContext.PrimaryDocumentStatus.SingleOrDefault(w => w.ProcessId == processId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.IsNotNull(reviewData);
+            Assert.IsNotNull(primaryDocumentStatus);
 
         }
     }
