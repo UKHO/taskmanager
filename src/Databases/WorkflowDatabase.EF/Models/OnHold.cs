@@ -9,7 +9,8 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public DateTime OnHoldTime { get; set; }
         public DateTime? OffHoldTime { get; set; }
-        public AdUser OnHoldBy { get; set; }
-        public AdUser OffHoldBy { get; set; }
+
+        public virtual AdUser OnHoldBy { get; set; }
+        public virtual AdUser OffHoldBy { get; set; }
     }
 }
