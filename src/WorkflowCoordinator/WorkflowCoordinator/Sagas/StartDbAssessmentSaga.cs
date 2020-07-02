@@ -139,13 +139,13 @@ namespace WorkflowCoordinator.Sagas
 
             // TODO: Exception triggered due to Created and Username not being populated
             mappedComments.Created = DateTime.Now;
-            mappedComments.Username = string.Empty;
+            mappedComments.AdUser = null;
 
             _dbContext.AssessmentData.Add(mappedAssessmentData);
 
             if (mappedComments.Text != null)
             {
-                _dbContext.Comment.Add(mappedComments);
+                _dbContext.Comments.Add(mappedComments);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -168,7 +168,7 @@ namespace WorkflowCoordinator.Sagas
                 Status = status.ToString(),
                 StartedAt = DateTime.Now,
                 ActivityChangedAt = DateTime.Today
-        };
+            };
 
             await _dbContext.WorkflowInstance.AddAsync(workflowInstance);
             await _dbContext.SaveChangesAsync();

@@ -24,7 +24,7 @@ namespace WorkflowCoordinator.Handlers
 
         public PersistWorkflowInstanceDataCommandHandler(
                                                             IWorkflowServiceApiClient workflowServiceApiClient,
-                                                            ILogger<PersistWorkflowInstanceDataCommandHandler> logger, 
+                                                            ILogger<PersistWorkflowInstanceDataCommandHandler> logger,
                                                             WorkflowDbContext dbContext,
                                                     IPcpEventServiceApiClient pcpEventServiceApiClient)
         {
@@ -89,7 +89,7 @@ namespace WorkflowCoordinator.Handlers
                     ValidateK2TaskForAssessAndVerify(message, k2Task);
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
-                    
+
                     await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
                     await PersistWorkflowDataToAssessFromReview(message.ProcessId, workflowInstance);
                     await ProcessAdditionalTasks(message, context);
@@ -329,12 +329,12 @@ namespace WorkflowCoordinator.Handlers
 
             if (!string.IsNullOrEmpty(primaryAssignTask.Notes))
             {
-                await _dbContext.Comment.AddAsync(new Comment()
+                await _dbContext.Comments.AddAsync(new Comment()
                 {
                     ProcessId = processId,
                     WorkflowInstanceId = primaryAssignTask.WorkflowInstanceId,
                     Text = $"Assign Task: {primaryAssignTask.Notes.Trim()}",
-                    Username = primaryAssignTask.Reviewer,
+                    AdUser = primaryAssignTask.Reviewer,
                     Created = DateTime.Today
                 });
 
