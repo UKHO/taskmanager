@@ -8,6 +8,10 @@ namespace Portal.Auth
     {
         Task<IEnumerable<AdUser>> GetUsersFromDbAsync();
 
-        Task<bool> ValidateUserAsync(string username);
+        Task<bool> ValidateUserAsync(string userPrincipalName);
+
+        Task<bool> ValidateUserAsync(AdUser user);
+
+        Task<AdUser> GetAdUserAsync(string userPrincipalName);
     }
 }
