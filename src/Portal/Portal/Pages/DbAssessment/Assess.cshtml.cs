@@ -163,7 +163,7 @@ namespace Portal.Pages.DbAssessment
                 ProductActioned,
                 ProductActionChangeDetails,
                 RecordProductAction,
-                DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
+                DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -212,7 +212,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
-                        DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
+                        DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {

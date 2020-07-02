@@ -345,7 +345,7 @@ namespace Portal.Pages.DbAssessment
             {
                 LogContext.PushProperty("UserAssignedToTask", userAssignedToTask.UserPrincipalName);
                 _logger.LogError("{UserPrincipalName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
-                throw new InvalidOperationException($"{userAssignedToTask} is assigned to this task. Please assign the task to yourself and click Save");
+                throw new InvalidOperationException($"{userAssignedToTask.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
             }
 
             if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
