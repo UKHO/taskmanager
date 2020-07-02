@@ -114,7 +114,7 @@ namespace SourceDocumentCoordinator.Handlers
             {
                 var linkedDocument = await _dbContext.LinkedDocument.FirstOrDefaultAsync(l =>
                                                                             l.ProcessId == message.ProcessId
-                                                                            && l.LinkedSdocId == documentAssessmentData.SdocId
+                                                                            && l.LinkedSdocId == linkedDocId
                                                                             && l.LinkType == DocumentLinkType.Backward.ToString());
 
                 var isNew = linkedDocument == null;
@@ -137,7 +137,7 @@ namespace SourceDocumentCoordinator.Handlers
                     linkedDocument.SourceDocumentName = documentAssessmentData.Name;
                     linkedDocument.ReceiptDate = documentAssessmentData.ReceiptDate;
                     linkedDocument.SourceDocumentType = documentAssessmentData.DocumentType;
-                    linkedDocument.SourceNature = documentAssessmentData.SourceName;
+                    linkedDocument.SourceNature = documentAssessmentData.DocumentNature;
                     linkedDocument.Datum = documentAssessmentData.Datum;
                 }
 
