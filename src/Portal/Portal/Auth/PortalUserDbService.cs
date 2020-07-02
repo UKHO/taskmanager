@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
 using Microsoft.EntityFrameworkCore;
@@ -27,20 +26,50 @@ namespace Portal.Auth
         /// <returns></returns>
         public async Task<IEnumerable<AdUser>> GetUsersFromDbAsync()
         {
-            return await _workflowDbContext.AdUser.ToListAsync();
+            return await _workflowDbContext.AdUsers.ToListAsync();
 
         }
 
         /// <summary>
-        /// Validate a username exists in the database
+        /// Validate a AdUser exists in the database
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> ValidateUserAsync(string username)
+        public async Task<bool> ValidateUserAsync(AdUser user)
         {
-            // TODO do we ever want to go and check AD then update database if we find a new user
-            // TODO switch to a unique value instead of display name for validating when we switch over
+            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName.Equals(user.UserPrincipalName));
+        }
 
-            return await _workflowDbContext.AdUser.AnyAsync(u => u.DisplayName.Equals(username, StringComparison.OrdinalIgnoreCase));
+        /// <summary>
+        /// Validate a user with UPN exists in the database
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> ValidateUserAsync(string userPrincipalName)
+        {
+            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName.Equals(userPrincipalName));
+        }
+
+        /// <summary>
+        /// Get an AdUsers object for user with given UPN from database
+        /// </summary>
+        /// <param name="userPrincipalName">Email address uniquely identifying user</param>
+        /// <returns></returns>
+        public async Task<AdUser> GetAdUserAsync(string userPrincipalName)
+        {
+            if (!string.IsNullOrEmpty(userPrincipalName))
+            {
+                try
+                {
+                    return await _workflowDbContext.AdUsers.SingleAsync(u =>
+                         u.UserPrincipalName.Equals(userPrincipalName));
+
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"User with email address {userPrincipalName} not found in database.", e);
+                }
+            }
+
+            throw new ApplicationException($"Value of {nameof(userPrincipalName)} cannot be null.");
         }
     }
 }
