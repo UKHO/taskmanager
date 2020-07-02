@@ -13,5 +13,6 @@ namespace SourceDocumentCoordinator.Sagas
         public int DocumentStatusId { get; set; } 
         public int ProcessId { get; set; }
         public SourceType SourceType { get; set; }
+        public Guid SdocRetrievalId { get; set; }   
     }
 }

@@ -23,8 +23,6 @@ namespace SourceDocumentCoordinator.UnitTests
     public class PersistDocumentInStoreCommandHandlerTests
     {
         private IContentServiceApiClient _fakeContentServiceApiClient;
-        private IDocumentStatusFactory _fakeDocumentStatusFactory;
-        private IDocumentFileLocationFactory _fakeDocumentFileLocationFactory;
         private IFileSystem _fakeFileSystem;
         private TestableMessageHandlerContext _handlerContext;
         private PersistDocumentInStoreCommandHandler _handler;
@@ -41,8 +39,6 @@ namespace SourceDocumentCoordinator.UnitTests
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
             _fakeContentServiceApiClient = A.Fake<IContentServiceApiClient>();
-            _fakeDocumentStatusFactory = A.Fake<IDocumentStatusFactory>();
-            _fakeDocumentFileLocationFactory = A.Fake<IDocumentFileLocationFactory>();
             _fakeFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
@@ -51,12 +47,8 @@ namespace SourceDocumentCoordinator.UnitTests
             });
             _fakeLogger = A.Fake<ILogger<PersistDocumentInStoreCommandHandler>>();
 
-            var generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
-            generalConfig.Value.CallerCode = "HBD";
-
-
             _handlerContext = new TestableMessageHandlerContext();
-            _handler = new PersistDocumentInStoreCommandHandler(generalConfig, _fakeContentServiceApiClient, _dbContext, _fakeDocumentStatusFactory, _fakeDocumentFileLocationFactory, _fakeLogger, _fakeFileSystem);
+            _handler = new PersistDocumentInStoreCommandHandler(_fakeContentServiceApiClient, _dbContext, _fakeLogger, _fakeFileSystem);
         }
 
         [TearDown]
@@ -86,20 +78,7 @@ namespace SourceDocumentCoordinator.UnitTests
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
 
             //Assert
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Primary))
-                .MustHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Primary))
-                .MustHaveHappened();
-
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Linked))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Linked))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Database))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Database))
-                .MustNotHaveHappened();
+            // TODO: Assert on DB instead of factory
         }
 
         [Test]
@@ -123,20 +102,8 @@ namespace SourceDocumentCoordinator.UnitTests
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
 
             //Assert
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Linked))
-                .MustHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Linked))
-                .MustHaveHappened();
+            // TODO: Assert on DB instead of factory
 
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Primary))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Primary))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Database))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Database))
-                .MustNotHaveHappened();
         }
         
         [Test]
@@ -160,20 +127,8 @@ namespace SourceDocumentCoordinator.UnitTests
             await _handler.Handle(message, _handlerContext).ConfigureAwait(false);
 
             //Assert
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Database))
-                .MustHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Database))
-                .MustHaveHappened();
+            // TODO: Assert on DB instead of factory
 
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Primary))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Primary))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(SourceType.Linked))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(SourceType.Linked))
-                .MustNotHaveHappened();
         }
 
         [Test]
@@ -193,10 +148,7 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.ThrowsAsync<FileNotFoundException>(() => _handler.Handle(message, _handlerContext));
 
             //Assert
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(A<SourceType>.Ignored))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(A<SourceType>.Ignored))
-                .MustNotHaveHappened();
+            // TODO: Assert on DB instead of factory
         }
         
         [Test]
@@ -220,10 +172,7 @@ namespace SourceDocumentCoordinator.UnitTests
             Assert.ThrowsAsync<Exception>(() => _handler.Handle(message, _handlerContext));
 
             //Assert
-            A.CallTo(() => _fakeDocumentStatusFactory.GetDocumentStatusProcessor(A<SourceType>.Ignored))
-                .MustNotHaveHappened();
-            A.CallTo(() => _fakeDocumentFileLocationFactory.GetDocumentFileLocationProcessor(A<SourceType>.Ignored))
-                .MustNotHaveHappened();
+            // TODO: Assert on DB instead of factory
         }
     }
 }

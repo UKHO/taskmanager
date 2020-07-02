@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using WorkflowDatabase.EF;
@@ -14,13 +13,6 @@ namespace Common.Factories
         {
             var documentStatusProcessor = documentStatusFactory.GetDocumentStatusProcessor(sourceType);
             return await documentStatusProcessor.Update(processId, sourceDocumentId, status);
-        }
-
-        public static async Task<int> UpdateSourceDocumentFileLocation(IDocumentFileLocationFactory documentFileLocationFactory,
-            int processId, int sourceDocumentId, SourceType sourceType, Guid contentServiceId, string generatedFullFilename)
-        {
-            var documentStatusProcessor = documentFileLocationFactory.GetDocumentFileLocationProcessor(sourceType);
-            return await documentStatusProcessor.Update(processId, sourceDocumentId, contentServiceId, generatedFullFilename);
         }
 
     }

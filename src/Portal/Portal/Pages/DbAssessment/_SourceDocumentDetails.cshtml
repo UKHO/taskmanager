@@ -39,20 +39,20 @@
                             @{
                                 if (Model.PrimaryDocumentStatus != null && Model.PrimaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                 {
-                                    <a href="@Model.PrimaryDocumentStatus.ContentServiceUri" target="_blank">@Model.Assessment.ParsedRsdraNumber</a>
+                                    <a href="@Model.PrimaryDocumentStatus.ContentServiceUri" target="_blank">@Html.DisplayFor(model => model.Assessment.ParsedRsdraNumber)</a>
                                 }
                                 else
                                 {
-                                    @Model.Assessment.ParsedRsdraNumber
+                                    @Html.DisplayFor(model => model.Assessment.ParsedRsdraNumber)
                                 }
                             }
                         </td>
                         <td id="rows">@Model.Assessment.PrimarySdocId</td>
-                        <td>@Model.Assessment.SourceDocumentName</td>
-                        <td>@Model.Assessment.ReceiptDate</td>
-                        <td>@Model.Assessment.SourceDocumentType</td>
-                        <td>@Model.Assessment.Datum</td>
-                        <td>@Model.Assessment.SourceNature</td>
+                        <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentName)</td>
+                        <td>@Html.DisplayFor(model => model.Assessment.ReceiptDate)</td>
+                        <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentType)</td>
+                        <td>@Html.DisplayFor(model => model.Assessment.Datum)</td>
+                        <td>@Html.DisplayFor(model => model.Assessment.SourceNature)</td>
                         <td></td>
                     </tr>
 
@@ -64,11 +64,11 @@
                                 <td></td>
                                 <td></td>
                                 <td id="rows">@linkedDocument.LinkedSdocId</td>
-                                <td>@linkedDocument.SourceDocumentName</td>
-                                <td>@linkedDocument.ReceiptDate</td>
-                                <td>@linkedDocument.SourceDocumentType</td>
-                                <td>@linkedDocument.Datum</td>
-                                <td>@linkedDocument.SourceNature</td>
+                                <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentName)</td>
+                                <td>@Html.DisplayFor(model => linkedDocument.ReceiptDate)</td>
+                                <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentType)</td>
+                                <td>@Html.DisplayFor(model => linkedDocument.Datum)</td>
+                                <td>@Html.DisplayFor(model => linkedDocument.SourceNature)</td>
                                 <td>
                                     @if (linkedDocument.Status == SourceDocumentRetrievalStatus.NotAttached.ToString())
                                     {
@@ -98,20 +98,20 @@
                                     @{
                                         if (attachedLinkedDocument.Status.Equals(SourceDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
                                         {
-                                            <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@attachedLinkedDocument.ParsedRsdraNumber</a>
+                                            <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@Html.DisplayFor(model => attachedLinkedDocument.ParsedRsdraNumber)</a>
                                         }
                                         else
                                         {
-                                            @attachedLinkedDocument.ParsedRsdraNumber
+                                            @Html.DisplayFor(model => attachedLinkedDocument.ParsedRsdraNumber)
                                         }
                                     }
                                 </td>
-                                <td id="rows">@attachedLinkedDocument.LinkedSdocId</td>
-                                <td>@attachedLinkedDocument.SourceDocumentName</td>
-                                <td>@attachedLinkedDocument.ReceiptDate</td>
-                                <td>@attachedLinkedDocument.SourceDocumentType</td>
-                                <td>@attachedLinkedDocument.Datum</td>
-                                <td>@attachedLinkedDocument.SourceNature</td>
+                                <td id="rows">@Html.DisplayFor(model => attachedLinkedDocument.LinkedSdocId)</td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentName)</td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.ReceiptDate)</td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentType)</td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.Datum)</td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceNature)</td>
                                 <td><i class="fa fa-times-circle" style="color: red"></i></td>
                             </tr>
                         }

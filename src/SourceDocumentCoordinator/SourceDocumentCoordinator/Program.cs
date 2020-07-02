@@ -3,7 +3,6 @@ using System.IO.Abstractions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Factories.DocumentFileLocationFactory;
 using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
@@ -74,7 +73,6 @@ namespace SourceDocumentCoordinator
                     .Bind(hostingContext.Configuration.GetSection("NsbDbSection"));
 
                 services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
-                services.AddScoped<IDocumentFileLocationFactory, DocumentFileLocationFactory>();
                 services.AddScoped<IFileSystem, FileSystem>();
 
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
