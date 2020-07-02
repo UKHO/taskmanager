@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -8,5 +9,19 @@ namespace WorkflowDatabase.EF.Models
         public string DisplayName { get; set; }
         public string UserPrincipalName { get; set; }
         public DateTime LastCheckedDate { get; set; }
+
+        [NotMapped]
+        public static AdUser Unknown => new AdUser
+        {
+            DisplayName = "Unknown",
+            UserPrincipalName = ""
+        };
+
+        [NotMapped]
+        public static AdUser Empty => new AdUser
+        {
+            DisplayName = "",
+            UserPrincipalName = ""
+        };
     }
 }

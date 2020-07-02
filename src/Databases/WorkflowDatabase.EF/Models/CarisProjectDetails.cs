@@ -9,6 +9,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProjectId { get; set; }
         public string ProjectName { get; set; }
         public DateTime Created { get; set; }
-        public string CreatedBy { get; set; }
+
+        public virtual AdUser CreatedBy { get; set; }
     }
 }
