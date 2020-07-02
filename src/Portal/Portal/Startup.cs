@@ -114,7 +114,7 @@ namespace Portal
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
             services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                options.UseSqlServer(workflowDbConnectionString));
+                options.UseLazyLoadingProxies().EnableSensitiveDataLogging().EnableDetailedErrors().UseSqlServer(workflowDbConnectionString));
 
             var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretsConfig.DataSource,
                 startupSecretsConfig.UserId, startupSecretsConfig.Password);
@@ -174,6 +174,9 @@ namespace Portal
                     : s.GetService<IOptions<UriConfig>>().Value.LandingPageUrl,
                 s.GetService<HttpProvider>()));
 
+            // Order of these two is important
+            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
+                services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
 
             // Auto mapper config
@@ -191,19 +194,20 @@ namespace Portal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WorkflowDbContext workflowDbContext, HpdDbContext hpdDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WorkflowDbContext workflowDbContext,
+            HpdDbContext hpdDbContext)
         {
             app.UseSerilogRequestLogging(
                 options =>
-                options.GetLevel = (ctx, d, ex) =>
-                {
-                    if (ex == null && ctx.Response.StatusCode <= 499)
+                    options.GetLevel = (ctx, d, ex) =>
                     {
-                        return LogEventLevel.Verbose;
-                    }
+                        if (ex == null && ctx.Response.StatusCode <= 499)
+                        {
+                            return LogEventLevel.Verbose;
+                        }
 
-                    return LogEventLevel.Error;
-                }
+                        return LogEventLevel.Error;
+                    }
             );
 
             if (env.IsDevelopment())
@@ -248,7 +252,7 @@ namespace Portal
                     .OrderBy(cw => cw.Name)
                     .ToList();
 
-                workflowDbContext.Database.ExecuteSqlCommand("Truncate Table [CachedHpdWorkspace]");
+                workflowDbContext.Database.ExecuteSqlRaw("Truncate Table [CachedHpdWorkspace]");
 
                 workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
                 workflowDbContext.SaveChanges();
@@ -258,16 +262,6 @@ namespace Portal
                 Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
             }
 
-            // Seeding
-
-            if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
-                SeedWorkflowDatabase(workflowDbContext);
-        }
-
-        private static void SeedWorkflowDatabase(WorkflowDbContext workflowDbContext)
-        {
-            TestWorkflowDatabaseSeeder.UsingDbContext(workflowDbContext).PopulateTables().SaveChanges();
-            Log.Logger.Information($"WorkflowDatabase successfully re-seeded.");
         }
 
     }
