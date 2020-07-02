@@ -259,7 +259,7 @@ namespace Portal.Pages.DbAssessment
                 SourceDocumentName = sourceDocumentData.Name,
                 ReceiptDate = sourceDocumentData.ReceiptDate,
                 SourceDocumentType = sourceDocumentData.DocumentType,
-                SourceNature = sourceDocumentData.SourceName,
+                SourceNature = sourceDocumentData.DocumentNature,
                 Datum = sourceDocumentData.Datum,
                 Status = SourceDocumentRetrievalStatus.Started.ToString(),
                 Created = DateTime.Now,
