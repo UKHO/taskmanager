@@ -1,5 +1,14 @@
 ﻿$(document).ready(function () {
-
+    $('#Reviewer').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#hdnReviewerOperatorUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('#Assessor').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#hdnAssessorOperatorUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('#Verifier').on('typeahead:selected',
+        function(eventObject, suggestionObject) {
+            $('#hdnVerifierOperatorUpn').val(suggestionObject.userPrincipalName);
+        });
 });
 
 function initialiseOperatorsTypeaheads() {
