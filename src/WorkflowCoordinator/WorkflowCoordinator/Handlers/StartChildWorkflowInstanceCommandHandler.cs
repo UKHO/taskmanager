@@ -21,7 +21,9 @@ namespace WorkflowCoordinator.Handlers
         private readonly WorkflowDbContext _dbContext;
         private readonly ILogger<StartChildWorkflowInstanceCommandHandler> _logger;
 
-        public StartChildWorkflowInstanceCommandHandler(IWorkflowServiceApiClient workflowServiceApiClient, WorkflowDbContext dbContext, ILogger<StartChildWorkflowInstanceCommandHandler> logger)
+        public StartChildWorkflowInstanceCommandHandler(IWorkflowServiceApiClient workflowServiceApiClient,
+            WorkflowDbContext dbContext,
+            ILogger<StartChildWorkflowInstanceCommandHandler> logger)
         {
             _workflowServiceApiClient = workflowServiceApiClient;
             _dbContext = dbContext;
@@ -213,22 +215,22 @@ namespace WorkflowCoordinator.Handlers
                                                                     int childProcessId,
                                                                     string assignTaskNote,
                                                                     int newWorkflowInstance,
-                                                                    string reviewer)
+                                                                    AdUser reviewer)
         {
             _logger.LogInformation("Entering CopyAdditionalAssignTaskNoteToComments method with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
 
             if (!string.IsNullOrEmpty(assignTaskNote))
             {
-                if (!await _dbContext.Comment.AnyAsync(c =>
+                if (!await _dbContext.Comments.AnyAsync(c =>
                                                                         c.ProcessId == childProcessId
                                                                         && c.Text.StartsWith("Assign Task:")))
                 {
-                    await _dbContext.Comment.AddAsync(new Comment()
+                    await _dbContext.Comments.AddAsync(new Comment()
                     {
                         ProcessId = childProcessId,
                         WorkflowInstanceId = newWorkflowInstance,
                         Text = $"Assign Task (Parent processId: {parentProcessId}): {assignTaskNote.Trim()}",
-                        Username = reviewer,
+                        AdUser = reviewer,
                         Created = DateTime.Today
                     });
                 }
