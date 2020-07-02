@@ -392,4 +392,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="LastModifiedByAdUserId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="0f767c9c-bac8-49a0-bc62-d9546867edb5" ChangeDateTime="07/02/2020 08:37:42">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[OnHoldUser]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OnHoldAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="633db7aa-16cf-424f-bf88-a3dab6be2fcc" ChangeDateTime="07/02/2020 08:37:46">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[OffHoldUser]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OffHoldAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a0fd4b5c-3c6e-4c09-93c8-55d536cfdf7f" ChangeDateTime="07/02/2020 08:39:28">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[OnHoldAdUserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OnHoldByAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4b516e8f-fb4f-4eff-a3c7-48bf5b6643b0" ChangeDateTime="07/02/2020 08:39:31">
+    <Property Name="ElementName" Value="[dbo].[OnHold].[OffHoldAdUserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OnHold]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OffHoldByAdUserId" />
+  </Operation>
 </Operations>
