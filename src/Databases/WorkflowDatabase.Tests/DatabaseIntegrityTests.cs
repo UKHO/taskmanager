@@ -45,17 +45,17 @@ namespace WorkflowDatabase.Tests
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "Someone",
+                Verifier = null,
                 ActivityCode = "Act666"
             });
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "You",
+                Verifier = null,
                 ActivityCode = "Act111"
             });
 
@@ -76,18 +76,18 @@ namespace WorkflowDatabase.Tests
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "Someone",
+                Verifier = null,
                 ActivityCode = "Act666",
                 TaskType = "Simples"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "You",
+                Verifier = null,
                 ActivityCode = "Act111",
                 TaskType = "Simples"
             });
@@ -187,7 +187,7 @@ namespace WorkflowDatabase.Tests
                     Status = WorkflowStatus.Started.ToString(),
                     StartedAt = DateTime.Now
                 });
-                
+
                 Assert.DoesNotThrowAsync(() => newContext.SaveChangesAsync());
             }
         }
@@ -274,12 +274,12 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_Comments_table_prevents_insert_for_no_WorkflowInstance()
         {
-            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comment()
+            _dbContext.Comments.AddAsync(new WorkflowDatabase.EF.Models.Comment()
             {
                 Created = DateTime.Now,
                 ProcessId = 0,
                 Text = "This is a comment",
-                Username = "Me",
+                AdUser = null,
                 WorkflowInstanceId = 555
             });
 
@@ -653,10 +653,10 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
             {
-                Assessor = "Greg",
+                Assessor = null,
                 TaskType = "Type 1",
                 Notes = "A note",
-                Verifier = "Ross",
+                Verifier = null,
                 WorkspaceAffected = "Workspace 1",
                 Status = AssignTaskStatus.New.ToString()
             });
@@ -706,7 +706,7 @@ namespace WorkflowDatabase.Tests
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
 
-            
+
         }
     }
 }
