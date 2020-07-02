@@ -170,14 +170,14 @@ namespace SourceDocumentCoordinator.UnitTests
             var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(message, _handlerContext));
 
             //Then
-            // linked doc without data, exception thrown, not added to DB
+            // linked doc without data, exception thrown
             Assert.IsTrue(ex.Message.Contains($"No assessment data found for SdocId: {forwardLinkedWithoutData}"));
-            Assert.IsFalse(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == forwardLinkedWithoutData));
 
-            // linked doc with data, not included in exception thrown, added to DB
+            // linked doc with or without data added to DB
             Assert.IsFalse(ex.Message.Contains($"No assessment data found for SdocId: {forwardLinkedWithData}"));
-            Assert.AreEqual(1, _dbContext.LinkedDocument.Count());
+            Assert.AreEqual(2, _dbContext.LinkedDocument.Count());
             Assert.IsTrue(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == forwardLinkedWithData));
+            Assert.IsTrue(_dbContext.LinkedDocument.Any(l => l.LinkedSdocId == forwardLinkedWithoutData));
             Assert.AreEqual(DocumentLinkType.Forward.ToString(), _dbContext.LinkedDocument.First(l => l.LinkedSdocId == forwardLinkedWithData).LinkType);
         }
 
