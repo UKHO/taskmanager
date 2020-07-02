@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Extensions;
 using Portal.Helpers;
@@ -33,6 +34,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IPortalUserDbService _portalUserDbService;
 
         [BindProperty]
         public bool IsOnHold { get; set; }
@@ -106,7 +108,8 @@ namespace Portal.Pages.DbAssessment
             IAdDirectoryService adDirectoryService,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IPortalUserDbService portalUserDbService)
         {
             _dbContext = dbContext;
             _eventServiceApiClient = eventServiceApiClient;
@@ -116,6 +119,7 @@ namespace Portal.Pages.DbAssessment
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
+            _portalUserDbService = portalUserDbService;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -291,7 +295,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
                                                                         processId,
                                                                     workflowInstance.WorkflowInstanceId,
-                                                                     CurrentUser.DisplayName);
+                                                                     CurrentUser.UserPrincipalName);
         }
 
         private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance)
@@ -361,7 +365,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment($"Assess: Changes saved",
                 processId,
                 workflowInstanceId,
-                 CurrentUser.DisplayName);
+                 CurrentUser.UserPrincipalName);
 
 
             return true;
@@ -537,7 +541,7 @@ namespace Portal.Pages.DbAssessment
                 {
                     ProcessId = processId,
                     OnHoldTime = DateTime.Now,
-                    OnHoldUser = CurrentUser.DisplayName,
+                    OnHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName),
                     WorkflowInstanceId = workflowInstance.WorkflowInstanceId
                 };
 
@@ -547,7 +551,7 @@ namespace Portal.Pages.DbAssessment
                 await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                     CurrentUser.DisplayName);
+                     CurrentUser.UserPrincipalName);
             }
             else
             {
@@ -561,7 +565,7 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 existingOnHoldRecord.OffHoldTime = DateTime.Now;
-                existingOnHoldRecord.OffHoldUser = CurrentUser.DisplayName;
+                existingOnHoldRecord.OffHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
                 await _dbContext.SaveChangesAsync();
 
@@ -569,7 +573,7 @@ namespace Portal.Pages.DbAssessment
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
-                     CurrentUser.DisplayName);
+                     CurrentUser.UserPrincipalName);
             }
         }
 

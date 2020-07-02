@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Portal.Auth;
 using Portal.BusinessLogic;
 using Portal.Extensions;
 using Portal.Helpers;
@@ -31,6 +32,7 @@ namespace Portal.Pages.DbAssessment
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<ReviewModel> _logger;
         private readonly IPageValidationHelper _pageValidationHelper;
+        private readonly IPortalUserDbService _portalUserDbService;
 
         public int ProcessId { get; set; }
 
@@ -84,7 +86,8 @@ namespace Portal.Pages.DbAssessment
             ICommentsHelper dbAssessmentCommentsHelper,
             IAdDirectoryService adDirectoryService,
             ILogger<ReviewModel> logger,
-            IPageValidationHelper pageValidationHelper)
+            IPageValidationHelper pageValidationHelper,
+            IPortalUserDbService portalUserDbService)
         {
             _dbContext = dbContext;
             _workflowBusinessLogicService = workflowBusinessLogicService;
@@ -93,6 +96,7 @@ namespace Portal.Pages.DbAssessment
             _adDirectoryService = adDirectoryService;
             _logger = logger;
             _pageValidationHelper = pageValidationHelper;
+            _portalUserDbService = portalUserDbService;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -240,7 +244,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment($"Review: Changes saved",
                 processId,
                 currentReviewData.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Finished Save with: ProcessId: {ProcessId}; Action: {Action};");
 
@@ -320,7 +324,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment("Task progression from Review to Assess has been triggered",
                 processId,
                 workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
         }
 
         private async Task MarkTaskAsTerminated(int processId, string comment)
@@ -330,7 +334,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment($"Terminate comment: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
 
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review,
                 WorkflowStage.Terminated);
@@ -341,7 +345,7 @@ namespace Portal.Pages.DbAssessment
             await _dbAssessmentCommentsHelper.AddComment("Task termination has been triggered",
                 processId,
                 workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
         }
 
         private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
@@ -426,7 +430,7 @@ namespace Portal.Pages.DbAssessment
                 {
                     ProcessId = processId,
                     OnHoldTime = DateTime.Now,
-                    OnHoldUser = CurrentUser.DisplayName,
+                    OnHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName),
                     WorkflowInstanceId = workflowInstance.WorkflowInstanceId
                 };
 
@@ -436,7 +440,7 @@ namespace Portal.Pages.DbAssessment
                 await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                    CurrentUser.DisplayName);
+                    CurrentUser.UserPrincipalName);
             }
             else
             {
@@ -450,7 +454,7 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 existingOnHoldRecord.OffHoldTime = DateTime.Now;
-                existingOnHoldRecord.OffHoldUser = CurrentUser.DisplayName;
+                existingOnHoldRecord.OffHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
                 await _dbContext.SaveChangesAsync();
 
@@ -458,7 +462,7 @@ namespace Portal.Pages.DbAssessment
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
-                    CurrentUser.DisplayName);
+                    CurrentUser.UserPrincipalName);
             }
         }
 
