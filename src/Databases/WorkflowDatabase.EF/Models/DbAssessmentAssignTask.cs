@@ -7,9 +7,9 @@ namespace WorkflowDatabase.EF.Models
         public int DbAssessmentAssignTaskId { get; set; }
         public int ProcessId { get; set; }
         [DisplayName("Assessor:")]
-        public string Assessor { get; set; }
+        public virtual AdUser Assessor { get; set; }
         [DisplayName("Verifier:")]
-        public string Verifier { get; set; }
+        public virtual AdUser Verifier { get; set; }
         [DisplayName("Task Type:")]
         public string TaskType { get; set; }
         [DisplayName("Workspace Affected:")]
