@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,7 +24,7 @@ namespace Portal.Pages.DbAssessment
     {
         private readonly WorkflowDbContext _dbContext;
         private readonly IOnHoldCalculator _onHoldCalculator;
-        private readonly ICommentsHelper _commentsHelper;
+        private readonly ICommentsHelper _dbAssessmentCommentsHelper;
         private readonly ITaskDataHelper _taskDataHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
         private readonly IDmEndDateCalculator _dmEndDateCalculator;
@@ -76,14 +77,14 @@ namespace Portal.Pages.DbAssessment
 
         public _TaskInformationModel(WorkflowDbContext DbContext,
             IOnHoldCalculator onHoldCalculator,
-            ICommentsHelper commentsHelper,
+            ICommentsHelper dbAssessmentCommentsHelper,
             ITaskDataHelper taskDataHelper,
             IOptions<GeneralConfig> generalConfig,
             IDmEndDateCalculator dmEndDateCalculator)
         {
             _dbContext = DbContext;
             _onHoldCalculator = onHoldCalculator;
-            _commentsHelper = commentsHelper;
+            _dbAssessmentCommentsHelper = dbAssessmentCommentsHelper;
             _taskDataHelper = taskDataHelper;
             _generalConfig = generalConfig;
             _dmEndDateCalculator = dmEndDateCalculator;

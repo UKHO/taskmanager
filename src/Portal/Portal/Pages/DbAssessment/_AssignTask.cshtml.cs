@@ -22,8 +22,6 @@ namespace Portal.Pages.DbAssessment
         public DbAssessmentReviewData PrimaryAssignedTask { get; set; }
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
 
-        public SelectList Assessors { get; set; }
-        public SelectList Verifiers { get; set; }
         public SelectList AssignedTaskTypes { get; set; }
 
         public int Ordinal { get; set; }
@@ -65,6 +63,10 @@ namespace Portal.Pages.DbAssessment
                     .DbAssessmentAssignTask
                     .Where(a => a.ProcessId == ProcessId)
                     .ToListAsync();
+               // var temp = AdditionalAssignedTasks.Single(a => a.ProcessId == ProcessId);
+
+               // Console.WriteLine("dsfd");
+
             }
             catch (ArgumentNullException e)
             {
@@ -77,16 +79,8 @@ namespace Portal.Pages.DbAssessment
 
         private async Task PopulateDropDowns()
         {
-            var users = await _dbContext.AdUser.OrderBy(a => a.DisplayName)
-                                                         .Select(u => u.DisplayName)
-                                                         .ToListAsync().ConfigureAwait(false);
-
-            Assessors = new SelectList(users);
-
-            Verifiers = new SelectList(users);
-
             var assignedTaskTypes = await _dbContext.AssignedTaskType.Select(st => st.Name)
-                                                                               .ToListAsync().ConfigureAwait(false);
+                .ToListAsync().ConfigureAwait(false);
 
             AssignedTaskTypes = new SelectList(assignedTaskTypes);
         }

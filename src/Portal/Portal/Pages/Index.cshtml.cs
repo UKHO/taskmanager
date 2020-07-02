@@ -151,6 +151,8 @@ namespace Portal.Pages
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
 
+            var currentAdUser = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+
             if (existingTaskNote == null)
             {
                 if (!string.IsNullOrEmpty(taskNote))
@@ -163,9 +165,9 @@ namespace Portal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = CurrentUser.DisplayName,
+                        CreatedBy = currentAdUser,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = CurrentUser.DisplayName,
+                        LastModifiedBy = currentAdUser,
                     });
                     await _dbContext.SaveChangesAsync();
                 }
@@ -176,33 +178,33 @@ namespace Portal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = CurrentUser.DisplayName;
+            existingTaskNote.LastModifiedBy = currentAdUser;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userPrincipalName, string taskStage)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", taskStage);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
-            LogContext.PushProperty("AssignedUser", userName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+            LogContext.PushProperty("AssignedUser", userPrincipalName);
 
             ValidationErrorMessages.Clear();
 
-            if (!await _portalUserDbService.ValidateUserAsync(userName))
+            if (!await _portalUserDbService.ValidateUserAsync(userPrincipalName))
             {
                 _logger.LogInformation("Attempted to assign task to unknown user {AssignedUser}");
-                ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
+                ValidationErrorMessages.Add($"Unable to assign task to unknown user {userPrincipalName}");
             }
 
             var instance = await _dbContext.WorkflowInstance.FirstAsync(wi => wi.ProcessId == processId);
             if (instance.ActivityName != taskStage)
             {
                 _logger.LogInformation("Attempted to assign task with ProcessId: {ProcessId} to a user but the task being assigned is no longer at the expected step of {ActivityName}.");
-                ValidationErrorMessages.Add($"Unable to assign task to {userName} because task with ProcessId: {processId} is not at expected step {taskStage}.");
+                ValidationErrorMessages.Add($"Unable to assign task to {userPrincipalName} because task with ProcessId: {processId} is not at expected step {taskStage}.");
             }
 
             if (ValidationErrorMessages.Any())
@@ -215,20 +217,22 @@ namespace Portal.Pages
 
             var isUpdateCarisProject = true;
 
+            var adUser = await _portalUserDbService.GetAdUserAsync(userPrincipalName);
+
             switch (taskStage)
             {
                 case "Review":
                     var review = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
-                    review.Reviewer = userName;
+                    review.Reviewer = adUser;
                     isUpdateCarisProject = false;
                     break;
                 case "Assess":
                     var assess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-                    assess.Assessor = userName;
+                    assess.Assessor = adUser;
                     break;
                 case "Verify":
                     var verify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
-                    verify.Verifier = userName;
+                    verify.Verifier = adUser;
                     break;
                 default:
                     throw new NotImplementedException($"'{taskStage}' not implemented");
@@ -238,7 +242,7 @@ namespace Portal.Pages
 
             if (isUpdateCarisProject)
             {
-                await UpdateCarisProjectWithAdditionalUser(processId, userName);
+                await UpdateCarisProjectWithAdditionalUser(processId, adUser);
 
                 if (ValidationErrorMessages.Any())
                 {
@@ -289,7 +293,7 @@ namespace Portal.Pages
             }
         }
 
-        private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
+        private async Task UpdateCarisProjectWithAdditionalUser(int processId, AdUser user)
         {
             var carisProjectDetails =
                 await _dbContext.CarisProjectDetails.SingleOrDefaultAsync(cp => cp.ProcessId == processId);
@@ -302,13 +306,13 @@ namespace Portal.Pages
             HpdUser hpdUsername = null;
             try
             {
-                hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+                hpdUsername = await GetHpdUser(user.UserPrincipalName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
 
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to assign {userName} to Caris project: {carisProjectDetails.ProjectId}");
-                ValidationErrorMessages.Add($"Failed to assign {userName} to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                _logger.LogError(e, $"Failed to assign {user.DisplayName} - {user.UserPrincipalName} to Caris project: {carisProjectDetails.ProjectId}");
+                ValidationErrorMessages.Add($"Failed to assign {user.DisplayName} to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
 
                 return;
             }
@@ -322,23 +326,23 @@ namespace Portal.Pages
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
-                ValidationErrorMessages.Add($"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                _logger.LogError(e, $"Failed to assign {user.UserPrincipalName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
+                ValidationErrorMessages.Add($"Failed to assign {user.DisplayName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
             }
         }
 
 
-        private async Task<HpdUser> GetHpdUser(string username)
+        private async Task<HpdUser> GetHpdUser(string userPrincipalName)
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName.Equals(userPrincipalName,
                     StringComparison.InvariantCultureIgnoreCase));
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
-                throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
+                _logger.LogError("Unable to find HPD Username for {UserPrincipalName} in our system.");
+                throw new InvalidOperationException($"Unable to find HPD username for {userPrincipalName}  in our system.",
                     ex.InnerException);
             }
 

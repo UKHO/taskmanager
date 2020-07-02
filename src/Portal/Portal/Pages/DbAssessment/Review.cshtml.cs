@@ -27,7 +27,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IEventServiceApiClient _eventServiceApiClient;
-        private readonly ICommentsHelper _commentsHelper;
+        private readonly ICommentsHelper _dbAssessmentCommentsHelper;
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<ReviewModel> _logger;
         private readonly IPageValidationHelper _pageValidationHelper;
@@ -55,7 +55,7 @@ namespace Portal.Pages.DbAssessment
         public List<DbAssessmentAssignTask> AdditionalAssignedTasks { get; set; }
 
         [BindProperty]
-        public string Reviewer { get; set; }
+        public AdUser Reviewer { get; set; }
 
         [BindProperty]
         public string Team { get; set; }
@@ -81,7 +81,7 @@ namespace Portal.Pages.DbAssessment
         public ReviewModel(WorkflowDbContext dbContext,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
             IEventServiceApiClient eventServiceApiClient,
-            ICommentsHelper commentsHelper,
+            ICommentsHelper dbAssessmentCommentsHelper,
             IAdDirectoryService adDirectoryService,
             ILogger<ReviewModel> logger,
             IPageValidationHelper pageValidationHelper)
@@ -89,7 +89,7 @@ namespace Portal.Pages.DbAssessment
             _dbContext = dbContext;
             _workflowBusinessLogicService = workflowBusinessLogicService;
             _eventServiceApiClient = eventServiceApiClient;
-            _commentsHelper = commentsHelper;
+            _dbAssessmentCommentsHelper = dbAssessmentCommentsHelper;
             _adDirectoryService = adDirectoryService;
             _logger = logger;
             _pageValidationHelper = pageValidationHelper;
@@ -237,7 +237,7 @@ namespace Portal.Pages.DbAssessment
             await UpdateAssessmentData(ProcessId);
 
 
-            await _commentsHelper.AddComment($"Review: Changes saved",
+            await _dbAssessmentCommentsHelper.AddComment($"Review: Changes saved",
                 processId,
                 currentReviewData.WorkflowInstanceId,
                 CurrentUser.DisplayName);
@@ -284,7 +284,7 @@ namespace Portal.Pages.DbAssessment
             ProcessId = processId;
 
             PrimaryAssignedTask.ProcessId = ProcessId;
-            
+
             try
             {
                 await MarkTaskAsComplete(processId);
@@ -317,7 +317,7 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation(
                 "Task progression from {ActivityName} to Assess has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            await _commentsHelper.AddComment("Task progression from Review to Assess has been triggered",
+            await _dbAssessmentCommentsHelper.AddComment("Task progression from Review to Assess has been triggered",
                 processId,
                 workflowInstance.WorkflowInstanceId,
                 CurrentUser.DisplayName);
@@ -327,7 +327,7 @@ namespace Portal.Pages.DbAssessment
         {
             var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            await _commentsHelper.AddComment($"Terminate comment: {comment}",
+            await _dbAssessmentCommentsHelper.AddComment($"Terminate comment: {comment}",
                 processId,
                 workflowInstance.WorkflowInstanceId,
                 CurrentUser.DisplayName);
@@ -338,7 +338,7 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation(
                 "Task termination from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            await _commentsHelper.AddComment("Task termination has been triggered",
+            await _dbAssessmentCommentsHelper.AddComment("Task termination has been triggered",
                 processId,
                 workflowInstance.WorkflowInstanceId,
                 CurrentUser.DisplayName);
@@ -433,7 +433,7 @@ namespace Portal.Pages.DbAssessment
                 await _dbContext.OnHold.AddAsync(onHoldRecord);
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} has been put on hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
                     CurrentUser.DisplayName);
@@ -454,7 +454,7 @@ namespace Portal.Pages.DbAssessment
 
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} taken off hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} taken off hold",
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
