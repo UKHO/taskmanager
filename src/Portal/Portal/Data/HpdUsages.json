@@ -168,5 +168,10 @@
     "HpdUsageId": 34,
     "Name": "Wrecks",
     "SortIndex": 5
+  },
+  {
+    "HpdUsageId": 35,
+    "Name": "POLAR",
+    "SortIndex": 35
   }
 ]
