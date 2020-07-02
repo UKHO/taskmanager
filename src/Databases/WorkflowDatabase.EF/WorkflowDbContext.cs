@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +22,7 @@ namespace WorkflowDatabase.EF
         }
 
         public DbSet<AssessmentData> AssessmentData { get; set; }
-        public DbSet<Comment> Comment { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         public DbSet<DbAssessmentReviewData> DbAssessmentReviewData { get; set; }
         public DbSet<DbAssessmentAssessData> DbAssessmentAssessData { get; set; }
         public DbSet<DbAssessmentVerifyData> DbAssessmentVerifyData { get; set; }
@@ -40,7 +39,7 @@ namespace WorkflowDatabase.EF
         public DbSet<AssignedTaskType> AssignedTaskType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
         public DbSet<HpdUser> HpdUser { get; set; }
-        public DbSet<AdUser> AdUser { get; set; }
+        public DbSet<AdUser> AdUsers { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
 
@@ -98,12 +97,12 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<WorkflowInstance>().Property(p => p.ActivityChangedAt).HasColumnType("date");
             modelBuilder.Entity<WorkflowInstance>().HasIndex(c => c.ProcessId).IsUnique();
             modelBuilder.Entity<WorkflowInstance>().HasIndex(c => new { c.ProcessId, c.PrimarySdocId }).IsUnique();
-            modelBuilder.Entity<LinkedDocument>().HasIndex(c => new {c.ProcessId, c.LinkedSdocId, c.LinkType}).IsUnique();
+            modelBuilder.Entity<LinkedDocument>().HasIndex(c => new { c.ProcessId, c.LinkedSdocId, c.LinkType }).IsUnique();
             modelBuilder.Entity<PrimaryDocumentStatus>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);
 
             base.OnModelCreating(modelBuilder);
         }
-    }   
+    }
 }
