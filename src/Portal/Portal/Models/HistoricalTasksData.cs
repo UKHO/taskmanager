@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace Portal.Models
 {
@@ -16,9 +17,9 @@ namespace Portal.Models
         public string SourceDocumentName { get; set; }
         public WorkflowStage TaskStage { get; set; }
         public WorkflowStatus Status { get; set; }
-        public string Reviewer { get; set; }
-        public string Assessor { get; set; }
-        public string Verifier { get; set; }
+        public AdUser Reviewer { get; set; }
+        public AdUser Assessor { get; set; }
+        public AdUser Verifier { get; set; }
         public string Team { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:d}")]
