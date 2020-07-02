@@ -206,7 +206,8 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 SourceDocumentId = linkedSdocId,
                 GeoReferenced = false,
-                SourceType = SourceType.Linked
+                SourceType = SourceType.Linked,
+                SdocRetrievalId = Guid.NewGuid()
             };
 
             _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
@@ -275,7 +276,8 @@ namespace Portal.Pages.DbAssessment
                 ProcessId = processId,
                 SourceDocumentId = sdocId,
                 GeoReferenced = false,
-                SourceType = SourceType.Database
+                SourceType = SourceType.Database,
+                SdocRetrievalId = Guid.NewGuid()
             };
 
             _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());

@@ -38,8 +38,12 @@ namespace SourceDocumentCoordinator.Sagas
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SourceDocumentRetrievalSagaData> mapper)
         {
-            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.CorrelationId)
-                .ToSaga(sagaData => sagaData.CorrelationId);
+            mapper.ConfigureMapping<InitiateSourceDocumentRetrievalEvent>(message => message.SdocRetrievalId)
+                .ToSaga(sagaData => sagaData.SdocRetrievalId);
+
+            mapper.ConfigureMapping<GetDocumentRequestQueueStatusCommand>(message => message.SdocRetrievalId)
+                .ToSaga(sagaData => sagaData.SdocRetrievalId);
+
         }
 
         public async Task Handle(InitiateSourceDocumentRetrievalEvent message, IMessageHandlerContext context)
@@ -75,7 +79,8 @@ namespace SourceDocumentCoordinator.Sagas
                 {
                     SourceDocumentId = message.SourceDocumentId,
                     CorrelationId = message.CorrelationId,
-                    SourceType = message.SourceType
+                    SourceType = message.SourceType,
+                    SdocRetrievalId = message.SdocRetrievalId
                 };
 
                 await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
@@ -176,7 +181,8 @@ namespace SourceDocumentCoordinator.Sagas
                         CorrelationId = message.CorrelationId,
                         ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId,
-                        GeoReferenced = false
+                        GeoReferenced = false,
+                        SdocRetrievalId = Guid.NewGuid()
                     };
                     await context.Publish(msg);
                     break;

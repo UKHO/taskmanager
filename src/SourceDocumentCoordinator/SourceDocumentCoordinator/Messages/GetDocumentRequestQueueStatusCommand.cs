@@ -9,5 +9,6 @@ namespace SourceDocumentCoordinator.Messages
         public Guid CorrelationId { get; set; }
         public int SourceDocumentId { get; set; }
         public SourceType SourceType { get; set; }
+        public Guid SdocRetrievalId { get; set; }
     }
 }
