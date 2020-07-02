@@ -65,15 +65,15 @@ case
 	else ''
 end as [TASK STAGE],
 case 
-	when wi.ActivityName = reviewStage then ISNULL(dard.Assessor, '')
-	when wi.ActivityName = assessStage then ISNULL(daad.Assessor, '')
-	when wi.ActivityName = verifyStage then ISNULL(davd.Assessor, '')
+	when wi.ActivityName = reviewStage then ISNULL(dard.AssessorAdUserId, '')
+	when wi.ActivityName = assessStage then ISNULL(daad.AssessorAdUserId, '')
+	when wi.ActivityName = verifyStage then ISNULL(davd.AssessorAdUserId, '')
 end as [DB COMPILER],
 'Unknown' as [COMP TIME],
 case 
-	when wi.ActivityName = reviewStage then ISNULL(dard.Verifier, '')
-	when wi.ActivityName = assessStage then ISNULL(daad.Verifier, '')
-	when wi.ActivityName = verifyStage then ISNULL(davd.Verifier, '')
+	when wi.ActivityName = reviewStage then ISNULL(dard.VerifierAdUserId, '')
+	when wi.ActivityName = assessStage then ISNULL(daad.VerifierAdUserId, '')
+	when wi.ActivityName = verifyStage then ISNULL(davd.VerifierAdUserId, '')
 end as [DB VERIFIER],
 'Unknown' as [VERIF TIME],
 case
