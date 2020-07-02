@@ -20,7 +20,9 @@ namespace Portal.ViewModels
         public bool OnHoldDaysGreen { get; set; }
         public bool OnHoldDaysRed { get; set; }
         public int OnHoldDays { get; set; }
+        [DisplayFormat(NullDisplayText = "N/A")]
         public string AssessmentDataRsdraNumber { get; set; }
+        [DisplayFormat(NullDisplayText = "N/A")]
         public string AssessmentDataSourceDocumentName { get; set; }
         public string Workspace { get; set; }
         public string TaskStage { get; set; }

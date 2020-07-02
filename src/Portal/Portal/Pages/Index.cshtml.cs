@@ -86,6 +86,7 @@ namespace Portal.Pages
                 .Include(vd => vd.DbAssessmentVerifyData)
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
+                .AsNoTracking()
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .OrderBy(wi => wi.ProcessId)
                 .ToListAsync();
@@ -106,7 +107,7 @@ namespace Portal.Pages
 
                 var taskType = GetTaskType(instance);
 
-                if (instance.AssessmentData.EffectiveStartDate.HasValue)
+                if (instance.AssessmentData?.EffectiveStartDate != null)
                 {
                     var result = _indexFacade.CalculateDmEndDate(
                         instance.AssessmentData.EffectiveStartDate.Value,
