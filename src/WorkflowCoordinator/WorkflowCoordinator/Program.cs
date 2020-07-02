@@ -87,9 +87,9 @@ namespace WorkflowCoordinator
 
                     if (isLocalDebugging)
                     {
+                        // TODO pull out to hosted service
                         using var sp = services.BuildServiceProvider();
-                        using var context = sp.GetRequiredService<WorkflowDbContext>();
-                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                        TestWorkflowDatabaseSeeder.UsingDbContext(sp).PopulateTables().SaveChanges();
                     }
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
