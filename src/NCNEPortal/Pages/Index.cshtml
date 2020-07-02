@@ -216,6 +216,75 @@
         </table>
     </div>
 </div>
+<div class="card mb-4 mt-3" id="assignedTasksTable">
+    <h3>Assigned to me</h3>
+    <div class="card-body" style="width: 100%">
+        <table id="assignedTasks" class="table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th style="min-width: 3.6rem;">Type</th>
+                    <th style="max-width: 3.6rem;">Chart Number</th>
+                    <th>Country</th>
+                    <th style="max-width: 4.0rem;">Workflow Type</th>
+                    <th style="min-width: 3.9rem;">Status</th>
+                    <th style="min-width: 5.9rem;">Compiler</th>
+                    <th style="min-width: 5.9rem;">Verifier 1</th>
+                    <th style="min-width: 5.9rem;">Verifier 2</th>
+                    <th style="min-width: 5.9rem;">100% Check</th>
+                    <th style="max-width: 4.0rem;">Last Update</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
+                                                        &&
+                                                        (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
+                 || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
+                 || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
+                 || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
+                {
+                    <tr>
+                        <td>
+                            <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            @task.ChartType
+                        </td>
+                        <td>
+                            @task.ChartNumber
+                        </td>
+                        <td>
+                            @task.Country
+                        </td>
+                        <td>
+                            @task.WorkflowType
+                        </td>
+                        <td>
+                            @task.CurrentStage
+                        </td>
+                        <td>
+                            @task.TaskRole.Compiler
+                        </td>
+                        <td>
+                            @task.TaskRole.VerifierOne
+                        </td>
+                        <td>
+                            @task.TaskRole.VerifierTwo
+                        </td>
+                        <td>
+                            @task.TaskRole.HundredPercentCheck
+                        </td>
+                        <td>
+                            @task.StatusChangeDate
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @* Modal Edit task note *@
 <div class="modal fade" id="editTaskNoteModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskNote" aria-hidden="true">

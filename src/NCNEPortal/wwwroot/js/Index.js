@@ -5,6 +5,7 @@
     var userFullName = $("#userFullName > strong").text();
 
     var inFlightTasksTable = setupInFlightTasks();
+    var assignedTasksTable = setupAssignedTasks();
 
     applyDatatableFilter();
 
@@ -13,6 +14,19 @@
    
     setMenuItemSelection();
     handleHistoricalTasks();
+
+    function setupAssignedTasks() {
+        var assignedTasksTable = $('#assignedTasks').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [10, 15, 20, 25],
+            'sDom': 'ltipr',
+            'autoWidth': true,
+            "order": [[0, 'asc']],
+            "scrollX": true
+        });
+
+        return assignedTasksTable;
+    }
 
     function setupInFlightTasks() {
 
@@ -98,7 +112,6 @@
                         return true;
                     }
                 }
-
             }
         );
     }
@@ -161,6 +174,8 @@
             $('#txtGlobalSearch').val("");
             inFlightTasksTable.search("").draw();
 
+            $('#assignedTasksTable').show();
+
         });
     }
 
@@ -172,6 +187,8 @@
             $('#txtGlobalSearch').val("");
 
             inFlightTasksTable.search("").draw();
+
+            $('#assignedTasksTable').hide();
 
         });
     }

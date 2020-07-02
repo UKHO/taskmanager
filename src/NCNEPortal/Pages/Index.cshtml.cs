@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Helpers.Auth;
+﻿using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,6 +9,10 @@ using NCNEPortal.Enums;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace NCNEPortal.Pages
@@ -54,6 +54,7 @@ namespace NCNEPortal.Pages
             NcneTasks = await _dbContext.TaskInfo
                 .Include(c => c.TaskNote)
                 .Include(s => s.TaskStage)
+                .Include(r => r.TaskRole)
                 .ToListAsync();
 
 
