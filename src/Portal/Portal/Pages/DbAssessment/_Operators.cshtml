@@ -17,15 +17,15 @@
 
                                 @if (Model.ParentPage == WorkflowStage.Review)
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_labelledby = "Reviewer" })
+                                    @Html.TextBoxFor(model => model.Reviewer.DisplayName, new { @id = "Reviewer", @class = "form-text-input", autocomplete = "off", spellcheck = "false" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @class = "form-text-input", aria_labelledby = "Reviewer" })
+                                    @Html.TextBoxFor(model => model.Reviewer, "", new { @disabled = "disabled", @id = "Reviewer", @class = "form-text-input", aria_labelledby = "Reviewer" })
                                 }
+                                @Html.HiddenFor(m => m.Reviewer.UserPrincipalName, new { @id = "hdnReviewerOperatorUpn" })
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="operator col-4">
@@ -36,12 +36,13 @@
 
                                 @if (Model.ParentPage == WorkflowStage.Assess)
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_labelledby = "Assessor" })
+                                    @Html.TextBoxFor(model => model.Assessor, Model.Assessor.DisplayName, new { @id = "Assessor", @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_labelledby = "Assessor" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @class = "form-text-input", aria_labelledby = "Assessor" })
+                                    @Html.TextBoxFor(model => model.Assessor, "", new { @disabled = "disabled", @id = "Assessor", @class = "form-text-input", aria_labelledby = "Assessor" })
                                 }
+                                @Html.HiddenFor(m => m.Assessor.UserPrincipalName, new { @id = "hdnAssessorOperatorUpn" })
                             </div>
                         </div>
                     </div>
@@ -53,19 +54,20 @@
                             <div class="text-input-wrap">
 
                                 @if (Model.ParentPage == WorkflowStage.Assess ||
-                                    Model.ParentPage == WorkflowStage.Verify)
+                              Model.ParentPage == WorkflowStage.Verify)
                                 {
-                                    @Html.TextBoxFor(model => model.Verifier, "", new { @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_labelledby = "Verifier" })
+                                    @Html.TextBoxFor(model => model.Verifier, Model.Verifier.DisplayName, new { @id = "Verifier", @class = "form-text-input", autocomplete = "off", spellcheck = "false", aria_labelledby = "Verifier" })
                                 }
                                 else
                                 {
-                                    @Html.TextBoxFor(model => model.Verifier, "", new { @disabled = "disabled", @class = "form-text-input", aria_labelledby = "Verifier" })
+                                    @Html.TextBoxFor(model => model.Verifier, "", new { @disabled = "disabled", @id = "Verifier", @class = "form-text-input", aria_labelledby = "Verifier" })
+
                                 }
+                                @Html.HiddenFor(m => m.Verifier.UserPrincipalName, new { @id = "hdnVerifierOperatorUpn" })
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="row justify-content-start">
 

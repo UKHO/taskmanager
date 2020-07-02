@@ -28,7 +28,7 @@ namespace Portal.Pages.DbAssessment
         private readonly WorkflowDbContext _dbContext;
         private readonly IEventServiceApiClient _eventServiceApiClient;
         private readonly ILogger<AssessModel> _logger;
-        private readonly ICommentsHelper _commentsHelper;
+        private readonly ICommentsHelper _dbAssessmentCommentsHelper;
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
@@ -52,10 +52,10 @@ namespace Portal.Pages.DbAssessment
         public string TaskType { get; set; }
 
         [BindProperty]
-        public string Assessor { get; set; }
+        public AdUser Assessor { get; set; }
 
         [BindProperty]
-        public string Verifier { get; set; }
+        public AdUser Verifier { get; set; }
 
         public _OperatorsModel OperatorsModel { get; set; }
 
@@ -102,7 +102,7 @@ namespace Portal.Pages.DbAssessment
         public AssessModel(WorkflowDbContext dbContext,
             IEventServiceApiClient eventServiceApiClient,
             ILogger<AssessModel> logger,
-            ICommentsHelper commentsHelper,
+            ICommentsHelper dbAssessmentCommentsHelper,
             IAdDirectoryService adDirectoryService,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
@@ -111,7 +111,7 @@ namespace Portal.Pages.DbAssessment
             _dbContext = dbContext;
             _eventServiceApiClient = eventServiceApiClient;
             _logger = logger;
-            _commentsHelper = commentsHelper;
+            _dbAssessmentCommentsHelper = dbAssessmentCommentsHelper;
             _adDirectoryService = adDirectoryService;
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
@@ -137,7 +137,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "Assess");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             var action = "Save";
             LogContext.PushProperty("Action", action);
@@ -174,7 +174,7 @@ namespace Portal.Pages.DbAssessment
                     StatusCode = (int)AssessCustomHttpStatusCode.FailuresDetected
                 };
             }
-            
+
             _logger.LogInformation("Finished Save with: ProcessId: {ProcessId}; Action: {Action};");
 
             return StatusCode((int)HttpStatusCode.OK);
@@ -186,7 +186,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -286,9 +286,9 @@ namespace Portal.Pages.DbAssessment
 
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Verify has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task progression from {ActivityName} to Verify has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            await _commentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
+            await _dbAssessmentCommentsHelper.AddComment("Task progression from Assess to Verify has been triggered",
                                                                         processId,
                                                                     workflowInstance.WorkflowInstanceId,
                                                                      CurrentUser.DisplayName);
@@ -358,8 +358,7 @@ namespace Portal.Pages.DbAssessment
             await UpdateDataImpact(processId);
 
             await UpdateStsDataImpact(processId);
-
-            await _commentsHelper.AddComment($"Assess: Changes saved",
+            await _dbAssessmentCommentsHelper.AddComment($"Assess: Changes saved",
                 processId,
                 workflowInstanceId,
                  CurrentUser.DisplayName);
@@ -368,7 +367,7 @@ namespace Portal.Pages.DbAssessment
             return true;
         }
 
-        private async Task<string> GetCurrentAssessor(int processId)
+        private async Task<AdUser> GetCurrentAssessor(int processId)
         {
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
             return currentAssessData.Assessor;
@@ -438,10 +437,10 @@ namespace Portal.Pages.DbAssessment
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task UpdateCarisProjectWithAdditionalUser(int processId, string userName)
+        private async Task UpdateCarisProjectWithAdditionalUser(int processId, AdUser user)
         {
 
-            var hpdUsername = await GetHpdUser(userName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+            var hpdUsername = await GetHpdUser(user);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
             var carisProjectDetails =
                 await _dbContext.CarisProjectDetails.SingleOrDefaultAsync(cp => cp.ProcessId == processId);
 
@@ -455,22 +454,21 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
-                throw new InvalidOperationException($"Edit Database: Failed to assign {userName} ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
+                _logger.LogError(e, $"Failed to assign {user.DisplayName} with UPN {user.UserPrincipalName} and HPD username ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}");
+                throw new InvalidOperationException($"Edit Database: Failed to assign {user.DisplayName} - ({hpdUsername.HpdUsername}) to Caris project: {carisProjectDetails.ProjectId}. {e.Message}");
             }
         }
 
-        private async Task<HpdUser> GetHpdUser(string username)
+        private async Task<HpdUser> GetHpdUser(AdUser user)
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.Equals(user));
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
-                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
+                _logger.LogError("Unable to find HPD Username for {UserPrincipalName} in our system.");
+                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {user.DisplayName} in our system.",
                     ex.InnerException);
             }
 
@@ -546,7 +544,7 @@ namespace Portal.Pages.DbAssessment
                 await _dbContext.OnHold.AddAsync(onHoldRecord);
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} has been put on hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
                      CurrentUser.DisplayName);
@@ -567,7 +565,7 @@ namespace Portal.Pages.DbAssessment
 
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} taken off hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} taken off hold",
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
