@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common.Helpers.Auth;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -11,14 +10,11 @@ namespace Portal.Auth
     public class PortalUserDbService : IPortalUserDbService
     {
         private readonly WorkflowDbContext _workflowDbContext;
-        private readonly IAdDirectoryService _adDirectoryService;
 
-        public PortalUserDbService(WorkflowDbContext workflowDbContext, IAdDirectoryService adDirectoryService)
+        public PortalUserDbService(WorkflowDbContext workflowDbContext)
         {
             _workflowDbContext = workflowDbContext;
-            _adDirectoryService = adDirectoryService;
         }
-
 
         /// <summary>
         /// Get a TM site's users from database
@@ -27,7 +23,6 @@ namespace Portal.Auth
         public async Task<IEnumerable<AdUser>> GetUsersFromDbAsync()
         {
             return await _workflowDbContext.AdUsers.ToListAsync();
-
         }
 
         /// <summary>

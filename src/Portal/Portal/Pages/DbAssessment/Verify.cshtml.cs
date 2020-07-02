@@ -357,7 +357,7 @@ namespace Portal.Pages.DbAssessment
             }
             else if (!CurrentUser.UserPrincipalName.Equals(verifyData.Verifier.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
             {
-                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
+                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
             }
 
             if (ValidationErrorMessages.Any())

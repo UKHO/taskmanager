@@ -19,6 +19,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -42,28 +43,7 @@ namespace Portal.UnitTests
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
 
-        public AdUser TestUser
-        {
-            get
-            {
-                var user = AdUser.Unknown;
-
-                user = _dbContext.AdUsers.SingleOrDefault(u =>
-                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
-
-                if (user == null)
-                {
-                    user = new AdUser
-                    {
-                        DisplayName = "Test User",
-                        UserPrincipalName = "test@email.com"
-                    };
-                    _dbContext.SaveChanges();
-                }
-
-                return user;
-            }
-        }
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public void Setup()
@@ -73,6 +53,8 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
 
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
@@ -194,12 +176,11 @@ namespace Portal.UnitTests
             _assessModel.Team = "HW";
             _assessModel.Assessor = TestUser;
 
-            _assessModel.Verifier = AdUser.Empty;
+            _assessModel.Verifier = null;
             _assessModel.DataImpacts = new List<DataImpact>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
-
 
             await _assessModel.OnPostSaveAsync(ProcessId);
 
@@ -221,7 +202,7 @@ namespace Portal.UnitTests
             _assessModel.Team = "HW";
             _assessModel.Verifier = TestUser;
 
-            _assessModel.Assessor = AdUser.Empty;
+            _assessModel.Assessor = null;
             _assessModel.DataImpacts = new List<DataImpact>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
@@ -364,7 +345,7 @@ namespace Portal.UnitTests
             await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor}", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: Unable to set Assessor to unknown user {_assessModel.Assessor.DisplayName}", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
                     _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
                 .WithAnyArguments().MustNotHaveHappened();
@@ -390,7 +371,7 @@ namespace Portal.UnitTests
             await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier}", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_assessModel.Verifier.DisplayName}", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
                     _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
                 .WithAnyArguments().MustNotHaveHappened();
@@ -417,13 +398,16 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
         {
+            var testUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
+
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+                .Returns((testUser2.DisplayName, testUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(testUser2);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
                     _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
                 .WithAnyArguments().MustNotHaveHappened();
@@ -535,6 +519,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored,  A< DataImpact>.Ignored,A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
@@ -546,7 +531,7 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OnHoldTime);
-            Assert.AreEqual(onHoldRow.OnHoldBy, TestUser);
+            Assert.AreEqual(onHoldRow.OnHoldBy.UserPrincipalName, TestUser.UserPrincipalName);
         }
 
         [Test]
@@ -557,6 +542,8 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored))
+                .Returns(TestUser);
             _assessModel.Assessor = TestUser;
             _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
@@ -577,7 +564,13 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 OnHoldTime = DateTime.Now,
-                OffHoldBy = TestUser,
+                OffHoldBy = new AdUser
+                {
+                    AdUserId = 4,
+                    DisplayName = "sdfd",
+                    UserPrincipalName = "sdfds@dsfds.coim",
+                    LastCheckedDate = DateTime.Now
+                },
                 WorkflowInstanceId = 1
             });
             await _dbContext.SaveChangesAsync();
@@ -588,7 +581,7 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OffHoldTime);
-            Assert.AreEqual(onHoldRow.OffHoldBy, TestUser);
+            Assert.AreEqual(onHoldRow.OffHoldBy.UserPrincipalName, TestUser.UserPrincipalName);
         }
 
         [Test]
@@ -599,6 +592,8 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored))
+                .Returns(TestUser);
             _assessModel.Assessor = TestUser;
             _assessModel.Team = "HW";
             _assessModel.RecordProductAction = new List<ProductAction>()
@@ -720,7 +715,7 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -778,7 +773,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct

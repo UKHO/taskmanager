@@ -54,7 +54,7 @@ namespace Portal.Helpers
                 }
                 else if (!currentUserEmail.Equals(currentAssignedReviewerInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -136,7 +136,7 @@ namespace Portal.Helpers
                 }
                 else if (!currentUserEmail.Equals(currentAssignedAssessorInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -249,7 +249,7 @@ namespace Portal.Helpers
                 }
                 else if (!currentUserEmail.Equals(currentAssignedVerifierInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
 
@@ -446,14 +446,14 @@ namespace Portal.Helpers
 
             if (!await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Assessor))
             {
-                validationErrorMessages.Add($"Assign Task 1: Unable to set Assessor to unknown user {primaryAssignedTask.Assessor}");
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Assessor to unknown user {primaryAssignedTask.Assessor.DisplayName}");
                 return false;
             }
 
             if (!string.IsNullOrEmpty(primaryAssignedTask.Verifier?.UserPrincipalName) &&
                 !await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Verifier))
             {
-                validationErrorMessages.Add($"Assign Task 1: Unable to set Verifier to unknown user {primaryAssignedTask.Verifier}");
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Verifier to unknown user {primaryAssignedTask.Verifier.DisplayName}");
                 return false;
             }
 
@@ -468,7 +468,7 @@ namespace Portal.Helpers
 
                 if (!await _portalAduserDbService.ValidateUserAsync(assessor))
                 {
-                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Assessor to unknown user {assessor}");
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Assessor to unknown user {assessor.DisplayName}");
                     return false;
                 }
             }
@@ -479,7 +479,7 @@ namespace Portal.Helpers
                 if (!string.IsNullOrEmpty(verifier?.UserPrincipalName) &&
                     !await _portalAduserDbService.ValidateUserAsync(verifier))
                 {
-                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Verifier to unknown user {verifier}");
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Verifier to unknown user {verifier.DisplayName}");
                     return false;
                 }
             }
@@ -577,7 +577,7 @@ namespace Portal.Helpers
 
             if (!await _portalAduserDbService.ValidateUserAsync(user))
             {
-                validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {user}");
+                validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {user.DisplayName}");
                 return false;
             }
             return true;
