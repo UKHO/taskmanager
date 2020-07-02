@@ -18,6 +18,12 @@
 
                 setCreateHandler();
                 initialiseTypeaheads($('.assignTaskAssessor, .assignTaskVerifier'));
+                $('.assignTaskAssessor').on('typeahead:selected', function (eventObject, suggestionObject) {
+                    $('#assignTaskAssessorUpn').val(suggestionObject.userPrincipalName);
+                });
+                $('.assignTaskVerifier').on('typeahead:selected', function(eventObject, suggestionObject) {
+                    $('#assignTaskVerifierUpn').val(suggestionObject.userPrincipalName);
+                });
                 update();
 
                 if (isReadOnly) {
@@ -79,6 +85,8 @@
                     }
                 }
             });
+
+      
     }
 
     function displayTypeaheadsInitialiseErrors(errorStringArray) {
@@ -113,8 +121,10 @@
                 assignNewIdForAdditionalAssignedTasks($(element), id);
 
                 //Set Form Control Names
-                $(element).find($(".assignTaskAssessor:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor");
-                $(element).find($(".assignTaskVerifier:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier");
+                $(element).find($(".assignTaskAssessor:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor.DisplayName");
+                $(element).find($(".assignTaskVerifier:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier.DisplayName");                
+                $(element).find($(".assignTaskAssessorUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor.UniversalPrincipalName");
+                $(element).find($(".assignTaskVerifierUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier.UniversalPrincipalName");
                 $(element).find($(".assignTaskType")).prop("name", "AdditionalAssignedTasks[" + id + "].TaskType");
                 $(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AdditionalAssignedTasks[" + id + "].WorkspaceAffected");
                 $(element).find($(".assignTaskNotes")).prop("name", "AdditionalAssignedTasks[" + id + "].Notes");
@@ -167,10 +177,16 @@
             var newThing = $($(".assignTask")[0]).clone();
 
             var assessorElement = $(newThing).find(".assignTaskAssessor:not(.tt-hint)");
+            var assessorUpnElement = $(newThing).find("#assignTaskAssessorUpn");
+            
             var verifierElement = $(newThing).find(".assignTaskVerifier:not(.tt-hint)");
+            var verifierUpnElement = $(newThing).find("#assignTaskVerifierUpn");
 
             assessorElement.val("");
+            assessorUpnElement.val("");
             verifierElement.val("");
+            assessorUpnElement.val("");
+
             $(newThing).find(".assignTaskType").val(0);
             $(newThing).find(".assignTaskWorkspaceAffected").val("");
             $(newThing).find(".assignTaskNotes").val("");
@@ -181,11 +197,20 @@
             assessorElement.siblings("span").remove();
             verifierElement.appendTo(verifierElement.parents("div")[0]);
             verifierElement.siblings("span").remove();
-
+            
             initialiseTypeaheads(assessorElement.add(verifierElement));
 
             $("#assignTasks").append(newThing);
             $(newThing).show();
+
+            assessorElement.on('typeahead:selected', function (eventObject, suggestionObject) {
+                assessorUpnElement.val(suggestionObject.userPrincipalName);
+
+            });            
+            verifierElement.on('typeahead:selected', function (eventObject, suggestionObject) {
+                verifierUpnElement.val(suggestionObject.userPrincipalName);
+
+            });
 
             update();
         });
