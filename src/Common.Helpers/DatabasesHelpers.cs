@@ -163,5 +163,13 @@ namespace Common.Helpers
             dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
             dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUser', RESEED, 0)");
         }
+
+        public static WorkflowDbContext GetInMemoryWorkflowDbContext()
+        {
+            var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
+                .UseInMemoryDatabase(databaseName: "inmemory")
+                .Options;
+            return new WorkflowDbContext(dbContextOptions);
+        }
     }
 }
