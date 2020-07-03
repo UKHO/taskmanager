@@ -11,7 +11,9 @@
 
     handleMyTaskList();
     handleTeamTasks();
-   
+
+    $.fn.dataTable.moment('DD/MM/YYYY');
+
     setMenuItemSelection();
     handleHistoricalTasks();
 

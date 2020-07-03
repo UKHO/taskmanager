@@ -44,7 +44,7 @@
 <h3>New Chart / New Edition</h3>
 
 <div class="card mb-4 mt-3">
-    <h3>In Flight Tasks</h3>
+    <h3>My Tasks</h3>
     <div class="card-body" style="width: 100%">
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
@@ -60,7 +60,7 @@
                     <th style="min-width: 5.9rem;">CIS</th>
                     <th style="min-width: 5.9rem;">Publication</th>
                     <th>Country</th>
-                    <th style="max-width: 4.0rem;">Workflow Type</th>
+                    <th style="max-width: 4.5rem;">Workflow Type</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -217,7 +217,7 @@
     </div>
 </div>
 <div class="card mb-4 mt-3" id="assignedTasksTable">
-    <h3>Assigned to me</h3>
+    <h3>Associated Tasks</h3>
     <div class="card-body" style="width: 100%">
         <table id="assignedTasks" class="table-striped" style="width: 100%">
             <thead>
@@ -238,11 +238,11 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                                        &&
-                                                        (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
-                 || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
-                 || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
-                 || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
+                                                     &&
+                                                     (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
+              || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
+              || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
+              || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
