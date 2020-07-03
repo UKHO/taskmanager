@@ -1,13 +1,157 @@
 ﻿@page
+@using DbUpdatePortal.Enums
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <a asp-page="./Index">
-        <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
-    </a>
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row pt-1">
+    <div class="col-4">
+        <a asp-page="./Index">
+            <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row mb-2">
+            <div id="menuItemList" class="col-10">
+                <button id="btnMyTaskList" class="btn btn-primary">My Task List</button>
+                <button id="btnTeamTasks" class="btn btn-primary">Team Tasks</button>
+                <button id="btnStats" class="btn btn-primary">Statistics</button>
+                <button id="btnHistoricalTasks" class="btn btn-primary">Historical Tasks</button>
+                <span class="ml-3" id="userFullName">Hello <strong>@Model.CurrentUser.DisplayName</strong></span>
+            </div>
+            <div class="col-2">
+                <button id="btnNewTask" class="btn btn-primary">New Task</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 pr-0">
+                <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Database Update</h3>
+
+<div class="card mb-4 mt-3">
+    <h3>My Tasks</h3>
+    <div class="card-body" style="width: 100%">
+        <table id="inFlightTasks" class="table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Process ID</th>
+                    <th style="min-width: 5.0rem;">Task Name</th>
+                    <th>User</th>
+                    <th style="min-width: 5.9rem;">Stage</th>
+                    <th style="min-width: 5.9rem;">Update Type</th>
+                    <th style="min-width: 5.9rem;">Target Date</th>
+                    <th style="min-width: 5.9rem;">Charting Area</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()))
+                {
+                    <tr>
+                        <td class="details-control"><i class="fa"></i></td>
+                        <td>
+                            <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            @task.AssignedUser
+                        </td>
+                        <td>
+                            @task.CurrentStage
+                        </td>
+                        <td>
+                            @task.UpdateType
+                        </td>
+                        <td>
+                            @task.TargetDate?.ToShortDateString()
+                        </td>
+                        <td>
+                            @task.ChartingArea
+                        </td>
+
+                        <td>
+                            @*<div class="dropdown" style="cursor: pointer;">
+                                    <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text">
+                                            <i class="far fa-edit">
+                                            </i>
+                                            Edit Task Note
+                                        </a>
+                                        <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.ChartType">
+                                            <i class="far fa-user">
+                                            </i>
+                                            Assign Task
+                                        </a>
+                                    </div>
+                                </div>*@
+                        </td>
+                        <td>
+                            @task.TaskNote?.Text
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4 mt-3" id="assignedTasksTable">
+    <h3>Associated Tasks</h3>
+    <div class="card-body" style="width: 100%">
+        <table id="assignedTasks" class="table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th style="min-width: 5.0rem;">Task Name</th>
+                    <th style="max-width: 4.0rem;">Update Type</th>
+                    <th style="min-width: 3.9rem;">Charting Area</th>
+                    <th style="min-width: 5.9rem;">Compiler</th>
+                    <th style="min-width: 5.9rem;">Verifier</th>
+                    <th style="max-width: 4.0rem;">Last Update</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
+                                                  &&
+                                                  (t.TaskRole.Verifier == Model.CurrentUser.DisplayName
+           || t.TaskRole.Compiler == Model.CurrentUser.DisplayName)))
+                {
+                    <tr>
+                        <td>
+                            <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            @task.Name
+                        </td>
+                        <td>
+                            @task.UpdateType
+                        </td>
+                        <td>
+                            @task.ChartingArea
+                        </td>
+                        <td>
+                            @task.TaskRole.Compiler
+                        </td>
+                        <td>
+                            @task.TaskRole.Verifier
+                        </td>
+                        <td>
+                            @task.StatusChangeDate
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
 </div>

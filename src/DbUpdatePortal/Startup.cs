@@ -1,6 +1,9 @@
 using Common.Helpers;
+using Common.Helpers.Auth;
+using DbUpdatePortal.Auth;
 using DbUpdatePortal.Configuration;
 using DbUpdatePortal.Helpers;
+using DbUpdatePortal.HostedServices;
 using DbUpdateWorkflowDatabase.EF;
 using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -12,12 +15,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Serilog;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Globalization;
-using DbUpdatePortal.HostedServices;
 
 namespace DbUpdatePortal
 {
@@ -50,7 +53,7 @@ namespace DbUpdatePortal
             });
 
             services.AddOptions<GeneralConfig>()
-                .Bind(Configuration.GetSection("dbupgradeportal"))
+                .Bind(Configuration.GetSection("dbupdateportal"))
                 .Bind(Configuration.GetSection("subscription"))
                 .Bind(Configuration.GetSection("caris"));
             services.AddOptions<UriConfig>()
@@ -67,33 +70,33 @@ namespace DbUpdatePortal
             Configuration.GetSection("subscription").Bind(startupConfig);
             Configuration.GetSection("dbupdateportal").Bind(startupConfig);
 
-            //services.AddOptions<AdUserUpdateServiceConfig>()
-            //    .Bind(Configuration.GetSection("dbupdateportal"));
-            //services.AddOptions<AdUserUpdateServiceSecrets>()
-            //    .Bind(Configuration.GetSection("DbUpdateActiveDirectory"));
+            services.AddOptions<AdUserUpdateServiceConfig>()
+                .Bind(Configuration.GetSection("dbupdateportal"));
+            services.AddOptions<AdUserUpdateServiceSecrets>()
+                .Bind(Configuration.GetSection("DbUpdateActiveDirectory"));
 
             // Use a singleton Microsoft.Graph.HttpProvider to avoid same issues HttpClient once suffered from
             services.AddSingleton<IHttpProvider, HttpProvider>();
 
 
             // TODO - refactor all GetService away
-            //services.AddSingleton<IAdDirectoryService,
-            //    AdDirectoryService>(s => new AdDirectoryService(
-            //    s.GetService<IOptions<StartupSecretsConfig>>().Value.ClientAzureAdSecret,
-            //    s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
-            //    s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
-            //    isLocalDevelopment
-            //        ? s.GetService<IOptions<UriConfig>>().Value.DbUpdateLocalDevLandingPageHttpsUrl
-            //        : s.GetService<IOptions<UriConfig>>().Value.DbUpdateLandingPageUrl,
-            //    s.GetService<HttpProvider>()));
+            services.AddSingleton<IAdDirectoryService,
+                AdDirectoryService>(s => new AdDirectoryService(
+                s.GetService<IOptions<StartupSecretsConfig>>().Value.ClientAzureAdSecret,
+                s.GetService<IOptions<GeneralConfig>>().Value.AzureAdClientId,
+                s.GetService<IOptions<GeneralConfig>>().Value.TenantId,
+                isLocalDevelopment
+                    ? s.GetService<IOptions<UriConfig>>().Value.DbUpdateLocalDevLandingPageHttpsUrl
+                    : s.GetService<IOptions<UriConfig>>().Value.DbUpdateLandingPageUrl,
+                s.GetService<HttpProvider>()));
 
 
             services.AddSingleton<AppVersionInfo>();
 
-            //services.AddScoped<IDbUpdateUserDbService,
-            //    DbUpdateUserDbService>(s => new DbUpdateUserDbService(s.GetService<DbUpdateWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
+            services.AddScoped<IDbUpdateUserDbService,
+                DbUpdateUserDbService>(s => new DbUpdateUserDbService(s.GetService<DbUpdateWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
-            //services.AddScoped<IDbUpdateUserDbService, DbUpdateUserDbService>();
+            services.AddScoped<IDbUpdateUserDbService, DbUpdateUserDbService>();
 
             // Order of these two is important
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)

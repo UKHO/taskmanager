@@ -1,66 +1,362 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
-
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+body {
+    color: #333333;
+    font-family: 'JohnstonITC', Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 14px;
+    font-weight: 300;
 }
 
-/* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
+/* Start chevron for notes on landing page */
+table.dataTable td.details-control i:before {
+    content: '\f078';
+    font-family: 'Font Awesome 5 Free';
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #09315B;
+    padding-right: 0.35em;
 }
+
+table.dataTable tr.shown td.details-control i:before {
+    content: '\f077';
+    color: #09315B;
+}
+/* End chevron for notes on landing page */
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.container {
+    max-width: 1540px;
+}
+
+table.task-list thead tr th {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.form-row {
+    margin: 1.0em 0;
+}
+
+
+/* TODO fix up in tasks note story */
+
+/*#inFlightTasks.table-striped > tbody > tr.even,
+#inFlightTasks.table-striped > tbody > tr.even + tr {
+    background-color: #ffffff;
+}
+
+#inFlightTasks.table-striped > tbody > tr.odd,
+#inFlightTasks.table-striped > tbody > tr.odd + tr {
+    background-color: #f9f9f9;
+}*/
+/*#inFlightTasks.table-striped > tbody > tr > td.note-formatting {
+    padding: 5px 0px 10px 15px;
+}*/
+
+.panel {
+    overflow: auto;
+}
+
+.deleteAssignTask {
+}
+
+/*Set outline for focus to override Bootstrap 4*/
+.btn:focus, .btn.focus,
+.switch > input:focus + span, .switch > input.focus + span,
+.checkbox-wrapper > input:focus + label::before, .checkbox-wrapper > input.focus + label::before {
+    outline: rgb(77, 144, 254) auto 1px;
+    outline-color: rgb(77, 144, 254);
+    outline-style: auto;
+    outline-width: 1px;
+}
+
+.btn-size > div {
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    max-width: 8.8rem;
+}
+
+
+/*Start primary button*/
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #09315B;
+    border-color: #09315B;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+
+.btn.btn-primary:disabled {
+    background-color: #DBDBDB;
+    color: #3A3A3A;
+    border-color: #DBDBDB;
 }
 
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  font-size: 14px;
-}
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.buttonSelected {
+    background-color: #007e97;
+    color: #fff;
+    font-weight: 400;
 }
 
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: unset;
 }
 
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
 }
 
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: unset;
 }
 
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  position: relative;
-  min-height: 100%;
+/*End primary button*/
+
+/*Start secondary button*/
+
+.btn-secondary {
+    color: #05284e;
+    background-color: #fff;
+    border-color: #05284e;
 }
 
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+.btn.btn-secondary:disabled {
+    background-color: #DBDBDB;
+    color: #3A3A3A;
+    border-color: #DBDBDB;
+}
+
+.btn-secondary:focus, .btn-secondary.focus {
+    box-shadow: unset;
+}
+
+.btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: #05284e;
+    border-color: #05284e;
+}
+
+.btn-secondary:not(:disabled):not(.disabled):active:focus, .btn-secondary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-secondary.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+.btn.btn-secondary:hover, .btn.btn-secondary.hover {
+    color: #05284e;
+    background-color: #eee;
+    border-color: #05284e;
+}
+
+/*End secondary button*/
+
+/*Start danger button*/
+
+.btn.btn-danger {
+    color: #ffffff;
+    background-color: #e20d0d;
+    border-color: #e20d0d;
+}
+
+.btn.btn-danger:hover, .btn.btn-danger.hover {
+    background-color: #e20d34;
+}
+
+.btn-danger:focus, .btn-danger.focus {
+    box-shadow: unset;
+}
+
+.btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
+.show > .btn-danger.dropdown-toggle {
+    color: #e20d0d;
+    background-color: #ffffff;
+    border-color: #e20d0d;
+}
+
+.btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
+.show > .btn-danger.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+/*End danger button*/
+
+/*Start mark complete button*/
+
+.btn.btn-complete {
+    color: #ffffff;
+    background-color: #0D8720;
+    border-color: #0D8720;
+}
+
+    .btn.btn-complete:hover, .btn.btn-complete.hover {
+        background-color: #0B701A;
+        border-color: #0B701A;
+    }
+
+.btn.btn-complete:focus, .btn.btn-complete.focus {
+    box-shadow: unset;
+}
+
+.btn-complete:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
+.show > .btn-complete.dropdown-toggle {
+    color: #0B701A;
+    background-color: #ffffff;
+    border-color: #0B701A;
+}
+
+.btn-complete:not(:disabled):not(.disabled):active:focus, .btn-complete:not(:disabled):not(.disabled).active:focus,
+.show > .btn-complete.dropdown-toggle:focus {
+    box-shadow: unset;
+}
+
+/*End mark complete button*/
+
+
+
+
+label {
+    font-weight: 300;
+}
+
+.navbar-header {
+    visibility: hidden;
+}
+
+.btn {
+    border: 2px solid #09315B;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0px;
+}
+
+h1, .h1 {
+    font-size: 2.1rem;
+}
+
+h2, .h2 {
+    font-size: 1.6rem;
+}
+
+h4, .h4 {
+    font-size: 1.4rem;
+    color: #09315B;
+}
+
+.card .close-x {
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.card > h3 {
+    height: 45px;
+    line-height: 45px;
+}
+
+/* DataTables tweaked for UKHO design system */
+table.dataTable td {
+    line-height: 1.8rem;
+}
+
+table.dataTable td,
+table.dataTable th {
+    padding-left: 0.5rem;
+}
+
+table.dataTable thead tr {
+    vertical-align: bottom;
+}
+/* Moving sort arrows down in line with titles */
+table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead .sorting_desc_disabled:after {
+    bottom: 0.2em;
+}
+
+/* General table tweaks for UKHO design */
+
+table thead {
+    border-bottom: 5px solid #09315B;
+}
+
+table th {
+    border-bottom: 5px solid #09315B;
+    text-align: left;
+    font-weight: normal;
+}
+
+table td {
+    border-right: 1px solid #d8d8d8;
+    font-weight: 300;
+}
+
+table > tbody > tr > th {
+    font-weight: 300;
+    border-bottom: unset;
+}
+
+.attachLinkedDocumentButtonContainer .fa.fa-paperclip,
+.attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
+    color: #09315B;
+    font-size: 24px;
+}
+
+.attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
+    position: relative;
+    bottom: 34px;
+    left: 11px;
+}
+
+.attachLinkedDocumentSpinnerContainer .spinner-border {
+    color: #09315B;
+    width: 2.75em;
+    height: 2.75em;
+}
+
+/* For checkbox sitting on right of text on assess page */
+/*.custom-control-label::before, .custom-control-label::after {
+    right: 0;
+}*/
+
+/* TODO is this actually being used? */
+/*label span {
+    position: absolute;
+    right: 21px;
+}*/
+
+.form-text-input {
+    width: 100%;
+    border: 2px solid #03284F;
+    color: #09315B;
+    padding-left: 18px;
+    padding: 0px 20px 0px 14px;
+    outline: none;
+    background-color: #f6f6f6;
+    line-height: 2.3rem;
+    border-radius: unset;
+    box-shadow: unset;
+}
+
+.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
+    box-shadow: unset;
+}
+    .form-text-input:-webkit-input-placeholder {
+        color: #09315B;
+        overflow: visible;
+    }
+
+.attachLinkedDocumentSpinnerContainer {
+    width: 68px;
 }
 
 /* Footer start */
@@ -98,10 +394,498 @@ body, .sticky-footer-wrapper {
     text-align: right;
     font-size: 11px;
 }
-
-/* Site link colour has reduced contrast over footer */
-.versioning a {
-    color: #09315B;
-    text-decoration: underline;
-}
+    /* Site link colour has reduced contrast over footer */
+    .versioning a {
+        color: #09315B; 
+        text-decoration: underline;
+    }
 /* Footer end */
+
+
+/* START of pagination matching UKHO design system */
+
+.page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #09315B;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+/* Square off prev/next buttons button corners */
+.page-item:last-child .page-link {
+    border-top-right-radius: 0rem;
+    border-bottom-right-radius: 0rem;
+}
+
+.page-item:first-child .page-link {
+    border-top-left-radius: 0rem;
+    border-bottom-left-radius: 0rem;
+}
+
+/* Admiralty blue for prev/next buttons */
+.pagination > li:first-child a {
+    background-color: #09315B;
+    color: #ffffff;
+}
+
+.pagination > li:last-child a {
+    background-color: #09315B;
+    color: #ffffff;
+}
+
+.page-link:focus {
+    z-index: 2;
+    outline: 0;
+    box-shadow: unset;
+}
+
+/* Format for clicking prev/next buttons */
+.pagination .page-item:last-child .page-link:active {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
+
+.pagination .page-item:first-child .page-link:active {
+    color: #09315B;
+    background-color: #ffffff;
+    border-color: #09315B;
+}
+/* END of pagination matching UKHO design system */
+
+/* Start UKHO design system error dialog stuff*/
+.modal-dialog.error {
+    border-left: 5px solid #e20d0d;
+}
+
+
+
+    .modal-dialog.error h3 {
+        color: #e20d0d;
+    }
+
+    .modal-dialog.error i.fa.fa-info-circle {
+        color: #e20d0d;
+    }
+
+    .fa, .modal-dialog h3::before, .modal-dialog.error h3::before, .modal-dialog.success h3::before, .modal-dialog.warning h3::before,
+    .fas,
+    .far,
+    .fal,
+    .fad,
+    .fab {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+    }
+
+.modal-content {
+    border-radius: unset;
+    border: 0px;
+}
+
+.fa, .dialog h5::before, .dialog.error h5::before, .dialog.success h5::before, .dialog.warning h5::before,
+.fas {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+.dialog {
+    padding: 18px 18px;
+    /* info type is default */
+    border-left: 5px solid #0177c1;
+}
+
+    .dialog h5 {
+        color: #0177c1;
+    }
+
+        .dialog h5::before, .dialog.warning h5::before, .dialog.success h5::before, .dialog.error h5::before {
+            color: inherit;
+            font-size: 18px;
+            margin: 0 10px 0 0;
+        }
+
+    .dialog.error {
+        border-left: 5px solid #e20d0d;
+    }
+
+        .dialog.error h5 {
+            color: #e20d0d;
+        }
+
+    .dialog.success {
+        border-left: 5px solid #4aab37;
+    }
+
+        .dialog.success h5 {
+            color: #4aab37;
+        }
+
+    .dialog.warning {
+        border-left: 5px solid #ef8123;
+    }
+
+        .dialog.warning h5 {
+            color: #ef8123;
+        }
+
+#assessDoneErrorMessage > ul {
+    display: inline;
+}
+
+.modal-dialog.error li:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+/* TYPEAHEAD START */
+span.twitter-typeahead {
+    width: 100%;
+}
+
+.tt-input.form-text-input {
+    width: 100%;
+    border: 2px solid #03284F;
+    color: #09315B;
+    padding-left: 18px;
+    padding: 0px 20px 0px 14px;
+    outline: none;
+    background-color: #f6f6f6;
+    line-height: 2.3rem;
+    border-radius: unset;
+}
+
+.tt-input.form-text-input:focus {
+    border-color: #0177c1;
+    color: #0177c1;
+    background-color: #ffffff;
+}
+
+.tt-menu {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 12px;
+    padding: 8px 4px 8px 4px;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.tt-suggestion {
+    padding: 3px 0px;
+}
+
+.tt-suggestion:hover {
+    cursor: pointer;
+    background-color: #0097CF;
+    color: #FFFFFF;
+}
+/* TYPEAHEAD END */
+
+/*label{margin-left:20px}*/
+#datepicker{ width: 180px;margin: 0 20px 20px 20px;}
+#datepicker > span:hover{ cursor: pointer;}
+
+
+
+
+.bottom {
+    border-color: #c8c8c8 transparent transparent transparent;
+    border-width: 4px 4px 0px 4px;
+    bottom: -4px;
+}
+
+tbody.workflow-row td {
+    padding: 10px 10px;
+    border-top: 1px;
+    border-bottom: 1px;
+    border-style: solid;
+    border-color: #d8d8d8;
+}
+
+    tbody.workflow-row td:not(:first-child):not(:last-child) {
+        border-left: 1px;
+        border-right: 1px;
+        border-top: 1px;
+        border-bottom: 1px;
+        border-style: solid;
+        border-color: #d8d8d8;
+    }
+
+    tbody.workflow-row td:first-child,
+    tbody.workflow-row td:last-child {
+        border-left: 0px;
+        border-right: 0px;
+    }
+
+/* Show comments switch */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    min-width: 28px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    border: #adb5bd solid 1px;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 16px;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 12px;
+        width: 12px;
+        left: 1px;
+        bottom: 1px;
+        background-color: #adb5bd;
+        -webkit-transition: .1s;
+        transition: .1s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #4aab37;
+    border: #4aab37 solid 1px;
+}
+
+input:focus + .slider {
+    box-shadow: none;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(12px);
+    -ms-transform: translateX(12px);
+    transform: translateX(12px);
+    background-color: #fff;
+    border: #fff solid 1px;
+}
+
+/* End switch */
+
+/* CHECKBOX START */
+
+.checkbox-wrapper input[type=checkbox] {
+    opacity: 0;
+    position: absolute;
+    left: -9999px;
+}
+
+    .checkbox-wrapper input[type=checkbox]:disabled ~ label::before {
+        border: 2px solid #adb5bd;
+    }
+
+    .checkbox-wrapper input[type=checkbox]:disabled ~ label::after {
+        color: #adb5bd;
+    }
+
+.checkbox-wrapper label {
+    position: relative;
+    display: inline-block;
+    padding-left: 35px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 24px;
+}
+
+.checkbox-wrapper label::before,
+.checkbox-wrapper label::after {
+    position: absolute;
+    content: "";
+    display: inline-block;
+}
+
+.checkbox-wrapper label::before {
+    height: 22px;
+    width: 22px;
+    border: 2px solid #03284F;
+    left: 0;
+    top: 0;
+}
+
+.checkbox-wrapper label::after {
+    height: 6px;
+    width: 13px;
+    border-left: 3px solid;
+    border-bottom: 3px solid;
+    transform: rotate(-45deg);
+    left: 5px;
+    top: 7px;
+}
+
+.checkbox-wrapper input[type=checkbox] + label::after {
+    content: none;
+}
+
+.checkbox-wrapper input[type=checkbox]:checked + label::after {
+    content: "";
+}
+
+/* CHECKBOX END */
+
+/* DROPDOWN START */
+
+
+.design-custom-select {
+    position: relative;
+    background-color: #f6f6f6;
+    border: 2px solid #03284F;
+}
+
+.design-custom-select select {
+    display: none;
+    /*hide original SELECT element: */
+}
+
+.design-custom-select .select-selected.select-arrow-active {
+    background-color: #ffffff;
+}
+
+.arrow-icon-wrap {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    pointer-events: none;
+}
+
+/* style the items (options), including the selected item: */
+.select-items div, .select-selected {
+    color: #09315B;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+/* Style items (options): */
+.select-items {
+    border: 2px solid #03284F;
+    border-top: none;
+    padding-top: 30px;
+    position: absolute;
+    background-color: #ffffff;
+    width: calc(100% + 4px);
+    top: 100%;
+    left: -2px;
+    right: 0;
+    z-index: 99;
+}
+
+.select-items div {
+    font-size: 21px;
+}
+
+/* Hide the items when the select box is closed: */
+.select-hide {
+    display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: 400;
+}
+
+
+
+/* DROPDOWN END */
+
+/* WORKFLOW PAGE START */
+
+.speech.count {
+    position: relative;
+    bottom: 25px;
+    left: 2px;
+    color: white;
+    text-align: center;
+    width: 26px;
+    background-color: #09315B;
+}
+
+.speech.bubble > i {
+    color: #09315B;
+    font-size: 30px;
+}
+
+table#workflow-table th {
+    padding: 0.4rem 0rem;
+}
+
+table#workflow-table tr.shaded {
+    background-color: #EEF3F4;
+}
+
+.show-comments span {
+    font-weight: 300;
+}
+
+.status.inProgress {
+    color: #0177C1;
+}
+
+.status.Complete {
+    color: #0D8720;
+}
+
+h4.Inactive {
+    color: #707070;
+    font-weight: 200;
+}
+
+h6.Inactive {
+    color: #707070;
+    font-weight: 200;
+}
+
+#generic-comments-table td {
+    border-right: none;
+    font-weight: 300;
+}
+
+/* WORKFLOW PAGE END */
+
+#stageName {
+    font-weight: 600;
+}
+
+#chartNo {
+    font-weight: 600;
+}
+
+#versionNo {
+    font-weight: 600;
+}
+
+h1.workflow-page-heading > span.red {
+    color: #cd2026;
+}
+
+.numberOnly::-webkit-inner-spin-button,
+.numberOnly::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
