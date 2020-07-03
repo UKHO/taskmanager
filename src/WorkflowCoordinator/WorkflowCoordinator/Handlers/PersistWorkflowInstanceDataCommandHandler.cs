@@ -48,8 +48,8 @@ namespace WorkflowCoordinator.Handlers
 
             var k2Task = await _workflowServiceApiClient.GetWorkflowInstanceData(message.ProcessId);
 
-            WorkflowInstance workflowInstance = null;
-            CompleteAssessmentCommand completeAssessment = null;
+            WorkflowInstance workflowInstance;
+            CompleteAssessmentCommand completeAssessment;
 
 
             switch (message.ToActivity)
@@ -80,7 +80,7 @@ namespace WorkflowCoordinator.Handlers
 
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
 
-                    await PersistWorkflowDataToAssessFromVerify(message.ProcessId, message.FromActivity, workflowInstance);
+                    await PersistWorkflowDataToAssessFromVerify(message.ProcessId, workflowInstance);
 
                     break;
                 case WorkflowStage.Assess:
@@ -91,7 +91,7 @@ namespace WorkflowCoordinator.Handlers
                     workflowInstance = await UpdateWorkflowInstanceData(message.ProcessId, k2Task.SerialNumber, WorkflowStage.Assess, WorkflowStatus.Started);
                     
                     await CopyPrimaryAssignTaskNoteToComments(message.ProcessId);
-                    await PersistWorkflowDataToAssessFromReview(message.ProcessId, message.FromActivity, workflowInstance);
+                    await PersistWorkflowDataToAssessFromReview(message.ProcessId, workflowInstance);
                     await ProcessAdditionalTasks(message, context);
 
                     break;
@@ -120,7 +120,7 @@ namespace WorkflowCoordinator.Handlers
 
                     await context.SendLocal(completeAssessment).ConfigureAwait(false);
 
-                    await PublishHdbAssessmentReadyEvent(workflowInstance.PrimaryDocumentStatus.SdocId);
+                    await PublishSourceDocumentVerifiedEvent(message.ProcessId, workflowInstance.PrimaryDocumentStatus.SdocId);
 
                     break;
                 default:
@@ -183,7 +183,7 @@ namespace WorkflowCoordinator.Handlers
 
         }
 
-        private async Task PersistWorkflowDataToAssessFromReview(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        private async Task PersistWorkflowDataToAssessFromReview(int processId, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssessFromReview", nameof(PersistWorkflowDataToAssessFromReview));
             LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
@@ -224,7 +224,7 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
-        private async Task PersistWorkflowDataToAssessFromVerify(int processId, WorkflowStage fromActivity, WorkflowInstance workflowInstance)
+        private async Task PersistWorkflowDataToAssessFromVerify(int processId, WorkflowInstance workflowInstance)
         {
             LogContext.PushProperty("PersistWorkflowDataToAssessFromVerify", nameof(PersistWorkflowDataToAssessFromVerify));
             LogContext.PushProperty("WorkflowInstanceId", workflowInstance.WorkflowInstanceId);
@@ -376,21 +376,23 @@ namespace WorkflowCoordinator.Handlers
         /// <summary>
         /// Posts a HdbAssessmentReadyEvent to PCP's Event Service API
         /// </summary>
+        /// <param name="processId"></param>
         /// <param name="sdocId"></param>
         /// <returns></returns>
-        private async Task PublishHdbAssessmentReadyEvent(int sdocId)
+        private async Task PublishSourceDocumentVerifiedEvent(int processId, int sdocId)
         {
-            var hdbAssessmentReadyEvent = new UKHO.Events.HDBAssessmentReadyEvent
+            var sourceDocumentVerifiedEvent = new UKHO.Events.SourceDocumentVerifiedEvent()
             {
-                SourceDocumentAssessmentId = sdocId.ToString()
+                SourceDocumentId = sdocId,
+                TaskManagerProcessId = processId
             };
 
-            LogContext.PushProperty("HDBAssessmentReadyEvent",
-                hdbAssessmentReadyEvent.ToJSONSerializedString());
+            LogContext.PushProperty("SourceDocumentVerifiedEvent",
+                sourceDocumentVerifiedEvent.ToJSONSerializedString());
 
-            _logger.LogInformation("Publishing HDBAssessmentReadyEvent to PCP's Event Service: {HDBAssessmentReadyEvent}");
+            _logger.LogInformation("Publishing SourceDocumentVerifiedEvent to PCP's Event Service: {SourceDocumentVerifiedEvent}");
 
-            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.HDBAssessmentReadyEvent), hdbAssessmentReadyEvent);
+            await _pcpEventServiceApiClient.PostEvent(nameof(UKHO.Events.SourceDocumentVerifiedEvent), sourceDocumentVerifiedEvent);
         }
 
     }
