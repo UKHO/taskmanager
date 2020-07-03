@@ -340,7 +340,7 @@ namespace WorkflowCoordinator.UnitTests
         }
         
         [Test]
-        public async Task Test_Handle_SignOff_FromActivity_Verify_And_ToActivity_Completed__then_HDBAssessmentReadyEvent_is_published()
+        public async Task Test_Handle_SignOff_FromActivity_Verify_And_ToActivity_Completed__then_SourceDocumentVerifiedEvent_is_published()
         {
             var processId = 1;
             var workflowInstanceId = 1;
@@ -399,8 +399,8 @@ namespace WorkflowCoordinator.UnitTests
 
             A.CallTo(() =>
                     _fakePcpEventServiceApiClient.PostEvent(
-                                                        nameof(HDBAssessmentReadyEvent), 
-                                                        A<HDBAssessmentReadyEvent>.That.Matches(c => c.SourceDocumentAssessmentId == sdocId.ToString() )))
+                                                        nameof(SourceDocumentVerifiedEvent), 
+                                                        A<SourceDocumentVerifiedEvent>.That.Matches(c => c.SourceDocumentId == sdocId && c.TaskManagerProcessId == processId )))
                 .MustHaveHappened();
 
 
