@@ -13,6 +13,7 @@ using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Models;
 using Portal.Pages.DbAssessment;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -28,6 +29,15 @@ namespace Portal.UnitTests
         private IAdDirectoryService _fakeAdDirectoryService;
         private ILogger<HistoricalTasksModel> _fakeLogger;
 
+        public AdUser ReviewerUser1 { get; set; }
+        public AdUser ReviewerUser2 { get; set; }
+
+        public AdUser AssessorUser1 { get; set; }
+        public AdUser AssessorUser2 { get; set; }
+
+        public AdUser VerifierUser1 { get; set; }
+        public AdUser VerifierUser2 { get; set; }
+
         [SetUp]
         public void Setup()
         {
@@ -35,6 +45,14 @@ namespace Portal.UnitTests
                 .UseInMemoryDatabase(databaseName: "inmemory")
                 .Options;
             _dbContext = new WorkflowDbContext(dbContextOptions);
+
+            ReviewerUser1 = AdUserHelper.CreateTestUser(_dbContext, 1);
+            ReviewerUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
+            AssessorUser1 = AdUserHelper.CreateTestUser(_dbContext, 3);
+            AssessorUser2 = AdUserHelper.CreateTestUser(_dbContext, 4);
+            VerifierUser1 = AdUserHelper.CreateTestUser(_dbContext, 5);
+            VerifierUser2 = AdUserHelper.CreateTestUser(_dbContext, 6);
+
 
             _dmEndDateCalculator = A.Fake<IDmEndDateCalculator>();
             _mapper = A.Fake<IMapper>();
@@ -44,7 +62,8 @@ namespace Portal.UnitTests
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
 
-            _historicalTasksModel = new HistoricalTasksModel(_dbContext, _dmEndDateCalculator, _mapper, _generalConfig, _fakeAdDirectoryService, _fakeLogger);
+            _historicalTasksModel = new HistoricalTasksModel(_dbContext, _dmEndDateCalculator, _mapper, _generalConfig,
+                _fakeAdDirectoryService, _fakeLogger);
 
         }
 
@@ -84,36 +103,37 @@ namespace Portal.UnitTests
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
             };
 
-            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 1,
-                                                ProcessId = 1,
-                                                ActivityName = WorkflowStage.Review.ToString(),
-                                                Status = WorkflowStatus.Started.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 01, 01).Date
-                                            },
-                                            terminatedTask,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 3,
-                                                ProcessId = 3,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Started.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 01, 01).Date
-                                            },
-                                            completedTasks,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 5,
-                                                ProcessId = 5,
-                                                ActivityName = WorkflowStage.Assess.ToString(),
-                                                Status = WorkflowStatus.Started.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 01, 01).Date
-                                            }
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>()
+            {
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 1,
+                    ProcessId = 1,
+                    ActivityName = WorkflowStage.Review.ToString(),
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 01, 01).Date
+                },
+                terminatedTask,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 3,
+                    ProcessId = 3,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 01, 01).Date
+                },
+                completedTasks,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 5,
+                    ProcessId = 5,
+                    ActivityName = WorkflowStage.Assess.ToString(),
+                    Status = WorkflowStatus.Started.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 01, 01).Date
+                }
             });
 
 
@@ -142,19 +162,23 @@ namespace Portal.UnitTests
                 }
             };
 
-            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+            A.CallTo(() =>
+                    _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(
+                        A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
                 .Returns(historicalTasks);
 
             await _historicalTasksModel.OnGetAsync();
 
             Assert.AreEqual(2, _historicalTasksModel.HistoricalTasks.Count);
             Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 2 || h.ProcessId == 4));
-            Assert.IsFalse(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 3 || h.ProcessId == 5));
+            Assert.IsFalse(_historicalTasksModel.HistoricalTasks.Any(h =>
+                h.ProcessId == 1 || h.ProcessId == 3 || h.ProcessId == 5));
         }
 
 
         [Test]
-        public async Task Test_OnGet_returns_Latest_Terminated_or_Completed_Tasks_that_is_less_or_equal_configured_count()
+        public async Task
+            Test_OnGet_returns_Latest_Terminated_or_Completed_Tasks_that_is_less_or_equal_configured_count()
         {
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
 
@@ -184,33 +208,34 @@ namespace Portal.UnitTests
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
             };
 
-            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
-                                            returnedWorkflow1,
-                                            returnedWorkflow2,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 3,
-                                                ProcessId = 3,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            },
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 4,
-                                                ProcessId = 4,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            }
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>()
+            {
+                returnedWorkflow1,
+                returnedWorkflow2,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 3,
+                    ProcessId = 3,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                },
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 4,
+                    ProcessId = 4,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                }
             });
 
 
@@ -239,18 +264,22 @@ namespace Portal.UnitTests
                 }
             };
 
-            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+            A.CallTo(() =>
+                    _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(
+                        A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
                 .Returns(historicalTasks);
 
             await _historicalTasksModel.OnGetAsync();
 
-            Assert.AreEqual(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords, _historicalTasksModel.HistoricalTasks.Count);
+            Assert.AreEqual(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords,
+                _historicalTasksModel.HistoricalTasks.Count);
             Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 2));
             Assert.IsFalse(_historicalTasksModel.HistoricalTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 4));
         }
 
         [Test]
-        public async Task Test_OnPost_when_empty_search_parameters_returns_Latest_Terminated_or_Completed_Tasks_that_is_less_or_equal_configured_count()
+        public async Task
+            Test_OnPost_when_empty_search_parameters_returns_Latest_Terminated_or_Completed_Tasks_that_is_less_or_equal_configured_count()
         {
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
 
@@ -280,33 +309,34 @@ namespace Portal.UnitTests
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
             };
 
-            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
-                                            returnedWorkflow1,
-                                            returnedWorkflow2,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 3,
-                                                ProcessId = 3,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            },
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 4,
-                                                ProcessId = 4,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            }
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>()
+            {
+                returnedWorkflow1,
+                returnedWorkflow2,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 3,
+                    ProcessId = 3,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                },
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 4,
+                    ProcessId = 4,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                }
             });
 
 
@@ -335,7 +365,9 @@ namespace Portal.UnitTests
                 }
             };
 
-            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+            A.CallTo(() =>
+                    _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(
+                        A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
                 .Returns(historicalTasks);
 
             _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters();
@@ -348,7 +380,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPost_when_assessmentData_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        public async Task
+            Test_OnPost_when_assessmentData_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
         {
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
 
@@ -390,45 +423,46 @@ namespace Portal.UnitTests
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
             };
 
-            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
-                                            returnedWorkflow1,
-                                            returnedWorkflow2,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 3,
-                                                ProcessId = 3,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
-                                                AssessmentData = new AssessmentData()
-                                                {
-                                                    PrimarySdocId = 333,
-                                                    ProcessId = 3,
-                                                    RsdraNumber = "RSDRA3",
-                                                    SourceDocumentName = "SourceDocument3"
-                                                },
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            },
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 4,
-                                                ProcessId = 4,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
-                                                AssessmentData = new AssessmentData()
-                                                {
-                                                    PrimarySdocId = 444,
-                                                    ProcessId = 4,
-                                                    RsdraNumber = "RSDRA4",
-                                                    SourceDocumentName = "SourceDocument4"
-                                                },
-                                                DbAssessmentReviewData = new DbAssessmentReviewData(),
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                            }
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>()
+            {
+                returnedWorkflow1,
+                returnedWorkflow2,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 3,
+                    ProcessId = 3,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                    AssessmentData = new AssessmentData()
+                    {
+                        PrimarySdocId = 333,
+                        ProcessId = 3,
+                        RsdraNumber = "RSDRA3",
+                        SourceDocumentName = "SourceDocument3"
+                    },
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                },
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 4,
+                    ProcessId = 4,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                    AssessmentData = new AssessmentData()
+                    {
+                        PrimarySdocId = 444,
+                        ProcessId = 4,
+                        RsdraNumber = "RSDRA4",
+                        SourceDocumentName = "SourceDocument4"
+                    },
+                    DbAssessmentReviewData = new DbAssessmentReviewData(),
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                }
             });
 
 
@@ -461,7 +495,9 @@ namespace Portal.UnitTests
                 }
             };
 
-            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+            A.CallTo(() =>
+                    _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(
+                        A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
                 .Returns(historicalTasks);
 
             _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
@@ -473,18 +509,17 @@ namespace Portal.UnitTests
             await _historicalTasksModel.OnPostAsync();
 
             Assert.AreEqual(2, _historicalTasksModel.HistoricalTasks.Count);
-            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.RsdraNumber.Contains(_historicalTasksModel.SearchParameters.RsdraNumber)));
-            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.SourceDocumentName.Contains(_historicalTasksModel.SearchParameters.SourceDocumentName)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h =>
+                h.RsdraNumber.Contains(_historicalTasksModel.SearchParameters.RsdraNumber)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h =>
+                h.SourceDocumentName.Contains(_historicalTasksModel.SearchParameters.SourceDocumentName)));
         }
 
         [Test]
-        public async Task Test_OnPost_when_Users_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        public async Task
+            Test_OnPost_when_Users_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
         {
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
-
-            var reviewer = "Matthew Stoodley";
-            var assessor = "Peter Bates";
-            var verifier = "Rossall Sandford";
 
             var returnedWorkflow1 = new WorkflowInstance()
             {
@@ -497,15 +532,15 @@ namespace Portal.UnitTests
                 AssessmentData = new AssessmentData(),
                 DbAssessmentReviewData = new DbAssessmentReviewData()
                 {
-                    Reviewer = reviewer,
-                    Assessor = assessor,
-                    Verifier = verifier
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
                 },
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
                 {
-                    Reviewer = reviewer,
-                    Assessor = assessor,
-                    Verifier = verifier
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
                 }
             };
 
@@ -520,65 +555,66 @@ namespace Portal.UnitTests
                 AssessmentData = new AssessmentData(),
                 DbAssessmentReviewData = new DbAssessmentReviewData()
                 {
-                    Reviewer = "Matthew Stoodley",
-                    Assessor = "Peter Bates",
-                    Verifier = "Rossall Sandford"
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
                 },
                 DbAssessmentVerifyData = new DbAssessmentVerifyData()
                 {
-                    Reviewer = "Matthew Stoodley",
-                    Assessor = "Peter Bates",
-                    Verifier = "Rossall Sandford"
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
                 }
             };
 
-            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>(){
-                                            returnedWorkflow1,
-                                            returnedWorkflow2,
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 3,
-                                                ProcessId = 3,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 03, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData()
-                                                {
-                                                    Reviewer = "Greg Williams",
-                                                    Assessor = "Stuart Barzey",
-                                                    Verifier = "Ben Hall"
-                                                },
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                                {
-                                                    Reviewer = "Greg Williams",
-                                                    Assessor = "Stuart Barzey",
-                                                    Verifier = "Ben Hall"
-                                                }
-                                            },
-                                            new WorkflowInstance()
-                                            {
-                                                WorkflowInstanceId = 4,
-                                                ProcessId = 4,
-                                                ActivityName = WorkflowStage.Verify.ToString(),
-                                                Status = WorkflowStatus.Completed.ToString(),
-                                                StartedAt = new DateTime(2020, 01, 01),
-                                                ActivityChangedAt = new DateTime(2020, 02, 01).Date,
-                                                AssessmentData = new AssessmentData(),
-                                                DbAssessmentReviewData = new DbAssessmentReviewData()
-                                                {
-                                                    Reviewer = "Greg Williams",
-                                                    Assessor = "Stuart Barzey",
-                                                    Verifier = "Ben Hall"
-                                                },
-                                                DbAssessmentVerifyData = new DbAssessmentVerifyData()
-                                                {
-                                                    Reviewer = "Greg Williams",
-                                                    Assessor = "Stuart Barzey",
-                                                    Verifier = "Ben Hall"
-                                                }
-                                            }
+            await _dbContext.WorkflowInstance.AddRangeAsync(new List<WorkflowInstance>()
+            {
+                returnedWorkflow1,
+                returnedWorkflow2,
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 3,
+                    ProcessId = 3,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 03, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData()
+                    {
+                        Reviewer = ReviewerUser2,
+                        Assessor = AssessorUser2,
+                        Verifier = VerifierUser2
+                    },
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                    {
+                        Reviewer = ReviewerUser2,
+                        Assessor = AssessorUser2,
+                        Verifier = VerifierUser2
+                    }
+                },
+                new WorkflowInstance()
+                {
+                    WorkflowInstanceId = 4,
+                    ProcessId = 4,
+                    ActivityName = WorkflowStage.Verify.ToString(),
+                    Status = WorkflowStatus.Completed.ToString(),
+                    StartedAt = new DateTime(2020, 01, 01),
+                    ActivityChangedAt = new DateTime(2020, 02, 01).Date,
+                    AssessmentData = new AssessmentData(),
+                    DbAssessmentReviewData = new DbAssessmentReviewData()
+                    {
+                        Reviewer = ReviewerUser2,
+                        Assessor = AssessorUser2,
+                        Verifier = VerifierUser2
+                    },
+                    DbAssessmentVerifyData = new DbAssessmentVerifyData()
+                    {
+                        Reviewer = ReviewerUser2,
+                        Assessor = AssessorUser2,
+                        Verifier = VerifierUser2
+                    }
+                }
             });
 
 
@@ -598,9 +634,9 @@ namespace Portal.UnitTests
                     SourceDocumentName = returnedWorkflow1.AssessmentData.SourceDocumentName,
                     Status = Enum.Parse<WorkflowStatus>(returnedWorkflow1.Status),
                     ActivityChangedAt = returnedWorkflow1.ActivityChangedAt,
-                    Reviewer = reviewer,
-                    Assessor = assessor,
-                    Verifier = verifier
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
                 },
                 new HistoricalTasksData()
                 {
@@ -610,29 +646,33 @@ namespace Portal.UnitTests
                     SourceDocumentName = returnedWorkflow2.AssessmentData.SourceDocumentName,
                     Status = Enum.Parse<WorkflowStatus>(returnedWorkflow2.Status),
                     ActivityChangedAt = returnedWorkflow2.ActivityChangedAt,
-                    Reviewer = reviewer,
-                    Assessor = assessor,
-                    Verifier = verifier
+                    Reviewer = ReviewerUser1,
+                    Assessor = AssessorUser1,
+                    Verifier = VerifierUser1
 
                 }
             };
 
-            A.CallTo(() => _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
+            A.CallTo(() =>
+                    _mapper.Map<List<WorkflowInstance>, List<HistoricalTasksData>>(
+                        A<List<WorkflowInstance>>.That.IsSameSequenceAs(filteredWorkflows)))
                 .Returns(historicalTasks);
 
             _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
             {
-                Reviewer = "Mat",
-                Assessor = "Bates",
-                Verifier = "Ross"
+                Reviewer = "User 1",
+                Assessor = "User 3",
+                Verifier = "User 5"
             };
 
             await _historicalTasksModel.OnPostAsync();
 
             Assert.AreEqual(2, _historicalTasksModel.HistoricalTasks.Count);
-            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Reviewer.Contains(reviewer)));
-            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Assessor.Contains(assessor)));
-            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Verifier.Contains(verifier)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Reviewer.Equals(ReviewerUser1)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Assessor.Equals(AssessorUser1)));
+            Assert.IsTrue(_historicalTasksModel.HistoricalTasks.Any(h => h.Verifier.Equals(VerifierUser1)));
+
+
         }
     }
 }
