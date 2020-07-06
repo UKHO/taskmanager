@@ -89,7 +89,7 @@ namespace WorkflowCoordinator
                     {
                         // TODO pull out to hosted service
                         using var sp = services.BuildServiceProvider();
-                        TestWorkflowDatabaseSeeder.UsingDbContext(sp).PopulateTables().SaveChanges();
+                        TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
                     }
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()

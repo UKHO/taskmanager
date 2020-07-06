@@ -100,7 +100,7 @@ namespace SourceDocumentCoordinator
                 {
                     // TODO pull out to hosted service
                     using var sp = services.BuildServiceProvider();
-                    TestWorkflowDatabaseSeeder.UsingDbContext(sp).PopulateTables().SaveChanges();
+                    TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
                 }
             })
             .UseNServiceBus(hostBuilderContext =>
