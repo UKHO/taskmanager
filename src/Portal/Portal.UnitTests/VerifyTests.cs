@@ -20,6 +20,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -37,12 +38,15 @@ namespace Portal.UnitTests
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
+        private IPortalUserDbService _realPortalUserDbService;
         private ICommentsHelper _commentsHelper;
         private ICommentsHelper _fakeCommentsHelper;
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakePageValidationHelper;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
+        public AdUser TestUser { get; set; }
+        public AdUser TestUser2 { get; set; }
 
         [SetUp]
         public void Setup()
@@ -52,12 +56,16 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+            _realPortalUserDbService = new PortalUserDbService(_dbContext);
 
             _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
+
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+            TestUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
 
             ProcessId = 123;
 
@@ -77,8 +85,8 @@ namespace Portal.UnitTests
             _dbContext.DbAssessmentVerifyData.Add(new DbAssessmentVerifyData()
             {
                 ProcessId = ProcessId,
-                Assessor = "TestUser",
-                Verifier = "TestUser"
+                Assessor = TestUser,
+                Verifier = TestUser
             });
 
             _dbContext.ProductAction.Add(new ProductAction
@@ -101,12 +109,10 @@ namespace Portal.UnitTests
                 .Options;
 
             _hpDbContext = new HpdDbContext(hpdDbContextOptions);
-
-            _commentsHelper = new CommentsHelper(_dbContext);
-            _fakeCommentsHelper = A.Fake<ICommentsHelper>();
-
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
+            _commentsHelper = new CommentsHelper(_dbContext, _fakePortalUserDbService);
+            _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
             _fakeLogger = A.Dummy<ILogger<VerifyModel>>();
 
@@ -120,7 +126,8 @@ namespace Portal.UnitTests
                 _fakeLogger,
                 _pageValidationHelper,
                 _fakeCarisProjectHelper,
-                _generalConfig);
+                _generalConfig,
+                _fakePortalUserDbService);
         }
 
         [TearDown]
@@ -139,7 +146,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "";
             _verifyModel.SourceCategory = "";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.DataImpacts = new List<DataImpact>();
 
             _verifyModel.Team = "HW";
@@ -159,7 +166,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
 
-            _verifyModel.Verifier = "";
+            _verifyModel.Verifier = AdUser.Empty;
             _verifyModel.DataImpacts = new List<DataImpact>();
 
             _verifyModel.Team = "HW";
@@ -182,13 +189,13 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier}", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: Unable to set Verifier to unknown user {_verifyModel.Verifier.DisplayName}", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -201,7 +208,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             var hpdUsage = new HpdUsage()
             {
                 HpdUsageId = 1,
@@ -235,7 +242,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -267,7 +274,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Some change details";
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -290,7 +297,7 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_productactions_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -304,7 +311,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -325,8 +332,8 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_features_unverified_on_dataimpacts_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -340,7 +347,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -377,7 +384,7 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_features_on_empty_dataimpacts_then_no_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -391,7 +398,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -625,7 +632,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
 
@@ -638,8 +645,8 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_has_active_child_tasks_returns_warning_message()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -647,7 +654,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -678,7 +685,7 @@ namespace Portal.UnitTests
         public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_not_created_then_MarkCarisProjectAsComplete_is_not_called()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
@@ -687,7 +694,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -709,12 +716,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_created_then_MarkCarisProjectAsComplete_is_called()
         {
-            string aduser = "TestUser";
-            string aduserEmail = "testuser@foobar.com";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns((aduser, aduserEmail));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -722,7 +727,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
 
-            _verifyModel.Verifier = aduser;
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -741,7 +746,7 @@ namespace Portal.UnitTests
 
             _dbContext.HpdUser.Add(new HpdUser()
             {
-                AdUsername = aduser,
+                AdUser = TestUser,
                 HpdUsername = "TestUser_Caris"
             });
 
@@ -756,7 +761,7 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_signOff_must_not_run_validation()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             _verifyModel.Ion = "Ion";
@@ -764,7 +769,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
 
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
 
             _verifyModel.RecordProductAction = new List<ProductAction>();
             _verifyModel.DataImpacts = new List<DataImpact>();
@@ -794,7 +799,7 @@ namespace Portal.UnitTests
 
 
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "ConfirmedSignOff");
 
@@ -803,12 +808,11 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
-                                                                                A<string>.Ignored,
+                                                                                A<AdUser>.Ignored,
                                                                                 A<bool>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
-                                                                                A<List<DataImpact>>.Ignored,
-                                                                                A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+                                                                                A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                                                             .MustNotHaveHappened();
 
             A.CallTo(() => _pageValidationHelper.CheckVerifyPageForWarnings(A<string>.Ignored,
@@ -829,11 +833,11 @@ namespace Portal.UnitTests
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
-            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -843,9 +847,9 @@ namespace Portal.UnitTests
             _verifyModel.IsOnHold = true;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                 .Returns(true);
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
@@ -854,18 +858,18 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OnHoldTime);
-            Assert.AreEqual(onHoldRow.OnHoldUser, "TestUser2");
+            Assert.AreEqual(onHoldRow.OnHoldBy.UserPrincipalName, TestUser.UserPrincipalName);
         }
 
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -875,16 +879,16 @@ namespace Portal.UnitTests
             _verifyModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
             {
                 ProcessId = ProcessId,
                 OnHoldTime = DateTime.Now,
-                OffHoldUser = "TestUser2",
+                OffHoldBy = TestUser,
                 WorkflowInstanceId = 1
             });
             await _dbContext.SaveChangesAsync();
@@ -895,18 +899,18 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OffHoldTime);
-            Assert.AreEqual(onHoldRow.OffHoldUser, "TestUser2");
+            Assert.AreEqual(onHoldRow.OffHoldBy.UserPrincipalName, TestUser.UserPrincipalName);
         }
 
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
-            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -916,14 +920,14 @@ namespace Portal.UnitTests
             _verifyModel.IsOnHold = true;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
 
-            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+            var comments = await _dbContext.Comments.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
@@ -934,11 +938,11 @@ namespace Portal.UnitTests
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment_On_Save()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig);
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _verifyModel.Verifier = "TestUser2";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -948,16 +952,16 @@ namespace Portal.UnitTests
             _verifyModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()
             {
                 ProcessId = ProcessId,
                 OnHoldTime = DateTime.Now.AddDays(-1),
-                OnHoldUser = "TestUser",
+                OnHoldBy = TestUser,
                 WorkflowInstanceId = 1
             });
 
@@ -965,7 +969,7 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
 
-            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+            var comments = await _dbContext.Comments.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
@@ -979,7 +983,7 @@ namespace Portal.UnitTests
                 .Returns(("This User", "thisuser@foobar.com"));
 
             var row = await _dbContext.DbAssessmentVerifyData.FirstAsync();
-            row.Verifier = "";
+            row.Verifier = AdUser.Empty;
             await _dbContext.SaveChangesAsync();
 
             await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
@@ -991,37 +995,43 @@ namespace Portal.UnitTests
         public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Reject()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = Guid.NewGuid()
+            });
 
             await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
 
-            await _verifyModel.OnPostDoneAsync(ProcessId,"Done");
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_That_Task_Fails_Validation_If_OnHold_At_Done()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser2@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             await _dbContext.OnHold.AddAsync(new OnHold
             {
                 ProcessId = ProcessId,
                 OnHoldTime = DateTime.Now,
-                OffHoldUser = "TestUser",
+                OffHoldBy = TestUser,
                 WorkflowInstanceId = 1
             });
             await _dbContext.SaveChangesAsync();
@@ -1038,7 +1048,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Verifier = "";
+            _verifyModel.Verifier = AdUser.Empty;
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "";
@@ -1057,7 +1067,7 @@ namespace Portal.UnitTests
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Verifier = "";
+            _verifyModel.Verifier = AdUser.Empty;
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "";
@@ -1080,7 +1090,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Test change details";
 
@@ -1102,7 +1112,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.ProductActioned = true;
             _verifyModel.ProductActionChangeDetails = "Test change details";
 
@@ -1124,7 +1134,7 @@ namespace Portal.UnitTests
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
-            _verifyModel.Verifier = "TestUser";
+            _verifyModel.Verifier = TestUser;
             _verifyModel.ProductActioned = false;
 
             _verifyModel.RecordProductAction = new List<ProductAction>();
