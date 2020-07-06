@@ -43,7 +43,7 @@ namespace WorkflowCoordinator.Config
         {
             return new Uri(
                 ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri,
-                $@"{DataServicesWebServiceAssessmentAssessedUri}{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}");
+                $@"{DataServicesWebServiceAssessmentAssessedUri}{callerCode}/{transactionId}/{sdocId}/{actionType}?change={Uri.EscapeDataString(change)}");
         }
         
         public Uri BuildPcpEventServiceUri(string eventName)
