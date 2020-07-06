@@ -3,7 +3,7 @@
   "info": {
     "title": "SDRA API",
     "description": "This API is for SDRA\n\nIt provides Source Document Assessment Data and Data Access\n",
-    "version": "1.1.4"
+    "version": "1.1.5"
   },
   "servers": [
     {
@@ -105,7 +105,7 @@
         }
       }
     },
-    "/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{action}/{change}": {
+    "/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{action}": {
       "put": {
         "tags": [
           "Assessment"
@@ -166,10 +166,10 @@
           },
           {
             "name": "change",
-            "in": "path",
-            "description": "tbc\n\nExample: tbc\n",
+            "in": "query",
+            "description": "Change comment for Record product action\n\nExample: tbc\n",
             "required": true,
-            "style": "simple",
+            "style": "form",
             "explode": false,
             "schema": {
               "type": "string"

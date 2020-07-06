@@ -192,7 +192,7 @@ namespace DataServices.Controllers
         /// <response code="406">Not acceptable.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPut]
-        [Route("/DataServices/v1/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{actionType}/{change}")]
+        [Route("/DataServices/v1/SourceDocument/Assessment/DocumentAssessed/{callerCode}/{transactionId}/{sdocId}/{actionType}")]
         [ValidateModelState]
         [SwaggerOperation("PutDocumentAsAssessed")]
         [SwaggerResponse(statusCode: 400, type: typeof(DefaultErrorResponse), description: "Bad request.")]
@@ -206,7 +206,7 @@ namespace DataServices.Controllers
                                                             [FromRoute][Required]string transactionId,
                                                             [FromRoute][Required]int? sdocId,
                                                             [FromRoute][Required]string actionType, 
-                                                            [FromRoute][Required]string change)
+                                                            [FromQuery][Required]string change)
         {
 
             LogContext.PushProperty("ApiResource", nameof(PutDocumentAsAssessed));
