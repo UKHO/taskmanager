@@ -832,8 +832,16 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row_On_Save()
         {
+            _dbContext.OnHold.Add(new OnHold()
+            {
+                ProcessId = ProcessId,
+                OnHoldTime = DateTime.Now.AddDays(-1),
+                OnHoldBy = TestUser,
+                WorkflowInstanceId = 1
+            });
+
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);

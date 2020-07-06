@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Common.Helpers;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
@@ -16,10 +19,35 @@ namespace Portal.UnitTests
         private IOnHoldCalculator _onHoldCalculator;
         private IIndexFacade _indexFacade;
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private WorkflowDbContext _dbContext;
+
+        public AdUser TestUser
+        {
+            get
+            {
+                var user = AdUser.Unknown;
+
+                user = _dbContext.AdUsers.SingleOrDefault(u =>
+                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
+
+                if (user == null)
+                {
+                    user = new AdUser
+                    {
+                        DisplayName = "Test User",
+                        UserPrincipalName = "test@email.com"
+                    };
+                    _dbContext.SaveChanges();
+                }
+
+                return user;
+            }
+        }
 
         [SetUp]
         public void SetUp()
         {
+            _dbContext = DatabasesHelpers.GetInMemoryWorkflowDbContext();
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.DmEndDateDaysSimple = 14;
 
@@ -44,9 +72,9 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-onHoldDays),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = null,
-                    OffHoldUser = null,
+                    OffHoldBy = null,
                 }
             };
 
@@ -67,7 +95,7 @@ namespace Portal.UnitTests
             var effectiveDate = DateTime.Today;
 
 
-            var result = _indexFacade.CalculateDmEndDate(effectiveDate,taskType, taskStage, onHoldRows);
+            var result = _indexFacade.CalculateDmEndDate(effectiveDate, taskType, taskStage, onHoldRows);
             Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDaysSimple), result.dmEndDate);
             Assert.AreEqual(_generalConfig.Value.DmEndDateDaysSimple, result.daysToDmEndDate);
 

@@ -339,7 +339,7 @@ namespace Portal.UnitTests
             _assessModel.SourceCategory = "SourceCategory";
             _assessModel.TaskType = "TaskType";
             _assessModel.Team = "HW";
-            _assessModel.Assessor = AdUser.Unknown;
+            _assessModel.Assessor = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" };
             _assessModel.Verifier = TestUser;
 
             await _assessModel.OnPostSaveAsync(ProcessId);
@@ -366,7 +366,7 @@ namespace Portal.UnitTests
             _assessModel.TaskType = "TaskType";
             _assessModel.Team = "HW";
             _assessModel.Assessor = TestUser;
-            _assessModel.Verifier = AdUser.Unknown;
+            _assessModel.Verifier = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
 
             await _assessModel.OnPostSaveAsync(ProcessId);
 

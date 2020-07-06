@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Portal.Auth;
 using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Helpers;
@@ -32,10 +33,32 @@ namespace Portal.UnitTests
         private ISessionFileGenerator _fakeSessionFileGenerator;
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private ICarisProjectNameGenerator _fakeCarisProjectNameGenerator;
+        private IPortalUserDbService _fakePortalUserDbService;
 
         public int ProcessId { get; set; }
-        public string UserFullName { get; set; }
-        public string UserEmail { get; set; }
+
+        public AdUser TestUser
+        {
+            get
+            {
+                var user = AdUser.Unknown;
+
+                user = _dbContext.AdUsers.SingleOrDefault(u =>
+                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
+
+                if (user == null)
+                {
+                    user = new AdUser
+                    {
+                        DisplayName = "Test User",
+                        UserPrincipalName = "test@email.com"
+                    };
+                    _dbContext.SaveChanges();
+                }
+
+                return user;
+            }
+        }
 
         [SetUp]
         public async Task Setup()
@@ -50,17 +73,16 @@ namespace Portal.UnitTests
             _fakeLogger = A.Dummy<ILogger<_EditDatabaseModel>>();
             _generalConfig = A.Fake<IOptions<GeneralConfig>>();
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
+            _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
             _fakeSessionFileGenerator = A.Fake<ISessionFileGenerator>();
             _fakeCarisProjectHelper = A.Fake<ICarisProjectHelper>();
             _fakeCarisProjectNameGenerator = A.Fake<ICarisProjectNameGenerator>();
 
             ProcessId = 123;
-            UserFullName = "TestUser";
-            UserEmail = "testuser@foobar.com";
             _generalConfig.Value.SessionFilename = "Testing.ext";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns((UserFullName, UserEmail));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
             {
@@ -68,7 +90,7 @@ namespace Portal.UnitTests
             });
             _dbContext.HpdUser.Add(new HpdUser
             {
-                AdUsername = "TestUserAd",
+                AdUser = TestUser,
                 HpdUsername = "HpdUser"
             });
             _dbContext.WorkflowInstance.Add(new WorkflowInstance()
@@ -79,7 +101,7 @@ namespace Portal.UnitTests
             await _dbContext.SaveChangesAsync();
 
             _editDatabaseModel = new _EditDatabaseModel(_dbContext, _fakeLogger, _generalConfig, _fakeWorkflowBusinessLogicService, _fakeAdDirectoryService,
-                                                        _fakeSessionFileGenerator, _fakeCarisProjectHelper, _fakeCarisProjectNameGenerator);
+                                                        _fakeSessionFileGenerator, _fakeCarisProjectHelper, _fakeCarisProjectNameGenerator, _fakePortalUserDbService);
         }
 
         [TearDown]
@@ -92,20 +114,17 @@ namespace Portal.UnitTests
         public async Task Test_CreateCarisProject_Given_Valid_Data_Then_Updates_DbAssessmentAssessData_WorkspaceAffected()
         {
             //Arrange
-            var userWithHpdUserRecord = "TestUserAd";
-            var userWithHpdUserRecordEmail = "testuserad@foobar.com";
-
             var setupAssessData = new DbAssessmentAssessData()
             {
                 ProcessId = ProcessId,
-                Assessor = userWithHpdUserRecord,
-                Verifier = userWithHpdUserRecord
+                Assessor = TestUser,
+                Verifier = TestUser
             };
             _dbContext.DbAssessmentAssessData.Add(setupAssessData);
             await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns((userWithHpdUserRecord, userWithHpdUserRecordEmail));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
                     A<int>.Ignored, A<string>.Ignored,
@@ -556,7 +575,7 @@ namespace Portal.UnitTests
             Assert.AreEqual("Failed to generate session file. No Hpd Usages were selected.", ex.Message);
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                                                                             ProcessId,
-                                                                            UserFullName,
+                                                                            TestUser.DisplayName,
                                                                             taskStage,
                                                                             A<CarisProjectDetails>.Ignored,
                                                                             A<List<string>>.Ignored,
@@ -585,7 +604,7 @@ namespace Portal.UnitTests
             Assert.AreEqual("Failed to generate session file. Caris project was never created.", ex.Message);
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.DisplayName,
                 taskStage,
                 A<CarisProjectDetails>.Ignored,
                 A<List<string>>.Ignored,
@@ -611,7 +630,7 @@ namespace Portal.UnitTests
                 ProjectId = 123456,
                 ProjectName = "SomeName",
                 Created = DateTime.Today,
-                CreatedBy = UserFullName
+                CreatedBy = TestUser
             };
 
             await _dbContext.CarisProjectDetails.AddAsync(carisproject);
@@ -620,7 +639,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.DisplayName,
                 taskStage,
                 carisproject,
                 selectedUsages,
@@ -641,7 +660,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.DisplayName,
                 taskStage,
                 carisproject,
                 selectedUsages,
