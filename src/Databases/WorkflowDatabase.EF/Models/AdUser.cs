@@ -23,5 +23,11 @@ namespace WorkflowDatabase.EF.Models
             DisplayName = "",
             UserPrincipalName = ""
         };
+
+        /// <summary>
+        ///  Returns true where UserPrincipalName is null, empty or whitespace.
+        /// </summary>
+        [NotMapped]
+        public bool HasNoUserPrincipalName => string.IsNullOrWhiteSpace(UserPrincipalName);
     }
 }

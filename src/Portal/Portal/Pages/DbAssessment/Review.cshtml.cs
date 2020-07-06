@@ -223,7 +223,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
 
-            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.DisplayName, currentReviewData.Reviewer))
+            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentReviewData.Reviewer))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -277,7 +277,7 @@ namespace Portal.Pages.DbAssessment
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
 
-            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.DisplayName, currentReviewData.Reviewer))
+            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentReviewData.Reviewer))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

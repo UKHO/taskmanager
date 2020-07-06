@@ -47,7 +47,7 @@ namespace Portal.Helpers
 
             if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (currentAssignedReviewerInDb is null)
+                if (currentAssignedReviewerInDb.HasNoUserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
                     isValid = false;
@@ -438,7 +438,7 @@ namespace Portal.Helpers
                                     List<DbAssessmentAssignTask> additionalAssignedTasks,
                                     List<string> validationErrorMessages)
         {
-            if (primaryAssignedTask.Assessor == null)
+            if (primaryAssignedTask.Assessor.HasNoUserPrincipalName)
             {
                 validationErrorMessages.Add($"Assign Task 1: Assessor is required");
                 return false;
@@ -569,7 +569,7 @@ namespace Portal.Helpers
         /// <returns></returns>
         private async Task<bool> ValidateOperators(AdUser user, string userTypeInMessage, List<string> validationErrorMessages)
         {
-            if (user == null)
+            if (user == null || user.HasNoUserPrincipalName)
             {
                 validationErrorMessages.Add($"Operators: {userTypeInMessage} cannot be empty");
                 return false;
