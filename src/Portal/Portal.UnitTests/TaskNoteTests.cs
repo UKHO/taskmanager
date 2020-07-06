@@ -33,6 +33,29 @@ namespace Portal.UnitTests
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
 
+        public AdUser TestUser
+        {
+            get
+            {
+                var user = AdUser.Unknown;
+
+                user = _dbContext.AdUsers.SingleOrDefault(u =>
+                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
+
+                if (user == null)
+                {
+                    user = new AdUser
+                    {
+                        DisplayName = "Test User",
+                        UserPrincipalName = "test@email.com"
+                    };
+                    _dbContext.SaveChanges();
+                }
+
+                return user;
+            }
+        }
+
         [SetUp]
         public async Task Setup()
         {
@@ -122,9 +145,9 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = "Test task note",
                 Created = DateTime.Now,
-                CreatedByUsername = "Tests",
+                CreatedBy = TestUser,
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
 
@@ -142,9 +165,9 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = string.Empty,
                 Created = DateTime.Now,
-                CreatedByUsername = "Tests",
+                CreatedBy = TestUser,
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
             await _indexModel.OnPostTaskNoteAsync(taskNote.Text, ProcessId);
@@ -161,9 +184,9 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = "Test task note",
                 Created = DateTime.Now,
-                CreatedByUsername = "Tests",
+                CreatedBy = TestUser,
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
             var updatedTaskNote = new TaskNote
@@ -172,7 +195,7 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = "Test task note for update",
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
             await _dbContext.TaskNote.AddAsync(taskNote);
@@ -202,9 +225,9 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = "Test task note",
                 Created = DateTime.Now,
-                CreatedByUsername = "Tests",
+                CreatedBy = TestUser,
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
             var updatedTaskNote = new TaskNote
@@ -213,7 +236,7 @@ namespace Portal.UnitTests
                 WorkflowInstanceId = 1,
                 Text = null,
                 LastModified = DateTime.Now,
-                LastModifiedByUsername = "Tests"
+                LastModifiedBy = TestUser
             };
 
             await _dbContext.TaskNote.AddAsync(taskNote);

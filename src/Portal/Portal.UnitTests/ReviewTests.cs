@@ -180,7 +180,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = AdUser.Unknown
+                Assessor = new AdUser { DisplayName = "Unknown", UserPrincipalName = "unknown" }
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -534,7 +534,7 @@ namespace Portal.UnitTests
                 WorkspaceAffected = "Test Workspace",
                 Assessor = TestUser
             };
-            _reviewModel.Reviewer = AdUser.Unknown;
+            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown.UserPrincipalName)).Returns(false);
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
