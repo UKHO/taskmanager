@@ -2,7 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Portal.Configuration;
 
 namespace Portal.HostedServices
 {
@@ -17,10 +20,14 @@ namespace Portal.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            //using var scope = _serviceProvider.CreateScope();
-            //var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            var isLocalDevelopment = ConfigHelpers.IsLocalDevelopment;
 
-            TestWorkflowDatabaseSeeder.UsingDbContext(_serviceProvider).PopulateTables().SaveChanges();
+            using var scope = _serviceProvider.CreateScope();
+            var startupConfig = scope.ServiceProvider.GetRequiredService<IOptions<StartupConfig>>().Value;
+
+            var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
+                isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
+            TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
 
             return Task.CompletedTask;
         }

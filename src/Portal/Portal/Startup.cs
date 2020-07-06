@@ -59,6 +59,12 @@ namespace Portal
             Configuration.GetSection("HpdDbSection").Bind(startupSecretsConfig);
             Configuration.GetSection("PortalActiveDirectory").Bind(startupSecretsConfig);
 
+            services.AddOptions<StartupConfig>()
+                .Bind(Configuration.GetSection("urls"))
+                .Bind(Configuration.GetSection("databases"))
+                .Bind(Configuration.GetSection("subscription"))
+                .Bind(Configuration.GetSection("portal"));
+
             services.AddOptions<AdUserUpdateServiceConfig>()
                 .Bind(Configuration.GetSection("portal"));
 

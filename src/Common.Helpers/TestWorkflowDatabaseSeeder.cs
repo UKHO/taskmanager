@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -12,23 +10,23 @@ namespace Common.Helpers
 {
     public class TestWorkflowDatabaseSeeder : ICanPopulateTables, ICanSaveChanges
     {
-        private readonly IServiceProvider _sp;
+        protected readonly DbContextOptions<WorkflowDbContext> _dbContextOptions;
 
-        protected TestWorkflowDatabaseSeeder(IServiceProvider sp)
+        protected TestWorkflowDatabaseSeeder(string workflowDbConnectionString)
         {
-            _sp = sp;
-
+            _dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
+                .UseSqlServer(workflowDbConnectionString)
+                .Options;
         }
 
-        public static ICanPopulateTables UsingDbContext(IServiceProvider sp)
+        public static ICanPopulateTables UsingDbConnectionString(string workflowDbConnectionString)
         {
-            return new TestWorkflowDatabaseSeeder(sp);
+            return new TestWorkflowDatabaseSeeder(workflowDbConnectionString);
         }
 
         public ICanSaveChanges PopulateTables()
         {
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             DatabasesHelpers.ClearWorkflowDbTables(workflowDbContext);
 
             AddAdditionalAdUsers();
@@ -48,8 +46,7 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\Users.json");
             var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
             if (users?.Any() ?? false) workflowDbContext.AdUsers.AddRange(users);
 
@@ -63,8 +60,7 @@ namespace Common.Helpers
             var jsonString = File.ReadAllText(@"Data\HpdUsages.json");
             var hpdUsages = JsonConvert.DeserializeObject<IEnumerable<HpdUsage>>(jsonString);
 
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             workflowDbContext.HpdUsage.AddRange(hpdUsages);
             workflowDbContext.SaveChanges();
         }
@@ -75,8 +71,7 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\HpdUsers.json");
             var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
             foreach (var hpdUser in hpdUsers)
             {
@@ -93,8 +88,7 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\ProductActionType.json");
             var productActionType = JsonConvert.DeserializeObject<IEnumerable<ProductActionType>>(jsonString);
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             workflowDbContext.ProductActionType.AddRange(productActionType);
             workflowDbContext.SaveChanges();
         }
@@ -105,8 +99,7 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\AssignedTaskType.json");
             var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskType>>(jsonString);
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             workflowDbContext.AssignedTaskType.AddRange(assignedTaskSourceType);
             workflowDbContext.SaveChanges();
         }
@@ -128,8 +121,7 @@ namespace Common.Helpers
 
             //  var wi = _context.WorkflowInstance.Include(w => w.).ToList();
 
-            using var scope = _sp.CreateScope();
-            var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             var wi = workflowDbContext.WorkflowInstance
                 //.Include(w => w.Comments).ThenInclude(c => c.AdUser).ThenInclude(u => u.AdUserId).AsNoTracking()
                 //.Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Reviewer).ThenInclude(u => u.AdUserId).AsNoTracking()

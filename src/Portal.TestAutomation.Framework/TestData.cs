@@ -8,55 +8,64 @@ namespace Portal.TestAutomation.Framework
 {
     public class TestData : TestWorkflowDatabaseSeeder
     {
-        private TestData(WorkflowDbContext context) : base(context)
+        private TestData(string workflowDbConnectionString) : base(workflowDbConnectionString)
         {
         }
 
+        // TODO rework temporary concat email domain
+
         public TestData AddUser(string userToAdd)
         {
-            var rand = new Random();
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
-            _context.AdUser.Add(new AdUser
+            var newUser = new AdUser
             {
-                UserPrincipalName = userToAdd,
+                UserPrincipalName = userToAdd + "@ukho.gov.uk",
                 DisplayName = userToAdd,
                 LastCheckedDate = DateTime.Today.AddDays(1)
-            });
+            };
 
-            _context.HpdUser.Add(new HpdUser
-                {AdUsername = userToAdd, HpdUsername = userToAdd.Replace(" ", "") + "-Caris"});
+            workflowDbContext.AdUsers.Add(newUser);
+
+
+            workflowDbContext.HpdUser.Add(new HpdUser
+            { AdUser = newUser, HpdUsername = userToAdd.Replace(" ", "") + "-Caris" });
 
             return this;
         }
 
         public TestData ReassignReviewsToUser(string user)
         {
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+
+            var adUser = workflowDbContext.AdUsers.Single(u => u.UserPrincipalName == user + "@ukho.gov.uk");
+
             var inProgressWorkflows =
-                _context.WorkflowInstance.Where(wi => wi.Status == WorkflowStatus.Started.ToString());
+                workflowDbContext.WorkflowInstance.Where(wi => wi.Status == WorkflowStatus.Started.ToString());
 
             var workflowAtAssessId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Assess.ToString())
                 .WorkflowInstanceId;
-            var assess = _context.DbAssessmentAssessData.First(x => x.WorkflowInstanceId == workflowAtAssessId);
-            assess.Reviewer = user;
+            var assess = workflowDbContext.DbAssessmentAssessData.First(x => x.WorkflowInstanceId == workflowAtAssessId);
+            assess.Reviewer = adUser;
 
 
             var workflowAtReviewId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Review.ToString())
                 .WorkflowInstanceId;
-            var review = _context.DbAssessmentReviewData.First(x => x.WorkflowInstanceId == workflowAtReviewId);
-            review.Reviewer = user;
+            var review = workflowDbContext.DbAssessmentReviewData.First(x => x.WorkflowInstanceId == workflowAtReviewId);
+            review.Reviewer = adUser;
 
 
             var workflowAtVerifyId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Verify.ToString())
                 .WorkflowInstanceId;
-            var verify = _context.DbAssessmentVerifyData.First(x => x.WorkflowInstanceId == workflowAtVerifyId);
-            verify.Reviewer = user;
+            var verify = workflowDbContext.DbAssessmentVerifyData.First(x => x.WorkflowInstanceId == workflowAtVerifyId);
+            verify.Reviewer = adUser;
 
             return this;
         }
 
-        public new static TestData UsingDbContext(WorkflowDbContext context)
+        public new static TestData UsingDbConnectionString(string workflowDbConnectionString)
         {
-            return new TestData(context);
+            return new TestData(workflowDbConnectionString);
         }
     }
 }
