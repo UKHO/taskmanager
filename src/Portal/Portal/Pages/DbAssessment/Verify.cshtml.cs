@@ -351,7 +351,7 @@ namespace Portal.Pages.DbAssessment
 
             var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
 
-            if (verifyData.Verifier is null)
+            if (string.IsNullOrWhiteSpace(verifyData.Verifier?.UserPrincipalName))
             {
                 ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
             }
