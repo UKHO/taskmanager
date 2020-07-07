@@ -42,8 +42,8 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SetDataImpactFromDb()
         {
-
-            DataImpacts = await _dbContext.DataImpact.Where(di => di.ProcessId == ProcessId).ToListAsync();
+            DataImpacts = await _dbContext.DataImpact
+                .Where(di => di.ProcessId == ProcessId && !di.StsUsage).ToListAsync();
 
             if (DataImpacts == null || DataImpacts.Count == 0)
             {

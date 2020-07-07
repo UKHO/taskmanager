@@ -473,7 +473,9 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateDataImpact(int processId)
         {
-            var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
+            var toRemove = await _dbContext.DataImpact
+                .Where(at => at.ProcessId == processId && !at.StsUsage)
+                .ToListAsync();
             _dbContext.DataImpact.RemoveRange(toRemove);
 
             if (DataImpacts.Any(a => a.HpdUsageId > 0))
@@ -483,6 +485,7 @@ namespace Portal.Pages.DbAssessment
                     if (dataImpact.HpdUsageId > 0)
                     {
                         dataImpact.ProcessId = processId;
+                        dataImpact.StsUsage = false;
                         _dbContext.DataImpact.Add(dataImpact);
                     }
                 }
