@@ -55,6 +55,39 @@
             <div class="row justify-content-start">
                 <div class="col-5"><button id="btnAddUsage" class="btn btn-primary" type="button">Add Usage</button></div>
             </div>
+            <hr/>
+            <div class="row" id="stsDataImpactContainer">
+                <div class="col-12">
+                    <div class="form-row justify-content-start mb-0">
+                        <div id="stsUsageColumnHeader" class="col-2 p-0 m-0"><label>STS Usage</label></div>
+                        <div id="stsEditedColumnHeader" class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>@*gone*@</label></div>
+                        <div id="stsCommentsColumnHeader" class="col-5 p-0 m-0"><label>Comments</label></div>
+                        <div id="stsFeatureSubmittedColumnHeader" class="col-2 d-flex justify-content-center align-items-center p-0 m-0"><label>@*gone*@</label></div>
+                        <div id="stsFeatureVerifiedColumnHeader" class="col-1 d-flex justify-content-center align-items-center p-0 m-0"><label>Verified</label></div>
+                    </div>
+                </div>
+                <div id="stsDataImpact" class="col-12">
+                    <div class="form-row align-items-center">
+                        <div class="col-2 p-0 m-0">
+                            @Html.DropDownListFor(model => model.StsDataImpact.HpdUsageId, Model.Usages, "",
+                                new { @class = "form-control", aria_labelledby = "stsUsageColumnHeader" })
+                        </div>
+                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"></div>
+                        <div class="col-5 p-0 m-0">
+                            @Html.TextBoxFor(model => model.StsDataImpact.Comments, 
+                                new {@class = "form-control", aria_labelledby = "stsCommentsColumnHeader"})
+                        </div>
+                        <div class="col-2 d-flex justify-content-center align-items-center p-0 m-0"></div>
+                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="StsDataImpact_FeaturesVerified" name="StsDataImpact.FeaturesVerified" @(Model.StsDataImpact.FeaturesVerified ? "checked" : "") value="true" aria-labelledby="stsFeatureVerifiedColumnHeader">
+                                <label class="custom-control-label" for="StsDataImpact_FeaturesVerified"><span class="screen-reader-only">Verified</span></label>
+                            </div>
+                        </div>
+                        <div class="col-1 d-flex justify-content-center align-items-center p-0 m-0"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
