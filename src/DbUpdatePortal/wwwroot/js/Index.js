@@ -5,6 +5,7 @@
     var userFullName = $("#userFullName > strong").text();
 
     var inFlightTasksTable = setupInFlightTasks();
+    var assignedTasksTable = setupAssignedTasks();
 
     applyDatatableFilter();
 
@@ -12,7 +13,21 @@
     handleTeamTasks();
    
     setMenuItemSelection();
-    handleHistoricalTasks();
+    //handleHistoricalTasks();
+
+
+    function setupAssignedTasks() {
+        return  assignedTasksTable = $('#assignedTasks').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [10, 15, 20, 25],
+            'sDom': 'ltipr',
+            'autoWidth': true,
+            "order": [[0, 'asc']],
+            "scrollX": true
+        });
+
+    }
+
 
     function setupInFlightTasks() {
 
@@ -28,12 +43,12 @@
                     'searchable': false
                 },
                 {
-                    'targets': [12],
+                    'targets': [8],
                     'orderable': false,
                     'searchable': false
                 },
                 {
-                    'targets': [13],
+                    'targets': [9],
                     'visible': false,
                     'searchable': false
                 }
@@ -41,7 +56,7 @@
             "order": [[1, 'asc']],
             "scrollX": true,
             "createdRow": function(row, data, dataIndex) {
-                if (data[13] === "") {
+                if (data[9] === "") {
                     $("td.details-control", row).removeClass("details-control");
                     $("td.details-control i", row).removeClass("fa");
                 }
@@ -52,7 +67,7 @@
     }
 
     function format(data) {
-        return '<span class="note-formatting">' + data[13] + '</span>';
+        return '<span class="note-formatting">' + data[9] + '</span>';
     }
 
     $('#inFlightTasks tbody').on('click',
@@ -103,18 +118,18 @@
         );
     }
 
-    function handleHistoricalTasks() {
-        $("#btnHistoricalTasks").click(function () {
+    //function handleHistoricalTasks() {
+    //    $("#btnHistoricalTasks").click(function () {
 
-            //sessionStorage.setItem('historicalMenuItem', menuItem);
-            window.location.href = "/HistoricalTasks";
+    //        //sessionStorage.setItem('historicalMenuItem', menuItem);
+    //        window.location.href = "/HistoricalTasks";
 
-        });
-    }
+    //    });
+    //}
 
     function filterMyAssignedTasksList(rowData) {
 
-        var username = rowData[5];
+        var username = rowData[2];
 
         if (username !== userFullName) {
             return false;
@@ -124,20 +139,20 @@
 
 
 
-    $(".taskNoteItem").on("click",
-        function () {
+    //$(".taskNoteItem").on("click",
+    //    function () {
 
-            $("#btnPostTaskNote").prop("disabled", false);
-            $("#editTaskNoteError").html("");
+    //        $("#btnPostTaskNote").prop("disabled", false);
+    //        $("#editTaskNoteError").html("");
 
-            var processId = $(this).data("processid");
-            $("#hdnProcessId").val(processId);
+    //        var processId = $(this).data("processid");
+    //        $("#hdnProcessId").val(processId);
 
-            var taskNote = $(this).data("tasknote");
-            $("#txtNote").val(taskNote);
+    //        var taskNote = $(this).data("tasknote");
+    //        $("#txtNote").val(taskNote);
 
-            $("#editTaskNoteModal").modal("show");
-        });
+    //        $("#editTaskNoteModal").modal("show");
+    //    });
 
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
@@ -161,6 +176,8 @@
             $('#txtGlobalSearch').val("");
             inFlightTasksTable.search("").draw();
 
+            $('#assignedTasksTable').show();
+
         });
     }
 
@@ -173,150 +190,152 @@
 
             inFlightTasksTable.search("").draw();
 
+            $('#assignedTasksTable').hide();
+
         });
     }
     
 
-    $("#editTaskNoteModal").on("shown.bs.modal",
-        function () {
-            $("#txtNote").focus();
-        });
+    //$("#editTaskNoteModal").on("shown.bs.modal",
+    //    function () {
+    //        $("#txtNote").focus();
+    //    });
 
-    $("#btnClearTaskNote").click(function () {
-        $("#txtNote").val("");
-        $("#txtNote").focus();
-    });
+    //$("#btnClearTaskNote").click(function () {
+    //    $("#txtNote").val("");
+    //    $("#txtNote").focus();
+    //});
 
-    $("#btnPostTaskNote").on("submit", function () {
-        $("#btnPostTaskNote").prop("disabled", true);
+    //$("#btnPostTaskNote").on("submit", function () {
+    //    $("#btnPostTaskNote").prop("disabled", true);
 
-    });
+    //});
 
-    $(".assignTaskItem").on("click",
-        function () {
+    //$(".assignTaskItem").on("click",
+    //    function () {
 
-            $("#btnAssignTaskToUser").prop("disabled", false);
-            $("#AssignTaskError").html("");
+    //        $("#btnAssignTaskToUser").prop("disabled", false);
+    //        $("#AssignTaskError").html("");
 
-            var processId = $(this).data("processid");
-            $("#hdnAssignTaskProcessId").val(processId);
+    //        var processId = $(this).data("processid");
+    //        $("#hdnAssignTaskProcessId").val(processId);
 
-            var taskStage = $(this).data("taskstage");
-            $("#hdnAssignTaskStage").val(taskStage);
+    //        var taskStage = $(this).data("taskstage");
+    //        $("#hdnAssignTaskStage").val(taskStage);
 
-            $("#assignTaskModal").modal("show");
-        });
+    //        $("#assignTaskModal").modal("show");
+    //    });
 
-    $("#assignTaskModal").on("shown.bs.modal",
-        function () {
-            $("#assignTaskTypeaheadError").hide();
-            $("#assignTaskErrorMsg").text("");
-            $("#txtUsername").focus();
-            $('.typeahead').typeahead('val', "");
-            $('.typeahead').typeahead('close');
-        });
+    //$("#assignTaskModal").on("shown.bs.modal",
+    //    function () {
+    //        $("#assignTaskTypeaheadError").hide();
+    //        $("#assignTaskErrorMsg").text("");
+    //        $("#txtUsername").focus();
+    //        $('.typeahead').typeahead('val', "");
+    //        $('.typeahead').typeahead('close');
+    //    });
 
-    $("#btnAssignTaskToUser").on("click", function () {
+    //$("#btnAssignTaskToUser").on("click", function () {
 
-        if ($("#txtUsername").val() === "") {
-            $("#assignTaskTypeaheadError").show();
-            $("#assignTaskErrorMsg").text("Please enter a user.");
-            return;
-        }
+    //    if ($("#txtUsername").val() === "") {
+    //        $("#assignTaskTypeaheadError").show();
+    //        $("#assignTaskErrorMsg").text("Please enter a user.");
+    //        return;
+    //    }
 
-        $("#btnAssignTaskToUser").prop("disabled", true);
+    //    $("#btnAssignTaskToUser").prop("disabled", true);
 
-        var processId = $("#hdnAssignTaskProcessId").val();
-        var userName = $("#txtUsername").val();
-        var taskStage = $("#hdnAssignTaskStage").val();
+    //    var processId = $("#hdnAssignTaskProcessId").val();
+    //    var userName = $("#txtUsername").val();
+    //    var taskStage = $("#hdnAssignTaskStage").val();
 
-        $.ajax({
-            type: "POST",
-            url: "Index/?handler=AssignTaskToUser",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "processId": processId,
-                "userName": userName,
-                "taskStage": taskStage
-            },
-            success: function (result) {
-                $("#assignTaskModal").modal("hide");
-                $("body").removeClass("modal-open");
-                $(".modal-backdrop").remove();
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "Index/?handler=AssignTaskToUser",
+    //        beforeSend: function (xhr) {
+    //            xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+    //        },
+    //        data: {
+    //            "processId": processId,
+    //            "userName": userName,
+    //            "taskStage": taskStage
+    //        },
+    //        success: function (result) {
+    //            $("#assignTaskModal").modal("hide");
+    //            $("body").removeClass("modal-open");
+    //            $(".modal-backdrop").remove();
 
-                window.location.reload();
-                //getComments();
-            },
-            error: function (error) {
-                console.log(error);
+    //            window.location.reload();
+    //            //getComments();
+    //        },
+    //        error: function (error) {
+    //            console.log(error);
 
-                //$("#AddCommentError")
-                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+    //            //$("#AddCommentError")
+    //            //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
 
-                //$("#btnPostComment").prop("disabled", false);
-            }
-        });
+    //            //$("#btnPostComment").prop("disabled", false);
+    //        }
+    //    });
 
-    });
+    //});
 
-    initialiseAssignTaskTypeahead();
+    //initialiseAssignTaskTypeahead();
 
-    function initialiseAssignTaskTypeahead() {
+    //function initialiseAssignTaskTypeahead() {
 
-        $('#assignTaskTypeaheadError').collapse("hide");
+    //    $('#assignTaskTypeaheadError').collapse("hide");
 
-        var users = new Bloodhound({
-            datumTokenizer: function (d) {
-                return Bloodhound.tokenizers.nonword(d.displayName);
-            }, 
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            prefetch: {
-                url: "/Index/?handler=Users",
-                ttl: 60000
-            },
-            initialize: false
-        });
-        var promise = users.initialize();
-        promise
-            .done(function () {
-                $("#btnAssignTaskToUser").prop("disabled", false);
-                $("#txtUsername").prop("disabled", false);
+    //    var users = new Bloodhound({
+    //        datumTokenizer: function (d) {
+    //            return Bloodhound.tokenizers.nonword(d.displayName);
+    //        }, 
+    //        queryTokenizer: Bloodhound.tokenizers.whitespace,
+    //        prefetch: {
+    //            url: "/Index/?handler=Users",
+    //            ttl: 60000
+    //        },
+    //        initialize: false
+    //    });
+    //    var promise = users.initialize();
+    //    promise
+    //        .done(function () {
+    //            $("#btnAssignTaskToUser").prop("disabled", false);
+    //            $("#txtUsername").prop("disabled", false);
 
-                $('#assignTaskTypeaheadError').collapse("hide");
+    //            $('#assignTaskTypeaheadError').collapse("hide");
 
-                usersFetched = true;
-            })
-            .fail(function () {
-                $("#btnAssignTaskToUser").prop("disabled", true);
-                $("#txtUsername").prop("disabled", true);
+    //            usersFetched = true;
+    //        })
+    //        .fail(function () {
+    //            $("#btnAssignTaskToUser").prop("disabled", true);
+    //            $("#txtUsername").prop("disabled", true);
 
-                $('#assignTaskTypeaheadError').collapse("show");
+    //            $('#assignTaskTypeaheadError').collapse("show");
 
-                usersFetched = false;
-            });
+    //            usersFetched = false;
+    //        });
 
-        // Initializing the typeahead
-        $('.typeahead').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-                minLength: 3 /* Specify minimum characters required for showing result */
-            },
-            {
-                name: 'users',
-                source: users,
-                limit: 100,
-                displayKey: 'displayName',
-                valueKey: 'userPrincipalName',
-                templates: {
-                    empty: '<div>No results</div>',
-                    suggestion: function(users) {
-                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
-                    }
-                }
-            });
-    }
+    //    // Initializing the typeahead
+    //    $('.typeahead').typeahead({
+    //            hint: true,
+    //            highlight: true, /* Enable substring highlighting */
+    //            minLength: 3 /* Specify minimum characters required for showing result */
+    //        },
+    //        {
+    //            name: 'users',
+    //            source: users,
+    //            limit: 100,
+    //            displayKey: 'displayName',
+    //            valueKey: 'userPrincipalName',
+    //            templates: {
+    //                empty: '<div>No results</div>',
+    //                suggestion: function(users) {
+    //                    return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+    //                }
+    //            }
+    //        });
+    //}
     //Show MyTaskList
     $("#btnMyTaskList").trigger("click");
 });

@@ -5,6 +5,8 @@
     ViewData["Title"] = "Home page";
 }
 
+<script type="text/javascript" src="~/js/Index.js" asp-append-version="true"></script>
+
 <div class="row pt-1">
     <div class="col-4">
         <a asp-page="./Index">
@@ -41,7 +43,7 @@
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
                 <tr>
-                    <th></th>
+                    <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>Process ID</th>
                     <th style="min-width: 5.0rem;">Task Name</th>
                     <th>User</th>
@@ -49,8 +51,8 @@
                     <th style="min-width: 5.9rem;">Update Type</th>
                     <th style="min-width: 5.9rem;">Target Date</th>
                     <th style="min-width: 5.9rem;">Charting Area</th>
-                    <th></th>
-                    <th></th>
+                    <th><span class="screen-reader-only">Assign Tasks</span></th>
+                    <th><span class="screen-reader-only">Edit Task Notes</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -62,7 +64,7 @@
                             <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
                         </td>
                         <td>
-                            @task.AssignedUser
+                            @task.Assigned.DisplayName
                         </td>
                         <td>
                             @task.CurrentStage
@@ -76,23 +78,19 @@
                         <td>
                             @task.ChartingArea
                         </td>
-
                         <td>
-                            @*<div class="dropdown" style="cursor: pointer;">
-                                    <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text">
-                                            <i class="far fa-edit">
-                                            </i>
-                                            Edit Task Note
-                                        </a>
-                                        <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.ChartType">
-                                            <i class="far fa-user">
-                                            </i>
-                                            Assign Task
-                                        </a>
-                                    </div>
-                                </div>*@
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div data-toggle="tooltip" data-placement="top" title="Task Notes">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                    <i class="far fa-edit"></i>
+                                </a>
+                            </div>
                         </td>
                         <td>
                             @task.TaskNote?.Text
@@ -122,9 +120,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                  &&
-                                                  (t.TaskRole.Verifier == Model.CurrentUser.DisplayName
-           || t.TaskRole.Compiler == Model.CurrentUser.DisplayName)))
+                                             &&
+                                             (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
+      || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>

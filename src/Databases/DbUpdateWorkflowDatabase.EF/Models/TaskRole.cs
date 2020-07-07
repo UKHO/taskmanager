@@ -9,7 +9,7 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
         public int TaskRoleId { get; set; }
         public int ProcessId { get; set; }
-        public string Compiler { get; set; }
-        public string Verifier { get; set; }
+        public virtual AdUser Compiler { get; set; }
+        public virtual AdUser Verifier { get; set; }
     }
 }

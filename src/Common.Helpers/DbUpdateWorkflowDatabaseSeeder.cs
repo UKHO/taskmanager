@@ -31,8 +31,8 @@ namespace Common.Helpers
             PopulateTaskStageType();
             PopulateChartingArea();
             PopulateUpdateType();
-            PopulateTaskInfo();
-            PopulateHpdUser();
+            //PopulateTaskInfo();
+            //PopulateHpdUser();
 
             return this;
         }

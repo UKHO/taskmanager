@@ -889,3 +889,18 @@ h1.workflow-page-heading > span.red {
     -webkit-appearance: none;
     margin: 0;
 }
+
+/* Start screen reader only. */
+/* To be added to spans which are not visible but should be read by screen readers */
+
+.screen-reader-only {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    clip: rect(1px,1px,1px,1px);
+    -webkit-clip-path: polygon(0 0, 0 0, 0 0);
+    clip-path: polygon(0 0, 0 0, 0 0);
+    overflow: hidden !important;
+}
+
+/* End screen reader only*/
