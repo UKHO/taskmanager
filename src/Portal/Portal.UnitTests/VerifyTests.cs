@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers;
@@ -400,11 +401,120 @@ namespace Portal.UnitTests
 
             _verifyModel.DataImpacts = new List<DataImpact>();
 
+            _verifyModel.StsDataImpact = new DataImpact() { HpdUsageId = 1 };
+
             var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
             Assert.AreNotEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.False(_verifyModel.ValidationErrorMessages.Contains("Data Impact: There are incomplete Features Verified tick boxes."));
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_stsdataimpact_usage_not_selected_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Data Impact: STS Usage has not been selected, are you sure you want to continue?", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_stsdataimpact_usage_selected_and_verified_false_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _verifyModel.StsDataImpact = new DataImpact(){ HpdUsageId = 1, FeaturesVerified = false };
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Data Impact: STS Usage has not been Verified", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_given_stsdataimpact_usage_selected_and_verified_false_then_validation_error_message_is_not_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _verifyModel.StsDataImpact = new DataImpact(){ HpdUsageId = 1, FeaturesVerified = false };
+
+            var response = (StatusCodeResult) await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -600,12 +710,14 @@ namespace Portal.UnitTests
                                                                                 A<bool>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
-                                                                                A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+                                                                                A<List<DataImpact>>.Ignored,
+                                                                                A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                                                             .MustNotHaveHappened();
 
             A.CallTo(() => _pageValidationHelper.CheckVerifyPageForWarnings(A<string>.Ignored,
                                                                                         A<WorkflowInstance>.Ignored,
                                                                                         A<List<DataImpact>>.Ignored,
+                                                                                        A<DataImpact>.Ignored,
                                                                                         A<List<string>>.Ignored))
                                                             .MustNotHaveHappened();
 
@@ -636,7 +748,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                 .Returns(true);
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
@@ -668,7 +780,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -709,7 +821,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
@@ -741,7 +853,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("TestUser2", "testuser2@foobar.com"));
 
-            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                 .Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()

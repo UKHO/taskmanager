@@ -78,6 +78,9 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
+        
+        [BindProperty]
+        public DataImpact StsDataImpact { get; set; }
 
         [BindProperty]
         public string Team { get; set; }
@@ -156,7 +159,7 @@ namespace Portal.Pages.DbAssessment
                 ProductActioned,
                 ProductActionChangeDetails,
                 RecordProductAction,
-                DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
+                DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -205,7 +208,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
-                        DataImpacts, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
+                        DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.DisplayName, currentAssessData.Assessor))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -213,7 +216,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    var hasWarnings = _pageValidationHelper.CheckAssessPageForWarnings(action, DataImpacts, ValidationErrorMessages);
+                    var hasWarnings = _pageValidationHelper.CheckAssessPageForWarnings(action, DataImpacts, StsDataImpact, ValidationErrorMessages);
 
                     if (hasWarnings)
                     {

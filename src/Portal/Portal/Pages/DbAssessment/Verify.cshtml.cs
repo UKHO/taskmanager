@@ -73,6 +73,9 @@ namespace Portal.Pages.DbAssessment
         public List<DataImpact> DataImpacts { get; set; }
 
         [BindProperty]
+        public DataImpact StsDataImpact { get; set; }
+
+        [BindProperty]
         public bool ProductActioned { get; set; }
 
         [BindProperty]
@@ -173,6 +176,7 @@ namespace Portal.Pages.DbAssessment
                 ProductActionChangeDetails,
                 RecordProductAction,
                 DataImpacts,
+                StsDataImpact,
                 Team,
                 ValidationErrorMessages,
                 CurrentUser.DisplayName))
@@ -248,6 +252,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActionChangeDetails,
                         RecordProductAction,
                         DataImpacts,
+                        StsDataImpact,
                         Team,
                         ValidationErrorMessages,
                         CurrentUser.DisplayName,
@@ -260,7 +265,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
+                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, StsDataImpact, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))
                     {

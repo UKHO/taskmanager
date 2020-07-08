@@ -427,7 +427,7 @@ namespace Portal.UnitTests
                 .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                    A<List<DataImpact>>.Ignored, A< DataImpact>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _assessModel.OnPostSaveAsync(ProcessId);
@@ -460,7 +460,7 @@ namespace Portal.UnitTests
                 .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -502,7 +502,7 @@ namespace Portal.UnitTests
                 .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _assessModel.OnPostSaveAsync(ProcessId);
@@ -535,7 +535,7 @@ namespace Portal.UnitTests
                 .Returns(("TestUser2", "testuser2@foobar.com"));
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.Add(new OnHold()
@@ -557,6 +557,53 @@ namespace Portal.UnitTests
                 c.Text.Contains($"Task {ProcessId} taken off hold", StringComparison.OrdinalIgnoreCase)));
         }
 
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_stsdataimpact_usage_not_selected_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = "TestUser2";
+            _assessModel.Verifier = "TestUser2";
+            _assessModel.Team = "HW";
+            _assessModel.TaskType = "TaskType";
+
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true}
+            };
+
+            var hpdUsage1 = new HpdUsage()
+            {
+                HpdUsageId = 1,
+                Name = "HpdUsageName1"
+            };
+            _assessModel.DataImpacts = new List<DataImpact>()
+            {
+                new DataImpact() { DataImpactId = 1, HpdUsageId = 1, HpdUsage = hpdUsage1, FeaturesSubmitted = true, ProcessId = 123}
+            };
+
+            _assessModel.Team = "HW";
+
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Data Impact: STS Usage has not been selected, are you sure you want to continue?", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
 
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_features_unsubmitted_on_dataimpacts_then_validation_error_message_is_present()
@@ -654,6 +701,8 @@ namespace Portal.UnitTests
 
             _assessModel.DataImpacts = new List<DataImpact>();
 
+            _assessModel.StsDataImpact = new DataImpact() { HpdUsageId = 1 };
+
 
             var response = await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -718,6 +767,7 @@ namespace Portal.UnitTests
                                                                                 A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
                                                                                 A<List<DataImpact>>.Ignored,
+                                                                                A<DataImpact>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
@@ -728,6 +778,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _pageValidationHelper.CheckAssessPageForWarnings(A<string>.Ignored,
                                                                                         A<List<DataImpact>>.Ignored,
+                                                                                        A<DataImpact>.Ignored,
                                                                                         A<List<string>>.Ignored))
                                                             .MustNotHaveHappened();
 
@@ -920,9 +971,11 @@ namespace Portal.UnitTests
                 null,
                 null,
                 null,
+                null,
                 null)).WithAnyArguments().Returns(true);
 
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForWarnings(
+                null,
                 null,
                 null,
                 null)).WithAnyArguments().Returns(false);
