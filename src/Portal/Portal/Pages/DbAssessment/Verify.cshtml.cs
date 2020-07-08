@@ -444,6 +444,8 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateDataImpact(processId);
 
+            await UpdateStsDataImpact(processId);
+
             await _commentsHelper.AddComment($"Verify: Changes saved",
                 processId,
                 workflowInstanceId,
@@ -704,6 +706,26 @@ namespace Portal.Pages.DbAssessment
                         _dbContext.DataImpact.Add(dataImpact);
                     }
                 }
+
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task UpdateStsDataImpact(int processId)
+        {
+            var toRemove = await _dbContext.DataImpact
+                .Where(at => at.ProcessId == processId && at.StsUsage)
+                .ToListAsync();
+            _dbContext.DataImpact.RemoveRange(toRemove);
+
+            if (StsDataImpact?.HpdUsageId > 0)
+            {
+                StsDataImpact.ProcessId = processId;
+                StsDataImpact.Edited = false;
+                StsDataImpact.FeaturesSubmitted = false;
+                StsDataImpact.StsUsage = true;
+
+                _dbContext.DataImpact.Add(StsDataImpact);
 
                 await _dbContext.SaveChangesAsync();
             }

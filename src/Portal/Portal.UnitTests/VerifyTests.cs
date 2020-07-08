@@ -518,6 +518,103 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Invalid_HpdUsageId_Then_No_Record_Is_Saved()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+                { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _verifyModel.StsDataImpact = new DataImpact() { HpdUsageId = 0 };
+
+            var response = (StatusCodeResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)HttpStatusCode.OK, response.StatusCode);
+
+            var stsDataImpact = await _dbContext.DataImpact.SingleOrDefaultAsync(di => di.ProcessId == ProcessId && di.StsUsage);
+
+            Assert.IsNull(stsDataImpact);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Valid_HpdUsageId_Then_Record_Is_Saved()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "testuser@foobar.com"));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+                { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
+            _hpDbContext.CarisProducts.Add(new CarisProduct
+                { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
+            await _hpDbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = "TestUser";
+
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
+            };
+
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            _verifyModel.StsDataImpact = new DataImpact()
+            {
+                ProcessId = ProcessId,
+                HpdUsageId = 2,
+                FeaturesVerified = false,
+                Comments = "This is a test comment",
+                //The following properties should be overwritten
+                FeaturesSubmitted = true,
+                Edited = true,
+                DataImpactId = 99999,
+                StsUsage = false
+            };
+
+            var response = (StatusCodeResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)HttpStatusCode.OK, response.StatusCode);
+
+            var stsDataImpact = await _dbContext.DataImpact.SingleOrDefaultAsync(di => di.ProcessId == ProcessId && di.StsUsage);
+
+            Assert.IsNotNull(stsDataImpact);
+
+            Assert.AreEqual(ProcessId, stsDataImpact.ProcessId);
+            Assert.AreEqual(_verifyModel.StsDataImpact.HpdUsageId, stsDataImpact.HpdUsageId);
+            Assert.AreEqual(_verifyModel.StsDataImpact.Comments, stsDataImpact.Comments);
+            Assert.AreEqual(_verifyModel.StsDataImpact.FeaturesVerified, stsDataImpact.FeaturesVerified);
+
+            Assert.IsFalse(stsDataImpact.FeaturesSubmitted);
+            Assert.IsFalse(stsDataImpact.Edited);
+        }
+
+        [Test]
         public async Task Test_entering_empty_team_results_in_validation_error_message_On_Save()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
