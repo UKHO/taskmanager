@@ -600,7 +600,7 @@ namespace Portal.Pages.DbAssessment
         {
             var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
 
-            currentVerify.Verifier = Verifier;
+            currentVerify.Verifier = await _portalUserDbService.GetAdUserAsync(Verifier.UserPrincipalName); ;
             currentVerify.Ion = Ion;
             currentVerify.ActivityCode = ActivityCode;
             currentVerify.SourceCategory = SourceCategory;

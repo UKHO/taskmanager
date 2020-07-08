@@ -11,6 +11,8 @@ namespace WorkflowDatabase.EF.Models
         public DateTime? OffHoldTime { get; set; }
 
         public virtual AdUser OnHoldBy { get; set; }
+        public int OnHoldByAdUserId { get; set; }
         public virtual AdUser OffHoldBy { get; set; }
+        public int OffHoldByAdUserId { get; set; }
     }
 }

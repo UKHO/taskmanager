@@ -371,18 +371,12 @@ namespace Portal.Pages.DbAssessment
             return true;
         }
 
-        private async Task<AdUser> GetCurrentAssessor(int processId)
-        {
-            var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
-            return currentAssessData.Assessor;
-        }
-
         private async Task UpdateTaskInformation(int processId)
         {
             var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
 
-            currentAssess.Assessor = Assessor;
-            currentAssess.Verifier = Verifier;
+            currentAssess.Assessor = await _portalUserDbService.GetAdUserAsync(Assessor.UserPrincipalName);
+            currentAssess.Verifier = await _portalUserDbService.GetAdUserAsync(Verifier.UserPrincipalName);
             currentAssess.Ion = Ion;
             currentAssess.ActivityCode = ActivityCode;
             currentAssess.SourceCategory = SourceCategory;
@@ -467,7 +461,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.Equals(user));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName == user.UserPrincipalName);
             }
             catch (InvalidOperationException ex)
             {

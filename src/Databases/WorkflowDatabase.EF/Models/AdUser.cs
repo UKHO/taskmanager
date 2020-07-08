@@ -1,12 +1,18 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
     public class AdUser
     {
+        public AdUser()
+        {
+            LastCheckedDate = DateTime.Now;
+        }
         public int AdUserId { get; set; }
         public string DisplayName { get; set; }
+
         public string UserPrincipalName { get; set; }
         public DateTime LastCheckedDate { get; set; }
 

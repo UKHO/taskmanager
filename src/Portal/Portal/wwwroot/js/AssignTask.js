@@ -123,8 +123,8 @@
                 //Set Form Control Names
                 $(element).find($(".assignTaskAssessor:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor.DisplayName");
                 $(element).find($(".assignTaskVerifier:not(.tt-hint)")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier.DisplayName");                
-                $(element).find($(".assignTaskAssessorUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor.UniversalPrincipalName");
-                $(element).find($(".assignTaskVerifierUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier.UniversalPrincipalName");
+                $(element).find($(".assignTaskAssessorUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Assessor.UserPrincipalName");
+                $(element).find($(".assignTaskVerifierUpn")).prop("name", "AdditionalAssignedTasks[" + id + "].Verifier.UserPrincipalName");
                 $(element).find($(".assignTaskType")).prop("name", "AdditionalAssignedTasks[" + id + "].TaskType");
                 $(element).find($(".assignTaskWorkspaceAffected")).prop("name", "AdditionalAssignedTasks[" + id + "].WorkspaceAffected");
                 $(element).find($(".assignTaskNotes")).prop("name", "AdditionalAssignedTasks[" + id + "].Notes");
@@ -159,7 +159,6 @@
                 $(this).attr("id", newId);
             }
         });
-
         $(element).find("[for]").each(function () {
             var newAttr = $(this).attr("for"); 
 
