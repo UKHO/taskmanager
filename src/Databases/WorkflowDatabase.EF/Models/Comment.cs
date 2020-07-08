@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowDatabase.EF.Models
 {
@@ -13,5 +11,6 @@ namespace WorkflowDatabase.EF.Models
         public DateTime Created { get; set; }
 
         public virtual AdUser AdUser { get; set; }
+        public int AdUserId { get; set; }
     }
 }

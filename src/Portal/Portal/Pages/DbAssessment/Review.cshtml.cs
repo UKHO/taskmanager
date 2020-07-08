@@ -380,6 +380,8 @@ namespace Portal.Pages.DbAssessment
             foreach (var task in AdditionalAssignedTasks)
             {
                 task.ProcessId = processId;
+                task.Assessor = await _portalUserDbService.GetAdUserAsync(task.Assessor.UserPrincipalName);
+                task.Verifier = await _portalUserDbService.GetAdUserAsync(task.Verifier.UserPrincipalName);
                 task.Status = AssignTaskStatus.New.ToString();
                 await _dbContext.DbAssessmentAssignTask.AddAsync(task);
                 await _dbContext.SaveChangesAsync();
@@ -389,10 +391,10 @@ namespace Portal.Pages.DbAssessment
         private async Task UpdateDbAssessmentReviewData(int processId)
         {
             var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
-            currentReview.Assessor = PrimaryAssignedTask.Assessor;
-            currentReview.Verifier = PrimaryAssignedTask.Verifier;
+            currentReview.Assessor = await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor.UserPrincipalName);
+            currentReview.Verifier = await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier.UserPrincipalName);
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
-            currentReview.Reviewer = Reviewer;
+            currentReview.Reviewer = await _portalUserDbService.GetAdUserAsync(Reviewer.UserPrincipalName);
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;

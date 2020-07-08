@@ -18,13 +18,13 @@
                         <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.Assessor, new { @class = "col-form-label" })</div>
                         @{ Model.PrimaryAssignedTask.Assessor ??= AdUser.Empty; }
                         <div class="col-7">@Html.TextBoxFor(model => model.PrimaryAssignedTask.Assessor.DisplayName, new { @class = "form-text-input assignTaskAssessor", autocomplete = "off", spellcheck = "false" })</div>
-                        @Html.HiddenFor(m => m.PrimaryAssignedTask.Assessor.UserPrincipalName, new { @id = "assignTaskAssessorUpn" })
+                        @Html.HiddenFor(m => m.PrimaryAssignedTask.Assessor.UserPrincipalName, new { @id = "assignTaskAssessorUpn", @class = "assignTaskAssessorUpn" })
                     </div>
                     <div class="form-row justify-content-between">
                         <div class="col-5">@Html.LabelFor(model => model.PrimaryAssignedTask.Verifier, new { @class = "col-form-label" })</div>
                         @{ Model.PrimaryAssignedTask.Verifier ??= AdUser.Empty; }
                         <div class="col-7">@Html.TextBoxFor(model => model.PrimaryAssignedTask.Verifier.DisplayName, new { @class = "form-text-input assignTaskVerifier", autocomplete = "off", spellcheck = "false" })</div>
-                        @Html.HiddenFor(m => m.PrimaryAssignedTask.Verifier.UserPrincipalName, new { @id = "assignTaskVerifierUpn" })
+                        @Html.HiddenFor(m => m.PrimaryAssignedTask.Verifier.UserPrincipalName, new { @id = "assignTaskVerifierUpn", @class = "assignTaskVerifierUpn" })
 
                     </div>
                     <div class="form-row justify-content-between">
@@ -72,13 +72,13 @@
                             <div class="form-row justify-content-between">
                                 @{ Model.AdditionalAssignedTasks.ElementAt(i).Assessor ??= AdUser.Empty; }
                                 <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor ?? AdUser.Unknown, "", new { @class = "form-text-input assignTaskAssessor", autocomplete = "off", spellcheck = "false" })</div>
+                                <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).Assessor.DisplayName, new { @class = "form-text-input assignTaskAssessor", autocomplete = "off", spellcheck = "false" })</div>
                                 @Html.HiddenFor(m => m.AdditionalAssignedTasks.ElementAt(i).Assessor.UserPrincipalName, new { @class = "assignTaskAssessorUpn" })
                             </div>
                             <div class="form-row justify-content-between">
                                 @{ Model.AdditionalAssignedTasks.ElementAt(i).Verifier ??= AdUser.Empty; }
                                 <div class="col-5">@Html.LabelFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier, new { @class = "col-form-label" })</div>
-                                <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier ?? AdUser.Unknown, "", new { @class = "form-text-input assignTaskVerifier", autocomplete = "off", spellcheck = "false" })</div>
+                                <div class="col-7">@Html.TextBoxFor(model => model.AdditionalAssignedTasks.ElementAt(i).Verifier.DisplayName, new { @class = "form-text-input assignTaskVerifier", autocomplete = "off", spellcheck = "false" })</div>
                                 @Html.HiddenFor(m => m.AdditionalAssignedTasks.ElementAt(i).Verifier.UserPrincipalName, new { @class = "assignTaskVerifierUpn" })
 
                             </div>
