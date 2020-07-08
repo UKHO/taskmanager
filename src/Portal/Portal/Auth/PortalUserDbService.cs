@@ -40,6 +40,8 @@ namespace Portal.Auth
         /// <returns></returns>
         public async Task<bool> ValidateUserAsync(string userPrincipalName)
         {
+            if (string.IsNullOrEmpty(userPrincipalName)) return false;
+
             return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName.Equals(userPrincipalName));
         }
 
