@@ -958,7 +958,7 @@ namespace Portal.UnitTests
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakepageValidationHelper, _fakePortalUserDbService);
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
 

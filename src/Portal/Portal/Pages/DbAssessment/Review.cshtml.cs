@@ -391,8 +391,10 @@ namespace Portal.Pages.DbAssessment
         private async Task UpdateDbAssessmentReviewData(int processId)
         {
             var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+
             currentReview.Assessor = await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor.UserPrincipalName);
-            currentReview.Verifier = await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier.UserPrincipalName);
+            currentReview.Verifier = await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) ?
+                await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) : null;
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
             currentReview.Reviewer = await _portalUserDbService.GetAdUserAsync(Reviewer.UserPrincipalName);
             currentReview.Notes = PrimaryAssignedTask.Notes;
@@ -400,6 +402,8 @@ namespace Portal.Pages.DbAssessment
             currentReview.Ion = Ion;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
+
+            _dbContext.DbAssessmentReviewData.Update(currentReview);
 
             await _dbContext.SaveChangesAsync();
         }
