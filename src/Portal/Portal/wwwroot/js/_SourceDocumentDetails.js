@@ -82,6 +82,8 @@
 
         hideAddSourceDialogs();
 
+        $("#searchSourceSpinner").show();
+
         $.ajax({
             type: "GET",
             url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
@@ -90,6 +92,9 @@
             },
             contentType: "application/json; charset=utf-8",
             data: { "sdocId": sdocId },
+            complete: function() {
+                $("#searchSourceSpinner").hide();
+            },
             success: function (data) {
                 if (data === null) {
                     $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
