@@ -86,7 +86,7 @@ namespace Portal.Pages
                 .Include(vd => vd.DbAssessmentVerifyData)
                 .Include(t => t.TaskNote)
                 .Include(o => o.OnHold)
-                .AsNoTracking()
+                //.AsNoTracking()
                 .Where(wi => wi.Status == WorkflowStatus.Started.ToString())
                 .OrderBy(wi => wi.ProcessId)
                 .ToListAsync();
