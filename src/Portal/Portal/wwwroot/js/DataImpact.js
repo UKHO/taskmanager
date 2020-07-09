@@ -97,6 +97,7 @@
         var pageIdentity = $("#pageIdentity").val();
         if (pageIdentity === "Assess") {
             $(".dataImpactFeaturesVerified").bind("click", false);
+            $("#StsDataImpact_FeaturesVerified").bind("click", false);
         } else if (pageIdentity === "Verify") {
             $(".dataImpactFeaturesSubmitted").bind("click", false);
         }

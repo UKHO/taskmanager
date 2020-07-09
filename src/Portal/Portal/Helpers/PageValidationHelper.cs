@@ -96,16 +96,17 @@ namespace Portal.Helpers
         /// <param name="activityCode"></param>
         /// <param name="sourceCategory"></param>
         /// <param name="taskType"></param>
+        /// <param name="productActioned"></param>
+        /// <param name="productActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="team"></param>
         /// <param name="assessor"></param>
         /// <param name="verifier"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedAssessorInDb"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="productActionChangeDetails"></param>
         /// <returns></returns>
         public async Task<bool> CheckAssessPageForErrors(string action,
             string ion,
@@ -116,6 +117,7 @@ namespace Portal.Helpers
             string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
             string team,
             string assessor,
             string verifier,
@@ -178,16 +180,27 @@ namespace Portal.Helpers
         /// </summary>
         /// <param name="action"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        public bool CheckAssessPageForWarnings(
-            string action,
+        public bool CheckAssessPageForWarnings(string action,
             List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
             List<string> validationWarningMessages)
         {
+            var hasWarnings = false;
 
-           return !CheckDataImpactFeatures(action, WorkflowStage.Assess, dataImpacts, validationWarningMessages);
+            if (!CheckDataImpactFeatures(action, WorkflowStage.Assess, dataImpacts, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
 
+            if (!CheckStsDataImpact(action, WorkflowStage.Assess, stsDataImpact, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
+            return hasWarnings;
         }
 
         /// <summary>
@@ -202,6 +215,7 @@ namespace Portal.Helpers
         /// <param name="productActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="team"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
@@ -217,6 +231,7 @@ namespace Portal.Helpers
             string productActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
             string team,
             List<string> validationErrorMessages,
             string currentUsername,
@@ -265,6 +280,11 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
+            if (!ValidateStsDataImpact(stsDataImpact, action, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
             if (string.IsNullOrWhiteSpace(team))
             {
                 validationErrorMessages.Add("Task Information: Team cannot be empty");
@@ -280,13 +300,14 @@ namespace Portal.Helpers
         /// <param name="action"></param>
         /// <param name="workflowInstance"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        public async Task<bool> CheckVerifyPageForWarnings(
-                                                            string action, 
-                                                            WorkflowInstance workflowInstance, 
-                                                            List<DataImpact> dataImpacts, 
-                                                            List<string> validationWarningMessages)
+        public async Task<bool> CheckVerifyPageForWarnings(string action,
+            WorkflowInstance workflowInstance,
+            List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
+            List<string> validationWarningMessages)
         {
             var hasWarnings = false;
 
@@ -296,6 +317,11 @@ namespace Portal.Helpers
             }
 
             if (!CheckDataImpactFeatures(action, WorkflowStage.Verify, dataImpacts, validationWarningMessages))
+            {
+                hasWarnings = true;
+            }
+
+            if (!CheckStsDataImpact(action, WorkflowStage.Verify, stsDataImpact, validationWarningMessages))
             {
                 hasWarnings = true;
             }
@@ -646,7 +672,7 @@ namespace Portal.Helpers
         }
 
         /// <summary>
-        /// Used in Verify pages
+        /// Used in Assess and Verify pages
         /// </summary>
         /// <param name="action"></param>
         /// <param name="workflowStage"></param>
@@ -694,6 +720,41 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess and Verify pages
         /// </summary>
+        /// <param name="action"></param>
+        /// <param name="workflowStage"></param>
+        /// <param name="stsDataImpact"></param>
+        /// <param name="validationWarningMessages"></param>
+        /// <returns></returns>
+        private bool CheckStsDataImpact(
+                                                string action, 
+                                                WorkflowStage workflowStage, 
+                                                DataImpact stsDataImpact,
+                                                List<string> validationWarningMessages)
+        {
+            if (action != "Done") return true;
+
+            switch (workflowStage)
+            {
+                case WorkflowStage.Assess:
+                case WorkflowStage.Verify:
+                    if (stsDataImpact == null || stsDataImpact.HpdUsageId == 0)
+                    {
+                        validationWarningMessages.Add(
+                            "Data Impact: STS Usage has not been selected, are you sure you want to continue?");
+                        return false;
+                    }
+
+                    break;
+                default:
+                    throw new NotImplementedException($"{workflowStage} not implemented");
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Used in Assess and Verify pages
+        /// </summary>
         /// <param name="dataImpacts"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
@@ -718,6 +779,31 @@ namespace Portal.Helpers
             return true;
         }
 
+        /// <summary>
+        /// Used in Verify page
+        /// </summary>
+        /// <param name="stsDataImpact"></param>
+        /// <param name="action"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <returns></returns>
+        private bool ValidateStsDataImpact(DataImpact stsDataImpact, string action,
+            List<string> validationErrorMessages)
+        {
+            if (stsDataImpact == null || stsDataImpact.HpdUsageId == 0 ||
+                action != "Done")
+            {
+                return true;
+            }
+
+            // Show error to user that they've chosen the same usage more than once
+            if (!stsDataImpact.FeaturesVerified)
+            {
+                validationErrorMessages.Add("Data Impact: STS Usage has not been Verified");
+                return false;
+            }
+
+            return true;
+        }
 
     }
 }

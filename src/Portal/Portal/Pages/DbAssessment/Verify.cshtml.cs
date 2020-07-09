@@ -73,6 +73,9 @@ namespace Portal.Pages.DbAssessment
         public List<DataImpact> DataImpacts { get; set; }
 
         [BindProperty]
+        public DataImpact StsDataImpact { get; set; }
+
+        [BindProperty]
         public bool ProductActioned { get; set; }
 
         [BindProperty]
@@ -173,6 +176,7 @@ namespace Portal.Pages.DbAssessment
                 ProductActionChangeDetails,
                 RecordProductAction,
                 DataImpacts,
+                StsDataImpact,
                 Team,
                 ValidationErrorMessages,
                 CurrentUser.DisplayName))
@@ -248,6 +252,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActionChangeDetails,
                         RecordProductAction,
                         DataImpacts,
+                        StsDataImpact,
                         Team,
                         ValidationErrorMessages,
                         CurrentUser.DisplayName,
@@ -260,7 +265,7 @@ namespace Portal.Pages.DbAssessment
                         };
                     }
 
-                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, ValidationErrorMessages);
+                    var hasWarnings = await _pageValidationHelper.CheckVerifyPageForWarnings(action, workflowInstance, DataImpacts, StsDataImpact, ValidationErrorMessages);
 
                     if (!await MarkCarisProjectAsComplete(processId))
                     {
@@ -438,6 +443,8 @@ namespace Portal.Pages.DbAssessment
             }
 
             await UpdateDataImpact(processId);
+
+            await UpdateStsDataImpact(processId);
 
             await _commentsHelper.AddComment($"Verify: Changes saved",
                 processId,
@@ -683,7 +690,9 @@ namespace Portal.Pages.DbAssessment
 
         private async Task UpdateDataImpact(int processId)
         {
-            var toRemove = await _dbContext.DataImpact.Where(at => at.ProcessId == processId).ToListAsync();
+            var toRemove = await _dbContext.DataImpact
+                .Where(at => at.ProcessId == processId && !at.StsUsage)
+                .ToListAsync();
             _dbContext.DataImpact.RemoveRange(toRemove);
 
             if (DataImpacts.Any(a => a.HpdUsageId > 0))
@@ -693,6 +702,7 @@ namespace Portal.Pages.DbAssessment
                     if (dataImpact.HpdUsageId > 0)
                     {
                         dataImpact.ProcessId = processId;
+                        dataImpact.StsUsage = false;
                         _dbContext.DataImpact.Add(dataImpact);
                     }
                 }
@@ -701,6 +711,25 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
+        private async Task UpdateStsDataImpact(int processId)
+        {
+            var toRemove = await _dbContext.DataImpact
+                .Where(at => at.ProcessId == processId && at.StsUsage)
+                .ToListAsync();
+            _dbContext.DataImpact.RemoveRange(toRemove);
+
+            if (StsDataImpact?.HpdUsageId > 0)
+            {
+                StsDataImpact.ProcessId = processId;
+                StsDataImpact.Edited = false;
+                StsDataImpact.FeaturesSubmitted = false;
+                StsDataImpact.StsUsage = true;
+
+                _dbContext.DataImpact.Add(StsDataImpact);
+
+                await _dbContext.SaveChangesAsync();
+            }
+        }
 
         private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {

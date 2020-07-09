@@ -350,7 +350,9 @@ The same HpdUsageId should not be used multiple times per ProcessId.
 |HpdUsageId         |INT                |No           |                                      |
 |Edited             |BIT                |No           |                                      |
 |Comments           |NVARCHAR(4000)     |Yes          |                                      |
-|Verified           |BIT                |No           |                                      |
+|Features Submitted |BIT                |No           |                                      |
+|Features Verified  |BIT                |No           |                                      |
+|StsUsage           |BIT                |No           |                                      |
 
 The ProcessId column has a foreign key constraint to the WorkflowInstance table.
 The HpdUsageId column has a foreign key constraint to the HpdUsage table.

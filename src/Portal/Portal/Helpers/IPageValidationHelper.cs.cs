@@ -40,6 +40,7 @@ namespace Portal.Helpers
         /// <param name="ProductActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="team"></param>
         /// <param name="assessor"></param>
         /// <param name="verifier"></param>
@@ -47,32 +48,34 @@ namespace Portal.Helpers
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
-        Task<bool> CheckAssessPageForErrors(
-                                            string action,
-                                            string ion,
-                                            string activityCode,
-                                            string sourceCategory,
-                                            string taskType,
-                                            bool productActioned,
-                                            string ProductActionChangeDetails,
-                                            List<ProductAction> recordProductAction,
-                                            List<DataImpact> dataImpacts,
-                                            string team,
-                                            string assessor,
-                                            string verifier,
-                                            List<string> validationErrorMessages,
-                                            string currentUsername,
-                                            string currentAssignedAssessorInDb);
+        Task<bool> CheckAssessPageForErrors(string action,
+            string ion,
+            string activityCode,
+            string sourceCategory,
+            string taskType,
+            bool productActioned,
+            string ProductActionChangeDetails,
+            List<ProductAction> recordProductAction,
+            List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
+            string team,
+            string assessor,
+            string verifier,
+            List<string> validationErrorMessages,
+            string currentUsername,
+            string currentAssignedAssessorInDb);
+
         /// <summary>
         /// Check for warnings
         /// </summary>
         /// <param name="action"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        bool CheckAssessPageForWarnings(
-            string action,
+        bool CheckAssessPageForWarnings(string action,
             List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
             List<string> validationWarningMessages);
 
 
@@ -88,6 +91,7 @@ namespace Portal.Helpers
         /// <param name="ProductActionChangeDetails"></param>
         /// <param name="recordProductAction"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="team"></param>
         /// <param name="validationErrorMessages"></param>
         /// <param name="currentUsername"></param>
@@ -103,6 +107,7 @@ namespace Portal.Helpers
             string ProductActionChangeDetails,
             List<ProductAction> recordProductAction,
             List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
             string team,
             List<string> validationErrorMessages,
             string currentUsername,
@@ -115,13 +120,14 @@ namespace Portal.Helpers
         /// <param name="action"></param>
         /// <param name="workflowInstance"></param>
         /// <param name="dataImpacts"></param>
+        /// <param name="stsDataImpact"></param>
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
-        Task<bool> CheckVerifyPageForWarnings(
-                                                string action, 
-                                                WorkflowInstance workflowInstance, 
-                                                List<DataImpact> dataImpacts, 
-                                                List<string> validationWarningMessages);
+        Task<bool> CheckVerifyPageForWarnings(string action,
+            WorkflowInstance workflowInstance,
+            List<DataImpact> dataImpacts,
+            DataImpact stsDataImpact,
+            List<string> validationWarningMessages);
 
     }
 }
