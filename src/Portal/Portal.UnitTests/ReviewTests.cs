@@ -4,8 +4,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
+using Common.Messages.Events;
 using FakeItEasy;
 using HpdDatabase.EF.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -968,6 +970,25 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostReviewTerminateAsync_Given_Task_Not_Assigned_To_User_Terminating_Returns_FailedValidation_Errors()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("ThisUserIsNotTheReviewer", "thisuser@foobar.com"));
+
+            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+
+            // Assert
+            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+
+            A.CallTo(() => _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent", A<ProgressWorkflowInstanceEvent>.Ignored))
+                .MustNotHaveHappened();
+            Assert.IsFalse(await _dbContext.WorkflowInstance.AnyAsync(
+                wi => wi.ProcessId == ProcessId && wi.Status == WorkflowStatus.Updating.ToString()));
+        }
+
+        [Test]
         public async Task Test_OnPostReviewTerminateAsync_Updates_WorkflowInstance_With_ActivityChangedAt()
         {
             var processId = 1234;
@@ -988,7 +1009,17 @@ namespace Portal.UnitTests
                 PrimarySdocId = 111111
             });
 
+
+            await _dbContext.DbAssessmentReviewData.AddAsync(new DbAssessmentReviewData()
+            {
+                ProcessId = processId,
+                Reviewer = "TestUser"
+            });
+
             await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "thisuser@foobar.com"));
 
             await _reviewModel.OnPostTerminateAsync("Testing", processId);
 
@@ -1003,6 +1034,9 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_Terminating_On_Hold_Task_Results_In_Validation_Error_Message()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("TestUser", "thisuser@foobar.com"));
+
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
