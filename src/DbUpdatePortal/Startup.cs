@@ -101,7 +101,7 @@ namespace DbUpdatePortal
             // Order of these two is important
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 services.AddHostedService<DatabaseSeedingService>();
-            //services.AddHostedService<AdUserUpdateService>();
+            services.AddHostedService<AdUserUpdateService>();
 
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
@@ -172,13 +172,20 @@ namespace DbUpdatePortal
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseRequestLocalization();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapHealthChecks("/health");
             });
+
+            app.UseAzureAppConfiguration();
         }
     }
 }

@@ -10,6 +10,8 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public int TaskRoleId { get; set; }
         public int ProcessId { get; set; }
         public virtual AdUser Compiler { get; set; }
+        public int CompilerAdUserId { get; set; }
         public virtual AdUser Verifier { get; set; }
+        public int VerifierAdUserId { get; set; }
     }
 }

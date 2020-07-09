@@ -15,5 +15,6 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public string Comment { get; set; }
         public DateTime Created { get; set; }
         public virtual AdUser AdUser { get; set; }
+        public int AdUserId { get; set; }
     }
 }

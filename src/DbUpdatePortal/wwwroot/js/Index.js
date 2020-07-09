@@ -4,6 +4,8 @@
 
     var userFullName = $("#userFullName > strong").text();
 
+    $.fn.dataTable.moment('DD/MM/YYYY');
+
     var inFlightTasksTable = setupInFlightTasks();
     var assignedTasksTable = setupAssignedTasks();
 
@@ -49,6 +51,11 @@
                 },
                 {
                     'targets': [9],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [10],
                     'visible': false,
                     'searchable': false
                 }
@@ -56,18 +63,55 @@
             "order": [[1, 'asc']],
             "scrollX": true,
             "createdRow": function(row, data, dataIndex) {
-                if (data[9] === "") {
+                if (data[10] === "") {
                     $("td.details-control", row).removeClass("details-control");
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
-        });
+        }).on("click", ".taskNoteItem", function (event) {
+            event.preventDefault();
 
+            var target = $(event.currentTarget);
+
+            if (target.is("a")) {
+
+                $("#btnPostTaskNote").prop("disabled", false);
+                $("#editTaskNoteError").html("");
+
+                var processId = $(this).data("processid");
+                $("#hdnProcessId").val(processId);
+
+                var taskNote = $(this).data("tasknote");
+                $("#txtNote").val(taskNote);
+
+                $("#editTaskNoteModal").modal("show");
+            }
+        }).on("click", ".assignTaskItem", function (event) {
+            showAssignTaskModal(event);
+        });
 
     }
 
+    function showAssignTaskModal(event) {
+
+        event.preventDefault();
+
+        var target = $(event.currentTarget);
+
+        if (target.is("a")) {
+
+            var processId = target.data("processid");
+            $("#hdnAssignTaskProcessId").val(processId);
+
+            //var taskStage = target.data("taskstage");
+            //$("#hdnAssignTaskStage").val(taskStage);
+
+            $("#assignTaskModal").modal("show");
+        }
+    }
+
     function format(data) {
-        return '<span class="note-formatting">' + data[9] + '</span>';
+        return '<span class="note-formatting">' + data[10] + '</span>';
     }
 
     $('#inFlightTasks tbody').on('click',
@@ -86,9 +130,9 @@
             }
         });
 
-    $('#txtGlobalSearch').keyup(function () {
-        inFlightTasksTable.search($(this).val()).draw();
-    });
+    //$('#txtGlobalSearch').keyup(function () {
+    //    inFlightTasksTable.search($(this).val()).draw();
+    //});
 
     $("#btnNewTask").click(function () { window.location.href = '/NewTask'; });
 
@@ -102,9 +146,9 @@
                 // My Tasks List filter
                 if (menuItem === 0) {
 
-                    if (settings.sTableId === "inFlightTasks") {
-                        return filterMyAssignedTasksList(rowData);
-                    }
+                    //if (settings.sTableId === "inFlightTasks") {
+                    //    return filterMyAssignedTasksList(rowData);
+                    //}
 
                     return true;
                 } else {
@@ -129,7 +173,7 @@
 
     function filterMyAssignedTasksList(rowData) {
 
-        var username = rowData[2];
+        var username = rowData[3];
 
         if (username !== userFullName) {
             return false;
@@ -176,6 +220,8 @@
             $('#txtGlobalSearch').val("");
             inFlightTasksTable.search("").draw();
 
+            $('#TasksHeading').html("My Tasks");
+
             $('#assignedTasksTable').show();
 
         });
@@ -189,6 +235,8 @@
             $('#txtGlobalSearch').val("");
 
             inFlightTasksTable.search("").draw();
+
+            $('#TasksHeading').html("Team Tasks");
 
             $('#assignedTasksTable').hide();
 

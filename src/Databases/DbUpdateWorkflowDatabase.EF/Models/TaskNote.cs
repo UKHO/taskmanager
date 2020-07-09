@@ -14,6 +14,8 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
         public virtual AdUser CreatedBy { get; set; }
+        public int CreatedByAdUserId { get; set; }
         public virtual AdUser LastModifiedBy { get; set; }
+        public int LastModifiedByAdUserId { get; set; }
     }
 }

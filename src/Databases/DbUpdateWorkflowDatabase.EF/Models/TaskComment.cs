@@ -16,5 +16,7 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public string ActionRole { get; set; }
 
         public virtual AdUser AdUser { get; set; }
+
+        public int AdUserId { get; set; }
     }
 }

@@ -7,5 +7,7 @@
         public string HpdUsername { get; set; }
 
         public virtual AdUser AdUser { get; set; }
+
+        public int AdUserId { get; set; }
     }
 }

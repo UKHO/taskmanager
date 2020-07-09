@@ -14,10 +14,12 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DbUpdatePortal.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DbUpdatePortal.Pages
 {
-    //[Authorize]
+    [Authorize]
     public class NewTaskModel : PageModel
     {
 
@@ -108,7 +110,7 @@ namespace DbUpdatePortal.Pages
         //public async Task<IActionResult> OnPostSaveAsync()
         //{
         //    LogContext.PushProperty("ActivityName", "NewTask");
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostSaveAsync));
+        //    LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostSaveAsync));
         //    LogContext.PushProperty("Action", "Save");
 
         //    try
@@ -117,31 +119,29 @@ namespace DbUpdatePortal.Pages
         //        ValidationErrorMessages.Clear();
 
 
-        //        var role = new TaskRole()
-        //        {
-        //            Compiler = Compiler,
-        //            VerifierOne = Verifier1,
-        //            VerifierTwo = Verifier2,
-        //            HundredPercentCheck = HundredPercentCheck
-        //        };
+        //        //var role = new TaskRole()
+        //        //{
+        //        //    Compiler = Compiler,
+        //        //    Verifier = Verifier
+        //        //};
 
-        //        if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
-        //        )
-        //        {
+        //        //if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
+        //        //)
+        //        //{
 
-        //            return new JsonResult(this.ValidationErrorMessages)
-        //            {
-        //                StatusCode = (int)HttpStatusCode.InternalServerError
-        //            };
-        //        }
+        //        //    return new JsonResult(this.ValidationErrorMessages)
+        //        //    {
+        //        //        StatusCode = (int)HttpStatusCode.InternalServerError
+        //        //    };
+        //        //}
 
-        //        ReCalculateDeadlineDates();
 
-        //        var currentStageId = (int)(ChartType == NcneChartType.Adoption.ToString()
-        //            ? NcneTaskStageType.With_SDRA
-        //            : NcneTaskStageType.Specification);
+        //        //var currentStageId = (int)(ChartType == NcneChartType.Adoption.ToString()
+        //        //    ? NcneTaskStageType.With_SDRA
+        //        //    : NcneTaskStageType.Specification);
 
-        //        var currentStage = _ncneWorkflowDbContext.TaskStageType.Find(currentStageId).Name;
+
+        //        var currentStage = DbUpdateTaskStageType.Compile.ToString();
 
         //        var newProcessId = await CreateTaskInfo(currentStage);
 
@@ -297,14 +297,6 @@ namespace DbUpdatePortal.Pages
 
             UpdateTypes = new SelectList(updateTypes);
         }
-
-        //public JsonResult OnPostCalcPublishDate(DateTime dtRepromat)
-        //{
-
-        //    PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtRepromat);
-
-        //    return new JsonResult(PublicationDate?.ToShortDateString());
-        //}
 
         public async Task<JsonResult> OnGetUsersAsync()
         {
