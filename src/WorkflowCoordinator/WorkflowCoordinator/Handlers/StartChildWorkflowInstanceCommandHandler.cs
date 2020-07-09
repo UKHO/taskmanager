@@ -262,7 +262,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentAssessData.FirstOrDefaultAsync(a => a.ProcessId == childProcessId);
 
             var isNew = childAssessData == null;
-
+            
             if (isNew)
             {
                 childAssessData = new DbAssessmentAssessData();
