@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
-using System;
-using System.Data.SqlClient;
 
 namespace NCNEWorkflowDatabase.EF
 {

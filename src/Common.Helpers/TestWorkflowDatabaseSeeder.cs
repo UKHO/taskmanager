@@ -123,32 +123,37 @@ namespace Common.Helpers
 
             using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             var wi = workflowDbContext.WorkflowInstance
-                //.Include(w => w.Comments).ThenInclude(c => c.AdUser).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Reviewer).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Reviewer).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Assessor).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Assessor).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Verifier).ThenInclude(u => u.AdUserId).AsNoTracking()
-                //.Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Verifier).ThenInclude(u => u.AdUserId).AsNoTracking()
-                .ToList();
+                .Include(w => w.Comments).ThenInclude(c => c.AdUser).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Reviewer).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Reviewer).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Assessor).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Assessor).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentAssessData).ThenInclude(a => a.Verifier).ThenInclude(u => u.AdUserId).AsNoTracking()
+                .Include(w => w.DbAssessmentReviewData).ThenInclude(a => a.Verifier).ThenInclude(u => u.AdUserId).AsNoTracking();
+            //.ToList();
 
+
+            var users = workflowDbContext.AdUsers;
 
             foreach (var task in tasks)
             {
-                foreach (var comment in task.Comments)
-                {
-                    workflowDbContext.Entry(comment.AdUser).State = EntityState.Unchanged;
-                }
+                //foreach (var comment in task.Comments)
+                //{
+                //    var temp = users.SingleOrDefault(u =>
+                //        comment.AdUser.UserPrincipalName == u.UserPrincipalName);
+                //    comment.AdUser = temp;
+                //    //   workflowDbContext.Entry(comment.AdUser).State = EntityState.Detached;
+                //}
 
-                if (task.DbAssessmentReviewData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Assessor).State = EntityState.Unchanged;
-                if (task.DbAssessmentReviewData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Reviewer).State = EntityState.Unchanged;
-                if (task.DbAssessmentReviewData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Verifier).State = EntityState.Unchanged;
-                if (task.DbAssessmentVerifyData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Assessor).State = EntityState.Unchanged;
-                if (task.DbAssessmentVerifyData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Reviewer).State = EntityState.Unchanged;
-                if (task.DbAssessmentVerifyData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Verifier).State = EntityState.Unchanged;
-                if (task.DbAssessmentAssessData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Assessor).State = EntityState.Unchanged;
-                if (task.DbAssessmentAssessData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Reviewer).State = EntityState.Unchanged;
-                if (task.DbAssessmentAssessData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Verifier).State = EntityState.Unchanged;
+                //if (task.DbAssessmentReviewData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Assessor).State = EntityState.Detached;
+                //if (task.DbAssessmentReviewData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Reviewer).State = EntityState.Detached;
+                //if (task.DbAssessmentReviewData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentReviewData.Verifier).State = EntityState.Detached;
+                //if (task.DbAssessmentVerifyData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Assessor).State = EntityState.Detached;
+                //if (task.DbAssessmentVerifyData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Reviewer).State = EntityState.Detached;
+                //if (task.DbAssessmentVerifyData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentVerifyData.Verifier).State = EntityState.Detached;
+                //if (task.DbAssessmentAssessData?.Assessor != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Assessor).State = EntityState.Detached;
+                //if (task.DbAssessmentAssessData?.Reviewer != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Reviewer).State = EntityState.Detached;
+                //if (task.DbAssessmentAssessData?.Verifier != null) workflowDbContext.Entry(task.DbAssessmentAssessData.Verifier).State = EntityState.Detached;
 
                 workflowDbContext.WorkflowInstance.Add(task);
                 workflowDbContext.SaveChanges();

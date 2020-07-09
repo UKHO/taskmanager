@@ -12,17 +12,13 @@
       {
         "processId": 445,
         "text": "A comment",
-        "adUser": {
-          "adUserId": 1
-        },
+        "adUserId": 1,
         "created": "2020-01-01T00:00:00"
       },
       {
         "processId": 445,
         "text": "A 2nd comment",
-        "adUser": {
-          "adUserId": 2
-        },
+        "adUserId": 1,
         "created": "2020-01-03T00:00:00"
       }
     ],
@@ -44,9 +40,9 @@
       "processId": 445,
       "ion": "Ion",
       "activityCode": "78798",
-      //"reviewer": { "adUserId": 5 },
-      //"assessor": {"adUserId": 4},
-      //"verifier": { "adUserId": 5 },
+      "reviewerAdUserId": 2,
+      "assessorAdUserId": 1,
+      "verifierAdUserId": 3,
       "TaskType": "Simple",
       "WorkspaceAffected": "2054_4",
       "Notes": "Important note"
@@ -56,1284 +52,1274 @@
       "ion": "Ion",
       "activityCode": "78798",
       "sourceCategory": "Engineering Drawings",
-      "reviewer": { "adUserId": 3 },
-      "assessor": { "adUserId": 4 },
-      //"verifier": { "adUserId": 5 },
+      "reviewerAdUserId": 2,
+      "assessorAdUserId": 1,
+      "verifierAdUserId": 3,
       "taskType": "Simple",
       "productActioned": false,
       "productActionChangeDetails": null,
       "workspaceAffected": "123",
       "CarisProjectName": "Sunrise"
-      //},
-      //"dbAssessmentAssignTask": [
-      //  {
-      //    "processId": 445,
-      //    "assessor": { "adUserId": 3 },
-      //    "verifier": { "adUserId": 3 },
-      //    "TaskType": "LTA",
-      //    "WorkspaceAffected": "2054_4",
-      //    "Notes": "Important note",
-      //    "status": "New"
-      //  }
-      //],}
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 445,
-      "SdocId": 1936906,
-      "ContentServiceId": null,
-      "Status": "Started",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
-    },
-    "DatabaseDocumentStatus": [
+      },
+    "dbAssessmentAssignTask": [
       {
         "processId": 445,
-        "SdocId": 1936906,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ]
-  },
-  {
-    "processId": 123,
-    "PrimarySdocId": 217547,
-    "serialNumber": "123_sn",
-    "parentProcessId": null,
-    "activityName": "Review",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 123,
-        "text": "A comment",
-        "username": "Ross",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 123,
-        "text": "A 2nd comment",
-        "username": "Ben",
-        "created": "2020-01-03T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 217547,
-      "rsdraNumber": "RSDRA2006000110163",
-      "sourceDocumentName": "HUA HIN",
-      "receiptDate": "2020-01-03T00:00:00",
-      "toSdoDate": null,
-      "effectiveStartDate": "2019-12-18T00:00:00",
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Chart - Navigational",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 123
-    },
-    "linkedDocument": [
-      {
-        "processId": 123,
-        "PrimarySdocId": 217547,
-        "rsdraNumber": "RSDRA2006000169482",
-        "sourceDocumentName": "HUA HIN",
-        "receiptDate": "2020-01-03T00:00:00",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "sourceNature": "Graphical",
-        "datum": "Non-WGS84",
-        "linkType": "Forward",
-        "linkedSdocId": 332373,
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 123,
-        "PrimarySdocId": 217547,
-        "rsdraNumber": "RSDRA2007000067413",
-        "sourceDocumentName": "NM_THA_119_119_(T)_2007",
-        "receiptDate": "2007-09-17T00:00:00",
-        "sourceDocumentType": "Source NM",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Backward",
-        "linkedSdocId": 1018253,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 123,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 123,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "dbAssessmentAssignTask": [
-      {
-        "processId": 123,
-        "assessor": "Matthew Stoodley",
-        "verifier": "Peter Bates",
-        "TaskType": "LTA",
-        "WorkspaceAffected": "2054_1",
-        "Notes": "Child1",
-        "status": "New"
-      },
-      {
-        "processId": 123,
-        "assessor": "Stuart Barzey",
-        "verifier": "Rossall Sandford",
-        "TaskType": "Simple",
-        "WorkspaceAffected": "2054_2",
-        "Notes": "Child2",
-        "status": "New"
-      }
-
-    ],
-    "PrimaryDocumentStatus": {
-      "processId": 123,
-      "SdocId": 217547,
-      "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
-      "Status": "Complete",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
-    },
-    "OnHold": [
-      {
-        "processId": 123,
-        "OnHoldTime": "2020-01-01",
-        "OnHoldUser": "Ross"
-      },
-      {
-        "processId": 123,
-        "OnHoldTime": "2020-01-01",
-        "OnHoldUser": "Ross",
-        "OffHoldTime": "2020-01-01",
-        "OffHoldUser": "Samir"
-      }
-    ],
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 123,
-        "SdocId": 217547,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ]
-  },
-  {
-    "processId": 632,
-    "PrimarySdocId": 1101541,
-    "serialNumber": "632_14",
-    "parentProcessId": null,
-    "activityName": "Review",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 632,
-        "text": "A comment",
-        "username": "G",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 632,
-        "text": "A 2nd comment",
-        "username": "Bon",
-        "created": "2020-01-03T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 1101541,
-      "rsdraNumber": "RSDRA2008000078062",
-      "sourceDocumentName": "NMBK_JAP_38_1323_2008_W14_W/14 - A1_1",
-      "receiptDate": "2020-01-01T00:00:00",
-      "toSdoDate": null,
-      "effectiveStartDate": "2020-01-01T00:00:00",
-      "teamDistributedTo": "PC",
-      "sourceDocumentType": "Source NM Block",
-      "sourceNature": "Graphical",
-      "datum": "WGS84",
-      "processId": 632
-    },
-    "linkedDocument": [
-      {
-        "processId": 632,
-        "PrimarySdocId": 1101541,
-        "rsdraNumber": "RSDRA2006000160952",
-        "sourceDocumentName": "APPROACHES TO MURORAN KO",
-        "receiptDate": "2002-07-12T00:00:00",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "sourceNature": "Graphical",
-        "datum": "WGS84",
-        "linkType": "Forward",
-        "linkedSdocId": 320532,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 632,
-        "PrimarySdocId": 1101541,
-        "rsdraNumber": "RSDRA2008000078061",
-        "sourceDocumentName": "NM_JAP_38_1323_2008",
-        "receiptDate": "2020-01-01T00:00:00",
-        "sourceDocumentType": "Source NM",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Backward",
-        "linkedSdocId": 1101540,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 632,
-      "ion": "I899",
-      "activityCode": "78798",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Peter Bates",
-      "verifier": "Rossall Sandford",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 632,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "OnHold": [
-      {
-        "processId": 632,
-        "OnHoldTime": "2020-02-26",
-        "OnHoldUser": "Ross"
-      },
-      {
-        "processId": 632,
-        "OnHoldTime": "2020-02-26",
-        "OnHoldUser": "Ross",
-        "OffHoldTime": "2020-02-26",
-        "OffHoldUser": "Samir"
-      }
-    ],
-    "PrimaryDocumentStatus": {
-      "processId": 632,
-      "SdocId": 1101541,
-      "ContentServiceId": null,
-      "Status": "Started",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 632,
-        "SdocId": 1101541,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ]
-  },
-  {
-    "processId": 125,
-    "PrimarySdocId": 206733,
-    "serialNumber": "125_sn",
-    "parentProcessId": null,
-    "activityName": "Assess",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 125,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 125,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206733,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": "2020-02-15", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": "HW",
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 125
-    },
-    "linkedDocument": [
-      {
-        "processId": 125,
-        "PrimarySdocId": 206733,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "FileGenerated",
-        "Filename": "RSDRA2018000094806_1.tif",
-        "Filepath": "<add path>",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 125,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 125,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "123",
-      "CarisProjectName": "Sunrise"
-    },
-    "CarisProjectDetails": {
-      "ProcessId": 125,
-      "ProjectId": 54179,
-      "ProjectName": "1072_2017000302065_HUA HIN",
-      "Created": "2020-02-28",
-      "CreatedBy": "pcp_user"
-    },
-    "OnHold": [
-      {
-        "processId": 125,
-        "OnHoldTime": "2020-02-28",
-        "OnHoldUser": "Ross"
-      },
-      {
-        "processId": 125,
-        "OnHoldTime": "2020-02-28",
-        "OnHoldUser": "Ross",
-        "OffHoldTime": "2020-02-28",
-        "OffHoldUser": "Samir"
-      }
-    ],
-    "PrimaryDocumentStatus": {
-      "processId": 125,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49",
-      "Status": "FileGenerated",
-      "Filename": "GeoReferenced_RSDRA2018000030860_1.TIF",
-      "Filepath": "<add path>"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 125,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "created": "2020-01-01T00:00:00",
-        "Status": "FileGenerated",
-        "Filename": "RSDRA2018000030860_1.TIF",
-        "Filepath": "<add path>"
-      }
-    ]
-  },
-  {
-    "processId": 126,
-    "PrimarySdocId": 938096,
-    "serialNumber": "126_sn",
-    "parentProcessId": null,
-    "activityName": "Assess",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 126,
-        "text": "A comment",
-        "username": "Peter",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 126,
-        "text": "A 2nd comment",
-        "username": "Shauno",
-        "created": "2020-01-03T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 938096,
-      "rsdraNumber": "RSDRA2006000374923",
-      "sourceDocumentName": "NM_DEN_30_235_06",
-      "receiptDate": "2020-01-01T00:00:00",
-      "toSdoDate": "2020-01-01T16:32:35",
-      "effectiveStartDate": "2020-02-05",
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Source NM",
-      "sourceNature": "Textual",
-      "datum": null,
-      "processId": 126
-    },
-    "linkedDocument": [
-      {
-        "processId": 126,
-        "PrimarySdocId": 938096,
-        "rsdraNumber": "RSDRA2006000156073",
-        "sourceDocumentName": "NAKSKOV",
-        "receiptDate": "1999-07-09T00:00:00",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "sourceNature": "Graphical",
-        "datum": "WGS84",
-        "linkType": "Forward",
-        "linkedSdocId": 306707,
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 126,
-        "PrimarySdocId": 938096,
-        "rsdraNumber": "RSDRA2006000374850",
-        "sourceDocumentName": "NMBN_DEN_30_06",
-        "receiptDate": "2020-01-01T00:00:00",
-        "sourceDocumentType": "Notices to Mariners - FG Bulletin",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Backward",
-        "linkedSdocId": 938037,
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 126,
-        "PrimarySdocId": 938096,
-        "rsdraNumber": "RSDRA2006000012977",
-        "sourceDocumentName": "Main Panel",
-        "receiptDate": null,
-        "sourceDocumentType": null,
-        "sourceNature": null,
-        "datum": null,
-        "linkType": "SEP",
-        "linkedSdocId": 83848,
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 126,
-      "ion": "I8766",
-      "activityCode": "4881",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "LTA",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 126,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "LTA",
-      "productActioned": true,
-      "productActionChangeDetails": "Test change details",
-      "workspaceAffected": "1239_0"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 126,
-      "SdocId": 938096,
-      "ContentServiceId": null,
-      "Status": "Started",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
-    },
-    "DatabaseDocumentStatus": [],
-    "ProductAction": [
-      {
-        "ProcessId": 126,
-        "ImpactedProduct": "GB1234",
-        "ProductActionTypeId": 1,
-        "Verified": false
-      },
-      {
-        "ProcessId": 126,
-        "ImpactedProduct": "GB5678",
-        "ProductActionTypeId": 2,
-        "Verified": false
-      }
-    ]
-  },
-  {
-    "processId": 588,
-    "PrimarySdocId": 206734,
-    "serialNumber": "588_38",
-    "parentProcessId": null,
-    "activityName": "Assess",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 588,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 588,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206734,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 588
-    },
-    "linkedDocument": [
-      {
-        "processId": 588,
-        "PrimarySdocId": 206734,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 588,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 588,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 588,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "Status": "Ready",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 588,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ]
-  },
-  {
-    "processId": 688,
-    "PrimarySdocId": 206735,
-    "serialNumber": "688_38",
-    "parentProcessId": null,
-    "activityName": "Verify",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 688,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 688,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206735,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 688
-    },
-    "linkedDocument": [
-      {
-        "processId": 688,
-        "PrimarySdocId": 206735,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 688,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 688,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "dbAssessmentVerifyData": {
-      "processId": 688,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "999",
-      "CarisProjectName": "Vproj"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 688,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "Status": "Ready",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 688,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "DataImpact": [
-      {
-        "ProcessId": 688,
-        "HpdUsageId": 1,
-        "Edited": false,
-        "Comments": "Test",
-        "FeaturesSubmitted": true,
-        "FeaturesVerified": false
-      }
-    ]
-  },
-  {
-    "processId": 788,
-    "PrimarySdocId": 206736,
-    "serialNumber": "788_38",
-    "parentProcessId": 688,
-    "activityName": "Verify",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 788,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 788,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206736,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 788
-    },
-    "linkedDocument": [
-      {
-        "processId": 788,
-        "PrimarySdocId": 206736,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 788,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 788,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "dbAssessmentVerifyData": {
-      "processId": 788,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "999",
-      "CarisProjectName": "Vproj"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 788,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "Status": "Ready",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 788,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "DataImpact": [
-      {
-        "ProcessId": 788,
-        "HpdUsageId": 1,
-        "Edited": false,
-        "Comments": "Test",
-        "FeaturesSubmitted": true,
-        "FeaturesVerified": false
-      }
-    ]
-  },
-  {
-    "processId": 888,
-    "PrimarySdocId": 206737,
-    "serialNumber": "888_38",
-    "parentProcessId": 688,
-    "activityName": "Verify",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 888,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 888,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206737,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 888
-    },
-    "linkedDocument": [
-      {
-        "processId": 888,
-        "PrimarySdocId": 206737,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 888,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 888,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "dbAssessmentVerifyData": {
-      "processId": 888,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "999",
-      "CarisProjectName": "Vproj"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 888,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "Status": "Ready",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 888,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "DataImpact": [
-      {
-        "ProcessId": 888,
-        "HpdUsageId": 1,
-        "Edited": false,
-        "Comments": "Test",
-        "FeaturesSubmitted": false,
-        "FeaturesVerified": false
-      }
-    ]
-  },
-  {
-    "processId": 127,
-    "PrimarySdocId": 934153,
-    "serialNumber": "126_sn",
-    "parentProcessId": null,
-    "activityName": "Review",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 127,
-        "text": "A comment",
-        "username": "The Gup",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 127,
-        "text": "A 2nd comment",
-        "username": "Ross",
-        "created": "2019-09-12T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 934153,
-      "rsdraNumber": "RSDRA2006000369682",
-      "sourceDocumentName": "NMBN_GER_27_06",
-      "receiptDate": "2020-01-01T00:00:00",
-      "toSdoDate": null,
-      "effectiveStartDate": "2019-12-28T00:00:00",
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Notices to Mariners - FG Bulletin",
-      "sourceNature": "Textual",
-      "datum": null,
-      "processId": 127
-    },
-    "linkedDocument": [
-      {
-        "processId": 127,
-        "PrimarySdocId": 934153,
-        "rsdraNumber": "RSDRA2006000369735",
-        "sourceDocumentName": "NM_GER_27_34_06",
-        "receiptDate": "2020-01-01T00:00:00",
-        "sourceDocumentType": "Source NM",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 934203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 127,
-      "ion": "I8766",
-      "activityCode": "4881",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssignTask": [
-      {
-        "processId": 127,
-        "assessor": "Matthew Stoodley",
-        "verifier": "Peter Bates",
+        "assessorAdUserId": 3,
+        "verifierAdUserId": 2,
         "TaskType": "LTA",
         "WorkspaceAffected": "2054_4",
         "Notes": "Important note",
         "status": "New"
       }
     ],
-    "PrimaryDocumentStatus": {
-      "processId": 127,
-      "SdocId": 934153,
-      "ContentServiceId": null,
-      "Status": "Started",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "c5479f90-1110-40ba-9131-5a8efc561948"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 127,
-        "SdocId": 934153,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
+  "PrimaryDocumentStatus": {
+        "processId": 445,
+        "SdocId": 1936906,
         "ContentServiceId": null,
         "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ]
-  },
-  {
-    "processId": 488,
-    "PrimarySdocId": 206738,
-    "serialNumber": "488_38",
-    "parentProcessId": null,
-    "activityName": "Verify",
-    "startedAt": "2020-01-01T00:00:00",
-    "status": "Started",
-    "activityChangedAt": "2020-04-27",
-    "comment": [
-      {
-        "processId": 488,
-        "text": "A comment",
-        "username": "Samir",
-        "created": "2020-01-01T00:00:00"
+        "StartedAt": "2020-01-03T00:00:00",
+        "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
       },
-      {
-        "processId": 488,
-        "text": "A 2nd comment",
-        "username": "GW",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 206738,
-      "rsdraNumber": "RSDRA2006000104322",
-      "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
-      "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
-      "toSdoDate": null,
-      "effectiveStartDate": null, // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
-      "teamDistributedTo": null,
-      "sourceDocumentType": "Photographic Sortie",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 488
-    },
-    "linkedDocument": [
-      {
-        "processId": 488,
-        "PrimarySdocId": 206738,
-        "rsdraNumber": "RSDRA2006000267725",
-        "sourceDocumentName": "BANGOR",
-        "receiptDate": "1994-08-05T00:00:00",
-        "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
-        "sourceNature": "Textual",
-        "datum": null,
-        "linkType": "Forward",
-        "linkedSdocId": 606203,
-        "ContentServiceId": null,
-        "Status": "NotAttached",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "dbAssessmentReviewData": {
-      "processId": 488,
-      "ion": "I229",
-      "activityCode": "743543",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "TaskType": "Simple",
-      "WorkspaceAffected": "2054_4",
-      "Notes": "Important note"
-    },
-    "dbAssessmentAssessData": {
-      "processId": 488,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "1239_0"
-    },
-    "dbAssessmentVerifyData": {
-      "processId": 488,
-      "ion": "Ion",
-      "activityCode": "78798",
-      "sourceCategory": "Engineering Drawings",
-      "reviewer": "Stuart Barzey",
-      "assessor": "Stuart Barzey",
-      "verifier": "Stuart Barzey",
-      "taskType": "Simple",
-      "productActioned": false,
-      "productActionChangeDetails": null,
-      "workspaceAffected": "999",
-      "CarisProjectName": "Vproj"
-    },
-    "PrimaryDocumentStatus": {
-      "processId": 488,
-      "SdocId": 206733,
-      "ContentServiceId": null,
-      "Status": "Ready",
-      "StartedAt": "2020-01-03T00:00:00",
-      "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
-    },
-    "DatabaseDocumentStatus": [
-      {
-        "processId": 488,
-        "SdocId": 206733,
-        "sourceDocumentName": "HUA HIN",
-        "sourceDocumentType": "Chart Panel Navigational or Repromat",
-        "ContentServiceId": null,
-        "Status": "Started",
-        "created": "2020-01-01T00:00:00"
-      }
-    ],
-    "DataImpact": [
-      {
-        "ProcessId": 488,
-        "HpdUsageId": 1,
-        "Edited": false,
-        "Comments": "Test",
-        "FeaturesSubmitted": false,
-        "FeaturesVerified": false
-      }
-    ]
-  },
-  {
-    "processId": 111,
-    "PrimarySdocId": 1936907,
-    "serialNumber": "111_14",
-    "parentProcessId": null,
-    "activityName": "Review",
-    "startedAt": "2019-05-01T00:00:00",
-    "status": "Terminated",
-    "activityChangedAt": "2019-06-27",
-    "comment": [
-      {
-        "processId": 111,
-        "text": "A comment",
-        "username": "Ross",
-        "created": "2020-01-01T00:00:00"
-      },
-      {
-        "processId": 111,
-        "text": "A 2nd comment",
-        "username": "Ben",
-        "created": "2020-01-03T00:00:00"
-      }
-    ],
-    "assessmentData": {
-      "PrimarySdocId": 1936907,
-      "rsdraNumber": "RSDRA2018000056196",
-      "sourceDocumentName": "HUA HIN",
-      "receiptDate": "2020-01-03T00:00:00",
-      "toSdoDate": null,
-      "effectiveStartDate": "2019-01-03T00:00:00",
-      "teamDistributedTo": "HW",
-      "sourceDocumentType": "Chart - Navigational",
-      "sourceNature": "Graphical",
-      "datum": null,
-      "processId": 111
+      "DatabaseDocumentStatus": [
+        {
+          "processId": 445,
+          "SdocId": 1936906,
+          "sourceDocumentName": "HUA HIN",
+          "sourceDocumentType": "Chart Panel Navigational or Repromat",
+          "ContentServiceId": null,
+          "Status": "Started",
+          "created": "2020-01-01T00:00:00"
+        }
+      ]
+    }
+  //},
+    //{
+    //  "processId": 123,
+    //  "PrimarySdocId": 217547,
+    //  "serialNumber": "123_sn",
+    //  "parentProcessId": null,
+    //  "activityName": "Review",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 123,
+    //      "text": "A comment",
+    //      "username": "Ross",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 123,
+    //      "text": "A 2nd comment",
+    //      "username": "Ben",
+    //      "created": "2020-01-03T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 217547,
+    //    "rsdraNumber": "RSDRA2006000110163",
+    //    "sourceDocumentName": "HUA HIN",
+    //    "receiptDate": "2020-01-03T00:00:00",
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "2019-12-18T00:00:00",
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Chart - Navigational",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 123
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 123,
+    //      "PrimarySdocId": 217547,
+    //      "rsdraNumber": "RSDRA2006000169482",
+    //      "sourceDocumentName": "HUA HIN",
+    //      "receiptDate": "2020-01-03T00:00:00",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "sourceNature": "Graphical",
+    //      "datum": "Non-WGS84",
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 332373,
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 123,
+    //      "PrimarySdocId": 217547,
+    //      "rsdraNumber": "RSDRA2007000067413",
+    //      "sourceDocumentName": "NM_THA_119_119_(T)_2007",
+    //      "receiptDate": "2007-09-17T00:00:00",
+    //      "sourceDocumentType": "Source NM",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Backward",
+    //      "linkedSdocId": 1018253,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 123,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 123,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "dbAssessmentAssignTask": [
+    //    {
+    //      "processId": 123,
+    //      "assessor": "Matthew Stoodley",
+    //      "verifier": "Peter Bates",
+    //      "TaskType": "LTA",
+    //      "WorkspaceAffected": "2054_4",
+    //      "Notes": "Important note",
+    //      "status":  "New" 
+    //    }
+    //  ],
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 123,
+    //    "SdocId": 217547,
+    //    "ContentServiceId": "17dbad6b-d258-4065-bd60-3fa9c0bceb67",
+    //    "Status": "Complete",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "44fe181b-57d2-42be-a13a-5b1c9c92c63d"
+    //  },
+    //  "OnHold": [
+    //    {
+    //      "processId": 123,
+    //      "OnHoldTime": "2020-01-01",
+    //      "OnHoldUser": "Ross"
+    //    },
+    //    {
+    //      "processId": 123,
+    //      "OnHoldTime": "2020-01-01",
+    //      "OnHoldUser": "Ross",
+    //      "OffHoldTime": "2020-01-01",
+    //      "OffHoldUser": "Samir"
+    //    }
+    //  ],
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 123,
+    //      "SdocId": 217547,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 632,
+    //  "PrimarySdocId": 1101541,
+    //  "serialNumber": "632_14",
+    //  "parentProcessId": null,
+    //  "activityName": "Review",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 632,
+    //      "text": "A comment",
+    //      "username": "G",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 632,
+    //      "text": "A 2nd comment",
+    //      "username": "Bon",
+    //      "created": "2020-01-03T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 1101541,
+    //    "rsdraNumber": "RSDRA2008000078062",
+    //    "sourceDocumentName": "NMBK_JAP_38_1323_2008_W14_W/14 - A1_1",
+    //    "receiptDate": "2020-01-01T00:00:00",
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "2020-01-01T00:00:00",
+    //    "teamDistributedTo": "Primary Responsibility",
+    //    "sourceDocumentType": "Source NM Block",
+    //    "sourceNature": "Graphical",
+    //    "datum": "WGS84",
+    //    "processId": 632
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 632,
+    //      "PrimarySdocId": 1101541,
+    //      "rsdraNumber": "RSDRA2006000160952",
+    //      "sourceDocumentName": "APPROACHES TO MURORAN KO",
+    //      "receiptDate": "2002-07-12T00:00:00",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "sourceNature": "Graphical",
+    //      "datum": "WGS84",
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 320532,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 632,
+    //      "PrimarySdocId": 1101541,
+    //      "rsdraNumber": "RSDRA2008000078061",
+    //      "sourceDocumentName": "NM_JAP_38_1323_2008",
+    //      "receiptDate": "2020-01-01T00:00:00",
+    //      "sourceDocumentType": "Source NM",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Backward",
+    //      "linkedSdocId": 1101540,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 632,
+    //    "ion": "I899",
+    //    "activityCode": "78798",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Peter Bates",
+    //    "verifier": "Rossall Sandford",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 632,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "OnHold": [
+    //    {
+    //      "processId": 632,
+    //      "OnHoldTime": "2020-02-26",
+    //      "OnHoldUser": "Ross"
+    //    },
+    //    {
+    //      "processId": 632,
+    //      "OnHoldTime": "2020-02-26",
+    //      "OnHoldUser": "Ross",
+    //      "OffHoldTime": "2020-02-26",
+    //      "OffHoldUser": "Samir"
+    //    }
+    //  ],
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 632,
+    //    "SdocId": 1101541,
+    //    "ContentServiceId": null,
+    //    "Status": "Started",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "f36228d9-e3e9-4189-b9ab-890bd3a19531"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 632,
+    //      "SdocId": 1101541,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 125,
+    //  "PrimarySdocId": 206733,
+    //  "serialNumber": "125_sn",
+    //  "parentProcessId": null,
+    //  "activityName": "Assess",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 125,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 125,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206733,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "2020-02-15", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": "Home Waters",
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 125
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 125,
+    //      "PrimarySdocId": 206733,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "FileGenerated",
+    //      "Filename": "RSDRA2018000094806_1.tif",
+    //      "Filepath": "<add path>",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 125,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 125,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "123",
+    //    "CarisProjectName": "Sunrise"
+    //  },
+    //  "CarisProjectDetails": {
+    //    "ProcessId": 125,
+    //    "ProjectId": 54179,
+    //    "ProjectName": "1072_2017000302065_HUA HIN",
+    //    "Created": "2020-02-28",
+    //    "CreatedBy": "pcp_user"
+    //  },
+    //  "OnHold": [
+    //    {
+    //      "processId": 125,
+    //      "OnHoldTime": "2020-02-28",
+    //      "OnHoldUser": "Ross"
+    //    },
+    //    {
+    //      "processId": 125,
+    //      "OnHoldTime": "2020-02-28",
+    //      "OnHoldUser": "Ross",
+    //      "OffHoldTime": "2020-02-28",
+    //      "OffHoldUser": "Samir"
+    //    }
+    //  ],
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 125,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49",
+    //    "Status": "FileGenerated",
+    //    "Filename": "GeoReferenced_RSDRA2018000030860_1.TIF",
+    //    "Filepath": "<add path>"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 125,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "created": "2020-01-01T00:00:00",
+    //      "Status": "FileGenerated",
+    //      "Filename": "RSDRA2018000030860_1.TIF",
+    //      "Filepath": "<add path>"
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 126,
+    //  "PrimarySdocId": 938096,
+    //  "serialNumber": "126_sn",
+    //  "parentProcessId": null,
+    //  "activityName": "Assess",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 126,
+    //      "text": "A comment",
+    //      "username": "Peter",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 126,
+    //      "text": "A 2nd comment",
+    //      "username": "Shauno",
+    //      "created": "2020-01-03T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 938096,
+    //    "rsdraNumber": "RSDRA2006000374923",
+    //    "sourceDocumentName": "NM_DEN_30_235_06",
+    //    "receiptDate": "2020-01-01T00:00:00",
+    //    "toSdoDate": "2020-01-01T16:32:35",
+    //    "effectiveStartDate": "2020-02-05",
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Source NM",
+    //    "sourceNature": "Textual",
+    //    "datum": null,
+    //    "processId": 126
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 126,
+    //      "PrimarySdocId": 938096,
+    //      "rsdraNumber": "RSDRA2006000156073",
+    //      "sourceDocumentName": "NAKSKOV",
+    //      "receiptDate": "1999-07-09T00:00:00",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "sourceNature": "Graphical",
+    //      "datum": "WGS84",
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 306707,
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 126,
+    //      "PrimarySdocId": 938096,
+    //      "rsdraNumber": "RSDRA2006000374850",
+    //      "sourceDocumentName": "NMBN_DEN_30_06",
+    //      "receiptDate": "2020-01-01T00:00:00",
+    //      "sourceDocumentType": "Notices to Mariners - FG Bulletin",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Backward",
+    //      "linkedSdocId": 938037,
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 126,
+    //      "PrimarySdocId": 938096,
+    //      "rsdraNumber": "RSDRA2006000012977",
+    //      "sourceDocumentName": "Main Panel",
+    //      "receiptDate": null,
+    //      "sourceDocumentType": null,
+    //      "sourceNature": null,
+    //      "datum": null,
+    //      "linkType": "SEP",
+    //      "linkedSdocId": 83848,
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 126,
+    //    "ion": "I8766",
+    //    "activityCode": "4881",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "LTA",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 126,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "LTA",
+    //    "productActioned": true,
+    //    "productActionChangeDetails": "Test change details",
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 126,
+    //    "SdocId": 938096,
+    //    "ContentServiceId": null,
+    //    "Status": "Started",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "f637e004-5e90-42b3-8a9a-d9ae4f1b7f5f"
+    //  },
+    //  "DatabaseDocumentStatus": [],
+    //  "ProductAction": [
+    //    {
+    //      "ProcessId": 126,
+    //      "ImpactedProduct": "GB1234",
+    //      "ProductActionTypeId": 1,
+    //      "Verified": false
+    //    },
+    //    {
+    //      "ProcessId": 126,
+    //      "ImpactedProduct": "GB5678",
+    //      "ProductActionTypeId": 2,
+    //      "Verified": false
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 588,
+    //  "PrimarySdocId": 206734,
+    //  "serialNumber": "588_38",
+    //  "parentProcessId": null,
+    //  "activityName": "Assess",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 588,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 588,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206734,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 588
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 588,
+    //      "PrimarySdocId": 206734,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 588,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 588,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 588,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "Status": "Ready",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 588,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 688,
+    //  "PrimarySdocId": 206735,
+    //  "serialNumber": "688_38",
+    //  "parentProcessId": null,
+    //  "activityName": "Verify",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 688,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 688,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206735,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 688
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 688,
+    //      "PrimarySdocId": 206735,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 688,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 688,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "dbAssessmentVerifyData": {
+    //    "processId": 688,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "999",
+    //    "CarisProjectName": "Vproj"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 688,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "Status": "Ready",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 688,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "DataImpact": [
+    //    {
+    //      "ProcessId": 688,
+    //      "HpdUsageId": 1,
+    //      "Edited": false,
+    //      "Comments": "Test",
+    //      "FeaturesSubmitted": true,
+    //      "FeaturesVerified": false
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 788,
+    //  "PrimarySdocId": 206736,
+    //  "serialNumber": "788_38",
+    //  "parentProcessId": 688,
+    //  "activityName": "Verify",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 788,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 788,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206736,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 788
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 788,
+    //      "PrimarySdocId": 206736,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 788,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 788,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "dbAssessmentVerifyData": {
+    //    "processId": 788,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "999",
+    //    "CarisProjectName": "Vproj"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 788,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "Status": "Ready",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 788,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "DataImpact": [
+    //    {
+    //      "ProcessId": 788,
+    //      "HpdUsageId": 1,
+    //      "Edited": false,
+    //      "Comments": "Test",
+    //      "FeaturesSubmitted": true,
+    //      "FeaturesVerified": false
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 888,
+    //  "PrimarySdocId": 206737,
+    //  "serialNumber": "888_38",
+    //  "parentProcessId": 688,
+    //  "activityName": "Verify",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 888,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 888,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206737,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 888
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 888,
+    //      "PrimarySdocId": 206737,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 888,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 888,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "dbAssessmentVerifyData": {
+    //    "processId": 888,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "999",
+    //    "CarisProjectName": "Vproj"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 888,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "Status": "Ready",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 888,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "DataImpact": [
+    //    {
+    //      "ProcessId": 888,
+    //      "HpdUsageId": 1,
+    //      "Edited": false,
+    //      "Comments": "Test",
+    //      "FeaturesSubmitted": false,
+    //      "FeaturesVerified": false
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 127,
+    //  "PrimarySdocId": 934153,
+    //  "serialNumber": "126_sn",
+    //  "parentProcessId": null,
+    //  "activityName": "Review",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 127,
+    //      "text": "A comment",
+    //      "username": "The Gup",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 127,
+    //      "text": "A 2nd comment",
+    //      "username": "Ross",
+    //      "created": "2019-09-12T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 934153,
+    //    "rsdraNumber": "RSDRA2006000369682",
+    //    "sourceDocumentName": "NMBN_GER_27_06",
+    //    "receiptDate": "2020-01-01T00:00:00",
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "2019-12-28T00:00:00",
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Notices to Mariners - FG Bulletin",
+    //    "sourceNature": "Textual",
+    //    "datum": null,
+    //    "processId": 127
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 127,
+    //      "PrimarySdocId": 934153,
+    //      "rsdraNumber": "RSDRA2006000369735",
+    //      "sourceDocumentName": "NM_GER_27_34_06",
+    //      "receiptDate": "2020-01-01T00:00:00",
+    //      "sourceDocumentType": "Source NM",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 934203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 127,
+    //    "ion": "I8766",
+    //    "activityCode": "4881",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssignTask": [
+    //    {
+    //      "processId": 127,
+    //      "assessor": "Matthew Stoodley",
+    //      "verifier": "Peter Bates",
+    //      "TaskType": "LTA",
+    //      "WorkspaceAffected": "2054_4",
+    //      "Notes": "Important note",
+    //      "status": "New"
+    //    }
+    //  ],
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 127,
+    //    "SdocId": 934153,
+    //    "ContentServiceId": null,
+    //    "Status": "Started",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "c5479f90-1110-40ba-9131-5a8efc561948"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 127,
+    //      "SdocId": 934153,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 488,
+    //  "PrimarySdocId": 206738,
+    //  "serialNumber": "488_38",
+    //  "parentProcessId": null,
+    //  "activityName": "Verify",
+    //  "startedAt": "2020-01-01T00:00:00",
+    //  "status": "Started",
+    //  "activityChangedAt": "2020-04-27",
+    //  "comment": [
+    //    {
+    //      "processId": 488,
+    //      "text": "A comment",
+    //      "username": "Samir",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 488,
+    //      "text": "A 2nd comment",
+    //      "username": "GW",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 206738,
+    //    "rsdraNumber": "RSDRA2006000104322",
+    //    "sourceDocumentName": "CAERNARVON TO SOUTHPORT",
+    //    "receiptDate": "1000-01-01T00:00:00", // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable???
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": null, // TODO: handle odd dates "1000-01-01T00:00:00", make it nullable????
+    //    "teamDistributedTo": null,
+    //    "sourceDocumentType": "Photographic Sortie",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 488
+    //  },
+    //  "linkedDocument": [
+    //    {
+    //      "processId": 488,
+    //      "PrimarySdocId": 206738,
+    //      "rsdraNumber": "RSDRA2006000267725",
+    //      "sourceDocumentName": "BANGOR",
+    //      "receiptDate": "1994-08-05T00:00:00",
+    //      "sourceDocumentType": "Correspondence (Letter / Email / Fax / Signal) - not requiring action (e.g. a delivery note)",
+    //      "sourceNature": "Textual",
+    //      "datum": null,
+    //      "linkType": "Forward",
+    //      "linkedSdocId": 606203,
+    //      "ContentServiceId": null,
+    //      "Status": "NotAttached",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "dbAssessmentReviewData": {
+    //    "processId": 488,
+    //    "ion": "I229",
+    //    "activityCode": "743543",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "TaskType": "Simple",
+    //    "WorkspaceAffected": "2054_4",
+    //    "Notes": "Important note"
+    //  },
+    //  "dbAssessmentAssessData": {
+    //    "processId": 488,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "1239_0"
+    //  },
+    //  "dbAssessmentVerifyData": {
+    //    "processId": 488,
+    //    "ion": "Ion",
+    //    "activityCode": "78798",
+    //    "sourceCategory": "Engineering Drawings",
+    //    "reviewer": "Stuart Barzey",
+    //    "assessor": "Stuart Barzey",
+    //    "verifier": "Stuart Barzey",
+    //    "taskType": "Simple",
+    //    "productActioned": false,
+    //    "productActionChangeDetails": null,
+    //    "workspaceAffected": "999",
+    //    "CarisProjectName": "Vproj"
+    //  },
+    //  "PrimaryDocumentStatus": {
+    //    "processId": 488,
+    //    "SdocId": 206733,
+    //    "ContentServiceId": null,
+    //    "Status": "Ready",
+    //    "StartedAt": "2020-01-03T00:00:00",
+    //    "CorrelationId": "6855f620-375f-4842-a5a4-8ac676bb3e49"
+    //  },
+    //  "DatabaseDocumentStatus": [
+    //    {
+    //      "processId": 488,
+    //      "SdocId": 206733,
+    //      "sourceDocumentName": "HUA HIN",
+    //      "sourceDocumentType": "Chart Panel Navigational or Repromat",
+    //      "ContentServiceId": null,
+    //      "Status": "Started",
+    //      "created": "2020-01-01T00:00:00"
+    //    }
+    //  ],
+    //  "DataImpact": [
+    //    {
+    //      "ProcessId": 488,
+    //      "HpdUsageId": 1,
+    //      "Edited": false,
+    //      "Comments": "Test",
+    //      "FeaturesSubmitted": false,
+    //      "FeaturesVerified": false
+    //    }
+    //  ]
+    //},
+    //{
+    //  "processId": 111,
+    //  "PrimarySdocId": 1936907,
+    //  "serialNumber": "111_14",
+    //  "parentProcessId": null,
+    //  "activityName": "Review",
+    //  "startedAt": "2019-05-01T00:00:00",
+    //  "status": "Terminated",
+    //  "activityChangedAt": "2019-06-27",
+    //  "comment": [
+    //    {
+    //      "processId": 111,
+    //      "text": "A comment",
+    //      "username": "Ross",
+    //      "created": "2020-01-01T00:00:00"
+    //    },
+    //    {
+    //      "processId": 111,
+    //      "text": "A 2nd comment",
+    //      "username": "Ben",
+    //      "created": "2020-01-03T00:00:00"
+    //    }
+    //  ],
+    //  "assessmentData": {
+    //    "PrimarySdocId": 1936907,
+    //    "rsdraNumber": "RSDRA2018000056196",
+    //    "sourceDocumentName": "HUA HIN",
+    //    "receiptDate": "2020-01-03T00:00:00",
+    //    "toSdoDate": null,
+    //    "effectiveStartDate": "2019-01-03T00:00:00",
+    //    "teamDistributedTo": "HW",
+    //    "sourceDocumentType": "Chart - Navigational",
+    //    "sourceNature": "Graphical",
+    //    "datum": null,
+    //    "processId": 111
 
     },
     "dbAssessmentReviewData": {
