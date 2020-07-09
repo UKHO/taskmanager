@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Data.SqlClient;
 using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF.Models;
 

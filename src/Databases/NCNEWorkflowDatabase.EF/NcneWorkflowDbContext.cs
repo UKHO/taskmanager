@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
 
