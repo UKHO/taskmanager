@@ -139,7 +139,7 @@ namespace Portal.Pages.DbAssessment
         {
             LogContext.PushProperty("ActivityName", "Verify");
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
+             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
             var action = "Save";
             LogContext.PushProperty("Action", action);
