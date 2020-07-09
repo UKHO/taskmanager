@@ -120,7 +120,7 @@ namespace Portal
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.WorkflowDbName);
 
             services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                options.UseLazyLoadingProxies().EnableSensitiveDataLogging().EnableDetailedErrors().UseSqlServer(workflowDbConnectionString));
+                options.UseLazyLoadingProxies().UseSqlServer(workflowDbConnectionString));
 
             var hpdConnection = DatabasesHelpers.BuildOracleConnectionString(startupSecretsConfig.DataSource,
                 startupSecretsConfig.UserId, startupSecretsConfig.Password);
