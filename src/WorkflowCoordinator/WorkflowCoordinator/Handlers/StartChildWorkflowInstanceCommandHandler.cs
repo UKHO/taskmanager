@@ -111,7 +111,6 @@ namespace WorkflowCoordinator.Handlers
                     .Include(w => w.PrimaryDocumentStatus)
                     .Include(w => w.LinkedDocument)
                     .Include(w => w.DatabaseDocumentStatus)
-                    .AsNoTracking()
                     .FirstAsync(w => w.ProcessId == message.ParentProcessId);
 
             if (parentWorkflowInstanceData == null)
@@ -122,7 +121,6 @@ namespace WorkflowCoordinator.Handlers
 
             var additionalAssignedTaskData =
                 await _dbContext.DbAssessmentAssignTask
-                                    .AsNoTracking()
                                     .FirstAsync(d => d.DbAssessmentAssignTaskId == message.AssignedTaskId);
 
             var newSn = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(message.ChildProcessId);
@@ -355,7 +353,7 @@ namespace WorkflowCoordinator.Handlers
             {
 
                 var childLinkedDocument =
-                    await _dbContext.LinkedDocument.SingleOrDefaultAsync(p => 
+                    await _dbContext.LinkedDocument.SingleOrDefaultAsync(p =>
                                                                 p.LinkedSdocId == parentLinkedDocument.LinkedSdocId
                                                                 && p.ProcessId == childProcessId);
 
@@ -448,9 +446,9 @@ namespace WorkflowCoordinator.Handlers
             _logger.LogInformation("Successfully updated child DatabaseDocumentStatus table with {ParentDatabaseDocumentStatusCount} records" +
                                                 " from parent with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
 
-    }
+        }
 
-    private async Task PersistAssessmentDataFromParent(int childProcessId, AssessmentData parentAssessmentData)
+        private async Task PersistAssessmentDataFromParent(int childProcessId, AssessmentData parentAssessmentData)
         {
             _logger.LogInformation("Entering PersistAssessmentDataFromParent method with ParentProcessId {ParentProcessId} and ChildProcessId {ProcessId}");
 

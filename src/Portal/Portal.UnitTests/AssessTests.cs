@@ -379,26 +379,24 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
-        //[Test]
-        //public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
-        //{
-        //    _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
-        //        _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
+        [Test]
+        public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
+        {
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+               .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
-        //    A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-        //       .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            var row = await _dbContext.DbAssessmentAssessData.FirstAsync();
+            row.AssessorAdUserId = null;
+            await _dbContext.SaveChangesAsync();
 
-        //    var row = await _dbContext.DbAssessmentAssessData.FirstAsync();
-        //    row.Assessor = null;
-        //    _dbContext.SaveChanges();
+            await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-        //    await _assessModel.OnPostDoneAsync(ProcessId, "Done");
-
-        //    Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
-        //    A.CallTo(() =>
-        //            _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
-        //        .WithAnyArguments().MustNotHaveHappened();
-        //}
+            Assert.Contains("Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
 
         [Test]
         public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
