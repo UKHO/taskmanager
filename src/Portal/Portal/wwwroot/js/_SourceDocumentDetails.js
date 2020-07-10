@@ -82,6 +82,9 @@
 
         hideAddSourceDialogs();
 
+        $("#btnSearchSource").prop("disabled", true);
+        $("#searchSourceSpinner").show();
+
         $.ajax({
             type: "GET",
             url: "_SourceDocumentDetails/?handler=DatabaseSourceDocumentData",
@@ -90,6 +93,10 @@
             },
             contentType: "application/json; charset=utf-8",
             data: { "sdocId": sdocId },
+            complete: function() {
+                $("#searchSourceSpinner").hide();
+                $("#btnSearchSource").prop("disabled", false);
+            },
             success: function (data) {
                 if (data === null) {
                     $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
@@ -137,7 +144,8 @@
         });
 
         $("#txtSourceDocumentId").keypress(function (e) {
-            if (e.keyCode !== 13) { //If not enter key then return
+            if (e.keyCode !== 13 || //If not enter key then return
+                $("#btnSearchSource").prop("disabled")) {
                 return;
             }
 
