@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF.Models;
@@ -17,7 +16,8 @@ namespace WorkflowDatabase.EF
 
             if (!isLocalDevelopment && !azureDevOpsBuild)
             {
-                (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+                var dbConnection = this.Database.GetDbConnection() as Microsoft.Data.SqlClient.SqlConnection;
+                dbConnection.AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
             }
         }
 
