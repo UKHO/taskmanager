@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,7 +40,7 @@ namespace WorkflowCoordinator
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
+                    var isLocalDebugging = false;
 
                     var startupLoggingConfig = new StartupLoggingConfig();
                     hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
@@ -75,22 +73,15 @@ namespace WorkflowCoordinator
                         isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer,
                         startupConfig.WorkflowDbName);
 
-                    var connection = new SqlConnection(workflowDbConnectionString)
-                    {
-                        AccessToken = isLocalDebugging
-                            ? null
-                            : new AzureServiceTokenProvider()
-                                .GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-                    };
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                        options.UseSqlServer(connection));
+                        options.UseSqlServer(workflowDbConnectionString));
 
-                    //if (isLocalDebugging)
-                    //{
-                    //    // TODO pull out to hosted service
-                    //    using var sp = services.BuildServiceProvider();
-                    //    TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
-                    //}
+                    if (isLocalDebugging)
+                    {
+                        // TODO pull out to hosted service
+                        using var sp = services.BuildServiceProvider();
+                        TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
+                    }
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                         .SetHandlerLifetime(TimeSpan.FromMinutes(5));
