@@ -11,6 +11,6 @@ namespace WorkflowDatabase.EF.Models
         public DateTime Created { get; set; }
 
         public virtual AdUser AdUser { get; set; }
-        public int AdUserId { get; set; }
+        public int? AdUserId { get; set; }
     }
 }
