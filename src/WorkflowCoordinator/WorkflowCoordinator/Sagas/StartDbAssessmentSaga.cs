@@ -139,7 +139,7 @@ namespace WorkflowCoordinator.Sagas
 
             // TODO: Exception triggered due to Created and Username not being populated
             mappedComments.Created = DateTime.Now;
-            mappedComments.AdUser = null;
+            mappedComments.AdUserId = null;
 
             _dbContext.AssessmentData.Add(mappedAssessmentData);
 
