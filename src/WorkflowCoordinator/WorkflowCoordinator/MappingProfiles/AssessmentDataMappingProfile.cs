@@ -25,6 +25,7 @@ namespace WorkflowCoordinator.MappingProfiles
                     opts => opts.MapFrom(source => source.SourceName));
 
             CreateMap<DocumentAssessmentData, Comment>()
+                .BeforeMap((s, d) => d.AdUserId = null)
                 .ForMember(destination => destination.Text,
                     opts => opts.MapFrom(source => source.Notes));
         }
