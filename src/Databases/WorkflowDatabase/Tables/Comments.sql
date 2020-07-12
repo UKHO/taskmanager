@@ -4,7 +4,7 @@
     [ProcessId] INT NOT NULL, 
     [Text] NVARCHAR(4000) NOT NULL, 
     [WorkflowInstanceId] INT NOT NULL, 
-    [AdUserId] INT NOT NULL, 
+    [AdUserId] INT NULL, 
     [Created] DATETIME NOT NULL, 
     CONSTRAINT [FK_Comments_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId]),
     CONSTRAINT [FK_Comments_AdUser] FOREIGN KEY ([AdUserId]) REFERENCES [AdUsers]([AdUserId])
