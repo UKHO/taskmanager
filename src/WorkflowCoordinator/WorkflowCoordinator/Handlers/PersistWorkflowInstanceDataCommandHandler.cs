@@ -214,9 +214,12 @@ namespace WorkflowCoordinator.Handlers
             assessData.SourceCategory = reviewData.SourceCategory;
             assessData.WorkspaceAffected = reviewData.WorkspaceAffected;
             assessData.TaskType = reviewData.TaskType;
-            assessData.Reviewer = reviewData.Reviewer;
-            assessData.Assessor = reviewData.Assessor;
-            assessData.Verifier = reviewData.Verifier;
+            assessData.Reviewer = await _dbContext.AdUsers.FirstOrDefaultAsync(u =>
+                u.UserPrincipalName.Equals(reviewData.Reviewer.UserPrincipalName));
+            assessData.Assessor = await _dbContext.AdUsers.FirstOrDefaultAsync(u =>
+                u.UserPrincipalName.Equals(reviewData.Assessor.UserPrincipalName)); ;
+            assessData.Verifier = await _dbContext.AdUsers.FirstOrDefaultAsync(u =>
+                u.UserPrincipalName.Equals(reviewData.Verifier.UserPrincipalName)); ;
 
             if (!isExists)
             {

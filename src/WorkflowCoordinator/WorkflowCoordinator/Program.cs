@@ -24,6 +24,7 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+            var isLocalDebugging = false;
 
             var builder = new HostBuilder()
                 .UseEnvironment(ConfigHelpers.HostBuilderEnvironment)
@@ -40,8 +41,6 @@ namespace WorkflowCoordinator
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    var isLocalDebugging = false;
-
                     var startupLoggingConfig = new StartupLoggingConfig();
                     hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
@@ -74,7 +73,7 @@ namespace WorkflowCoordinator
                         startupConfig.WorkflowDbName);
 
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                        options.UseSqlServer(workflowDbConnectionString));
+                        options.UseLazyLoadingProxies().UseSqlServer(workflowDbConnectionString));
 
                     if (isLocalDebugging)
                     {
@@ -116,8 +115,6 @@ namespace WorkflowCoordinator
                 })
                 .UseNServiceBus(hostBuilderContext =>
                 {
-                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
-
                     var nsbConfig = new NsbConfig();
                     hostBuilderContext.Configuration.GetSection("nsb").Bind(nsbConfig);
                     hostBuilderContext.Configuration.GetSection("urls").Bind(nsbConfig);
