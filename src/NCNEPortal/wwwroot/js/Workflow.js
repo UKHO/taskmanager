@@ -1,8 +1,17 @@
 ﻿$(document).ready(function () {
     var isReadOnly = $("#IsReadOnly").val() === "True";
+    var isPublished = $("#IsPublished").val() == "True";
 
     if (isReadOnly) {
         makeFormReadOnly($("#frmWorkflow"));
+    }
+
+
+    if (isPublished) {
+        $("#3psToggle").prop("disabled", true);
+        $("#SendDate3ps").prop("disabled", true);
+        $("#ExpectedReturnDate3ps").prop("disabled", true);
+        $("#ActualReturnDate3ps").prop("disabled", true);
     }
 
     var formChanged = false;
@@ -113,6 +122,7 @@
         $("#PublishConfirmModal").modal("show");
 
     });
+
 
     $("#btnPublishConfirm").click(function () {
         var complete = $("#Complete").val();
@@ -948,6 +958,7 @@
 
 
     $("#btnComplete").click(function () {
+       
         var userName = $("#Verifier1").val();
 
         $.ajax({

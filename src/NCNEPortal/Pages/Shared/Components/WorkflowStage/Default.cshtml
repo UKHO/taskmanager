@@ -57,7 +57,7 @@
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication)
             {
                 @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
-            Model.IsReadOnly == false)
+          Model.IsReadOnly == false)
                 {
                     <div class="d-flex justify-content-end">
                         @if (@Model.TaskStageType.AllowRework)
@@ -120,7 +120,7 @@
                                            data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
                                            data-StageName="@(Model.TaskStageType.Name)"
                                            @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
-                                           @((Model.Status == NcneTaskStageStatus.InProgress.ToString()) ? "" : " disabled ")
+                                           @(((Model.Status == NcneTaskStageStatus.InProgress.ToString()) && (Model.IsReadOnly == false)) ? "" : " disabled ")
                                            id="check@(Model.TaskStageId)">
                                     <label for="check@(Model.TaskStageId)"></label>
                                 </div>
