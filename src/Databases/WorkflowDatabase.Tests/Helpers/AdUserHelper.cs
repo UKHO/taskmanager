@@ -20,7 +20,7 @@ namespace Portal.UnitTests.Helpers
 
             var users = dbContext.AdUsers.ToList();
             var user = users.SingleOrDefault(u =>
-               u.UserPrincipalName.Equals(email, StringComparison.OrdinalIgnoreCase));
+               u.UserPrincipalName == email);
             if (user != null) return user;
 
             user = new AdUser

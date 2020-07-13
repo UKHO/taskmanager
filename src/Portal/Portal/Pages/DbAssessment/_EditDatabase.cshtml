@@ -106,27 +106,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            @{
-                                var usageIndex = -1;
-                                foreach (var hpdUsage in Model.HpdUsages.Where(hpdUsage => !hpdUsage.Equals("POLAR", StringComparison.InvariantCulture)))
-                                {
-                                    usageIndex++;
-                                    var id = $"usageCheckbox{usageIndex}";
-                                    <tr>
-                                        <td class="hpdUsageName">
-                                            @hpdUsage
-                                        </td>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <input type="checkbox" id="@id" data-usage-name="@hpdUsage">
-                                                <label for="@id">
-                                                    <span class="screen-reader-only">Usage</span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                @{
+                                    var usageIndex = -1;
+                                    foreach (var hpdUsage in Model.HpdUsages.Where(hpdUsage => hpdUsage != "POLAR"))
+                                    {
+                                        usageIndex++;
+                                        var id = $"usageCheckbox{usageIndex}";
+                                        <tr>
+                                            <td class="hpdUsageName">
+                                                @hpdUsage
+                                            </td>
+                                            <td>
+                                                <div class="checkbox-wrapper">
+                                                    <input type="checkbox" id="@id" data-usage-name="@hpdUsage">
+                                                    <label for="@id">
+                                                        <span class="screen-reader-only">Usage</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
                                 }
-                            }
                             </tbody>
                         </table>
                     </div>
@@ -157,25 +157,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            @{
-                                var sourceIndex = -1;
-                                foreach (var source in Model.SourceDocuments)
-                                {
-                                    sourceIndex++;
-                                    var id = $"sourceCheckbox{sourceIndex}";
-                                    <tr>
-                                        <td class="sourceDocumentName">
-                                            @source.DocumentName
-                                        </td>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <input type="checkbox" id="@id" data-source-filename="@(source.DocumentName)" data-source-fullfilename="@(source.DocumentFullName)">
-                                                <label for="@id"><span class="screen-reader-only">Source Document Id</span></label>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                @{
+                                    var sourceIndex = -1;
+                                    foreach (var source in Model.SourceDocuments)
+                                    {
+                                        sourceIndex++;
+                                        var id = $"sourceCheckbox{sourceIndex}";
+                                        <tr>
+                                            <td class="sourceDocumentName">
+                                                @source.DocumentName
+                                            </td>
+                                            <td>
+                                                <div class="checkbox-wrapper">
+                                                    <input type="checkbox" id="@id" data-source-filename="@(source.DocumentName)" data-source-fullfilename="@(source.DocumentFullName)">
+                                                    <label for="@id"><span class="screen-reader-only">Source Document Id</span></label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
                                 }
-                            }
                             </tbody>
                         </table>
                     </div>

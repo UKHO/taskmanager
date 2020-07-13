@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -20,7 +19,7 @@ namespace WorkflowCoordinator.UnitTests.Helpers
 
 
             var user = dbContext.AdUsers.SingleOrDefault(u =>
-                u.UserPrincipalName.Equals(email, StringComparison.OrdinalIgnoreCase));
+                u.UserPrincipalName == email);
             if (user != null) return user;
 
             user = new AdUser

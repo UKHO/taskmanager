@@ -355,7 +355,7 @@ namespace Portal.Pages.DbAssessment
             {
                 ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
             }
-            else if (!CurrentUser.UserPrincipalName.Equals(verifyData.Verifier.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
+            else if (CurrentUser.UserPrincipalName!=verifyData.Verifier.UserPrincipalName)
             {
                 ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
             }
@@ -680,8 +680,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName.Equals(userPrincipalName,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {
