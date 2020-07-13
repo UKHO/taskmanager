@@ -127,7 +127,7 @@ namespace Portal.Pages.DbAssessment
 
             IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
-            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.AsNoTracking().FirstAsync(r => r.ProcessId == processId);
+            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentVerifyData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
             SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<VerifyCustomHttpStatusCode>();
@@ -139,7 +139,7 @@ namespace Portal.Pages.DbAssessment
         {
             LogContext.PushProperty("ActivityName", "Verify");
             LogContext.PushProperty("ProcessId", processId);
-             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
             var action = "Save";
             LogContext.PushProperty("Action", action);
@@ -355,7 +355,7 @@ namespace Portal.Pages.DbAssessment
             {
                 ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
             }
-            else if (CurrentUser.UserPrincipalName!=verifyData.Verifier.UserPrincipalName)
+            else if (CurrentUser.UserPrincipalName != verifyData.Verifier.UserPrincipalName)
             {
                 ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
             }
@@ -592,7 +592,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetOnHoldData(int processId)
         {
-            var onHoldRows = await _dbContext.OnHold.AsNoTracking().Where(r => r.ProcessId == processId).ToListAsync();
+            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
 
@@ -680,7 +680,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName == userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {

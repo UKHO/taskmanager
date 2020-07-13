@@ -43,7 +43,6 @@ namespace WorkflowCoordinator.Handlers
                 .Include(wi => wi.DbAssessmentVerifyData)
                 .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(w => w.Comments)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(wi => wi.ProcessId == message.ProcessId);
 
             if (workflowInstance == null)
