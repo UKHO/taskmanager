@@ -359,6 +359,9 @@ ASALocalRun/
 **/EventServices.ApiTests/**/*.iml
 **/EventServices.ApiTests/**/*.log
 
+# SourceDocumentService logs
+**/SourceDocumentService/*.txt
+
 *.refactorlog
 # ignoring maven files?
 *.lst
