@@ -25,8 +25,8 @@ WITH params AS (
 	where comp.[Name] = 'Compile Chart')
 
 SELECT
-ti.ChartNumber as [Chart No.],
-ti.Country as [Location],
+ISNULL(ti.ChartNumber, '') as [Chart No.],
+ISNULL(ti.Country, '') as [Location],
 ti.WorkflowType as [Type],
 '?' as [Sales],
 CASE
@@ -46,7 +46,7 @@ CASE
 	WHEN spec.Status = 'Completed' THEN 'Yes'
 	ELSE 'No'
 END as [Spec],
-ti.Ion as [ION],
+ISNULL(ti.Ion, '') as [ION],
 '?' as [Specifier],
 '?' as [Complexity],
 CASE 
