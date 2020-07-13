@@ -1,0 +1,31 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool: NautilusBuild
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core 3.1.x SDK'
+  inputs:
+    packageType: sdk
+    version: 3.1.x
+    installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $InformationPreference = "Continue"
+      Show-PackageLicences -pathToSource $(build.sourcesdirectory) -nugetFeedUrl "https://proget.ukho.gov.uk/nuget/operations/"
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(Build.SourcesDirectory)\\src\\SourceDocumentService\\SourceDocumentService.csproj'
+    feedsToUse: 'select'
+  displayName: 'dotnet restore dataservices'
