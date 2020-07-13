@@ -23,13 +23,13 @@ stages:
       workspace:
           clean: all
 
-    steps:
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core 3.1.x SDK'
-      inputs:
-        packageType: sdk
-        version: 3.1.x
-        installationPath: $(Agent.ToolsDirectory)\\dotnet
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
       - task: PowerShell@2
         inputs:
@@ -74,49 +74,49 @@ stages:
         displayName: 'dotnet test SourceDocumentServiceTests'
 
     - job: DependencyCheck
-        pool: NautilusBuild
+      pool: NautilusBuild
 
-        workspace:
-          clean: all
+      workspace:
+        clean: all
 
-        steps:
-        - task: UseDotNet@2
-          displayName: 'Use .NET Core 2.1.x SDK'
-          inputs:
-            packageType: sdk
-            version: 2.1.x
-            installationPath: $(Agent.ToolsDirectory)\\dotnet
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 2.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 2.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-        - task: UseDotNet@2
-          displayName: 'Use .NET Core 3.1.x SDK'
-          inputs:
-            packageType: sdk
-            version: 3.1.x
-            installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core 3.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          installationPath: $(Agent.ToolsDirectory)\\dotnet
 
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: publish
-            arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
-            projects: "**/SourceDocumentService.csproj"
-            publishWebProjects: false
-            modifyOutputPath: false
-            zipAfterPublish: false
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: publish
+          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          projects: "**/SourceDocumentService.csproj"
+          publishWebProjects: false
+          modifyOutputPath: false
+          zipAfterPublish: false
 
-        - task: CmdLine@2
-          inputs:
-            script: 'dependency-check --project "SourceDocumentService - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
-          displayName: "Run NVD Checker"
+      - task: CmdLine@2
+        inputs:
+          script: 'dependency-check --project "SourceDocumentService - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
+        displayName: "Run NVD Checker"
 
-        - task: PublishPipelineArtifact@1
-          inputs:
-            targetPath: '$(Build.SourcesDirectory)\DCReport'
-            artifact: "NVD report"
-            publishLocation: "pipeline"
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)\DCReport'
+          artifact: "NVD report"
+          publishLocation: "pipeline"
 
-        - task: PowerShell@2
-          displayName: "Fail build if dependency checker has vulnerabilities"
-          inputs:
-            targetType: inline
-            script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*        
+      - task: PowerShell@2
+        displayName: "Fail build if dependency checker has vulnerabilities"
+        inputs:
+          targetType: inline
+          script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*        
 
