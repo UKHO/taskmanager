@@ -93,9 +93,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.AccessibilityTests",
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DbUpdateWorkflowDatabase", "Databases\DbUpWorkflowDatabase\DbUpdateWorkflowDatabase.sqlproj", "{98A656ED-8A08-4971-9C6F-C7EE3DC0F7A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbUpdateWorkflowDatabase.Tests", "Databases\DbUpdateWorkflowDatabase.Tests\DbUpdateWorkflowDatabase.Tests.csproj", "{21CE924D-4734-4114-A07D-CF26E4CDA263}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbUpdateWorkflowDatabase.Tests", "Databases\DbUpdateWorkflowDatabase.Tests\DbUpdateWorkflowDatabase.Tests.csproj", "{21CE924D-4734-4114-A07D-CF26E4CDA263}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbUpdateWorkflowDatabase.EF", "Databases\DbUpdateWorkflowDatabase.EF\DbUpdateWorkflowDatabase.EF.csproj", "{E67BD03F-4373-47AD-860A-365379034053}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbUpdateWorkflowDatabase.EF", "Databases\DbUpdateWorkflowDatabase.EF\DbUpdateWorkflowDatabase.EF.csproj", "{E67BD03F-4373-47AD-860A-365379034053}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DbUpdate", "DbUpdate", "{368D615C-212A-4679-8831-EBFEAF496047}"
 EndProject
@@ -110,6 +110,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbUpdatePortal.TestAutomation.Specs", "DbUpdatePortal.TestAutomation.Specs\DbUpdatePortal.TestAutomation.Specs.csproj", "{15C5FCD2-12F9-4A72-B021-C6EC48A519E0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbUpdatePortal.TestAutomation.Steps", "DbUpdatePortal.TestAutomation.Steps\DbUpdatePortal.TestAutomation.Steps.csproj", "{F3A35B5C-1AFB-49A6-AF4F-123B0C653A68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceDocumentService", "SourceDocumentService", "{3E039553-1538-4262-B62E-5286218C4519}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceDocumentService", "SourceDocumentServices\SourceDocumentService.csproj", "{13D519DC-109D-45AC-9C02-BD87CB05803A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -303,6 +307,10 @@ Global
 		{F3A35B5C-1AFB-49A6-AF4F-123B0C653A68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A35B5C-1AFB-49A6-AF4F-123B0C653A68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A35B5C-1AFB-49A6-AF4F-123B0C653A68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13D519DC-109D-45AC-9C02-BD87CB05803A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13D519DC-109D-45AC-9C02-BD87CB05803A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13D519DC-109D-45AC-9C02-BD87CB05803A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13D519DC-109D-45AC-9C02-BD87CB05803A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -353,6 +361,7 @@ Global
 		{655FE3DE-05A2-43CD-808E-2060B40428B4} = {368D615C-212A-4679-8831-EBFEAF496047}
 		{15C5FCD2-12F9-4A72-B021-C6EC48A519E0} = {368D615C-212A-4679-8831-EBFEAF496047}
 		{F3A35B5C-1AFB-49A6-AF4F-123B0C653A68} = {368D615C-212A-4679-8831-EBFEAF496047}
+		{13D519DC-109D-45AC-9C02-BD87CB05803A} = {3E039553-1538-4262-B62E-5286218C4519}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77269532-E17B-46D3-943A-11A10CA36E74}
