@@ -90,7 +90,7 @@
                         </td>
                         <td>
                             <div data-toggle="tooltip" data-placement="top" title="Task Notes">
-                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote.Text" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
                                     <i class="far fa-edit"></i>
                                 </a>
                             </div>
@@ -122,11 +122,10 @@
             </thead>
             <tbody>
 
-                @*@foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                           &&
-                                                           (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
-                    || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))*@
-                @foreach (var task in Model.DbUpdateTasks)
+                @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
+                                                          &&
+                                                          (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
+                   || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -164,7 +163,7 @@
         <div class="modal-content">
             <form method="post" id="frmTaskNote" asp-page-handler="TaskNote">
                 <div class="modal-header">
-                    <h4 class="modal-title">Edit Task Note</h4>
+                    <h4 class="modal-title" id="editNoteTitle">Edit Task Note</h4>
                 </div>
                 <div class="modal-body">
                     <div id="modal-body">
@@ -189,13 +188,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Assign Task</h4>
+                <h4 class="modal-title" id="assignTaskTitle">Assign Task</h4>
             </div>
             <div class="modal-body">
                 <div id="assignTaskModal-body">
                     <div id="assignTaskTypeahead">
                         <div class="text-input-wrap">
-                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false" aria-label="Username Textbox">
+                            <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false" aria-label="Username Textbox">
                         </div>
                         <div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
                             <h5 class="mb-3">
@@ -206,7 +205,7 @@
                         </div>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
-                    @*<input type="hidden" id="hdnAssignTaskStage" name="taskStage" />*@
+                    <input type="hidden" id="hdnUserName" />
                 </div>
             </div>
             <div class="modal-footer">

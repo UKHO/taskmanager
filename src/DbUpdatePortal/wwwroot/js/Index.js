@@ -1,5 +1,11 @@
 ﻿$(document).ready(function () {
 
+    $('#txtUserName').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#hdnUserName').val(suggestionObject.userPrincipalName);
+    });
+
+    var usersFetched = false;
+
     var menuItem = 0;
 
     var userFullName = $("#userFullName > strong").text();
@@ -15,6 +21,9 @@
     handleTeamTasks();
    
     setMenuItemSelection();
+
+    handleAssignTask();
+
     //handleHistoricalTasks();
 
 
@@ -84,6 +93,8 @@
                 var taskNote = $(this).data("tasknote");
                 $("#txtNote").val(taskNote);
 
+                $("#editNoteTitle").html("Edit Task Note (Process ID : " + processId + ")");
+
                 $("#editTaskNoteModal").modal("show");
             }
         }).on("click", ".assignTaskItem", function (event) {
@@ -103,8 +114,7 @@
             var processId = target.data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
 
-            //var taskStage = target.data("taskstage");
-            //$("#hdnAssignTaskStage").val(taskStage);
+            $("#assignTaskTitle").html("Assign Task ( Process ID : " + processId + ")");
 
             $("#assignTaskModal").modal("show");
         }
@@ -130,9 +140,9 @@
             }
         });
 
-    //$('#txtGlobalSearch').keyup(function () {
-    //    inFlightTasksTable.search($(this).val()).draw();
-    //});
+    $('#txtGlobalSearch').keyup(function () {
+        inFlightTasksTable.search($(this).val()).draw();
+    });
 
     $("#btnNewTask").click(function () { window.location.href = '/NewTask'; });
 
@@ -146,9 +156,9 @@
                 // My Tasks List filter
                 if (menuItem === 0) {
 
-                    //if (settings.sTableId === "inFlightTasks") {
-                    //    return filterMyAssignedTasksList(rowData);
-                    //}
+                    if (settings.sTableId === "inFlightTasks") {
+                        return filterMyAssignedTasksList(rowData);
+                    }
 
                     return true;
                 } else {
@@ -171,6 +181,23 @@
     //    });
     //}
 
+    function handleAssignTask() {
+
+        $("#assignTaskModal").on("shown.bs.modal",
+            function () {
+                $("#assignTaskTypeaheadError").hide();
+                $("#assignTaskErrorMsg").text("");
+                $("#txtUserName").focus();
+                $('.typeahead').typeahead('val', "");
+                $('.typeahead').typeahead('close');
+            });
+
+        $("#btnCancelAssignTask").on("click",
+            function () {
+                if (usersFetched) removeAssignUserErrors();
+            });
+    }
+
     function filterMyAssignedTasksList(rowData) {
 
         var username = rowData[3];
@@ -183,20 +210,20 @@
 
 
 
-    //$(".taskNoteItem").on("click",
-    //    function () {
+    $(".taskNoteItem").on("click",
+        function () {
 
-    //        $("#btnPostTaskNote").prop("disabled", false);
-    //        $("#editTaskNoteError").html("");
+            $("#btnPostTaskNote").prop("disabled", false);
+            $("#editTaskNoteError").html("");
 
-    //        var processId = $(this).data("processid");
-    //        $("#hdnProcessId").val(processId);
+            var processId = $(this).data("processid");
+            $("#hdnProcessId").val(processId);
 
-    //        var taskNote = $(this).data("tasknote");
-    //        $("#txtNote").val(taskNote);
+            var taskNote = $(this).data("tasknote");
+            $("#txtNote").val(taskNote);
 
-    //        $("#editTaskNoteModal").modal("show");
-    //    });
+            $("#editTaskNoteModal").modal("show");
+        });
 
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
@@ -244,146 +271,166 @@
     }
     
 
-    //$("#editTaskNoteModal").on("shown.bs.modal",
-    //    function () {
-    //        $("#txtNote").focus();
-    //    });
+    $("#editTaskNoteModal").on("shown.bs.modal",
+        function () {
+            $("#txtNote").focus();
+        });
 
-    //$("#btnClearTaskNote").click(function () {
-    //    $("#txtNote").val("");
-    //    $("#txtNote").focus();
-    //});
+    $("#btnClearTaskNote").click(function () {
+        $("#txtNote").val("");
+        $("#txtNote").focus();
+    });
 
-    //$("#btnPostTaskNote").on("submit", function () {
-    //    $("#btnPostTaskNote").prop("disabled", true);
+    $("#btnPostTaskNote").on("submit", function () {
+        $("#btnPostTaskNote").prop("disabled", true);
 
-    //});
+    });
 
-    //$(".assignTaskItem").on("click",
-    //    function () {
+    $(".assignTaskItem").on("click",
+        function () {
 
-    //        $("#btnAssignTaskToUser").prop("disabled", false);
-    //        $("#AssignTaskError").html("");
+            $("#btnAssignTaskToUser").prop("disabled", false);
+            $("#AssignTaskError").html("");
 
-    //        var processId = $(this).data("processid");
-    //        $("#hdnAssignTaskProcessId").val(processId);
+            var processId = $(this).data("processid");
+            $("#hdnAssignTaskProcessId").val(processId);
 
-    //        var taskStage = $(this).data("taskstage");
-    //        $("#hdnAssignTaskStage").val(taskStage);
+            $("#assignTaskModal").modal("show");
+        });
 
-    //        $("#assignTaskModal").modal("show");
-    //    });
+    $("#assignTaskModal").on("shown.bs.modal",
+        function () {
+            $("#assignTaskTypeaheadError").hide();
+            $("#assignTaskErrorMsg").text("");
+            $("#txtUserName").focus();
+            $('.typeahead').typeahead('val', "");
+            $('.typeahead').typeahead('close');
+        });
 
-    //$("#assignTaskModal").on("shown.bs.modal",
-    //    function () {
-    //        $("#assignTaskTypeaheadError").hide();
-    //        $("#assignTaskErrorMsg").text("");
-    //        $("#txtUsername").focus();
-    //        $('.typeahead').typeahead('val', "");
-    //        $('.typeahead').typeahead('close');
-    //    });
+    $("#btnAssignTaskToUser").on("click", function () {
 
-    //$("#btnAssignTaskToUser").on("click", function () {
+        if ($("#txtUserName").val() === "") {
+            $("#assignTaskTypeaheadError").show();
+            $("#assignTaskErrorMsg").text("Please enter a user.");
+            return;
+        }
 
-    //    if ($("#txtUsername").val() === "") {
-    //        $("#assignTaskTypeaheadError").show();
-    //        $("#assignTaskErrorMsg").text("Please enter a user.");
-    //        return;
-    //    }
+        $("#btnAssignTaskToUser").prop("disabled", true);
 
-    //    $("#btnAssignTaskToUser").prop("disabled", true);
+        var processId = $("#hdnAssignTaskProcessId").val();
+        var userName = $("#txtUserName").val();
+        var userPrinciple = $("#hdnUserName").val();
+       
+        $.ajax({
+            type: "POST",
+            url: "Index/?handler=AssignTaskToUser",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId,
+                "userName": userName,
+                "userPrinciple": userPrinciple
+            },
+            success: function (result) {
+                $("#assignTaskModal").modal("hide");
+                $("body").removeClass("modal-open");
+                $(".modal-backdrop").remove();
 
-    //    var processId = $("#hdnAssignTaskProcessId").val();
-    //    var userName = $("#txtUsername").val();
-    //    var taskStage = $("#hdnAssignTaskStage").val();
+                window.location.reload();
+            },
+            error: function (error) {
+                var responseJson = error.responseJSON;
 
-    //    $.ajax({
-    //        type: "POST",
-    //        url: "Index/?handler=AssignTaskToUser",
-    //        beforeSend: function (xhr) {
-    //            xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-    //        },
-    //        data: {
-    //            "processId": processId,
-    //            "userName": userName,
-    //            "taskStage": taskStage
-    //        },
-    //        success: function (result) {
-    //            $("#assignTaskModal").modal("hide");
-    //            $("body").removeClass("modal-open");
-    //            $(".modal-backdrop").remove();
+                displayAssignUserErrors(responseJson);
 
-    //            window.location.reload();
-    //            //getComments();
-    //        },
-    //        error: function (error) {
-    //            console.log(error);
+                $("#btnAssignTaskToUser").prop("disabled", false);
+            }
+        });
 
-    //            //$("#AddCommentError")
-    //            //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+    });
 
-    //            //$("#btnPostComment").prop("disabled", false);
-    //        }
-    //    });
+    initialiseAssignTaskTypeahead();
 
-    //});
+    function initialiseAssignTaskTypeahead() {
 
-    //initialiseAssignTaskTypeahead();
+        $('#assignTaskTypeaheadError').collapse("hide");
 
-    //function initialiseAssignTaskTypeahead() {
+        var users = new Bloodhound({
+            datumTokenizer: function (d) {
+                return Bloodhound.tokenizers.nonword(d.displayName);
+            }, 
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            prefetch: {
+                url: "/Index/?handler=Users",
+                ttl: 60000
+            },
+            initialize: false
+        });
+        var promise = users.initialize();
+        promise
+            .done(function () {
+                $("#btnAssignTaskToUser").prop("disabled", false);
+                $("#txtUserName").prop("disabled", false);
 
-    //    $('#assignTaskTypeaheadError').collapse("hide");
+                $('#assignTaskTypeaheadError').collapse("hide");
 
-    //    var users = new Bloodhound({
-    //        datumTokenizer: function (d) {
-    //            return Bloodhound.tokenizers.nonword(d.displayName);
-    //        }, 
-    //        queryTokenizer: Bloodhound.tokenizers.whitespace,
-    //        prefetch: {
-    //            url: "/Index/?handler=Users",
-    //            ttl: 60000
-    //        },
-    //        initialize: false
-    //    });
-    //    var promise = users.initialize();
-    //    promise
-    //        .done(function () {
-    //            $("#btnAssignTaskToUser").prop("disabled", false);
-    //            $("#txtUsername").prop("disabled", false);
+                removeAssignUserErrors();
 
-    //            $('#assignTaskTypeaheadError').collapse("hide");
+                usersFetched = true;
+            })
+            .fail(function () {
+                $("#btnAssignTaskToUser").prop("disabled", true);
+                $("#txtUserName").prop("disabled", true);
 
-    //            usersFetched = true;
-    //        })
-    //        .fail(function () {
-    //            $("#btnAssignTaskToUser").prop("disabled", true);
-    //            $("#txtUsername").prop("disabled", true);
+                $('#assignTaskTypeaheadError').collapse("show");
 
-    //            $('#assignTaskTypeaheadError').collapse("show");
+                usersFetched = false;
+            });
 
-    //            usersFetched = false;
-    //        });
+        // Initializing the typeahead
+        $('.typeahead').typeahead({
+                hint: true,
+                highlight: true, /* Enable substring highlighting */
+                minLength: 3 /* Specify minimum characters required for showing result */
+            },
+            {
+                name: 'users',
+                source: users,
+                limit: 100,
+                displayKey: 'displayName',
+                valueKey: 'userPrincipalName',
+                templates: {
+                    empty: '<div>No results</div>',
+                    suggestion: function(users) {
+                        return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
+                    }
+                }
+            });
+    }
 
-    //    // Initializing the typeahead
-    //    $('.typeahead').typeahead({
-    //            hint: true,
-    //            highlight: true, /* Enable substring highlighting */
-    //            minLength: 3 /* Specify minimum characters required for showing result */
-    //        },
-    //        {
-    //            name: 'users',
-    //            source: users,
-    //            limit: 100,
-    //            displayKey: 'displayName',
-    //            valueKey: 'userPrincipalName',
-    //            templates: {
-    //                empty: '<div>No results</div>',
-    //                suggestion: function(users) {
-    //                    return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
-    //                }
-    //            }
-    //        });
-    //}
+    function displayAssignUserErrors(errorStringArray) {
+
+        var orderedList = $("#assignTaskErrorList");
+
+        // == to catch undefined and null
+        if (errorStringArray == null) {
+            orderedList.append("<li>An unknown error has occurred</li>");
+
+        } else {
+            errorStringArray.forEach(function (item) {
+                orderedList.append("<li>" + item + "</li>");
+            });
+        }
+
+        $("#assignTaskErrorMessages").collapse("show");
+    }
+
+    function removeAssignUserErrors() {
+        $("#assignTaskErrorMessages").collapse("hide");
+        $("#assignTaskErrorList").empty();
+    }
+
     //Show MyTaskList
     $("#btnMyTaskList").trigger("click");
 });
