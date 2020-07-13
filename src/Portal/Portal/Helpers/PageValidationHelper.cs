@@ -45,7 +45,7 @@ namespace Portal.Helpers
         {
             var isValid = true;
 
-            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            if (action=="Done")
             {
                 if (currentAssignedReviewerInDb.HasNoUserPrincipalName)
                 {
@@ -127,14 +127,14 @@ namespace Portal.Helpers
         {
             var isValid = true;
 
-            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            if (action == "Done")
             {
                 if (currentAssignedAssessorInDb is null)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUserEmail.Equals(currentAssignedAssessorInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
+                else if (currentUserEmail != currentAssignedAssessorInDb.UserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
@@ -247,7 +247,7 @@ namespace Portal.Helpers
                     validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUserEmail.Equals(currentAssignedVerifierInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
+                else if (currentUserEmail!=currentAssignedVerifierInDb.UserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
@@ -646,10 +646,11 @@ namespace Portal.Helpers
                 foreach (var productAction in recordProductAction)
                 {
                     // Check for existing impacted products
-                    var isExist = await _hpdDbContext.CarisProducts.AnyAsync(p =>
-                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
+                    var carisProducts = await _hpdDbContext.CarisProducts.ToListAsync();
+                    var isExist = carisProducts.Any(p =>
+                        p.ProductStatus == "Active" &&
+                        p.TypeKey == "ENC" &&
+                        p.ProductName == productAction.ImpactedProduct);
 
                     if (!isExist)
                     {
@@ -726,8 +727,8 @@ namespace Portal.Helpers
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
         private bool CheckStsDataImpact(
-                                                string action, 
-                                                WorkflowStage workflowStage, 
+                                                string action,
+                                                WorkflowStage workflowStage,
                                                 DataImpact stsDataImpact,
                                                 List<string> validationWarningMessages)
         {

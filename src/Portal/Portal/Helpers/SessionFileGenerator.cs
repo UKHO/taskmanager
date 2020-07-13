@@ -55,8 +55,7 @@ namespace Portal.Helpers
 
             try
             {
-                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName.Equals(userPrincipalName,
-                    StringComparison.CurrentCultureIgnoreCase));
+                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {

@@ -341,7 +341,7 @@ namespace Portal.Pages.DbAssessment
         {
             var userAssignedToTask = await GetUserAssignedToTask(processId, taskStage);
 
-            if (!userAssignedToTask.UserPrincipalName.Equals(currentLoggedInUserEmail, StringComparison.InvariantCultureIgnoreCase))
+            if (userAssignedToTask.UserPrincipalName!=currentLoggedInUserEmail)
             {
                 LogContext.PushProperty("UserAssignedToTask", userAssignedToTask.UserPrincipalName);
                 _logger.LogError("{UserPrincipalName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
@@ -349,7 +349,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
-                c.Name.Equals(carisWorkspace, StringComparison.InvariantCultureIgnoreCase)))
+                c.Name==carisWorkspace))
             {
                 _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
                 throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
@@ -401,8 +401,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName.Equals(userPrincipalName,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {

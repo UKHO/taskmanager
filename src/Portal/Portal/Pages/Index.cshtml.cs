@@ -335,8 +335,7 @@ namespace Portal.Pages
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName.Equals(userPrincipalName,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {

@@ -16,8 +16,8 @@ namespace Portal.Calculators
         public (DateTime dmEndDate, short daysToDmEndDate) CalculateDmEndDate(DateTime effectiveStartDate, string taskType, string taskStage)
         {
 
-            var isReview = taskStage.Equals("Review", StringComparison.InvariantCultureIgnoreCase);
-            var isSimple = taskType.Equals("Simple", StringComparison.InvariantCultureIgnoreCase);
+            var isReview = taskStage == "Review";
+            var isSimple = taskType == "Simple";
             var dmEndDateDays = (isReview || isSimple)
                                                     ? _generalConfig.Value.DmEndDateDaysSimple
                                                     : _generalConfig.Value.DmEndDateDaysLTA;
@@ -35,7 +35,7 @@ namespace Portal.Calculators
                 return (redAlert: false, amberAlert: false, greenAlert: false);
             }
 
-            var redAlert = daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc; 
+            var redAlert = daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateRedAlertUpperInc;
             var amberAlert = !redAlert && daysToDmEndDate <= _generalConfig.Value.DaysToDmEndDateAmberAlertUpperInc;
             var greenAlert = !redAlert && !amberAlert;
 

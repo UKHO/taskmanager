@@ -31,7 +31,7 @@ namespace Portal.Auth
         /// <returns></returns>
         public async Task<bool> ValidateUserAsync(AdUser user)
         {
-            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName.Equals(user.UserPrincipalName));
+            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName == user.UserPrincipalName);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Portal.Auth
         {
             if (string.IsNullOrEmpty(userPrincipalName)) return false;
 
-            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName.Equals(userPrincipalName));
+            return await _workflowDbContext.AdUsers.AnyAsync(u => u.UserPrincipalName == userPrincipalName);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Portal.Auth
                 try
                 {
                     return await _workflowDbContext.AdUsers.SingleAsync(u =>
-                         u.UserPrincipalName.Equals(userPrincipalName));
+                         u.UserPrincipalName == userPrincipalName);
 
                 }
                 catch (Exception e)

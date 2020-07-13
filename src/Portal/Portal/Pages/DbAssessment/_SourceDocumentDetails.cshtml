@@ -96,7 +96,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (attachedLinkedDocument.Status.Equals(SourceDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (attachedLinkedDocument.Status==SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                         {
                                             <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@Html.DisplayFor(model => attachedLinkedDocument.ParsedRsdraNumber)</a>
                                         }
@@ -125,7 +125,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (databaseDocument.Status.Equals(SourceDocumentRetrievalStatus.FileGenerated.ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (databaseDocument.Status==SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                         {
                                             <a href="@databaseDocument.ContentServiceUri" target="_blank">@databaseDocument.ParsedRsdraNumber</a>
                                         }
