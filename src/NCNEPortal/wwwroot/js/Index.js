@@ -175,6 +175,8 @@
             $('#txtGlobalSearch').val("");
             inFlightTasksTable.search("").draw();
 
+            $('#myTasksTitle').html("My Tasks");
+
             $('#assignedTasksTable').show();
 
         });
@@ -188,6 +190,8 @@
             $('#txtGlobalSearch').val("");
 
             inFlightTasksTable.search("").draw();
+
+            $('#myTasksTitle').html("Team Tasks");
 
             $('#assignedTasksTable').hide();
 
