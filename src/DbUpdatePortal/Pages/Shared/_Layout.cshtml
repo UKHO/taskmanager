@@ -1,16 +1,62 @@
 ﻿@using DbUpdatePortal.Helpers
 @inject AppVersionInfo appInfo
 
+@{
+    ViewData["Year"] = DateTime.Now.Year;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Database Update Portal</title>
-    <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/datatables/css/dataTables.bootstrap4.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/ukho-styles/cards.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap4/dist/css/bootstrap.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/datatables/css/dataTables.bootstrap4.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/ukho-styles/cards.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/jquery.js" asp-append-version="true"></script>
+        <script src="~/lib/moment.js/moment.js" asp-append-version="true"></script>
+        <script src="~/lib/popper.js/umd/popper.js" asp-append-version="true"></script>
+        <script src="~/lib/typeahead.js/typeahead.bundle.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap4/dist/js/bootstrap.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables/js/jquery.dataTables.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables/js/dataTables.bootstrap4.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables.net-plugins/sorting/datetime-moment.js" asp-append-version="true"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery/jquery.min.js" asp-append-version="true"></script>
+        <script src="~/lib/moment.js/moment.min.js" asp-append-version="true"></script>
+        <script src="~/lib/popper.js/umd/popper.min.js" asp-append-version="true"></script>
+        <script src="~/lib/typeahead.js/typeahead.bundle.min.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap4/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables/js/jquery.dataTables.min.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables/js/dataTables.bootstrap4.min.js" asp-append-version="true"></script>
+        <script src="~/lib/datatables.net-plugins/sorting/datetime-moment.js" asp-append-version="true"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    @RenderSection("Scripts", required: false)
 </head>
 <body>
+    <partial name="_CookieConsentPartial" />
 
     <div class="d-flex flex-column sticky-footer-wrapper">
         <div class="container body-content flex-fill">
@@ -26,12 +72,6 @@
                 </div>
             </div>
         </footer>
-
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap4/dist/js/bootstrap.js" asp-append-version="true"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-
-        @RenderSection("Scripts", required: false)
     </div>
 </body>
 </html>

@@ -9,5 +9,7 @@ namespace DbUpdatePortal.Auth
         Task<IEnumerable<AdUser>> GetUsersFromDbAsync();
 
         Task<bool> ValidateUserAsync(string username);
+
+        Task<AdUser> GetAdUserAsync(string userPrincipalName);
     }
 }

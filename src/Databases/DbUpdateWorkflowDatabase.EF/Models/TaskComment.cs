@@ -11,9 +11,12 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public int TaskCommentId { get; set; }
         public int ProcessId { get; set; }
         public string Comment { get; set; }
-        public string Username { get; set; }
         public DateTime Created { get; set; }
         public bool ActionIndicator { get; set; }
         public string ActionRole { get; set; }
+
+        public virtual AdUser AdUser { get; set; }
+
+        public int AdUserId { get; set; }
     }
 }

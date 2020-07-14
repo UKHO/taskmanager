@@ -142,7 +142,8 @@ namespace Common.Helpers
             dbContext.UpdateType.RemoveRange(dbContext.UpdateType);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            dbContext.AdUser.RemoveRange(dbContext.AdUser);
+            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
+
 
             if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);
 
@@ -153,6 +154,7 @@ namespace Common.Helpers
         private static void ReseedDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext)
         {
             dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
+            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('AdUser', RESEED, 0)");
         }
     }
 }
