@@ -20,7 +20,7 @@ namespace SourceDocumentCoordinator.Config
         public string DataServicesWebServiceDocumentsFromListUriSdocIdQuery { get; set; }  
         public Uri DataServicesWebServiceHealthcheckUri { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
-        public Uri ContentServiceBaseUrl { get; set; }
+        public Uri SourceDocumentServiceBaseUrl { get; set; }
 
         public Uri BuildDataServicesBaseUri()
         {
