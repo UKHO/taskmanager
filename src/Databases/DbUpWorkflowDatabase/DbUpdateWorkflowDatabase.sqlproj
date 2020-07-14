@@ -78,4 +78,7 @@
   <ItemGroup>
     <None Include="DbUpdateWorkflowDatabase.publish.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DbUpdateWorkflowDatabase.refactorlog" />
+  </ItemGroup>
 </Project>

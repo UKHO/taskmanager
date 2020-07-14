@@ -26,13 +26,13 @@ namespace Common.Helpers
         {
             DatabasesHelpers.ClearDbUpdateWorkflowDbTables(_context, true);
 
-            AddAdditionalAdUsers();
+            //AddAdditionalAdUsers();
 
             PopulateTaskStageType();
             PopulateChartingArea();
             PopulateUpdateType();
             PopulateTaskInfo();
-            PopulateHpdUser();
+            //PopulateHpdUser();
 
             return this;
         }

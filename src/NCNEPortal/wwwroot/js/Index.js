@@ -18,7 +18,7 @@
     handleHistoricalTasks();
 
     function setupAssignedTasks() {
-        var assignedTasksTable = $('#assignedTasks').DataTable({
+        return  assignedTasksTable = $('#assignedTasks').DataTable({
             "pageLength": 10,
             "lengthMenu": [10, 15, 20, 25],
             'sDom': 'ltipr',
@@ -26,8 +26,7 @@
             "order": [[0, 'asc']],
             "scrollX": true
         });
-
-        return assignedTasksTable;
+       
     }
 
     function setupInFlightTasks() {

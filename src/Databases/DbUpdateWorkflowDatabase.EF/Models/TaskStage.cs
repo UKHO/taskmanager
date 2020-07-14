@@ -12,7 +12,6 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public int TaskStageTypeId { get; set; }
 
-        public string AssignedUser { get; set; }
         public DateTime? DateExpected { get; set; }
 
         public DateTime? DateCompleted { get; set; }
@@ -23,6 +22,9 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public virtual TaskStageType TaskStageType { get; set; }
 
         public virtual bool IsReadOnly { get; set; } = false;
+
+        public virtual AdUser Assigned { get; set; }
+        public int AssignedAdUserId { get; set; }
     }
 
 }

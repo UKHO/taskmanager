@@ -40,5 +40,29 @@ namespace DbUpdatePortal.Auth
 
             return await _dbUpdateWorkflowDbContext.AdUser.AnyAsync(u => u.DisplayName.Equals(username, StringComparison.OrdinalIgnoreCase));
         }
+
+        /// <summary>
+        /// Get an AdUsers object for user with given UPN from database
+        /// </summary>
+        /// <param name="userPrincipalName">Email address uniquely identifying user</param>
+        /// <returns></returns>
+        public async Task<AdUser> GetAdUserAsync(string userPrincipalName)
+        {
+            if (!string.IsNullOrEmpty(userPrincipalName))
+            {
+                try
+                {
+                    return await _dbUpdateWorkflowDbContext.AdUser.SingleAsync(u =>
+                        u.UserPrincipalName.Equals(userPrincipalName));
+
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"User with email address {userPrincipalName} not found in database.", e);
+                }
+            }
+
+            throw new ApplicationException($"Value of {nameof(userPrincipalName)} cannot be null.");
+        }
     }
 }

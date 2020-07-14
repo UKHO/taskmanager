@@ -30,6 +30,52 @@
       ]
     },
     {
+      "library": "datatables@1.10.19",
+      "destination": "wwwroot/lib/datatables/",
+      "files": [
+        "js/dataTables.bootstrap.js",
+        "js/dataTables.bootstrap.min.js",
+        "images/sort_asc.png",
+        "images/sort_asc_disabled.png",
+        "images/sort_both.png",
+        "images/sort_desc.png",
+        "images/sort_desc_disabled.png",
+        "js/dataTables.bootstrap4.js",
+        "js/dataTables.bootstrap4.min.js",
+        "js/dataTables.dataTables.js",
+        "js/dataTables.dataTables.min.js",
+        "js/dataTables.foundation.js",
+        "js/dataTables.foundation.min.js",
+        "js/dataTables.jqueryui.js",
+        "js/dataTables.jqueryui.min.js",
+        "css/dataTables.bootstrap4.min.css",
+        "css/dataTables.bootstrap4.css",
+        "js/dataTables.semanticui.js",
+        "js/dataTables.semanticui.min.js",
+        "css/dataTables.bootstrap.min.css",
+        "css/dataTables.bootstrap.css",
+        "js/jquery.dataTables.js",
+        "js/jquery.dataTables.min.js",
+        "css/dataTables.foundation.css",
+        "css/dataTables.foundation.min.css",
+        "css/dataTables.jqueryui.css",
+        "css/dataTables.jqueryui.min.css",
+        "css/dataTables.semanticui.css",
+        "css/dataTables.semanticui.min.css",
+        "css/jquery.dataTables.css",
+        "css/jquery.dataTables.min.css"
+      ]
+    },
+    {
+      "library": "datatables.net-plugins@1.10.20",
+      "provider": "jsdelivr",
+      "destination": "wwwroot/lib/datatables.net-plugins/",
+      "files": [
+        "sorting/datetime-moment.js",
+        "License.txt"
+      ]
+    },
+    {
       "library": "font-awesome@5.10.2",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
@@ -100,6 +146,14 @@
     {
       "library": "bootstrap-datepicker@1.9.0",
       "destination": "wwwroot/lib/bootstrap-datepicker/"
+    },
+    {
+      "library": "moment.js@2.26.0",
+      "destination": "wwwroot/lib/moment.js/",
+      "files": [
+        "moment.min.js",
+        "moment.js"
+      ]
     }
   ]
 }

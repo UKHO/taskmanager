@@ -20,13 +20,15 @@ namespace DbUpdateWorkflowDatabase.EF.Models
 
         public string CurrentStage { get; set; }
 
-        public string AssignedUser { get; set; }
+
         public DateTime AssignedDate { get; set; }
 
         public string Status { get; set; }
 
         public DateTime? StatusChangeDate { get; set; }
 
+        public virtual AdUser Assigned { get; set; }
+        public int AssignedAdUserId { get; set; }
         public virtual TaskNote TaskNote { get; set; }
 
         public virtual TaskRole TaskRole { get; set; }
