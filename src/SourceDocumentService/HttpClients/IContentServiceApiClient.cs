@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace SourceDocumentCoordinator.HttpClients
+namespace SourceDocumentService.HttpClients
 {
     public interface IContentServiceApiClient
     {

@@ -4,15 +4,12 @@ using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
-using Common.Factories.Interfaces;
 using Common.Messages.Enums;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NServiceBus.Testing;
 using NUnit.Framework;
-using SourceDocumentCoordinator.Config;
 using SourceDocumentCoordinator.Handlers;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
@@ -22,7 +19,7 @@ namespace SourceDocumentCoordinator.UnitTests
 {
     public class PersistDocumentInStoreCommandHandlerTests
     {
-        private IContentServiceApiClient _fakeContentServiceApiClient;
+        private ISourceDocumentServiceApiClient _fakeSourceDocumentServiceApiClient;
         private IFileSystem _fakeFileSystem;
         private TestableMessageHandlerContext _handlerContext;
         private PersistDocumentInStoreCommandHandler _handler;
@@ -38,7 +35,7 @@ namespace SourceDocumentCoordinator.UnitTests
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
 
-            _fakeContentServiceApiClient = A.Fake<IContentServiceApiClient>();
+            _fakeSourceDocumentServiceApiClient = A.Fake<ISourceDocumentServiceApiClient>();
             _fakeFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
@@ -48,7 +45,7 @@ namespace SourceDocumentCoordinator.UnitTests
             _fakeLogger = A.Fake<ILogger<PersistDocumentInStoreCommandHandler>>();
 
             _handlerContext = new TestableMessageHandlerContext();
-            _handler = new PersistDocumentInStoreCommandHandler(_fakeContentServiceApiClient, _dbContext, _fakeLogger, _fakeFileSystem);
+            _handler = new PersistDocumentInStoreCommandHandler(_fakeSourceDocumentServiceApiClient, _dbContext, _fakeLogger, _fakeFileSystem);
         }
 
         [TearDown]
@@ -58,7 +55,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_When_Primary_Document_Successfully_posted_to_contentService_Then_Document_Status_and_FileLocation_is_Updated()
+        public async Task Test_When_Primary_Document_Successfully_posted_to_SourceDocumentService_Then_Document_Status_and_FileLocation_is_Updated()
         {
             //Given
             var message = new PersistDocumentInStoreCommand()
@@ -71,7 +68,7 @@ namespace SourceDocumentCoordinator.UnitTests
             };
 
             A.CallTo(() =>
-                    _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
+                    _fakeSourceDocumentServiceApiClient.Post(message.ProcessId, message.SourceDocumentId, message.Filepath))
                 .Returns(Guid.NewGuid());
 
             // when
@@ -82,7 +79,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
 
         [Test]
-        public async Task Test_When_Linked_Document_Successfully_posted_to_contentService_Then_Document_Status_and_FileLocation_is_Updated()
+        public async Task Test_When_Linked_Document_Successfully_posted_to_SourceDocumentService_Then_Document_Status_and_FileLocation_is_Updated()
         {
             //Given
             var message = new PersistDocumentInStoreCommand()
@@ -95,7 +92,7 @@ namespace SourceDocumentCoordinator.UnitTests
             };
 
             A.CallTo(() =>
-                    _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
+                    _fakeSourceDocumentServiceApiClient.Post(message.ProcessId, message.SourceDocumentId, message.Filepath))
                 .Returns(Guid.NewGuid());
 
             // when
@@ -107,7 +104,7 @@ namespace SourceDocumentCoordinator.UnitTests
         }
         
         [Test]
-        public async Task Test_When_Database_Document_Successfully_posted_to_contentService_Then_Document_Status_and_FileLocation_is_Updated()
+        public async Task Test_When_Database_Document_Successfully_posted_to_SourceDocumentService_Then_Document_Status_and_FileLocation_is_Updated()
         {
             //Given
             var message = new PersistDocumentInStoreCommand()
@@ -120,7 +117,7 @@ namespace SourceDocumentCoordinator.UnitTests
             };
 
             A.CallTo(() =>
-                    _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
+                    _fakeSourceDocumentServiceApiClient.Post(message.ProcessId, message.SourceDocumentId, message.Filepath))
                 .Returns(Guid.NewGuid());
 
             // when
@@ -129,50 +126,6 @@ namespace SourceDocumentCoordinator.UnitTests
             //Assert
             // TODO: Assert on DB instead of factory
 
-        }
-
-        [Test]
-        public void Test_When_Document_does_not_exists_Then_FileNotFoundException_thrown_and_Document_Status_and_FileLocation_is_not_Updated()
-        {
-            //Given
-            var message = new PersistDocumentInStoreCommand()
-            {
-                CorrelationId = Guid.NewGuid(),
-                ProcessId = 5678,
-                SourceDocumentId = 1999999,
-                SourceType = SourceType.Database,
-                Filepath = "DoesNotExists.tif"
-            };
-
-            // when
-            Assert.ThrowsAsync<FileNotFoundException>(() => _handler.Handle(message, _handlerContext));
-
-            //Assert
-            // TODO: Assert on DB instead of factory
-        }
-        
-        [Test]
-        public void Test_When_ContentService_Call_fail_Then_Exception_thrown_and_Document_Status_and_FileLocation_is_not_Updated()
-        {
-            //Given
-            var message = new PersistDocumentInStoreCommand()
-            {
-                CorrelationId = Guid.NewGuid(),
-                ProcessId = 5678,
-                SourceDocumentId = 1999999,
-                SourceType = SourceType.Database,
-                Filepath = @"c:\test\TestImage.tif"
-            };
-
-            A.CallTo(() =>
-                    _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, Path.GetFileName(message.Filepath)))
-                .Throws(new Exception());
-
-            // when
-            Assert.ThrowsAsync<Exception>(() => _handler.Handle(message, _handlerContext));
-
-            //Assert
-            // TODO: Assert on DB instead of factory
         }
     }
 }

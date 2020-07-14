@@ -1,4 +1,4 @@
-﻿namespace SourceDocumentCoordinator.Models
+﻿namespace SourceDocumentService.Models
 {
     public class ContentServicePostRequest
     {

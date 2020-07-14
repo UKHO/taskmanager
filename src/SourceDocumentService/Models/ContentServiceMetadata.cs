@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceDocumentCoordinator.Models
+namespace SourceDocumentService.Models
 {
     public class ContentServiceMetadata
     {
