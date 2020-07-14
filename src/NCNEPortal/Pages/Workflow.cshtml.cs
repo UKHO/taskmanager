@@ -144,6 +144,8 @@ namespace NCNEPortal
 
         public bool CompleteEnabled { get; set; }
 
+        public bool IsPublished { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private (string DisplayName, string UserPrincipalName) _currentUser;
@@ -300,6 +302,9 @@ namespace NCNEPortal
                                                    t.Status == NcneTaskStageStatus.Completed.ToString()) &&
                                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
                                                       t.Status == NcneTaskStageStatus.Completed.ToString());
+
+            IsPublished = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart &&
+                                                 t.Status == NcneTaskStageStatus.Completed.ToString());
 
             IsReadOnly = taskInfo.Status == NcneTaskStatus.Completed.ToString() ||
                          taskInfo.Status == NcneTaskStatus.Terminated.ToString();
