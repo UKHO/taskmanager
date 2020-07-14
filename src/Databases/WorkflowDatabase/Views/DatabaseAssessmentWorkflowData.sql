@@ -14,7 +14,12 @@ SELECT
 ad.RsdraNumber as [RSDRA No],
 ad.PrimarySdocId as [SDOC ID],
 ad.SourceDocumentName as [SOURCE NAME],
-ad.SourceDocumentType as [SOURCE TYPE],
+ad.SourceDocumentType as [SOURCE CATEGORY],
+case 
+	when wi.ActivityName = reviewStage then ISNULL(dard.TaskType, '')
+	when wi.ActivityName = assessStage then ISNULL(daad.TaskType, '')
+	when wi.ActivityName = verifyStage then ISNULL(davd.TaskType, '')
+end as [TASK TYPE],
 ISNULL(CONVERT(nvarchar(20), ad.ReceiptDate, 103), '') as [RECEIPT DATE],
 ISNULL(CONVERT(nvarchar(20), ad.ToSdoDate, 103), '') as [TO SDO DATE],
 ISNULL(CONVERT(nvarchar(20), wi.StartedAt, 103), '') as [DM RECEIPT],
@@ -44,7 +49,7 @@ case
 	when ad.EffectiveStartDate is not null then DATEDIFF(dd, GETDATE(), DATEADD(DD, 20, ad.EffectiveStartDate))
 	else ''
 end as [EXT DAYS TO DM END],
-dard.WorkspaceAffected as [Chart Affected],
+ISNULL(dard.WorkspaceAffected, '') as [Chart Affected],
 ISNULL(tn.[Text], '') as COMMENTS,
 case 
 	when oh.OffHoldTime is null then 'YES' 
