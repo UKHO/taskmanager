@@ -149,6 +149,17 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
+            var isAssignedToUser = await _dbContext.DbAssessmentReviewData.AnyAsync(r => r.ProcessId == processId && r.Reviewer == CurrentUser.DisplayName);
+            if (!isAssignedToUser)
+            {
+                ValidationErrorMessages.Add("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
+            }
+
             if (IsOnHold)
             {
                 ValidationErrorMessages.Add("Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.");

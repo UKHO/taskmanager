@@ -684,7 +684,7 @@ namespace Portal.UnitTests
 
             var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Data Impact: STS Usage has not been selected, are you sure you want to continue?", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
@@ -740,7 +740,7 @@ namespace Portal.UnitTests
 
             var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual((int)VerifyCustomHttpStatusCode.WarningsDetected, response.StatusCode);
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.WarningsDetected, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Data Impact: There are incomplete Features Submitted tick boxes.", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
@@ -896,7 +896,7 @@ namespace Portal.UnitTests
 
             var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
 
-            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
@@ -924,7 +924,7 @@ namespace Portal.UnitTests
 
             var response = (JsonResult)await _assessModel.OnPostSaveAsync(ProcessId);
 
-            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
