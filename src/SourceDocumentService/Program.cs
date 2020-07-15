@@ -30,15 +30,6 @@ namespace SourceDocumentService
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureAppConfiguration(builder =>
-                {
-                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
-
-                    var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
-
-                    builder.AddAzureAppConfiguration(azureAppConfConnectionString)
-                        .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
                 });
     }
 }

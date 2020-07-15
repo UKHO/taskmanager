@@ -7,8 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="app.config.token" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App.config.token" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="System.IO.Abstractions" Version="12.0.5" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -32,9 +33,9 @@ namespace SourceDocumentService.UnitTests
             _fakeLogger = A.Fake<ILogger<SourceDocumentController>>();
             _fakeFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
-                {@"c:\myfile.txt", new MockFileData("Testing is meh.")},
-                {@"c:\demo\jQuery.js", new MockFileData("some js")},
-                {@"c:\test\TestImage.tif", new MockFileData(new byte[] {0x12, 0x34, 0x56, 0xd2})}
+                {@"myfile.txt", new MockFileData("Testing is meh.")},
+                {@"jQuery.js", new MockFileData("some js")},
+                {@"TestImage.tif", new MockFileData(new byte[] {0x12, 0x34, 0x56, 0xd2})}
             });
 
             _sourceDocumentController =
@@ -45,7 +46,7 @@ namespace SourceDocumentService.UnitTests
         public async Task Test_When_Document_does_not_exist_Then_FileNotFoundException_thrown_and_Document_Status_and_FileLocation_is_not_Updated()
         {
             Assert.ThrowsAsync<FileNotFoundException>(() => _sourceDocumentController.PostSourceDocumentToContentService(_processId,
-                _sDocId, @"C:\test\notexist.txt"));
+                _sDocId, @"notexist.txt"));
         }
     }
 }

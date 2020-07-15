@@ -20,17 +20,25 @@ namespace SourceDocumentCoordinator.Config
         public string DataServicesWebServiceDocumentsFromListUriSdocIdQuery { get; set; }  
         public Uri DataServicesWebServiceHealthcheckUri { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
+        public Uri SourceDocumentServiceLocalhostBaseUrl { get; set; }
         public Uri SourceDocumentServiceBaseUrl { get; set; }
+        public Uri SourceDocumentServicePostDocumentUrl { get; set; }
 
         public Uri BuildDataServicesBaseUri()
         {
             return ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri;
         }
 
-
         public Uri BuildDataServicesUri(int sdocId)
         {
             return new Uri(ConfigHelpers.IsLocalDevelopment ? DataAccessLocalhostBaseUri : DataServicesWebServiceBaseUri, $@"{DataServicesDocumentAssessmentDataUri}{sdocId}");
+        }
+
+        public Uri BuildSourceDocumentServicePostDocumentUri(int processId, int sdocId, string filename)
+        {
+            return new Uri(
+                ConfigHelpers.IsLocalDevelopment ? SourceDocumentServiceLocalhostBaseUrl : SourceDocumentServiceBaseUrl,
+                $@"{SourceDocumentServicePostDocumentUrl}{processId}/{sdocId}/{filename}");
         }
     }
 }

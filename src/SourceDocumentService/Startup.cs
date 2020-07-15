@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.IO.Abstractions;
 using System.Net;
 using System.Net.Http;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SourceDocumentService.Config;
 using SourceDocumentService.HttpClients;
 
 namespace SourceDocumentService
@@ -29,17 +29,13 @@ namespace SourceDocumentService
 
             services.AddScoped<IFileSystem, FileSystem>();
 
-            var startupSecretsConfig = new StartupSecretsConfig();
-            Configuration.GetSection("ContentService").Bind(startupSecretsConfig);
-
             services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     Credentials = new NetworkCredential
                     {
-                        UserName = startupSecretsConfig.ContentServiceUsername,
-                        Password = startupSecretsConfig.ContentServicePassword,
-                        Domain = startupSecretsConfig.ContentServiceDomain
+                        UserName = ConfigurationManager.AppSettings["ContentServiceUsername"],
+                        Password = ConfigurationManager.AppSettings["ContentServicePassword"]
                     }
                 })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));

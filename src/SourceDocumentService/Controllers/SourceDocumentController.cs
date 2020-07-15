@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.Net;
 using SourceDocumentService.HttpClients;
 using System.IO;
@@ -39,42 +40,44 @@ namespace SourceDocumentService.Controllers
         /// </summary>
         /// <param name="processId"></param>
         /// <param name="sdocId"></param>
-        /// <param name="filepath"></param>
+        /// <param name="filename"></param>
         /// <returns></returns>
-        [Route("/SourceDocumentService/v1/PostSourceDocument/{processId}/{sdocId}")]
+        [Route("/SourceDocumentService/v1/PostSourceDocument/{processId}/{sdocId}/{filename}")]
         [HttpPost]
-        public async Task<IActionResult> PostSourceDocumentToContentService([FromRoute][Required] int processId, [FromRoute][Required] int sdocId, [FromBody][Required] string filepath)
+        public async Task<IActionResult> PostSourceDocumentToContentService([FromRoute][Required] int processId, [FromRoute][Required] int sdocId, [Required][FromRoute] string filename)
         {
             _logger.LogInformation($"{nameof(PostSourceDocumentToContentService)} invoked with ProcessId {processId}, " +
-                                   $"sdocId {sdocId} and filepath {filepath}.");
+                                   $"sdocId {sdocId} and filepath {filename}.");
 
-            byte[] fileBytes = { };
+            byte[] fileBytes;
+
+            var filestorePath = ConfigurationManager.AppSettings["FilestorePath"];
 
             // Retrieve file from DFS
             try
             {
-                fileBytes = await _fileSystem.File.ReadAllBytesAsync(filepath);
+                fileBytes = await _fileSystem.File.ReadAllBytesAsync(Path.Combine(filestorePath, filename));
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError(ex, $"No permissions to reed file: {filepath}.");
+                _logger.LogError(ex, $"No permissions to reed file: {filename}.");
                 throw;
             }
             catch (SecurityException ex)
             {
-                _logger.LogError(ex, $"No permissions to reed file: {filepath}.");
+                _logger.LogError(ex, $"No permissions to reed file: {filename}.");
                 throw;
             }
             catch (FileNotFoundException ex)
             {
-                _logger.LogError(ex, $"Unable to find file: {filepath}");
+                _logger.LogError(ex, $"Unable to find file: {filename}");
                 throw;
             }
 
             // Post to Content Service
-            var contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(filepath));
+            var contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(filename));
 
-            _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filepath}.");
+            _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filename}.");
 
             return new ObjectResult(contentServiceId);
         }

@@ -85,7 +85,6 @@ namespace SourceDocumentCoordinator
                         {
                             UserName = startupSecretsConfig.SourceDocumentServiceUsername,
                             Password = startupSecretsConfig.SourceDocumentServicePassword,
-                            Domain = startupSecretsConfig.SourceDocumentDomain
                         }
                     })
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));

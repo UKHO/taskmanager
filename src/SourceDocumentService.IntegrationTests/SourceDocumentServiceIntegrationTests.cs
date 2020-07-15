@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Common.Helpers;
 using NUnit.Framework;
-using SourceDocumentService.Config;
 using SourceDocumentService.HttpClients;
 
 namespace SourceDocumentService.IntegrationTests
@@ -16,8 +13,6 @@ namespace SourceDocumentService.IntegrationTests
     public class SourceDocumentServiceIntegrationTests
     {
         private IContentServiceApiClient _contentServiceApiClient;
-        private OptionsSnapshotWrapper<UriConfig> _uriConfigWrapper;
-        private OptionsSnapshotWrapper<SecretsConfig> _secretsConfigWrapper;
 
         [Test]
         public async Task Test_ContentService_Connectivity()
