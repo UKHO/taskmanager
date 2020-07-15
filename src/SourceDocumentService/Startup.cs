@@ -1,8 +1,15 @@
+using System;
+using System.Configuration;
+using System.IO.Abstractions;
+using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SourceDocumentService.Configuration;
+using SourceDocumentService.HttpClients;
 
 namespace SourceDocumentService
 {
@@ -20,6 +27,20 @@ namespace SourceDocumentService
         {
             services.AddControllers();
             services.AddHealthChecks();
+
+            services.AddScoped<IFileSystem, FileSystem>();
+            services.AddScoped<IConfigurationManager, AppConfigConfigurationManager>();
+
+            services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    Credentials = new NetworkCredential
+                    {
+                        UserName = ConfigurationManager.AppSettings["ContentServiceUsername"],
+                        Password = ConfigurationManager.AppSettings["ContentServicePassword"]
+                    }
+                })
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

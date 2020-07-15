@@ -1,26 +1,22 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Helpers;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using SourceDocumentCoordinator.Config;
-using SourceDocumentCoordinator.Models;
+using SourceDocumentService.Models;
 
-namespace SourceDocumentCoordinator.HttpClients
+namespace SourceDocumentService.HttpClients
 {
     public class ContentServiceApiClient : IContentServiceApiClient
     {
-        private readonly IOptions<UriConfig> _uriConfig;
         private readonly HttpClient _httpClient;
 
-        public ContentServiceApiClient(HttpClient httpClient, IOptions<UriConfig> uriConfig, IOptions<SecretsConfig> secretsConfig)
+        public ContentServiceApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _uriConfig = uriConfig;
         }
 
         public async Task<Guid> Post(byte[] fileBytes, string filename)
@@ -31,14 +27,22 @@ namespace SourceDocumentCoordinator.HttpClients
             var byteArrayContent = new ByteArrayContent(fileBytes);
             byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(DetermineFileType(filename));
 
-            var response = await _httpClient.PostAsync(_uriConfig.Value.ContentServiceBaseUrl, new MultipartFormDataContent
-            {
-                {new StringContent(JsonConvert.SerializeObject(ConstructContentServicePostRequest()), Encoding.UTF8, "application/json"),  "cspostrequest"},
-                {byteArrayContent, "file", filename}
+            var response = await _httpClient.PostAsync(ConfigurationManager.AppSettings["ContentServiceBaseUrl"],
+                new MultipartFormDataContent
+                {
+                    {
+                        new StringContent(
+                            System.Text.Json.JsonSerializer.Serialize(ConstructContentServicePostRequest()),
+                            Encoding.UTF8, "application/json"),
+                        "cspostrequest"
+                    },
+                    {byteArrayContent, "file", filename}
 
-            });
+                });
 
-            var deserializedResponse = JsonConvert.DeserializeObject<ContentServiceResponse>(await response.Content.ReadAsStringAsync());
+            var deserializedResponse =
+                System.Text.Json.JsonSerializer.Deserialize<ContentServiceResponse>(
+                    await response.Content.ReadAsStringAsync());
 
             return GuidHelpers.ExtractGuidFromString(deserializedResponse.Properties.MetaData.Description);
         }

@@ -49,7 +49,7 @@ namespace SourceDocumentCoordinator
                 hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
                 var startupSecretsConfig = new StartupSecretsConfig();
-                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretsConfig);
+                hostingContext.Configuration.GetSection("SourceDocumentService").Bind(startupSecretsConfig);
                 hostingContext.Configuration.GetSection("subscription").Bind(startupSecretsConfig);
                 hostingContext.Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
 
@@ -78,14 +78,13 @@ namespace SourceDocumentCoordinator
                 services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
-                services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
+                services.AddHttpClient<ISourceDocumentServiceApiClient, SourceDocumentServiceApiClient>()
                     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                     {
                         Credentials = new NetworkCredential
                         {
-                            UserName = startupSecretsConfig.ContentServiceUsername,
-                            Password = startupSecretsConfig.ContentServicePassword,
-                            Domain = startupSecretsConfig.ContentServiceDomain
+                            UserName = startupSecretsConfig.SourceDocumentServiceUsername,
+                            Password = startupSecretsConfig.SourceDocumentServicePassword,
                         }
                     })
                     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
