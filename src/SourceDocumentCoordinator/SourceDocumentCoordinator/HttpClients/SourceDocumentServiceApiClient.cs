@@ -17,13 +17,13 @@ namespace SourceDocumentCoordinator.HttpClients
             _uriConfig = uriConfig;
         }
 
-        public async Task<Guid> Post(int processId, int sdocId, string filepath)
+        public async Task<Guid> Post(int processId, int sdocId, string filename)
         {
             var data = "";
 
-            var content = new StringContent(filepath, System.Text.Encoding.UTF8, "application/json");
+            var url = _uriConfig.Value.BuildSourceDocumentServicePostDocumentUri(processId, sdocId, filename);
 
-            using var response = await _httpClient.PostAsync(_uriConfig.Value.SourceDocumentServiceBaseUrl, content).ConfigureAwait(false);
+            using var response = await _httpClient.PostAsync(url, null).ConfigureAwait(false);
 
             data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
