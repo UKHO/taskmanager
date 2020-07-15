@@ -49,7 +49,7 @@ namespace SourceDocumentCoordinator
                 hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
                 var startupSecretsConfig = new StartupSecretsConfig();
-                hostingContext.Configuration.GetSection("ContentService").Bind(startupSecretsConfig);
+                hostingContext.Configuration.GetSection("SourceDocumentService").Bind(startupSecretsConfig);
                 hostingContext.Configuration.GetSection("subscription").Bind(startupSecretsConfig);
                 hostingContext.Configuration.GetSection("LoggingDbSection").Bind(startupSecretsConfig);
 
