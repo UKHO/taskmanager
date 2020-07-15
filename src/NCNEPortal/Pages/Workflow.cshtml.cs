@@ -293,7 +293,7 @@ namespace NCNEPortal
                 CarisProjectName = carisProject.ProjectName;
                 IsCarisProjectCreated = true;
             }
-            else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.ChartType}_{taskInfo.ChartNumber}";
+            else if (taskInfo != null) CarisProjectName = $"{ProcessId}_{taskInfo.WorkflowType}_{taskInfo.ChartNumber}";
 
             Header = $"{taskInfo.WorkflowType}{(String.IsNullOrEmpty(taskInfo.ChartNumber) ? "" : $" - {taskInfo.ChartNumber}")}";
 
