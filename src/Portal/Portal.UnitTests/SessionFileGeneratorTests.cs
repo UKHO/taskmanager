@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,7 @@ using NUnit.Framework;
 using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -26,29 +26,7 @@ namespace Portal.UnitTests
         public string WorkspaceAffected { get; set; }
         private IPortalUserDbService _fakePortalUserDbService;
 
-
-        public AdUser TestUser
-        {
-            get
-            {
-                var user = AdUser.Unknown;
-
-                user = _dbContext.AdUsers.SingleOrDefault(u =>
-                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
-
-                if (user == null)
-                {
-                    user = new AdUser
-                    {
-                        DisplayName = "Test User",
-                        UserPrincipalName = "test@email.com"
-                    };
-                    _dbContext.SaveChanges();
-                }
-
-                return user;
-            }
-        }
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -58,6 +36,7 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
 
             ProcessId = 123;
             WorkspaceAffected = "TestWorkspace";
