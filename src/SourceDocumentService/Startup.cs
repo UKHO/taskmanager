@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SourceDocumentService.Configuration;
 using SourceDocumentService.HttpClients;
 
 namespace SourceDocumentService
@@ -28,6 +29,7 @@ namespace SourceDocumentService
             services.AddHealthChecks();
 
             services.AddScoped<IFileSystem, FileSystem>();
+            services.AddScoped<IConfigurationManager, AppConfigConfigurationManager>();
 
             services.AddHttpClient<IContentServiceApiClient, ContentServiceApiClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler

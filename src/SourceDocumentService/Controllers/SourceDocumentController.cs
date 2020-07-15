@@ -10,6 +10,7 @@ using SourceDocumentService.HttpClients;
 using System.IO;
 using System.Security;
 using Serilog.Context;
+using SourceDocumentService.Configuration;
 
 namespace SourceDocumentService.Controllers
 {
@@ -19,12 +20,15 @@ namespace SourceDocumentService.Controllers
         private readonly ILogger<SourceDocumentController> _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IContentServiceApiClient _contentServiceApiClient;
+        private readonly IConfigurationManager _configurationManager;
 
-        public SourceDocumentController(ILogger<SourceDocumentController> logger, IFileSystem fileSystem, IContentServiceApiClient contentServiceApiClient)
+        public SourceDocumentController(ILogger<SourceDocumentController> logger, IFileSystem fileSystem, IContentServiceApiClient contentServiceApiClient,
+            IConfigurationManager configurationManager)
         {
             _logger = logger;
             _fileSystem = fileSystem;
             _contentServiceApiClient = contentServiceApiClient;
+            _configurationManager = configurationManager;
         }
 
         [HttpGet("{id}")]
@@ -51,7 +55,7 @@ namespace SourceDocumentService.Controllers
 
             byte[] fileBytes;
 
-            var filestorePath = ConfigurationManager.AppSettings["FilestorePath"];
+            var filestorePath = _configurationManager.GetAppSetting("FilestorePath");
 
             // Retrieve file from DFS
             try

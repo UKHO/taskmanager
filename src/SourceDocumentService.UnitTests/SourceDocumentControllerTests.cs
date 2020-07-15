@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using SourceDocumentService.Configuration;
 using SourceDocumentService.Controllers;
 using SourceDocumentService.HttpClients;
 
@@ -20,6 +20,7 @@ namespace SourceDocumentService.UnitTests
         private SourceDocumentController _sourceDocumentController;
         private ILogger<SourceDocumentController> _fakeLogger;
         private IContentServiceApiClient _fakeContentServiceApiClient;
+        private IConfigurationManager _fakeConfigurationManager;
         private int _processId;
         private int _sDocId;
 
@@ -35,18 +36,31 @@ namespace SourceDocumentService.UnitTests
             {
                 {@"myfile.txt", new MockFileData("Testing is meh.")},
                 {@"jQuery.js", new MockFileData("some js")},
-                {@"TestImage.tif", new MockFileData(new byte[] {0x12, 0x34, 0x56, 0xd2})}
+                { "c:\\test\\TestImage.tif", new MockFileData(new byte[] {0x12, 0x34, 0x56, 0xd2})}
             });
+            _fakeConfigurationManager = A.Fake<IConfigurationManager>();
+
+            A.CallTo(() => _fakeConfigurationManager.GetAppSetting("FilestorePath")).Returns("c:\\test\\");
 
             _sourceDocumentController =
-                new SourceDocumentController(_fakeLogger, _fakeFileSystem, _fakeContentServiceApiClient);
+                new SourceDocumentController(_fakeLogger, _fakeFileSystem, _fakeContentServiceApiClient, _fakeConfigurationManager);
         }
 
         [Test]
-        public async Task Test_When_Document_does_not_exist_Then_FileNotFoundException_thrown_and_Document_Status_and_FileLocation_is_not_Updated()
+        public void Test_when_document_does_not_exist_then_FileNotFoundException_thrown()
         {
             Assert.ThrowsAsync<FileNotFoundException>(() => _sourceDocumentController.PostSourceDocumentToContentService(_processId,
                 _sDocId, @"notexist.txt"));
+        }
+
+        [Test]
+        public async Task Test_When_document_exists_then_ContentService_call_made()
+        {
+            A.CallTo(() => _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, A<string>.Ignored)).Returns(Guid.NewGuid());
+
+            await _sourceDocumentController.PostSourceDocumentToContentService(_processId, _sDocId, @"TestImage.tif");
+            A.CallTo(() => _fakeContentServiceApiClient.Post(A<byte[]>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+
         }
     }
 }
