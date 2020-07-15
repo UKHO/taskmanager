@@ -63,10 +63,6 @@ namespace Portal.Pages.DbAssessment
                     .DbAssessmentAssignTask
                     .Where(a => a.ProcessId == ProcessId)
                     .ToListAsync();
-               // var temp = AdditionalAssignedTasks.Single(a => a.ProcessId == ProcessId);
-
-               // Console.WriteLine("dsfd");
-
             }
             catch (ArgumentNullException e)
             {
