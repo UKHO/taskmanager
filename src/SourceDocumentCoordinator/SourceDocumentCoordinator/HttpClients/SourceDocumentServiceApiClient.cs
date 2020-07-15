@@ -19,19 +19,18 @@ namespace SourceDocumentCoordinator.HttpClients
 
         public async Task<Guid> Post(int processId, int sdocId, string filename)
         {
-            var data = "";
-
             var url = _uriConfig.Value.BuildSourceDocumentServicePostDocumentUri(processId, sdocId, filename);
 
-            using var response = await _httpClient.PostAsync(url, null).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync(url, null).ConfigureAwait(false);
 
-            data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var data = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
                                                $"\n Message= '{data}'," +
                                                $"\n Url='{_uriConfig.Value.SourceDocumentServiceBaseUrl}'");
 
-            return Guid.Parse(data);
+            return System.Text.Json.JsonSerializer.Deserialize<Guid>(data);
         }
     }
 }
