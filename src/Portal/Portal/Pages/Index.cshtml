@@ -6,35 +6,37 @@
 
 <script type="text/javascript" src="~/js/Index.js" asp-append-version="true"></script>
 
-<div class="row pt-1">
-    <div class="col-4">
-        <a asp-page="/Index">
-            <img id="ukhoLogo" src="~/images/ukhologo.svg" alt="UKHO Logo" />
-        </a>
-    </div>
-    <div class="col-8">
-        <div class="row mb-2">
-            <div id="menuItemList" class="col-10">
-                <button id="btnMyTaskList" class="btn btn-primary">My Task List</button>
-                <button id="btnTeamTasks" class="btn btn-primary">Team Tasks</button>
-                <button id="btnStats" class="btn btn-primary">Statistics</button>
-                <button id="btnHistoricalTasks" class="btn btn-primary">Historical Tasks</button>
-                <span class="ml-3" id="userFullName">Hello <strong>@Model.CurrentUser.DisplayName</strong></span>
-            </div>
+<div class="container-fluid">
+    <div class="row pt-1">
+        <div class="col-4 ml-0 pl-0">
+            <a asp-page="/Index">
+                <img id="ukhoLogo" src="~/images/ukhologo.svg" alt="UKHO Logo" />
+            </a>
         </div>
-        <div class="row">
-            <div class="col-6 pr-0">
-                <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
+        <div class="col-8">
+            <div class="row mb-2">
+                <div id="menuItemList" class="col-12">
+                    <button id="btnMyTaskList" class="btn btn-primary">My Task List</button>
+                    <button id="btnTeamTasks" class="btn btn-primary">Team Tasks</button>
+                    <button id="btnStats" class="btn btn-primary">Statistics</button>
+                    <button id="btnHistoricalTasks" class="btn btn-primary">Historical Tasks</button>
+                    <span class="ml-3 float-right" id="userFullName" style="color: #09315B">Hello <strong>@Model.CurrentUser.DisplayName</strong></span>
+                </div>
             </div>
-            <div class="col-6">
-                <button id="btnRefresh" type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Refresh the task lists, preserving selected sort options and search criteria." aria-label="Refresh the task lists, preserving selected sort options and search criteria."><span class="fas fa-sync-alt"></span></button>
-                <button type="button" id="btnSelectTeam" class="btn btn-primary"><i class="filterIcon fa fa-filter" aria-hidden="true" style="font-size: 75%"></i> Select Team</button>
+            <div class="row">
+                <div class="col-6 pr-0">
+                    <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
+                </div>
+                <div class="col-2">
+                    <button type="button" id="btnSelectTeam" class="btn btn-primary"><i class="filterIcon fa fa-filter" aria-hidden="true" style="font-size: 75%"></i> Select Team</button>
+                </div>
+                <div class="col-4 m-0 p-0 float-right">
+                    <h3 class="m-0 p-0  float-right" style="color: #09315B">Database Assessment</h3>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<h3>Database Assessment</h3>
 
 <div class="card mb-4 mt-3">
     <h6>Unassigned Tasks</h6>
@@ -68,12 +70,12 @@
                             @Html.DisplayFor(model => task.DmEndDate)
 
                             @if (task.DaysToDmEndDateRedAlert ||
-                                 task.DaysToDmEndDateAmberAlert ||
-                                 task.DaysToDmEndDateGreenAlert)
+                                task.DaysToDmEndDateAmberAlert ||
+                                task.DaysToDmEndDateGreenAlert)
                             {
-                                <div class="right mr-1 
-                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
-                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
+                                <div class="right mr-1
+                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "")
+                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "")
                                  @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
                                     @Html.DisplayFor(model => task.DaysToDmEndDate)
                                 </div>
@@ -162,12 +164,12 @@
                             @Html.DisplayFor(model => task.DmEndDate)
 
                             @if (task.DaysToDmEndDateRedAlert ||
-                                 task.DaysToDmEndDateAmberAlert ||
-                                 task.DaysToDmEndDateGreenAlert)
+                                task.DaysToDmEndDateAmberAlert ||
+                                task.DaysToDmEndDateGreenAlert)
                             {
-                                <div class="right mr-1 
-                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "") 
-                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "") 
+                                <div class="right mr-1
+                                 @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "")
+                                 @(task.DaysToDmEndDateAmberAlert ? "alertText amber" : "")
                                  @(task.DaysToDmEndDateRedAlert ? "alertText red" : "")">
                                     @Html.DisplayFor(model => task.DaysToDmEndDate)
                                 </div>
