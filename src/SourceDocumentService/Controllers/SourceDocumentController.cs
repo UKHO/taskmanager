@@ -31,14 +31,6 @@ namespace SourceDocumentService.Controllers
             _configurationManager = configurationManager;
         }
 
-        [HttpGet("{id}")]
-        [Route("/SourceDocumentService/v1/")]
-        public string Get()
-        {
-            _logger.LogInformation("GET accessed at " + DateTime.Now);
-            return "Ok";
-        }
-
         /// <summary>
         /// Reads source document from given DFS location and posts it to Content Service
         /// </summary>
@@ -64,12 +56,12 @@ namespace SourceDocumentService.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError(ex, $"No permissions to reed file: {filename}.");
+                _logger.LogError(ex, $"No permissions to read file: {filename}.");
                 throw;
             }
             catch (SecurityException ex)
             {
-                _logger.LogError(ex, $"No permissions to reed file: {filename}.");
+                _logger.LogError(ex, $"No permissions to read file: {filename}.");
                 throw;
             }
             catch (FileNotFoundException ex)
@@ -81,7 +73,8 @@ namespace SourceDocumentService.Controllers
             // Post to Content Service
             var contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(filename));
 
-            _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filename}.");
+            _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filename}. " +
+                                   $"Returned Guid: {contentServiceId}");
 
             return Ok(contentServiceId);
         }
