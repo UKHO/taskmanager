@@ -83,7 +83,7 @@ namespace SourceDocumentService.Controllers
 
             _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filename}.");
 
-            return new ObjectResult(contentServiceId);
+            return Ok(contentServiceId);
         }
     }
 }
