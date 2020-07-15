@@ -1,4 +1,8 @@
+using System;
+using Common.Helpers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -26,6 +30,15 @@ namespace SourceDocumentService
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureAppConfiguration(builder =>
+                {
+                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+
+                    var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+
+                    builder.AddAzureAppConfiguration(azureAppConfConnectionString)
+                        .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
                 });
     }
 }
