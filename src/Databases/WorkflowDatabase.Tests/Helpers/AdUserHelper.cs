@@ -3,7 +3,7 @@ using System.Linq;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
-namespace Portal.UnitTests.Helpers
+namespace WorkflowDatabase.Tests.Helpers
 {
     internal static class AdUserHelper
     {
@@ -33,6 +33,29 @@ namespace Portal.UnitTests.Helpers
             dbContext.SaveChanges();
 
             return user;
+        }
+
+        internal static WorkflowInstance CreateSkeletonWorkflowInstance(WorkflowDbContext dbContext, int processId = 1)
+        {
+            var workflowInstanceList = dbContext.WorkflowInstance.ToList();
+            var workflowInstance = workflowInstanceList.SingleOrDefault(u =>
+                u.ProcessId == processId);
+            if (workflowInstance != null) return workflowInstance;
+
+            workflowInstance = new WorkflowInstance
+            {
+                ProcessId = processId,
+                PrimarySdocId = 1,
+                SerialNumber = string.Empty,
+                ActivityName = string.Empty,
+                ActivityChangedAt = DateTime.Now,
+                StartedAt = DateTime.Now,
+                Status = string.Empty
+            };
+            dbContext.WorkflowInstance.Add(workflowInstance);
+            dbContext.SaveChanges();
+
+            return workflowInstance;
         }
     }
 }

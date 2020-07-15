@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
+using WorkflowDatabase.Tests.Helpers;
 
 namespace WorkflowDatabase.Tests
 {
