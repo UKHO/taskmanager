@@ -1037,13 +1037,13 @@ namespace Portal.UnitTests
             await _dbContext.DbAssessmentReviewData.AddAsync(new DbAssessmentReviewData()
             {
                 ProcessId = processId,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             });
 
             await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "thisuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             await _reviewModel.OnPostTerminateAsync("Testing", processId);
 
@@ -1059,7 +1059,7 @@ namespace Portal.UnitTests
         public async Task Test_Terminating_On_Hold_Task_Results_In_Validation_Error_Message()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "thisuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 

@@ -153,7 +153,7 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-            var isAssignedToUser = await _dbContext.DbAssessmentReviewData.AnyAsync(r => r.ProcessId == processId && r.Reviewer == CurrentUser.DisplayName);
+            var isAssignedToUser = await _dbContext.DbAssessmentReviewData.AnyAsync(r => r.ProcessId == processId && r.Reviewer.UserPrincipalName == CurrentUser.UserPrincipalName);
             if (!isAssignedToUser)
             {
                 ValidationErrorMessages.Add("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
