@@ -19,7 +19,7 @@
                     <th scope="col">Document Type</th>
                     <th scope="col">Datum</th>
                     <th scope="col">Type</th>
-                    <th><span class="screen-reader-only">Attach/Remove Documents</span></th>
+                    <th style="width: 4.5rem"><span class="screen-reader-only">Attach/Remove Documents</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -72,15 +72,20 @@
                                 <td>
                                     @if (linkedDocument.Status == SourceDocumentRetrievalStatus.NotAttached.ToString())
                                     {
-                                        <div class="attachLinkedDocumentButtonContainer">
-                                            <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
-                                                <i class="fa fa-paperclip"></i>
-                                            </a>
-                                        </div>
-                                        <div class="attachLinkedDocumentSpinnerContainer">
-                                            <div class="spinner-border">
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-12 m-0 p-0">
+                                                    <div class="attachLinkedDocumentButtonContainer float-right">
+                                                        <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                            <i class="fa fa-paperclip"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="attachLinkedDocumentSpinnerContainer">
+                                                        <div class="float-left"><i class="fas fa-crosshairs fa-spin"></i></div>
+                                                        <div class="float-right"><i class="fa fa-paperclip"></i></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <i class="fa fa-paperclip"></i>
                                         </div>
                                     }
                                 </td>
@@ -112,7 +117,23 @@
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentType)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.Datum)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceNature)</td>
-                                <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                                <td>
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12 m-0 p-0">
+                                                <div class="detachLinkedDocumentButtonContainer float-right">
+                                                    <a class="detachLinkedDocument" data-linkedSdocId="@attachedLinkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                        <i class="fa fa-times-circle"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="detachLinkedDocumentSpinnerContainer">
+                                                    <div class="float-left"><i class="fas fa-crosshairs fa-spin"></i></div>
+                                                    <div class="float-right"><i class="fa fa-times-circle"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
@@ -142,7 +163,24 @@
                                 <td>@databaseDocument.SourceDocumentType</td>
                                 <td>@databaseDocument.Datum</td>
                                 <td>@databaseDocument.SourceNature</td>
-                                <td><i class="fa fa-times-circle" style="color: red"></i></td>
+                                <td>
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12 m-0 p-0">
+                                                <div class="detachDatabaseDocumentButtonContainer float-right">
+                                                    <a class="detachDatabaseDocument" data-linkedSdocId="@databaseDocument.SdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                        <i class="fa fa-times-circle"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="detachDatabaseDocumentSpinnerContainer">
+                                                    <div class="float-left"><i class="fas fa-crosshairs fa-spin"></i></div>
+                                                    <div class="float-right"><i class="fa fa-times-circle"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
                             </tr>
                         }
                     }
