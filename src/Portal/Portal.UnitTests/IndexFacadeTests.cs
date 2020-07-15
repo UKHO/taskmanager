@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Common.Helpers;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
@@ -8,6 +7,7 @@ using NUnit.Framework;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -21,33 +21,14 @@ namespace Portal.UnitTests
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
         private WorkflowDbContext _dbContext;
 
-        public AdUser TestUser
-        {
-            get
-            {
-                var user = AdUser.Unknown;
-
-                user = _dbContext.AdUsers.SingleOrDefault(u =>
-                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
-
-                if (user == null)
-                {
-                    user = new AdUser
-                    {
-                        DisplayName = "Test User",
-                        UserPrincipalName = "test@email.com"
-                    };
-                    _dbContext.SaveChanges();
-                }
-
-                return user;
-            }
-        }
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public void SetUp()
         {
             _dbContext = DatabasesHelpers.GetInMemoryWorkflowDbContext();
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.DmEndDateDaysSimple = 14;
 

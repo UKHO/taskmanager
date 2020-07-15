@@ -15,6 +15,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.MappingProfiles;
 using Portal.Pages;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -33,28 +34,7 @@ namespace Portal.UnitTests
         private ICarisProjectHelper _fakeCarisProjectHelper;
         private IOptions<GeneralConfig> _generalConfig;
 
-        public AdUser TestUser
-        {
-            get
-            {
-                var user = AdUser.Unknown;
-
-                user = _dbContext.AdUsers.SingleOrDefault(u =>
-                    u.UserPrincipalName.Equals("test@email.com", StringComparison.OrdinalIgnoreCase));
-
-                if (user == null)
-                {
-                    user = new AdUser
-                    {
-                        DisplayName = "Test User",
-                        UserPrincipalName = "test@email.com"
-                    };
-                    _dbContext.SaveChanges();
-                }
-
-                return user;
-            }
-        }
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -64,7 +44,7 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
-
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
 
             var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new TaskViewModelMappingProfile()); });
             _mapper = mappingConfig.CreateMapper();
