@@ -17,6 +17,13 @@
                 $("#sourceDocuments").html(result);
 
                 $(".attachLinkedDocumentSpinnerContainer").hide();
+                $(".attachLinkedDocumentButtonContainer").show();
+
+                $(".detachLinkedDocumentSpinnerContainer").hide();
+                $(".detachLinkedDocumentButtonContainer").show();
+
+                $(".detachDatabaseDocumentSpinnerContainer").hide();
+                $(".detachDatabaseDocumentButtonContainer").show();
 
                 if (isReadOnly) {
                     return;
@@ -24,6 +31,8 @@
 
                 applyCollapseIconHandler();
                 applyAttachLinkedDocumentHandlers();
+                applydetachLinkedDocumentHandlers();
+                applydetachDatabaseDocumentHandlers();
                 applySearchSourceHandler();
                 applyAddSourceHandler();
             },
@@ -36,8 +45,8 @@
 
     function applyAttachLinkedDocumentHandlers() {
         $(".attachLinkedDocument").on("click", function (e) {
-            $(this).parent().siblings(".attachLinkedDocumentSpinnerContainer").show();
             $(this).parent().hide();
+            $(this).parent().siblings(".attachLinkedDocumentSpinnerContainer").show();
 
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
@@ -63,6 +72,70 @@
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
                 }
             });
+        });
+    }
+    
+    function applydetachLinkedDocumentHandlers() {
+        $(".detachLinkedDocument").on("click", function (e) {
+            $(this).parent().hide();
+            $(this).parent().siblings(".detachLinkedDocumentSpinnerContainer").show();
+
+            //var linkedSdocId = Number($(this).data("linkedsdocid"));
+            //var processId = Number($(this).data("processid"));
+            //var correlationId = $(this).data("correlationid");
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
+            //    beforeSend: function (xhr) {
+            //        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            //    },
+            //    data: {
+            //        "linkedSdocId": linkedSdocId,
+            //        "processId": processId,
+            //        "correlationId": correlationId
+            //    },
+            //    success: function (result) {
+            //        getSourceDocuments();
+            //    },
+            //    error: function (error) {
+            //        //TODO: Implement error dialogs
+            //        $("#assignTasksError")
+            //            .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+            //    }
+            //});
+        });
+    }
+
+    function applydetachDatabaseDocumentHandlers() {
+        $(".detachDatabaseDocument").on("click", function (e) {
+            $(this).parent().hide();
+            $(this).parent().siblings(".detachDatabaseDocumentSpinnerContainer").show();
+
+            //var linkedSdocId = Number($(this).data("linkedsdocid"));
+            //var processId = Number($(this).data("processid"));
+            //var correlationId = $(this).data("correlationid");
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
+            //    beforeSend: function (xhr) {
+            //        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+            //    },
+            //    data: {
+            //        "linkedSdocId": linkedSdocId,
+            //        "processId": processId,
+            //        "correlationId": correlationId
+            //    },
+            //    success: function (result) {
+            //        getSourceDocuments();
+            //    },
+            //    error: function (error) {
+            //        //TODO: Implement error dialogs
+            //        $("#assignTasksError")
+            //            .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+            //    }
+            //});
         });
     }
 

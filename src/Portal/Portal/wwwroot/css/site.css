@@ -284,22 +284,38 @@ table > tbody > tr > th {
     border-bottom: unset;
 }
 
-.attachLinkedDocumentButtonContainer .fa.fa-paperclip,
-.attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
+/* Attaching and Detaching Source Documents*/
+.attachLinkedDocumentButtonContainer {
     color: #09315B;
-    font-size: 24px;
+    font-size: 125%;
 }
 
 .attachLinkedDocumentSpinnerContainer .fa.fa-paperclip {
-    position: relative;
-    bottom: 34px;
-    left: 11px;
+    color: #7898ba;
+    font-size: 125%;
 }
 
-.attachLinkedDocumentSpinnerContainer .spinner-border {
+.attachLinkedDocumentSpinnerContainer .fas.fa-crosshairs {
     color: #09315B;
-    width: 2.75em;
-    height: 2.75em;
+    font-size: 125%;
+}
+
+.detachLinkedDocumentButtonContainer,
+.detachDatabaseDocumentButtonContainer {
+    color: #c82d12;
+    font-size: 125%;
+}
+
+.detachLinkedDocumentSpinnerContainer .fa.fa-times-circle,
+.detachDatabaseDocumentSpinnerContainer .fa.fa-times-circle {
+    color: #c88378;
+    font-size: 125%;
+}
+
+.detachLinkedDocumentSpinnerContainer .fas.fa-crosshairs,
+.detachDatabaseDocumentSpinnerContainer .fas.fa-crosshairs {
+    color: #c82d12;
+    font-size: 125%;
 }
 
 /* For checkbox sitting on right of text on assess page */
@@ -330,10 +346,6 @@ table > tbody > tr > th {
         color: #0177c1;
         background-color: #ffffff;
     }
-
-.attachLinkedDocumentSpinnerContainer {
-    width: 68px;
-}
 
 
 .buttonSelected {
