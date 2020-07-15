@@ -16,17 +16,17 @@ namespace SourceDocumentCoordinator.Handlers
 {
     public class PersistDocumentInStoreCommandHandler : IHandleMessages<PersistDocumentInStoreCommand>
     {
-        private readonly IContentServiceApiClient _contentServiceApiClient;
+        private readonly ISourceDocumentServiceApiClient _sourceDocumentServiceApiClient;
         private readonly WorkflowDbContext _dbContext;
         private readonly ILogger<PersistDocumentInStoreCommandHandler> _logger;
         private readonly IFileSystem _fileSystem;
 
-        public PersistDocumentInStoreCommandHandler(IContentServiceApiClient contentServiceApiClient, 
+        public PersistDocumentInStoreCommandHandler(ISourceDocumentServiceApiClient sourceDocumentServiceApiClient,
                                                     WorkflowDbContext dbContext,
                                                     ILogger<PersistDocumentInStoreCommandHandler> logger,
                                                     IFileSystem fileSystem)
         {
-            _contentServiceApiClient = contentServiceApiClient;
+            _sourceDocumentServiceApiClient = sourceDocumentServiceApiClient;
             _dbContext = dbContext;
             _logger = logger;
             _fileSystem = fileSystem;
@@ -49,15 +49,14 @@ namespace SourceDocumentCoordinator.Handlers
 
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
-            _logger.LogInformation("Uploading source document to Content Service from {SourceDocumentPath}");
+            _logger.LogInformation("Calling SourceDocumentService to persist file: {SourceDocumentPath}");
 
-            var fileBytes = await _fileSystem.File.ReadAllBytesAsync(message.Filepath);
-
-            var contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(message.Filepath));
+            var contentServiceId = await _sourceDocumentServiceApiClient.Post(message.ProcessId,
+                message.SourceDocumentId, Path.GetFileName(message.Filepath));
 
             LogContext.PushProperty("ContentServiceId", contentServiceId);
 
-            _logger.LogInformation("Successfully Uploaded source document to Content Service with Content Service Id {ContentServiceId}");
+            _logger.LogInformation("Successfully called SourceDocumentService to post document to Content Service with Content Service Id {ContentServiceId}");
 
             await UpdatePrimaryDocumentStatus(message, contentServiceId);
             await UpdateLinkedDocuments(message, contentServiceId);
