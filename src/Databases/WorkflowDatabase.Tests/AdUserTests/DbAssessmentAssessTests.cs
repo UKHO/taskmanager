@@ -34,7 +34,7 @@ namespace WorkflowDatabase.Tests.AdUserTests
         }
 
         [Test]
-        public void Dbassessmentreviewdata_table_prevents_unknown_revieweraduser_due_to_FK()
+        public void Dbassessmentassessdata_table_prevents_unknown_revieweraduser_due_to_FK()
         {
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
             {
@@ -47,7 +47,7 @@ namespace WorkflowDatabase.Tests.AdUserTests
         }
 
         [Test]
-        public void Dbassessmentreviewdata_table_prevents_unknown_assessoraduser_due_to_FK()
+        public void Dbassessmentassessdata_table_prevents_unknown_assessoraduser_due_to_FK()
         {
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
             {
@@ -60,7 +60,7 @@ namespace WorkflowDatabase.Tests.AdUserTests
         }
 
         [Test]
-        public void Dbassessmentreviewdata_table_prevents_unknown_verifieraduser_due_to_FK()
+        public void Dbassessmentassessdata_table_prevents_unknown_verifieraduser_due_to_FK()
         {
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData
             {
