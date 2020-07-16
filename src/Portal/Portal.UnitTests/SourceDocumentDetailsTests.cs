@@ -65,7 +65,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public void Test_InvalidOperationException_thrown_when_no_assessmentdata_exists()
+        public async Task Test_InvalidOperationException_thrown_when_no_assessmentdata_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
@@ -79,13 +79,14 @@ namespace Portal.UnitTests
             _dbContext.SaveChanges();
 
             var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, _fakeWorkflowBusinessLogicService, null, null, null, _fakeLogger);
-            var ex = Assert.Throws<InvalidOperationException>(() =>
-                sourceDocumentDetailsModel.OnGet());
+
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() =>
+                sourceDocumentDetailsModel.OnGetAsync());
             Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
         }
 
         [Test]
-        public void Test_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
+        public async Task Test_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
@@ -111,7 +112,7 @@ namespace Portal.UnitTests
             _dbContext.SaveChanges();
 
             var sourceDocumentDetailsModel = new _SourceDocumentDetailsModel(_dbContext, null, _fakeWorkflowBusinessLogicService, null, null, null, _fakeLogger) { ProcessId = ProcessId };
-            Assert.DoesNotThrow(() => sourceDocumentDetailsModel.OnGet());
+            Assert.DoesNotThrowAsync(() => sourceDocumentDetailsModel.OnGetAsync());
         }
 
         [Test]
