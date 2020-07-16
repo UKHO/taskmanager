@@ -70,6 +70,8 @@ td > span.overflowElipsis {
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom;
+    min-width: 8rem;
+    max-width: 18rem;
 }
 
 .panel {
