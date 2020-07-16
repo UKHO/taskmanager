@@ -218,16 +218,7 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-            // Update DB first, as it is the one used for populating Attached secondary sources
-            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
-
-            await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                                                                    _documentStatusFactory,
-                                                                    processId,
-                                                                    linkedSdocId,
-                                                                    SourceDocumentRetrievalStatus.Started,
-                                                                    SourceType.Linked);
-
+            // first publish event
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
@@ -244,6 +235,17 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
             _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
+
+            // Update DB
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                _documentStatusFactory,
+                processId,
+                linkedSdocId,
+                SourceDocumentRetrievalStatus.Started,
+                SourceType.Linked);
+
 
             return StatusCode(200);
         }
@@ -313,7 +315,27 @@ namespace Portal.Pages.DbAssessment
                 return StatusCode(405);
             }
 
-            // Update DB first, as it is the one used for populating Attached sources
+            // publish event
+            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
+            {
+                CorrelationId = correlationId,
+                ProcessId = processId,
+                SourceDocumentId = sdocId,
+                GeoReferenced = false,
+                SourceType = SourceType.Database,
+                SdocRetrievalId = Guid.NewGuid()
+            };
+
+            LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
+            LogContext.PushProperty("Message", docRetrievalEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
+            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
+            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
+
+            // Update DB 
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
+
             var sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
 
             await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
@@ -333,22 +355,6 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
-            {
-                CorrelationId = correlationId,
-                ProcessId = processId,
-                SourceDocumentId = sdocId,
-                GeoReferenced = false,
-                SourceType = SourceType.Database,
-                SdocRetrievalId = Guid.NewGuid()
-            };
-
-            LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
-            LogContext.PushProperty("Message", docRetrievalEvent.ToJSONSerializedString());
-
-            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
-            await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
-            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
 
             return StatusCode(200);
         }
