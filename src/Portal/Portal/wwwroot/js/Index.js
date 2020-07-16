@@ -130,6 +130,8 @@
                 var taskNote = $(this).data("tasknote");
                 $("#txtNote").val(taskNote);
 
+                $("#editTaskNoteModal h4.modal-title").text("Edit task " + processId + " note");
+
                 $("#editTaskNoteModal").modal("show");
             }
         }).on("click", ".assignTaskItem", function (event) {
@@ -150,6 +152,8 @@
 
             var taskStage = target.data("taskstage");
             $("#hdnAssignTaskStage").val(taskStage);
+
+            $("#assignTaskModal h4.modal-title").text("Assign task " + processId + " to user");
 
             $("#assignTaskModal").modal("show");
         }
