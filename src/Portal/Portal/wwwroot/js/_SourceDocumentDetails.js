@@ -31,8 +31,8 @@
 
                 applyCollapseIconHandler();
                 applyAttachLinkedDocumentHandlers();
-                applydetachLinkedDocumentHandlers();
-                applydetachDatabaseDocumentHandlers();
+                applyDetachLinkedDocumentHandlers();
+                applyDetachDatabaseDocumentHandlers();
                 applySearchSourceHandler();
                 applyAddSourceHandler();
             },
@@ -45,8 +45,9 @@
 
     function applyAttachLinkedDocumentHandlers() {
         $(".attachLinkedDocument").on("click", function (e) {
-            $(this).parent().hide();
-            $(this).parent().siblings(".attachLinkedDocumentSpinnerContainer").show();
+            var parent = $(this).parent();
+            $(parent).hide();
+            $(parent).siblings(".attachLinkedDocumentSpinnerContainer").show();
 
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
@@ -70,47 +71,53 @@
                     //TODO: Implement error dialogs
                     $("#assignTasksError")
                         .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+
+                    $(parent).show();
+                    $(parent).siblings(".attachLinkedDocumentSpinnerContainer").hide();
                 }
             });
         });
     }
-    
-    function applydetachLinkedDocumentHandlers() {
+
+    function applyDetachLinkedDocumentHandlers() {
         $(".detachLinkedDocument").on("click", function (e) {
-            $(this).parent().hide();
-            $(this).parent().siblings(".detachLinkedDocumentSpinnerContainer").show();
+            var parent = $(this).parent();
+            $(parent).hide();
+            $(parent).siblings(".detachLinkedDocumentSpinnerContainer").show();
 
-            //var linkedSdocId = Number($(this).data("linkedsdocid"));
-            //var processId = Number($(this).data("processid"));
-            //var correlationId = $(this).data("correlationid");
+            var linkedSdocId = Number($(this).data("linkedsdocid"));
+            var processId = Number($(this).data("processid"));
 
-            //$.ajax({
-            //    type: "POST",
-            //    url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
-            //    beforeSend: function (xhr) {
-            //        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            //    },
-            //    data: {
-            //        "linkedSdocId": linkedSdocId,
-            //        "processId": processId,
-            //        "correlationId": correlationId
-            //    },
-            //    success: function (result) {
-            //        getSourceDocuments();
-            //    },
-            //    error: function (error) {
-            //        //TODO: Implement error dialogs
-            //        $("#assignTasksError")
-            //            .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
-            //    }
-            //});
+            $.ajax({
+                type: "POST",
+                url: "_SourceDocumentDetails/?handler=DetachLinkedDocument",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "linkedSdocId": linkedSdocId,
+                    "processId": processId
+                },
+                success: function (result) {
+                    getSourceDocuments();
+                },
+                error: function (error) {
+                    //TODO: Implement error dialogs
+                    $("#assignTasksError")
+                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+
+                    $(parent).show();
+                    $(parent).siblings(".detachLinkedDocumentSpinnerContainer").hide();
+                }
+            });
         });
     }
 
-    function applydetachDatabaseDocumentHandlers() {
+    function applyDetachDatabaseDocumentHandlers() {
         $(".detachDatabaseDocument").on("click", function (e) {
-            $(this).parent().hide();
-            $(this).parent().siblings(".detachDatabaseDocumentSpinnerContainer").show();
+            var parent = $(this).parent();
+            $(parent).hide();
+            $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").show();
 
             //var linkedSdocId = Number($(this).data("linkedsdocid"));
             //var processId = Number($(this).data("processid"));
@@ -134,6 +141,9 @@
             //        //TODO: Implement error dialogs
             //        $("#assignTasksError")
             //            .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+
+            //        $(parent).show();
+            //        $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").hide();
             //    }
             //});
         });
@@ -166,7 +176,7 @@
             },
             contentType: "application/json; charset=utf-8",
             data: { "sdocId": sdocId },
-            complete: function() {
+            complete: function () {
                 $("#searchSourceSpinner").hide();
                 $("#btnSearchSource").prop("disabled", false);
             },

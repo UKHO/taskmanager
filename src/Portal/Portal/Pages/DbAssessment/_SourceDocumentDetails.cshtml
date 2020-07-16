@@ -76,7 +76,11 @@
                                             <div class="row">
                                                 <div class="col-12 m-0 p-0">
                                                     <div class="attachLinkedDocumentButtonContainer float-right">
-                                                        <a class="attachLinkedDocument" data-linkedSdocId="@linkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                        <a class="attachLinkedDocument" 
+                                                                               data-linkedSdocId="@linkedDocument.LinkedSdocId" 
+                                                                               data-processId="@Model.ProcessId" 
+                                                                               data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId" 
+                                                                               style="cursor: pointer;">
                                                             <i class="fa fa-paperclip"></i>
                                                         </a>
                                                     </div>
@@ -122,8 +126,11 @@
                                         <div class="row">
                                             <div class="col-12 m-0 p-0">
                                                 <div class="detachLinkedDocumentButtonContainer float-right">
-                                                    <a class="detachLinkedDocument" data-linkedSdocId="@attachedLinkedDocument.LinkedSdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
-                                                        <i class="fa fa-times-circle"></i>
+                                                    <a class="detachLinkedDocument"
+                                                                               data-linkedSdocId="@attachedLinkedDocument.LinkedSdocId" 
+                                                                               data-processId="@Model.ProcessId" 
+                                                                               style="cursor: pointer;" >
+                                                                                <i class="fa fa-times-circle"></i>
                                                     </a>
                                                 </div>
                                                 <div class="detachLinkedDocumentSpinnerContainer">
@@ -168,7 +175,10 @@
                                         <div class="row">
                                             <div class="col-12 m-0 p-0">
                                                 <div class="detachDatabaseDocumentButtonContainer float-right">
-                                                    <a class="detachDatabaseDocument" data-linkedSdocId="@databaseDocument.SdocId" data-processId="@Model.ProcessId" data-correlationId="@Model.PrimaryDocumentStatus.CorrelationId">
+                                                    <a class="detachDatabaseDocument" 
+                                                                               data-linkedSdocId="@databaseDocument.SdocId" 
+                                                                               data-processId="@Model.ProcessId" 
+                                                                               style="cursor: pointer;">
                                                         <i class="fa fa-times-circle"></i>
                                                     </a>
                                                 </div>

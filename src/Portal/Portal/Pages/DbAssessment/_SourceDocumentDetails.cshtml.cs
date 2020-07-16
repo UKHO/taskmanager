@@ -10,6 +10,7 @@ using Common.Messages.Events;
 using DataServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.BusinessLogic;
@@ -55,17 +56,28 @@ namespace Portal.Pages.DbAssessment
             _logger = logger;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            GetPrimaryDocumentData();
-            GetPrimaryDocumentStatus();
-            GetLinkedDocuments();
+            LogContext.PushProperty("ProcessId", ProcessId);
+            LogContext.PushProperty("PortalResource", nameof(OnGetAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId};");
+
+            await GetAssessmentDataAsync();
+            await GetPrimaryDocumentStatusAsync();
+            await GetLinkedDocumentsAsync();
             GetAttachedLinkedDocuments();
-            GetDatabaseDocuments();
+            await GetDatabaseDocumentsAsync();
         }
 
         public async Task<JsonResult> OnGetDatabaseSourceDocumentDataAsync(int sdocId)
         {
+            LogContext.PushProperty("ProcessId", ProcessId);
+            LogContext.PushProperty("SourceDocumentId", sdocId);
+            LogContext.PushProperty("PortalResource", nameof(OnGetDatabaseSourceDocumentDataAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             DocumentAssessmentData sourceDocumentData = null;
             try
             {
@@ -83,13 +95,15 @@ namespace Portal.Pages.DbAssessment
             return new JsonResult(sourceDocumentData);
         }
 
-        private void GetPrimaryDocumentData()
+        private async Task GetAssessmentDataAsync()
         {
+            _logger.LogInformation("Getting Assessment data for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             try
             {
-                Assessment = _dbContext
+                Assessment = await _dbContext
                     .AssessmentData
-                    .First(c => c.ProcessId == ProcessId);
+                    .FirstAsync(c => c.ProcessId == ProcessId);
             }
             catch (InvalidOperationException e)
             {
@@ -100,13 +114,16 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private void GetLinkedDocuments()
+        private async Task GetLinkedDocumentsAsync()
         {
+            _logger.LogInformation("Getting Primary linked documents data for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             try
             {
-                LinkedDocuments = _dbContext
+                LinkedDocuments = await _dbContext
                     .LinkedDocument
-                    .Where(c => c.ProcessId == ProcessId).ToList();
+                    .Where(c => c.ProcessId == ProcessId)
+                    .ToListAsync();
             }
             catch (ArgumentNullException e)
             {
@@ -117,13 +134,16 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private void GetDatabaseDocuments()
+        private async Task GetDatabaseDocumentsAsync()
         {
+            _logger.LogInformation("Getting Database documents data for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             try
             {
-                DatabaseDocuments = _dbContext
+                DatabaseDocuments = await _dbContext
                     .DatabaseDocumentStatus
-                    .Where(c => c.ProcessId == ProcessId).ToList();
+                    .Where(c => c.ProcessId == ProcessId)
+                    .ToListAsync();
 
                 foreach (var databaseDocumentStatus in DatabaseDocuments)
                 {
@@ -142,11 +162,13 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private void GetPrimaryDocumentStatus()
+        private async Task GetPrimaryDocumentStatusAsync()
         {
+            _logger.LogInformation("Getting Primary document status data for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             try
             {
-                PrimaryDocumentStatus = _dbContext.PrimaryDocumentStatus.First(s => s.ProcessId == ProcessId);
+                PrimaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(s => s.ProcessId == ProcessId);
 
                 if (PrimaryDocumentStatus.ContentServiceId.HasValue)
                     PrimaryDocumentStatus.ContentServiceUri =
@@ -162,6 +184,8 @@ namespace Portal.Pages.DbAssessment
 
         private void GetAttachedLinkedDocuments()
         {
+            _logger.LogInformation("Getting 'Attached' linked document data for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
+
             if (LinkedDocuments != null && LinkedDocuments.Any())
             {
                 AttachedLinkedDocuments = LinkedDocuments.Where(l =>
@@ -179,8 +203,11 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId, int processId, Guid correlationId)
         {
             LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("LinkedSdocId", linkedSdocId);
             LogContext.PushProperty("PortalResource", nameof(OnPostAttachLinkedDocumentAsync));
 
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+            
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
             if (isWorkflowReadOnly)
@@ -192,6 +219,8 @@ namespace Portal.Pages.DbAssessment
             }
 
             // Update DB first, as it is the one used for populating Attached secondary sources
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
                                                                     _documentStatusFactory,
                                                                     processId,
@@ -209,9 +238,43 @@ namespace Portal.Pages.DbAssessment
                 SdocRetrievalId = Guid.NewGuid()
             };
 
-            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
+            LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
+            LogContext.PushProperty("Message", docRetrievalEvent.ToJSONSerializedString());
+            
+            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
-            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
+            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
+
+            return StatusCode(200);
+        }
+        
+        public async Task<IActionResult> OnPostDetachLinkedDocumentAsync(int linkedSdocId, int processId)
+        {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("LinkedSdocId", linkedSdocId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDetachLinkedDocumentAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+            
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+                throw appException;
+            }
+
+            // Update DB first, as it is the one used for populating Attached secondary sources
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+
+            await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                                                                    _documentStatusFactory,
+                                                                    processId,
+                                                                    linkedSdocId,
+                                                                    SourceDocumentRetrievalStatus.NotAttached,
+                                                                    SourceType.Linked);
 
             return StatusCode(200);
         }
@@ -228,7 +291,10 @@ namespace Portal.Pages.DbAssessment
         public async Task<IActionResult> OnPostAddSourceFromSdraAsync(int sdocId, int processId, Guid correlationId)
         {
             LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("SdocId", sdocId);
             LogContext.PushProperty("PortalResource", nameof(OnPostAddSourceFromSdraAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -240,7 +306,7 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
 
             if (_dbContext.DatabaseDocumentStatus.Any(dds => dds.SdocId == sdocId && dds.ProcessId == processId))
             {
@@ -279,9 +345,12 @@ namespace Portal.Pages.DbAssessment
                 SdocRetrievalId = Guid.NewGuid()
             };
 
-            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
+            LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
+            LogContext.PushProperty("Message", docRetrievalEvent.ToJSONSerializedString());
+
+            _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
-            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent};", docRetrievalEvent.ToJSONSerializedString());
+            _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
 
             return StatusCode(200);
         }
