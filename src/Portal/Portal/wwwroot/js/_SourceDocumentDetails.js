@@ -119,33 +119,31 @@
             $(parent).hide();
             $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").show();
 
-            //var linkedSdocId = Number($(this).data("linkedsdocid"));
-            //var processId = Number($(this).data("processid"));
-            //var correlationId = $(this).data("correlationid");
+            var sdocId = Number($(this).data("sdocid"));
+            var processId = Number($(this).data("processid"));
 
-            //$.ajax({
-            //    type: "POST",
-            //    url: "_SourceDocumentDetails/?handler=AttachLinkedDocument",
-            //    beforeSend: function (xhr) {
-            //        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            //    },
-            //    data: {
-            //        "linkedSdocId": linkedSdocId,
-            //        "processId": processId,
-            //        "correlationId": correlationId
-            //    },
-            //    success: function (result) {
-            //        getSourceDocuments();
-            //    },
-            //    error: function (error) {
-            //        //TODO: Implement error dialogs
-            //        $("#assignTasksError")
-            //            .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+            $.ajax({
+                type: "POST",
+                url: "_SourceDocumentDetails/?handler=DetachDatabaseDocument",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "sdocId": sdocId,
+                    "processId": processId
+                },
+                success: function (result) {
+                    getSourceDocuments();
+                },
+                error: function (error) {
+                    //TODO: Implement error dialogs
+                    $("#assignTasksError")
+                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
 
-            //        $(parent).show();
-            //        $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").hide();
-            //    }
-            //});
+                    $(parent).show();
+                    $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").hide();
+                }
+            });
         });
     }
 

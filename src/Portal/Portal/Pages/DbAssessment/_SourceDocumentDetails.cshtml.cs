@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Factories;
+﻿using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Common.Messages.Enums;
@@ -17,6 +13,10 @@ using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.HttpClients;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using LinkedDocument = WorkflowDatabase.EF.Models.LinkedDocument;
@@ -207,7 +207,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostAttachLinkedDocumentAsync));
 
             _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
-            
+
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
             if (isWorkflowReadOnly)
@@ -240,14 +240,14 @@ namespace Portal.Pages.DbAssessment
 
             LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
             LogContext.PushProperty("Message", docRetrievalEvent.ToJSONSerializedString());
-            
+
             _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
             _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
 
             return StatusCode(200);
         }
-        
+
         public async Task<IActionResult> OnPostDetachLinkedDocumentAsync(int linkedSdocId, int processId)
         {
             LogContext.PushProperty("ProcessId", processId);
@@ -255,7 +255,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("PortalResource", nameof(OnPostDetachLinkedDocumentAsync));
 
             _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
-            
+
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
             if (isWorkflowReadOnly)
@@ -266,7 +266,6 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-            // Update DB first, as it is the one used for populating Attached secondary sources
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
 
             await SourceDocumentHelper.UpdateSourceDocumentStatus(
@@ -314,6 +313,7 @@ namespace Portal.Pages.DbAssessment
                 return StatusCode(405);
             }
 
+            // Update DB first, as it is the one used for populating Attached sources
             var sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
 
             await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
@@ -333,8 +333,6 @@ namespace Portal.Pages.DbAssessment
 
             await _dbContext.SaveChangesAsync();
 
-            // Update DB first
-
             var docRetrievalEvent = new InitiateSourceDocumentRetrievalEvent
             {
                 CorrelationId = correlationId,
@@ -351,6 +349,43 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Publishing InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
             await _eventServiceApiClient.PostEvent(nameof(InitiateSourceDocumentRetrievalEvent), docRetrievalEvent);
             _logger.LogInformation("Published InitiateSourceDocumentRetrievalEvent: {InitiateSourceDocumentRetrievalEvent}; Message: {Message}");
+
+            return StatusCode(200);
+        }
+
+
+        public async Task<IActionResult> OnPostDetachDatabaseDocumentAsync(int sdocId, int processId)
+        {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("SdocId", sdocId);
+            LogContext.PushProperty("PortalResource", nameof(OnPostDetachDatabaseDocumentAsync));
+
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
+
+            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+
+            if (isWorkflowReadOnly)
+            {
+                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document");
+                _logger.LogError(appException,
+                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+                throw appException;
+            }
+            
+            _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
+
+            var databaseDocument =
+                await _dbContext.DatabaseDocumentStatus.FirstOrDefaultAsync(dds =>
+                    dds.ProcessId == processId && dds.SdocId == sdocId);
+
+            if (databaseDocument == null)
+            {
+                _logger.LogWarning("Failed to find source document attached from SDRA source; ProcessId: {ProcessId}; SdocId: {SdocId}");
+                throw new ApplicationException($"Failed to find source document attached from SDRA source; ProcessId: {processId}; SdocId: {sdocId}");
+            }
+
+            _dbContext.DatabaseDocumentStatus.Remove(databaseDocument);
+            await _dbContext.SaveChangesAsync();
 
             return StatusCode(200);
         }
