@@ -32,11 +32,6 @@
             <div class="col-6 pr-0">
                 <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
             </div>
-            <div class="col-6">
-                <button id="btnRefresh" type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Refresh the task lists, preserving selected sort options and search criteria." aria-label="Refresh the task lists, preserving selected sort options and search criteria."><span class="fas fa-sync-alt"></span></button>
-                <!-- <button class="btn btn-primary dropdown" type="button" id="btnSelectStage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Stage</button>
-                <button class="btn btn-primary dropdown" type="button" id="btnSelectTeam" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select Team</button> -->
-            </div>
         </div>
     </div>
 </div>
@@ -52,7 +47,7 @@
                     <th></th>
                     <th>Process ID</th>
                     <th style="min-width: 3.6rem;">Chart Type</th>
-                    <th style="max-width: 3.6rem;">Chart Number</th>
+                    <th style="max-width: 3.9rem;">Chart Number</th>
                     <th style="min-width: 3.9rem;">Status</th>
                     <th>User</th>
                     <th style="min-width: 7.0rem;">Forms</th>
@@ -238,11 +233,11 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                                 &&
-                                                 (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
-          || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
-          || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
-          || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
+                                              &&
+                                              (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
+       || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
+       || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
+       || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
