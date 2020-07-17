@@ -16,6 +16,7 @@ using Portal.BusinessLogic;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -31,6 +32,7 @@ namespace Portal.UnitTests
         private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
         private IAdDirectoryService _fakeAdDirectoryService;
         private IPortalUserDbService _fakePortalUserDbService;
+        private IPortalUserDbService _realPortalUserDbService;
         private ILogger<ReviewModel> _fakeLogger;
         private IEventServiceApiClient _fakeEventServiceApiClient;
         private ICommentsHelper _commentsHelper;
@@ -38,19 +40,26 @@ namespace Portal.UnitTests
         private IPageValidationHelper _pageValidationHelper;
         private IPageValidationHelper _fakepageValidationHelper;
 
+        public AdUser TestUser { get; set; }
+
+        public AdUser TestUser2 { get; set; }
 
         [SetUp]
         public void Setup()
         {
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
+                .UseInMemoryDatabase(databaseName: "inmemory").UseLazyLoadingProxies()
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+            _realPortalUserDbService = new PortalUserDbService(_dbContext);
+
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+            TestUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
 
             _fakeWorkflowBusinessLogicService = A.Fake<IWorkflowBusinessLogicService>();
             _fakeEventServiceApiClient = A.Fake<IEventServiceApiClient>();
-            _commentsHelper = new CommentsHelper(_dbContext);
+            _commentsHelper = new CommentsHelper(_dbContext, new PortalUserDbService(_dbContext));
             _fakeCommentsHelper = A.Fake<ICommentsHelper>();
 
             ProcessId = 123;
@@ -68,7 +77,7 @@ namespace Portal.UnitTests
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
                 ProcessId = ProcessId,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             });
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
@@ -81,7 +90,7 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 OnHoldTime = DateTime.Now.AddDays(-1),
-                OnHoldUser = "TestUser",
+                OnHoldBy = TestUser,
                 WorkflowInstanceId = 1
             });
 
@@ -103,7 +112,7 @@ namespace Portal.UnitTests
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper);
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakePortalUserDbService);
         }
 
         [TearDown]
@@ -119,7 +128,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "test invalid type",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -145,7 +154,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -171,7 +180,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = "THIS ASSESSOR DOES NOT EXIST"
+                Assessor = new AdUser { DisplayName = "Unknown", UserPrincipalName = "unknown" }
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -179,7 +188,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Assessor to unknown user THIS ASSESSOR DOES NOT EXIST"));
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Assessor to unknown user Unknown"));
         }
 
         [Test]
@@ -196,19 +205,23 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = "Test User",
-                Verifier = "THIS VERIFIER DOES NOT EXIST"
+                Assessor = TestUser,
+                Verifier = new AdUser
+                {
+                    DisplayName = "Unknown",
+                    UserPrincipalName = "unknown@email.com"
+                }
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Verifier to unknown user THIS VERIFIER DOES NOT EXIST"));
+            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Verifier to unknown user Unknown"));
         }
 
         [Test]
@@ -225,7 +238,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = ""
+                Assessor = AdUser.Empty
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -250,7 +263,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
@@ -259,7 +272,7 @@ namespace Portal.UnitTests
                     ProcessId = ProcessId,
                     TaskType = "This is invalid",
                     WorkspaceAffected = "Test Workspace",
-                    Assessor = "Test User"
+                    Assessor = TestUser
                 }
             };
 
@@ -284,7 +297,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
@@ -293,7 +306,7 @@ namespace Portal.UnitTests
                     ProcessId = ProcessId,
                     TaskType = "Simple",
                     WorkspaceAffected = "",
-                    Assessor = "Test User"
+                    Assessor = TestUser
                 }
             };
 
@@ -315,11 +328,12 @@ namespace Portal.UnitTests
             });
             await _dbContext.SaveChangesAsync();
 
+            _reviewModel.Reviewer = TestUser;
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser,
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
@@ -328,18 +342,24 @@ namespace Portal.UnitTests
                     ProcessId = ProcessId,
                     TaskType = "Simple",
                     WorkspaceAffected = "test workspace",
-                    Assessor = "THIS ASSESSOR DOES NOT EXIST"
+                    Assessor = new AdUser
+                    {
+                        DisplayName = "Unknown",
+                        UserPrincipalName = "unknown@email.com"
+                    }
                 }
             };
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
-                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Assessor to unknown user THIS ASSESSOR DOES NOT EXIST"));
+                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Assessor to unknown user Unknown"));
         }
 
         [Test]
@@ -356,7 +376,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
@@ -365,24 +385,31 @@ namespace Portal.UnitTests
                     ProcessId = ProcessId,
                     TaskType = "Simple",
                     WorkspaceAffected = "test workspace",
-                    Assessor = "Test User",
-                    Verifier = "THIS VERIFIER DOES NOT EXIST"
+                    Assessor = TestUser,
+                    Verifier = new AdUser
+                    {
+                        DisplayName = "Unknown",
+                        UserPrincipalName = "unknown@email.com"
+                    }
                 }
             };
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Test User"))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
-                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Verifier to unknown user THIS VERIFIER DOES NOT EXIST"));
+                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Verifier to unknown user Unknown"));
         }
 
         [Test]
         public async Task Test_entering_an_empty_additional_assessor_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+                .Returns(true);
+
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
                 AssignedTaskTypeId = 1,
@@ -394,7 +421,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>
             {
@@ -403,12 +430,9 @@ namespace Portal.UnitTests
                     ProcessId = ProcessId,
                     TaskType = "Simple",
                     WorkspaceAffected = "test workspace",
-                    Assessor = ""
+                    Assessor = AdUser.Empty
                 }
             };
-
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -431,32 +455,32 @@ namespace Portal.UnitTests
 
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService,
                 _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger,
-                _fakepageValidationHelper)
+                _fakepageValidationHelper, _fakePortalUserDbService)
             {
                 PrimaryAssignedTask = new DbAssessmentReviewData
                 {
                     TaskType = "Simple",
                     WorkspaceAffected = "Test Workspace",
-                    Assessor = "Test User",
+                    Assessor = TestUser,
                     Notes = primaryAssignTaskNote,
-                    Reviewer = "TestUser"
+                    Reviewer = TestUser
                 },
                 AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
 
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Reviewer = TestUser;
             _reviewModel.Team = "HW";
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
-            var isExist = await _dbContext.Comment.AnyAsync(c =>
+            var isExist = await _dbContext.Comments.AnyAsync(c =>
                 c.Text.Contains(primaryAssignTaskNote, StringComparison.OrdinalIgnoreCase));
             Assert.IsFalse(isExist);
         }
@@ -477,7 +501,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -485,11 +509,11 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("This User", "thisuser@foobar.com"));
 
-            var currentCommentsCount = await _dbContext.Comment.CountAsync();
+            var currentCommentsCount = await _dbContext.Comments.CountAsync();
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
-            var newCommentsCount = await _dbContext.Comment.CountAsync();
+            var newCommentsCount = await _dbContext.Comments.CountAsync();
 
             Assert.AreEqual(currentCommentsCount, newCommentsCount);
         }
@@ -508,10 +532,10 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
-            _reviewModel.Reviewer = "Invalid User";
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync("Invalid User")).Returns(false);
+            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown.UserPrincipalName)).Returns(false);
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
@@ -520,7 +544,7 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
+            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer.DisplayName}",
                 _reviewModel.ValidationErrorMessages);
         }
 
@@ -538,7 +562,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
@@ -564,9 +588,9 @@ namespace Portal.UnitTests
             {
                 TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
-            _reviewModel.Reviewer = "";
+            _reviewModel.Reviewer = AdUser.Empty;
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             _reviewModel.Team = "HW";
@@ -591,9 +615,9 @@ namespace Portal.UnitTests
             {
                 TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
-            _reviewModel.Reviewer = "";
+            _reviewModel.Reviewer = AdUser.Empty;
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -616,7 +640,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Test entry",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -641,7 +665,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -654,12 +678,12 @@ namespace Portal.UnitTests
             _reviewModel.SourceCategory = "SourceCategory";
             _reviewModel.Team = "HW";
 
-            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Reviewer = TestUser;
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer}",
+            Assert.Contains($"Operators: Unable to set Reviewer to unknown user {_reviewModel.Reviewer.DisplayName}",
                 _reviewModel.ValidationErrorMessages);
         }
 
@@ -678,7 +702,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -688,7 +712,7 @@ namespace Portal.UnitTests
             _reviewModel.SourceCategory = "SourceCategory";
             _reviewModel.Team = "HW";
 
-            _reviewModel.Reviewer = "";
+            _reviewModel.Reviewer = AdUser.Empty;
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -714,7 +738,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User"
+                Assessor = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -724,7 +748,7 @@ namespace Portal.UnitTests
             _reviewModel.SourceCategory = "SourceCategory";
             _reviewModel.Team = "";
 
-            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Reviewer = TestUser;
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -748,22 +772,22 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             var row = await _dbContext.DbAssessmentReviewData.FirstAsync();
-            row.Reviewer = "";
+            row.Reviewer = AdUser.Empty;
             await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser";
+            _reviewModel.Reviewer = TestUser;
             _reviewModel.Team = "HW";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -788,31 +812,31 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             };
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: TestUser is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+            Assert.Contains($"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakepageValidationHelper);
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
 
@@ -820,21 +844,21 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -846,14 +870,14 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OnHoldTime);
-            Assert.AreEqual(onHoldRow.OnHoldUser, "TestUser2");
+            Assert.AreEqual(onHoldRow.OnHoldBy.UserPrincipalName, TestUser2.UserPrincipalName);
         }
 
         [Test]
         public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakepageValidationHelper);
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
 
@@ -861,22 +885,22 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
@@ -885,14 +909,14 @@ namespace Portal.UnitTests
 
             Assert.NotNull(onHoldRow);
             Assert.NotNull(onHoldRow.OffHoldTime);
-            Assert.AreEqual(onHoldRow.OffHoldUser, "TestUser2");
+            Assert.AreEqual(onHoldRow.OffHoldBy.UserPrincipalName, TestUser2.UserPrincipalName);
         }
 
         [Test]
         public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakepageValidationHelper);
+                _fakeLogger, _fakepageValidationHelper, _fakePortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
 
@@ -900,22 +924,22 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -923,7 +947,7 @@ namespace Portal.UnitTests
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
 
-            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+            var comments = await _dbContext.Comments.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
@@ -934,7 +958,7 @@ namespace Portal.UnitTests
         public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
-                _fakeLogger, _fakepageValidationHelper);
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
 
@@ -942,27 +966,27 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "Test Workspace",
-                Assessor = "Test User",
+                Assessor = TestUser,
                 Notes = primaryAssignTaskNote,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
-            _reviewModel.Reviewer = "TestUser2";
+            _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
 
-            var comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+            var comments = await _dbContext.Comments.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             Assert.GreaterOrEqual(comments.Count, 1);
             Assert.IsTrue(comments.Any(c =>
@@ -1013,13 +1037,13 @@ namespace Portal.UnitTests
             await _dbContext.DbAssessmentReviewData.AddAsync(new DbAssessmentReviewData()
             {
                 ProcessId = processId,
-                Reviewer = "TestUser"
+                Reviewer = TestUser
             });
 
             await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "thisuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             await _reviewModel.OnPostTerminateAsync("Testing", processId);
 
@@ -1035,7 +1059,7 @@ namespace Portal.UnitTests
         public async Task Test_Terminating_On_Hold_Task_Results_In_Validation_Error_Message()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "thisuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 

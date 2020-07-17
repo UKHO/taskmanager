@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -18,7 +19,7 @@ namespace Portal.Pages.DbAssessment
     public class _CommentsModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly ICommentsHelper _commentsHelper;
+        private readonly ICommentsHelper _dbAssessmentCommentsHelper;
         private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<_CommentsModel> _logger;
@@ -39,13 +40,13 @@ namespace Portal.Pages.DbAssessment
         }
 
         public _CommentsModel(WorkflowDbContext dbContext,
-            ICommentsHelper commentsHelper,
+            ICommentsHelper dbAssessmentCommentsHelper,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
             IAdDirectoryService adDirectoryService,
             ILogger<_CommentsModel> logger)
         {
             _dbContext = dbContext;
-            _commentsHelper = commentsHelper;
+            _dbAssessmentCommentsHelper = dbAssessmentCommentsHelper;
             _workflowBusinessLogicService = workflowBusinessLogicService;
             _adDirectoryService = adDirectoryService;
             _logger = logger;
@@ -53,7 +54,7 @@ namespace Portal.Pages.DbAssessment
 
         public async Task OnGetAsync(int processId)
         {
-            Comments = await _dbContext.Comment.Where(c => c.ProcessId == processId).ToListAsync();
+            Comments = await _dbContext.Comments.Where(c => c.ProcessId == processId).ToListAsync();
             ProcessId = processId;
         }
 
@@ -74,12 +75,20 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
-            await _commentsHelper.AddComment(newCommentMessage,
-                ProcessId,
-                workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+            try
+            {
+                await _dbAssessmentCommentsHelper.AddComment(newCommentMessage,
+                    ProcessId,
+                    workflowInstance.WorkflowInstanceId,
+                    CurrentUser.UserPrincipalName);
+            }
+            catch (ApplicationException appException)
+            {
+                _logger.LogError(appException, "Problem adding comment for ProcessId {ProcessId}.");
+                // TODO  - shall we let user know the comment was not added?
+            }
 
-            Comments = await _dbContext.Comment.Where(c => c.ProcessId == ProcessId).ToListAsync();
+            Comments = await _dbContext.Comments.Where(c => c.ProcessId == ProcessId).ToListAsync();
 
             return Page();
         }

@@ -82,7 +82,7 @@ namespace WorkflowCoordinator.HttpClients
             }
 
             var workflows = JsonConvert.DeserializeObject<K2Workflows>(data);
-            var dbAssesmentWorkflow = workflows.Workflows.First(w => w.Name.Equals(_generalConfig.Value.K2DBAssessmentWorkflowName, StringComparison.OrdinalIgnoreCase));
+            var dbAssesmentWorkflow = workflows.Workflows.First(w => w.Name == _generalConfig.Value.K2DBAssessmentWorkflowName);
             return dbAssesmentWorkflow.Id;
 
         }

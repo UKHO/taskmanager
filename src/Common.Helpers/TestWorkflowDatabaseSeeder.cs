@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -9,22 +10,24 @@ namespace Common.Helpers
 {
     public class TestWorkflowDatabaseSeeder : ICanPopulateTables, ICanSaveChanges
     {
-        protected readonly WorkflowDbContext _context;
+        protected readonly DbContextOptions<WorkflowDbContext> _dbContextOptions;
 
-        protected TestWorkflowDatabaseSeeder(WorkflowDbContext context)
+        protected TestWorkflowDatabaseSeeder(string workflowDbConnectionString)
         {
-            _context = context;
+            _dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
+                .UseSqlServer(workflowDbConnectionString)
+                .Options;
         }
 
-        public static ICanPopulateTables UsingDbContext(WorkflowDbContext context)
+        public static ICanPopulateTables UsingDbConnectionString(string workflowDbConnectionString)
         {
-            return new TestWorkflowDatabaseSeeder(context);
+            return new TestWorkflowDatabaseSeeder(workflowDbConnectionString);
         }
 
         public ICanSaveChanges PopulateTables()
         {
-
-            DatabasesHelpers.ClearWorkflowDbTables(_context);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+            DatabasesHelpers.ClearWorkflowDbTables(workflowDbContext);
 
             AddAdditionalAdUsers();
 
@@ -43,8 +46,11 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\Users.json");
             var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
-            if (users?.Any() ?? false) _context.AdUser.AddRange(users);
+            if (users?.Any() ?? false) workflowDbContext.AdUsers.AddRange(users);
+
+            workflowDbContext.SaveChanges();
         }
 
         private void PopulateHpdUsage()
@@ -54,7 +60,9 @@ namespace Common.Helpers
             var jsonString = File.ReadAllText(@"Data\HpdUsages.json");
             var hpdUsages = JsonConvert.DeserializeObject<IEnumerable<HpdUsage>>(jsonString);
 
-            _context.HpdUsage.AddRange(hpdUsages);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+            workflowDbContext.HpdUsage.AddRange(hpdUsages);
+            workflowDbContext.SaveChanges();
         }
 
         private void PopulateHpdUser()
@@ -63,8 +71,15 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\HpdUsers.json");
             var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
-            _context.HpdUser.AddRange(hpdUsers);
+            foreach (var hpdUser in hpdUsers)
+            {
+                workflowDbContext.Entry(hpdUser.AdUser).State = EntityState.Unchanged;
+                workflowDbContext.HpdUser.Add(hpdUser);
+            }
+
+            workflowDbContext.SaveChanges();
         }
 
         private void PopulateProductActionType()
@@ -73,8 +88,9 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\ProductActionType.json");
             var productActionType = JsonConvert.DeserializeObject<IEnumerable<ProductActionType>>(jsonString);
-
-            _context.ProductActionType.AddRange(productActionType);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+            workflowDbContext.ProductActionType.AddRange(productActionType);
+            workflowDbContext.SaveChanges();
         }
 
         private void PopulateAssignedTaskSourceType()
@@ -83,9 +99,11 @@ namespace Common.Helpers
 
             var jsonString = File.ReadAllText(@"Data\AssignedTaskType.json");
             var assignedTaskSourceType = JsonConvert.DeserializeObject<IEnumerable<AssignedTaskType>>(jsonString);
-
-            _context.AssignedTaskType.AddRange(assignedTaskSourceType);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+            workflowDbContext.AssignedTaskType.AddRange(assignedTaskSourceType);
+            workflowDbContext.SaveChanges();
         }
+
 
         private void PopulateWorkflowInstance()
         {
@@ -94,12 +112,20 @@ namespace Common.Helpers
             var jsonString = File.ReadAllText(@"Data\TasksSeedData.json");
             var tasks = JsonConvert.DeserializeObject<IEnumerable<WorkflowInstance>>(jsonString);
 
-            _context.WorkflowInstance.AddRange(tasks);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+
+            foreach (var task in tasks)
+            {
+                workflowDbContext.WorkflowInstance.Add(task);
+                workflowDbContext.SaveChanges();
+            }
+
+            workflowDbContext.SaveChanges();
         }
 
         public void SaveChanges()
         {
-            _context.SaveChanges();
+            //_context.SaveChanges();
         }
     }
 

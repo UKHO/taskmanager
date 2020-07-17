@@ -7,8 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -20,9 +22,11 @@ namespace Portal.UnitTests
         private ISessionFileGenerator _sessionFileGenerator;
         private IOptions<SecretsConfig> _secretsConfig;
         private int ProcessId { get; set; }
-        private string UserFullName { get; set; }
         private ILogger<SessionFileGenerator> _logger;
         public string WorkspaceAffected { get; set; }
+        private IPortalUserDbService _fakePortalUserDbService;
+
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public async Task Setup()
@@ -32,18 +36,20 @@ namespace Portal.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
 
             ProcessId = 123;
             WorkspaceAffected = "TestWorkspace";
-            UserFullName = "TestUser";
 
             _secretsConfig = A.Fake<IOptions<SecretsConfig>>();
             _secretsConfig.Value.HpdServiceName = "ServiceName";
 
             _logger = A.Fake<ILogger<SessionFileGenerator>>();
 
+            _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
+
             _sessionFileGenerator = new SessionFileGenerator(_dbContext,
-                _secretsConfig, _logger);
+                _secretsConfig, _logger, _fakePortalUserDbService);
 
             var assessData = new DbAssessmentAssessData
             {
@@ -63,21 +69,23 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_PopulateSessionFile_UserFullName_That_Does_Not_Exist_Throws_InvalidOperationException()
         {
-            UserFullName = "DOES NOT EXIST";
             var hpdUser = new HpdUser()
             {
                 HpdUserId = 1,
-                AdUsername = "Test User 1",
+                AdUser = TestUser,
                 HpdUsername = "TestUser1-Caris"
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
 
             await _dbContext.SaveChangesAsync();
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             Assert.ThrowsAsync(typeof(InvalidOperationException),
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
-                    UserFullName,
+                    "unknownUserEmail",
                     "Assess",
                     new CarisProjectDetails(), null, null)
             );
@@ -86,12 +94,11 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Data()
         {
-            UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
             var hpdUser = new HpdUser()
             {
                 HpdUserId = 1,
-                AdUsername = UserFullName,
+                AdUser = TestUser,
                 HpdUsername = hpdUsername
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
@@ -103,9 +110,12 @@ namespace Portal.UnitTests
                 "Usage2"
             };
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.UserPrincipalName,
                 "Assess",
                 new CarisProjectDetails(), selectedUsages, null);
 
@@ -122,12 +132,11 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_PopulateSessionFile_Returns_Populated_Hpd_Usages()
         {
-            UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
             var hpdUser = new HpdUser()
             {
                 HpdUserId = 1,
-                AdUsername = UserFullName,
+                AdUser = TestUser,
                 HpdUsername = hpdUsername
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
@@ -145,12 +154,15 @@ namespace Portal.UnitTests
                 ProjectId = 123456,
                 ProjectName = "SomeName",
                 Created = DateTime.Today,
-                CreatedBy = UserFullName
+                CreatedBy = TestUser
             };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.UserPrincipalName,
                 "Assess",
                 carisproject, selectedUsages, null);
 
@@ -177,17 +189,15 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_PopulateSessionFile_Returns_Populated_WorkspaceAffected()
         {
-            UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
             var hpdUser = new HpdUser()
             {
                 HpdUserId = 1,
-                AdUsername = UserFullName,
+                AdUser = TestUser,
                 HpdUsername = hpdUsername
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
             await _dbContext.SaveChangesAsync();
-
 
             var selectedUsages = new List<string>()
             {
@@ -195,9 +205,12 @@ namespace Portal.UnitTests
                 "Usage2"
             };
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.UserPrincipalName,
                 "Assess",
                 new CarisProjectDetails(), selectedUsages, null);
 
@@ -209,12 +222,11 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_PopulateSessionFile_Returns_Populated_With_Selected_Sources()
         {
-            UserFullName = "Test User 1";
             var hpdUsername = "TestUser1-Caris";
             var hpdUser = new HpdUser()
             {
                 HpdUserId = 1,
-                AdUsername = UserFullName,
+                AdUser = TestUser,
                 HpdUsername = hpdUsername
             };
             await _dbContext.HpdUser.AddAsync(hpdUser);
@@ -225,7 +237,6 @@ namespace Portal.UnitTests
                 "Usage1",
                 "Usage2"
             };
-
 
             var selectedSources = new List<string>()
             {
@@ -239,12 +250,15 @@ namespace Portal.UnitTests
                 ProjectId = 123456,
                 ProjectName = "SomeName",
                 Created = DateTime.Today,
-                CreatedBy = UserFullName
+                CreatedBy = TestUser
             };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                UserFullName,
+                TestUser.UserPrincipalName,
                 "Assess",
                 carisproject, selectedUsages, selectedSources);
 
@@ -255,13 +269,13 @@ namespace Portal.UnitTests
                 sessionFile.DataSources.DataSource.Count);
 
             Assert.AreEqual(
-                        $":HPD:Project:|{carisproject.ProjectName}", 
+                        $":HPD:Project:|{carisproject.ProjectName}",
                         sessionFile.DataSources.DataSource[0].SourceString);
             Assert.AreEqual(
-                        selectedSources[0], 
+                        selectedSources[0],
                         sessionFile.DataSources.DataSource[1].SourceString);
             Assert.AreEqual(
-                        selectedSources[1], 
+                        selectedSources[1],
                         sessionFile.DataSources.DataSource[2].SourceString);
 
             Assert.AreEqual(
@@ -270,7 +284,7 @@ namespace Portal.UnitTests
             Assert.AreEqual(
                 Path.GetFileNameWithoutExtension(selectedSources[1]),
                 sessionFile.DataSources.DataSource[2].SourceParam.DisplayName.Value);
-            
+
             Assert.AreEqual(
                 selectedSources[0],
                 sessionFile.DataSources.DataSource[1].SourceParam.SurfaceString.Value);

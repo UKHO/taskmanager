@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Oracle.EntityFrameworkCore" Version="2.19.30" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.31" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="3.19.0-beta1" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.70" />
   </ItemGroup>
 
 </Project>

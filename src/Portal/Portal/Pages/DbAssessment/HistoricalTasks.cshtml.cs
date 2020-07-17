@@ -117,7 +117,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "HistoricalTasks");
             LogContext.PushProperty("PortalResource", nameof(OnPostAsync));
             LogContext.PushProperty("HistoricalTasksSearchParameters", SearchParameters.ToJSONSerializedString());
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalNamesnip", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering Get filtered Historical Tasks with parameters {HistoricalTasksSearchParameters}");
 
@@ -138,16 +138,16 @@ namespace Portal.Pages.DbAssessment
                             && (string.IsNullOrWhiteSpace(SearchParameters.SourceDocumentName) || wi.AssessmentData.SourceDocumentName.ToUpper().Contains(SearchParameters.SourceDocumentName.ToUpper()))
                             && (string.IsNullOrWhiteSpace(SearchParameters.Reviewer)
                                     || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                             wi.DbAssessmentReviewData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
-                                             : wi.DbAssessmentVerifyData.Reviewer.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
+                                             wi.DbAssessmentReviewData.Reviewer.DisplayName.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())
+                                             : wi.DbAssessmentVerifyData.Reviewer.DisplayName.ToUpper().Contains(SearchParameters.Reviewer.ToUpper())))
                             && (string.IsNullOrWhiteSpace(SearchParameters.Assessor)
                                 || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                    wi.DbAssessmentReviewData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
-                                    : wi.DbAssessmentVerifyData.Assessor.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
+                                    wi.DbAssessmentReviewData.Assessor.DisplayName.ToUpper().Contains(SearchParameters.Assessor.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Assessor.DisplayName.ToUpper().Contains(SearchParameters.Assessor.ToUpper())))
                             && (string.IsNullOrWhiteSpace(SearchParameters.Verifier)
                                 || (wi.ActivityName == WorkflowStage.Review.ToString() ?
-                                    wi.DbAssessmentReviewData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
-                                    : wi.DbAssessmentVerifyData.Verifier.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
+                                    wi.DbAssessmentReviewData.Verifier.DisplayName.ToUpper().Contains(SearchParameters.Verifier.ToUpper())
+                                    : wi.DbAssessmentVerifyData.Verifier.DisplayName.ToUpper().Contains(SearchParameters.Verifier.ToUpper())))
 
                             ))
                     .OrderByDescending(wi => wi.ActivityChangedAt)

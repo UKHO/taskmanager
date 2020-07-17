@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common.Helpers;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
 using Portal.Configuration;
+using Portal.UnitTests.Helpers;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
@@ -14,10 +17,16 @@ namespace Portal.UnitTests
         private IList<OnHold> _onHoldRows;
         private OnHoldCalculator _onHoldCalculator;
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private WorkflowDbContext _dbContext;
+
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public void SetUp()
         {
+            _dbContext = DatabasesHelpers.GetInMemoryWorkflowDbContext();
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.OnHoldDaysGreenIconUpper = 5;
             _generalConfig.Value.OnHoldDaysAmberIconUpper = 6;
@@ -35,9 +44,9 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-3),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = null,
-                    OffHoldUser = null,
+                    OffHoldBy = null,
                 }
             };
 
@@ -55,9 +64,9 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-3),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OffHoldUser = "TestUser"
+                    OffHoldBy = TestUser
                 }
             };
 
@@ -75,27 +84,27 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-3),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OffHoldUser = "TestUser",
+                    OffHoldBy = TestUser,
                 },
                 new OnHold
                 {
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OffHoldUser = "TestUser",
+                    OffHoldBy = TestUser,
                 },
                 new OnHold
                 {
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = null,
-                    OffHoldUser = null,
+                    OffHoldBy = null,
                 },
             };
 
@@ -113,27 +122,27 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-3),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OffHoldUser = "TestUser",
+                    OffHoldBy = TestUser,
                 },
                 new OnHold
                 {
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-2),
-                    OffHoldUser = "TestUser",
+                    OffHoldBy = TestUser,
                 },
                 new OnHold
                 {
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OffHoldUser = "TestUser",
+                    OffHoldBy = TestUser,
                 },
             };
 
@@ -151,9 +160,9 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = DateTime.Now.Date.AddDays(-1),
-                    OffHoldUser = "TestUser"
+                    OffHoldBy = TestUser
                 }
             };
 

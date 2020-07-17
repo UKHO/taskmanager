@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.Auth;
 using Portal.Configuration;
 using Portal.Models;
 using Serilog.Context;
@@ -19,45 +20,47 @@ namespace Portal.Helpers
         private readonly WorkflowDbContext _dbContext;
         private readonly IOptions<SecretsConfig> _secretsConfig;
         private readonly ILogger<SessionFileGenerator> _logger;
+        private readonly IPortalUserDbService _portalUserDbService;
 
         public SessionFileGenerator(WorkflowDbContext dbContext,
             IOptions<SecretsConfig> secretsConfig,
-            ILogger<SessionFileGenerator> logger)
+            ILogger<SessionFileGenerator> logger,
+            IPortalUserDbService portalUserDbService)
         {
             _dbContext = dbContext;
             _secretsConfig = secretsConfig;
             _logger = logger;
+            _portalUserDbService = portalUserDbService;
         }
 
         public async Task<SessionFile> PopulateSessionFile(
                                                             int processId,
-                                                            string userFullName,
+                                                            string userPrincipalName,
                                                             string taskStage,
                                                             CarisProjectDetails carisProjectDetails,
                                                             List<string> selectedHpdUsages,
                                                             List<string> selectedSources)
         {
             LogContext.PushProperty("PortalResource", nameof(PopulateSessionFile));
-            LogContext.PushProperty("UserFullName", userFullName);
+            LogContext.PushProperty("UserPrincipalName", userPrincipalName);
 
             // User details
             HpdUser hpdUser;
 
-            if (userFullName == "Unknown")
+            if (!await _portalUserDbService.ValidateUserAsync(userPrincipalName))
             {
-                _logger.LogError("ProcessId {ProcessId}: Unable to get username from Active Directory for {UserFullName}");
-                throw new ArgumentNullException(nameof(userFullName), "Unable to get username from Active Directory.");
+                _logger.LogError("ProcessId {ProcessId}: Unable to get username from Active Directory for {UserPrincipalName}");
+                throw new ArgumentNullException(nameof(userPrincipalName), "Unable to get username from Active Directory.");
             }
 
             try
             {
-                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(userFullName,
-                    StringComparison.CurrentCultureIgnoreCase));
+                hpdUser = await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName}.");
-                throw new InvalidOperationException($"Unable to find HPD username for {userFullName}.",
+                _logger.LogError("Unable to find HPD Username for {UserPrincipalName}.");
+                throw new InvalidOperationException($"Unable to find HPD username for {userPrincipalName}.",
                     ex.InnerException);
             }
 

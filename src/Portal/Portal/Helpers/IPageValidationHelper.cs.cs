@@ -23,10 +23,10 @@ namespace Portal.Helpers
                                             DbAssessmentReviewData primaryAssignedTask,
                                             List<DbAssessmentAssignTask> additionalAssignedTasks,
                                             string team,
-                                            string reviewer,
+                                            AdUser reviewer,
                                             List<string> validationErrorMessages,
-                                            string currentUsername,
-                                            string currentAssignedReviewerInDb);
+                                            string currentUserEmail,
+                                            AdUser currentAssignedReviewerInDb);
 
         /// <summary>
         /// Used in Assess page
@@ -48,23 +48,23 @@ namespace Portal.Helpers
         /// <param name="currentUsername"></param>
         /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
-        Task<bool> CheckAssessPageForErrors(string action,
-            string ion,
-            string activityCode,
-            string sourceCategory,
-            string taskType,
-            bool productActioned,
-            string ProductActionChangeDetails,
-            List<ProductAction> recordProductAction,
-            List<DataImpact> dataImpacts,
-            DataImpact stsDataImpact,
-            string team,
-            string assessor,
-            string verifier,
-            List<string> validationErrorMessages,
-            string currentUsername,
-            string currentAssignedAssessorInDb);
-
+        Task<bool> CheckAssessPageForErrors(
+                                            string action,
+                                            string ion,
+                                            string activityCode,
+                                            string sourceCategory,
+                                            string taskType,
+                                            bool productActioned,
+                                            string ProductActionChangeDetails,
+                                            List<ProductAction> recordProductAction,
+                                            List<DataImpact> dataImpacts,
+                                            DataImpact stsDataImpact,
+                                            string team,
+                                            AdUser assessor,
+                                            AdUser verifier,
+                                            List<string> validationErrorMessages,
+                                            string currentUserEmail,
+                                            AdUser currentAssignedAssessorInDb);
         /// <summary>
         /// Check for warnings
         /// </summary>
@@ -102,7 +102,7 @@ namespace Portal.Helpers
             string ion,
             string activityCode,
             string sourceCategory,
-            string formDataAssignedVerifier,
+            AdUser formDataAssignedVerifier,
             bool productActioned,
             string ProductActionChangeDetails,
             List<ProductAction> recordProductAction,
@@ -111,7 +111,7 @@ namespace Portal.Helpers
             string team,
             List<string> validationErrorMessages,
             string currentUsername,
-            string currentAssignedVerifierInDb = "",
+            AdUser currentAssignedVerifierInDb = null,
             bool isOnHold = false);
 
         /// <summary>

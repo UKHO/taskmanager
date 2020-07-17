@@ -11,6 +11,7 @@ using NUnit.Framework;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
+using WorkflowCoordinator.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -25,6 +26,9 @@ namespace WorkflowCoordinator.UnitTests
         private TestableMessageHandlerContext _handlerContext;
         private WorkflowDbContext _dbContext;
 
+        public AdUser TestUser { get; set; }
+
+
         [SetUp]
         public void Setup()
         {
@@ -33,6 +37,8 @@ namespace WorkflowCoordinator.UnitTests
                 .Options;
 
             _dbContext = new WorkflowDbContext(dbContextOptions);
+
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
 
             _handlerContext = new TestableMessageHandlerContext();
 
@@ -72,7 +78,7 @@ namespace WorkflowCoordinator.UnitTests
                 .Returns(string.Empty);
 
             //When
-            var ex =Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(startWorkflowInstanceEvent, _handlerContext));
+            var ex = Assert.ThrowsAsync<ApplicationException>(() => _handler.Handle(startWorkflowInstanceEvent, _handlerContext));
 
             //Then
             Assert.IsTrue(ex.Message.Contains($"Failed to get K2 Task serial number for ProcessId {childProcessId}"));
@@ -147,7 +153,7 @@ namespace WorkflowCoordinator.UnitTests
                 WorkflowInstanceId = parentWorkflowinstanceData.WorkflowInstanceId,
                 ActivityCode = "Some code",
                 Ion = "Parent Review ION",
-                Reviewer = "reviewer1"
+                Reviewer = TestUser
             };
 
             await _dbContext.DbAssessmentReviewData.AddAsync(parentReviewData);
@@ -156,10 +162,10 @@ namespace WorkflowCoordinator.UnitTests
             {
                 DbAssessmentAssignTaskId = assignedTaskId,
                 ProcessId = parentProcessId,
-                Assessor = "assessor1",
+                Assessor = TestUser,
                 TaskType = "Type 1",
                 Notes = "A note",
-                Verifier = "verifier1",
+                Verifier = TestUser,
                 WorkspaceAffected = "Workspace 1"
 
             };
@@ -275,7 +281,7 @@ namespace WorkflowCoordinator.UnitTests
 
             // Assert Parent Assigned Task Notes persisted into child comments
             var childComments =
-                await _dbContext.Comment.Where(ad => ad.ProcessId == childProcessId).Select(c => c.Text).ToListAsync();
+                await _dbContext.Comments.Where(ad => ad.ProcessId == childProcessId).Select(c => c.Text).ToListAsync();
 
             var newChildComment =
                 $"Assign Task (Parent processId: {parentProcessId}): {parentAssignedTaskData.Notes.Trim()}";
@@ -300,11 +306,11 @@ namespace WorkflowCoordinator.UnitTests
             {
                 ProcessId = parentProcessId,
                 PrimarySdocId = primarySdocId,
-                SerialNumber =  "445_14",
-                ParentProcessId =  null,
-                ActivityName =  WorkflowStage.Review.ToString(),
-                StartedAt =  DateTime.Now,
-                Status =  WorkflowStatus.Started.ToString(),
+                SerialNumber = "445_14",
+                ParentProcessId = null,
+                ActivityName = WorkflowStage.Review.ToString(),
+                StartedAt = DateTime.Now,
+                Status = WorkflowStatus.Started.ToString(),
                 ActivityChangedAt = newActivityChangedAt
             };
 
@@ -317,7 +323,7 @@ namespace WorkflowCoordinator.UnitTests
                 WorkflowInstanceId = parentWorkflowinstanceData.WorkflowInstanceId,
                 ActivityCode = "Some code",
                 Ion = "Parent Review ION",
-                Reviewer = "reviewer1"
+                Reviewer = TestUser
             };
 
             await _dbContext.DbAssessmentReviewData.AddAsync(parentReviewData);
@@ -326,10 +332,10 @@ namespace WorkflowCoordinator.UnitTests
             {
                 DbAssessmentAssignTaskId = assignedTaskId,
                 ProcessId = parentProcessId,
-                Assessor = "assessor1",
+                Assessor = TestUser,
                 TaskType = "Type 1",
                 Notes = "A note",
-                Verifier = "verifier1",
+                Verifier = TestUser,
                 WorkspaceAffected = "Workspace 1"
 
             };

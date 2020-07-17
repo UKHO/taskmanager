@@ -64,7 +64,7 @@
   <ItemGroup>
     <Build Include="Tables\WorkflowInstance.sql" />
     <Build Include="Tables\AssessmentData.sql" />
-    <Build Include="Tables\Comment.sql" />
+    <Build Include="Tables\Comments.sql" />
     <Build Include="Tables\DbAssessmentReviewData.sql" />
     <Build Include="Tables\PrimaryDocumentStatus.sql" />
     <Build Include="Tables\LinkedDocument.sql" />
@@ -83,7 +83,7 @@
     <Build Include="Tables\DbAssessmentAssignTask.sql" />
     <Build Include="Tables\DbAssessmentVerifyData.sql" />
     <Build Include="Tables\CarisProjectDetails.sql" />
-    <Build Include="Tables\AdUser.sql" />
+    <Build Include="Tables\AdUsers.sql" />
     <Build Include="Views\DatabaseAssessmentWorkflowData.sql" />
   </ItemGroup>
   <ItemGroup>

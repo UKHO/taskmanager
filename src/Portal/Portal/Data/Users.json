@@ -1,9 +1,27 @@
-// e.g. of additional AD users, from NCNE
-
-//[
-//  {
-//    "DisplayName": "SVC_TMNCNEPrtlUITest",
-//    "UserPrincipalName": "SVC_TMNCNEPrtlUITest@ukho.gov.uk",
-//    "LastCheckedDate": "2020-01-10T00:00:00"
-//  }
-//]
+[
+  {
+    "DisplayName": "Dummy User1",
+    "UserPrincipalName": "dummy1@ukho.gov.uk",
+    "LastCheckedDate": "2020-01-10T00:00:00"
+  },
+  {
+    "DisplayName": "Dummy User2",
+    "UserPrincipalName": "dummy2@ukho.gov.uk",
+    "LastCheckedDate": "2020-01-10T00:00:00"
+  },
+  {
+    "DisplayName": "Dummy User3",
+    "UserPrincipalName": "dummy3@ukho.gov.uk",
+    "LastCheckedDate": "2020-01-10T00:00:00"
+  },
+  {
+    "DisplayName": "Dummy User4",
+    "UserPrincipalName": "dummy4@ukho.gov.uk",
+    "LastCheckedDate": "2020-01-10T00:00:00"
+  },
+  {
+    "DisplayName": "Dummy User5",
+    "UserPrincipalName": "dummy5@ukho.gov.uk",
+    "LastCheckedDate": "2020-01-10T00:00:00"
+  }
+]

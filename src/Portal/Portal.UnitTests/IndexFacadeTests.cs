@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common.Helpers;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Portal.Calculators;
 using Portal.Configuration;
 using Portal.Helpers;
+using Portal.UnitTests.Helpers;
+using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
 namespace Portal.UnitTests
@@ -16,10 +19,16 @@ namespace Portal.UnitTests
         private IOnHoldCalculator _onHoldCalculator;
         private IIndexFacade _indexFacade;
         private IOptionsSnapshot<GeneralConfig> _generalConfig;
+        private WorkflowDbContext _dbContext;
+
+        public AdUser TestUser { get; set; }
 
         [SetUp]
         public void SetUp()
         {
+            _dbContext = DatabasesHelpers.GetInMemoryWorkflowDbContext();
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+
             _generalConfig = A.Fake<IOptionsSnapshot<GeneralConfig>>();
             _generalConfig.Value.DmEndDateDaysSimple = 14;
 
@@ -44,9 +53,9 @@ namespace Portal.UnitTests
                     ProcessId = 123,
                     WorkflowInstanceId = 1,
                     OnHoldTime = DateTime.Now.Date.AddDays(-onHoldDays),
-                    OnHoldUser = "TestUser",
+                    OnHoldBy = TestUser,
                     OffHoldTime = null,
-                    OffHoldUser = null,
+                    OffHoldBy = null,
                 }
             };
 
@@ -67,7 +76,7 @@ namespace Portal.UnitTests
             var effectiveDate = DateTime.Today;
 
 
-            var result = _indexFacade.CalculateDmEndDate(effectiveDate,taskType, taskStage, onHoldRows);
+            var result = _indexFacade.CalculateDmEndDate(effectiveDate, taskType, taskStage, onHoldRows);
             Assert.AreEqual(effectiveDate.AddDays(_generalConfig.Value.DmEndDateDaysSimple), result.dmEndDate);
             Assert.AreEqual(_generalConfig.Value.DmEndDateDaysSimple, result.daysToDmEndDate);
 

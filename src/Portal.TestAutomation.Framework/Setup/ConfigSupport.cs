@@ -55,24 +55,26 @@ namespace Portal.TestAutomation.Framework.Setup
         [BeforeTestRun]
         public static void SetupDatabase()
         {
-            InitialiseWorkflowDbContext();
 
-            TestWorkflowDatabaseSeeder.UsingDbContext(_workflowDbContext).PopulateTables().SaveChanges();
-
-            TestData.UsingDbContext(_workflowDbContext)
-                .AddUser(_secrets.LoginAccount)
-                .ReassignReviewsToUser(_secrets.LoginAccount)
-                .SaveChanges();
-        }
-
-        private static void InitialiseWorkflowDbContext()
-        {
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(ConfigHelpers.IsLocalDevelopment,
                 ConfigHelpers.IsAzureDevOpsBuild || ConfigHelpers.IsAzure || ConfigHelpers.IsAzureDev
                     ? _dbConfig.WorkflowDbServer
                     : _dbConfig.LocalDbServer, _dbConfig.WorkflowDbName,
                 _dbConfig.WorkflowDbUITestAcct, _dbConfig.WorkflowDbPassword);
 
+            InitialiseWorkflowDbContext(workflowDbConnectionString);
+
+            TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
+
+            TestData.UsingDbConnectionString(workflowDbConnectionString)
+                .AddUser(_secrets.LoginAccount)
+                .ReassignReviewsToUser(_secrets.LoginAccount)
+                .SaveChanges();
+        }
+
+        private static void InitialiseWorkflowDbContext(string workflowDbConnectionString)
+        {
+           
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)
                 .Options;

@@ -1,9 +1,9 @@
-﻿using DbUpdateWorkflowDatabase.EF;
+﻿using System;
+using System.Data.SqlClient;
+using DbUpdateWorkflowDatabase.EF;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
-using System;
-using System.Data.SqlClient;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -36,29 +36,36 @@ namespace Common.Helpers
 
         public static void ClearWorkflowDbTables(WorkflowDbContext workflowDbContext)
         {
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [LinkedDocument]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [Comment]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [AssessmentData]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentReviewData]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentAssessData]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentVerifyData]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [PrimaryDocumentStatus]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [OnHold]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [TaskNote]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DatabaseDocumentStatus]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductAction]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [ProductActionType]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [AssignedTaskType]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DataImpact]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [AdUser]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUsage]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [DbAssessmentAssignTask]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [CarisProjectDetails]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [WorkflowInstance]");
-            workflowDbContext.Database.ExecuteSqlCommand("delete from [HpdUser]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [LinkedDocument]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [Comments]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [AssessmentData]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DbAssessmentReviewData]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DbAssessmentAssessData]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DbAssessmentVerifyData]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [PrimaryDocumentStatus]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [OnHold]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [TaskNote]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DatabaseDocumentStatus]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [ProductAction]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [ProductActionType]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [AssignedTaskType]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DataImpact]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [HpdUser]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [HpdUsage]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [DbAssessmentAssignTask]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [CarisProjectDetails]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [WorkflowInstance]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [AdUsers]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [CachedHpdWorkspace]");
+
+            ReSeedWorkflowDbTables(workflowDbContext);
+            workflowDbContext.SaveChanges();
         }
 
-
+        private static void ReSeedWorkflowDbTables(WorkflowDbContext dbContext)
+        {
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUsers', RESEED, 0)");
+        }
 
         public static void ReCreateLocalDb(string localDbServer, string dbName, string connectionString, bool isLocalDebugging)
         {
@@ -120,7 +127,8 @@ namespace Common.Helpers
 
         private static void ReSeedNcneWorkflowDbTables(NcneWorkflowDbContext dbContext)
         {
-            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUser', RESEED, 0)");
         }
 
         public static void ClearDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext,
@@ -153,8 +161,16 @@ namespace Common.Helpers
 
         private static void ReseedDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext)
         {
-            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
-            dbContext.Database.ExecuteSqlCommand("DBCC CHECKIDENT('AdUser', RESEED, 0)");
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUser', RESEED, 0)");
+        }
+
+        public static WorkflowDbContext GetInMemoryWorkflowDbContext()
+        {
+            var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
+                .UseInMemoryDatabase(databaseName: "inmemory")
+                .Options;
+            return new WorkflowDbContext(dbContextOptions);
         }
     }
 }

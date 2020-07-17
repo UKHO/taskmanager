@@ -111,7 +111,7 @@
         $("#modalReviewPopup").modal("show");
 
         var formData = $("#frmReviewPage").serialize();
-
+        console.log(formData);
         $.ajax({
             type: "POST",
             url: "Review/?handler=Save",
@@ -306,7 +306,7 @@
 
         $("#modalReviewProgressWarning").show();
     }
-    
+
     function populateAndShowWaitPopupForContinueDone() {
         $("#modalReviewProgressWarning").hide();
 
@@ -316,7 +316,10 @@
         $("#modalReviewWaitMessage").html("");
 
         var ulTag = "<ul class=\"mb-0 pb-0\" />";
+    }
 
+
+    function displayOperatorsInitialiseErrors(errorStringArray) {
 
         $("#modalReviewWaitMessage").append(ulTag);
         var unOrderedList = $("#modalReviewWaitMessage ul");

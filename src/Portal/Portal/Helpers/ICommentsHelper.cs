@@ -4,6 +4,6 @@ namespace Portal.Helpers
 {
     public interface ICommentsHelper
     {
-        Task AddComment(string comment, int processId, int workflowInstanceId, string userFullName);
+        Task AddComment(string comment, int processId, int workflowInstanceId, string userPrincipalName);
     }
 }

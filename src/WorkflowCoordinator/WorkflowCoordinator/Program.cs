@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +24,7 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
+            var isLocalDebugging = false;
 
             var builder = new HostBuilder()
                 .UseEnvironment(ConfigHelpers.HostBuilderEnvironment)
@@ -42,8 +41,6 @@ namespace WorkflowCoordinator
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
-
                     var startupLoggingConfig = new StartupLoggingConfig();
                     hostingContext.Configuration.GetSection("logging").Bind(startupLoggingConfig);
 
@@ -75,21 +72,13 @@ namespace WorkflowCoordinator
                         isLocalDebugging ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer,
                         startupConfig.WorkflowDbName);
 
-                    var connection = new SqlConnection(workflowDbConnectionString)
-                    {
-                        AccessToken = isLocalDebugging
-                            ? null
-                            : new AzureServiceTokenProvider()
-                                .GetAccessTokenAsync(startupConfig.AzureDbTokenUrl.ToString()).Result
-                    };
                     services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
-                        options.UseSqlServer(connection));
+                        options.UseLazyLoadingProxies().UseSqlServer(workflowDbConnectionString));
 
                     if (isLocalDebugging)
                     {
                         using var sp = services.BuildServiceProvider();
-                        using var context = sp.GetRequiredService<WorkflowDbContext>();
-                        TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                        TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
                     }
 
                     services.AddHttpClient<IDataServiceApiClient, DataServiceApiClient>()
@@ -125,8 +114,6 @@ namespace WorkflowCoordinator
                 })
                 .UseNServiceBus(hostBuilderContext =>
                 {
-                    var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
-
                     var nsbConfig = new NsbConfig();
                     hostBuilderContext.Configuration.GetSection("nsb").Bind(nsbConfig);
                     hostBuilderContext.Configuration.GetSection("urls").Bind(nsbConfig);

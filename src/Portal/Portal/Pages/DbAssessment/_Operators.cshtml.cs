@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -13,17 +13,17 @@ namespace Portal.Pages.DbAssessment
     {
 
         [DisplayName("Reviewer:")]
-        public string Reviewer { get; set; }
+        public virtual AdUser Reviewer { get; set; }
 
         [DisplayName("Assessor:")]
-        public string Assessor { get; set; }
+        public virtual AdUser Assessor { get; set; }
 
         [DisplayName("Verifier:")]
-        public string Verifier { get; set; }
+        public virtual AdUser Verifier { get; set; }
 
-        public SelectList Verifiers { get; set; }
+        public List<AdUser> Verifiers { get; set; }
 
-        public SelectList Reviewers { get; set; }
+        public List<AdUser> Reviewers { get; set; }
 
         public WorkflowStage ParentPage { get; set; }
 
@@ -34,15 +34,19 @@ namespace Portal.Pages.DbAssessment
 
         internal static async Task<_OperatorsModel> GetOperatorsDataAsync(IOperatorData currentData, WorkflowDbContext workflowDbContext)
         {
-            var users = await workflowDbContext.AdUser.OrderBy(a => a.DisplayName).ToListAsync().ConfigureAwait(false);
+            var users = await workflowDbContext.AdUsers.Select(u => new AdUser
+            {
+                DisplayName = u.DisplayName,
+                UserPrincipalName = u.UserPrincipalName
+            }).ToListAsync();
 
             return new _OperatorsModel
             {
-                Reviewer = currentData.Reviewer ?? "",
-                Assessor = currentData.Assessor ?? "Unknown",
-                Verifier = currentData.Verifier ?? "",
-                Verifiers = new SelectList(users.Select(u => u.DisplayName)),
-                Reviewers = new SelectList(users)
+                Reviewer = currentData.Reviewer ?? AdUser.Empty,
+                Assessor = currentData.Assessor ?? AdUser.Empty,
+                Verifier = currentData.Verifier ?? AdUser.Empty,
+                Verifiers = users,
+                Reviewers = users
             };
         }
     }

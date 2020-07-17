@@ -76,7 +76,7 @@ namespace Portal.HostedServices
             using var scope = _serviceScopeFactory.CreateScope();
             var workflowDbContext = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
 
-            var currentAdUsers = await workflowDbContext.AdUser.ToListAsync();
+            var currentAdUsers = await workflowDbContext.AdUsers.ToListAsync();
 
             var newAdUsers = adGroupMembers.Where(m =>
                 currentAdUsers.All(c => c.UserPrincipalName != m.UserPrincipalName)).Select(n => new AdUser
@@ -89,7 +89,7 @@ namespace Portal.HostedServices
 
             if (newAdUsers.Count > 0) _logger.LogInformation($"{nameof(AdUserUpdateService)}: {newAdUsers.Count} new users added to database from AD.");
 
-            workflowDbContext.AdUser.AddRange(newAdUsers);
+            workflowDbContext.AdUsers.AddRange(newAdUsers);
 
             await workflowDbContext.SaveChangesAsync();
         }

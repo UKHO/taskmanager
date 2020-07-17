@@ -43,7 +43,6 @@ namespace WorkflowCoordinator.Handlers
                 .Include(wi => wi.DbAssessmentVerifyData)
                 .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(w => w.Comments)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(wi => wi.ProcessId == message.ProcessId);
 
             if (workflowInstance == null)
@@ -79,10 +78,7 @@ namespace WorkflowCoordinator.Handlers
             try
             {
                 var sdocId = workflowInstance.PrimaryDocumentStatus.SdocId;
-                var action = workflowInstance.DbAssessmentVerifyData.TaskType.Equals("Simple",
-                                                                                   StringComparison.InvariantCultureIgnoreCase)
-                                                                                   ? "Imm Act - NM"
-                                                                                   : "Longer-term Action";
+                var action = workflowInstance.DbAssessmentVerifyData.TaskType=="Simple" ? "Imm Act - NM" : "Longer-term Action";
                 var change = string.IsNullOrWhiteSpace(workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails) ? "n/a" : workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails;
 
                 await _dataServiceApiClient.MarkAssessmentAsAssessed(workflowInstance.ProcessId.ToString(), sdocId, action, change);
