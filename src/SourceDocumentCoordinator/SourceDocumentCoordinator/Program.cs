@@ -81,6 +81,7 @@ namespace SourceDocumentCoordinator
                 services.AddHttpClient<ISourceDocumentServiceApiClient, SourceDocumentServiceApiClient>()
                     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                     {
+                        ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
                         Credentials = new NetworkCredential
                         {
                             UserName = startupSecretsConfig.SourceDocumentServiceUsername,
