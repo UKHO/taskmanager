@@ -1,6 +1,6 @@
 ﻿using System;
-using DbUpdateWorkflowDatabase.EF;
 using System.Data.SqlClient;
+using DbUpdateWorkflowDatabase.EF;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
@@ -58,11 +58,11 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlRaw("delete from [AdUsers]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [CachedHpdWorkspace]");
 
-            ReSeedNorkflowDbTables(workflowDbContext);
+            ReSeedWorkflowDbTables(workflowDbContext);
             workflowDbContext.SaveChanges();
         }
 
-        private static void ReSeedNorkflowDbTables(WorkflowDbContext dbContext)
+        private static void ReSeedWorkflowDbTables(WorkflowDbContext dbContext)
         {
             dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUsers', RESEED, 0)");
         }
