@@ -38,7 +38,7 @@ namespace SourceDocumentService.Controllers
         /// <param name="sdocId"></param>
         /// <param name="filename"></param>
         /// <returns></returns>
-        [Route("/SourceDocumentService/v1/PostSourceDocument/{processId}/{sdocId}/{filename}")]
+        [Route("/v1/PostSourceDocument/{processId}/{sdocId}/{filename}")]
         [HttpPost]
         public async Task<IActionResult> PostSourceDocumentToContentService([FromRoute][Required] int processId, [FromRoute][Required] int sdocId, [Required][FromRoute] string filename)
         {
