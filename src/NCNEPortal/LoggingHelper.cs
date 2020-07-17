@@ -30,7 +30,7 @@ namespace NCNEPortal
                 AdditionalColumns = new Collection<SqlColumn>
                 {
                     new SqlColumn
-                        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "UserPrincipalName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ProcessId", DataType = SqlDbType.Int},
                     new SqlColumn

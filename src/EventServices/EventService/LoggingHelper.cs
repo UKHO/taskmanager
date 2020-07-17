@@ -28,7 +28,7 @@ namespace EventService
                 AdditionalColumns = new Collection<SqlColumn>
                 {
                     new SqlColumn
-                        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "UserPrincipalName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "EventName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
