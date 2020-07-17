@@ -34,6 +34,7 @@ namespace NCNEWorkflowDatabase.EF.Models
 
         public string Status { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? StatusChangeDate { get; set; }
 
         public int FormDateStatus { get; set; }
