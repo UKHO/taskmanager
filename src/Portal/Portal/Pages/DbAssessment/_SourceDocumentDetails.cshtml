@@ -125,7 +125,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (databaseDocument.Status==SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                                        if (databaseDocument.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                         {
                                             <a href="@databaseDocument.ContentServiceUri" target="_blank">@databaseDocument.ParsedRsdraNumber</a>
                                         }
