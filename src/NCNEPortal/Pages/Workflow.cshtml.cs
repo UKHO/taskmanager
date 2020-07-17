@@ -1,4 +1,11 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,13 +23,6 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -405,8 +405,7 @@ namespace NCNEPortal
 
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername == username);
             }
             catch (InvalidOperationException ex)
             {

@@ -39,22 +39,22 @@ namespace Portal.Helpers
         public async Task<bool> CheckReviewPageForErrors(string action, DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             string team,
-            string reviewer,
-            List<string> validationErrorMessages, string currentUsername,
-            string currentAssignedReviewerInDb)
+            AdUser reviewer,
+            List<string> validationErrorMessages, string currentUserEmail,
+            AdUser currentAssignedReviewerInDb)
         {
             var isValid = true;
 
-            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            if (action == "Done")
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedReviewerInDb))
+                if (currentAssignedReviewerInDb.HasNoUserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedReviewerInDb, StringComparison.InvariantCultureIgnoreCase))
+                else if (!currentUserEmail.Equals(currentAssignedReviewerInDb.UserPrincipalName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -119,24 +119,24 @@ namespace Portal.Helpers
             List<DataImpact> dataImpacts,
             DataImpact stsDataImpact,
             string team,
-            string assessor,
-            string verifier,
+            AdUser assessor,
+            AdUser verifier,
             List<string> validationErrorMessages,
-            string currentUsername,
-            string currentAssignedAssessorInDb)
+            string currentUserEmail,
+            AdUser currentAssignedAssessorInDb)
         {
             var isValid = true;
 
-            if (action.Equals("Done", StringComparison.InvariantCultureIgnoreCase))
+            if (action == "Done")
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedAssessorInDb))
+                if (currentAssignedAssessorInDb is null)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Assessor of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedAssessorInDb, StringComparison.InvariantCultureIgnoreCase))
+                else if (currentUserEmail != currentAssignedAssessorInDb.UserPrincipalName)
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedAssessorInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
             }
@@ -226,7 +226,7 @@ namespace Portal.Helpers
             string ion,
             string activityCode,
             string sourceCategory,
-            string formDataAssignedVerifier,
+            AdUser formDataAssignedVerifier,
             bool productActioned,
             string productActionChangeDetails,
             List<ProductAction> recordProductAction,
@@ -234,25 +234,25 @@ namespace Portal.Helpers
             DataImpact stsDataImpact,
             string team,
             List<string> validationErrorMessages,
-            string currentUsername,
-            string currentAssignedVerifierInDb = "",
+            string currentUserEmail,
+            AdUser currentAssignedVerifierInDb = null,
             bool isOnHold = false)
         {
             var isValid = true;
 
             if (action == "Done")
             {
-                if (string.IsNullOrWhiteSpace(currentAssignedVerifierInDb))
+                if (currentAssignedVerifierInDb is null)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (!currentUsername.Equals(currentAssignedVerifierInDb, StringComparison.InvariantCultureIgnoreCase))
+                else if (currentUserEmail!=currentAssignedVerifierInDb.UserPrincipalName)
                 {
-                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb} is assigned to this task. Please assign the task to yourself and click Save");
+                    validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                
+
                 if (isOnHold)
                 {
                     validationErrorMessages.Add("Task Information: Unable to Sign-off task.Take task off hold before signing-off and click Save.");
@@ -438,7 +438,7 @@ namespace Portal.Helpers
                                     List<DbAssessmentAssignTask> additionalAssignedTasks,
                                     List<string> validationErrorMessages)
         {
-            if (string.IsNullOrEmpty(primaryAssignedTask.Assessor))
+            if (primaryAssignedTask.Assessor.HasNoUserPrincipalName)
             {
                 validationErrorMessages.Add($"Assign Task 1: Assessor is required");
                 return false;
@@ -446,29 +446,29 @@ namespace Portal.Helpers
 
             if (!await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Assessor))
             {
-                validationErrorMessages.Add($"Assign Task 1: Unable to set Assessor to unknown user {primaryAssignedTask.Assessor}");
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Assessor to unknown user {primaryAssignedTask.Assessor.DisplayName}");
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(primaryAssignedTask.Verifier) &&
+            if (!string.IsNullOrEmpty(primaryAssignedTask.Verifier?.UserPrincipalName) &&
                 !await _portalAduserDbService.ValidateUserAsync(primaryAssignedTask.Verifier))
             {
-                validationErrorMessages.Add($"Assign Task 1: Unable to set Verifier to unknown user {primaryAssignedTask.Verifier}");
+                validationErrorMessages.Add($"Assign Task 1: Unable to set Verifier to unknown user {primaryAssignedTask.Verifier.DisplayName}");
                 return false;
             }
 
             var additionalAssignedTaskAssessors = additionalAssignedTasks.Select(st => st.Assessor).ToList();
             foreach (var assessor in additionalAssignedTaskAssessors)
             {
-                if (string.IsNullOrEmpty(assessor))
+                if (string.IsNullOrEmpty(assessor?.UserPrincipalName))
                 {
                     validationErrorMessages.Add($"Additional Assign Task: Assessor is required");
                     return false;
                 }
-                
+
                 if (!await _portalAduserDbService.ValidateUserAsync(assessor))
                 {
-                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Assessor to unknown user {assessor}");
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Assessor to unknown user {assessor.DisplayName}");
                     return false;
                 }
             }
@@ -476,10 +476,10 @@ namespace Portal.Helpers
             var additionalAssignedTaskVerifiers = additionalAssignedTasks.Select(st => st.Verifier).ToList();
             foreach (var verifier in additionalAssignedTaskVerifiers)
             {
-                if (!string.IsNullOrEmpty(verifier) &&
+                if (!string.IsNullOrEmpty(verifier?.UserPrincipalName) &&
                     !await _portalAduserDbService.ValidateUserAsync(verifier))
                 {
-                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Verifier to unknown user {verifier}");
+                    validationErrorMessages.Add($"Additional Assign Task: Unable to set Verifier to unknown user {verifier.DisplayName}");
                     return false;
                 }
             }
@@ -563,21 +563,21 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Assess and Verify pages
         /// </summary>
-        /// <param name="operatorUsername"></param>
+        /// <param name="user"></param>
         /// <param name="userTypeInMessage"></param>
         /// <param name="validationErrorMessages"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateOperators(string operatorUsername, string userTypeInMessage, List<string> validationErrorMessages)
+        private async Task<bool> ValidateOperators(AdUser user, string userTypeInMessage, List<string> validationErrorMessages)
         {
-            if (string.IsNullOrWhiteSpace(operatorUsername))
+            if (user == null || user.HasNoUserPrincipalName)
             {
                 validationErrorMessages.Add($"Operators: {userTypeInMessage} cannot be empty");
                 return false;
             }
 
-            if (!await _portalAduserDbService.ValidateUserAsync(operatorUsername))
+            if (!await _portalAduserDbService.ValidateUserAsync(user))
             {
-                validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {operatorUsername}");
+                validationErrorMessages.Add($"Operators: Unable to set {userTypeInMessage} to unknown user {user.DisplayName}");
                 return false;
             }
             return true;
@@ -646,10 +646,11 @@ namespace Portal.Helpers
                 foreach (var productAction in recordProductAction)
                 {
                     // Check for existing impacted products
-                    var isExist = await _hpdDbContext.CarisProducts.AnyAsync(p =>
-                        p.ProductStatus.Equals("Active", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.TypeKey.Equals("ENC", StringComparison.InvariantCultureIgnoreCase) &&
-                        p.ProductName.Equals(productAction.ImpactedProduct, StringComparison.InvariantCultureIgnoreCase));
+                    var carisProducts = await _hpdDbContext.CarisProducts.ToListAsync();
+                    var isExist = carisProducts.Any(p =>
+                        p.ProductStatus == "Active" &&
+                        p.TypeKey == "ENC" &&
+                        p.ProductName == productAction.ImpactedProduct);
 
                     if (!isExist)
                     {
@@ -680,8 +681,8 @@ namespace Portal.Helpers
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
         private bool CheckDataImpactFeatures(
-                                                string action, 
-                                                WorkflowStage workflowStage, 
+                                                string action,
+                                                WorkflowStage workflowStage,
                                                 List<DataImpact> dataImpacts,
                                                 List<string> validationWarningMessages)
         {
@@ -726,8 +727,8 @@ namespace Portal.Helpers
         /// <param name="validationWarningMessages"></param>
         /// <returns></returns>
         private bool CheckStsDataImpact(
-                                                string action, 
-                                                WorkflowStage workflowStage, 
+                                                string action,
+                                                WorkflowStage workflowStage,
                                                 DataImpact stsDataImpact,
                                                 List<string> validationWarningMessages)
         {

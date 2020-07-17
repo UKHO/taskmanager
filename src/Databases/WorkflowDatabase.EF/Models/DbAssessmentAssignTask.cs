@@ -6,10 +6,6 @@ namespace WorkflowDatabase.EF.Models
     {
         public int DbAssessmentAssignTaskId { get; set; }
         public int ProcessId { get; set; }
-        [DisplayName("Assessor:")]
-        public string Assessor { get; set; }
-        [DisplayName("Verifier:")]
-        public string Verifier { get; set; }
         [DisplayName("Task Type:")]
         public string TaskType { get; set; }
         [DisplayName("Workspace Affected:")]
@@ -17,5 +13,12 @@ namespace WorkflowDatabase.EF.Models
         [DisplayName("Notes:")]
         public string Notes { get; set; }
         public string Status { get; set; }
+
+        [DisplayName("Assessor:")]
+        public virtual AdUser Assessor { get; set; }
+        public int? AssessorAdUserId { get; set; }
+        [DisplayName("Verifier:")]
+        public virtual AdUser Verifier { get; set; }
+        public int? VerifierAdUserId { get; set; }
     }
 }

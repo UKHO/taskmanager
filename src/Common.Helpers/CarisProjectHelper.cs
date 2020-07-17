@@ -103,7 +103,7 @@ namespace Common.Helpers
 
             // Check if project already exists
             if (await _hpdDbContext.CarisProjectData.AnyAsync(p =>
-                p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase)))
+                p.ProjectName == projectName))
             {
                 throw new ArgumentException($"Failed to create Caris project {projectName}, project already exists");
             }
@@ -281,7 +281,7 @@ namespace Common.Helpers
                     transaction.Commit();
 
                     carisProjectId = (await _hpdDbContext.CarisProjectData.SingleAsync(p =>
-                        p.ProjectName.Equals(projectName, StringComparison.InvariantCultureIgnoreCase))).ProjectId;
+                        p.ProjectName == projectName)).ProjectId;
                 }
                 catch (Exception)
                 {
@@ -394,7 +394,7 @@ namespace Common.Helpers
         private async Task<int> GetCarisProjectPriorityId(string projectPriority)
         {
             var carisProjectPriority = await _hpdDbContext.CarisProjectPriorities.SingleOrDefaultAsync(s =>
-                s.ProjectPriorityName.Equals(projectPriority, StringComparison.InvariantCultureIgnoreCase));
+                s.ProjectPriorityName == projectPriority);
 
             if (carisProjectPriority == null)
             {
@@ -408,7 +408,7 @@ namespace Common.Helpers
         private async Task<int> GetCarisProjectStatusId(string projectStatus)
         {
             var carisProjectStatus = await _hpdDbContext.CarisProjectStatuses.SingleOrDefaultAsync(s =>
-                s.ProjectStatusName.Equals(projectStatus, StringComparison.InvariantCultureIgnoreCase));
+                s.ProjectStatusName == projectStatus);
 
             if (carisProjectStatus == null)
             {
@@ -422,7 +422,7 @@ namespace Common.Helpers
         private async Task<int> GetCarisProjectTypeId(string projectType)
         {
             var carisProjectType = await _hpdDbContext.CarisProjectTypes.SingleOrDefaultAsync(p =>
-                p.ProjectTypeName.Equals(projectType, StringComparison.InvariantCultureIgnoreCase));
+                p.ProjectTypeName == projectType);
 
             if (carisProjectType == null)
             {
@@ -449,7 +449,7 @@ namespace Common.Helpers
         private async Task<int> GetHpdUserId(string hpdUsername)
         {
             var creator = await _hpdDbContext.CarisUsers.SingleOrDefaultAsync(u =>
-                u.Username.Equals(hpdUsername, StringComparison.InvariantCultureIgnoreCase));
+                u.Username == hpdUsername);
 
             if (creator == null)
             {

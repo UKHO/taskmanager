@@ -98,8 +98,7 @@ namespace SourceDocumentCoordinator
                 if (isLocalDebugging)
                 {
                     using var sp = services.BuildServiceProvider();
-                    using var context = sp.GetRequiredService<WorkflowDbContext>();
-                    TestWorkflowDatabaseSeeder.UsingDbContext(context).PopulateTables().SaveChanges();
+                    TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
                 }
             })
             .UseNServiceBus(hostBuilderContext =>

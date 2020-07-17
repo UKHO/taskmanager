@@ -12,6 +12,7 @@ using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
+using WorkflowCoordinator.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -100,7 +101,8 @@ namespace WorkflowCoordinator.UnitTests
             var reviewData = new DbAssessmentReviewData()
             {
                 WorkflowInstanceId = workflowInstanceId,
-                ProcessId = processId
+                ProcessId = processId,
+                Reviewer = AdUserHelper.CreateTestUser(_dbContext)
             };
             await _dbContext.DbAssessmentReviewData.AddAsync(reviewData);
 
@@ -178,7 +180,7 @@ namespace WorkflowCoordinator.UnitTests
             };
             await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
 
-            var primaryDocumentStatus  = new PrimaryDocumentStatus()
+            var primaryDocumentStatus = new PrimaryDocumentStatus()
             {
                 ProcessId = processId,
                 SdocId = 1234567
@@ -321,7 +323,7 @@ namespace WorkflowCoordinator.UnitTests
                 Ion = "Verify ION"
             });
 
-            
+
             var primaryDocumentStatus = new PrimaryDocumentStatus()
             {
                 ProcessId = processId,
@@ -338,7 +340,7 @@ namespace WorkflowCoordinator.UnitTests
 
             Assert.AreEqual(newActivityChangedAt, workflowInstance.ActivityChangedAt);
         }
-        
+
         [Test]
         public async Task Test_Handle_SignOff_FromActivity_Verify_And_ToActivity_Completed__then_SourceDocumentVerifiedEvent_is_published()
         {
@@ -399,8 +401,8 @@ namespace WorkflowCoordinator.UnitTests
 
             A.CallTo(() =>
                     _fakePcpEventServiceApiClient.PostEvent(
-                                                        nameof(SourceDocumentVerifiedEvent), 
-                                                        A<SourceDocumentVerifiedEvent>.That.Matches(c => c.SourceDocumentId == sdocId && c.TaskManagerProcessId == processId )))
+                                                        nameof(SourceDocumentVerifiedEvent),
+                                                        A<SourceDocumentVerifiedEvent>.That.Matches(c => c.SourceDocumentId == sdocId && c.TaskManagerProcessId == processId)))
                 .MustHaveHappened();
 
 

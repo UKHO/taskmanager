@@ -9,9 +9,13 @@ namespace WorkflowDatabase.EF.Models
         public string Text { get; set; }
         public int WorkflowInstanceId { get; set; }
         public DateTime Created { get; set; }
-        public string CreatedByUsername { get; set; }
         public DateTime LastModified { get; set; }
-        public string LastModifiedByUsername { get; set; }
+
+        public virtual AdUser CreatedBy { get; set; }
+        public int? CreatedByAdUserId { get; set; }
+
+        public virtual AdUser LastModifiedBy { get; set; }
+        public int? LastModifiedByAdUserId { get; set; }
 
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Portal.Auth;
 using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.Extensions;
@@ -26,12 +27,13 @@ namespace Portal.Pages.DbAssessment
     [Authorize]
     public class VerifyModel : PageModel
     {
-        private readonly ICommentsHelper _commentsHelper;
+        private readonly ICommentsHelper _dbAssessmentCommentsHelper;
         private readonly IAdDirectoryService _adDirectoryService;
         private readonly ILogger<VerifyModel> _logger;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly ICarisProjectHelper _carisProjectHelper;
         private readonly IOptions<GeneralConfig> _generalConfig;
+        private readonly IPortalUserDbService _portalUserDbService;
         private readonly WorkflowDbContext _dbContext;
         private readonly IWorkflowBusinessLogicService _workflowBusinessLogicService;
         private readonly IEventServiceApiClient _eventServiceApiClient;
@@ -67,7 +69,7 @@ namespace Portal.Pages.DbAssessment
         public string SourceCategory { get; set; }
 
         [BindProperty]
-        public string Verifier { get; set; }
+        public AdUser Verifier { get; set; }
 
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
@@ -97,22 +99,24 @@ namespace Portal.Pages.DbAssessment
         public VerifyModel(WorkflowDbContext dbContext,
             IWorkflowBusinessLogicService workflowBusinessLogicService,
             IEventServiceApiClient eventServiceApiClient,
-            ICommentsHelper commentsHelper,
+            ICommentsHelper dbAssessmentCommentsHelper,
             IAdDirectoryService adDirectoryService,
             ILogger<VerifyModel> logger,
             IPageValidationHelper pageValidationHelper,
             ICarisProjectHelper carisProjectHelper,
-            IOptions<GeneralConfig> generalConfig)
+            IOptions<GeneralConfig> generalConfig,
+            IPortalUserDbService portalUserDbService)
         {
             _dbContext = dbContext;
             _workflowBusinessLogicService = workflowBusinessLogicService;
             _eventServiceApiClient = eventServiceApiClient;
-            _commentsHelper = commentsHelper;
+            _dbAssessmentCommentsHelper = dbAssessmentCommentsHelper;
             _adDirectoryService = adDirectoryService;
             _logger = logger;
             _pageValidationHelper = pageValidationHelper;
             _carisProjectHelper = carisProjectHelper;
             _generalConfig = generalConfig;
+            _portalUserDbService = portalUserDbService;
 
             ValidationErrorMessages = new List<string>();
         }
@@ -123,7 +127,7 @@ namespace Portal.Pages.DbAssessment
 
             IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
-            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.AsNoTracking().FirstAsync(r => r.ProcessId == processId);
+            var currentVerifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentVerifyData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Verify;
             SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<VerifyCustomHttpStatusCode>();
@@ -136,7 +140,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "Verify");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
             var action = "Save";
             LogContext.PushProperty("Action", action);
 
@@ -207,7 +211,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
             LogContext.PushProperty("Action", action);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
@@ -255,7 +259,7 @@ namespace Portal.Pages.DbAssessment
                         StsDataImpact,
                         Team,
                         ValidationErrorMessages,
-                        CurrentUser.DisplayName,
+                        CurrentUser.UserPrincipalName,
                         verifyData.Verifier, IsOnHold)) // from database
 
                     {
@@ -339,7 +343,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostRejectVerifyAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering Reject with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -347,13 +351,13 @@ namespace Portal.Pages.DbAssessment
 
             var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
 
-            if (string.IsNullOrWhiteSpace(verifyData.Verifier))
+            if (string.IsNullOrWhiteSpace(verifyData.Verifier?.UserPrincipalName))
             {
                 ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
             }
-            else if (!CurrentUser.DisplayName.Equals(verifyData.Verifier, StringComparison.InvariantCultureIgnoreCase))
+            else if (CurrentUser.UserPrincipalName != verifyData.Verifier.UserPrincipalName)
             {
-                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier} is assigned to this task. Please assign the task to yourself and click Save");
+                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
             }
 
             if (ValidationErrorMessages.Any())
@@ -446,10 +450,10 @@ namespace Portal.Pages.DbAssessment
 
             await UpdateStsDataImpact(processId);
 
-            await _commentsHelper.AddComment($"Verify: Changes saved",
+            await _dbAssessmentCommentsHelper.AddComment($"Verify: Changes saved",
                 processId,
                 workflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
 
             return true;
         }
@@ -482,32 +486,32 @@ namespace Portal.Pages.DbAssessment
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Completed);
 
             _logger.LogInformation(
-                "Task sign-off from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task sign-off from {ActivityName} has been triggered by {userPrincipcalname} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            await _commentsHelper.AddComment("Task sign-off has been triggered",
+            await _dbAssessmentCommentsHelper.AddComment("Task sign-off has been triggered",
                 processId,
                 workflowInstance.WorkflowInstanceId,
-                CurrentUser.DisplayName);
+                CurrentUser.UserPrincipalName);
         }
 
         private async Task MarkTaskAsRejected(int processId, string comment)
         {
             var workflowInstance = await MarkWorkflowInstanceAsUpdating(processId);
 
-            await _commentsHelper.AddComment($"Verify Rejected: {comment}",
+            await _dbAssessmentCommentsHelper.AddComment($"Verify Rejected: {comment}",
                                                     processId,
                                                     workflowInstance.WorkflowInstanceId,
-                                                    CurrentUser.DisplayName);
+                                                    CurrentUser.UserPrincipalName);
 
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Verify, WorkflowStage.Rejected);
 
             _logger.LogInformation(
-                "Task rejection from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task rejection from {ActivityName} has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            await _commentsHelper.AddComment("Task rejection has been triggered",
+            await _dbAssessmentCommentsHelper.AddComment("Task rejection has been triggered",
                                                     processId,
                                                     workflowInstance.WorkflowInstanceId,
-                                                    CurrentUser.DisplayName);
+                                                    CurrentUser.UserPrincipalName);
         }
 
         private async Task PublishProgressWorkflowInstanceEvent(int processId, WorkflowInstance workflowInstance, WorkflowStage fromActivity, WorkflowStage toActivity)
@@ -550,17 +554,17 @@ namespace Portal.Pages.DbAssessment
                 {
                     ProcessId = processId,
                     OnHoldTime = DateTime.Now,
-                    OnHoldUser = CurrentUser.DisplayName,
+                    OnHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName),
                     WorkflowInstanceId = workflowInstance.WorkflowInstanceId
                 };
 
                 await _dbContext.OnHold.AddAsync(onHoldRecord);
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} has been put on hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
-                    CurrentUser.DisplayName);
+                    CurrentUser.UserPrincipalName);
             }
             else
             {
@@ -574,21 +578,21 @@ namespace Portal.Pages.DbAssessment
                 }
 
                 existingOnHoldRecord.OffHoldTime = DateTime.Now;
-                existingOnHoldRecord.OffHoldUser = CurrentUser.DisplayName;
+                existingOnHoldRecord.OffHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
                 await _dbContext.SaveChangesAsync();
 
-                await _commentsHelper.AddComment($"Task {processId} taken off hold",
+                await _dbAssessmentCommentsHelper.AddComment($"Task {processId} taken off hold",
                     processId,
                     _dbContext.WorkflowInstance.First(p => p.ProcessId == processId)
                         .WorkflowInstanceId,
-                    CurrentUser.DisplayName);
+                    CurrentUser.UserPrincipalName);
             }
         }
 
         private async Task GetOnHoldData(int processId)
         {
-            var onHoldRows = await _dbContext.OnHold.AsNoTracking().Where(r => r.ProcessId == processId).ToListAsync();
+            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
             IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
         }
 
@@ -596,7 +600,7 @@ namespace Portal.Pages.DbAssessment
         {
             var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
 
-            currentVerify.Verifier = Verifier;
+            currentVerify.Verifier = await _portalUserDbService.GetAdUserAsync(Verifier.UserPrincipalName); ;
             currentVerify.Ion = Ion;
             currentVerify.ActivityCode = ActivityCode;
             currentVerify.SourceCategory = SourceCategory;
@@ -641,8 +645,8 @@ namespace Portal.Pages.DbAssessment
             if (isCarisProjectCreated)
             {
                 // just update Caris project Assigned users
-                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Assessor);
-                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Verifier);
+                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Assessor.DisplayName);
+                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Verifier.DisplayName);
 
                 return;
             }
@@ -672,17 +676,16 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        private async Task<HpdUser> GetHpdUser(string username)
+        private async Task<HpdUser> GetHpdUser(string userPrincipalName)
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername.Equals(username,
-                    StringComparison.InvariantCultureIgnoreCase));
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName == userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError("Unable to find HPD Username for {UserFullName} in our system.");
-                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {username} in our system.",
+                _logger.LogError("Unable to find HPD Username for {UserPrincipalName} in our system.");
+                throw new InvalidOperationException($"Edit Database: Unable to find HPD username for {userPrincipalName} in our system.",
                     ex.InnerException);
             }
 

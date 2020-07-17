@@ -1,38 +1,10 @@
 [
   {
-    "AdUsername": "Greg Williams",
-    "HpdUsername": "GregWilliams-Caris"
+    "AdUser": { "adUserId": 2 },
+    "HpdUsername": "someone-Caris"
   },
   {
-    "AdUsername": "Samir Hasson",
-    "HpdUsername": "SamirHassoun-Caris"
-  },
-  {
-    "AdUsername": "Ben Hall",
-    "HpdUsername": "BenHall-Caris"
-  },
-  {
-    "AdUsername": "Rossall Sandford",
-    "HpdUsername": "RossallSandford-Caris"
-  },
-  {
-    "AdUsername": "Bonnie Poole",
-    "HpdUsername": "BonniePoole-Caris"
-  },
-  {
-    "AdUsername": "Gareth Evans",
-    "HpdUsername": "GarethEvans-Caris"
-  },
-  {
-    "AdUsername": "Matthew Stoodley",
-    "HpdUsername": "MatthewStoodley-Caris"
-  },
-  {
-    "AdUsername": "Peter Bates",
-    "HpdUsername": "PeterBates-Caris"
-  },
-  {
-    "AdUsername": "Rajan Shunmuga",
-    "HpdUsername": "RajanShunmuga-Caris"
+    "AdUSer": { "adUserId": 1 },
+    "HpdUsername": "someone2-Caris"
   }
 ]

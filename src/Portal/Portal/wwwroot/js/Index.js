@@ -363,6 +363,10 @@
             });
     }
 
+    $('#txtUsername').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
+    });
+
     function handleAssignTaskToUser() {
         $("#btnAssignTaskToUser").on("click",
             function () {
@@ -380,7 +384,7 @@
                 $("#btnAssignTaskToUser").prop("disabled", true);
 
                 var processId = $("#hdnAssignTaskProcessId").val();
-                var userName = $("#txtUsername").val();
+                var userPrincipalName = $("#hdnAssignTaskUpn").val();
                 var taskStage = $("#hdnAssignTaskStage").val();
 
                 $.ajax({
@@ -392,7 +396,7 @@
                     },
                     data: {
                         "processId": processId,
-                        "userName": userName,
+                        "userPrincipalName": userPrincipalName,
                         "taskStage": taskStage
                     },
                     success: function (result) {

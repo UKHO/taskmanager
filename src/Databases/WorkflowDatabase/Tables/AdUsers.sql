@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[AdUser]
+﻿CREATE TABLE [dbo].[AdUsers]
 (
 	[AdUserId] INT NOT NULL PRIMARY KEY IDENTITY, 
     [DisplayName] NVARCHAR(255) NOT NULL, 
@@ -8,4 +8,4 @@
 
 GO
 
-CREATE UNIQUE INDEX [IX_AdUser_UserPrincipalName] ON [dbo].[AdUser] ([UserPrincipalName])
+CREATE UNIQUE INDEX [IX_AdUser_UserPrincipalName] ON [dbo].[AdUsers] ([UserPrincipalName])

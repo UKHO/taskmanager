@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Portal.UnitTests.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -13,6 +15,9 @@ namespace WorkflowDatabase.Tests
         private WorkflowDbContext _dbContext;
         private DbContextOptions<WorkflowDbContext> _dbContextOptions;
 
+        public AdUser TestUser { get; set; }
+        public AdUser TestUser2 { get; set; }
+
         [SetUp]
         public void Setup()
         {
@@ -22,8 +27,10 @@ namespace WorkflowDatabase.Tests
                 .Options;
 
             _dbContext = new WorkflowDbContext(_dbContextOptions);
-
             DatabasesHelpers.ClearWorkflowDbTables(_dbContext);
+
+            TestUser = AdUserHelper.CreateTestUser(_dbContext);
+            TestUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
         }
 
         [TearDown]
@@ -45,17 +52,17 @@ namespace WorkflowDatabase.Tests
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "Someone",
+                Verifier = null,
                 ActivityCode = "Act666"
             });
 
             _dbContext.DbAssessmentReviewData.Add(new DbAssessmentReviewData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "You",
+                Verifier = null,
                 ActivityCode = "Act111"
             });
 
@@ -76,18 +83,18 @@ namespace WorkflowDatabase.Tests
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "Someone",
+                Verifier = null,
                 ActivityCode = "Act666",
                 TaskType = "Simples"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                Assessor = "Me",
+                Assessor = null,
                 WorkflowInstanceId = 1,
-                Verifier = "You",
+                Verifier = null,
                 ActivityCode = "Act111",
                 TaskType = "Simples"
             });
@@ -187,7 +194,7 @@ namespace WorkflowDatabase.Tests
                     Status = WorkflowStatus.Started.ToString(),
                     StartedAt = DateTime.Now
                 });
-                
+
                 Assert.DoesNotThrowAsync(() => newContext.SaveChangesAsync());
             }
         }
@@ -274,12 +281,12 @@ namespace WorkflowDatabase.Tests
         [Test]
         public void Ensure_Comments_table_prevents_insert_for_no_WorkflowInstance()
         {
-            _dbContext.Comment.AddAsync(new WorkflowDatabase.EF.Models.Comment()
+            _dbContext.Comments.AddAsync(new WorkflowDatabase.EF.Models.Comment()
             {
                 Created = DateTime.Now,
                 ProcessId = 0,
                 Text = "This is a comment",
-                Username = "Me",
+                AdUser = _dbContext.AdUsers.Single(u => u.UserPrincipalName == TestUser.UserPrincipalName),
                 WorkflowInstanceId = 555
             });
 
@@ -421,7 +428,7 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.HpdUser.Add(new HpdUser
             {
-                AdUsername = "TMAccount1",
+                AdUser = _dbContext.AdUsers.Single(u => u.UserPrincipalName == TestUser.UserPrincipalName),
                 HpdUsername = "Person1"
             });
             _dbContext.SaveChanges();
@@ -430,7 +437,7 @@ namespace WorkflowDatabase.Tests
             {
                 newContext.HpdUser.Add(new HpdUser
                 {
-                    AdUsername = "TMAccount1",
+                    AdUser = newContext.AdUsers.Single(u => u.UserPrincipalName == TestUser.UserPrincipalName),
                     HpdUsername = "Person2"
                 });
 
@@ -444,7 +451,7 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.HpdUser.Add(new HpdUser
             {
-                AdUsername = "TMAccount1",
+                AdUser = _dbContext.AdUsers.Single(u => u.UserPrincipalName == TestUser.UserPrincipalName),
                 HpdUsername = "Person1"
             });
             _dbContext.SaveChanges();
@@ -453,7 +460,7 @@ namespace WorkflowDatabase.Tests
             {
                 newContext.HpdUser.Add(new HpdUser
                 {
-                    AdUsername = "TMAccount2",
+                    AdUser = newContext.AdUsers.Single(u => u.UserPrincipalName == TestUser2.UserPrincipalName),
                     HpdUsername = "Person1"
                 });
 
@@ -653,10 +660,10 @@ namespace WorkflowDatabase.Tests
         {
             _dbContext.DbAssessmentAssignTask.AddAsync(new DbAssessmentAssignTask
             {
-                Assessor = "Greg",
+                Assessor = null,
                 TaskType = "Type 1",
                 Notes = "A note",
-                Verifier = "Ross",
+                Verifier = null,
                 WorkspaceAffected = "Workspace 1",
                 Status = AssignTaskStatus.New.ToString()
             });
@@ -668,7 +675,7 @@ namespace WorkflowDatabase.Tests
         [Test]
         public async Task Ensure_CarisProjectDetails_table_prevents_duplicate_ProcessId_due_to_UQ()
         {
-            await _dbContext.WorkflowInstance.AddAsync(new WorkflowInstance()
+            _dbContext.WorkflowInstance.Add(new WorkflowInstance()
             {
                 ProcessId = 1,
                 SerialNumber = "1_sn",
@@ -680,11 +687,11 @@ namespace WorkflowDatabase.Tests
 
             await _dbContext.SaveChangesAsync();
 
-            await _dbContext.CarisProjectDetails.AddAsync(new CarisProjectDetails
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
             {
                 ProcessId = 1,
                 ProjectName = "TestProject",
-                CreatedBy = "TestUser",
+                CreatedBy = _dbContext.AdUsers.Single(u => u.UserPrincipalName == TestUser.UserPrincipalName),
                 Created = DateTime.Now,
                 ProjectId = 1
             });
@@ -693,20 +700,20 @@ namespace WorkflowDatabase.Tests
 
             using (var newContext = new WorkflowDbContext(_dbContextOptions))
             {
-                await newContext.CarisProjectDetails.AddAsync(new CarisProjectDetails
+                newContext.CarisProjectDetails.Add(new CarisProjectDetails
                 {
                     ProcessId = 1,
                     ProjectName = "TestProject2",
-                    CreatedBy = "TestUser2",
+                    CreatedBy = newContext.AdUsers.Single(u => u.UserPrincipalName == TestUser2.UserPrincipalName),
                     Created = DateTime.Now.AddDays(1),
                     ProjectId = 2
                 });
 
-                var ex = Assert.ThrowsAsync<DbUpdateException>(() => newContext.SaveChangesAsync());
+                var ex = Assert.ThrowsAsync<DbUpdateException>(async () => await newContext.SaveChangesAsync());
                 Assert.That(ex.InnerException.Message.Contains("Violation of UNIQUE KEY constraint", StringComparison.OrdinalIgnoreCase));
             }
 
-            
+
         }
     }
 }

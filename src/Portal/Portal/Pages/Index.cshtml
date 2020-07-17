@@ -59,7 +59,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => string.IsNullOrEmpty(t.Reviewer)))
+                @foreach (var task in Model.Tasks.Where(t => t.Reviewer is null))
                 {
                     <tr>
                         <td>
@@ -152,7 +152,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var task in Model.Tasks.Where(t => !string.IsNullOrEmpty(t.Reviewer)))
+                @foreach (var task in Model.Tasks.Where(t => t.Reviewer != null))
                 {
                     <tr>
                         <td class="details-control"><i class="fa"></i></td>
@@ -201,13 +201,12 @@
                             @task.TaskStage
                         </td>
                         <td>
-                            @task.Reviewer
+                            @task.Reviewer?.DisplayName
+                        <td>
+                            @task.Assessor?.DisplayName
                         </td>
                         <td>
-                            @task.Assessor
-                        </td>
-                        <td>
-                            @task.Verifier
+                            @task.Verifier?.DisplayName
                         </td>
                         <td>
                             @task.Team
@@ -286,6 +285,7 @@
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
+                    <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />
                 </div>
             </div>
             <div class="modal-footer">

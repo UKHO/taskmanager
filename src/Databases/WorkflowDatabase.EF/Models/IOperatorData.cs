@@ -2,10 +2,10 @@ namespace WorkflowDatabase.EF.Models
 {
     public interface IOperatorData
     {
-        string Reviewer { get; set; }
+        AdUser Reviewer { get; set; }
 
-        string Verifier { get; set; }
+        AdUser Verifier { get; set; }
 
-        string Assessor { get; set; }
+        AdUser Assessor { get; set; }
     }
 }

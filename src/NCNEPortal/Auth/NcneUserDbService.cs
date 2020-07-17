@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +37,7 @@ namespace NCNEPortal.Auth
             // TODO do we ever want to go and check AD then update database if we find a new user
             // TODO switch to a unique value instead of display name for validating when we switch over
 
-            return await _ncneWorkflowDbContext.AdUser.AnyAsync(u => u.DisplayName.Equals(username, StringComparison.OrdinalIgnoreCase));
+            return await _ncneWorkflowDbContext.AdUser.AnyAsync(u => u.DisplayName == username);
         }
     }
 }
