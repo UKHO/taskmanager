@@ -1,12 +1,12 @@
-﻿using Common.Helpers;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Data;
+using Common.Helpers;
 using DbUpdatePortal.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
 
 namespace DbUpdatePortal
 {
@@ -30,7 +30,7 @@ namespace DbUpdatePortal
                 AdditionalColumns = new Collection<SqlColumn>
                 {
                     new SqlColumn
-                        {ColumnName = "UserFullName", DataType = SqlDbType.NVarChar, DataLength = 255},
+                        {ColumnName = "UserPrincipalName", DataType = SqlDbType.NVarChar, DataLength = 255},
                     new SqlColumn
                         {ColumnName = "ProcessId", DataType = SqlDbType.Int},
                     new SqlColumn
