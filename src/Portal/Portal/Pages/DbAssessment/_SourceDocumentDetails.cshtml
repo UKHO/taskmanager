@@ -96,7 +96,7 @@
                                 <td></td>
                                 <td>
                                     @{
-                                        if (attachedLinkedDocument.Status==SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                                        if (attachedLinkedDocument.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
                                         {
                                             <a href="@attachedLinkedDocument.ContentServiceUri" target="_blank">@Html.DisplayFor(model => attachedLinkedDocument.ParsedRsdraNumber)</a>
                                         }
