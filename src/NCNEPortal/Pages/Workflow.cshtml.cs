@@ -367,8 +367,41 @@ namespace NCNEPortal
                 _generalConfig.Value.CarisNewProjectStatus,
                 _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 
+            //Add the users from other roles to the Caris Project
+            var role = await _dbContext.TaskRole.FirstOrDefaultAsync(t => t.ProcessId == processId);
+            if ((!string.IsNullOrEmpty(role.Compiler)) && (role.Compiler != CurrentUser.DisplayName))
+            {
+                hpdUser = await GetHpdUser(role.Compiler);
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                     _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if ((!string.IsNullOrEmpty(role.VerifierOne)) && (role.VerifierOne != CurrentUser.DisplayName))
+            {
+                hpdUser = await GetHpdUser(role.VerifierOne);
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if ((!string.IsNullOrEmpty(role.VerifierTwo)) && (role.VerifierTwo != CurrentUser.DisplayName))
+            {
+                hpdUser = await GetHpdUser(role.VerifierTwo);
+
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if ((!string.IsNullOrEmpty(role.HundredPercentCheck)) && (role.HundredPercentCheck != CurrentUser.DisplayName))
+            {
+                hpdUser = await GetHpdUser(role.HundredPercentCheck);
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+
             return projectId;
         }
+
 
 
         private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
@@ -717,6 +750,11 @@ namespace NCNEPortal
             task.ExpectedDate3Ps = ExpectedReturnDate3ps;
             task.ActualDate3Ps = ActualReturnDate3ps;
 
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == task.ProcessId);
+
+            if (carisProject != null)
+                UpdateCarisProjectUsers(task, carisProject.ProjectId);
+
             UpdateRoles(task);
 
             UpdateStatus(task);
@@ -799,6 +837,41 @@ namespace NCNEPortal
                     if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Open.ToString();
                 }
             }
+        }
+
+        private void UpdateCarisProjectUsers(TaskInfo task, int projectId)
+        {
+
+
+            var hpdUser = GetHpdUser(Compiler).Result;
+
+            if ((!string.IsNullOrEmpty(Compiler)) && (Compiler != task.TaskRole.Compiler))
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+
+            if ((!string.IsNullOrEmpty(Verifier1)) && (Verifier1 != task.TaskRole.VerifierOne))
+            {
+                hpdUser = GetHpdUser(Verifier1).Result;
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if ((!string.IsNullOrEmpty(Verifier2)) && (Verifier2 != task.TaskRole.VerifierTwo))
+            {
+                hpdUser = GetHpdUser(Verifier2).Result;
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if ((!string.IsNullOrEmpty(HundredPercentCheck)) &&
+                (HundredPercentCheck != task.TaskRole.HundredPercentCheck))
+            {
+                hpdUser = GetHpdUser(HundredPercentCheck).Result;
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+
         }
 
         private void UpdateRoles(TaskInfo task)
