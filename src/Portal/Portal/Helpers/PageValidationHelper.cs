@@ -45,7 +45,7 @@ namespace Portal.Helpers
         {
             var isValid = true;
 
-            if (action=="Done")
+            if (action == "Done")
             {
                 if (currentAssignedReviewerInDb.HasNoUserPrincipalName)
                 {
