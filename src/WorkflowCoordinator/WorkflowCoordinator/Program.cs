@@ -77,7 +77,6 @@ namespace WorkflowCoordinator
 
                     if (isLocalDebugging)
                     {
-                        // TODO pull out to hosted service
                         using var sp = services.BuildServiceProvider();
                         TestWorkflowDatabaseSeeder.UsingDbConnectionString(workflowDbConnectionString).PopulateTables().SaveChanges();
                     }
