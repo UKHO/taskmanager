@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
     var processId = Number($("#hdnProcessId").val());
     var isReadOnly = $("#IsReadOnly").val() === "True";
+    var errorMessageDelayCollapse = 2500; //2.5 seconds
 
     getSourceDocuments();
 
@@ -68,12 +69,17 @@
                     getSourceDocuments();
                 },
                 error: function (error) {
-                    //TODO: Implement error dialogs
-                    $("#assignTasksError")
-                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").text(JSON.parse(error.responseText));
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("show");
 
                     $(parent).show();
                     $(parent).siblings(".attachLinkedDocumentSpinnerContainer").hide();
+
+                    setTimeout(function() {
+                        $("#addDatabaseSourceDocument .dialog.error").collapse('hide');
+                    },errorMessageDelayCollapse);
                 }
             });
         });
@@ -102,12 +108,18 @@
                     getSourceDocuments();
                 },
                 error: function (error) {
-                    //TODO: Implement error dialogs
-                    $("#assignTasksError")
-                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").text(JSON.parse(error.responseText));
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("show");
 
                     $(parent).show();
                     $(parent).siblings(".detachLinkedDocumentSpinnerContainer").hide();
+
+                    setTimeout(function() {
+                        $("#addDatabaseSourceDocument .dialog.error").collapse('hide');
+                    },errorMessageDelayCollapse);
+
                 }
             });
         });
@@ -136,12 +148,17 @@
                     getSourceDocuments();
                 },
                 error: function (error) {
-                    //TODO: Implement error dialogs
-                    $("#assignTasksError")
-                        .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to create new assign task section.</div>");
+                    $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
+                    $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
+                    $("#addSourceErrorMessage").text(JSON.parse(error.responseText));
+                    $("#addDatabaseSourceDocument .dialog.error").collapse("show");
 
                     $(parent).show();
                     $(parent).siblings(".detachDatabaseDocumentSpinnerContainer").hide();
+
+                    setTimeout(function() {
+                        $("#addDatabaseSourceDocument .dialog.error").collapse('hide');
+                    },errorMessageDelayCollapse);
                 }
             });
         });
