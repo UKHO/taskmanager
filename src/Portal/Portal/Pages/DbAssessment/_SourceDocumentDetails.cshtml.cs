@@ -1,4 +1,9 @@
-﻿using Common.Factories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Factories;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Common.Messages.Enums;
@@ -13,10 +18,6 @@ using Portal.BusinessLogic;
 using Portal.Configuration;
 using Portal.HttpClients;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 using LinkedDocument = WorkflowDatabase.EF.Models.LinkedDocument;
@@ -78,10 +79,25 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; and SourceDocumentId {SourceDocumentId}");
 
-            DocumentAssessmentData sourceDocumentData = null;
             try
             {
-                sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
+                (DocumentAssessmentData sourceDocumentData, HttpStatusCode httpStatusCode, string errorMessage,
+                    Uri fullUri) = await _dataServiceApiClient.GetAssessmentData(sdocId);
+
+                if (httpStatusCode == HttpStatusCode.OK)
+                {
+                    return new JsonResult(sourceDocumentData);
+                }
+
+                _logger.LogError("Failed requesting DataService with RequestUri: {RequestUri} and: SdocId: {SdocId};",
+                    fullUri,
+                    sdocId);
+
+                return new JsonResult(errorMessage)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+
             }
             catch (Exception e)
             {
@@ -89,10 +105,12 @@ namespace Portal.Pages.DbAssessment
                     nameof(_dataServiceApiClient.GetAssessmentData),
                     sdocId);
 
-                throw;
-            }
 
-            return new JsonResult(sourceDocumentData);
+                return new JsonResult("System failure fetching Source Document Data. Please try again later.")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
         }
 
         private async Task GetAssessmentDataAsync()
@@ -301,10 +319,12 @@ namespace Portal.Pages.DbAssessment
 
             if (isWorkflowReadOnly)
             {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot add source from SDRA");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot add source from SDRA");
-                throw appException;
+                _logger.LogError("Workflow Instance for ProcessId {ProcessId} is readonly, cannot add source from SDRA");
+
+                return new JsonResult($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot add source from SDRA")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
@@ -336,8 +356,20 @@ namespace Portal.Pages.DbAssessment
             // Update DB 
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
 
-            var sourceDocumentData = await _dataServiceApiClient.GetAssessmentData(sdocId);
+            (DocumentAssessmentData sourceDocumentData, HttpStatusCode httpStatusCode, string errorMessage,
+                Uri fullUri) = await _dataServiceApiClient.GetAssessmentData(sdocId);
 
+            if (httpStatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError("Failed requesting DataService with RequestUri: {RequestUri} and: SdocId: {SdocId};",
+                    fullUri,
+                    sdocId);
+
+                return new JsonResult(errorMessage)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
             await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
             {
                 ProcessId = processId,
@@ -377,7 +409,7 @@ namespace Portal.Pages.DbAssessment
                     "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
                 throw appException;
             }
-            
+
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; SdocId: {SdocId}");
 
             var databaseDocument =

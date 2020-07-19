@@ -20,22 +20,29 @@ namespace Portal.HttpClients
             _uriConfig = uriConfig;
         }
 
-        public async Task<DocumentAssessmentData> GetAssessmentData(int sdocId)
+        public async
+            Task<(DocumentAssessmentData assessmentData, HttpStatusCode httpStatusCode, string errorMessage, Uri fullUri
+                )> GetAssessmentData(int sdocId)
         {
             var fullUri = _uriConfig.Value.BuildDocumentAssessmentDataDataServicesUri(sdocId);
 
             using var response = await _httpClient.GetAsync(fullUri, HttpCompletionOption.ResponseHeadersRead);
-
-            if (response.StatusCode != HttpStatusCode.OK)
-                throw new ApplicationException($"StatusCode='{response.StatusCode}'," +
-                                               $"\n Message= '{response.Content}'," +
-                                               $"\n Url='{fullUri}'");
-
             var data = await response.Content.ReadAsStringAsync();
-            var assessmentData = JsonConvert.DeserializeObject<DocumentAssessmentData>(data);
-            
-            return assessmentData;
-        }
 
+            if (response.IsSuccessStatusCode)
+            {
+                var assessmentData = JsonConvert.DeserializeObject<DocumentAssessmentData>(data);
+
+                return (assessmentData,
+                    response.StatusCode,
+                    string.Empty,
+                    fullUri);
+            }
+
+            return (null,
+                response.StatusCode,
+                string.IsNullOrEmpty(data) ? "System failure fetching Source Document Data. Please try again later." : data,
+                fullUri);
+        }
     }
 }

@@ -195,10 +195,10 @@
                 $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
                 $("#addSourceErrorMessage").text("");
             },
-            error: function () {
+            error: function (error) {
                 $("#addDatabaseSourceDocument .dialog.success").collapse("hide");
                 $("#addDatabaseSourceDocument .dialog.warning").collapse("hide");
-                $("#addSourceErrorMessage").text("Failed to connect to SDRA. Please try again later.");
+                $("#addSourceErrorMessage").text(JSON.parse(error.responseText));
                 $("#addDatabaseSourceDocument .dialog.error").collapse("show");
             }
         });
