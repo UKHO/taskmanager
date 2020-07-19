@@ -280,10 +280,12 @@ namespace Portal.Pages.DbAssessment
 
             if (isWorkflowReadOnly)
             {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
-                throw appException;
+                _logger.LogError("Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+
+                return new JsonResult($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
