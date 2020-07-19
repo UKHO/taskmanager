@@ -230,10 +230,12 @@ namespace Portal.Pages.DbAssessment
 
             if (isWorkflowReadOnly)
             {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
-                throw appException;
+                _logger.LogError("Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+
+                return new JsonResult($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
             // first publish event
@@ -280,9 +282,9 @@ namespace Portal.Pages.DbAssessment
 
             if (isWorkflowReadOnly)
             {
-                _logger.LogError("Workflow Instance for ProcessId {ProcessId} is readonly, cannot attach linked document");
+                _logger.LogError("Workflow Instance for ProcessId {ProcessId} is readonly, cannot detach linked document");
 
-                return new JsonResult($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot attach linked document")
+                return new JsonResult($"Workflow Instance for {nameof(processId)} {processId} is readonly, cannot detach linked document")
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
