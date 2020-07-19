@@ -143,11 +143,10 @@ namespace Portal.Pages.DbAssessment
                     .Where(c => c.ProcessId == ProcessId)
                     .ToListAsync();
             }
-            catch (ArgumentNullException e)
+            catch (Exception e)
             {
-                // Log and throw, as we're unable to get Linked Documents
-                e.Data.Add("OurMessage", "Unable to retrieve Linked Documents");
-                Console.WriteLine(e);
+                _logger.LogError(e, "Unable to retrieve Linked Documents for ProcessId {ProcessId}");
+
                 throw;
             }
         }
@@ -171,11 +170,10 @@ namespace Portal.Pages.DbAssessment
                 }
 
             }
-            catch (ArgumentNullException e)
+            catch (Exception e)
             {
-                // Log and throw, as we're unable to get Database Documents
-                e.Data.Add("OurMessage", "Unable to retrieve Database Documents");
-                Console.WriteLine(e);
+                _logger.LogError(e, "Unable to retrieve Database Documents for ProcessId {ProcessId}");
+
                 throw;
             }
         }
@@ -192,11 +190,11 @@ namespace Portal.Pages.DbAssessment
                     PrimaryDocumentStatus.ContentServiceUri =
                         _uriConfig.Value.BuildContentServiceUri(PrimaryDocumentStatus.ContentServiceId.Value);
             }
-            catch (InvalidOperationException e)
+            catch (Exception e)
             {
-                // Log that we're unable to get a Source Doc Status row
-                e.Data.Add("OurMessage", "Unable to retrieve PrimaryDocumentStatus");
-                Console.WriteLine(e);
+                _logger.LogError(e, "Unable to retrieve PrimaryDocumentStatus for ProcessId {ProcessId}");
+
+                throw;
             }
         }
 
