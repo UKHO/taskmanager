@@ -259,15 +259,26 @@ namespace Portal.Pages.DbAssessment
             // Update DB
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
 
-            await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                _documentStatusFactory,
-                processId,
-                linkedSdocId,
-                SourceDocumentRetrievalStatus.Started,
-                SourceType.Linked);
+            try
+            {
+                await SourceDocumentHelper.UpdateSourceDocumentStatus(
+                    _documentStatusFactory,
+                    processId,
+                    linkedSdocId,
+                    SourceDocumentRetrievalStatus.Started,
+                    SourceType.Linked);
 
-
-            return StatusCode(200);
+                return StatusCode(200);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+                    "Error updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+                return new JsonResult($"Error updating document status in database for Source Document {linkedSdocId}")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
         }
 
         public async Task<IActionResult> OnPostDetachLinkedDocumentAsync(int linkedSdocId, int processId)
@@ -292,14 +303,22 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
 
-            await SourceDocumentHelper.UpdateSourceDocumentStatus(
-                                                                    _documentStatusFactory,
-                                                                    processId,
-                                                                    linkedSdocId,
-                                                                    SourceDocumentRetrievalStatus.NotAttached,
-                                                                    SourceType.Linked);
+            try
+            {
+                await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, processId, linkedSdocId,
+                    SourceDocumentRetrievalStatus.NotAttached, SourceType.Linked);
 
-            return StatusCode(200);
+                return StatusCode(200);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+                    "Error updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+                return new JsonResult($"Error updating document status in database for Source Document {linkedSdocId}")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
         }
 
         /// <summary>
@@ -374,6 +393,7 @@ namespace Portal.Pages.DbAssessment
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
             }
+
             await _dbContext.DatabaseDocumentStatus.AddAsync(new DatabaseDocumentStatus()
             {
                 ProcessId = processId,
@@ -390,7 +410,6 @@ namespace Portal.Pages.DbAssessment
             });
 
             await _dbContext.SaveChangesAsync();
-
 
             return StatusCode(200);
         }
@@ -425,7 +444,10 @@ namespace Portal.Pages.DbAssessment
             if (databaseDocument == null)
             {
                 _logger.LogWarning("Failed to find source document attached from SDRA source; ProcessId: {ProcessId}; SdocId: {SdocId}");
-                throw new ApplicationException($"Failed to find source document attached from SDRA source; ProcessId: {processId}; SdocId: {sdocId}");
+                return new JsonResult($"Failed to find source document attached from SDRA source; ProcessId: {processId}; SdocId: {sdocId}")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
 
             _dbContext.DatabaseDocumentStatus.Remove(databaseDocument);
