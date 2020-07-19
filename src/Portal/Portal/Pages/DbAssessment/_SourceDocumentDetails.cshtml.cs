@@ -123,11 +123,10 @@ namespace Portal.Pages.DbAssessment
                     .AssessmentData
                     .FirstAsync(c => c.ProcessId == ProcessId);
             }
-            catch (InvalidOperationException e)
+            catch (Exception e)
             {
-                // Log and throw, as we're unable to get assessment data
-                e.Data.Add("OurMessage", "Unable to retrieve AssessmentData");
-                Console.WriteLine(e);
+                _logger.LogError(e, "Unable to retrieve AssessmentData for ProcessId {ProcessId}");
+
                 throw;
             }
         }
