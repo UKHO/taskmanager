@@ -39,6 +39,7 @@ namespace NCNEWorkflowDatabase.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
             modelBuilder.Entity<TaskInfo>()
                 .HasMany(x => x.TaskComment)
                 .WithOne()

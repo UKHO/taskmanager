@@ -78,22 +78,22 @@ namespace NCNEPortal
 
         [BindProperty]
         [DisplayName("Compiler")]
-        public string Compiler { get; set; }
+        public AdUser Compiler { get; set; }
 
 
         [BindProperty]
         [DisplayName("Verifier V1")]
-        public string Verifier1 { get; set; }
+        public AdUser Verifier1 { get; set; }
 
 
         [BindProperty]
         [DisplayName("Verifier V2")]
-        public string Verifier2 { get; set; }
+        public AdUser Verifier2 { get; set; }
 
 
         [BindProperty]
         [DisplayName("100% Check")]
-        public string HundredPercentCheck { get; set; }
+        public AdUser HundredPercentCheck { get; set; }
 
 
         public List<string> ValidationErrorMessages { get; set; }
@@ -210,7 +210,7 @@ namespace NCNEPortal
                 CommitDate = this.CommitToPrintDate,
                 CisDate = this.CISDate,
                 Country = this.Country,
-                AssignedUser = this.Compiler,
+                Assigned = this.Compiler,
                 AssignedDate = DateTime.Now,
                 CurrentStage = currentStage,
                 Status = NcneTaskStatus.InProgress.ToString(),
@@ -277,7 +277,7 @@ namespace NCNEPortal
                 };
 
                 //Assign the user according to the stage
-                taskStage.AssignedUser = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
+                taskStage.Assigned = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
                 {
                     NcneTaskStageType.With_Geodesy => this.Compiler,
                     NcneTaskStageType.With_SDRA => this.Compiler,

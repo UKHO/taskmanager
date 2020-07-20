@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +11,10 @@ using NCNEPortal.Models;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NCNEPortal.Pages
 {
@@ -105,10 +105,10 @@ namespace NCNEPortal.Pages
                             && (string.IsNullOrWhiteSpace(SearchParameters.ChartType) || t.ChartType.ToUpper().Contains(SearchParameters.ChartType.ToUpper()))
                             && (string.IsNullOrWhiteSpace(SearchParameters.WorkflowType) || t.WorkflowType.ToUpper().Contains(SearchParameters.WorkflowType.ToUpper()))
                             && (string.IsNullOrWhiteSpace(SearchParameters.ChartNo) || t.ChartNumber.ToUpper().Contains(SearchParameters.ChartNo.ToUpper()))
-                            && (string.IsNullOrWhiteSpace(SearchParameters.Compiler) || t.TaskRole.Compiler.ToUpper().Contains(SearchParameters.Compiler.ToUpper()))
-                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierOne) || t.TaskRole.VerifierOne.ToUpper().Contains(SearchParameters.VerifierOne.ToUpper()))
-                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierTwo) || t.TaskRole.VerifierTwo.ToUpper().Contains(SearchParameters.VerifierTwo.ToUpper()))
-                            && (string.IsNullOrWhiteSpace(SearchParameters.HundredPercentCheck) || t.TaskRole.HundredPercentCheck.ToUpper().Contains(SearchParameters.HundredPercentCheck.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.Compiler) || t.TaskRole.Compiler.DisplayName.ToUpper().Contains(SearchParameters.Compiler.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierOne) || t.TaskRole.VerifierOne.DisplayName.ToUpper().Contains(SearchParameters.VerifierOne.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.VerifierTwo) || t.TaskRole.VerifierTwo.DisplayName.ToUpper().Contains(SearchParameters.VerifierTwo.ToUpper()))
+                            && (string.IsNullOrWhiteSpace(SearchParameters.HundredPercentCheck) || t.TaskRole.HundredPercentCheck.DisplayName.ToUpper().Contains(SearchParameters.HundredPercentCheck.ToUpper()))
                             ))
                     .OrderByDescending(t => t.StatusChangeDate)
                     .Take(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords)

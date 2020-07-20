@@ -9,9 +9,14 @@ namespace NCNEWorkflowDatabase.EF.Models
         [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
         public int TaskRoleId { get; set; }
         public int ProcessId { get; set; }
-        public string Compiler { get; set; }
-        public string VerifierOne { get; set; }
-        public string VerifierTwo { get; set; }
-        public string HundredPercentCheck { get; set; }
+
+        public virtual AdUser Compiler { get; set; }
+        public int? CompilerAdUserId { get; set; }
+        public virtual AdUser VerifierOne { get; set; }
+        public int? VerifierOneAdUserId { get; set; }
+        public virtual AdUser VerifierTwo { get; set; }
+        public int? VerifierTwoAdUserId { get; set; }
+        public virtual AdUser HundredPercentCheck { get; set; }
+        public int? HundredPercentCheckAdUserId { get; set; }
     }
 }

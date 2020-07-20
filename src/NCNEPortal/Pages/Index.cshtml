@@ -78,7 +78,7 @@
                             @task.CurrentStage
                         </td>
                         <td>
-                            @task.AssignedUser
+                            @task.Assigned.DisplayName
                         </td>
                         <td>
                             @task.AnnounceDate?.ToShortDateString()
@@ -233,11 +233,11 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                              &&
-                                              (t.TaskRole.VerifierOne == Model.CurrentUser.DisplayName
-       || t.TaskRole.Compiler == Model.CurrentUser.DisplayName
-       || t.TaskRole.VerifierTwo == Model.CurrentUser.DisplayName
-       || t.TaskRole.HundredPercentCheck == Model.CurrentUser.DisplayName)))
+                                            &&
+                                            (t.TaskRole.VerifierOne.DisplayName == Model.CurrentUser.DisplayName
+     || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName
+     || t.TaskRole.VerifierTwo.DisplayName == Model.CurrentUser.DisplayName
+     || t.TaskRole.HundredPercentCheck.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -259,16 +259,16 @@
                             @task.CurrentStage
                         </td>
                         <td>
-                            @task.TaskRole.Compiler
+                            @task.TaskRole.Compiler?.DisplayName
                         </td>
                         <td>
-                            @task.TaskRole.VerifierOne
+                            @task.TaskRole.VerifierOne?.DisplayName
                         </td>
                         <td>
-                            @task.TaskRole.VerifierTwo
+                            @task.TaskRole.VerifierTwo?.DisplayName
                         </td>
                         <td>
-                            @task.TaskRole.HundredPercentCheck
+                            @task.TaskRole.HundredPercentCheck?.DisplayName
                         </td>
                         <td>
                             @task.StatusChangeDate

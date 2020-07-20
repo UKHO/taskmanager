@@ -1,9 +1,9 @@
-﻿using System;
-using System.Data.SqlClient;
-using DbUpdateWorkflowDatabase.EF;
+﻿using DbUpdateWorkflowDatabase.EF;
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF;
 using Oracle.ManagedDataAccess.Client;
+using System;
+using System.Data.SqlClient;
 using WorkflowDatabase.EF;
 
 namespace Common.Helpers
@@ -118,7 +118,7 @@ namespace Common.Helpers
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            dbContext.AdUser.RemoveRange(dbContext.AdUser);
+            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
             if (reseedIdentity) ReSeedNcneWorkflowDbTables(dbContext);
 

@@ -12,6 +12,7 @@ using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 
@@ -38,6 +39,7 @@ namespace NCNEPortal.Pages
         [BindProperty(SupportsGet = true)]
         public List<TaskInfo> NcneTasks { get; set; }
 
+        public List<string> ValidationErrorMessages { get; set; }
         public IndexModel(INcneUserDbService ncneUserDbService,
                           NcneWorkflowDbContext ncneWorkflowDbContext,
                           ILogger<IndexModel> logger,
@@ -47,14 +49,28 @@ namespace NCNEPortal.Pages
             _dbContext = ncneWorkflowDbContext;
             _logger = logger;
             _adDirectoryService = adDirectoryService;
+
+            ValidationErrorMessages = new List<string>();
         }
 
         public async Task OnGetAsync()
         {
             NcneTasks = await _dbContext.TaskInfo
+                .Include(t => t.Assigned)
                 .Include(c => c.TaskNote)
+                .ThenInclude(t => t.CreatedBy)
+                .Include(c => c.TaskNote)
+                .ThenInclude(t => t.LastModifiedBy)
                 .Include(s => s.TaskStage)
+                .ThenInclude(t => t.Assigned)
                 .Include(r => r.TaskRole)
+                .ThenInclude(c => c.Compiler)
+                .Include(r => r.TaskRole)
+                .ThenInclude(v => v.VerifierOne)
+                .Include(r => r.TaskRole)
+                .ThenInclude(v => v.VerifierTwo)
+                .Include(r => r.TaskRole)
+                .ThenInclude(h => h.HundredPercentCheck)
                 .ToListAsync();
 
 
@@ -74,7 +90,7 @@ namespace NCNEPortal.Pages
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
-
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
             if (existingTaskNote == null)
             {
                 if (!string.IsNullOrEmpty(taskNote))
@@ -84,9 +100,9 @@ namespace NCNEPortal.Pages
                         ProcessId = processId,
                         Text = taskNote,
                         Created = DateTime.Now,
-                        CreatedByUsername = CurrentUser.DisplayName,
+                        CreatedBy = user,
                         LastModified = DateTime.Now,
-                        LastModifiedByUsername = CurrentUser.DisplayName
+                        LastModifiedBy = user
                     });
 
                     await _dbContext.SaveChangesAsync();
@@ -98,23 +114,25 @@ namespace NCNEPortal.Pages
 
             existingTaskNote.Text = taskNote;
             existingTaskNote.LastModified = DateTime.Now;
-            existingTaskNote.LastModifiedByUsername = CurrentUser.DisplayName;
+            existingTaskNote.LastModifiedBy = user;
             await _dbContext.SaveChangesAsync();
 
             await OnGetAsync();
             return Page();
         }
 
-        public async Task OnPostAssignTaskToUserAsync(int processId, string userName, string taskStage)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrinciple)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
 
+            ValidationErrorMessages.Clear();
+
             if (await _ncneUserDbService.ValidateUserAsync(userName))
             {
                 var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
-
-                instance.AssignedUser = userName;
+                var user = await _ncneUserDbService.GetAdUserAsync(userPrinciple);
+                instance.Assigned = user;
                 instance.AssignedDate = DateTime.Now;
 
                 await _dbContext.SaveChangesAsync();
@@ -122,7 +140,14 @@ namespace NCNEPortal.Pages
             else
             {
                 _logger.LogInformation($"Attempted to assign task to unknown user {userName}");
+                ValidationErrorMessages.Add($"Unable to assign task to unknown user {userName}");
+                return new JsonResult(ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
+
+            return StatusCode(200);
         }
 
         public async Task<JsonResult> OnGetUsersAsync()

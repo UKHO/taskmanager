@@ -94,41 +94,41 @@ namespace NCNEPortal.UnitTests
             Assert.That(_dbContext.TaskInfo.Single().Status, Is.EqualTo(NcneTaskStatus.Terminated.ToString()));
 
         }
-        [Test]
-        public async Task Test_OnPostTaskTerminate_Adds_termination_comments_for_valid_comments()
-        {
-            AddTaskInfo(100);
+        //[Test]
+        //public async Task Test_OnPostTaskTerminate_Adds_termination_comments_for_valid_comments()
+        //{
+        //    AddTaskInfo(100);
 
-            await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
+        //    await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
 
-            A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Terminate comment: Valid Comment", 100, A<string>.Ignored))
-                .MustHaveHappened();
+        //    A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Terminate comment: Valid Comment", 100, A<string>.Ignored))
+        //        .MustHaveHappened();
 
-        }
+        //}
 
 
-        [Test]
-        public async Task Test_OnPostTaskComment_adds_TaskComments_for_valid_comments()
-        {
-            AddTaskInfo(100);
+        //[Test]
+        //public async Task Test_OnPostTaskComment_adds_TaskComments_for_valid_comments()
+        //{
+        //    AddTaskInfo(100);
 
-            await _workflowModel.OnPostTaskCommentAsync("Valid Comment", 100);
+        //    await _workflowModel.OnPostTaskCommentAsync("Valid Comment", 100);
 
-            A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Valid Comment", 100, A<string>.Ignored))
-                .MustHaveHappened();
-        }
+        //    A.CallTo(() => _fakeCommentsHelper.AddTaskComment("Valid Comment", 100, A<string>.Ignored))
+        //        .MustHaveHappened();
+        //}
 
-        [Test]
-        public async Task Test_OnPostTaskComment_does_not_add_TaskComments_for_Invalid_comments()
-        {
-            AddTaskInfo(100);
+        //[Test]
+        //public async Task Test_OnPostTaskComment_does_not_add_TaskComments_for_Invalid_comments()
+        //{
+        //    AddTaskInfo(100);
 
-            await _workflowModel.OnPostTaskCommentAsync("", 100);
+        //    await _workflowModel.OnPostTaskCommentAsync("", 100);
 
-            A.CallTo(() => _fakeCommentsHelper.AddTaskComment(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored))
-                .MustNotHaveHappened();
+        //    A.CallTo(() => _fakeCommentsHelper.AddTaskComment(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored))
+        //        .MustNotHaveHappened();
 
-        }
+        //}
 
         private void AddTaskInfo(int processId)
         {

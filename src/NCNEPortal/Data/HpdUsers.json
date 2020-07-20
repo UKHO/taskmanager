@@ -1,42 +1,19 @@
 [
   {
-    "AdUsername": "Greg Williams",
+    "AdUserId": 3,
     "HpdUsername": "TM_User"
   },
   {
-    "AdUsername": "Samir Hasson",
+    "AdUserId": 4,
     "HpdUsername": "TM_User"
   },
   {
-    "AdUsername": "Ben Hall",
+    "AdUserId": 6,
     "HpdUsername": "TM_User"
   },
+
   {
-    "AdUsername": "Rossall Sandford",
+    "AdUserId": 7,
     "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Bonnie Poole",
-    "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Gareth Evans",
-    "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Matthew Stoodley",
-    "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Peter Bates",
-    "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Rajan Shunmuga",
-    "HpdUsername": "TM_User"
-  },
-  {
-    "AdUsername": "Stuart Barzey",
-    "HpdUsername" :  "TM_User" 
   }
 ]
