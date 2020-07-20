@@ -4,12 +4,9 @@ using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
-using System.Net;
 using SourceDocumentService.HttpClients;
 using System.IO;
 using System.Security;
-using Serilog.Context;
 using SourceDocumentService.Configuration;
 
 namespace SourceDocumentService.Controllers
