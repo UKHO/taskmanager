@@ -3,8 +3,10 @@ using System.Configuration;
 using System.IO.Abstractions;
 using System.Net;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +29,22 @@ namespace SourceDocumentService
         {
             services.AddControllers();
             services.AddHealthChecks();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ADRoleOnly", policy => policy.RequireRole(ConfigurationManager.AppSettings["PermittedRoles"]));
+            });
+
+            var s = ConfigurationManager.AppSettings["PermittedRoles"];
+
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<IConfigurationManager, AppConfigConfigurationManager>();
