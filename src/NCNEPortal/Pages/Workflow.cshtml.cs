@@ -491,7 +491,7 @@ namespace NCNEPortal
 
             var roles = _dbContext.TaskRole.Single(r => r.ProcessId == processId);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName,
+            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.UserPrincipalName,
                 (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
             {
 
@@ -508,7 +508,7 @@ namespace NCNEPortal
         {
             ValidationErrorMessages.Clear();
 
-            if (!(_pageValidationHelper.ValidateForRework(username, CurrentUser.DisplayName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForRework(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -523,7 +523,7 @@ namespace NCNEPortal
         {
             ValidationErrorMessages.Clear();
 
-            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.DisplayName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {

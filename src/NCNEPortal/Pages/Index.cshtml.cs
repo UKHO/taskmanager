@@ -121,7 +121,7 @@ namespace NCNEPortal.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrinciple)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrincipal)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
@@ -131,7 +131,7 @@ namespace NCNEPortal.Pages
             if (await _ncneUserDbService.ValidateUserAsync(userName))
             {
                 var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
-                var user = await _ncneUserDbService.GetAdUserAsync(userPrinciple);
+                var user = await _ncneUserDbService.GetAdUserAsync(userPrincipal);
                 instance.Assigned = user;
                 instance.AssignedDate = DateTime.Now;
 

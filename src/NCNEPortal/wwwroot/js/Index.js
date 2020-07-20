@@ -1,5 +1,11 @@
 ﻿$(document).ready(function () {
 
+    $('#txtUserName').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
+    });
+
+    var usersFetched = false;
+
     var menuItem = 0;
 
     var userFullName = $("#userFullName > strong").text();
@@ -49,6 +55,11 @@
                 },
                 {
                     'targets': [13],
+                    'orderable': false,
+                    'searchable': false
+                },
+                {
+                    'targets': [14],
                     'visible': false,
                     'searchable': false
                 }
@@ -56,18 +67,40 @@
             "order": [[1, 'asc']],
             "scrollX": true,
             "createdRow": function(row, data, dataIndex) {
-                if (data[13] === "") {
+                if (data[14] === "") {
                     $("td.details-control", row).removeClass("details-control");
                     $("td.details-control i", row).removeClass("fa");
                 }
             }
+        }).on("click", ".taskNoteItem", function (event) {
+            event.preventDefault();
+
+            var target = $(event.currentTarget);
+
+            if (target.is("a")) {
+
+                $("#btnPostTaskNote").prop("disabled", false);
+                $("#editTaskNoteError").html("");
+
+                var processId = $(this).data("processid");
+                $("#hdnProcessId").val(processId);
+
+                var taskNote = $(this).data("tasknote");
+                $("#txtNote").val(taskNote);
+
+                $("#editTaskNoteModal h4.modal-title").text("Edit task " + processId + " note");
+
+                $("#editTaskNoteModal").modal("show");
+            }
+        }).on("click", ".assignTaskItem", function (event) {
+            showAssignTaskModal(event);
         });
 
 
     }
 
     function format(data) {
-        return '<span class="note-formatting">' + data[13] + '</span>';
+        return '<span class="note-formatting">' + data[14] + '</span>';
     }
 
     $('#inFlightTasks tbody').on('click',
@@ -112,7 +145,9 @@
                     if (settings.sTableId === "inFlightTasks") {
                         return true;
                     }
+
                 }
+
             }
         );
     }
@@ -137,21 +172,6 @@
     }
 
 
-
-    $(".taskNoteItem").on("click",
-        function () {
-
-            $("#btnPostTaskNote").prop("disabled", false);
-            $("#editTaskNoteError").html("");
-
-            var processId = $(this).data("processid");
-            $("#hdnProcessId").val(processId);
-
-            var taskNote = $(this).data("tasknote");
-            $("#txtNote").val(taskNote);
-
-            $("#editTaskNoteModal").modal("show");
-        });
 
     function setMenuItemSelection() {
         $("#menuItemList button").each(function (index) {
@@ -214,33 +234,37 @@
 
     });
 
-    $(".assignTaskItem").on("click",
-        function () {
+   
+    function showAssignTaskModal(event) {
 
-            $("#btnAssignTaskToUser").prop("disabled", false);
-            $("#AssignTaskError").html("");
+        event.preventDefault();
 
-            var processId = $(this).data("processid");
+        var target = $(event.currentTarget);
+
+        if (target.is("a")) {
+
+            var processId = target.data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
 
-            var taskStage = $(this).data("taskstage");
-            $("#hdnAssignTaskStage").val(taskStage);
+            $("#assignTaskModal h4.modal-title").text("Assign task " + processId + " to user");
 
             $("#assignTaskModal").modal("show");
-        });
+        }
+    }
+
 
     $("#assignTaskModal").on("shown.bs.modal",
         function () {
             $("#assignTaskTypeaheadError").hide();
             $("#assignTaskErrorMsg").text("");
-            $("#txtUsername").focus();
+            $("#txtUserName").focus();
             $('.typeahead').typeahead('val', "");
             $('.typeahead').typeahead('close');
         });
 
     $("#btnAssignTaskToUser").on("click", function () {
 
-        if ($("#txtUsername").val() === "") {
+        if ($("#txtUserName").val() === "") {
             $("#assignTaskTypeaheadError").show();
             $("#assignTaskErrorMsg").text("Please enter a user.");
             return;
@@ -249,8 +273,8 @@
         $("#btnAssignTaskToUser").prop("disabled", true);
 
         var processId = $("#hdnAssignTaskProcessId").val();
-        var userName = $("#txtUsername").val();
-        var taskStage = $("#hdnAssignTaskStage").val();
+        var userName = $("#txtUserName").val();
+        var userPrincipalName = $("#hdnAssignTaskUpn").val();
 
         $.ajax({
             type: "POST",
@@ -261,7 +285,7 @@
             data: {
                 "processId": processId,
                 "userName": userName,
-                "taskStage": taskStage
+                "userPrincipal": userPrincipalName
             },
             success: function (result) {
                 $("#assignTaskModal").modal("hide");
@@ -272,12 +296,11 @@
                 //getComments();
             },
             error: function (error) {
-                console.log(error);
+                var responseJson = error.responseJSON;
 
-                //$("#AddCommentError")
-                //    .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+                displayAssignUserErrors(responseJson);
 
-                //$("#btnPostComment").prop("disabled", false);
+                $("#btnAssignTaskToUser").prop("disabled", false);
             }
         });
 
@@ -304,7 +327,7 @@
         promise
             .done(function () {
                 $("#btnAssignTaskToUser").prop("disabled", false);
-                $("#txtUsername").prop("disabled", false);
+                $("#txtUserName").prop("disabled", false);
 
                 $('#assignTaskTypeaheadError').collapse("hide");
 
@@ -312,7 +335,7 @@
             })
             .fail(function () {
                 $("#btnAssignTaskToUser").prop("disabled", true);
-                $("#txtUsername").prop("disabled", true);
+                $("#txtUserName").prop("disabled", true);
 
                 $('#assignTaskTypeaheadError').collapse("show");
 
@@ -339,6 +362,29 @@
                 }
             });
     }
+
+    function displayAssignUserErrors(errorStringArray) {
+
+        var orderedList = $("#assignTaskErrorList");
+
+        // == to catch undefined and null
+        if (errorStringArray == null) {
+            orderedList.append("<li>An unknown error has occurred</li>");
+
+        } else {
+            errorStringArray.forEach(function (item) {
+                orderedList.append("<li>" + item + "</li>");
+            });
+        }
+
+        $("#assignTaskErrorMessages").collapse("show");
+    }
+
+    function removeAssignUserErrors() {
+        $("#assignTaskErrorMessages").collapse("hide");
+        $("#assignTaskErrorList").empty();
+    }
+
     //Show MyTaskList
     $("#btnMyTaskList").trigger("click");
 });

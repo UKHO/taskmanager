@@ -44,7 +44,7 @@
         <table id="inFlightTasks" class="table-striped" style="width: 100%">
             <thead>
                 <tr>
-                    <th></th>
+                    <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>Process ID</th>
                     <th style="min-width: 3.6rem;">Chart Type</th>
                     <th style="max-width: 3.9rem;">Chart Number</th>
@@ -56,8 +56,8 @@
                     <th style="min-width: 7.0rem;">Publication</th>
                     <th>Country</th>
                     <th style="max-width: 4.5rem;">Workflow Type</th>
-                    <th></th>
-                    <th></th>
+                    <th><span class="screen-reader-only">Assign Tasks</span></th>
+                    <th><span class="screen-reader-only">Edit Task Notes</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -186,20 +186,17 @@
                             @task.WorkflowType
                         </td>
                         <td>
-                            <div class="dropdown" style="cursor: pointer;">
-                                <i class="fas fa-cog black" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></i>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item taskNoteItem" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text">
-                                        <i class="far fa-edit">
-                                        </i>
-                                        Edit Task Note
-                                    </a>
-                                    <a class="dropdown-item assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.ChartType">
-                                        <i class="far fa-user">
-                                        </i>
-                                        Assign Task
-                                    </a>
-                                </div>
+                            <div data-toggle="tooltip" data-placement="top" title="Assign Task">
+                                <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" aria-label="Assign Task" href="#" style="cursor: pointer;">
+                                    <i class="far fa-user"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div data-toggle="tooltip" data-placement="top" title="Task Notes">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                    <i class="far fa-edit"></i>
+                                </a>
                             </div>
                         </td>
                         <td>
@@ -233,11 +230,11 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                            &&
-                                            (t.TaskRole.VerifierOne.DisplayName == Model.CurrentUser.DisplayName
-     || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName
-     || t.TaskRole.VerifierTwo.DisplayName == Model.CurrentUser.DisplayName
-     || t.TaskRole.HundredPercentCheck.DisplayName == Model.CurrentUser.DisplayName)))
+                                     &&
+                                     (t.TaskRole.VerifierOne?.DisplayName == Model.CurrentUser.DisplayName
+|| t.TaskRole.Compiler?.DisplayName == Model.CurrentUser.DisplayName
+|| t.TaskRole.VerifierTwo?.DisplayName == Model.CurrentUser.DisplayName
+|| t.TaskRole.HundredPercentCheck?.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -318,7 +315,7 @@
                 <div id="assignTaskModal-body">
                     <div id="assignTaskTypeahead">
                         <div class="text-input-wrap">
-                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                            <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
                         </div>
                         <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
                             <h5>
@@ -328,7 +325,7 @@
                         </section>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
-                    <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
+                    <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />
                     <br />
                     <div id="AssignTaskError"></div>
                 </div>

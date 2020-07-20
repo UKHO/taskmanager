@@ -1,5 +1,21 @@
 ﻿$(document).ready(function() {
 
+    $('.ta_compiler').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#CompilerUpn').val(suggestionObject.userPrincipalName);
+    });
+
+    $('.ta_v1').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
+    });
+
+    $('.ta_v2').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#Verifier2Upn').val(suggestionObject.userPrincipalName);
+    });
+
+    $('.ta_100pCheck').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#HundredPCheckUpn').val(suggestionObject.userPrincipalName);
+    });
+
     $("#PublicationDate").datepicker({
         autoclose: true,
         todayHighLight: true,
