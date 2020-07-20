@@ -4,17 +4,16 @@ using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
-using System.Net;
 using SourceDocumentService.HttpClients;
 using System.IO;
 using System.Security;
-using Serilog.Context;
+using Microsoft.AspNetCore.Authorization;
 using SourceDocumentService.Configuration;
 
 namespace SourceDocumentService.Controllers
 {
     [ApiController]
+    [Authorize(Policy = "ADRoleOnly")]
     public class SourceDocumentController : ControllerBase
     {
         private readonly ILogger<SourceDocumentController> _logger;
