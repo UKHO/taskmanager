@@ -35,8 +35,6 @@ namespace SourceDocumentService
                 options.AddPolicy("ADRoleOnly", policy => policy.RequireRole(ConfigurationManager.AppSettings["PermittedRoles"]));
             });
 
-            var s = ConfigurationManager.AppSettings["PermittedRoles"];
-
             services.AddMvc(config =>
             {
                 var policy = new AuthorizationPolicyBuilder()
