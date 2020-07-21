@@ -68,6 +68,13 @@ namespace NCNEPortal.Pages
             {
                 NcneTasks = await _dbContext.TaskInfo
                     .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.Compiler)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.VerifierOne)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.VerifierTwo)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.HundredPercentCheck)
                     .OrderByDescending(t => t.StatusChangeDate)
                     .Where(t => t.Status == NcneTaskStatus.Completed.ToString() ||
                                 t.Status == NcneTaskStatus.Terminated.ToString())
@@ -96,7 +103,14 @@ namespace NCNEPortal.Pages
             try
             {
                 NcneTasks = await _dbContext.TaskInfo
-                    .Include(t => t.TaskRole)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.Compiler)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.VerifierOne)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.VerifierTwo)
+                    .Include(c => c.TaskRole)
+                    .ThenInclude(c => c.HundredPercentCheck)
                     .Where(t =>
                         (t.Status == NcneTaskStatus.Completed.ToString() || t.Status == NcneTaskStatus.Terminated.ToString())
                         && (
