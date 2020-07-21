@@ -86,6 +86,13 @@ $ConfigData =
                 CopyToNodes = $true
                 TargetDirectory = "c:\temp\SourceDocumentServiceDeploy\SourceDocumentService.BuildDeploy"
                 CleanOnDeploy = $true
+            },
+            @{
+                Name = "UKHO.SourceDocumentService.BuildDeploy.Tests"
+                Roles = @("WebApi", "BuildDeploy", "Tests")
+                CopyToNodes = $true
+                TargetDirectory = "c:\temp\SourceDocumentServiceDeploy\SourceDocumentService.BuildDeploy.Tests"
+                CleanOnDeploy = $true
             }
         )
     } 
