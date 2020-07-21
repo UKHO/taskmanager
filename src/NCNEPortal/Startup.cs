@@ -91,8 +91,8 @@ namespace NCNEPortal
                     : s.GetService<IOptions<UriConfig>>().Value.NcneLandingPageUrl,
                 s.GetService<HttpProvider>()));
 
-            services.AddScoped<INcneUserDbService,
-                NcneUserDbService>(s => new NcneUserDbService(s.GetService<NcneWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
+            //services.AddScoped<INcneUserDbService,
+            //    NcneUserDbService>(s => new NcneUserDbService(s.GetService<NcneWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
             services.AddScoped<IMilestoneCalculator, MilestoneCalculator>();
             services.AddScoped<ICommentsHelper, CommentsHelper>();
