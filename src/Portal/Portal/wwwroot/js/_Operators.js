@@ -1,11 +1,11 @@
 ﻿$(document).ready(function () {
-    $('#Reviewer').on('typeahead:selected', function (eventObject, suggestionObject) {
+    $('#Reviewer').on('typeahead:selected typeahead:autocomplete', function (eventObject, suggestionObject) {
         $('#hdnReviewerOperatorUpn').val(suggestionObject.userPrincipalName);
     });
-    $('#Assessor').on('typeahead:selected', function (eventObject, suggestionObject) {
+    $('#Assessor').on('typeahead:selected typeahead:autocomplete', function (eventObject, suggestionObject) {
         $('#hdnAssessorOperatorUpn').val(suggestionObject.userPrincipalName);
     });
-    $('#Verifier').on('typeahead:selected',
+    $('#Verifier').on('typeahead:selected typeahead:autocomplete',
         function(eventObject, suggestionObject) {
             $('#hdnVerifierOperatorUpn').val(suggestionObject.userPrincipalName);
         });
