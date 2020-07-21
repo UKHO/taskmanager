@@ -38,7 +38,7 @@
 
             }
         </td>
-        <td>@Model.AssignedUser</td>
+        <td>@Model.Assigned?.DisplayName</td>
         <td id="DtExp-@(Model.TaskStageId)">@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
         <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
         <td>
@@ -57,7 +57,7 @@
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication)
             {
                 @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
-          Model.IsReadOnly == false)
+       Model.IsReadOnly == false)
                 {
                     <div class="d-flex justify-content-end">
                         @if (@Model.TaskStageType.AllowRework)
@@ -65,7 +65,7 @@
                             <div class="mt-3 mr-3">
                                 <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary btn-stage-rework"
                                         data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
-                                        data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                        data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
                                         data-StageName="@(Model.TaskStageType.Name)">
                                     Rework
                                 </button>
@@ -74,7 +74,7 @@
                         <div class="mt-3">
                             <button id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete btn-stage-complete"
                                     data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
-                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
                                     data-StageName="@(Model.TaskStageType.Name)" style="min-width: 139px;">
                                 Mark Complete
                             </button>
@@ -92,7 +92,7 @@
                                     @((Model.Status == NcneTaskStageStatus.InProgress.ToString() && Model.IsReadOnly == false) ? "" : " disabled ")
                                     class="btn btn-block btn-primary btn-caris-publish"
                                     data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
-                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
                                     data-StageName="@(Model.TaskStageType.Name)">
                                 Publish in CARIS
                             </button>
@@ -101,7 +101,7 @@
                             <div class="checkbox-wrapper">
                                 <input type="checkbox"
                                        @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
-                                       disabled "check@(Model.TaskStageId)">
+                                       disabled id="check@(Model.TaskStageId)">
                                 <label for="check@(Model.TaskStageId)"></label>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                                 <div class="checkbox-wrapper">
                                     <input type="checkbox" class="chk_publish_step"
                                            data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
-                                           data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.AssignedUser)"
+                                           data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
                                            data-StageName="@(Model.TaskStageType.Name)"
                                            @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
                                            @(((Model.Status == NcneTaskStageStatus.InProgress.ToString()) && (Model.IsReadOnly == false)) ? "" : " disabled ")
@@ -149,7 +149,7 @@
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>@comment.Username</strong>
+                                    <strong>@comment.AdUser.DisplayName</strong>
                                 </div>
                             </div>
                             <div class="col-10">

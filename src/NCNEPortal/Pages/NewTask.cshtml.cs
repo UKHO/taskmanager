@@ -78,22 +78,22 @@ namespace NCNEPortal
 
         [BindProperty]
         [DisplayName("Compiler")]
-        public string Compiler { get; set; }
+        public AdUser Compiler { get; set; }
 
 
         [BindProperty]
         [DisplayName("Verifier V1")]
-        public string Verifier1 { get; set; }
+        public AdUser Verifier1 { get; set; }
 
 
         [BindProperty]
         [DisplayName("Verifier V2")]
-        public string Verifier2 { get; set; }
+        public AdUser Verifier2 { get; set; }
 
 
         [BindProperty]
         [DisplayName("100% Check")]
-        public string HundredPercentCheck { get; set; }
+        public AdUser HundredPercentCheck { get; set; }
 
 
         public List<string> ValidationErrorMessages { get; set; }
@@ -154,13 +154,12 @@ namespace NCNEPortal
 
                 ValidationErrorMessages.Clear();
 
-
                 var role = new TaskRole()
                 {
-                    Compiler = Compiler,
-                    VerifierOne = Verifier1,
-                    VerifierTwo = Verifier2,
-                    HundredPercentCheck = HundredPercentCheck
+                    Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
+                    VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
+                    VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
+                    HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
                 };
 
                 if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
@@ -181,9 +180,9 @@ namespace NCNEPortal
 
                 var currentStage = _ncneWorkflowDbContext.TaskStageType.Find(currentStageId).Name;
 
-                var newProcessId = await CreateTaskInfo(currentStage);
+                var newProcessId = await CreateTaskInfo(currentStage, role);
 
-                await CreateTaskStages(newProcessId);
+                await CreateTaskStages(newProcessId, role);
 
                 return StatusCode(200);
             }
@@ -195,7 +194,7 @@ namespace NCNEPortal
 
         }
 
-        private async Task<int> CreateTaskInfo(string currentStage)
+        private async Task<int> CreateTaskInfo(string currentStage, TaskRole role)
         {
             var taskInfo = _ncneWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
             {
@@ -210,18 +209,12 @@ namespace NCNEPortal
                 CommitDate = this.CommitToPrintDate,
                 CisDate = this.CISDate,
                 Country = this.Country,
-                AssignedUser = this.Compiler,
+                Assigned = role.Compiler,
                 AssignedDate = DateTime.Now,
                 CurrentStage = currentStage,
                 Status = NcneTaskStatus.InProgress.ToString(),
                 StatusChangeDate = DateTime.Now,
-                TaskRole = new TaskRole
-                {
-                    Compiler = this.Compiler,
-                    VerifierOne = this.Verifier1,
-                    VerifierTwo = this.Verifier2,
-                    HundredPercentCheck = this.HundredPercentCheck
-                }
+                TaskRole = role
 
             });
 
@@ -248,7 +241,7 @@ namespace NCNEPortal
             }
         }
 
-        private async Task CreateTaskStages(int processId)
+        private async Task CreateTaskStages(int processId, TaskRole role)
         {
 
 
@@ -277,17 +270,17 @@ namespace NCNEPortal
                 };
 
                 //Assign the user according to the stage
-                taskStage.AssignedUser = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
+                taskStage.Assigned = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.With_Geodesy => this.Compiler,
-                    NcneTaskStageType.With_SDRA => this.Compiler,
-                    NcneTaskStageType.Specification => this.Compiler,
-                    NcneTaskStageType.Compile => this.Compiler,
-                    NcneTaskStageType.V1_Rework => this.Compiler,
-                    NcneTaskStageType.V2_Rework => this.Compiler,
-                    NcneTaskStageType.V2 => this.Verifier2,
-                    NcneTaskStageType.Hundred_Percent_Check => HundredPercentCheck,
-                    _ => this.Verifier1
+                    NcneTaskStageType.With_Geodesy => role.Compiler,
+                    NcneTaskStageType.With_SDRA => role.Compiler,
+                    NcneTaskStageType.Specification => role.Compiler,
+                    NcneTaskStageType.Compile => role.Compiler,
+                    NcneTaskStageType.V1_Rework => role.Compiler,
+                    NcneTaskStageType.V2_Rework => role.Compiler,
+                    NcneTaskStageType.V2 => role.VerifierTwo,
+                    NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    _ => role.VerifierOne
                 };
 
 

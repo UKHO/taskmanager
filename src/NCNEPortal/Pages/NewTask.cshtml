@@ -188,6 +188,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.Compiler, "",
                                                 new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.Compiler.UserPrincipalName, new { @id = "CompilerUpn", @class = "CompilerUpn" })
                                         </div>
 
                                     </div>
@@ -202,6 +203,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.Verifier1, "",
                                                 new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.Verifier1.UserPrincipalName, new { @id = "Verifier1Upn", @class = "Verifier1Upn" })
                                         </div>
 
                                     </div>
@@ -216,6 +218,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.Verifier2, "",
                                                 new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
                                         </div>
 
                                     </div>
@@ -230,6 +233,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.HundredPercentCheck, "",
                                                 new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
                                         </div>
 
                                     </div>

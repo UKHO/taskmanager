@@ -27,7 +27,8 @@ namespace NCNEWorkflowDatabase.EF.Models
         public DateTime? SentDate3Ps { get; set; }
         public DateTime? ExpectedDate3Ps { get; set; }
         public DateTime? ActualDate3Ps { get; set; }
-        public string AssignedUser { get; set; }
+        public virtual AdUser Assigned { get; set; }
+        public int AssignedAdUserId { get; set; }
         public DateTime AssignedDate { get; set; }
 
         public string CurrentStage { get; set; }
