@@ -57,7 +57,7 @@
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication)
             {
                 @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
-        Model.IsReadOnly == false)
+       Model.IsReadOnly == false)
                 {
                     <div class="d-flex justify-content-end">
                         @if (@Model.TaskStageType.AllowRework)
@@ -101,7 +101,7 @@
                             <div class="checkbox-wrapper">
                                 <input type="checkbox"
                                        @((Model.Status == NcneTaskStageStatus.Completed.ToString()) ? " checked " : "")
-                                       disabled "check@(Model.TaskStageId)">
+                                       disabled id="check@(Model.TaskStageId)">
                                 <label for="check@(Model.TaskStageId)"></label>
                             </div>
                         </div>

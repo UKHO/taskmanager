@@ -3,6 +3,9 @@
     $('#txtUserName').on('typeahead:selected', function (eventObject, suggestionObject) {
         $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
     });
+    $('#txtUserName').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
+    });
 
     var usersFetched = false;
 
