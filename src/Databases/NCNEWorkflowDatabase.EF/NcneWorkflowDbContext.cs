@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NCNEWorkflowDatabase.EF.Models;
 using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace NCNEWorkflowDatabase.EF
 {
