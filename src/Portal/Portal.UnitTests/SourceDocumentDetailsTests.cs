@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Factories;
 using Common.Factories.DocumentStatusFactory;
 using Common.Helpers;
 using Common.Messages.Events;
@@ -82,7 +81,7 @@ namespace Portal.UnitTests
 
             var ex = Assert.ThrowsAsync<InvalidOperationException>(() =>
                 sourceDocumentDetailsModel.OnGetAsync());
-            Assert.AreEqual("Unable to retrieve AssessmentData", ex.Data["OurMessage"]);
+            Assert.AreEqual($"Unable to retrieve AssessmentData for ProcessId 0", ex.Data["OurMessage"]);
         }
 
         [Test]
