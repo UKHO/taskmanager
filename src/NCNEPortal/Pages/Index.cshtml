@@ -230,11 +230,11 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                     &&
-                                     (t.TaskRole.VerifierOne?.DisplayName == Model.CurrentUser.DisplayName
-|| t.TaskRole.Compiler?.DisplayName == Model.CurrentUser.DisplayName
-|| t.TaskRole.VerifierTwo?.DisplayName == Model.CurrentUser.DisplayName
-|| t.TaskRole.HundredPercentCheck?.DisplayName == Model.CurrentUser.DisplayName)))
+                                    &&
+                                    (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+|| t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+|| t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+|| t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))
                 {
                     <tr>
                         <td>
