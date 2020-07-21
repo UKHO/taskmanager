@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,6 +16,13 @@ using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TaskComment = NCNEWorkflowDatabase.EF.Models.TaskComment;
 
 
@@ -96,24 +96,24 @@ namespace NCNEPortal
 
         [DisplayName("Compiler")]
         [BindProperty]
-        public string Compiler { get; set; }
+        public AdUser Compiler { get; set; }
 
         public SelectList CompilerList { get; set; }
 
         [DisplayName("Verifier V1")]
         [BindProperty]
-        public string Verifier1 { get; set; }
+        public AdUser Verifier1 { get; set; }
 
 
         [DisplayName("Verifier V2")]
         [BindProperty]
-        public string Verifier2 { get; set; }
+        public AdUser Verifier2 { get; set; }
 
 
 
         [DisplayName("100% Check")]
         [BindProperty]
-        public string HundredPercentCheck { get; set; }
+        public AdUser HundredPercentCheck { get; set; }
 
         [BindProperty] public bool SentTo3Ps { get; set; }
 
@@ -213,7 +213,8 @@ namespace NCNEPortal
 
             var taskInfo = UpdateTaskAsTerminated(processId);
 
-            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, CurrentUser.DisplayName);
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, user);
 
             _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -243,10 +244,14 @@ namespace NCNEPortal
             ProcessId = processId;
 
             var taskInfo = _dbContext.TaskInfo
-                .Include(task => task.TaskRole)
-                .Include(task => task.TaskStage).ThenInclude(comment => comment.TaskStageComment)
+                .Include(task => task.TaskRole).ThenInclude(c => c.Compiler)
+                .Include(task => task.TaskRole).ThenInclude(c => c.VerifierOne)
+                .Include(task => task.TaskRole).ThenInclude(c => c.VerifierTwo)
+                .Include(task => task.TaskRole).ThenInclude(c => c.HundredPercentCheck)
+                .Include(task => task.TaskStage).ThenInclude(comment => comment.TaskStageComment).ThenInclude(u => u.AdUser)
                 .Include(task => task.TaskStage).ThenInclude(stagetype => stagetype.TaskStageType)
-                .Include(task => task.TaskComment)
+                .Include(task => task.TaskStage).ThenInclude(r => r.Assigned)
+                .Include(task => task.TaskComment).ThenInclude(c => c.AdUser)
                 .FirstOrDefault(t => t.ProcessId == processId);
 
 
@@ -356,8 +361,10 @@ namespace NCNEPortal
                 return carisProjectDetails.ProjectId;
             }
 
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+
             // which will also implicitly validate if the current user has been mapped to HPD account in our database
-            var hpdUser = await GetHpdUser(CurrentUser.DisplayName);
+            var hpdUser = await GetHpdUser(user);
 
             _logger.LogInformation(
                 "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
@@ -369,29 +376,26 @@ namespace NCNEPortal
 
             //Add the users from other roles to the Caris Project
             var role = await _dbContext.TaskRole.FirstOrDefaultAsync(t => t.ProcessId == processId);
-            if ((!string.IsNullOrEmpty(role.Compiler)) && (role.Compiler != CurrentUser.DisplayName))
+            if (role.Compiler != null && role.Compiler != user)
             {
                 hpdUser = await GetHpdUser(role.Compiler);
                 await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                      _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
-
-            if ((!string.IsNullOrEmpty(role.VerifierOne)) && (role.VerifierOne != CurrentUser.DisplayName))
+            if (role.VerifierOne != null && role.VerifierOne != user)
             {
                 hpdUser = await GetHpdUser(role.VerifierOne);
                 await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
-
-            if ((!string.IsNullOrEmpty(role.VerifierTwo)) && (role.VerifierTwo != CurrentUser.DisplayName))
+            if (role.VerifierTwo != null && role.VerifierTwo != user)
             {
                 hpdUser = await GetHpdUser(role.VerifierTwo);
 
                 await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
-
-            if ((!string.IsNullOrEmpty(role.HundredPercentCheck)) && (role.HundredPercentCheck != CurrentUser.DisplayName))
+            if (role.HundredPercentCheck != null && role.HundredPercentCheck != user)
             {
                 hpdUser = await GetHpdUser(role.HundredPercentCheck);
                 await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
@@ -421,11 +425,13 @@ namespace NCNEPortal
             _logger.LogInformation(
                 "Adding Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}. with new details");
 
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+
             _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
             {
                 ProcessId = processId,
                 Created = DateTime.Now,
-                CreatedBy = CurrentUser.DisplayName,
+                CreatedBy = user,
                 ProjectId = projectId,
                 ProjectName = projectName
             });
@@ -433,17 +439,17 @@ namespace NCNEPortal
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<HpdUser> GetHpdUser(string username)
+        private async Task<HpdUser> GetHpdUser(AdUser user)
         {
 
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUsername == username);
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser == user);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogError($"Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
-                throw new InvalidOperationException($"Unable to find HPD username for {username}  in our system.",
+                throw new InvalidOperationException($"Unable to find HPD username for {user.DisplayName}  in our system.",
                     ex.InnerException);
             }
 
@@ -483,9 +489,13 @@ namespace NCNEPortal
             ValidationErrorMessages.Clear();
 
 
-            var roles = _dbContext.TaskRole.Single(r => r.ProcessId == processId);
+            var roles = _dbContext.TaskRole
+                .Include(c => c.Compiler)
+                .Include(v => v.VerifierOne)
+                .Include(v => v.VerifierTwo)
+                .Include(h => h.HundredPercentCheck).Single(r => r.ProcessId == processId);
 
-            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.DisplayName,
+            if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.UserPrincipalName,
                 (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
             {
 
@@ -502,7 +512,7 @@ namespace NCNEPortal
         {
             ValidationErrorMessages.Clear();
 
-            if (!(_pageValidationHelper.ValidateForRework(username, CurrentUser.DisplayName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForRework(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -517,7 +527,7 @@ namespace NCNEPortal
         {
             ValidationErrorMessages.Clear();
 
-            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.DisplayName, ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -540,7 +550,8 @@ namespace NCNEPortal
             taskInfo.Status = NcneTaskStatus.Completed.ToString();
             taskInfo.StatusChangeDate = DateTime.Now;
 
-            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteWorkflow, processId, CurrentUser.DisplayName, null, null, null);
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteWorkflow, processId, user, null, null, null);
 
             await _dbContext.SaveChangesAsync();
 
@@ -570,10 +581,11 @@ namespace NCNEPortal
             var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId).Include(t => t.TaskStageType); ;
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
             currentStage.Status = NcneTaskStageStatus.Rework.ToString();
             currentStage.DateCompleted = DateTime.Now;
-            currentStage.AssignedUser = CurrentUser.DisplayName;
+            currentStage.Assigned = user;
 
             _logger.LogInformation(
                 " stage {StageId} of task {ProcessId} sent for rework.");
@@ -585,17 +597,17 @@ namespace NCNEPortal
                 NcneTaskStageStatus.InProgress.ToString();
 
             var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStage)?
-                .AssignedUser;
+                .Assigned;
 
             var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
 
-            taskInfo.AssignedUser = nextStageUser;
+            taskInfo.Assigned = nextStageUser;
             taskInfo.AssignedDate = DateTime.Now;
             taskInfo.CurrentStage = taskStages.FirstAsync(t => t.TaskStageTypeId == (int)nextStage).Result.TaskStageType.Name;
 
             var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;
 
-            await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, CurrentUser.DisplayName, stageName, null, null);
+            await _commentsHelper.AddTaskSystemComment(NcneCommentType.ReworkStage, processId, user, stageName, null, null);
 
             await _dbContext.SaveChangesAsync();
 
@@ -610,9 +622,11 @@ namespace NCNEPortal
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
+            var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+
             currentStage.Status = NcneTaskStageStatus.Completed.ToString();
             currentStage.DateCompleted = DateTime.Now;
-            currentStage.AssignedUser = CurrentUser.DisplayName;
+            currentStage.Assigned = user;
 
             _logger.LogInformation(
                 "stage {StageId} of task {ProcessId} is completed.");
@@ -636,9 +650,9 @@ namespace NCNEPortal
                 }
 
                 var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStages[0])?
-                    .AssignedUser;
+                    .Assigned;
 
-                taskInfo.AssignedUser = nextStageUser;
+                taskInfo.Assigned = nextStageUser;
                 taskInfo.AssignedDate = DateTime.Now;
             }
 
@@ -653,13 +667,13 @@ namespace NCNEPortal
                 //complete the publication stage
                 publishStage.Status = NcneTaskStageStatus.Completed.ToString();
                 publishStage.DateCompleted = DateTime.Now;
-                publishStage.AssignedUser = CurrentUser.DisplayName;
+                publishStage.Assigned = user;
             }
 
             var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;
 
             await _commentsHelper.AddTaskSystemComment(currentStage.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart ? NcneCommentType.CarisPublish : NcneCommentType.CompleteStage,
-                processId, CurrentUser.DisplayName, stageName, null, null);
+                processId, user, stageName, null, null);
 
             taskInfo.CurrentStage = GetCurrentStage(new List<TaskStage>(taskStages));
 
@@ -689,11 +703,12 @@ namespace NCNEPortal
 
             var role = new TaskRole()
             {
-                Compiler = Compiler,
                 ProcessId = processId,
-                VerifierOne = Verifier1,
-                VerifierTwo = Verifier2,
-                HundredPercentCheck = HundredPercentCheck
+                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
+                VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
+                VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
+                HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
+
             };
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
@@ -709,13 +724,13 @@ namespace NCNEPortal
                 };
             }
 
-            var result = await UpdateTaskInformation(processId, chartType);
+            var result = await UpdateTaskInformation(processId, chartType, role);
 
 
             return new JsonResult(JsonConvert.SerializeObject(result));
         }
 
-        private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType)
+        private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType, TaskRole role)
         {
 
             _logger.LogInformation(
@@ -723,8 +738,18 @@ namespace NCNEPortal
 
 
             var task =
-                await _dbContext.TaskInfo.Include(t => t.TaskRole)
-                      .Include(s => s.TaskStage).FirstAsync(t => t.ProcessId == processId);
+                await _dbContext.TaskInfo
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(c => c.Compiler)
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(v => v.VerifierOne)
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(v => v.VerifierTwo)
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(h => h.HundredPercentCheck)
+                      .Include(s => s.TaskStage)
+                      .ThenInclude(r => r.Assigned)
+                      .FirstAsync(t => t.ProcessId == processId);
             task.Ion = Ion;
             task.ChartNumber = ChartNo;
             task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
@@ -736,7 +761,7 @@ namespace NCNEPortal
 
             }
 
-            await AddSystemComments(task, processId, Compiler, Verifier1, Verifier2, HundredPercentCheck);
+            await AddSystemComments(task, processId, role);
 
             task.RepromatDate = RepromatDate;
 
@@ -755,11 +780,11 @@ namespace NCNEPortal
             if (carisProject != null)
                 UpdateCarisProjectUsers(task, carisProject.ProjectId);
 
-            UpdateRoles(task);
+            UpdateRoles(task, role);
 
-            UpdateStatus(task);
+            UpdateStatus(task, role);
 
-            UpdateTaskUser(task);
+            UpdateTaskUser(task, role);
 
             var deadLines = UpdateDeadlineDates(task);
 
@@ -770,13 +795,13 @@ namespace NCNEPortal
 
         }
 
-        private async Task AddSystemComments(TaskInfo task, int processId, string compiler,
-              string v1, string v2, string hundredPercentCheck)
+        private async Task AddSystemComments(TaskInfo task, int processId, TaskRole role)
         {
 
             _logger.LogInformation(
                 " Adding system comments for process {ProcessId}.");
 
+            var currentUser = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
             //update the system comment on changes
             if (((PublicationDate != null) && (task.PublicationDate != PublicationDate)) ||
@@ -784,34 +809,34 @@ namespace NCNEPortal
                 (task.AnnounceDate != AnnounceDate) ||
                 (task.CommitDate != CommitToPrintDate) ||
                 (task.CisDate != CISDate))
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, CurrentUser.DisplayName, null,
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, currentUser, null,
                     null, null);
 
-            if (!string.IsNullOrEmpty(Compiler) && task.TaskRole.Compiler != compiler)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, CurrentUser.DisplayName,
-                    null, Compiler, null);
-            if (!string.IsNullOrEmpty(Verifier1) && task.TaskRole.VerifierOne != v1)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, CurrentUser.DisplayName,
-                    null, Verifier1, null);
-            if (!string.IsNullOrEmpty(Verifier2) && task.TaskRole.VerifierTwo != v2)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, CurrentUser.DisplayName,
-                    null, Verifier2, null);
-            if (!string.IsNullOrEmpty(hundredPercentCheck) && task.TaskRole.HundredPercentCheck != hundredPercentCheck)
-                await _commentsHelper.AddTaskSystemComment(NcneCommentType.HundredPcChange, processId, CurrentUser.DisplayName,
-                    null, hundredPercentCheck, null);
+            if (role.Compiler != null && task.TaskRole?.Compiler != role.Compiler)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, currentUser,
+                    null, role.Compiler.DisplayName, null);
+            if (role.VerifierOne != null && task.TaskRole?.VerifierOne != role.VerifierOne)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, currentUser,
+                    null, role.VerifierOne.DisplayName, null);
+            if (role.VerifierTwo != null && task.TaskRole?.VerifierTwo != role.VerifierTwo)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, currentUser,
+                    null, role.VerifierTwo.DisplayName, null);
+            if (role.HundredPercentCheckAdUserId != null && task.TaskRole?.HundredPercentCheck != role.HundredPercentCheck)
+                await _commentsHelper.AddTaskSystemComment(NcneCommentType.HundredPcChange, processId, currentUser,
+                    null, role.HundredPercentCheck.DisplayName, null);
 
             if ((task.ThreePs != SentTo3Ps) || (task.SentDate3Ps != SendDate3ps)
                                             || (task.ExpectedDate3Ps != ExpectedReturnDate3ps) ||
                                             (task.ActualDate3Ps != ActualReturnDate3ps))
             {
                 await _commentsHelper.AddTaskSystemComment(NcneCommentType.ThreePsChange, processId,
-                    CurrentUser.DisplayName,
+                    currentUser,
                     null, null, null);
             }
         }
 
 
-        private void UpdateStatus(TaskInfo task)
+        private void UpdateStatus(TaskInfo task, TaskRole role)
         {
 
             _logger.LogInformation(
@@ -821,7 +846,7 @@ namespace NCNEPortal
             var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
             var v2Rework = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2_Rework);
 
-            if (Verifier2 == null)
+            if (role.VerifierTwo == null)
             {
                 if (v2 != null) v2.Status = NcneTaskStageStatus.Inactive.ToString();
                 if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Inactive.ToString();
@@ -845,26 +870,26 @@ namespace NCNEPortal
 
             var hpdUser = GetHpdUser(Compiler).Result;
 
-            if ((!string.IsNullOrEmpty(Compiler)) && (Compiler != task.TaskRole.Compiler))
+            if (Compiler != null && Compiler != task.TaskRole.Compiler)
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
 
-            if ((!string.IsNullOrEmpty(Verifier1)) && (Verifier1 != task.TaskRole.VerifierOne))
+            if (Verifier1 != null && Verifier1 != task.TaskRole.VerifierOne)
             {
                 hpdUser = GetHpdUser(Verifier1).Result;
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
 
-            if ((!string.IsNullOrEmpty(Verifier2)) && (Verifier2 != task.TaskRole.VerifierTwo))
+            if (Verifier2 != null && Verifier2 != task.TaskRole.VerifierTwo)
             {
                 hpdUser = GetHpdUser(Verifier2).Result;
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
 
-            if ((!string.IsNullOrEmpty(HundredPercentCheck)) &&
-                (HundredPercentCheck != task.TaskRole.HundredPercentCheck))
+            if (HundredPercentCheck != null &&
+                HundredPercentCheck != task.TaskRole.HundredPercentCheck)
             {
                 hpdUser = GetHpdUser(HundredPercentCheck).Result;
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
@@ -874,37 +899,34 @@ namespace NCNEPortal
 
         }
 
-        private void UpdateRoles(TaskInfo task)
+        private void UpdateRoles(TaskInfo task, TaskRole role)
         {
 
             _logger.LogInformation(
                 " Updating Roles for for task {ProcessId}.");
 
 
-            task.TaskRole.Compiler = Compiler;
-            task.TaskRole.VerifierOne = Verifier1;
-            task.TaskRole.VerifierTwo = Verifier2;
-            task.TaskRole.HundredPercentCheck = HundredPercentCheck;
+            task.TaskRole = role;
 
             foreach (var taskStage in task.TaskStage.Where
                 (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
             {
-                taskStage.AssignedUser = (NcneTaskStageType)taskStage.TaskStageTypeId switch
+                taskStage.Assigned = (NcneTaskStageType)taskStage.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.With_Geodesy => this.Compiler,
-                    NcneTaskStageType.With_SDRA => this.Compiler,
-                    NcneTaskStageType.Specification => this.Compiler,
-                    NcneTaskStageType.Compile => this.Compiler,
-                    NcneTaskStageType.V1_Rework => this.Compiler,
-                    NcneTaskStageType.V2_Rework => this.Compiler,
-                    NcneTaskStageType.V2 => this.Verifier2,
-                    NcneTaskStageType.Hundred_Percent_Check => HundredPercentCheck,
-                    _ => this.Verifier1
+                    NcneTaskStageType.With_Geodesy => role.Compiler,
+                    NcneTaskStageType.With_SDRA => role.Compiler,
+                    NcneTaskStageType.Specification => role.Compiler,
+                    NcneTaskStageType.Compile => role.Compiler,
+                    NcneTaskStageType.V1_Rework => role.Compiler,
+                    NcneTaskStageType.V2_Rework => role.Compiler,
+                    NcneTaskStageType.V2 => role.VerifierTwo,
+                    NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    _ => role.VerifierOne
                 };
             }
         }
 
-        private void UpdateTaskUser(TaskInfo task)
+        private void UpdateTaskUser(TaskInfo task, TaskRole role)
         {
 
             _logger.LogInformation(
@@ -914,20 +936,20 @@ namespace NCNEPortal
             var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
                                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
             if (taskInProgress == null)
-                task.AssignedUser = task.TaskRole.HundredPercentCheck;
+                task.Assigned = role.HundredPercentCheck;
             else
             {
-                task.AssignedUser = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
+                task.Assigned = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.With_SDRA => task.TaskRole.Compiler,
-                    NcneTaskStageType.With_Geodesy => task.TaskRole.Compiler,
-                    NcneTaskStageType.Specification => task.TaskRole.Compiler,
-                    NcneTaskStageType.Compile => task.TaskRole.Compiler,
-                    NcneTaskStageType.V1 => task.TaskRole.VerifierOne,
-                    NcneTaskStageType.V1_Rework => task.TaskRole.Compiler,
-                    NcneTaskStageType.V2 => task.TaskRole.VerifierTwo,
-                    NcneTaskStageType.V2_Rework => task.TaskRole.Compiler,
-                    _ => task.TaskRole.HundredPercentCheck
+                    NcneTaskStageType.With_SDRA => role.Compiler,
+                    NcneTaskStageType.With_Geodesy => role.Compiler,
+                    NcneTaskStageType.Specification => role.Compiler,
+                    NcneTaskStageType.Compile => role.Compiler,
+                    NcneTaskStageType.V1 => role.VerifierOne,
+                    NcneTaskStageType.V1_Rework => role.Compiler,
+                    NcneTaskStageType.V2 => role.VerifierTwo,
+                    NcneTaskStageType.V2_Rework => role.Compiler,
+                    _ => role.HundredPercentCheck
                 };
             }
 
@@ -1085,7 +1107,8 @@ namespace NCNEPortal
                 _logger.LogInformation(
                     " Task comment added for task {ProcessId}.");
 
-                await _commentsHelper.AddTaskComment(txtComment, commentProcessId, CurrentUser.DisplayName);
+                var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+                await _commentsHelper.AddTaskComment(txtComment, commentProcessId, user);
             }
 
             var result = new[]
@@ -1105,14 +1128,14 @@ namespace NCNEPortal
 
 
             txtComment = string.IsNullOrEmpty(txtComment) ? string.Empty : txtComment.Trim();
-
+            var currentUser = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
             if (!string.IsNullOrEmpty(txtComment))
             {
                 _logger.LogInformation(
                     " Task stage comment added for task {ProcessId} and stage {StageId}.");
 
-                await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, CurrentUser.DisplayName);
+                await _commentsHelper.AddTaskStageComment(txtComment, commentProcessId, stageId, currentUser);
                 await _dbContext.SaveChangesAsync();
             }
 

@@ -16,13 +16,13 @@ namespace NCNEPortal.Helpers
         }
 
 
-        public async Task AddTaskComment(string comment, int processId, string userFullName)
+        public async Task AddTaskComment(string comment, int processId, AdUser user)
         {
             await _dbContext.TaskComment.AddAsync
             (new TaskComment
             {
                 ProcessId = processId,
-                Username = userFullName,
+                AdUser = user,
                 Comment = comment,
                 ActionIndicator = false,
                 Created = DateTime.Now
@@ -31,7 +31,7 @@ namespace NCNEPortal.Helpers
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task AddTaskSystemComment(NcneCommentType changeType, int processId, string userFullName, string stageName,
+        public async Task AddTaskSystemComment(NcneCommentType changeType, int processId, AdUser user, string stageName,
             string roleName, DateTime? dateChangedTo)
         {
             var comment = changeType switch
@@ -53,14 +53,14 @@ namespace NCNEPortal.Helpers
             (new TaskComment
             {
                 ProcessId = processId,
-                Username = userFullName,
+                AdUser = user,
                 Comment = comment,
                 ActionIndicator = true,
                 Created = DateTime.Now
             });
         }
 
-        public async Task AddTaskStageComment(string comment, int processId, int taskStageId, string userFullName)
+        public async Task AddTaskStageComment(string comment, int processId, int taskStageId, AdUser user)
         {
             await _dbContext.TaskStageComment.AddAsync(
                 new TaskStageComment
@@ -69,7 +69,7 @@ namespace NCNEPortal.Helpers
                     ProcessId = processId,
                     Created = DateTime.Now,
                     TaskStageId = taskStageId,
-                    Username = userFullName
+                    AdUser = user
                 });
         }
     }

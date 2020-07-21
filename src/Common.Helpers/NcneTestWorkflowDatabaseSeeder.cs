@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using NCNEWorkflowDatabase.EF;
+﻿using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Common.Helpers
 {
@@ -25,7 +25,7 @@ namespace Common.Helpers
         {
             DatabasesHelpers.ClearNcneWorkflowDbTables(_context, true);
 
-            AddAdditionalAdUsers();
+            //AddAdditionalAdUsers();
 
             PopulateTaskStageType();
             PopulateChartType();

@@ -13,7 +13,8 @@ namespace NCNEWorkflowDatabase.EF.Models
         public int TaskStageId { get; set; }
         public int ProcessId { get; set; }
         public string Comment { get; set; }
-        public string Username { get; set; }
+        public virtual AdUser AdUser { get; set; }
+        public int AdUserId { get; set; }
         public DateTime Created { get; set; }
 
     }

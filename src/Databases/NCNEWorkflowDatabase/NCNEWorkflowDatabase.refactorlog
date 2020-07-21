@@ -49,4 +49,95 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="HundredPercentCheck" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="43df99eb-5d58-4e91-b3e7-04b134a58008" ChangeDateTime="07/18/2020 21:33:44">
+    <Property Name="ElementName" Value="[dbo].[HpdUser].[AdUsername]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[HpdUser]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d010bcc5-fb7a-4f52-a87d-f16606534957" ChangeDateTime="07/18/2020 21:35:14">
+    <Property Name="ElementName" Value="[dbo].[TaskComment].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskComment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2fbcb40f-47f4-4193-92fa-c67b6fe43df3" ChangeDateTime="07/18/2020 21:37:40">
+    <Property Name="ElementName" Value="[dbo].[TaskInfo].[AssignedUser]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AssignedUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9a700e52-703d-46e5-ae86-8220d5b7ea9e" ChangeDateTime="07/18/2020 21:39:30">
+    <Property Name="ElementName" Value="[dbo].[TaskNote].[CreatedByUsername]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskNote]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedByAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9d43496f-ddea-4991-bd80-cb1b9ba5c954" ChangeDateTime="07/18/2020 21:39:40">
+    <Property Name="ElementName" Value="[dbo].[TaskNote].[LastModifiedByUsername]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskNote]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LastModifiedByAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6008d8b0-d488-41bd-9664-58a7a522bb27" ChangeDateTime="07/18/2020 21:40:01">
+    <Property Name="ElementName" Value="[dbo].[TaskRole].[Compiler]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskRole]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CompilerAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="478154b1-da7b-4378-8e87-d4036903b893" ChangeDateTime="07/18/2020 21:40:07">
+    <Property Name="ElementName" Value="[dbo].[TaskRole].[VerifierOne]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskRole]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VerifierOneAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a7692a82-a11e-460c-9daa-fdd40f0a164a" ChangeDateTime="07/18/2020 21:40:14">
+    <Property Name="ElementName" Value="[dbo].[TaskRole].[VerifierTwo]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskRole]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VerifierTwoAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="51969906-10f6-4e81-8dda-363540b9071d" ChangeDateTime="07/18/2020 21:40:22">
+    <Property Name="ElementName" Value="[dbo].[TaskRole].[HundredPercentCheck]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskRole]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="HundredPercentCheckAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4bb17aff-8929-4a4c-a707-6041030c3aac" ChangeDateTime="07/18/2020 21:40:56">
+    <Property Name="ElementName" Value="[dbo].[TaskStage].[AssignedUser]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskStage]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AssignedAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="20b6d9ee-ae4e-4036-8545-32036a2a3aa5" ChangeDateTime="07/18/2020 21:41:19">
+    <Property Name="ElementName" Value="[dbo].[TaskStageComment].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskStageComment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b52bfafa-a471-4883-bfde-f59474a6ee70" ChangeDateTime="07/19/2020 22:17:46">
+    <Property Name="ElementName" Value="[dbo].[CarisProjectDetails].[CreatedBy]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CarisProjectDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedByAdUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b73208ef-c9df-4ee6-ace4-5ae9781bb67b" ChangeDateTime="07/19/2020 22:22:07">
+    <Property Name="ElementName" Value="[dbo].[TaskInfo].[AssignedUserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TaskInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AssignedAdUserId" />
+  </Operation>
 </Operations>

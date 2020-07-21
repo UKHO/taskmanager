@@ -6,6 +6,31 @@
         makeFormReadOnly($("#frmWorkflow"));
     }
 
+    $('.ta_compiler').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#CompilerUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_compiler').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#CompilerUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v1').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v1').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v2').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#Verifier2Upn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v2').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#Verifier2Upn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_100pCheck').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#HundredPCheckUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_100pCheck').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#HundredPCheckUpn').val(suggestionObject.userPrincipalName);
+    });
+
 
     if (isPublished) {
         $("#3psToggle").prop("disabled", true);
@@ -959,7 +984,7 @@
 
     $("#btnComplete").click(function () {
        
-        var userName = $("#Verifier1").val();
+        var userName = $("#Verifier1Upn").val();
 
         $.ajax({
             type: "POST",

@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                          &&
-                                                          (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
-                   || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                                         &&
+                                                         (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
+                  || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -184,28 +184,29 @@
 </div>
 
 @* Modal Assign task to user *@
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="assignTaskModal" tabindex="-1" role="dialog" aria-label="Assign Task Modal Dialog" aria-hidden="true">
+<div class="modal fade" id="assignTaskModal" tabindex="-1" role="dialog" aria-labelledby="AssignTaskToUser" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="assignTaskTitle">Assign Task</h4>
+                <h4 class="modal-title">Assign Task</h4>
             </div>
             <div class="modal-body">
                 <div id="assignTaskModal-body">
                     <div id="assignTaskTypeahead">
                         <div class="text-input-wrap">
-                            <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false" aria-label="Username Textbox">
+                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
                         </div>
-                        <div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
-                            <h5 class="mb-3">
-                                <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
-                                <span>There's a problem</span>
+                        <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
+                            <h5>
+                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                                <span id="assignTaskErrorMsg">Failed to look up users</span>
                             </h5>
-                            <ol id="assignTaskErrorList" class="error-list"></ol>
-                        </div>
+                        </section>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
-                    <input type="hidden" id="hdnUserName" />
+                    <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
+                    <br />
+                    <div id="AssignTaskError"></div>
                 </div>
             </div>
             <div class="modal-footer">

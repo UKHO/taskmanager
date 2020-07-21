@@ -261,8 +261,9 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
                                 <div>
-                                    @Html.TextBoxFor(model => model.Compiler, "",
+                                    @Html.TextBoxFor(model => model.Compiler.DisplayName, "",
                                         new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.Compiler.UserPrincipalName, new { @id = "CompilerUpn", @class = "CompilerUpn" })
                                 </div>
                             </div>
                         </div>
@@ -270,8 +271,9 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.Verifier1, new { @class = "col-form-label" })</div>
                                 <div>
-                                    @Html.TextBoxFor(model => model.Verifier1, "",
+                                    @Html.TextBoxFor(model => model.Verifier1.DisplayName, "",
                                         new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.Verifier1.UserPrincipalName, new { @id = "Verifier1Upn", @class = "Verifier1Upn" })
                                 </div>
                             </div>
                         </div>
@@ -279,8 +281,9 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
                                 <div>
-                                    @Html.TextBoxFor(model => model.Verifier2, "",
+                                    @Html.TextBoxFor(model => model.Verifier2.DisplayName, "",
                                         new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
                                 </div>
                             </div>
                         </div>
@@ -288,8 +291,9 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.HundredPercentCheck, new { @class = "col-form-label" })</div>
                                 <div>
-                                    @Html.TextBoxFor(model => model.HundredPercentCheck, "",
+                                    @Html.TextBoxFor(model => model.HundredPercentCheck.DisplayName, "",
                                         new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
                                 </div>
                             </div>
                         </div>
@@ -415,7 +419,7 @@
                                 <tr>
                                     <td style="width: 200px">
                                         <div class="mb-2">
-                                            <strong>@comment.Username</strong>
+                                            <strong>@comment.AdUser.DisplayName</strong>
                                         </div>
                                         <div>
                                             @comment.Created.ToLongDateString()

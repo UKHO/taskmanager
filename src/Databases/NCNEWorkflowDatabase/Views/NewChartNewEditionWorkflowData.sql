@@ -53,12 +53,12 @@ CASE
 	WHEN spec.Status = 'Completed' THEN 'Yes'
 	ELSE 'No'
 END as [Started],
-isnull(comp.AssignedUser, '') as [Comp],
-isnull(v1.AssignedUser, '') as [V1],
-isnull(v1Rework.AssignedUser, '') as [V1 Corr],
-isnull(v2.AssignedUser, '') as [V2],
-isnull(v2Rework.AssignedUser, '') as [V2 Corr],
-isnull(comp.AssignedUser, '') as [Circ],
+isnull(comp.AssignedAdUserId, '') as [Comp],
+isnull(v1.AssignedAdUserId, '') as [V1],
+isnull(v1Rework.AssignedAdUserId, '') as [V1 Corr],
+isnull(v2.AssignedAdUserId, '') as [V2],
+isnull(v2Rework.AssignedAdUserId, '') as [V2 Corr],
+isnull(comp.AssignedAdUserId, '') as [Circ],
 isnull(CONVERT(varchar(20), forms.DateCompleted, 103), '') as [100%],
 isnull(CONVERT(varchar(20), forms.DateExpected, 103), '') as [H Forms],
 isnull(CONVERT(varchar(20), commitPrint.DateExpected, 103), '') as [CTP],
