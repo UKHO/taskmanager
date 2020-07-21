@@ -130,7 +130,7 @@ namespace NCNEPortal
                     isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.NcneWorkflowDbName);
 
             services.AddDbContext<NcneWorkflowDbContext>((serviceProvider, options) =>
-                options.UseLazyLoadingProxies().UseSqlServer(workflowDbConnectionString));
+                options.UseSqlServer(workflowDbConnectionString));
 
             var startupSecretConfig = new StartupSecretsConfig();
             Configuration.GetSection("K2RestApi").Bind(startupSecretConfig);
