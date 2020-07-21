@@ -183,9 +183,9 @@ namespace Portal.Pages.DbAssessment
 
             try
             {
-                PrimaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstAsync(s => s.ProcessId == ProcessId);
+                PrimaryDocumentStatus = await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(s => s.ProcessId == ProcessId);
 
-                if (PrimaryDocumentStatus.ContentServiceId.HasValue)
+                if (PrimaryDocumentStatus?.ContentServiceId != null)
                     PrimaryDocumentStatus.ContentServiceUri =
                         _uriConfig.Value.BuildContentServiceUri(PrimaryDocumentStatus.ContentServiceId.Value);
             }
