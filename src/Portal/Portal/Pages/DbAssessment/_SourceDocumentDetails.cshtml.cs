@@ -126,7 +126,7 @@ namespace Portal.Pages.DbAssessment
             catch (Exception e)
             {
                 _logger.LogError(e, "Unable to retrieve AssessmentData for ProcessId {ProcessId}");
-
+                e.Data.Add("OurMessage", $"Unable to retrieve AssessmentData for ProcessId {ProcessId}");
                 throw;
             }
         }
