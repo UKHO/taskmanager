@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
@@ -84,16 +82,16 @@ namespace NCNEPortal.UnitTests
 
         }
 
-        [Test]
-        public async Task Test_OnPostTaskTerminate_Terminate_the_status_for_valid_processId()
-        {
-            AddTaskInfo(100);
+        //[Test]
+        //public async Task Test_OnPostTaskTerminate_Terminate_the_status_for_valid_processId()
+        //{
+        //    AddTaskInfo(100);
 
-            await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
+        //    await _workflowModel.OnPostTaskTerminateAsync("Valid Comment", 100);
 
-            Assert.That(_dbContext.TaskInfo.Single().Status, Is.EqualTo(NcneTaskStatus.Terminated.ToString()));
+        //    Assert.That(_dbContext.TaskInfo.Single().Status, Is.EqualTo(NcneTaskStatus.Terminated.ToString()));
 
-        }
+        //}
         //[Test]
         //public async Task Test_OnPostTaskTerminate_Adds_termination_comments_for_valid_comments()
         //{
