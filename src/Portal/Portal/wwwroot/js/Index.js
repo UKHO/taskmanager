@@ -363,7 +363,7 @@
             });
     }
 
-    $('#txtUsername').on('typeahead:selected', function (eventObject, suggestionObject) {
+    $('#txtUsername').on('typeahead:selected typeahead:autocomplete', function (eventObject, suggestionObject) {
         $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
     });
 
