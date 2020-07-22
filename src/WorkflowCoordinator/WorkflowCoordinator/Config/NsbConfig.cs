@@ -10,5 +10,6 @@ namespace WorkflowCoordinator.Config
         public string EventServiceName { get; set; }
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
+        public string ServiceControlQueue { get; set; }
     }
 }
