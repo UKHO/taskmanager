@@ -11,5 +11,6 @@ namespace WorkflowCoordinator.Config
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
         public string ServiceControlQueue { get; set; }
+        public Guid WorkflowCoordinatorUniqueIdentifier { get; set; }
     }
 }
