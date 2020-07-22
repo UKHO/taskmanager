@@ -130,6 +130,7 @@ namespace SourceDocumentCoordinator.Handlers
                 linkedDocument.LinkType = DocumentLinkType.Backward.ToString();
                 linkedDocument.Status = SourceDocumentRetrievalStatus.NotAttached.ToString();
                 linkedDocument.Created = DateTime.Now;
+                linkedDocument.UniqueId = Guid.NewGuid();
 
                 if (documentAssessmentData != null)
                 {
@@ -146,8 +147,9 @@ namespace SourceDocumentCoordinator.Handlers
                     await _dbContext.LinkedDocument.AddAsync(linkedDocument);
                 }
 
+                LogContext.PushProperty("UniqueId", linkedDocument.UniqueId);
                 _logger.LogInformation(
-                    "Successfully added backward linked document: {LinkedDocument} to Source Document: {SourceDocumentId}");
+                    "Successfully added backward linked document: {LinkedDocument} to Source Document: {SourceDocumentId} with UniqueId: {UniqueId}");
             }
             catch (Exception e)
             {
