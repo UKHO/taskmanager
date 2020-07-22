@@ -15,11 +15,15 @@ namespace Common.Factories.DocumentStatusFactory
             this._dbContext = dbContext;
         }
 
-        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status)
+        public Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status, Guid uniqueId)
         {
             var row = await _dbContext.LinkedDocument
-                .SingleOrDefaultAsync(r => r.ProcessId == processId
-                                           && r.LinkedSdocId == sourceDocumentId);
+                .SingleOrDefaultAsync(r => r.UniqueId == uniqueId);
 
             if (row == null)
             {
