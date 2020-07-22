@@ -10,5 +10,6 @@ namespace SourceDocumentCoordinator.Config
         public string WorkflowCoordinatorName { get; set; }
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
+        public string ServiceControlQueue { get; set; }
     }
 }
