@@ -36,5 +36,6 @@ namespace WorkflowDatabase.EF.Models
         public Uri ContentServiceUri { get; set; }
         public string Filename { get; set; }
         public string Filepath { get; set; }
+        public Guid UniqueId { get; set; }
     }
 }
