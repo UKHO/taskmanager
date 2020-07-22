@@ -18,10 +18,10 @@
 
                 setCreateHandler();
                 initialiseTypeaheads($('.assignTaskAssessor, .assignTaskVerifier'));
-                $('.assignTaskAssessor').on('typeahead:selected', function (eventObject, suggestionObject) {
+                $('.assignTaskAssessor').on('typeahead:selected  typeahead:autocomplete', function (eventObject, suggestionObject) {
                     $('#assignTaskAssessorUpn').val(suggestionObject.userPrincipalName);
                 });
-                $('.assignTaskVerifier').on('typeahead:selected', function(eventObject, suggestionObject) {
+                $('.assignTaskVerifier').on('typeahead:selected  typeahead:autocomplete', function(eventObject, suggestionObject) {
                     $('#assignTaskVerifierUpn').val(suggestionObject.userPrincipalName);
                 });
                 update();
@@ -202,11 +202,11 @@
             $("#assignTasks").append(newThing);
             $(newThing).show();
 
-            assessorElement.on('typeahead:selected', function (eventObject, suggestionObject) {
+            assessorElement.on('typeahead:selected  typeahead:autocomplete', function (eventObject, suggestionObject) {
                 assessorUpnElement.val(suggestionObject.userPrincipalName);
 
             });            
-            verifierElement.on('typeahead:selected', function (eventObject, suggestionObject) {
+            verifierElement.on('typeahead:selected  typeahead:autocomplete', function (eventObject, suggestionObject) {
                 verifierUpnElement.val(suggestionObject.userPrincipalName);
 
             });
