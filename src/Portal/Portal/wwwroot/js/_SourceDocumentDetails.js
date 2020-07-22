@@ -95,8 +95,8 @@
 
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
-            var uniqueId = $(this).data("uniqueId");
-
+            var uniqueId = $(this).data("uniqueid");
+            
             $.ajax({
                 type: "POST",
                 url: "_SourceDocumentDetails/?handler=DetachLinkedDocument",
