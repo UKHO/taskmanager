@@ -11,5 +11,6 @@ namespace SourceDocumentCoordinator.Config
         public string LocalDbServer { get; set; }
         public Uri AzureDbTokenUrl { get; set; }
         public string ServiceControlQueue { get; set; }
+        public Guid SourceDocumentCoordinatorUniqueIdentifier { get; set; }
     }
 }

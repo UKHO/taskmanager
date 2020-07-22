@@ -141,6 +141,9 @@ namespace SourceDocumentCoordinator
                         nsbConfig.ServiceControlQueue,
                         TimeSpan.FromSeconds(15),
                         TimeSpan.FromSeconds(30));
+
+                    endpointConfiguration.UniquelyIdentifyRunningInstance()
+                        .UsingCustomIdentifier(nsbConfig.SourceDocumentCoordinatorUniqueIdentifier);
                 }
 
                 var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
