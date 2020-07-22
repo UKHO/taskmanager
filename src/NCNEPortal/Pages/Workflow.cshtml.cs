@@ -325,7 +325,7 @@ namespace NCNEPortal
 
 
 
-        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName, string chartNo)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
@@ -333,6 +333,10 @@ namespace NCNEPortal
 
             _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
 
+            if (string.IsNullOrWhiteSpace(ChartNo))
+            {
+                throw new ArgumentException(" Please enter Chart Number before creating the Caris Project");
+            }
 
             if (string.IsNullOrWhiteSpace(projectName))
             {
@@ -950,11 +954,11 @@ namespace NCNEPortal
                     NcneTaskStageType.With_Geodesy => role.Compiler,
                     NcneTaskStageType.Specification => role.Compiler,
                     NcneTaskStageType.Compile => role.Compiler,
-                    NcneTaskStageType.V1 => role.VerifierOne,
                     NcneTaskStageType.V1_Rework => role.Compiler,
-                    NcneTaskStageType.V2 => role.VerifierTwo,
                     NcneTaskStageType.V2_Rework => role.Compiler,
-                    _ => role.HundredPercentCheck
+                    NcneTaskStageType.V2 => role.VerifierTwo,
+                    NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    _ => role.VerifierOne
                 };
             }
 
@@ -1052,7 +1056,8 @@ namespace NCNEPortal
             return new JsonResult(result);
         }
 
-        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
+        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId, bool sentTo3Ps,
+            string actualReturn)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostPublishCarisChart));
@@ -1061,6 +1066,27 @@ namespace NCNEPortal
 
             try
             {
+
+                if (sentTo3Ps)
+                {
+                    if (string.IsNullOrWhiteSpace(actualReturn))
+                    {
+                        return new JsonResult("Please enter actual return date on 3PS before publishing the chart")
+                        {
+                            StatusCode = (int)HttpStatusCode.InternalServerError
+                        };
+
+                    }
+
+                    if ((Convert.ToDateTime(actualReturn)).Date > DateTime.Now.Date)
+                    {
+                        return new JsonResult("Actual return date cannot be later than today")
+                        {
+                            StatusCode = (int)HttpStatusCode.InternalServerError
+                        };
+                    }
+                }
+
                 var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
 
                 if (result)
