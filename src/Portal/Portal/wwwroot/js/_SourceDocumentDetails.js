@@ -53,6 +53,7 @@
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
             var correlationId = $(this).data("correlationid");
+            var uniqueId = $(this).data("uniqueId");
 
             $.ajax({
                 type: "POST",
@@ -63,7 +64,8 @@
                 data: {
                     "linkedSdocId": linkedSdocId,
                     "processId": processId,
-                    "correlationId": correlationId
+                    "correlationId": correlationId,
+                    "uniqueId": uniqueId
                 },
                 success: function (result) {
                     getSourceDocuments();
@@ -93,6 +95,7 @@
 
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
+            var uniqueId = $(this).data("uniqueId");
 
             $.ajax({
                 type: "POST",
@@ -102,7 +105,8 @@
                 },
                 data: {
                     "linkedSdocId": linkedSdocId,
-                    "processId": processId
+                    "processId": processId,
+                    "uniqueId": uniqueId
                 },
                 success: function (result) {
                     getSourceDocuments();

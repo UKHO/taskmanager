@@ -80,7 +80,8 @@ namespace SourceDocumentCoordinator.Sagas
                     SourceDocumentId = message.SourceDocumentId,
                     CorrelationId = message.CorrelationId,
                     SourceType = message.SourceType,
-                    SdocRetrievalId = message.SdocRetrievalId
+                    SdocRetrievalId = message.SdocRetrievalId,
+                    UniqueId = message.UniqueId
                 };
 
                 await RequestTimeout<GetDocumentRequestQueueStatusCommand>(context,
@@ -108,12 +109,12 @@ namespace SourceDocumentCoordinator.Sagas
             switch ((QueueForRetrievalReturnCodeEnum)returnCode.Code.Value)
             {
                 case QueueForRetrievalReturnCodeEnum.Success:
-                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType);
+                    Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType, message.UniqueId);
                     break;
                 case QueueForRetrievalReturnCodeEnum.AlreadyQueued:
                     if (Data.DocumentStatusId < 1)
                     {
-                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType);
+                        Data.DocumentStatusId = await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, message.ProcessId, message.SourceDocumentId, SourceDocumentRetrievalStatus.Started, message.SourceType, message.UniqueId);
                     }
                     break;
                 case QueueForRetrievalReturnCodeEnum.QueueInsertionFailed:
@@ -139,7 +140,7 @@ namespace SourceDocumentCoordinator.Sagas
                 case RequestQueueStatusReturnCodeEnum.Success:
                 case RequestQueueStatusReturnCodeEnum.NotGeoreferenced:
                     // Doc Ready; update DB;
-                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.SourceType);
+                    await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, Data.ProcessId, Data.SourceDocumentId, SourceDocumentRetrievalStatus.Ready, Data.SourceType, message.UniqueId);
 
                     var removeFromQueue = new ClearDocumentRequestFromQueueCommand
                     {
