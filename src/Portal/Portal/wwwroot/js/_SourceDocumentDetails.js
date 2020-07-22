@@ -53,7 +53,7 @@
             var linkedSdocId = Number($(this).data("linkedsdocid"));
             var processId = Number($(this).data("processid"));
             var correlationId = $(this).data("correlationid");
-            var uniqueId = $(this).data("uniqueId");
+            var uniqueId = $(this).data("uniqueid");
 
             $.ajax({
                 type: "POST",
