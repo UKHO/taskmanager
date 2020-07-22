@@ -150,6 +150,9 @@ namespace WorkflowCoordinator
                             nsbConfig.ServiceControlQueue,
                             TimeSpan.FromSeconds(15),
                             TimeSpan.FromSeconds(30));
+
+                        endpointConfiguration.UniquelyIdentifyRunningInstance()
+                            .UsingCustomIdentifier(nsbConfig.WorkflowCoordinatorUniqueIdentifier);
                     }
 
 
