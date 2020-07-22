@@ -16,6 +16,7 @@
     [Created] DATETIME NOT NULL,  
 	[Filename] NVARCHAR(100) NULL, 
 	[Filepath] NVARCHAR(255) NULL,
+    [UniqueId] UNIQUEIDENTIFIER NOT NULL, 
     CONSTRAINT [FK_LinkedDocument_WorkflowInstance] FOREIGN KEY ([ProcessId]) REFERENCES [WorkflowInstance]([ProcessId]),
     CONSTRAINT [AK_LinkedDocument_Composite_ProcessId_LinkedSdocId_LinkType] UNIQUE ([ProcessId],[LinkedSdocId],[LinkType])
 

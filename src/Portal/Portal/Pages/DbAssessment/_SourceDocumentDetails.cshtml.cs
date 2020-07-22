@@ -215,13 +215,14 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId, int processId, Guid correlationId)
+        public async Task<IActionResult> OnPostAttachLinkedDocumentAsync(int linkedSdocId, int processId, Guid correlationId, Guid uniqueId)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("LinkedSdocId", linkedSdocId);
             LogContext.PushProperty("PortalResource", nameof(OnPostAttachLinkedDocumentAsync));
+            LogContext.PushProperty("UniqueId", uniqueId);
 
-            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}; UniqueId: {UniqueId}");
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -243,7 +244,8 @@ namespace Portal.Pages.DbAssessment
                 SourceDocumentId = linkedSdocId,
                 GeoReferenced = false,
                 SourceType = SourceType.Linked,
-                SdocRetrievalId = Guid.NewGuid()
+                SdocRetrievalId = Guid.NewGuid(),
+                UniqueId = uniqueId
             };
 
             LogContext.PushProperty("InitiateSourceDocumentRetrievalEvent", nameof(InitiateSourceDocumentRetrievalEvent));
@@ -263,7 +265,8 @@ namespace Portal.Pages.DbAssessment
                     processId,
                     linkedSdocId,
                     SourceDocumentRetrievalStatus.Started,
-                    SourceType.Linked);
+                    SourceType.Linked,
+                    uniqueId);
 
                 return StatusCode(200);
             }
@@ -278,13 +281,14 @@ namespace Portal.Pages.DbAssessment
             }
         }
 
-        public async Task<IActionResult> OnPostDetachLinkedDocumentAsync(int linkedSdocId, int processId)
+        public async Task<IActionResult> OnPostDetachLinkedDocumentAsync(int linkedSdocId, int processId, Guid uniqueId)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("LinkedSdocId", linkedSdocId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDetachLinkedDocumentAsync));
+            LogContext.PushProperty("UniqueId", uniqueId);
 
-            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+            _logger.LogInformation("Entering {PortalResource} for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId} and UniqueId: {UniqueId}");
 
             var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
 
@@ -303,14 +307,14 @@ namespace Portal.Pages.DbAssessment
             try
             {
                 await SourceDocumentHelper.UpdateSourceDocumentStatus(_documentStatusFactory, processId, linkedSdocId,
-                    SourceDocumentRetrievalStatus.NotAttached, SourceType.Linked);
+                    SourceDocumentRetrievalStatus.NotAttached, SourceType.Linked, uniqueId);
 
                 return StatusCode(200);
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
-                    "Error updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId}");
+                    "Error updating document status in database for _SourceDocumentDetailsModel with: ProcessId: {ProcessId}; LinkedSdocId: {LinkedSdocId} and UniqueId: {UniqueId}");
                 return new JsonResult($"Error updating document status in database for Source Document {linkedSdocId}")
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
