@@ -145,6 +145,11 @@ namespace WorkflowCoordinator
                             nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
                         endpointConfiguration = new WorkflowCoordinatorConfig(nsbConfig, nsbSecretsConfig);
+
+                        endpointConfiguration.SendHeartbeatTo(
+                            nsbConfig.ServiceControlQueue,
+                            TimeSpan.FromSeconds(15),
+                            TimeSpan.FromSeconds(30));
                     }
 
 

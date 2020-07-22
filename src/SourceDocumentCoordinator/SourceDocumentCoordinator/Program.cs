@@ -136,6 +136,11 @@ namespace SourceDocumentCoordinator
                     nsbSecretsConfig.NsbDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(false, nsbSecretsConfig.NsbDataSource, nsbSecretsConfig.NsbInitialCatalog);
 
                     endpointConfiguration = new SourceDocumentCoordinatorConfig(nsbConfig, nsbSecretsConfig);
+
+                    endpointConfiguration.SendHeartbeatTo(
+                        nsbConfig.ServiceControlQueue,
+                        TimeSpan.FromSeconds(15),
+                        TimeSpan.FromSeconds(30));
                 }
 
                 var serilogTracing = endpointConfiguration.EnableSerilogTracing(Log.Logger);
