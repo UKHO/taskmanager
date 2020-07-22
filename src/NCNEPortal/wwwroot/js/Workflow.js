@@ -248,7 +248,8 @@
             data: {
                 "processId": processId,
                 "username": username,
-                "stageTypeId": stageTypeId
+                "stageTypeId": stageTypeId,
+                "publish" : publish
             },
 
             success: function (result) {

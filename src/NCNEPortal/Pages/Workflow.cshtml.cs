@@ -349,6 +349,13 @@ namespace NCNEPortal
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
 
+            //Save the ChartNo
+            var task = _dbContext.TaskInfo.FindAsync(processId).Result;
+
+            task.ChartNumber = ChartNo;
+
+            await _dbContext.SaveChangesAsync();
+
             return StatusCode(200);
         }
 
@@ -492,7 +499,7 @@ namespace NCNEPortal
 
         }
 
-        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId)
+        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId, bool publish)
         {
             ValidationErrorMessages.Clear();
 
@@ -511,6 +518,21 @@ namespace NCNEPortal
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
+            }
+
+            if (publish)
+            {
+                var task = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+
+                if (!_pageValidationHelper.ValidateForPublishCarisChart(task.ThreePs, task.ActualDate3Ps,
+                    ValidationErrorMessages))
+                {
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+
             }
 
             return new JsonResult(HttpStatusCode.OK);
