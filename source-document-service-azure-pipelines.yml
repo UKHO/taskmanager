@@ -4,7 +4,7 @@ trigger:
     - features/*
   paths:
     include:
-    - src/SourceDocumentService/*
+    - src/SourceDocumentService*
 
 pr:
   branches:
@@ -12,7 +12,7 @@ pr:
     - master
   paths:
     include:
-    - src/SourceDocumentService/*
+    - src/SourceDocumentService*
 
 stages:
 - stage: Build
@@ -73,6 +73,53 @@ stages:
           projects: '$(Build.SourcesDirectory)\\src\\SourceDocumentService.UnitTests\\SourceDocumentService.UnitTests.csproj'
         displayName: 'dotnet test SourceDocumentServiceTests'
 
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: publish
+          arguments: "--configuration $(BuildConfiguration) --output $(System.DefaultWorkingDirectory)/publish_output"
+          projects: "**/SourceDocumentService.csproj"
+          publishWebProjects: false
+          modifyOutputPath: false
+          zipAfterPublish: false
+
+      - task: PowerShell@2
+        displayName: "temp directory"
+        inputs:
+          pwsh: false
+          targetType: inline
+          script: |
+            cd "$(System.DefaultWorkingDirectory)"
+            dir
+            cd "$(Build.SourcesDirectory)/src/"
+            dir
+
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: "$(System.DefaultWorkingDirectory)\\publish_output"
+          contents: '**' 
+          targetFolder: "$(Build.ArtifactStagingDirectory)\\SourceDocumentService"
+
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy"
+          contents: '**' 
+          targetFolder: "$(Build.ArtifactStagingDirectory)\\SourceDocumentService.BuildDeploy"
+
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy.Tests"
+          contents: '**' 
+          targetFolder: "$(Build.ArtifactStagingDirectory)\\SourceDocumentService.BuildDeploy.Tests"
+
+      - publish: "$(Build.ArtifactStagingDirectory)\\SourceDocumentService"
+        artifact: "SourceDocumentService"
+
+      - publish: "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy"
+        artifact: "UKHO.SourceDocumentService.BuildDeploy" #Deliberately named UKHO.* due to Install Component
+
+      - publish: "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy.Tests"
+        artifact: "UKHO.SourceDocumentService.BuildDeploy.Tests" #Deliberately named UKHO.* due to Install Component
+
     - job: DependencyCheck
       pool: NautilusBuild
 
@@ -120,3 +167,746 @@ stages:
           targetType: inline
           script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*        
 
+- stage: DeployDev
+  dependsOn: 
+    - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeploySourceDocumentServiceDev
+      displayName: Deploy SourceDocumentService Api
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerDev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: PowerShell@2
+                displayName: "Install PoSHPackages on Release Agent"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Dev1"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |    
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
+
+                    #Iterate and confirm PoSHRepositories
+                    $repos = (Get-PSRepository | Select-Object -ExpandProperty Name)
+                    $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+                      Write-Host "Checking repository $($_.Name)"
+                      
+                      if ($repos -notcontains $_.Name) {
+                        Write-Warning "Repository $($_.Name) not found"
+                      } else {
+                        Write-Host "Repository $($_.Name) found"
+                      }
+                    }
+                    
+                    #Iterate and install PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Get-Module -Name $_.Name | Remove-Module
+                      
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Installing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Install-Module -Name $_.Name `
+                                        -MinimumVersion $_.MinimumVersion `
+                                        -MaximumVersion $_.MaximumVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      } else {
+                        Write-Host "Installing $($_.Name) $($_.RequiredVersion)"
+                        Install-Module -Name $_.Name `
+                                        -RequiredVersion $_.RequiredVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      }
+                    }
+              
+              - task: PowerShell@2
+                displayName: "Install Component"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Dev1"
+                  DEPLOY_USERNAME: "$(DeployUsernameDev1)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordDev1)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameDev1)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordDev1)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+
+                    #Rename Token Config File
+                    $rootFolder = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\SourceDocumentService"
+                    Remove-Item -Path (Join-Path $rootFolder App.config)
+                    Rename-Item -Path (Join-Path $rootFolder App.config.token) -NewName SourceDocumentService.dll.config.token
+                    Rename-TokenConfig -RootFolder $rootFolder
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Install-Component -ConfigData $ConfigData -ErrorAction Stop
+
+              - task: PowerShell@2
+                displayName: "Run Internal Pester"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Dev1"
+                  DEPLOY_USERNAME: "$(DeployUsernameDev1)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordDev1)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameDev1)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordDev1)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Invoke-InternalPesterTests -ConfigData $ConfigData -ErrorAction Stop
+
+- stage: DeployUAT
+  dependsOn: 
+    - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeploySourceDocumentServiceUAT
+      displayName: Deploy SourceDocumentService Api
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerUAT'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: PowerShell@2
+                displayName: "Install PoSHPackages on Release Agent"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "AT1"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |    
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
+
+                    #Iterate and confirm PoSHRepositories
+                    $repos = (Get-PSRepository | Select-Object -ExpandProperty Name)
+                    $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+                      Write-Host "Checking repository $($_.Name)"
+                      
+                      if ($repos -notcontains $_.Name) {
+                        Write-Warning "Repository $($_.Name) not found"
+                      } else {
+                        Write-Host "Repository $($_.Name) found"
+                      }
+                    }
+                    
+                    #Iterate and install PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Get-Module -Name $_.Name | Remove-Module
+                      
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Installing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Install-Module -Name $_.Name `
+                                        -MinimumVersion $_.MinimumVersion `
+                                        -MaximumVersion $_.MaximumVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      } else {
+                        Write-Host "Installing $($_.Name) $($_.RequiredVersion)"
+                        Install-Module -Name $_.Name `
+                                        -RequiredVersion $_.RequiredVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      }
+                    }
+              
+              - task: PowerShell@2
+                displayName: "Install Component"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "AT1"
+                  DEPLOY_USERNAME: "$(DeployUsernameAT1)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordAT1)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameAT1)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordAT1)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+
+                    #Rename Token Config File
+                    $rootFolder = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\SourceDocumentService"
+                    Remove-Item -Path (Join-Path $rootFolder App.config)
+                    Rename-Item -Path (Join-Path $rootFolder App.config.token) -NewName SourceDocumentService.dll.config.token
+                    Rename-TokenConfig -RootFolder $rootFolder
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Install-Component -ConfigData $ConfigData -ErrorAction Stop
+
+              - task: PowerShell@2
+                displayName: "Run Internal Pester"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "AT1"
+                  DEPLOY_USERNAME: "$(DeployUsernameAT1)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordAT1)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameAT1)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordAT1)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Invoke-InternalPesterTests -ConfigData $ConfigData -ErrorAction Stop
+
+- stage: DeployPre
+  dependsOn: 
+    - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeploySourceDocumentServicePre
+      displayName: Deploy SourceDocumentService Api
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPre'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: PowerShell@2
+                displayName: "Install PoSHPackages on Release Agent"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Pre"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |    
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
+
+                    #Iterate and confirm PoSHRepositories
+                    $repos = (Get-PSRepository | Select-Object -ExpandProperty Name)
+                    $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+                      Write-Host "Checking repository $($_.Name)"
+                      
+                      if ($repos -notcontains $_.Name) {
+                        Write-Warning "Repository $($_.Name) not found"
+                      } else {
+                        Write-Host "Repository $($_.Name) found"
+                      }
+                    }
+                    
+                    #Iterate and install PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Get-Module -Name $_.Name | Remove-Module
+                      
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Installing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Install-Module -Name $_.Name `
+                                        -MinimumVersion $_.MinimumVersion `
+                                        -MaximumVersion $_.MaximumVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      } else {
+                        Write-Host "Installing $($_.Name) $($_.RequiredVersion)"
+                        Install-Module -Name $_.Name `
+                                        -RequiredVersion $_.RequiredVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      }
+                    }
+              
+              - task: PowerShell@2
+                displayName: "Install Component"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Pre"
+                  DEPLOY_USERNAME: "$(DeployUsernamePre)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordPre)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernamePre)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordPre)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+
+                    #Rename Token Config File
+                    $rootFolder = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\SourceDocumentService"
+                    Remove-Item -Path (Join-Path $rootFolder App.config)
+                    Rename-Item -Path (Join-Path $rootFolder App.config.token) -NewName SourceDocumentService.dll.config.token
+                    Rename-TokenConfig -RootFolder $rootFolder
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Install-Component -ConfigData $ConfigData -ErrorAction Stop
+
+              - task: PowerShell@2
+                displayName: "Run Internal Pester"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Pre"
+                  DEPLOY_USERNAME: "$(DeployUsernamePre)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordPre)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernamePre)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordPre)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Invoke-InternalPesterTests -ConfigData $ConfigData -ErrorAction Stop
+
+- stage: DeployPrd
+  dependsOn: 
+    - Build
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+    - deployment: DeploySourceDocumentServicePrd
+      displayName: Deploy SourceDocumentService Api
+      pool: "NautilusRelease"
+      environment: 'TaskmanagerPrd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: PowerShell@2
+                displayName: "Install PoSHPackages on Release Agent"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Live"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |    
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
+
+                    #Iterate and confirm PoSHRepositories
+                    $repos = (Get-PSRepository | Select-Object -ExpandProperty Name)
+                    $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+                      Write-Host "Checking repository $($_.Name)"
+                      
+                      if ($repos -notcontains $_.Name) {
+                        Write-Warning "Repository $($_.Name) not found"
+                      } else {
+                        Write-Host "Repository $($_.Name) found"
+                      }
+                    }
+                    
+                    #Iterate and install PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Get-Module -Name $_.Name | Remove-Module
+                      
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Installing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Install-Module -Name $_.Name `
+                                        -MinimumVersion $_.MinimumVersion `
+                                        -MaximumVersion $_.MaximumVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      } else {
+                        Write-Host "Installing $($_.Name) $($_.RequiredVersion)"
+                        Install-Module -Name $_.Name `
+                                        -RequiredVersion $_.RequiredVersion `
+                                        -Repository $_.Repository `
+                                        -Force -Scope CurrentUser -AllowClobber
+                      }
+                    }
+              
+              - task: PowerShell@2
+                displayName: "Install Component"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Live"
+                  DEPLOY_USERNAME: "$(DeployUsernameLive)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordLive)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameLive)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordLive)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+
+                    #Rename Token Config File
+                    $rootFolder = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\SourceDocumentService"
+                    Remove-Item -Path (Join-Path $rootFolder App.config)
+                    Rename-Item -Path (Join-Path $rootFolder App.config.token) -NewName SourceDocumentService.dll.config.token
+                    Rename-TokenConfig -RootFolder $rootFolder
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Install-Component -ConfigData $ConfigData -ErrorAction Stop
+
+              - task: PowerShell@2
+                displayName: "Run Internal Pester"
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Live"
+                  DEPLOY_USERNAME: "$(DeployUsernameLive)"
+                  DEPLOY_PASSWORD: "$(DeployPasswordLive)"
+                  SERVICE_ACCOUNT_USERNAME: "$(ServiceAccountUsernameLive)"
+                  SERVICE_ACCOUNT_PASSWORD: "$(ServiceAccountPasswordLive)"
+                inputs:
+                  pwsh: false
+                  targetType: inline
+                  script: |
+                    # Create Deploy Credentials
+                    $deploySecPasswd = ConvertTo-SecureString "$($env:DEPLOY_PASSWORD)" -AsPlainText -Force
+                    $deployCred = New-Object System.Management.Automation.PSCredential("$($env:DEPLOY_USERNAME)" , $deploySecPasswd)
+
+                    # Create Service Credentials
+                    $serviceSecPasswd = ConvertTo-SecureString "$($env:SERVICE_ACCOUNT_PASSWORD)" -AsPlainText -Force
+                    $serviceCred = New-Object System.Management.Automation.PSCredential("$($env:SERVICE_ACCOUNT_USERNAME)" , $serviceSecPasswd)
+
+                    # Get $ConfigData
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
+
+                    $configParams = @{
+                      Environment = "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                      ArtifactRootDirectory = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)"
+                      DeployCred = $deployCred
+                      ServiceCred = $serviceCred
+                    }
+                    
+                    . ($pathToConfig) @configParams
+                    
+                    #Iterate and remove PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      Write-Host "Removing $($_.Name)"
+                      Get-Module -Name $_.Name | Remove-Module -Force
+                    }
+
+                    #Iterate and import PoSHPackages
+                    $ConfigData.NonNodeData.PoSHPackages | `
+                    Where-Object { $_.Usages -contains "Build" -or $_.Usages -contains "Release" } | `
+                    ForEach-Object {
+                      if ($null -eq $_.RequiredVersion) {
+                        Write-Host "Importing $($_.Name) between $($_.MinimumVersion) and $($_.MaximumVersion)"
+                        Import-Module -Name $_.Name `
+                                      -MinimumVersion $_.MinimumVersion `
+                                      -MaximumVersion $_.MaximumVersion
+                      } else {
+                        Write-Host "Importing $($_.Name) $($_.RequiredVersion)"
+                        Import-Module -Name $_.Name `
+                                      -RequiredVersion $_.RequiredVersion
+                      }
+                    }
+                    
+                    # Method in UKHO.Operations.BuildDeployTools
+                    Invoke-InternalPesterTests -ConfigData $ConfigData -ErrorAction Stop
