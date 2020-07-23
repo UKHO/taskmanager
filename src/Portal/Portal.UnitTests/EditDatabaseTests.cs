@@ -556,7 +556,7 @@ namespace Portal.UnitTests
             Assert.AreEqual("Failed to generate session file. No Hpd Usages were selected.", ex.Message);
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                                                                             ProcessId,
-                                                                            TestUser.DisplayName,
+                                                                            TestUser.UserPrincipalName,
                                                                             taskStage,
                                                                             A<CarisProjectDetails>.Ignored,
                                                                             A<List<string>>.Ignored,
@@ -585,7 +585,7 @@ namespace Portal.UnitTests
             Assert.AreEqual("Failed to generate session file. Caris project was never created.", ex.Message);
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                TestUser.DisplayName,
+                TestUser.UserPrincipalName,
                 taskStage,
                 A<CarisProjectDetails>.Ignored,
                 A<List<string>>.Ignored,
@@ -620,7 +620,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                TestUser.DisplayName,
+                TestUser.UserPrincipalName,
                 taskStage,
                 carisproject,
                 selectedUsages,
@@ -641,7 +641,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                TestUser.DisplayName,
+                TestUser.UserPrincipalName,
                 taskStage,
                 carisproject,
                 selectedUsages,
