@@ -379,6 +379,7 @@ namespace WorkflowCoordinator.Handlers
                 childLinkedDocument.Created = parentLinkedDocument.Created;
                 childLinkedDocument.Filename = parentLinkedDocument.Filename;
                 childLinkedDocument.Filepath = parentLinkedDocument.Filepath;
+                childLinkedDocument.UniqueId = parentLinkedDocument.UniqueId;
 
                 if (isNew)
                 {
