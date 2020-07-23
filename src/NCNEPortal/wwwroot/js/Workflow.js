@@ -825,13 +825,7 @@
     } else {
         setControlState(true);
     }
-
-    $("#ChartNo").on("focusout",
-        function() {
-            var projectName = $("#hdnProcessId").val() + "_" + $("#workflowType").text().trim() + "_" + $("#ChartNo").val();
-            $("#txtCarisProject").val(projectName);
-        });
-
+    
     $("#btnCreateCarisProject").on("click",
         function() {
 
@@ -845,7 +839,6 @@
 
             var processId = Number($("#hdnProcessId").val());
             var projectName = $("#txtCarisProject").val();
-            var chartNo = $("#ChartNo").val();
 
             $.ajax({
                 type: "POST",
@@ -856,8 +849,7 @@
                 },
                 data: {
                     "processId": processId,
-                    "projectName": projectName,
-                    "chartNo" : chartNo
+                    "projectName": projectName
 
                 },
                 success: function(data) {

@@ -325,7 +325,7 @@ namespace NCNEPortal
 
 
 
-        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName, string chartNo)
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
@@ -333,9 +333,11 @@ namespace NCNEPortal
 
             _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
 
-            if (string.IsNullOrWhiteSpace(ChartNo))
+            var task = await _dbContext.TaskInfo.FindAsync(processId);
+
+            if (string.IsNullOrWhiteSpace(task.ChartNumber))
             {
-                throw new ArgumentException(" Please enter Chart Number before creating the Caris Project");
+                throw new ArgumentException(" Please enter and save Chart Number before creating the Caris Project");
             }
 
             if (string.IsNullOrWhiteSpace(projectName))
@@ -348,11 +350,6 @@ namespace NCNEPortal
             var projectId = await CreateCarisProject(processId, projectName);
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
-
-            //Save the ChartNo
-            var task = _dbContext.TaskInfo.FindAsync(processId).Result;
-
-            task.ChartNumber = ChartNo;
 
             await _dbContext.SaveChangesAsync();
 
