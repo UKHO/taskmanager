@@ -375,7 +375,11 @@ namespace NCNEPortal
                 _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 
             //Add the users from other roles to the Caris Project
-            var role = await _dbContext.TaskRole.FirstOrDefaultAsync(t => t.ProcessId == processId);
+            var role = await _dbContext.TaskRole.Include(c => c.Compiler)
+                                                .Include(c => c.VerifierOne)
+                                                .Include(c => c.VerifierTwo)
+                                                .Include(c => c.HundredPercentCheck)
+                                                .FirstOrDefaultAsync(t => t.ProcessId == processId);
             if (role.Compiler != null && role.Compiler != user)
             {
                 hpdUser = await GetHpdUser(role.Compiler);
@@ -618,7 +622,8 @@ namespace NCNEPortal
         private async Task<bool> CompleteStage(int processId, int stageId)
         {
 
-            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId).Include(t => t.TaskStageType);
+            var taskStages = _dbContext.TaskStage.Include(r => r.Assigned)
+                .Where(s => s.ProcessId == processId).Include(t => t.TaskStageType);
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
 
@@ -778,7 +783,7 @@ namespace NCNEPortal
             var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == task.ProcessId);
 
             if (carisProject != null)
-                UpdateCarisProjectUsers(task, carisProject.ProjectId);
+                UpdateCarisProjectUsers(task, role, carisProject.ProjectId);
 
             UpdateRoles(task, role);
 
@@ -864,34 +869,34 @@ namespace NCNEPortal
             }
         }
 
-        private void UpdateCarisProjectUsers(TaskInfo task, int projectId)
+        private void UpdateCarisProjectUsers(TaskInfo task, TaskRole role, int projectId)
         {
 
 
-            var hpdUser = GetHpdUser(Compiler).Result;
+            var hpdUser = GetHpdUser(role.Compiler).Result;
 
-            if (Compiler != null && Compiler != task.TaskRole.Compiler)
+            if (role.Compiler != null && role.Compiler != task.TaskRole.Compiler)
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
 
-            if (Verifier1 != null && Verifier1 != task.TaskRole.VerifierOne)
+            if (role.VerifierOne != null && role.VerifierOne != task.TaskRole.VerifierOne)
             {
-                hpdUser = GetHpdUser(Verifier1).Result;
-                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-                    _generalConfig.Value.CarisProjectTimeoutSeconds);
-            }
-
-            if (Verifier2 != null && Verifier2 != task.TaskRole.VerifierTwo)
-            {
-                hpdUser = GetHpdUser(Verifier2).Result;
+                hpdUser = GetHpdUser(role.VerifierOne).Result;
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
 
-            if (HundredPercentCheck != null &&
-                HundredPercentCheck != task.TaskRole.HundredPercentCheck)
+            if (role.VerifierTwo != null && role.VerifierTwo != task.TaskRole.VerifierTwo)
             {
-                hpdUser = GetHpdUser(HundredPercentCheck).Result;
+                hpdUser = GetHpdUser(role.VerifierTwo).Result;
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+
+            if (role.HundredPercentCheck != null &&
+                role.HundredPercentCheck != task.TaskRole.HundredPercentCheck)
+            {
+                hpdUser = GetHpdUser(role.HundredPercentCheck).Result;
                 _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
                     _generalConfig.Value.CarisProjectTimeoutSeconds);
             }
