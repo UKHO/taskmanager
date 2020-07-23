@@ -620,7 +620,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                TestUser.DisplayName,
+                TestUser.UserPrincipalName,
                 taskStage,
                 carisproject,
                 selectedUsages,
@@ -641,7 +641,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
-                TestUser.DisplayName,
+                TestUser.UserPrincipalName,
                 taskStage,
                 carisproject,
                 selectedUsages,
