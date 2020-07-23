@@ -59,7 +59,7 @@ namespace SourceDocumentCoordinator.Handlers
             _logger.LogInformation("Successfully called SourceDocumentService to post document to Content Service with Content Service Id {ContentServiceId}");
 
             await UpdatePrimaryDocumentStatus(message, contentServiceId);
-            await UpdateLinkedDocuments(message, contentServiceId);
+            await UpdateLinkedDocument(message, contentServiceId, message.UniqueId);
             await UpdateDatabaseDocuments(message, contentServiceId);
 
             await _dbContext.SaveChangesAsync();
@@ -88,24 +88,20 @@ namespace SourceDocumentCoordinator.Handlers
             }
         }
 
-        private async Task UpdateLinkedDocuments(PersistDocumentInStoreCommand message, Guid newGuid)
+        private async Task UpdateLinkedDocument(PersistDocumentInStoreCommand message, Guid newGuid, Guid uniqueId)
         {
 
             _logger.LogInformation("Updating LinkedDocument with generated source document file info");
 
-            var linkedDocuments = await _dbContext.LinkedDocument
-                                                                .Where(pd => pd.LinkedSdocId == message.SourceDocumentId
+            var linkedDocument = await _dbContext.LinkedDocument
+                                                                .Where(pd => pd.UniqueId == uniqueId
                                                                              && (pd.Status == SourceDocumentRetrievalStatus.Started.ToString()
                                                                                  || pd.Status == SourceDocumentRetrievalStatus.Ready.ToString()))
-                                                                .ToListAsync();
-
-            foreach (var linkedDocument in linkedDocuments)
-            {
-                linkedDocument.ContentServiceId = newGuid;
-                linkedDocument.Filename = Path.GetFileName(message.Filepath)?.Trim();
-                linkedDocument.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
-                linkedDocument.Status = SourceDocumentRetrievalStatus.FileGenerated.ToString();
-            }
+                                                                .SingleOrDefaultAsync();
+            linkedDocument.ContentServiceId = newGuid;
+            linkedDocument.Filename = Path.GetFileName(message.Filepath)?.Trim();
+            linkedDocument.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
+            linkedDocument.Status = SourceDocumentRetrievalStatus.FileGenerated.ToString();
         }
 
         private async Task UpdateDatabaseDocuments(PersistDocumentInStoreCommand message, Guid newGuid)
