@@ -139,10 +139,25 @@ namespace NCNEPortal.Pages
 
             if (await _ncneUserDbService.ValidateUserAsync(userName))
             {
-                var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
+                var instance = await _dbContext.TaskInfo
+                              .Include(r => r.TaskRole)
+                              .ThenInclude(u => u.Compiler)
+                              .Include(r => r.TaskRole)
+                              .ThenInclude(u => u.VerifierOne)
+                              .Include(r => r.TaskRole)
+                              .ThenInclude(u => u.VerifierTwo)
+                              .Include(r => r.TaskRole)
+                              .ThenInclude(u => u.HundredPercentCheck)
+                              .Include(s => s.TaskStage)
+                              .ThenInclude(u => u.Assigned)
+                              .FirstAsync(t => t.ProcessId == processId);
+
                 var user = await _ncneUserDbService.GetAdUserAsync(userPrincipal);
                 instance.Assigned = user;
                 instance.AssignedDate = DateTime.Now;
+
+                //Update the new user in task role and stages
+                UpdateTaskStageUser(instance, user);
 
                 //Update the caris Project with the current user if the caris project is created already
                 await UpdateCarisProject(processId, user);
@@ -160,6 +175,70 @@ namespace NCNEPortal.Pages
             }
 
             return StatusCode(200);
+        }
+
+        private void UpdateTaskStageUser(TaskInfo task, AdUser user)
+        {
+            _logger.LogInformation(
+                " Updating Task stage users from roles for task {ProcessId}.");
+
+
+            var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
+                                                          && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
+
+            //Assign the user to the role of the user who is in-charge of the task stage in progress
+            if (taskInProgress == null)
+                task.TaskRole.HundredPercentCheck = user;
+            else
+            {
+                switch ((NcneTaskStageType)taskInProgress.TaskStageTypeId)
+                {
+                    case NcneTaskStageType.With_SDRA:
+                    case NcneTaskStageType.With_Geodesy:
+                    case NcneTaskStageType.Specification:
+                    case NcneTaskStageType.Compile:
+                    case NcneTaskStageType.V1_Rework:
+                    case NcneTaskStageType.V2_Rework:
+                        {
+                            task.TaskRole.Compiler = user;
+                            break;
+                        }
+                    case NcneTaskStageType.V2:
+                        {
+                            task.TaskRole.VerifierTwo = user;
+                            break;
+                        }
+                    case NcneTaskStageType.Hundred_Percent_Check:
+                        {
+                            task.TaskRole.HundredPercentCheck = user;
+                            break;
+                        }
+                    default:
+                        {
+                            task.TaskRole.VerifierOne = user;
+                            break;
+                        }
+                }
+            }
+
+
+            foreach (var stage in task.TaskStage.Where(s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
+            {
+                //Assign the user according to the stage
+                stage.Assigned = (NcneTaskStageType)stage.TaskStageTypeId switch
+                {
+                    NcneTaskStageType.With_Geodesy => task.TaskRole.Compiler,
+                    NcneTaskStageType.With_SDRA => task.TaskRole.Compiler,
+                    NcneTaskStageType.Specification => task.TaskRole.Compiler,
+                    NcneTaskStageType.Compile => task.TaskRole.Compiler,
+                    NcneTaskStageType.V1_Rework => task.TaskRole.Compiler,
+                    NcneTaskStageType.V2_Rework => task.TaskRole.Compiler,
+                    NcneTaskStageType.V2 => task.TaskRole.VerifierTwo,
+                    NcneTaskStageType.Hundred_Percent_Check => task.TaskRole.HundredPercentCheck,
+                    _ => task.TaskRole.VerifierOne
+                };
+            }
+
         }
 
         private async Task UpdateCarisProject(int processId, AdUser user)

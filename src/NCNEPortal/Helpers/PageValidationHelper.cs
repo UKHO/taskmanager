@@ -154,6 +154,28 @@ namespace NCNEPortal.Helpers
             return isValid;
         }
 
+        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+            if (threePs)
+            {
+                if (actualReturnDate3Ps == null)
+                {
+                    validationErrorMessages.Add("3PS : return date must be completed first");
+                    isValid = false;
+                }
+
+                if (actualReturnDate3Ps?.Date > DateTime.Now.Date)
+                {
+                    validationErrorMessages.Add("3PS : Actual return date cannot be in the future");
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
         private bool ValidateThreePs(DateTime? sendDate3Ps, DateTime? expectedReturnDate3Ps, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
         {
             bool isValid = true;
