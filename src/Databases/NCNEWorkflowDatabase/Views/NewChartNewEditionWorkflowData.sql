@@ -53,12 +53,12 @@ CASE
 	WHEN spec.Status = 'Completed' THEN 'Yes'
 	ELSE 'No'
 END as [Started],
-isnull(comp.AssignedAdUserId, '') as [Comp],
-isnull(v1.AssignedAdUserId, '') as [V1],
-isnull(v1Rework.AssignedAdUserId, '') as [V1 Corr],
-isnull(v2.AssignedAdUserId, '') as [V2],
-isnull(v2Rework.AssignedAdUserId, '') as [V2 Corr],
-isnull(comp.AssignedAdUserId, '') as [Circ],
+isnull(compUser.DisplayName, '') as [Comp],
+isnull(v1User.DisplayName, '') as [V1],
+isnull(v1ReworkUser.DisplayName, '') as [V1 Corr],
+isnull(v2User.DisplayName, '') as [V2],
+isnull(v2ReworkUser.DisplayName, '') as [V2 Corr],
+isnull(compUser.DisplayName, '') as [Circ],
 isnull(CONVERT(varchar(20), forms.DateCompleted, 103), '') as [100%],
 isnull(CONVERT(varchar(20), forms.DateExpected, 103), '') as [H Forms],
 isnull(CONVERT(varchar(20), commitPrint.DateExpected, 103), '') as [CTP],
@@ -81,3 +81,9 @@ join [dbo].[TaskStage] v1Rework on ti.ProcessId = v1Rework.ProcessId and v1Rewor
 join [dbo].[TaskStage] v2Rework on ti.ProcessId = v2Rework.ProcessId and v2Rework.TaskStageTypeId = params.v2ReworkTaskType
 join [dbo].[TaskStage] commitPrint on ti.ProcessId = commitPrint.ProcessId and commitPrint.TaskStageTypeId = params.commitPrintTaskType
 left join [dbo].[TaskNote] tn on ti.ProcessId = tn.ProcessId
+
+join [dbo].[AdUser] compUser on comp.AssignedAdUserId = compUser.AdUserId
+left join [dbo].[AdUser] v1User on v1.AssignedAdUserId = v1User.AdUserId
+left join [dbo].[AdUser] v1ReworkUser on v1Rework.AssignedAdUserId = v1ReworkUser.AdUserId
+left join [dbo].[AdUser] v2User on v2.AssignedAdUserId = v2User.AdUserId
+left join [dbo].[AdUser] v2ReworkUser on v2Rework.AssignedAdUserId = v2ReworkUser.AdUserId
