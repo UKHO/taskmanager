@@ -259,10 +259,10 @@ namespace NCNEPortal
                     NcneTaskStageType.Specification => (this.ChartType == NcneChartType.Adoption.ToString()
                                ? NcneTaskStageStatus.Open.ToString() :
                                NcneTaskStageStatus.InProgress.ToString()),
-                    NcneTaskStageType.V2 => (this.Verifier2 == null
+                    NcneTaskStageType.V2 => (role.VerifierTwo == null
                         ? NcneTaskStageStatus.Inactive.ToString()
                         : NcneTaskStageStatus.Open.ToString()),
-                    NcneTaskStageType.V2_Rework => (this.Verifier2 == null
+                    NcneTaskStageType.V2_Rework => (role.VerifierTwo == null
                         ? NcneTaskStageStatus.Inactive.ToString()
                         : NcneTaskStageStatus.Open.ToString()),
                     NcneTaskStageType.Forms => NcneTaskStageStatus.InProgress.ToString(),
