@@ -65,15 +65,15 @@ case
 	else ''
 end as [TASK STAGE],
 case 
-	when wi.ActivityName = reviewStage then ISNULL(dard.AssessorAdUserId, '')
-	when wi.ActivityName = assessStage then ISNULL(daad.AssessorAdUserId, '')
-	when wi.ActivityName = verifyStage then ISNULL(davd.AssessorAdUserId, '')
+	when wi.ActivityName = reviewStage then ISNULL(dardAssessorUser.DisplayName, '')
+	when wi.ActivityName = assessStage then ISNULL(daadAssessorUser.DisplayName, '')
+	when wi.ActivityName = verifyStage then ISNULL(davdAssessorUser.DisplayName, '')
 end as [DB COMPILER],
 'Unknown' as [COMP TIME],
 case 
-	when wi.ActivityName = reviewStage then ISNULL(dard.VerifierAdUserId, '')
-	when wi.ActivityName = assessStage then ISNULL(daad.VerifierAdUserId, '')
-	when wi.ActivityName = verifyStage then ISNULL(davd.VerifierAdUserId, '')
+	when wi.ActivityName = reviewStage then ISNULL(dardVerifierUser.DisplayName, '')
+	when wi.ActivityName = assessStage then ISNULL(daadVerifierUser.DisplayName, '')
+	when wi.ActivityName = verifyStage then ISNULL(davdVerifierUser.DisplayName, '')
 end as [DB VERIFIER],
 'Unknown' as [VERIF TIME],
 case
@@ -101,3 +101,10 @@ left join (select top (1) * from dbo.OnHold
 			where OnHoldTime is not null 
 			and OffHoldTime is not null) oh
 on wi.ProcessId = oh.ProcessId
+
+left join dbo.AdUsers dardAssessorUser on dard.AssessorAdUserId = dardAssessorUser.AdUserId
+left join dbo.AdUsers daadAssessorUser on daad.AssessorAdUserId = daadAssessorUser.AdUserId
+left join dbo.AdUsers davdAssessorUser on davd.AssessorAdUserId = davdAssessorUser.AdUserId
+left join dbo.AdUsers dardVerifierUser on dard.VerifierAdUserId = dardVerifierUser.AdUserId
+left join dbo.AdUsers daadVerifierUser on daad.VerifierAdUserId = daadVerifierUser.AdUserId
+left join dbo.AdUsers davdVerifierUser on davd.VerifierAdUserId = davdVerifierUser.AdUserId
