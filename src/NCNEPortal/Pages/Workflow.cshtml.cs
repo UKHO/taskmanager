@@ -333,6 +333,12 @@ namespace NCNEPortal
 
             _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
 
+            var task = await _dbContext.TaskInfo.FindAsync(processId);
+
+            if (string.IsNullOrWhiteSpace(task.ChartNumber))
+            {
+                throw new ArgumentException(" Please enter and save Chart Number before creating the Caris Project");
+            }
 
             if (string.IsNullOrWhiteSpace(projectName))
             {
@@ -344,6 +350,8 @@ namespace NCNEPortal
             var projectId = await CreateCarisProject(processId, projectName);
 
             await UpdateCarisProjectDetails(processId, projectName, projectId);
+
+            await _dbContext.SaveChangesAsync();
 
             return StatusCode(200);
         }
@@ -488,7 +496,7 @@ namespace NCNEPortal
 
         }
 
-        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId)
+        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId, bool publish)
         {
             ValidationErrorMessages.Clear();
 
@@ -507,6 +515,21 @@ namespace NCNEPortal
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
+            }
+
+            if (publish)
+            {
+                var task = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+
+                if (!_pageValidationHelper.ValidateForPublishCarisChart(task.ThreePs, task.ActualDate3Ps,
+                    ValidationErrorMessages))
+                {
+                    return new JsonResult(this.ValidationErrorMessages)
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
+
             }
 
             return new JsonResult(HttpStatusCode.OK);
@@ -950,11 +973,11 @@ namespace NCNEPortal
                     NcneTaskStageType.With_Geodesy => role.Compiler,
                     NcneTaskStageType.Specification => role.Compiler,
                     NcneTaskStageType.Compile => role.Compiler,
-                    NcneTaskStageType.V1 => role.VerifierOne,
                     NcneTaskStageType.V1_Rework => role.Compiler,
-                    NcneTaskStageType.V2 => role.VerifierTwo,
                     NcneTaskStageType.V2_Rework => role.Compiler,
-                    _ => role.HundredPercentCheck
+                    NcneTaskStageType.V2 => role.VerifierTwo,
+                    NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    _ => role.VerifierOne
                 };
             }
 
@@ -1061,6 +1084,7 @@ namespace NCNEPortal
 
             try
             {
+
                 var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
 
                 if (result)

@@ -244,7 +244,8 @@
             data: {
                 "processId": processId,
                 "username": username,
-                "stageTypeId": stageTypeId
+                "stageTypeId": stageTypeId,
+                "publish" : publish
             },
 
             success: function (result) {
@@ -820,57 +821,61 @@
     } else {
         setControlState(true);
     }
+    
+    $("#btnCreateCarisProject").on("click",
+        function() {
+
+            $("#createCarisProjectSuccess").collapse("hide");
+            $("#createCarisProjectError").collapse("hide");
 
 
+            setControlState(false);
 
-    $("#btnCreateCarisProject").on("click", function () {
+            $("#createCarisProjectSpinner").show();
 
-        $("#createCarisProjectSuccess").collapse("hide");
-        $("#createCarisProjectError").collapse("hide");
+            var processId = Number($("#hdnProcessId").val());
+            var projectName = $("#txtCarisProject").val();
 
-        setControlState(false);
+            $.ajax({
+                type: "POST",
+                url: "Workflow/?handler=CreateCarisProject",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "processId": processId,
+                    "projectName": projectName
 
-        $("#createCarisProjectSpinner").show();
+                },
+                success: function(data) {
+                    $("#createCarisProjectSuccess").collapse("show");
+                },
+                error: function(error) {
+                    setControlState(true);
+                    var errorMessage = error.getResponseHeader("Error");
 
-        var processId = Number($("#hdnProcessId").val());
-        var projectName = $("#txtCarisProject").val();
+                    $("#createCarisProjectErrorMessage")
+                        .text("Failed to complete Caris Project creation. " + errorMessage);
+                    $("#createCarisProjectError").collapse("show");
+                },
+                complete: function() {
+                    $("#createCarisProjectSpinner").hide();
+                }
+            });
 
-        $.ajax({
-            type: "POST",
-            url: "Workflow/?handler=CreateCarisProject",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "processId": processId,
-                "projectName": projectName,
-
-            },
-            success: function (data) {
-                $("#createCarisProjectSuccess").collapse("show");
-            },
-            error: function (error) {
-                setControlState(true);
-                var errorMessage = error.getResponseHeader("Error");
-
-                $("#createCarisProjectErrorMessage").text("Failed to complete Caris Project creation. " + errorMessage);
-                $("#createCarisProjectError").collapse("show");
-            },
-            complete: function () {
-                $("#createCarisProjectSpinner").hide();
-            }
         });
-
-    });
 
 
     function setControlState(enableCarisProject) {
         if (enableCarisProject) {
             $("#btnCreateCarisProject").prop("disabled", false);
             $("#txtCarisProject").prop("disabled", false);
+            $("#ChartNo").prop("disabled", false);
         } else {
             $("#btnCreateCarisProject").prop("disabled", true);
             $("#txtCarisProject").prop("disabled", true);
+            $("#ChartNo").prop("disabled", true);
         }
     }
 

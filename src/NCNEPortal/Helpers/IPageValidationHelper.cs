@@ -25,5 +25,7 @@ namespace NCNEPortal.Helpers
         public bool ValidateForRework(string assignedUser, string userName, List<string> validationErrorMessages);
 
         public bool ValidateForCompleteWorkflow(string assignedUser, string userName, List<string> validationErrorMessages);
+
+        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages);
     }
 }
