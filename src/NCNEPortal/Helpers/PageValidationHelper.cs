@@ -162,7 +162,7 @@ namespace NCNEPortal.Helpers
             {
                 if (actualReturnDate3Ps == null)
                 {
-                    validationErrorMessages.Add("3PS : return date must be completed first");
+                    validationErrorMessages.Add("3PS : Please enter the actual return date before publishing the chart");
                     isValid = false;
                 }
 
