@@ -183,7 +183,7 @@ namespace Portal.Pages.DbAssessment
                 StsDataImpact,
                 Team,
                 ValidationErrorMessages,
-                CurrentUser.DisplayName))
+                CurrentUser.UserPrincipalName))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -645,8 +645,8 @@ namespace Portal.Pages.DbAssessment
             if (isCarisProjectCreated)
             {
                 // just update Caris project Assigned users
-                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Assessor.DisplayName);
-                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Verifier.DisplayName);
+                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Assessor.UserPrincipalName);
+                await UpdateCarisProjectWithAdditionalUser(processId, currentVerify.Verifier.UserPrincipalName);
 
                 return;
             }
