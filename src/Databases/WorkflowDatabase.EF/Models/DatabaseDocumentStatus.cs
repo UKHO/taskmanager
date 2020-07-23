@@ -8,7 +8,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public int SdocId { get; set; }
         public string RsdraNumber { get; set; }
-        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+        public string ParsedRsdraNumber => this.RsdraNumber?.Replace("RSDRA", "");
         public string SourceDocumentName { get; set; }
         public string SourceDocumentType { get; set; }
         public string SourceNature { get; set; }

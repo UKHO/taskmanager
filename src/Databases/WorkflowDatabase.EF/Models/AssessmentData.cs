@@ -12,7 +12,7 @@ namespace WorkflowDatabase.EF.Models
         public string RsdraNumber { get; set; }
 
         [DisplayFormat(NullDisplayText = "N/A")]
-        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+        public string ParsedRsdraNumber => this.RsdraNumber?.Replace("RSDRA", "");
 
         [DisplayFormat(NullDisplayText = "N/A")]
         public string SourceDocumentName { get; set; }
