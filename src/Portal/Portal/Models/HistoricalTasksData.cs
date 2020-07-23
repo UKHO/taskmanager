@@ -13,7 +13,7 @@ namespace Portal.Models
         [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? DmEndDate { get; set; }
         public string RsdraNumber { get; set; }
-        public string ParsedRsdraNumber => this.RsdraNumber.Replace("RSDRA", "");
+        public string ParsedRsdraNumber => this.RsdraNumber?.Replace("RSDRA", "");
         public string SourceDocumentName { get; set; }
         public WorkflowStage TaskStage { get; set; }
         public WorkflowStatus Status { get; set; }
