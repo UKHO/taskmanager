@@ -11,5 +11,6 @@ namespace SourceDocumentCoordinator.Messages
         public int SourceDocumentId { get; set; }
         public SourceType SourceType { get; set; }
         public string Filepath { get; set; }
+        public Guid UniqueId { get; set; }
     }
 }

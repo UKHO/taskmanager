@@ -157,7 +157,8 @@ namespace SourceDocumentCoordinator.Sagas
                         ProcessId = Data.ProcessId,
                         SourceDocumentId = message.SourceDocumentId,
                         SourceType = message.SourceType,
-                        Filepath = sourceDocument.Message
+                        Filepath = sourceDocument.Message,
+                        UniqueId =  message.UniqueId
                     };
                     await context.SendLocal(persistCommand).ConfigureAwait(false);
 
