@@ -118,7 +118,7 @@ namespace Common.Helpers
             dbContext.WorkflowType.RemoveRange(dbContext.WorkflowType);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
             if (reseedIdentity) ReSeedNcneWorkflowDbTables(dbContext);
 

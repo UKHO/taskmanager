@@ -159,9 +159,7 @@
             var versionNo = $("#chartVersionNo").val();
             processId = $("#hdnPublishProcessId").val();
             var stageId = $("#hdnPublishStageId").val();
-            var sentTo3Ps = $("#3psToggle").prop("checked");
-            var actualReturn = $("#ActualReturnDate3ps").val();
-            publishCarisChart(versionNo, processId, stageId, sentTo3Ps, actualReturn);
+            publishCarisChart(versionNo, processId, stageId);
         }
 
     });
@@ -203,7 +201,7 @@
         });
     }
 
-    function publishCarisChart(versionNo, processId, stageId, sentTo3Ps, actualReturn) {
+    function publishCarisChart(versionNo, processId, stageId) {
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=PublishCarisChart",
@@ -214,9 +212,7 @@
             data: {
                 "versionNumber": versionNo,
                 "processId": processId,
-                "stageId": stageId,
-                "sentTo3Ps": sentTo3Ps,
-                "actualReturn" : actualReturn
+                "stageId": stageId
             },
             success: function (result) {
                 formChanged = false;

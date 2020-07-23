@@ -1075,8 +1075,7 @@ namespace NCNEPortal
             return new JsonResult(result);
         }
 
-        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId, bool sentTo3Ps,
-            string actualReturn)
+        public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("NcnePortalResource", nameof(OnPostPublishCarisChart));
@@ -1085,26 +1084,6 @@ namespace NCNEPortal
 
             try
             {
-
-                if (sentTo3Ps)
-                {
-                    if (string.IsNullOrWhiteSpace(actualReturn))
-                    {
-                        return new JsonResult("Please enter actual return date on 3PS before publishing the chart")
-                        {
-                            StatusCode = (int)HttpStatusCode.InternalServerError
-                        };
-
-                    }
-
-                    if ((Convert.ToDateTime(actualReturn)).Date > DateTime.Now.Date)
-                    {
-                        return new JsonResult("Actual return date cannot be later than today")
-                        {
-                            StatusCode = (int)HttpStatusCode.InternalServerError
-                        };
-                    }
-                }
 
                 var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
 
