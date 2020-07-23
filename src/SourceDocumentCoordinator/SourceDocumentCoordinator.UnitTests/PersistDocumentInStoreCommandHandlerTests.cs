@@ -14,6 +14,7 @@ using SourceDocumentCoordinator.Handlers;
 using SourceDocumentCoordinator.HttpClients;
 using SourceDocumentCoordinator.Messages;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 
 namespace SourceDocumentCoordinator.UnitTests
 {
@@ -81,6 +82,20 @@ namespace SourceDocumentCoordinator.UnitTests
         [Test]
         public async Task Test_When_Linked_Document_Successfully_posted_to_SourceDocumentService_Then_Document_Status_and_FileLocation_is_Updated()
         {
+            var linkedDocUniqueId = Guid.NewGuid();
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument
+            {
+                ProcessId = 5678,
+                LinkType = "Forward",
+                Created = DateTime.Now.Date,
+                UniqueId = linkedDocUniqueId,
+                LinkedSdocId = 1999999,
+                Status = "Started"
+            });
+
+            await _dbContext.SaveChangesAsync();
+
             //Given
             var message = new PersistDocumentInStoreCommand()
             {
@@ -88,7 +103,8 @@ namespace SourceDocumentCoordinator.UnitTests
                 ProcessId = 5678,
                 SourceDocumentId = 1999999,
                 SourceType = SourceType.Linked,
-                Filepath = @"c:\test\TestImage.tif"
+                Filepath = @"c:\test\TestImage.tif",
+                UniqueId = linkedDocUniqueId
             };
 
             A.CallTo(() =>
