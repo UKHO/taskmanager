@@ -222,7 +222,7 @@ namespace NCNEPortal.Pages
             }
 
 
-            foreach (var stage in task.TaskStage)
+            foreach (var stage in task.TaskStage.Where(s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
             {
                 //Assign the user according to the stage
                 stage.Assigned = (NcneTaskStageType)stage.TaskStageTypeId switch
