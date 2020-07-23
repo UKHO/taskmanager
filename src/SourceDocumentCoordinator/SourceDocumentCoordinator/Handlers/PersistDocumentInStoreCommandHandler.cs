@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers;
+using Common.Messages.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -59,7 +60,12 @@ namespace SourceDocumentCoordinator.Handlers
             _logger.LogInformation("Successfully called SourceDocumentService to post document to Content Service with Content Service Id {ContentServiceId}");
 
             await UpdatePrimaryDocumentStatus(message, contentServiceId);
-            await UpdateLinkedDocument(message, contentServiceId, message.UniqueId);
+
+            if (message.SourceType == SourceType.Linked && message.UniqueId != Guid.Empty)
+            {
+                await UpdateLinkedDocument(message, contentServiceId, message.UniqueId);
+            }
+
             await UpdateDatabaseDocuments(message, contentServiceId);
 
             await _dbContext.SaveChangesAsync();
@@ -98,6 +104,7 @@ namespace SourceDocumentCoordinator.Handlers
                                                                              && (pd.Status == SourceDocumentRetrievalStatus.Started.ToString()
                                                                                  || pd.Status == SourceDocumentRetrievalStatus.Ready.ToString()))
                                                                 .SingleOrDefaultAsync();
+
             linkedDocument.ContentServiceId = newGuid;
             linkedDocument.Filename = Path.GetFileName(message.Filepath)?.Trim();
             linkedDocument.Filepath = Path.GetDirectoryName(message.Filepath)?.Trim();
