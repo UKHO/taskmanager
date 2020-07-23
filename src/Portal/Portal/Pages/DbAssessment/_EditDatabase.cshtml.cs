@@ -160,7 +160,7 @@ namespace Portal.Pages.DbAssessment
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                                                                                 processId,
-                                                                                 CurrentUser.DisplayName,
+                                                                                 CurrentUser.UserPrincipalName,
                                                                                 taskStage,
                                                                                 carisProjectDetails,
                                                                                 selectedHpdUsages,
