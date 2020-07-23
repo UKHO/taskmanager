@@ -31,14 +31,6 @@
         $('#HundredPCheckUpn').val(suggestionObject.userPrincipalName);
     });
 
-
-    if (isPublished) {
-        $("#3psToggle").prop("disabled", true);
-        $("#SendDate3ps").prop("disabled", true);
-        $("#ExpectedReturnDate3ps").prop("disabled", true);
-        $("#ActualReturnDate3ps").prop("disabled", true);
-    }
-
     var formChanged = false;
     $("#frmWorkflow").change(function () { formChanged = true; });
     
@@ -594,7 +586,15 @@
          $("#lblRepDate").hide();
      }
 
-    set3psStatus();
+
+    if (isPublished) {
+        $("#3psToggle").prop("disabled", true);
+        $("#SendDate3ps").prop("disabled", true);
+        $("#ExpectedReturnDate3ps").prop("disabled", true);
+        $("#ActualReturnDate3ps").prop("disabled", true);
+    } else {
+        set3psStatus();
+    }
 
     $("#3psToggle").on("change",
         function() {
