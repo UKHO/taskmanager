@@ -23,7 +23,7 @@ namespace Common.Factories.DocumentStatusFactory
         public async Task<int> Update(int processId, int sourceDocumentId, SourceDocumentRetrievalStatus status, Guid uniqueId)
         {
             var row = await _dbContext.LinkedDocument
-                .SingleOrDefaultAsync(r => r.UniqueId == uniqueId);
+                .SingleOrDefaultAsync(r => r.UniqueId == uniqueId && r.ProcessId == processId);
 
             if (row == null)
             {
