@@ -605,7 +605,9 @@ namespace NCNEPortal
 
         private async Task<bool> SendtoRework(int processId, int stageId)
         {
-            var taskStages = _dbContext.TaskStage.Where(s => s.ProcessId == processId).Include(t => t.TaskStageType); ;
+
+            var taskStages = _dbContext.TaskStage.Include(r => r.Assigned)
+                .Where(s => s.ProcessId == processId).Include(t => t.TaskStageType);
 
             var currentStage = await taskStages.SingleAsync(t => t.TaskStageId == stageId);
             var user = await _ncneUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
