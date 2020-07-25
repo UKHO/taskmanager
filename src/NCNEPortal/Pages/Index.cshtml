@@ -230,8 +230,8 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                    &&
-                                    (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+                                   &&
+                                   (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))
@@ -268,7 +268,10 @@
                             @task.TaskRole.HundredPercentCheck?.DisplayName
                         </td>
                         <td>
-                            @task.StatusChangeDate
+                            @if (task.StatusChangeDate != null)
+                            {
+                                @task.StatusChangeDate.Value.ToShortDateString()
+                            }
                         </td>
                     </tr>
                 }
