@@ -71,28 +71,28 @@ stages:
         workingDirectory: '$(Build.SourcesDirectory)\\src\\portal\\portal'
         failOnStderr: true
   
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'test'
-          projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
-          arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings --configuration $(BuildConfiguration) --no-build
-        displayName: 'dotnet test portaltests'
+      # - task: DotNetCoreCLI@2
+      #   inputs:
+      #     command: 'test'
+      #     projects: '$(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\portal.unittests.csproj'
+      #     arguments: --collect:"XPlat Code Coverage" -s $(Build.SourcesDirectory)\\src\\portal\\portal.unittests\\CodeCoverage.runsettings --configuration $(BuildConfiguration) --no-build
+      #   displayName: 'dotnet test portaltests'
 
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: custom
-          custom: tool
-          arguments: install --tool-path . dotnet-reportgenerator-globaltool
-        displayName: Install ReportGenerator tool
+      # - task: DotNetCoreCLI@2
+      #   inputs:
+      #     command: custom
+      #     custom: tool
+      #     arguments: install --tool-path . dotnet-reportgenerator-globaltool
+      #   displayName: Install ReportGenerator tool
 
-      - script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
-        displayName: Create reports
+      # - script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+      #   displayName: Create reports
   
-      - task: PublishCodeCoverageResults@1
-        displayName: 'Publish code coverage'
-        inputs:
-          codeCoverageTool: Cobertura
-          summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
+      # - task: PublishCodeCoverageResults@1
+      #   displayName: 'Publish code coverage'
+      #   inputs:
+      #     codeCoverageTool: Cobertura
+      #     summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml
 
       - task: DotNetCoreCLI@2
         inputs:
