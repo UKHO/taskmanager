@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
@@ -247,7 +248,7 @@ namespace Portal.Helpers
                     validationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-                else if (currentUserEmail!=currentAssignedVerifierInDb.UserPrincipalName)
+                else if (currentUserEmail != currentAssignedVerifierInDb.UserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: {currentAssignedVerifierInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
@@ -643,14 +644,35 @@ namespace Portal.Helpers
                     return false;
                 }
 
+                List<string> result = new List<string>();
+
+                //var commandText = "SELECT  pc.name, pc.product_status, pc.type_key " +
+                //                  " FROM hpdowner.VECTOR_PRODUCT_VIEW pc WHERE pc.product_status = 'Active' " +
+                //                  $" AND name = '{productAction.ImpactedProduct}' " +
+                //                  $" AND type_key = 'ENC'";              
+                var commandText = "SELECT  pc.name " +
+                                  " FROM hpdowner.VECTOR_PRODUCT_VIEW pc WHERE pc.product_status = 'Active' " +
+                                  $" AND type_key = 'ENC'";
+
+                var connection = _hpdDbContext.Database.GetDbConnection();
+                await using var command = connection.CreateCommand();
+                command.CommandType = CommandType.Text;
+                command.CommandText = commandText;
+
+                await connection.OpenAsync();
+                await using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    result.Add(reader[0].ToString());
+                }
+
+                await connection.CloseAsync();
+                await connection.DisposeAsync();
+
                 foreach (var productAction in recordProductAction)
                 {
-                    // Check for existing impacted products
-                    var carisProducts = await _hpdDbContext.CarisProducts.ToListAsync();
-                    var isExist = carisProducts.Any(p =>
-                        p.ProductStatus == "Active" &&
-                        p.TypeKey == "ENC" &&
-                        p.ProductName == productAction.ImpactedProduct);
+                    var isExist = result.Any(r => r == productAction.ImpactedProduct);
 
                     if (!isExist)
                     {
