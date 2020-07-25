@@ -667,9 +667,6 @@ namespace Portal.Helpers
                     result.Add(reader[0].ToString());
                 }
 
-                await connection.CloseAsync();
-                await connection.DisposeAsync();
-
                 foreach (var productAction in recordProductAction)
                 {
                     var isExist = result.Any(r => r == productAction.ImpactedProduct);
