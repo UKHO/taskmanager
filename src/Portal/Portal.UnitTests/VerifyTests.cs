@@ -229,6 +229,7 @@ namespace Portal.UnitTests
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages);
         }
 
+        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message_On_Save()
         {
@@ -260,7 +261,7 @@ namespace Portal.UnitTests
             Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages);
         }
 
-
+        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message_On_Save()
         {
