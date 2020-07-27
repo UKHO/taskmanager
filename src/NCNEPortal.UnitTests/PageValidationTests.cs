@@ -1,11 +1,13 @@
 ﻿using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NCNEPortal.Auth;
+using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
 using NCNEWorkflowDatabase.Tests.Helpers;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace NCNEPortal.UnitTests
@@ -123,425 +125,426 @@ namespace NCNEPortal.UnitTests
 
             Assert.IsFalse(result);
             Assert.AreEqual(validationErrorMessages.Count, 3);
-            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier1 role to unknown user InValid User");
-            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier2 role to unknown user InValid User");
-            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign 100% Check role to unknown user InValid User");
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier1 role to unknown user Invalid User2");
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign Verifier2 role to unknown user Invalid User2");
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Unable to assign 100% Check role to unknown user Invalid User2");
         }
 
-        //[Test]
-        //public void Validation_for_ValidateNewTaskPage_with_mandatory_valid_parameter_passes()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        [Test]
+        public void Validation_for_ValidateNewTaskPage_with_mandatory_valid_parameter_passes()
+        {
+            var validationErrorMessages = new List<string>();
 
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1"
-        //    };
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser
+            };
 
-        //    var result =
-        //        _pageValidationHelper.ValidateNewTaskPage(taskRole, "NC", "Adoption", validationErrorMessages);
 
-        //    Assert.IsTrue(result);
-        //    CollectionAssert.IsEmpty(validationErrorMessages);
+            var result =
+                _pageValidationHelper.ValidateNewTaskPage(taskRole, "NC", "Adoption", validationErrorMessages);
 
-        //}
+            Assert.IsTrue(result);
+            CollectionAssert.IsEmpty(validationErrorMessages);
 
-        //[Test]
-        //public void Validation_for_ValidateNewTaskPage_with_All_valid_parameter_passes()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
+        [Test]
+        public void Validation_for_ValidateNewTaskPage_with_All_valid_parameter_passes()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
 
-        //    var result =
-        //        _pageValidationHelper.ValidateNewTaskPage(taskRole, "NC", "Adoption", validationErrorMessages);
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    Assert.IsTrue(result);
-        //    CollectionAssert.IsEmpty(validationErrorMessages);
+            var result =
+                _pageValidationHelper.ValidateNewTaskPage(taskRole, "NC", "Adoption", validationErrorMessages);
 
-        //}
+            Assert.IsTrue(result);
+            CollectionAssert.IsEmpty(validationErrorMessages);
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_invalid_Repromate_Date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Repromate_Date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    DateTime? nulldate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
+            DateTime? nulldate = null;
 
-        //    var ThreePSInfo = (false, nulldate, nulldate, nulldate);
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, null, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "Task Information: Repromat Date cannot be empty");
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, null, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Repromat Date cannot be empty");
 
+        }
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_invalid_Duration_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
 
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Duration_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
 
-        //    DateTime? nulldate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    DateTime repromatDate = DateTime.Now;
-        //    int Dating = 0;
+            DateTime? nulldate = null;
 
+            DateTime repromatDate = DateTime.Now;
+            int Dating = 0;
 
-        //    var ThreePSInfo = (false, nulldate, nulldate, nulldate);
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, repromatDate, Dating, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "Task Information: Duration cannot be empty");
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, repromatDate, Dating, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Duration cannot be empty");
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_invalid_Publication_Date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_invalid_Publication_Date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
 
-        //    DateTime? invalidDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    DateTime? publicationDate = null;
+            DateTime? invalidDate = null;
 
+            DateTime? publicationDate = null;
 
 
-        //    var ThreePSInfo = (false, invalidDate, invalidDate, invalidDate);
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, null, 1, "Primary", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (false, invalidDate, invalidDate, invalidDate);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "Task Information: Publication Date cannot be empty");
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, null, 1, "Primary", ThreePSInfo,
+                validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Publication Date cannot be empty");
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_3ps_Expected_return_date_without_sent_to_date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_3ps_Expected_return_date_without_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
 
-        //    DateTime? invalidDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    DateTime? publicationDate = null;
+            DateTime? invalidDate = null;
 
+            DateTime? publicationDate = null;
 
 
-        //    var ThreePSInfo = (true, invalidDate, DateTime.Now, invalidDate);
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (true, invalidDate, DateTime.Now, invalidDate);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering expected return date");
-        //}
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_3ps_Actual_return_date_without_sent_to_date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering expected return date");
+        }
 
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_3ps_Actual_return_date_without_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
 
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
 
-        //    DateTime? invalidDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    DateTime? publicationDate = null;
+            DateTime? invalidDate = null;
 
+            DateTime? publicationDate = null;
 
 
-        //    var ThreePSInfo = (true, invalidDate, invalidDate, DateTime.Now);
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (true, invalidDate, invalidDate, DateTime.Now);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 2);
-        //    CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering actual return date");
-        //    CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter expected return date before entering actual return date");
-        //}
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_for_3ps_expected_return_date_earlier_than_sent_to_date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 2);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter date sent to 3PS before entering actual return date");
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Please enter expected return date before entering actual return date");
+        }
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_for_3ps_expected_return_date_earlier_than_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    DateTime? invalidDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    DateTime? publicationDate = null;
+            DateTime? invalidDate = null;
 
-        //    var ThreePSInfo = (true, DateTime.Now, DateTime.Now.AddDays(-2), invalidDate);
+            DateTime? publicationDate = null;
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now.AddDays(-2), invalidDate);
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "3PS : Expected return date cannot be earlier than Sent to 3PS date");
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Expected return date cannot be earlier than Sent to 3PS date");
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_for_3ps_actual_return_date_earlier_than_sent_to_date_fails()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_for_3ps_actual_return_date_earlier_than_sent_to_date_fails()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    DateTime? publicationDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
+            DateTime? publicationDate = null;
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
 
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, "3PS : Actual return date cannot be earlier than Sent to 3PS date");
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "3PS : Actual return date cannot be earlier than Sent to 3PS date");
 
+        }
 
-        //[Test]
-        //public void Validation_for_ValidateWorkflowPage_with_Valid_data_Passes()
-        //{
-        //    var validationErrorMessages = new List<string>();
 
-        //    A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
-        //        .Returns(_validUsers);
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_Valid_data_Passes()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var taskRole = new TaskRole
-        //    {
-        //        Compiler = "Valid User1",
-        //        VerifierOne = "Valid User2",
-        //        VerifierTwo = "Valid User1",
-        //        HundredPercentCheck = "Valid User2"
-        //    };
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
 
-        //    DateTime? publicationDate = null;
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now);
+            DateTime? publicationDate = null;
 
-        //    var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
-        //        validationErrorMessages);
+            var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now);
 
-        //    Assert.IsTrue(result);
-        //    Assert.IsEmpty(validationErrorMessages);
-        //}
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+                validationErrorMessages);
 
-        //[TestCase("", "Valid User1", NcneTaskStageType.With_SDRA)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.With_Geodesy)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Specification)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.V1)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.V1_Rework)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.V2)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.V2_Rework)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Final_Updating)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Commit_To_Print)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.CIS)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Publication)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Publish_Chart)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Clear_Vector)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Retire_Old_Version)]
-        //[TestCase("", "Valid User1", NcneTaskStageType.Consider_Withdrawn_Charts)]
-        //public void Validation_for_ValidateForCompletion_with_empty_user_fails(string assignedUser, string currentUser, NcneTaskStageType stageType)
-        //{
-        //    var validationErrorMessages = new List<string>();
+            Assert.IsTrue(result);
+            Assert.IsEmpty(validationErrorMessages);
+        }
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
+        [TestCase("", "Valid User1", NcneTaskStageType.With_SDRA)]
+        [TestCase("", "Valid User1", NcneTaskStageType.With_Geodesy)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Specification)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V1)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V1_Rework)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V2)]
+        [TestCase("", "Valid User1", NcneTaskStageType.V2_Rework)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Final_Updating)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Commit_To_Print)]
+        [TestCase("", "Valid User1", NcneTaskStageType.CIS)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Publication)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Publish_Chart)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Clear_Vector)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Retire_Old_Version)]
+        [TestCase("", "Valid User1", NcneTaskStageType.Consider_Withdrawn_Charts)]
+        public void Validation_for_ValidateForCompletion_with_empty_user_fails(string assignedUser, string currentUser, NcneTaskStageType stageType)
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    Assert.IsFalse(result);
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
 
-        //    CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage before completion");
+            Assert.IsFalse(result);
 
-        //}
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.With_SDRA)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.With_Geodesy)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Specification)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.V1)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.V1_Rework)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.V2)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.V2_Rework)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Final_Updating)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Hundred_Percent_Check)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Commit_To_Print)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.CIS)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Publication)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Publish_Chart)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Clear_Vector)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Retire_Old_Version)]
-        //[TestCase("Valid User2", "Valid User1", NcneTaskStageType.Consider_Withdrawn_Charts)]
-        //public void Validation_for_ValidateForCompletion_with_wrong_user_fails_for_all_stages_other_than_forms(string assignedUser, string currentUser, NcneTaskStageType stageType)
-        //{
-        //    var validationErrorMessages = new List<string>();
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage before completion");
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
+        }
+        [TestCase(NcneTaskStageType.With_SDRA)]
+        [TestCase(NcneTaskStageType.With_Geodesy)]
+        [TestCase(NcneTaskStageType.Specification)]
+        [TestCase(NcneTaskStageType.V1)]
+        [TestCase(NcneTaskStageType.V1_Rework)]
+        [TestCase(NcneTaskStageType.V2)]
+        [TestCase(NcneTaskStageType.V2_Rework)]
+        [TestCase(NcneTaskStageType.Final_Updating)]
+        [TestCase(NcneTaskStageType.Hundred_Percent_Check)]
+        [TestCase(NcneTaskStageType.Commit_To_Print)]
+        [TestCase(NcneTaskStageType.CIS)]
+        [TestCase(NcneTaskStageType.Publication)]
+        [TestCase(NcneTaskStageType.Publish_Chart)]
+        [TestCase(NcneTaskStageType.Clear_Vector)]
+        [TestCase(NcneTaskStageType.Retire_Old_Version)]
+        [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts)]
+        public void Validation_for_ValidateForCompletion_with_wrong_user_fails_for_all_stages_other_than_forms(NcneTaskStageType stageType)
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    Assert.IsFalse(result);
-        //    CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser2.UserPrincipalName, stageType, new TaskRole(), validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
 
-        //[TestCase("", "Valid User")]
-        //[TestCase("Valid User", "Another User")]
-        //public void Validation_for_ValidateForCompletion_for_Forms_Stage_allows_any_user_and_unassigned_to_Complete(string assignedUser, string currentUser)
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
-        //    var currentStageType = NcneTaskStageType.Forms;
+        [TestCase("", "Valid User")]
+        [TestCase("Valid User", "Another User")]
+        public void Validation_for_ValidateForCompletion_for_Forms_Stage_allows_any_user_and_unassigned_to_Complete(string assignedUser, string currentUser)
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, new TaskRole(), validationErrorMessages);
+            var currentStageType = NcneTaskStageType.Forms;
 
-        //    Assert.IsTrue(result);
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, new TaskRole(), validationErrorMessages);
 
-        //}
+            Assert.IsTrue(result);
 
-        //[Test]
-        //public void Validation_for_ValidateForCompletion_fails_for_Compile_step_if_V1_not_assigned()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        }
 
-        //    var role = new TaskRole()
-        //    { Compiler = "Valid User" };
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_Compile_step_if_V1_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Compile, role, validationErrorMessages);
+            var role = new TaskRole()
+            { Compiler = _testUser };
 
-        //    Assert.IsFalse(result);
-        //    CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Compile, role, validationErrorMessages);
 
-        //}
-        //[Test]
-        //public void Validation_for_ValidateForCompletion_fails_for_FinalUpdate_step_if_100pCheck_not_assigned()
-        //{
-        //    var validationErrorMessages = new List<string>();
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
 
-        //    var role = new TaskRole()
-        //    {
-        //        Compiler = "Valid User",
-        //        VerifierOne = "Valid User",
-        //        VerifierTwo = "Valid User"
-        //    };
+        }
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_FinalUpdate_step_if_100pCheck_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Final_Updating, role, validationErrorMessages);
+            var role = new TaskRole()
+            {
+                Compiler = _testUser,
+                VerifierOne = _testUser,
+                VerifierTwo = _testUser
+            };
 
-        //    Assert.IsFalse(result);
-        //    CollectionAssert.Contains(validationErrorMessages, "Please assign a user to 100% Check role before completing this stage");
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Final_Updating, role, validationErrorMessages);
 
-        //}
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to 100% Check role before completing this stage");
+
+        }
 
         //[Test]
         //public void Validation_for_ValidateForCompletion_fails_for_100pCheck_step_if_V1_not_assigned()

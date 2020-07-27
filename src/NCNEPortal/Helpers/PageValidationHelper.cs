@@ -275,7 +275,9 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = true;
 
-            var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
+            //var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
+
+            var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.ToList();
 
             if (taskRole.Compiler == null)
             {
@@ -283,43 +285,43 @@ namespace NCNEPortal.Helpers
                 isValid = false;
             }
 
-            //else
+            else
 
-            //{
-            //    if (userList.All(a => a != taskRole.Compiler))
-            //    {
-            //        validationErrorMessages.Add($"Task Information: Unable to assign Compiler role to unknown user {taskRole.Compiler}");
-            //        isValid = false;
-            //    }
-            //}
+            {
+                if (userList.All(a => a != taskRole.Compiler))
+                {
+                    validationErrorMessages.Add($"Task Information: Unable to assign Compiler role to unknown user {taskRole.Compiler.DisplayName}");
+                    isValid = false;
+                }
+            }
 
 
-            //if (!string.IsNullOrEmpty(taskRole.VerifierOne))
-            //{
-            //    if (userList.All(a => a != taskRole.VerifierOne))
-            //    {
-            //        validationErrorMessages.Add($"Task Information: Unable to assign Verifier1 role to unknown user {taskRole.VerifierOne}");
-            //        isValid = false;
-            //    }
-            //}
+            if (taskRole.VerifierOne != null)
+            {
+                if (userList.All(a => a != taskRole.VerifierOne))
+                {
+                    validationErrorMessages.Add($"Task Information: Unable to assign Verifier1 role to unknown user {taskRole.VerifierOne.DisplayName}");
+                    isValid = false;
+                }
+            }
 
-            //if (!string.IsNullOrEmpty(taskRole.VerifierTwo))
-            //{
-            //    if (userList.All(a => a != taskRole.VerifierTwo))
-            //    {
-            //        validationErrorMessages.Add($"Task Information: Unable to assign Verifier2 role to unknown user {taskRole.VerifierTwo}");
-            //        isValid = false;
-            //    }
-            //}
+            if (taskRole.VerifierTwo != null)
+            {
+                if (userList.All(a => a != taskRole.VerifierTwo))
+                {
+                    validationErrorMessages.Add($"Task Information: Unable to assign Verifier2 role to unknown user {taskRole.VerifierTwo.DisplayName}");
+                    isValid = false;
+                }
+            }
 
-            //if (!string.IsNullOrEmpty(taskRole.HundredPercentCheck))
-            //{
-            //    if (userList.All(a => a != taskRole.HundredPercentCheck))
-            //    {
-            //        validationErrorMessages.Add($"Task Information: Unable to assign 100% Check role to unknown user {taskRole.HundredPercentCheck}");
-            //        isValid = false;
-            //    }
-            //}
+            if (taskRole.HundredPercentCheck != null)
+            {
+                if (userList.All(a => a != taskRole.HundredPercentCheck))
+                {
+                    validationErrorMessages.Add($"Task Information: Unable to assign 100% Check role to unknown user {taskRole.HundredPercentCheck.DisplayName}");
+                    isValid = false;
+                }
+            }
 
             return isValid;
         }
