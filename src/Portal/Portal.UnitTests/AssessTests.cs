@@ -254,6 +254,7 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
+        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message()
         {
@@ -291,7 +292,7 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
-
+        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
