@@ -258,7 +258,7 @@ namespace Portal
                     .OrderBy(cw => cw.Name)
                     .ToList();
 
-                workflowDbContext.Database.ExecuteSqlRaw("Truncate Table [CachedHpdWorkspace]");
+                workflowDbContext.Database.ExecuteSqlRaw("DELETE FROM [CachedHpdWorkspace]");
 
                 workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
                 workflowDbContext.SaveChanges();
