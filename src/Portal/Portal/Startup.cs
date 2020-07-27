@@ -251,16 +251,18 @@ namespace Portal
 
             try
             {
-                var workspaces = hpdDbContext.CarisWorkspaces
+                var hpdWorkspaces = hpdDbContext.CarisWorkspaces
                     .Select(cw => cw.Name.Trim()) //trim to prevent unique constraint errors
                     .Distinct()
                     .Select(cw => new CachedHpdWorkspace { Name = cw })
                     .OrderBy(cw => cw.Name)
                     .ToList();
 
+                Log.Logger.Information($"Deleting all workspace rows in WorkflowDatabase table CachedHpdWorkspace");
                 workflowDbContext.Database.ExecuteSqlRaw("DELETE FROM [CachedHpdWorkspace]");
 
-                workflowDbContext.CachedHpdWorkspace.AddRange(workspaces);
+                Log.Logger.Information($"Adding {hpdWorkspaces.Count} workspace from HPD, to WorkflowDatabase");
+                workflowDbContext.CachedHpdWorkspace.AddRange(hpdWorkspaces);
                 workflowDbContext.SaveChanges();
             }
             catch (Exception e)
