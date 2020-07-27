@@ -721,7 +721,7 @@ namespace NCNEPortal
             return inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion";
         }
 
-        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType)
+        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType, string chartNo)
         {
 
             LogContext.PushProperty("ProcessId", processId);
@@ -730,7 +730,7 @@ namespace NCNEPortal
 
             ValidationErrorMessages.Clear();
 
-
+            ChartNo = chartNo;
             var role = new TaskRole()
             {
                 ProcessId = processId,

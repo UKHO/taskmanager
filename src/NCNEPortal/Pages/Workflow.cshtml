@@ -128,6 +128,7 @@
         <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
         <input type="hidden" asp-for="ProcessId" />
         <input type="hidden" asp-for="ChartType" />
+        <input type="hidden" id="hdnChartNo" asp-for="ChartNo" />
         <input type="hidden" asp-for="IsReadOnly" />
         <input type="hidden" asp-for="IsPublished" />
 
@@ -364,7 +365,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                    <button type="button" id="btnCreateCarisProject" class="btn btn-block btn-primary">
                                         <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
                                         Create CARIS Project
                                     </button>
