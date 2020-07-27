@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Common.Helpers;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
@@ -30,6 +31,8 @@ namespace Portal.TestAutomation.Framework
 
             workflowDbContext.HpdUser.Add(new HpdUser
             { AdUser = newUser, HpdUsername = userToAdd.Replace(" ", "") + "-Caris" });
+
+            workflowDbContext.SaveChangesAsync();
 
             return this;
         }
