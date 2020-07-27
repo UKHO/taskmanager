@@ -68,8 +68,7 @@ namespace Portal.TestAutomation.Framework.Setup
 
             TestData.UsingDbConnectionString(workflowDbConnectionString)
                 .AddUser(_secrets.LoginAccount)
-                .ReassignReviewsToUser(_secrets.LoginAccount)
-                .SaveChanges();
+                .ReassignReviewsToUser(_secrets.LoginAccount);
         }
 
         private static void InitialiseWorkflowDbContext(string workflowDbConnectionString)
