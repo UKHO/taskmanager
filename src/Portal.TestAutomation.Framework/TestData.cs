@@ -37,7 +37,7 @@ namespace Portal.TestAutomation.Framework
             return this;
         }
 
-        public TestData ReassignReviewsToUser(string user)
+        public TestData AssignTasksToCurrentUser(string user)
         {
             using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
 
@@ -45,23 +45,23 @@ namespace Portal.TestAutomation.Framework
 
             var inProgressWorkflows =
                 workflowDbContext.WorkflowInstance.Where(wi => wi.Status == WorkflowStatus.Started.ToString());
-
-            var workflowAtAssessId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Assess.ToString())
-                .WorkflowInstanceId;
-            var assess = workflowDbContext.DbAssessmentAssessData.First(x => x.WorkflowInstanceId == workflowAtAssessId);
-            assess.Reviewer = adUser;
-
-
+            
             var workflowAtReviewId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Review.ToString())
                 .WorkflowInstanceId;
             var review = workflowDbContext.DbAssessmentReviewData.First(x => x.WorkflowInstanceId == workflowAtReviewId);
             review.Reviewer = adUser;
 
-
+            var workflowAtAssessId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Assess.ToString())
+                .WorkflowInstanceId;
+            var assess = workflowDbContext.DbAssessmentAssessData.First(x => x.WorkflowInstanceId == workflowAtAssessId);
+            assess.Assessor = adUser;
+            
             var workflowAtVerifyId = inProgressWorkflows.First(w => w.ActivityName == WorkflowStage.Verify.ToString())
                 .WorkflowInstanceId;
             var verify = workflowDbContext.DbAssessmentVerifyData.First(x => x.WorkflowInstanceId == workflowAtVerifyId);
-            verify.Reviewer = adUser;
+            verify.Verifier = adUser;
+
+            workflowDbContext.SaveChanges();
 
             return this;
         }
