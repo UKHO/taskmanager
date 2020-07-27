@@ -741,15 +741,17 @@
             $("#btnClose").prop("disabled", true);
             $("#btnSave").prop("disabled", true);
 
-            var formData = $("#frmWorkflow").serialize();
+            $("#hdnChartNo").val($("#ChartNo").val());
 
+            var formData = $("#frmWorkflow").serialize();
+            
             $.ajax({
                 type: "POST",
                 url: "Workflow/?handler=Save",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data: formData,
+                data:  formData,
                 complete: function () {
                     window.setTimeout(function () {
                         //$("#modalWaitAssessDone").modal("hide");
@@ -850,6 +852,7 @@
                 },
                 success: function(data) {
                     $("#createCarisProjectSuccess").collapse("show");
+                    
                 },
                 error: function(error) {
                     setControlState(true);
