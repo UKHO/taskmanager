@@ -37,7 +37,7 @@ namespace Portal.TestAutomation.Steps
 
             Assert.That(inFlightTasks, Is.Not.Null.And.Count.AtLeast(1), "No inflight tasks found");
             Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Review.ToString()), Has.All.Property("Reviewer").EqualTo(_landingPage.UserName));
-            Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Assess.ToString()), Has.All.Property("Assessor").EqualTo(_landingPage.UserName));
+            //Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Assess.ToString()), Has.All.Property("Assessor").EqualTo(_landingPage.UserName));
             Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Verify.ToString()), Has.All.Property("Verifier").EqualTo(_landingPage.UserName));
         }
     }
