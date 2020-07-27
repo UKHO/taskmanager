@@ -32,7 +32,7 @@ namespace Portal.TestAutomation.Framework
             workflowDbContext.HpdUser.Add(new HpdUser
             { AdUser = newUser, HpdUsername = userToAdd.Replace(" ", "") + "-Caris" });
 
-            workflowDbContext.SaveChangesAsync();
+            workflowDbContext.SaveChanges();
 
             return this;
         }
