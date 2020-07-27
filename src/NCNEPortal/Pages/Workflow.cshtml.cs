@@ -48,6 +48,7 @@ namespace NCNEPortal
         [DisplayName("Chart title")] public string ChartTitle { get; set; }
 
         [DisplayName("Chart number")]
+        [BindProperty]
         public string ChartNo { get; set; }
 
 
