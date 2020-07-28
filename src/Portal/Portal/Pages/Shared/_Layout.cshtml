@@ -53,10 +53,11 @@
     @RenderSection("Scripts", required: false)
 </head>
 <body>
-    <partial name="_CookieConsentPartial" />
 
     <div class="d-flex flex-column sticky-footer-wrapper">
         <div class="container body-content flex-fill">
+            <partial name="_CookieConsentPartial" />
+
             @RenderBody()
         </div>
         <footer>
