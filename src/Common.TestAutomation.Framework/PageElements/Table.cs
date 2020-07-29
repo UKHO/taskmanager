@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 
 namespace Common.TestAutomation.Framework.PageElements
@@ -67,6 +68,7 @@ namespace Common.TestAutomation.Framework.PageElements
 
             var columnIndex = TableHeaders.ToList().FindIndex(e =>
             {
+                ScrollToElement(e);
                 var cleanedWebElementText = regexFilter.Replace(e.Text, "");
                 return cleanedWebElementText.Equals(cleanedColumnName, StringComparison.InvariantCultureIgnoreCase);
             });
@@ -93,6 +95,16 @@ namespace Common.TestAutomation.Framework.PageElements
             }
 
             return newRow;
+        }
+
+        private void ScrollToElement(IWebElement element)
+        {
+            if (!element.Displayed)
+            {
+                var actions = new Actions(Driver);
+                actions.MoveToElement(element);
+                actions.Perform();
+            }
         }
     }
 }
