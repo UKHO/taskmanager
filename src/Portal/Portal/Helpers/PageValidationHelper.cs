@@ -157,7 +157,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
+            if (!ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -271,7 +271,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
+            if (!ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -594,9 +594,9 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="productActioned"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        private bool ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
         {
-            var isValid = await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
+            var isValid = ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
 
             if (action != "Done")
             {
@@ -611,14 +611,12 @@ namespace Portal.Helpers
                         $"Record Product Action: All Product Actions must be verified");
                     isValid = false;
                 }
-
-
             }
 
             return isValid;
         }
 
-        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private bool ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
             const string messagePrefix = "Record Product Action:";
 
@@ -642,41 +640,6 @@ namespace Portal.Helpers
                 {
                     validationErrorMessages.Add($"{messagePrefix} Please ensure impacted product is fully populated");
                     return false;
-                }
-
-                List<string> result = new List<string>();
-
-                //var commandText = "SELECT  pc.name, pc.product_status, pc.type_key " +
-                //                  " FROM hpdowner.VECTOR_PRODUCT_VIEW pc WHERE pc.product_status = 'Active' " +
-                //                  $" AND name = '{productAction.ImpactedProduct}' " +
-                //                  $" AND type_key = 'ENC'";              
-                var commandText = "SELECT  pc.name " +
-                                  " FROM hpdowner.VECTOR_PRODUCT_VIEW pc WHERE pc.product_status = 'Active' " +
-                                  $" AND type_key = 'ENC'";
-
-                var connection = _hpdDbContext.Database.GetDbConnection();
-                await using var command = connection.CreateCommand();
-                command.CommandType = CommandType.Text;
-                command.CommandText = commandText;
-
-                await connection.OpenAsync();
-                await using var reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
-                {
-                    result.Add(reader[0].ToString());
-                }
-
-                foreach (var productAction in recordProductAction)
-                {
-                    var isExist = result.Any(r => r == productAction.ImpactedProduct);
-
-                    if (!isExist)
-                    {
-                        validationErrorMessages.Add(
-                            $"{messagePrefix} Impacted product {productAction.ImpactedProduct} does not exist");
-                        isValid = false;
-                    }
                 }
 
                 if (recordProductAction.GroupBy(p => p.ImpactedProduct)
