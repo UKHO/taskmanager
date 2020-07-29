@@ -13,6 +13,8 @@
 
     var userFullName = $("#userFullName > strong").text();
 
+    $.fn.dataTable.moment('DD/MM/YYYY');
+
     var inFlightTasksTable = setupInFlightTasks();
     var assignedTasksTable = setupAssignedTasks();
 
@@ -20,8 +22,6 @@
 
     handleMyTaskList();
     handleTeamTasks();
-
-    $.fn.dataTable.moment('DD/MM/YYYY');
 
     setMenuItemSelection();
     handleHistoricalTasks();
