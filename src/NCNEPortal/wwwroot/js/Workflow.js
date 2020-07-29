@@ -341,6 +341,7 @@
     });
 
     $("#btnConfirm").click(function() {
+        $(this).prop('disabled', true);
         var processId = $("#hdnConfirmProcessId").val();
         var stageId = $("#hdnConfirmStageId").val();
         var rework = $("#Rework").val();
