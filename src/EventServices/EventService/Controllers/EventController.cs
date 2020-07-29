@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Common.Messages;
 using EventService.Attributes;
 using EventService.Models;
@@ -153,7 +154,7 @@ namespace EventService.Controllers
         {
             LogContext.PushProperty("ApiResource", nameof(PostEvent));
             LogContext.PushProperty("EventName", eventName);
-            LogContext.PushProperty("EventBody", body);
+            LogContext.PushProperty("EventBody", body.ToJSONSerializedString());
 
             _logger.LogInformation("{ApiResource} entered with event {EventName}");
             // Use reflection to discover events, retrieve the correct event by name and 
@@ -224,7 +225,9 @@ namespace EventService.Controllers
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2),
                     (exception, timeSpan, retryAttempt, context) =>
                     {
-                        _logger.LogError(exception, $"Failed to publish event {eventName}, attempting retry: {retryAttempt}");
+                        LogContext.PushProperty("RetryAttempt", retryAttempt);
+
+                        _logger.LogError(exception, "Failed to publish event {EventName}, attempting retry: {RetryAttempt}");
                     })
                 .ExecuteAndCaptureAsync(() => _messageSession.Publish(populatedEvent, new PublishOptions()));
 
