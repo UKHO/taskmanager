@@ -229,39 +229,6 @@ namespace Portal.UnitTests
             Assert.Contains($"Data Impact: More than one of the same Usage selected", _verifyModel.ValidationErrorMessages);
         }
 
-        [Ignore("Now using SQL command text instead of Oracle EF")]
-        [Test]
-        public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message_On_Save()
-        {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
-
-            _hpDbContext.CarisProducts.Add(new CarisProduct()
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
-
-            _verifyModel.Ion = "Ion";
-            _verifyModel.ActivityCode = "ActivityCode";
-            _verifyModel.SourceCategory = "SourceCategory";
-            _verifyModel.Verifier = TestUser;
-            _verifyModel.ProductActioned = true;
-            _verifyModel.ProductActionChangeDetails = "Some change details";
-            _verifyModel.DataImpacts = new List<DataImpact>();
-            _verifyModel.RecordProductAction = new List<ProductAction>()
-            {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
-            };
-
-            _verifyModel.Team = "HW";
-
-            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
-
-            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
-            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _verifyModel.ValidationErrorMessages);
-        }
-
-        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message_On_Save()
         {
