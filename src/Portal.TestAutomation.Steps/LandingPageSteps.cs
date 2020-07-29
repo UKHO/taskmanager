@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using Portal.TestAutomation.Framework.Pages;
 using TechTalk.SpecFlow;
 using WorkflowDatabase.EF;
@@ -22,7 +23,7 @@ namespace Portal.TestAutomation.Steps
             _landingPage.NavigateTo();
         }
 
-        [Then(@"The landing page has loaded")]
+        [When(@"The landing page has loaded")]
         [Then(@"I am redirected to the landing page")]
         public void ThenTheLandingPageHasLoaded()
         {
@@ -35,7 +36,9 @@ namespace Portal.TestAutomation.Steps
             var inFlightTasks = _landingPage.InFlightTasks;
 
             Assert.That(inFlightTasks, Is.Not.Null.And.Count.AtLeast(1), "No inflight tasks found");
-            Assert.That(inFlightTasks, Has.All.Property("Reviewer").EqualTo(_landingPage.UserName));
+            Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Review.ToString()), Has.All.Property("Reviewer").EqualTo(_landingPage.UserName));
+            Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Assess.ToString()), Has.All.Property("Assessor").EqualTo(_landingPage.UserName));
+            Assert.That(inFlightTasks.Where(i => i.Stage == WorkflowStage.Verify.ToString()), Has.All.Property("Verifier").EqualTo(_landingPage.UserName));
         }
     }
 }
