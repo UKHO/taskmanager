@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using BoDi;
 using Common.TestAutomation.Framework.Logging;
 using Common.TestAutomation.Framework.Pages;
@@ -47,6 +48,7 @@ namespace Common.TestAutomation.Framework
                 eventDriver.Navigating += (sender, e) => logger.Log($"    Navigating to {e.Url}");
 
                 _webDriver = eventDriver;
+                _webDriver.Manage().Window.FullScreen();
                 _webDriver.Manage().Window.Maximize();
 
                 _objectContainer.RegisterInstanceAs(_webDriver);
