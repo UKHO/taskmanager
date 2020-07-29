@@ -181,7 +181,7 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public void Validation_for_ValidateWorkflowPage_with_invalid_Repromate_Date_fails()
+        public void Validation_for_Complete_Step_for_Forms_with_invalid_Repromate_Date_fails()
         {
             var validationErrorMessages = new List<string>();
 
@@ -197,13 +197,10 @@ namespace NCNEPortal.UnitTests
                 HundredPercentCheck = _testUser2
             };
 
-            DateTime? nulldate = null;
 
-
-            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
-
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, null, 1, "Adoption", ThreePSInfo,
-                validationErrorMessages);
+            var result = _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName,
+                _testUser.UserPrincipalName,
+                NcneTaskStageType.Forms, taskRole, null, null, 1, "Adoption", validationErrorMessages);
 
             Assert.IsFalse(result);
             Assert.AreEqual(validationErrorMessages.Count, 1);
@@ -213,7 +210,7 @@ namespace NCNEPortal.UnitTests
 
 
         [Test]
-        public void Validation_for_ValidateWorkflowPage_with_invalid_Duration_fails()
+        public void Validation_for_Complete_Step_for_Forms_with_invalid_Duration_fails()
         {
             var validationErrorMessages = new List<string>();
 
@@ -230,16 +227,14 @@ namespace NCNEPortal.UnitTests
                 HundredPercentCheck = _testUser2
             };
 
-            DateTime? nulldate = null;
-
             DateTime repromatDate = DateTime.Now;
             int Dating = 0;
 
 
-            var ThreePSInfo = (false, nulldate, nulldate, nulldate);
+            var result = _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName,
+                _testUser.UserPrincipalName,
+                NcneTaskStageType.Forms, taskRole, null, repromatDate, Dating, "Adoption", validationErrorMessages);
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, null, repromatDate, Dating, "Adoption", ThreePSInfo,
-                validationErrorMessages);
 
             Assert.IsFalse(result);
             Assert.AreEqual(validationErrorMessages.Count, 1);
@@ -248,7 +243,7 @@ namespace NCNEPortal.UnitTests
         }
 
         [Test]
-        public void Validation_for_ValidateWorkflowPage_with_invalid_Publication_Date_fails()
+        public void Validation_for_Complete_Step_for_Forms_with_invalid_Publication_Date_fails()
         {
             var validationErrorMessages = new List<string>();
 
@@ -265,16 +260,14 @@ namespace NCNEPortal.UnitTests
                 HundredPercentCheck = _testUser2
             };
 
-            DateTime? invalidDate = null;
 
             DateTime? publicationDate = null;
 
 
+            var result = _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName,
+                _testUser.UserPrincipalName,
+                NcneTaskStageType.Forms, taskRole, publicationDate, null, 1, "Primary", validationErrorMessages);
 
-            var ThreePSInfo = (false, invalidDate, invalidDate, invalidDate);
-
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, null, 1, "Primary", ThreePSInfo,
-                validationErrorMessages);
 
             Assert.IsFalse(result);
             Assert.AreEqual(validationErrorMessages.Count, 1);
@@ -461,7 +454,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), null, null, 0, "NC"
+                      , validationErrorMessages);
 
             Assert.IsFalse(result);
 
@@ -489,7 +483,8 @@ namespace NCNEPortal.UnitTests
             var validationErrorMessages = new List<string>();
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser2.UserPrincipalName, stageType, new TaskRole(), validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser2.UserPrincipalName, stageType, new TaskRole(),
+                      null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
             CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
@@ -504,8 +499,11 @@ namespace NCNEPortal.UnitTests
 
             var currentStageType = NcneTaskStageType.Forms;
 
+            const int dating = (int)DeadlineEnum.TwoWeeks;
+
             var result =
-                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, currentStageType, new TaskRole(), validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser2.UserPrincipalName, currentStageType, new TaskRole(),
+                                     DateTime.Now, DateTime.Now, dating, "NC", validationErrorMessages);
 
             Assert.IsTrue(result);
 
@@ -520,7 +518,8 @@ namespace NCNEPortal.UnitTests
             { Compiler = _testUser };
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Compile, role, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Compile, role,
+                    null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
             CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
@@ -539,88 +538,92 @@ namespace NCNEPortal.UnitTests
             };
 
             var result =
-                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Final_Updating, role, validationErrorMessages);
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, NcneTaskStageType.Final_Updating, role,
+                    null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
             CollectionAssert.Contains(validationErrorMessages, "Please assign a user to 100% Check role before completing this stage");
 
         }
 
-        //[Test]
-        //public void Validation_for_ValidateForCompletion_fails_for_100pCheck_step_if_V1_not_assigned()
-        //{
-        //    var validationErrorMessages = new List<string>();
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_100pCheck_step_if_V1_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
 
-        //    var role = new TaskRole()
-        //    {
-        //        Compiler = "Valid User",
-        //        VerifierTwo = "Valid User",
-        //        HundredPercentCheck = "Valid User"
-        //    };
+            var role = new TaskRole()
+            {
+                Compiler = _testUser2,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", NcneTaskStageType.Hundred_Percent_Check, role, validationErrorMessages);
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName,
+                    NcneTaskStageType.Hundred_Percent_Check, role,
+                    null, null, 0, "NC", validationErrorMessages);
 
-        //    Assert.IsFalse(result);
-        //    CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
 
-        //}
+        }
 
-        //[TestCase(NcneTaskStageType.Compile)]
-        //[TestCase(NcneTaskStageType.V1)]
-        //[TestCase(NcneTaskStageType.V2)]
-        //public void Validation_for_ValidateForCompletion_Passes_if_user_assigned_for_next_step(NcneTaskStageType currentStage)
-        //{
+        [TestCase(NcneTaskStageType.Compile)]
+        [TestCase(NcneTaskStageType.V1)]
+        [TestCase(NcneTaskStageType.V2)]
+        public void Validation_for_ValidateForCompletion_Passes_if_user_assigned_for_next_step(NcneTaskStageType currentStage)
+        {
 
-        //    var validationErrorMessages = new List<string>();
+            var validationErrorMessages = new List<string>();
 
-        //    var role = new TaskRole()
-        //    {
-        //        Compiler = "Valid User",
-        //        VerifierOne = "Valid User",
-        //        VerifierTwo = "Valid User",
-        //        HundredPercentCheck = "Valid User"
-        //    };
+            var role = new TaskRole()
+            {
+                Compiler = _testUser2,
+                VerifierOne = _testUser,
+                VerifierTwo = _testUser,
+                HundredPercentCheck = _testUser2
+            };
 
-        //    var result = _pageValidationHelper.ValidateForCompletion("Valid User", "Valid User", currentStage, role,
-        //        validationErrorMessages);
+            var result = _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName,
+                 currentStage, role, null, null, 0, "NC",
+                validationErrorMessages);
 
-        //    Assert.IsTrue(result);
+            Assert.IsTrue(result);
 
-        //}
-
-
-        //[TestCase("", "Valid User1", "Please assign a user to this stage before sending this task for Rework")]
-        //[TestCase("Valid User2", "Valid User1", "Current user is not valid for sending this task for Rework")]
-        //public void Validation_for_ValidateForRework_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
-        //{
-        //    var validationErrorMessages = new List<string>();
-
-        //    var result =
-        //        _pageValidationHelper.ValidateForRework(assignedUser, currentUser, validationErrorMessages);
-
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, errorMessage);
+        }
 
 
-        //}
+        [TestCase("", "Valid User1", "Please assign a user to this stage before sending this task for Rework")]
+        [TestCase("Valid User2", "Valid User1", "Current user is not valid for sending this task for Rework")]
+        public void Validation_for_ValidateForRework_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
 
-        //[TestCase("", "Valid User1", "Please assign a user to the V1 role before completing the workflow")]
-        //[TestCase("Valid User2", "Valid User1", "Only users assigned to the V1 role are allowed to complete the workflow.")]
-        //public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
-        //{
-        //    var validationErrorMessages = new List<string>();
+            var result =
+                _pageValidationHelper.ValidateForRework(assignedUser, currentUser, validationErrorMessages);
 
-        //    var result =
-        //        _pageValidationHelper.ValidateForCompleteWorkflow(assignedUser, currentUser, validationErrorMessages);
-
-        //    Assert.IsFalse(result);
-        //    Assert.AreEqual(validationErrorMessages.Count, 1);
-        //    CollectionAssert.Contains(validationErrorMessages, errorMessage);
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
 
 
-        //}
+        }
+
+        [TestCase("", "Valid User1", "Please assign a user to the V1 role before completing the workflow")]
+        [TestCase("Valid User2", "Valid User1", "Only users assigned to the V1 role are allowed to complete the workflow.")]
+        public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompleteWorkflow(assignedUser, currentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
+
+        }
 
     }
 }
