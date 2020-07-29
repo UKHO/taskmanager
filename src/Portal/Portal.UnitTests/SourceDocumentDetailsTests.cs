@@ -64,7 +64,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_InvalidOperationException_thrown_when_no_assessmentdata_exists()
+        public async Task Test_OnGetAsync_InvalidOperationException_thrown_when_no_assessmentdata_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
@@ -85,7 +85,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
+        public async Task Test_OnGetAsync_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
@@ -115,7 +115,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_DatabaseDocumentStatusProcessor_Is_Used_To_Create_A_New_DatabaseDocumentStatus_Row()
+        public async Task Test_OnPostAddSourceFromSdraAsync_DatabaseDocumentStatusProcessor_Is_Used_To_Create_A_New_DatabaseDocumentStatus_Row()
         {
             await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, ProcessId, Guid.NewGuid());
 
@@ -123,7 +123,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_InitiateSourceDocumentRetrievalEvent_Is_Fired_When_Adding_Source_From_Database()
+        public async Task Test_OnPostAddSourceFromSdraAsync_InitiateSourceDocumentRetrievalEvent_Is_Fired_When_Adding_Source_From_Database()
         {
             await _sourceDocumentDetailsModel.OnPostAddSourceFromSdraAsync(SdocId, ProcessId, CorrelationId);
 
