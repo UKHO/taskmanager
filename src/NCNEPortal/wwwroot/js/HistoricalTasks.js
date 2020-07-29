@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    $.fn.dataTable.moment('DD/MM/YYYY');
 
     $('#historicalTasks').DataTable({
         "pageLength": 10,
