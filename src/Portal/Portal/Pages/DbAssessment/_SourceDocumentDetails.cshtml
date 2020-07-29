@@ -50,7 +50,11 @@
                             }
                         </td>
                         <td id="rows">@Model.Assessment.PrimarySdocId</td>
-                        <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentName)</td>
+                        <td>
+                            <span class="overflowElipsis" title="@Model.Assessment.SourceDocumentName">
+                                @Html.DisplayFor(model => model.Assessment.SourceDocumentName)
+                            </span>
+                        </td>
                         <td>@SourceType.Primary.ToString()</td>
                         <td>@Html.DisplayFor(model => model.Assessment.ReceiptDate)</td>
                         <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentType)</td>
@@ -67,7 +71,11 @@
                                 <td></td>
                                 <td></td>
                                 <td id="rows">@linkedDocument.LinkedSdocId</td>
-                                <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentName)</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@linkedDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => linkedDocument.SourceDocumentName)
+                                    </span>
+                                </td>
                                 <td>@Html.DisplayFor(model => linkedDocument.LinkType)</td>
                                 <td>@Html.DisplayFor(model => linkedDocument.ReceiptDate)</td>
                                 <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentType)</td>
@@ -121,7 +129,11 @@
                                     }
                                 </td>
                                 <td id="rows">@Html.DisplayFor(model => attachedLinkedDocument.LinkedSdocId)</td>
-                                <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentName)</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@attachedLinkedDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentName)
+                                    </span>
+                                </td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.LinkType)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.ReceiptDate)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentType)</td>
@@ -172,7 +184,11 @@
 
                                 </td>
                                 <td>@databaseDocument.SdocId</td>
-                                <td>@databaseDocument.SourceDocumentName</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@databaseDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => databaseDocument.SourceDocumentName)
+                                    </span>
+                                </td>
                                 <td>@SourceType.Database.ToString()</td>
                                 <td>@databaseDocument.ReceiptDate</td>
                                 <td>@databaseDocument.SourceDocumentType</td>
