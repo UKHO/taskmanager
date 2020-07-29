@@ -19,7 +19,6 @@ namespace Portal.TestAutomation.Framework.Pages
                     ? urlsConfig.LandingPageUrl
                     : urlsConfig.LocalDevLandingPageUrl)
         {
-            Console.WriteLine($"==> Client browser window size: {driver.Manage().Window.Size}");
             InFlightTaskTable = new DataTable(Driver, Wait, "inFlightTasks");
         }
 
