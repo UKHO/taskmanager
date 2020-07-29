@@ -42,11 +42,6 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
 
-            if (!ValidateDates(publicationDate, repromatDate, dating, chartType, validationErrorMessages))
-            {
-                isValid = false;
-            }
-
             if (threePsInfo.SentTo3Ps == true)
             {
                 if (!ValidateThreePs(threePsInfo.SendDate3ps, threePsInfo.ExpectedReturnDate3ps,
@@ -61,11 +56,22 @@ namespace NCNEPortal.Helpers
         }
 
         public bool ValidateForCompletion(string assignedUser, string username, NcneTaskStageType stageType,
-            TaskRole role, List<string> validationErrorMessages)
+            TaskRole role, DateTime? publicationDate,
+            DateTime? repromatDate,
+            int dating,
+            string chartType, List<string> validationErrorMessages)
         {
             bool isValid = true;
 
-            if (stageType != NcneTaskStageType.Forms)
+            if (stageType == NcneTaskStageType.Forms)
+            {
+                if (!ValidateDates(publicationDate, repromatDate, dating, chartType, validationErrorMessages))
+                {
+                    isValid = false;
+                }
+            }
+            else
+
             {
                 if (string.IsNullOrEmpty(assignedUser))
                 {
@@ -154,11 +160,19 @@ namespace NCNEPortal.Helpers
             return isValid;
         }
 
-        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages)
+        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps,
+            int currentStageTypeId, string formsStatus, List<string> validationErrorMessages)
         {
             bool isValid = true;
 
-            if (threePs)
+            if (formsStatus != NcneTaskStageStatus.Completed.ToString())
+            {
+                validationErrorMessages.Add("Please complete Forms before completing publication steps");
+                isValid = false;
+
+            }
+
+            if (currentStageTypeId == (int)NcneTaskStageType.Publication && threePs)
             {
                 if (actualReturnDate3Ps == null)
                 {
