@@ -1,9 +1,9 @@
-﻿using NCNEWorkflowDatabase.EF;
-using NCNEWorkflowDatabase.EF.Models;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NCNEWorkflowDatabase.EF;
+using NCNEWorkflowDatabase.EF.Models;
+using Newtonsoft.Json;
 
 namespace Common.Helpers
 {
@@ -25,7 +25,7 @@ namespace Common.Helpers
         {
             DatabasesHelpers.ClearNcneWorkflowDbTables(_context, true);
 
-            //AddAdditionalAdUsers();
+            AddAdditionalAdUsers();
 
             PopulateTaskStageType();
             PopulateChartType();
@@ -44,6 +44,7 @@ namespace Common.Helpers
             var users = JsonConvert.DeserializeObject<IEnumerable<AdUser>>(jsonString);
 
             if (users?.Any() ?? false) _context.AdUser.AddRange(users);
+            _context.SaveChanges();
         }
 
         private void PopulateTaskInfo()
