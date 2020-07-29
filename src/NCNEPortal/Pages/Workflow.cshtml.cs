@@ -500,15 +500,19 @@ namespace NCNEPortal
         {
             ValidationErrorMessages.Clear();
 
-
+            var task = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
             var roles = _dbContext.TaskRole
                 .Include(c => c.Compiler)
                 .Include(v => v.VerifierOne)
                 .Include(v => v.VerifierTwo)
                 .Include(h => h.HundredPercentCheck).Single(r => r.ProcessId == processId);
 
+            var dating = task.Duration == null ? 0 : (int)Enum.Parse(typeof(DeadlineEnum), task.Duration);
+
             if (!(_pageValidationHelper.ValidateForCompletion(username, CurrentUser.UserPrincipalName,
-                (NcneTaskStageType)stageTypeId, roles, ValidationErrorMessages)))
+                (NcneTaskStageType)stageTypeId, roles, task.PublicationDate,
+                 task.RepromatDate, dating, task.ChartType
+                , ValidationErrorMessages)))
             {
 
                 return new JsonResult(this.ValidationErrorMessages)
@@ -517,12 +521,16 @@ namespace NCNEPortal
                 };
             }
 
-            if (publish)
+
+            if (stageTypeId >= (int)NcneTaskStageType.Publication)
             {
-                var task = _dbContext.TaskInfo.Single(t => t.ProcessId == processId);
+                var formsStatus = _dbContext.TaskStage.Single(t => t.ProcessId == processId
+                                                             && t.TaskStageTypeId == (int)NcneTaskStageType.Forms)
+                    .Status;
+
 
                 if (!_pageValidationHelper.ValidateForPublishCarisChart(task.ThreePs, task.ActualDate3Ps,
-                    ValidationErrorMessages))
+                    stageTypeId,formsStatus, ValidationErrorMessages))
                 {
                     return new JsonResult(this.ValidationErrorMessages)
                     {

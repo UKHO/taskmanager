@@ -20,12 +20,16 @@ namespace NCNEPortal.Helpers
             List<string> validationErrorMessages);
 
         public bool ValidateForCompletion(string assignedUser, string userName, NcneTaskStageType stageType,
-            TaskRole role, List<string> validationErrorMessages);
+            TaskRole role, DateTime? publicationDate,
+            DateTime? repromatDate,
+            int dating,
+            string chartType, List<string> validationErrorMessages);
 
         public bool ValidateForRework(string assignedUser, string userName, List<string> validationErrorMessages);
 
         public bool ValidateForCompleteWorkflow(string assignedUser, string userName, List<string> validationErrorMessages);
 
-        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps, List<string> validationErrorMessages);
+        public bool ValidateForPublishCarisChart(bool threePs, DateTime? actualReturnDate3Ps,
+                                                 int currentStageTypeId, string formsStatus, List<string> validationErrorMessages);
     }
 }
