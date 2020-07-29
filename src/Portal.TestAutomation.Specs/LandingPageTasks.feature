@@ -1,7 +1,8 @@
 ﻿Feature: LandingPageTasks
 
 Scenario: The landing page shows my tasks
-	When I navigate to the landing page
+	Given I am on the landing page
+	When The landing page has loaded
 	Then I should see all of the tasks assigned to me
 		#And I should see all of the unassigned tasks
 		#And I shouldn't see tasks assigned to other people
