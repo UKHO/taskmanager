@@ -254,45 +254,6 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
-        [Ignore("Now using SQL command text instead of Oracle EF")]
-        [Test]
-        public async Task Test_entering_non_existing_impactedProduct_in_productAction_results_in_validation_error_message()
-        {
-
-            _hpDbContext.CarisProducts.Add(new CarisProduct()
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
-
-
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
-
-            _assessModel.Ion = "Ion";
-            _assessModel.ActivityCode = "ActivityCode";
-            _assessModel.SourceCategory = "SourceCategory";
-            _assessModel.TaskType = "TaskType";
-            _assessModel.Team = "HW";
-            _assessModel.Assessor = TestUser;
-            _assessModel.Verifier = TestUser;
-            _assessModel.ProductActioned = true;
-            _assessModel.ProductActionChangeDetails = "Some change details";
-            _assessModel.DataImpacts = new List<DataImpact>();
-            _assessModel.RecordProductAction = new List<ProductAction>
-            {
-                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB5678", ProductActionTypeId = 1}
-            };
-
-
-            await _assessModel.OnPostSaveAsync(ProcessId);
-
-            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Record Product Action: Impacted product GB5678 does not exist", _assessModel.ValidationErrorMessages);
-            A.CallTo(() =>
-                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
-                .WithAnyArguments().MustNotHaveHappened();
-        }
-
-        [Ignore("Now using SQL command text instead of Oracle EF")]
         [Test]
         public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
