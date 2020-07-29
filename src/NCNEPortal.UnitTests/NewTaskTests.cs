@@ -7,6 +7,7 @@ using NCNEPortal.Calculators;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
+using NCNEWorkflowDatabase.Tests.Helpers;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,30 +49,34 @@ namespace NCNEPortal.UnitTests
             _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakencneUserDbService, _fakeStageTypeFactory, _fakePageValidationHelper);
         }
 
-        //[Test]
-        //public async Task OnPostSaveAsync_gives_no_validation_errors_when_valid()
-        //{
+        [Test]
+        public async Task OnPostSaveAsync_gives_no_validation_errors_when_valid()
+        {
 
-        //    _newTaskModel.Compiler = "Stuart";
-        //    _newTaskModel.ChartType = "Adoption";
-        //    _newTaskModel.WorkflowType = "NE";
+            var user = AdUserHelper.CreateTestUser(_dbContext);
+
+            _newTaskModel.Compiler = user;
+            _newTaskModel.ChartType = "Adoption";
+            _newTaskModel.WorkflowType = "NE";
 
 
-        //    A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-        //        A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
-        //    A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-        //            A<string>.Ignored, A<List<string>>.Ignored))
-        //        .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
-        //    A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(
-        //        A<TaskRole>.That.Matches(task => task.Compiler == "Stuart"),
-        //        "NE",
-        //        "Adoption",
-        //        A<List<string>>.That.IsEmpty())).Returns(true);
 
-        //    await _newTaskModel.OnPostSaveAsync();
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<List<string>>.Ignored))
+                .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
+            A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(
+                A<TaskRole>.That.Matches(task => task.Compiler == user),
+                "NE",
+                "Adoption",
+                A<List<string>>.That.IsEmpty())).Returns(true);
+            A.CallTo(() => _fakencneUserDbService.GetAdUserAsync(user.UserPrincipalName)).Returns(user);
 
-        //    Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 0);
-        //}
+            await _newTaskModel.OnPostSaveAsync();
+
+            Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 0);
+        }
 
         [Test]
         public async Task OnPostSaveAsync_gives_validation_errors_when_invalid()
