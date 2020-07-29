@@ -31,7 +31,7 @@
                 {
                     <div class="form-group row justify-content-start align-items-center recordProductAction">
                         <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label productActionImpactedProductLabel" })</div>
-                        <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control productActionImpactedProduct" })</div>
+                        <div class="col-2">@Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control productActionImpactedProduct", @maxlength = 100 })</div>
 
                         <div class="row col-8 align-items-center">
                             <div class="col-3">@Html.LabelFor(model => row.ProductActionTypeId, new { @class = "col-form-label productActionTypeLabel" })</div>
