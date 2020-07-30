@@ -90,13 +90,13 @@ namespace DbUpdatePortal
                     : s.GetService<IOptions<UriConfig>>().Value.DbUpdateLandingPageUrl,
                 s.GetService<HttpProvider>()));
 
-
             services.AddSingleton<AppVersionInfo>();
 
             services.AddScoped<IDbUpdateUserDbService,
                 DbUpdateUserDbService>(s => new DbUpdateUserDbService(s.GetService<DbUpdateWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
             services.AddScoped<IDbUpdateUserDbService, DbUpdateUserDbService>();
+            services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
 
             // Order of these two is important
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)

@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                         &&
-                                                         (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
-                  || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                                       &&
+                                                       (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
+                || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -147,7 +147,7 @@
                             @task.TaskRole.Verifier.DisplayName
                         </td>
                         <td>
-                            @task.StatusChangeDate
+                            @Html.DisplayFor(model => task.StatusChangeDate)
                         </td>
                     </tr>
                 }
@@ -188,13 +188,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Assign Task</h4>
+                <h4 class="modal-title" id="assignTaskTitle">Assign Task</h4>
             </div>
             <div class="modal-body">
                 <div id="assignTaskModal-body">
                     <div id="assignTaskTypeahead">
                         <div class="text-input-wrap">
-                            <input id="txtUsername" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
+                            <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
                         </div>
                         <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
                             <h5>
@@ -204,7 +204,7 @@
                         </section>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
-                    <input type="hidden" id="hdnAssignTaskStage" name="taskStage" />
+                    <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />
                     <br />
                     <div id="AssignTaskError"></div>
                 </div>

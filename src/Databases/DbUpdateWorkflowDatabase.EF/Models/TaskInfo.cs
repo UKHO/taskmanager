@@ -25,6 +25,7 @@ namespace DbUpdateWorkflowDatabase.EF.Models
 
         public string Status { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? StatusChangeDate { get; set; }
 
         public virtual AdUser Assigned { get; set; }

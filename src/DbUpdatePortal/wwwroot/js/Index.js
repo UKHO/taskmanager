@@ -1,7 +1,11 @@
 ﻿$(document).ready(function () {
 
     $('#txtUserName').on('typeahead:selected', function (eventObject, suggestionObject) {
-        $('#hdnUserName').val(suggestionObject.userPrincipalName);
+        $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
+    });
+
+    $('#txtUserName').on('typeahead:autocomplete', function (eventObject, suggestionObject) {
+        $('#hdnAssignTaskUpn').val(suggestionObject.userPrincipalName);
     });
 
     var usersFetched = false;
@@ -93,7 +97,7 @@
                 var taskNote = $(this).data("tasknote");
                 $("#txtNote").val(taskNote);
 
-                $("#editNoteTitle").html("Edit Task Note (Process ID : " + processId + ")");
+                $("#editTaskNoteModal h4.modal-title").text("Edit task " + processId + " note");
 
                 $("#editTaskNoteModal").modal("show");
             }
@@ -114,7 +118,7 @@
             var processId = target.data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
 
-            $("#assignTaskTitle").html("Assign Task ( Process ID : " + processId + ")");
+            $("#assignTaskModal h4.modal-title").text("Assign task " + processId + " to user");
 
             $("#assignTaskModal").modal("show");
         }
@@ -319,7 +323,7 @@
 
         var processId = $("#hdnAssignTaskProcessId").val();
         var userName = $("#txtUserName").val();
-        var userPrinciple = $("#hdnUserName").val();
+        var userPrinciple = $("#hdnAssignTaskUpn").val();
        
         $.ajax({
             type: "POST",
