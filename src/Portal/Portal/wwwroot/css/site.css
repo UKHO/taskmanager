@@ -71,7 +71,7 @@ td > span.overflowElipsis {
     text-overflow: ellipsis;
     vertical-align: bottom;
     min-width: 8rem;
-    max-width: 18rem;
+    max-width: 17.5rem;
 }
 
 .panel {

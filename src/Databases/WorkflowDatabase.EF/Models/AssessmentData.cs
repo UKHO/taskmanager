@@ -16,7 +16,10 @@ namespace WorkflowDatabase.EF.Models
 
         [DisplayFormat(NullDisplayText = "N/A")]
         public string SourceDocumentName { get; set; }
+
+        [DisplayFormat(NullDisplayText = "N/A", DataFormatString = "{0:d}")]
         public DateTime? ReceiptDate { get; set; }
+
         public DateTime? ToSdoDate { get; set; }
         public DateTime? EffectiveStartDate { get; set; }
         public string TeamDistributedTo { get; set; }

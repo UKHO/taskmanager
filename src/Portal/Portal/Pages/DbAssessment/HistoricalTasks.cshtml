@@ -140,7 +140,9 @@
                             @task.RsdraNumber
                         </td>
                         <td>
-                            @task.SourceDocumentName
+                            <span class="overflowElipsis" title="@task.SourceDocumentName">
+                                @Html.DisplayFor(model => task.SourceDocumentName)
+                            </span>
                         </td>
                         <td>
                             @task.Status
