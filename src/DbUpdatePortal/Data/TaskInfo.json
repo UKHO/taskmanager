@@ -4,7 +4,7 @@
     "chartingArea": "Home Waters",
     "UpdateType": "Continuous improvement",
     "TargetDate": "2020-01-10T00:00:00",
-    "CurrentStage": "Compile Chart",
+    "CurrentStage": "V1",
     "StatusChangeDate": "2020-01-10T00:00:00",
     "AssignedAdUserId": 3,
     "AssignedDate": "2020-01-06",
@@ -63,14 +63,21 @@
         "TaskStageTypeId": 2,
         "DateExpected": null,
         "DateCompleted": null,
-        "AssignedAdUserId": 6,
+        "AssignedAdUserId": 3,
         "Status": "InProgress"
       },
       {
         "TaskStageTypeId": 3,
         "DateExpected": null,
         "DateCompleted": null,
-        "AssignedAdUserId": 6,
+        "AssignedAdUserId": 3,
+        "Status": "Open"
+      },
+      {
+        "TaskStageTypeId": 4,
+        "DateExpected": null,
+        "DateCompleted": null,
+        "AssignedAdUserId": 3,
         "Status": "Open"
       }
     ]
