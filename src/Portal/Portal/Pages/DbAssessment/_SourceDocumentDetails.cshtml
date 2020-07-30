@@ -1,4 +1,5 @@
 ﻿@page
+@using Common.Messages.Enums
 @using WorkflowDatabase.EF
 
 @model Portal.Pages.DbAssessment._SourceDocumentDetailsModel
@@ -15,6 +16,7 @@
                     <th scope="col">RSDRA</th>
                     <th scope="col">SDOC</th>
                     <th scope="col">Source Name</th>
+                    <th scope="col">Link</th>
                     <th scope="col">Receipt Date</th>
                     <th scope="col">Document Type</th>
                     <th scope="col">Datum</th>
@@ -48,7 +50,12 @@
                             }
                         </td>
                         <td id="rows">@Model.Assessment.PrimarySdocId</td>
-                        <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentName)</td>
+                        <td>
+                            <span class="overflowElipsis" title="@Model.Assessment.SourceDocumentName">
+                                @Html.DisplayFor(model => model.Assessment.SourceDocumentName)
+                            </span>
+                        </td>
+                        <td>@SourceType.Primary.ToString()</td>
                         <td>@Html.DisplayFor(model => model.Assessment.ReceiptDate)</td>
                         <td>@Html.DisplayFor(model => model.Assessment.SourceDocumentType)</td>
                         <td>@Html.DisplayFor(model => model.Assessment.Datum)</td>
@@ -64,7 +71,12 @@
                                 <td></td>
                                 <td></td>
                                 <td id="rows">@linkedDocument.LinkedSdocId</td>
-                                <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentName)</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@linkedDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => linkedDocument.SourceDocumentName)
+                                    </span>
+                                </td>
+                                <td>@Html.DisplayFor(model => linkedDocument.LinkType)</td>
                                 <td>@Html.DisplayFor(model => linkedDocument.ReceiptDate)</td>
                                 <td>@Html.DisplayFor(model => linkedDocument.SourceDocumentType)</td>
                                 <td>@Html.DisplayFor(model => linkedDocument.Datum)</td>
@@ -117,7 +129,12 @@
                                     }
                                 </td>
                                 <td id="rows">@Html.DisplayFor(model => attachedLinkedDocument.LinkedSdocId)</td>
-                                <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentName)</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@attachedLinkedDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentName)
+                                    </span>
+                                </td>
+                                <td>@Html.DisplayFor(model => attachedLinkedDocument.LinkType)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.ReceiptDate)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.SourceDocumentType)</td>
                                 <td>@Html.DisplayFor(model => attachedLinkedDocument.Datum)</td>
@@ -167,8 +184,13 @@
 
                                 </td>
                                 <td>@databaseDocument.SdocId</td>
-                                <td>@databaseDocument.SourceDocumentName</td>
-                                <td>@databaseDocument.ReceiptDate</td>
+                                <td>
+                                    <span class="overflowElipsis" title="@databaseDocument.SourceDocumentName">
+                                        @Html.DisplayFor(model => databaseDocument.SourceDocumentName)
+                                    </span>
+                                </td>
+                                <td>@SourceType.Database.ToString()</td>
+                                <td>@Html.DisplayFor(model => databaseDocument.ReceiptDate)</td>
                                 <td>@databaseDocument.SourceDocumentType</td>
                                 <td>@databaseDocument.Datum</td>
                                 <td>@databaseDocument.SourceNature</td>
