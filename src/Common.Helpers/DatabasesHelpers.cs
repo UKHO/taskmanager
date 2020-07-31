@@ -150,7 +150,7 @@ namespace Common.Helpers
             dbContext.UpdateType.RemoveRange(dbContext.UpdateType);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
 
             if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);
