@@ -459,7 +459,7 @@ namespace NCNEPortal.UnitTests
 
             Assert.IsFalse(result);
 
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage before completion");
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage and Save before completion");
 
         }
         [TestCase(NcneTaskStageType.With_SDRA)]
@@ -522,7 +522,7 @@ namespace NCNEPortal.UnitTests
                     null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role and Save before completing this stage");
 
         }
         [Test]
@@ -542,8 +542,8 @@ namespace NCNEPortal.UnitTests
                     null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to 100% Check role before completing this stage");
-
+            CollectionAssert.Contains(validationErrorMessages,
+                "Please assign a user to 100% Check role and Save before completing this stage");
         }
 
         [Test]
@@ -564,8 +564,7 @@ namespace NCNEPortal.UnitTests
                     null, null, 0, "NC", validationErrorMessages);
 
             Assert.IsFalse(result);
-            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role before completing this stage");
-
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to V1 role and Save before completing this stage");
         }
 
         [TestCase(NcneTaskStageType.Compile)]
@@ -609,7 +608,7 @@ namespace NCNEPortal.UnitTests
 
         }
 
-        [TestCase("", "Valid User1", "Please assign a user to the V1 role before completing the workflow")]
+        [TestCase("", "Valid User1", "Please assign a user to the V1 role and Save before completing the workflow")]
         [TestCase("Valid User2", "Valid User1", "Only users assigned to the V1 role are allowed to complete the workflow.")]
         public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
         {
