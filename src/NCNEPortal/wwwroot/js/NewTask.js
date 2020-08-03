@@ -25,6 +25,18 @@
         $('#HundredPCheckUpn').val(suggestionObject.userPrincipalName);
     });
 
+    var tabIndex = 1;
+    $("#frmNewTask *").filter(':visible').each(function (i) {
+
+        var tagName = $(this).prop("tagName").toLowerCase();
+        var designSystem = $(this).hasClass("design-custom-select");
+
+        if (tagName === "input" || tagName === "button" || designSystem ) {
+            $(this).attr('tabindex', tabIndex);
+            tabIndex++;
+        }
+    });
+
     $("#PublicationDate").datepicker({
         autoclose: true,
         todayHighLight: true,
