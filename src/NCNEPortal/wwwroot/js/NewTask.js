@@ -83,7 +83,7 @@
     });
 
     $("#btnCreate").click(function() {
-
+        $("#btnCreate").prop("disabled", true);
 
         removeAssignRoleErrors();
         var formData = $("#frmNewTask").serialize();
@@ -107,6 +107,7 @@
                     displayAssignRoleErrors(responseJson);
                 }
 
+                $("#btnCreate").prop("disabled", false);
             }
         });
 
