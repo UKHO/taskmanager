@@ -71,11 +71,10 @@ namespace NCNEPortal.Helpers
                 }
             }
             else
-
             {
                 if (string.IsNullOrEmpty(assignedUser))
                 {
-                    validationErrorMessages.Add("Please assign a user to this stage before completion");
+                    validationErrorMessages.Add("Please assign a user to this stage and Save before completion");
                     isValid = false;
 
                 }
@@ -90,19 +89,19 @@ namespace NCNEPortal.Helpers
 
                 if (stageType == NcneTaskStageType.Compile && (role.VerifierOne == null))
                 {
-                    validationErrorMessages.Add("Please assign a user to V1 role before completing this stage");
+                    validationErrorMessages.Add("Please assign a user to V1 role and Save before completing this stage");
                     isValid = false;
                 }
 
                 if (stageType == NcneTaskStageType.Final_Updating && (role.HundredPercentCheck == null))
                 {
-                    validationErrorMessages.Add("Please assign a user to 100% Check role before completing this stage");
+                    validationErrorMessages.Add("Please assign a user to 100% Check role and Save before completing this stage");
                     isValid = false;
                 }
 
                 if (stageType == NcneTaskStageType.Hundred_Percent_Check && (role.VerifierOne == null))
                 {
-                    validationErrorMessages.Add("Please assign a user to V1 role before completing this stage");
+                    validationErrorMessages.Add("Please assign a user to V1 role and Save before completing this stage");
                     isValid = false;
                 }
             }
@@ -143,7 +142,7 @@ namespace NCNEPortal.Helpers
 
             if (string.IsNullOrEmpty(assignedUser))
             {
-                validationErrorMessages.Add("Please assign a user to the V1 role before completing the workflow");
+                validationErrorMessages.Add("Please assign a user to the V1 role and Save before completing the workflow");
                 isValid = false;
 
             }
@@ -275,8 +274,6 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = true;
 
-            //var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.Select(u => u.DisplayName).ToList();
-
             var userList = _ncneUserDbService.GetUsersFromDbAsync().Result.ToList();
 
             if (taskRole.Compiler == null)
@@ -286,7 +283,6 @@ namespace NCNEPortal.Helpers
             }
 
             else
-
             {
                 if (userList.All(a => a != taskRole.Compiler))
                 {
@@ -294,7 +290,6 @@ namespace NCNEPortal.Helpers
                     isValid = false;
                 }
             }
-
 
             if (taskRole.VerifierOne != null)
             {
