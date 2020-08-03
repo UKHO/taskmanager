@@ -22,6 +22,6 @@ namespace WorkflowDatabase.EF.Models
         public virtual AdUser Assessor { get; set; }
         public int? AssessorAdUserId { get; set; }
         public virtual AdUser Verifier { get; set; }
-        public int VerifierAdUserId { get; set; }
+        public int? VerifierAdUserId { get; set; }
     }
 }
