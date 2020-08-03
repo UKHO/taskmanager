@@ -3,6 +3,7 @@
     "Name": "Name",
     "chartingArea": "Home Waters",
     "UpdateType": "Continuous improvement",
+    "ProductAction" :  "None" ,
     "TargetDate": "2020-01-10T00:00:00",
     "CurrentStage": "V1",
     "StatusChangeDate": "2020-01-10T00:00:00",

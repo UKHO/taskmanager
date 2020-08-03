@@ -184,14 +184,15 @@ namespace DbUpdatePortal.Pages
                 switch ((DbUpdateTaskStageType)taskInProgress.TaskStageTypeId)
                 {
                     case DbUpdateTaskStageType.Compile:
-                    case DbUpdateTaskStageType.V1_Rework:
-                    case DbUpdateTaskStageType.CPT:
-                    case DbUpdateTaskStageType.DCPT:
+                    case DbUpdateTaskStageType.Verification_Rework:
                         {
                             task.TaskRole.Compiler = user;
                             break;
                         }
-                    case DbUpdateTaskStageType.V1:
+                    case DbUpdateTaskStageType.Verify:
+                    case DbUpdateTaskStageType.SNC:
+                    case DbUpdateTaskStageType.ENC:
+
                         {
                             task.TaskRole.Verifier = user;
                             break;
@@ -210,7 +211,9 @@ namespace DbUpdatePortal.Pages
                 //Assign the user according to the stage
                 stage.Assigned = (DbUpdateTaskStageType)stage.TaskStageTypeId switch
                 {
-                    DbUpdateTaskStageType.V1 => task.TaskRole.Verifier,
+                    DbUpdateTaskStageType.Verify => task.TaskRole.Verifier,
+                    DbUpdateTaskStageType.SNC => task.TaskRole.Verifier,
+                    DbUpdateTaskStageType.ENC => task.TaskRole.Verifier,
                     _ => task.TaskRole.Compiler
                 };
             }

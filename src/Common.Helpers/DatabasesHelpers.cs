@@ -148,9 +148,10 @@ namespace Common.Helpers
             dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
             dbContext.ChartingArea.RemoveRange(dbContext.ChartingArea);
             dbContext.UpdateType.RemoveRange(dbContext.UpdateType);
+            dbContext.ProductAction.RemoveRange(dbContext.ProductAction);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            dbContext.AdUser.RemoveRange(dbContext.AdUser);
+            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
 
             if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);

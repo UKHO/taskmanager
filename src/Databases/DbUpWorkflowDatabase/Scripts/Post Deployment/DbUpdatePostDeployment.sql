@@ -52,11 +52,11 @@ WHEN NOT MATCHED BY source THEN DELETE;
 merge [dbo].[TaskStageType] as target
 using (
   values
-         (1, 'Compile Chart', 1, 0),
-         (2, 'V1', 2, 1),
-         (3, 'V1 Rework', 3, 0),
-         (4, 'CPT', 4, 0),
-         (5, 'DCPT', 5, 0)
+         (1, 'Compile Database', 1, 0),
+         (2, 'Verify Database', 2, 1),
+         (3, 'Verification Rework', 3, 0),
+         (4, 'SNC', 4, 0),
+         (5, 'ENC', 5, 0)
 
 ) as source ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
 on (target.[TaskStageTypeId] = source.[TaskStageTypeId])
@@ -70,5 +70,20 @@ INSERT ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
 WHEN NOT MATCHED BY source THEN DELETE;
   
 
-
+/* Product Action */
+merge [dbo].[ProductAction] as target
+using (
+    values
+        (1, 'None'),
+        (2, 'SNC'),
+        (3, 'ENC'),
+        (4, 'BOTH')
+) as source ([ProductActionId], [Name])
+on (target.[ProductActionId] = source.[ProductActionId])
+WHEN matched THEN
+UPDATE SET [Name] = source.[Name]
+WHEN NOT MATCHED BY target THEN
+INSERT ([ProductActionId], [Name])
+    VALUES (source.[ProductActionId], source.[Name])
+WHEN NOT MATCHED BY source THEN DELETE;
 

@@ -1,6 +1,7 @@
 ﻿using DbUpdatePortal.Auth;
 using DbUpdateWorkflowDatabase.EF;
 using DbUpdateWorkflowDatabase.EF.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,8 +15,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DbUpdatePortal.Enums;
-using Microsoft.AspNetCore.Authorization;
 
 namespace DbUpdatePortal.Pages
 {
@@ -43,6 +42,10 @@ namespace DbUpdatePortal.Pages
 
         public SelectList ChartingAreas { get; set; }
 
+        [BindProperty]
+        [DisplayName("Product Action")] public string ProductAction { get; set; }
+
+        public SelectList ProductActions { get; set; }
 
         [BindProperty]
         [DisplayName("Target Date")]
@@ -87,6 +90,7 @@ namespace DbUpdatePortal.Pages
 
                 SetChartingAreas();
                 SetUpdateTypes();
+                SetProductActions();
 
                 TargetDate = null;
 
@@ -296,6 +300,19 @@ namespace DbUpdatePortal.Pages
                 .Select(u => u.Name);
 
             UpdateTypes = new SelectList(updateTypes);
+        }
+
+        private void SetProductActions()
+        {
+            if (!System.IO.File.Exists(@"Data\ProductActions.json"))
+                throw new FileNotFoundException(@"Data\ProductActions.json");
+
+            var jsonString = System.IO.File.ReadAllText(@"Data\ProductActions.json");
+
+            var productActions = JsonConvert.DeserializeObject<IEnumerable<ProductAction>>(jsonString)
+                .Select(u => u.Name);
+
+            ProductActions = new SelectList(productActions);
         }
 
         public async Task<JsonResult> OnGetUsersAsync()

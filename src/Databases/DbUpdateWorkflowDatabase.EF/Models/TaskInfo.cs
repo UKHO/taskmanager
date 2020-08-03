@@ -16,6 +16,8 @@ namespace DbUpdateWorkflowDatabase.EF.Models
 
         public string ChartingArea { get; set; }
 
+        public string ProductAction { get; set; }
+
         public DateTime? TargetDate { get; set; }
 
         public string CurrentStage { get; set; }

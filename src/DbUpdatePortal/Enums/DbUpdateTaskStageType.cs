@@ -3,10 +3,10 @@
     public enum DbUpdateTaskStageType
     {
         Compile = 1,
-        V1 = 2,
-        V1_Rework = 3,
-        CPT = 4,
-        DCPT = 5
+        Verify = 2,
+        Verification_Rework = 3,
+        SNC = 4,
+        ENC = 5
 
     }
 }

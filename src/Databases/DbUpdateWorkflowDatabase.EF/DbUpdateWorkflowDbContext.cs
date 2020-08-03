@@ -36,6 +36,8 @@ namespace DbUpdateWorkflowDatabase.EF
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<AdUser> AdUser { get; set; }
 
+        public DbSet<ProductAction> ProductAction { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TaskInfo>()
