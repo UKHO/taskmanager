@@ -1,7 +1,7 @@
 ﻿using System;
 using DbUpdateWorkflowDatabase.EF.Models;
 using Microsoft.Azure.Services.AppAuthentication;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace DbUpdateWorkflowDatabase.EF
