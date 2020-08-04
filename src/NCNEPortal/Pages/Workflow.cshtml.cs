@@ -190,7 +190,7 @@ namespace NCNEPortal
         {
             LogContext.PushProperty("ActivityName", "Workflow");
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostTaskTerminateAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostTaskTerminateAsync));
             LogContext.PushProperty("Comment", comment);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
@@ -328,10 +328,10 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
         {
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCreateCarisProjectAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostCreateCarisProjectAsync));
             LogContext.PushProperty("ProjectName", projectName);
 
-            _logger.LogInformation("Entering {NcnePortalResource} for Workflow with: ProcessId: {ProcessId}");
+            _logger.LogInformation("Entering {NCNEPortalResource} for Workflow with: ProcessId: {ProcessId}");
 
             var task = await _dbContext.TaskInfo.FindAsync(processId);
 
@@ -575,7 +575,7 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostCompleteWorkflow(int processId)
         {
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCompleteWorkflow));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostCompleteWorkflow));
 
             var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
 
@@ -596,7 +596,7 @@ namespace NCNEPortal
         public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, bool isRework)
         {
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostCompleteAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostCompleteAsync));
             LogContext.PushProperty("StageId", stageId);
 
             if (isRework)
@@ -733,7 +733,7 @@ namespace NCNEPortal
         {
 
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostSaveAsync));
             LogContext.PushProperty("ChartType", chartType);
 
             ValidationErrorMessages.Clear();
@@ -1060,7 +1060,7 @@ namespace NCNEPortal
         {
 
             LogContext.PushProperty("VersionNumber", versionNumber);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostGetChartDetails));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostGetChartDetails));
 
             var panelInfo = await _carisProjectHelper.GetValidHpdPanelInfo(versionNumber);
 
@@ -1088,7 +1088,7 @@ namespace NCNEPortal
         public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
         {
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostPublishCarisChart));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostPublishCarisChart));
             LogContext.PushProperty("VersionNumber", versionNumber);
 
 
@@ -1135,7 +1135,7 @@ namespace NCNEPortal
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {
             LogContext.PushProperty("ProcessId", commentProcessId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostTaskCommentAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostTaskCommentAsync));
             LogContext.PushProperty("Comment", txtComment);
 
 
@@ -1161,7 +1161,7 @@ namespace NCNEPortal
         public async Task<JsonResult> OnPostStageCommentAsync(string txtComment, int commentProcessId, int stageId)
         {
             LogContext.PushProperty("ProcessId", commentProcessId);
-            LogContext.PushProperty("NcnePortalResource", nameof(OnPostStageCommentAsync));
+            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostStageCommentAsync));
             LogContext.PushProperty("Comment", txtComment);
             LogContext.PushProperty("StageId", stageId);
 
