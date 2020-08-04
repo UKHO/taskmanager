@@ -151,11 +151,9 @@ namespace Common.Helpers
             dbContext.ProductAction.RemoveRange(dbContext.ProductAction);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
-
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
             if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);
-
 
             dbContext.SaveChanges();
         }
