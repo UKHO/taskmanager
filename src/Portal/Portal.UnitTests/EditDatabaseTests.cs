@@ -231,7 +231,8 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 Filename = "Testing1.tif",
-                Filepath = "c:\\Temp"
+                Filepath = "c:\\Temp",
+                SourceNature = "Graphical"
             });
 
             _dbContext.LinkedDocument.Add(new LinkedDocument()
@@ -239,15 +240,14 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 Filename = "Testing2.tif",
-                Filepath = "c:\\Temp"
+                Filepath = "c:\\Temp",
+                SourceNature = "Graphical"
             });
 
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            //Expected value is 1 higher than added LinkedDocuments as an item
-            //is added to SourceDocuments in SetupForOnGetAsync()
             Assert.AreEqual(3, _editDatabaseModel.SourceDocuments.Count);
         }
 
@@ -291,7 +291,8 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 Filename = "Testing.tif",
-                Filepath = "c:\\Temp"
+                Filepath = "c:\\Temp",
+                SourceNature = "Graphical"
             });
 
 
@@ -299,8 +300,6 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            //Expected value is 1 higher than added DatabaseDocumentStatus as an item
-            //is added to SourceDocuments in SetupForOnGetAsync()
             Assert.AreEqual(2, _editDatabaseModel.SourceDocuments.Count);
         }
 
@@ -348,15 +347,16 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
-                Filename = "Testing.tif",
-                Filepath = "c:\\Temp"
+                Filename = "Testing1.tif",
+                Filepath = "c:\\Temp",
+                SourceNature = "Graphical"
             });
 
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any( s => s.DocumentName == "Testing1.tif"));
 
         }
 
@@ -369,8 +369,9 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
-                Filename = "Testing.tif",
-                Filepath = "c:\\Temp"
+                Filename = "Testing1.tif",
+                Filepath = "c:\\Temp",
+                SourceNature = "Graphical"
 
             });
 
@@ -378,7 +379,7 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[1].DocumentName);
+            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any( s=> s.DocumentName == "Testing1.tif"));
 
         }
 
@@ -391,6 +392,7 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                SourceNature = "Graphical",
                 Filename = "Testing1.tif",
                 Filepath = "c:\\Temp"
             });
@@ -400,6 +402,7 @@ namespace Portal.UnitTests
                 ProcessId = ProcessId,
                 Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
                 Filename = "Testing2.tif",
+                SourceNature = "Graphical",
                 Filepath = "c:\\Temp"
             });
 
@@ -407,13 +410,11 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            //Expected value is 1 higher than added DatabaseDocumentStatus as an item
-            //is added to SourceDocuments in SetupForOnGetAsync()
             Assert.AreEqual(3, _editDatabaseModel.SourceDocuments.Count);
         }
 
         [Test]
-        public async Task Test_OnGet_Only_Adds_Documents_With_Matching_ProcessId_And_status_is_FileGenerated_()
+        public async Task Test_OnGet_Only_Adds_Documents_With_Matching_ProcessId_And_status_is_FileGenerated_And_Graphical_Only()
         {
             await SetupForOnGetAsync();
 
@@ -421,33 +422,49 @@ namespace Portal.UnitTests
             {
                 ProcessId = 456,
                 SourceDocumentName = "Source2",
-                RsdraNumber = "RSDRA456"
+                RsdraNumber = "RSDRA456",
+                SourceNature = "Graphical"
             });
 
             _dbContext.DbAssessmentAssessData.Add(new DbAssessmentAssessData()
             {
-                ProcessId = 456,
+                ProcessId = ProcessId,
                 WorkspaceAffected = "AWorkspace2"
             });
 
             _dbContext.LinkedDocument.Add(new LinkedDocument()
             {
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                SourceNature = "Graphical",
+                Filename = "File1.tif",
+                Filepath = "c:\\Tmp"
+            });
+
+            _dbContext.LinkedDocument.Add(new LinkedDocument()
+            {
                 ProcessId = 456,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                SourceNature = "Graphical",
+                Filename = "File2.tif",
+                Filepath = "c:\\Tmp"
             });
 
             _dbContext.DatabaseDocumentStatus.Add(new DatabaseDocumentStatus()
             {
-                ProcessId = 456,
-                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString()
+                ProcessId = ProcessId,
+                Status = SourceDocumentRetrievalStatus.FileGenerated.ToString(),
+                SourceNature = "Textual",
+                Filename = "File3.pdf",
+                Filepath = "c:\\Tmp"
             });
 
             await _dbContext.SaveChangesAsync();
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.AreEqual(1, _editDatabaseModel.SourceDocuments.Count);
-            Assert.AreEqual("Testing.tif", _editDatabaseModel.SourceDocuments[0].DocumentName);
+            Assert.AreEqual(2, _editDatabaseModel.SourceDocuments.Count);
+            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any(s => s.DocumentName == "File1.tif" || s.DocumentName == "Testing.tif"));
 
         }
 
@@ -660,7 +677,8 @@ namespace Portal.UnitTests
             {
                 ProcessId = ProcessId,
                 SourceDocumentName = "Source",
-                RsdraNumber = "RSDRA123"
+                RsdraNumber = "RSDRA123",
+                SourceNature = "Graphical"
             });
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()

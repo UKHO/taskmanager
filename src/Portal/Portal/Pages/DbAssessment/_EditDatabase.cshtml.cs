@@ -11,7 +11,6 @@ using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Auth;
@@ -234,8 +233,13 @@ namespace Portal.Pages.DbAssessment
 
         private async Task GetSourceDocuments(int processId)
         {
-            var primaryDocumentStatus = await _dbContext.PrimaryDocumentStatus
-                .FirstOrDefaultAsync(pds => pds.ProcessId == processId);
+            var workflowInstance = await _dbContext.WorkflowInstance
+                                                            .Include(wi => wi.PrimaryDocumentStatus)
+                                                            .Include(wi => wi.AssessmentData)
+                                                            .FirstOrDefaultAsync(wi => wi.ProcessId == processId
+                                                                                                        && wi.AssessmentData.SourceNature == "Graphical");
+            
+            var primaryDocumentStatus = workflowInstance?.PrimaryDocumentStatus;
 
             if (primaryDocumentStatus != null &&
                 primaryDocumentStatus.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
@@ -250,26 +254,28 @@ namespace Portal.Pages.DbAssessment
             }
 
             var linkedDocuments = await _dbContext.LinkedDocument
-                .Where(ld => ld.ProcessId == processId &&
-                                          ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
-                .Select(ld => new SourceViewModel()
-                {
-                    DocumentName = ld.Filename,
-                    DocumentFullName = Path.Combine(ld.Filepath, ld.Filename)
-                })
-                .ToListAsync();
+                                                                        .Where(ld => ld.ProcessId == processId
+                                                                                    && ld.SourceNature == "Graphical"
+                                                                                    && ld.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                                                                        .Select(ld => new SourceViewModel()
+                                                                        {
+                                                                            DocumentName = ld.Filename,
+                                                                            DocumentFullName = Path.Combine(ld.Filepath, ld.Filename)
+                                                                        })
+                                                                        .ToListAsync();
 
             SourceDocuments.AddRange(linkedDocuments);
 
             var databaseDocuments = await _dbContext.DatabaseDocumentStatus
-                .Where(dd => dd.ProcessId == processId &&
-                                                dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
-                .Select(dd => new SourceViewModel()
-                {
-                    DocumentName = dd.Filename,
-                    DocumentFullName = Path.Combine(dd.Filepath, dd.Filename)
-                })
-                .ToListAsync();
+                                                                        .Where(dd => dd.ProcessId == processId
+                                                                                            && dd.SourceNature == "Graphical"
+                                                                                            && dd.Status == SourceDocumentRetrievalStatus.FileGenerated.ToString())
+                                                                        .Select(dd => new SourceViewModel()
+                                                                        {
+                                                                            DocumentName = dd.Filename,
+                                                                            DocumentFullName = Path.Combine(dd.Filepath, dd.Filename)
+                                                                        })
+                                                                        .ToListAsync();
 
             SourceDocuments.AddRange(databaseDocuments);
         }
