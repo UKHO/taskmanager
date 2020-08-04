@@ -5,6 +5,6 @@
         None = 1,
         SNC = 2,
         ENC = 3,
-        BOTH = 4
+        Both = 4
     }
 }
