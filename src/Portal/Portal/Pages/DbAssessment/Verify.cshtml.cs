@@ -169,6 +169,18 @@ namespace Portal.Pages.DbAssessment
                 throw appException;
             }
 
+            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
+
+            if (!isUserValid)
+            {
+                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
+            }
+
             ProcessId = processId;
 
             if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
@@ -235,6 +247,18 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(appException,
                     "Workflow Instance for ProcessId {ProcessId} has already been completed");
                 throw appException;
+            }
+
+            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
+
+            if (!isUserValid)
+            {
+                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
             }
 
             ProcessId = processId;
@@ -349,25 +373,6 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
-            var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
-
-            if (string.IsNullOrWhiteSpace(verifyData.Verifier?.UserPrincipalName))
-            {
-                ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
-            }
-            else if (CurrentUser.UserPrincipalName != verifyData.Verifier.UserPrincipalName)
-            {
-                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
-            }
-
-            if (ValidationErrorMessages.Any())
-            {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                };
-            }
-
             if (string.IsNullOrWhiteSpace(comment))
             {
                 _logger.LogError("Comment is null, empty or whitespace: {Comment}");
@@ -403,6 +408,37 @@ namespace Portal.Pages.DbAssessment
                 _logger.LogError(appException,
                     "Workflow Instance for ProcessId {ProcessId} has already been completed");
                 throw appException;
+            }
+
+            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
+
+            if (!isUserValid)
+            {
+                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
+            }
+
+            var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(v => v.ProcessId == processId);
+
+            if (string.IsNullOrWhiteSpace(verifyData.Verifier?.UserPrincipalName))
+            {
+                ValidationErrorMessages.Add($"Operators: You are not assigned as the Verifier of this task. Please assign the task to yourself and click Save");
+            }
+            else if (CurrentUser.UserPrincipalName != verifyData.Verifier.UserPrincipalName)
+            {
+                ValidationErrorMessages.Add($"Operators: {verifyData.Verifier.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
+            }
+
+            if (ValidationErrorMessages.Any())
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
+                };
             }
 
             _logger.LogInformation("Rejecting: ProcessId: {ProcessId}; Comment: {Comment};");
