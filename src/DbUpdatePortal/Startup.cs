@@ -97,6 +97,8 @@ namespace DbUpdatePortal
 
             services.AddScoped<IDbUpdateUserDbService, DbUpdateUserDbService>();
             services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
+            services.AddScoped<IStageTypeFactory, StageTypeFactory>();
+            services.AddScoped<IPageValidationHelper, PageValidationHelper>();
 
             // Order of these two is important
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)

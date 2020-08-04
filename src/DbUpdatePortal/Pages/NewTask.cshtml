@@ -145,6 +145,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.Compiler, "",
                                                 new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.Compiler.UserPrincipalName, new { @id = "CompilerUpn", @class = "CompilerUpn" })
                                         </div>
 
                                     </div>
@@ -159,6 +160,7 @@
                                         <div class="col">
                                             @Html.TextBoxFor(model => model.Verifier, "",
                                                 new { placeholder = "Verifier", id = "Verifier", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                                            @Html.HiddenFor(m => m.Verifier.UserPrincipalName, new { @id = "Verifier1Upn", @class = "Verifier1Upn" })
                                         </div>
 
                                     </div>

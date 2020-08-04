@@ -77,7 +77,7 @@ using (
         (1, 'None'),
         (2, 'SNC'),
         (3, 'ENC'),
-        (4, 'BOTH')
+        (4, 'SNC & ENC')
 ) as source ([ProductActionId], [Name])
 on (target.[ProductActionId] = source.[ProductActionId])
 WHEN matched THEN

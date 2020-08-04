@@ -90,7 +90,7 @@
                         </td>
                         <td>
                             <div data-toggle="tooltip" data-placement="top" title="Task Notes">
-                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote.Text" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
+                                <a class="taskNoteItem pr-1" data-processid="@task.ProcessId" data-tasknote="@task.TaskNote?.Text" aria-label="Edit Task Note" href="#" style="cursor: pointer;">
                                     <i class="far fa-edit"></i>
                                 </a>
                             </div>
@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                       &&
-                                                       (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
-                || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                                      &&
+                                                      (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
+               || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>

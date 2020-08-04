@@ -1,5 +1,19 @@
 ﻿$(document).ready(function() {
 
+    $('.ta_compiler').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#CompilerUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_compiler').on('typeahead:autocompleted', function (eventObject, suggestionObject) {
+        $('#CompilerUpn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v1').on('typeahead:selected', function (eventObject, suggestionObject) {
+        $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
+    });
+    $('.ta_v1').on('typeahead:autocompleted',
+        function(eventObject, suggestionObject) {
+            $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
+        });
+
     $("#TargetDate").datepicker({
         autoclose: true,
         todayHighLight: true,
