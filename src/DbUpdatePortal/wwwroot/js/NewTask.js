@@ -14,6 +14,19 @@
             $('#Verifier1Upn').val(suggestionObject.userPrincipalName);
         });
 
+    var tabIndex = 1;
+    $("#frmNewTask *").filter(':visible').each(function (i) {
+
+        var tagName = $(this).prop("tagName").toLowerCase();
+        var designSystem = $(this).hasClass("design-custom-select");
+
+        if (tagName === "input" || tagName === "button" || designSystem) {
+            $(this).attr('tabindex', tabIndex);
+            tabIndex++;
+        }
+    });
+
+
     $("#TargetDate").datepicker({
         autoclose: true,
         todayHighLight: true,
@@ -27,6 +40,7 @@
 
     $("#btnCreate").click(function() {
 
+        $("#btnCreate").prop("disabled", true);
 
         removeAssignRoleErrors();
         var formData = $("#frmNewTask").serialize();
@@ -50,6 +64,7 @@
                     displayAssignRoleErrors(responseJson);
                 }
 
+                $("#btnCreate").prop("disabled", false);
             }
         });
 

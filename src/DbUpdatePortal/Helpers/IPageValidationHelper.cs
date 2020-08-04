@@ -5,7 +5,7 @@ namespace DbUpdatePortal.Helpers
 {
     public interface IPageValidationHelper
     {
-        public bool ValidateNewTaskPage(TaskRole taskRole, string chartingArea, string updateType, string productAction,
+        public bool ValidateNewTaskPage(TaskRole taskRole, string taskName, string chartingArea, string updateType, string productAction,
             List<string> validationErrorMessages);
     }
 }

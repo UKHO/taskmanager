@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                      &&
-                                                      (t.TaskRole.Verifier.DisplayName == Model.CurrentUser.DisplayName
-               || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                                    &&
+                                                    (t.TaskRole.Verifier?.DisplayName == Model.CurrentUser.DisplayName
+             || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -144,7 +144,7 @@
                             @task.TaskRole.Compiler.DisplayName
                         </td>
                         <td>
-                            @task.TaskRole.Verifier.DisplayName
+                            @task.TaskRole.Verifier?.DisplayName
                         </td>
                         <td>
                             @Html.DisplayFor(model => task.StatusChangeDate)

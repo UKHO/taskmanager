@@ -12,6 +12,6 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public virtual AdUser Compiler { get; set; }
         public int CompilerAdUserId { get; set; }
         public virtual AdUser Verifier { get; set; }
-        public int VerifierAdUserId { get; set; }
+        public int? VerifierAdUserId { get; set; }
     }
 }

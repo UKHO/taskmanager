@@ -14,10 +14,17 @@ namespace DbUpdatePortal.Helpers
             _dbUpdateUserDbService = dbUpdateUserDbService;
         }
 
-        public bool ValidateNewTaskPage(TaskRole taskRole, string chartingArea, string updateType, string productAction,
+        public bool ValidateNewTaskPage(TaskRole taskRole, string taskName, string chartingArea, string updateType,
+            string productAction,
             List<string> validationErrorMessages)
         {
             var isValid = ValidateUserRoles(taskRole, validationErrorMessages);
+
+            if (string.IsNullOrEmpty(chartingArea))
+            {
+                validationErrorMessages.Add("Task Information: Task Name cannot be empty");
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(chartingArea))
             {

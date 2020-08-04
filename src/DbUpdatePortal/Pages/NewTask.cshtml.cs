@@ -46,7 +46,7 @@ namespace DbUpdatePortal.Pages
         public SelectList ChartingAreas { get; set; }
 
         [BindProperty]
-        [DisplayName("Product Action")] public string ProductAction { get; set; }
+        [DisplayName("Product Action Requirement")] public string ProductAction { get; set; }
 
         public SelectList ProductActions { get; set; }
 
@@ -70,7 +70,6 @@ namespace DbUpdatePortal.Pages
         public List<string> ValidationErrorMessages { get; set; }
 
         public NewTaskModel(DbUpdateWorkflowDbContext dbUpdateWorkflowDbContext,
-                            //IMilestoneCalculator milestoneCalculator,
                             ILogger<NewTaskModel> logger,
                             IDbUpdateUserDbService dbUpdateUserDbService
                             , IStageTypeFactory stageTypeFactory,
@@ -132,7 +131,7 @@ namespace DbUpdatePortal.Pages
                     Verifier = string.IsNullOrEmpty(Verifier?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Verifier.UserPrincipalName),
                 };
 
-                if (!(_pageValidationHelper.ValidateNewTaskPage(role, ChartingArea, UpdateType, ProductAction, ValidationErrorMessages))
+                if (!(_pageValidationHelper.ValidateNewTaskPage(role, TaskName, ChartingArea, UpdateType, ProductAction, ValidationErrorMessages))
                 )
                 {
 
@@ -163,8 +162,6 @@ namespace DbUpdatePortal.Pages
         {
             try
             {
-
-
 
                 var taskInfo = _dbUpdateWorkflowDbContext.TaskInfo.Add(entity: new TaskInfo()
                 {
@@ -205,7 +202,11 @@ namespace DbUpdatePortal.Pages
 
                 taskStage.ProcessId = processId;
                 taskStage.TaskStageTypeId = taskStageType.TaskStageTypeId;
-                Enum.TryParse(this.ProductAction, out DbUpdateProductAction action);
+
+                if (!Enum.TryParse(this.ProductAction, true, out DbUpdateProductAction selectedAction))
+                {
+                    selectedAction = DbUpdateProductAction.Both;
+                }
 
                 //Assign the status of the task stage 
                 taskStage.Status = (DbUpdateTaskStageType)taskStageType.TaskStageTypeId switch
@@ -214,11 +215,11 @@ namespace DbUpdatePortal.Pages
                     DbUpdateTaskStageType.Verify => DbUpdateTaskStageStatus.Open.ToString(),
                     DbUpdateTaskStageType.Verification_Rework => DbUpdateTaskStageStatus.Open.ToString(),
                     DbUpdateTaskStageType.ENC =>
-                    action != DbUpdateProductAction.None && action != DbUpdateProductAction.SNC
+                    selectedAction == DbUpdateProductAction.ENC || selectedAction == DbUpdateProductAction.Both
                         ? DbUpdateTaskStageStatus.Open.ToString()
                         : DbUpdateTaskStageStatus.Inactive.ToString(),
                     DbUpdateTaskStageType.SNC =>
-                    action != DbUpdateProductAction.None && action != DbUpdateProductAction.ENC
+                    selectedAction == DbUpdateProductAction.SNC && selectedAction == DbUpdateProductAction.Both
                         ? DbUpdateTaskStageStatus.Open.ToString()
                         : DbUpdateTaskStageStatus.Inactive.ToString(),
                     _ => DbUpdateTaskStageStatus.Inactive.ToString()
@@ -232,17 +233,6 @@ namespace DbUpdatePortal.Pages
 
                     _ => role.Verifier
                 };
-
-
-                ////set the Expected Date of completion for Forms, Commit to print , CIS and publication
-                //taskStage.DateExpected = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
-                //{
-                //    NcneTaskStageType.Forms => this.AnnounceDate,
-                //    NcneTaskStageType.Commit_To_Print => this.CommitToPrintDate,
-                //    NcneTaskStageType.CIS => this.CISDate,
-                //    NcneTaskStageType.Publication => this.PublicationDate,
-                //    _ => null
-                //};
 
             }
 

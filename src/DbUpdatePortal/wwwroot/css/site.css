@@ -70,7 +70,8 @@ table.task-list thead tr th {
 /*Set outline for focus to override Bootstrap 4*/
 .btn:focus, .btn.focus,
 .switch > input:focus + span, .switch > input.focus + span,
-.checkbox-wrapper > input:focus + label::before, .checkbox-wrapper > input.focus + label::before {
+.checkbox-wrapper > input:focus + label::before, .checkbox-wrapper > input.focus + label::before,
+.design-custom-select:focus, .design-custom-select.focus {
     outline: rgb(77, 144, 254) auto 1px;
     outline-color: rgb(77, 144, 254);
     outline-style: auto;
