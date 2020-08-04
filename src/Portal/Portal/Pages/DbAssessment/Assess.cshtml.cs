@@ -150,6 +150,18 @@ namespace Portal.Pages.DbAssessment
 
             ValidationErrorMessages.Clear();
 
+            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
+
+            if (!isUserValid)
+            {
+                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
+                };
+            }
+
             ProcessId = processId;
 
             var currentAssessData = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
@@ -195,6 +207,18 @@ namespace Portal.Pages.DbAssessment
             _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; ActivityName: {ActivityName}; Action: {Action};");
 
             ValidationErrorMessages.Clear();
+
+            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
+
+            if (!isUserValid)
+            {
+                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)AssessCustomHttpStatusCode.FailedValidation
+                };
+            }
 
             ProcessId = processId;
 

@@ -133,6 +133,9 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -159,6 +162,9 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -184,6 +190,9 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -215,6 +224,8 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
@@ -242,6 +253,9 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -276,6 +290,9 @@ namespace Portal.UnitTests
                 }
             };
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -309,6 +326,9 @@ namespace Portal.UnitTests
                     Assessor = TestUser
                 }
             };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -352,6 +372,8 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
@@ -394,6 +416,10 @@ namespace Portal.UnitTests
                 }
             };
 
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
@@ -433,6 +459,9 @@ namespace Portal.UnitTests
                     Assessor = AdUser.Empty
                 }
             };
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -534,7 +563,12 @@ namespace Portal.UnitTests
                 WorkspaceAffected = "Test Workspace",
                 Assessor = TestUser
             };
-            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
+            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" };
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown.UserPrincipalName)).Returns(false);
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -568,6 +602,9 @@ namespace Portal.UnitTests
 
             _reviewModel.Team = "HW";
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -595,6 +632,9 @@ namespace Portal.UnitTests
 
             _reviewModel.Team = "HW";
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -619,6 +659,11 @@ namespace Portal.UnitTests
             };
             _reviewModel.Reviewer = AdUser.Empty;
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -644,6 +689,11 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -680,6 +730,9 @@ namespace Portal.UnitTests
 
             _reviewModel.Reviewer = TestUser;
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
@@ -713,6 +766,9 @@ namespace Portal.UnitTests
             _reviewModel.Team = "HW";
 
             _reviewModel.Reviewer = AdUser.Empty;
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -833,6 +889,84 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostDoneAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = TestUser,
+                Notes = primaryAssignTaskNote,
+                Reviewer = TestUser
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            _reviewModel.Reviewer = TestUser2;
+            _reviewModel.Team = "HW";
+
+            _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
+            await _dbContext.SaveChangesAsync();
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _reviewModel.OnPostDoneAsync(ProcessId);
+
+            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _reviewModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
+
+            var primaryAssignTaskNote = "Testing primary";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "Test Workspace",
+                Assessor = TestUser,
+                Notes = primaryAssignTaskNote,
+                Reviewer = TestUser
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            _reviewModel.Reviewer = TestUser2;
+            _reviewModel.Team = "HW";
+
+            _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
+            await _dbContext.SaveChangesAsync();
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _reviewModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _reviewModel.ValidationErrorMessages);
+        }
+
+        [Test]
         public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
@@ -851,13 +985,13 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
             _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -892,14 +1026,14 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
             _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -931,14 +1065,14 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
             _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = true;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -973,14 +1107,14 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
             _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
             _reviewModel.IsOnHold = false;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -994,8 +1128,33 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostReviewTerminateAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+
+            // Assert
+            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _reviewModel.ValidationErrorMessages);
+
+            A.CallTo(() => _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent", A<ProgressWorkflowInstanceEvent>.Ignored))
+                .MustNotHaveHappened();
+            Assert.IsFalse(await _dbContext.WorkflowInstance.AnyAsync(
+                wi => wi.ProcessId == ProcessId && wi.Status == WorkflowStatus.Updating.ToString()));
+        }
+
+        [Test]
         public async Task Test_OnPostReviewTerminateAsync_Given_Task_Not_Assigned_To_User_Terminating_Returns_FailedValidation_Errors()
         {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("ThisUserIsNotTheReviewer", "thisuser@foobar.com"));
 
@@ -1044,6 +1203,8 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             await _reviewModel.OnPostTerminateAsync("Testing", processId);
 
@@ -1060,6 +1221,8 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
