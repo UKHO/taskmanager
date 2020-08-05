@@ -923,7 +923,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
         }
 
@@ -962,7 +962,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
         }
 
@@ -1141,7 +1141,7 @@ namespace Portal.UnitTests
             // Assert
             Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
 
             A.CallTo(() => _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent", A<ProgressWorkflowInstanceEvent>.Ignored))
