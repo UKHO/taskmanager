@@ -173,7 +173,7 @@ namespace Portal.Pages.DbAssessment
 
             if (!isUserValid)
             {
-                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -253,7 +253,7 @@ namespace Portal.Pages.DbAssessment
 
             if (!isUserValid)
             {
-                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -414,7 +414,7 @@ namespace Portal.Pages.DbAssessment
 
             if (!isUserValid)
             {
-                ValidationErrorMessages.Add("Operators: Your user account cannot be accepted. Please contact system administrators");
+                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
 
                 return new JsonResult(this.ValidationErrorMessages)
                 {
