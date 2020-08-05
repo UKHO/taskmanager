@@ -371,7 +371,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _assessModel.ValidationErrorMessages);
         }
 
@@ -402,7 +402,7 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _assessModel.ValidationErrorMessages);
         }
 
