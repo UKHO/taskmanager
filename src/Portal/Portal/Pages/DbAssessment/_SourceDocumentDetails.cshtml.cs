@@ -9,6 +9,7 @@ using Common.Helpers;
 using Common.Messages.Enums;
 using Common.Messages.Events;
 using DataServices.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ using LinkedDocument = WorkflowDatabase.EF.Models.LinkedDocument;
 
 namespace Portal.Pages.DbAssessment
 {
+    [Authorize]
     public class _SourceDocumentDetailsModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;

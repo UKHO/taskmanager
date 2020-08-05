@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Common.Helpers;
 using Common.Helpers.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ using WorkflowDatabase.EF.Models;
 namespace Portal.Pages.DbAssessment
 {
     [TypeFilter(typeof(JavascriptError))]
+    [Authorize]
     public class _EditDatabaseModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
