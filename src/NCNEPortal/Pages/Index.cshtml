@@ -230,8 +230,8 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                   &&
-                                   (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+                                  &&
+                                  (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))
@@ -320,12 +320,13 @@
                         <div class="text-input-wrap">
                             <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
                         </div>
-                        <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
-                            <h5>
-                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                                <span id="assignTaskErrorMsg">Failed to look up users</span>
+                        <div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
+                            <h5 class="mb-3">
+                                <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                                <span>There's a problem</span>
                             </h5>
-                        </section>
+                            <ol id="assignTaskErrorList" class="error-list"></ol>
+                        </div>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />

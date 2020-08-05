@@ -55,8 +55,8 @@ using (
          (1, 'Compile Database', 1, 0),
          (2, 'Verify Database', 2, 1),
          (3, 'Verification Rework', 3, 0),
-         (4, 'SNC', 4, 0),
-         (5, 'ENC', 5, 0)
+         (4, 'ENC', 4, 0),
+         (5, 'SNC', 5, 0)
 
 ) as source ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
 on (target.[TaskStageTypeId] = source.[TaskStageTypeId])
@@ -75,9 +75,9 @@ merge [dbo].[ProductAction] as target
 using (
     values
         (1, 'None'),
-        (2, 'SNC'),
-        (3, 'ENC'),
-        (4, 'SNC & ENC')
+        (2, 'ENC'),
+        (3, 'SNC'),
+        (4, 'ENC & SNC')
 ) as source ([ProductActionId], [Name])
 on (target.[ProductActionId] = source.[ProductActionId])
 WHEN matched THEN

@@ -50,7 +50,7 @@ namespace DbUpdatePortal.Pages
         public IndexModel(IDbUpdateUserDbService dbUpdateUserDbService,
                           DbUpdateWorkflowDbContext dbContext,
                           ILogger<IndexModel> logger,
-                           IAdDirectoryService adDirectoryService,
+                          IAdDirectoryService adDirectoryService,
                           ICarisProjectHelper carisProjectHelper,
                           IOptions<GeneralConfig> generalConfig
                           )
@@ -84,6 +84,14 @@ namespace DbUpdatePortal.Pages
         }
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("ActivityName", "TaskNote");
+            LogContext.PushProperty("TaskNote", taskNote);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostTaskNoteAsync));
+
+            _logger.LogInformation($"Entering Assign Note with: ProcessId: {processId}; Note : {taskNote};");
+
+
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -124,6 +132,10 @@ namespace DbUpdatePortal.Pages
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
+            LogContext.PushProperty("UserPrincipalName", userPrinciple);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostAssignTaskToUserAsync));
+
+            _logger.LogInformation($"Entering Assign Task with: ProcessId: {processId}; Principle : {userPrinciple};");
 
             ValidationErrorMessages.Clear();
 

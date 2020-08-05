@@ -3,8 +3,8 @@
     public enum DbUpdateProductAction
     {
         None = 1,
-        SNC = 2,
-        ENC = 3,
+        ENC = 2,
+        SNC = 3,
         Both = 4
     }
 }

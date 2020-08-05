@@ -38,7 +38,8 @@ namespace DbUpdatePortal.Helpers
             }
             if (string.IsNullOrEmpty(productAction))
             {
-                validationErrorMessages.Add("Task Information : Product Action cannot be empty");
+                validationErrorMessages.Add("Task Information : Product Action Required cannot be empty");
+                isValid = false;
             }
 
             return isValid;

@@ -1,18 +1,19 @@
 [
   {
-  "ProductActionId": 1,
-  "Name": "None"
+    "ProductActionId": 1,
+    "Name": "None"
   },
   {
     "ProductActionId": 2,
-    "Name": "SNC"
-  },
-  {
-    "ProductActionId": 3,
     "Name": "ENC"
   },
   {
+    "ProductActionId": 3,
+    "Name": "SNC"
+  },
+
+  {
     "ProductActionId": 4,
-    "Name": "SNC & ENC"
+    "Name": "ENC & SNC"
   }
 ]

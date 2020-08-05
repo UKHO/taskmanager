@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                    &&
-                                                    (t.TaskRole.Verifier?.DisplayName == Model.CurrentUser.DisplayName
-             || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                                   &&
+                                                   (t.TaskRole.Verifier?.DisplayName == Model.CurrentUser.DisplayName
+            || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -196,12 +196,13 @@
                         <div class="text-input-wrap">
                             <input id="txtUserName" type="text" class="typeahead tt-query form-text-input" autocomplete="off" spellcheck="false">
                         </div>
-                        <section class="dialog error collapse mt-3" id="assignTaskTypeaheadError">
-                            <h5>
-                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                                <span id="assignTaskErrorMsg">Failed to look up users</span>
+                        <div id="assignTaskErrorMessages" class="dialog error collapse mt-3 pb-1">
+                            <h5 class="mb-3">
+                                <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                                <span>There's a problem</span>
                             </h5>
-                        </section>
+                            <ol id="assignTaskErrorList" class="error-list"></ol>
+                        </div>
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />
