@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Helpers;
 using Common.Helpers.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
+    [Authorize]
     public class HistoricalTasksModel : PageModel
     {
         private readonly WorkflowDbContext _dbContext;
