@@ -306,21 +306,6 @@ namespace Portal.UnitTests
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _verifyModel.ValidationErrorMessages);
-            //_assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
-            //    _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
-
-            //var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
-            //A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-            //    .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
-            //A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
-            //    .Returns(false);
-
-            //var result = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
-
-            //Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
-            //Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
-            //Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
-            //    _assessModel.ValidationErrorMessages);
         }
 
         [Test]
