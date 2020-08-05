@@ -139,6 +139,39 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_CreateCarisProject_With_No_Verifier_At_Assess_Completes_Successfully()
+        {
+            //Arrange
+            var setupAssessData = new DbAssessmentAssessData()
+            {
+                ProcessId = ProcessId,
+                Assessor = TestUser,
+                Verifier = null
+            };
+            _dbContext.DbAssessmentAssessData.Add(setupAssessData);
+            await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+
+            A.CallTo(() => _fakeCarisProjectHelper.CreateCarisProject(
+                    A<int>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<string>.Ignored,
+                    A<int>.Ignored))
+                .Returns(1);
+
+            //Act
+            await _editDatabaseModel.OnPostCreateCarisProjectAsync(ProcessId, "Assess", "TestProject", "TestWorkspace");
+
+            //Assert
+            var projectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(p => p.ProjectId == 1
+                                                                                           && p.ProcessId == ProcessId);
+            Assert.IsNotNull(projectDetails);
+            Assert.AreEqual("TestProject", projectDetails.ProjectName);
+        }
+
+        [Test]
         public async Task Test_OnGet_Adds_timestamp_to_session_filename()
         {
 
@@ -356,7 +389,7 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any( s => s.DocumentName == "Testing1.tif"));
+            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any(s => s.DocumentName == "Testing1.tif"));
 
         }
 
@@ -379,7 +412,7 @@ namespace Portal.UnitTests
 
             await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
 
-            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any( s=> s.DocumentName == "Testing1.tif"));
+            Assert.IsTrue(_editDatabaseModel.SourceDocuments.Any(s => s.DocumentName == "Testing1.tif"));
 
         }
 
