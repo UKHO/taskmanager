@@ -137,7 +137,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_an_empty_ion_activityCode_sourceCategory_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -160,8 +160,13 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_Verifier_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_an_empty_Verifier_results_in_validation_error_message()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -179,10 +184,12 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(false);
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -199,7 +206,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -230,7 +237,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -259,6 +266,61 @@ namespace Portal.UnitTests
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _verifyModel.ValidationErrorMessages);
+            //_assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
+            //    _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
+
+            //var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            //A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+            //    .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            //A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+            //    .Returns(false);
+
+            //var result = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            //Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            //Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            //Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+            //    _assessModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -301,6 +363,8 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -390,6 +454,8 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -461,7 +527,9 @@ namespace Portal.UnitTests
         public async Task Test_OnPostSaveAsync_given_stsdataimpact_usage_selected_and_verified_false_then_validation_error_message_is_not_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -496,7 +564,9 @@ namespace Portal.UnitTests
         public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Invalid_HpdUsageId_Then_No_Record_Is_Saved()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -535,7 +605,9 @@ namespace Portal.UnitTests
         public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Valid_HpdUsageId_Then_Record_Is_Saved()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser", "testuser@foobar.com"));
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -590,7 +662,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_empty_team_results_in_validation_error_message_On_Save()
+        public async Task Test_OnPostSaveAsync_entering_empty_team_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -614,6 +686,8 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -684,9 +758,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_caris_project_is_created_then_MarkCarisProjectAsComplete_is_called()
         {
-
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -729,6 +804,10 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_signOff_must_not_run_validation()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
@@ -798,7 +877,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
             _dbContext.OnHold.Add(new OnHold()
             {
@@ -841,7 +920,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
@@ -884,11 +963,13 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
             _verifyModel.Verifier = TestUser;
@@ -918,7 +999,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
@@ -962,10 +1043,12 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_With_No_Verifier_Fails_Validation_On_Reject()
+        public async Task Test_OnPostRejectVerifyAsync_That_Task_With_No_Verifier_Fails_Validation()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("This User", "thisuser@foobar.com"));
+                .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
 
             var row = await _dbContext.DbAssessmentVerifyData.FirstAsync();
             row.Verifier = AdUser.Empty;
@@ -977,10 +1060,12 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Reject()
+        public async Task Test_OnPostRejectVerifyAsync_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
 
             _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
             {
@@ -995,10 +1080,72 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
+        public async Task Test_OnPostRejectVerifyAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+                _fakeLogger, _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _realPortalUserDbService);
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostRejectVerifyAsync_Given_Valid_Workflow_Then_Workflow_Is_Rejected()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            var correlationId = Guid.NewGuid();
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = correlationId
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            var workflowInstance =
+                await _dbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == ProcessId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(WorkflowStatus.Updating.ToString(), workflowInstance.Status);
+            A.CallTo(() =>
+                _fakeEventServiceApiClient.PostEvent(
+                    nameof(ProgressWorkflowInstanceEvent),
+                    A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
+                        p.CorrelationId == correlationId
+                        && p.ProcessId == ProcessId
+                        && p.FromActivity == WorkflowStage.Verify
+                        && p.ToActivity == WorkflowStage.Rejected
+                    ))).MustHaveHappened();
+            A.CallTo(() => _fakeCommentsHelper.AddComment(
+                "Task rejection has been triggered",
+                ProcessId,
+                workflowInstance.WorkflowInstanceId,
+                TestUser.UserPrincipalName)).MustHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
+                .Returns(true);
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
@@ -1007,10 +1154,12 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_Fails_Validation_If_OnHold_At_Done()
+        public async Task Test_OnPostDoneAsync_That_Task_Fails_Validation_If_OnHold()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
 
             await _dbContext.OnHold.AddAsync(new OnHold
             {
@@ -1028,8 +1177,13 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Save()
+        public async Task Test_OnPostSaveAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -1047,8 +1201,13 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
             _verifyModel.SourceCategory = "SourceCategory";
@@ -1066,7 +1225,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Save()
+        public async Task Test_OnPostSaveAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -1088,7 +1247,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -1110,7 +1269,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_On_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
