@@ -323,7 +323,7 @@
 
         var processId = $("#hdnAssignTaskProcessId").val();
         var userName = $("#txtUserName").val();
-        var userPrinciple = $("#hdnAssignTaskUpn").val();
+        var userPrincipal = $("#hdnAssignTaskUpn").val();
        
         $.ajax({
             type: "POST",
@@ -334,7 +334,7 @@
             data: {
                 "processId": processId,
                 "userName": userName,
-                "userPrinciple": userPrinciple
+                "userPrincipal": userPrincipal
             },
             success: function (result) {
                 $("#assignTaskModal").modal("hide");

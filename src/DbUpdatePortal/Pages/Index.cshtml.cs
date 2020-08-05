@@ -128,14 +128,14 @@ namespace DbUpdatePortal.Pages
         }
 
 
-        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrinciple)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrincipal)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
-            LogContext.PushProperty("UserPrincipalName", userPrinciple);
+            LogContext.PushProperty("UserPrincipalName", userPrincipal);
             LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostAssignTaskToUserAsync));
 
-            _logger.LogInformation($"Entering Assign Task with: ProcessId: {processId}; Principle : {userPrinciple};");
+            _logger.LogInformation($"Entering Assign Task with: ProcessId: {processId}; Principal : {userPrincipal};");
 
             ValidationErrorMessages.Clear();
 
@@ -151,7 +151,7 @@ namespace DbUpdatePortal.Pages
                     .ThenInclude(u => u.Assigned)
                     .FirstAsync(t => t.ProcessId == processId);
 
-                var user = await _dbUpdateUserDbService.GetAdUserAsync(userPrinciple);
+                var user = await _dbUpdateUserDbService.GetAdUserAsync(userPrincipal);
 
                 instance.Assigned = user;
                 instance.AssignedDate = DateTime.Now;
