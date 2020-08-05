@@ -131,7 +131,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_assessor_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_assessor_results_in_validation_error_message()
         {
             _hpDbContext.CarisProducts.Add(new CarisProduct()
             { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
@@ -169,7 +169,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_Verifier_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_an_empty_Verifier_results_in_validation_error_message()
         {
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -181,6 +181,10 @@ namespace Portal.UnitTests
             _assessModel.Verifier = null;
             _assessModel.DataImpacts = new List<DataImpact>();
 
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
@@ -195,7 +199,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_an_empty_assessor_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_an_empty_assessor_results_in_validation_error_message()
         {
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -207,6 +211,10 @@ namespace Portal.UnitTests
             _assessModel.Assessor = null;
             _assessModel.DataImpacts = new List<DataImpact>();
 
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
@@ -220,7 +228,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_duplicate_hpd_usages_in_dataImpact_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -255,7 +263,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
             _hpDbContext.CarisProducts.Add(new CarisProduct()
             { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
@@ -290,14 +298,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_invalid_username_for_assessor_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_invalid_username_for_assessor_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
-                .Returns(true);
-
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown))
-                .Returns(false);
-
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
@@ -305,6 +307,15 @@ namespace Portal.UnitTests
             _assessModel.Team = "HW";
             _assessModel.Assessor = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" };
             _assessModel.Verifier = TestUser;
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown))
+                .Returns(false);
 
             await _assessModel.OnPostSaveAsync(ProcessId);
 
@@ -316,14 +327,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_entering_invalid_username_for_verifier_results_in_validation_error_message()
+        public async Task Test_OnPostSaveAsync_entering_invalid_username_for_verifier_results_in_validation_error_message()
         {
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
-                .Returns(true);
-
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown))
-                .Returns(false);
-
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
             _assessModel.SourceCategory = "SourceCategory";
@@ -331,6 +336,15 @@ namespace Portal.UnitTests
             _assessModel.Team = "HW";
             _assessModel.Assessor = TestUser;
             _assessModel.Verifier = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
+            
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(AdUser.Unknown))
+                .Returns(false);
 
             await _assessModel.OnPostSaveAsync(ProcessId);
 
@@ -342,11 +356,64 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_With_No_Assessor_Fails_Validation_On_Done()
+        public async Task Test_OnPostDoneAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
         {
-            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _assessModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        {
+            _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
+                _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            _assessModel.Assessor = TestUser;
+            _assessModel.Verifier = TestUser;
+            _assessModel.Team = "HW";
+            _assessModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
+            };
+            _assessModel.DataImpacts = new List<DataImpact>();
+
+            var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("THIS DISPLAY NAME DOES NOT EXIST", invalidPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
+                .Returns(false);
+
+            var result = (JsonResult)await _assessModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Operators: Your user account cannot be accepted. Please contact system administrators",
+                _assessModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_That_Task_With_No_Assessor_Fails_Validation()
+        {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
 
             var row = await _dbContext.DbAssessmentAssessData.FirstAsync();
             row.AssessorAdUserId = null;
@@ -361,12 +428,14 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned_At_Done()
+        public async Task Test_OnPostDoneAsync_That_Task_With_Assessor_Fails_Validation_If_CurrentUser_Not_Assigned()
         {
             var testUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((testUser2.DisplayName, testUser2.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(testUser2.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(testUser2);
 
             await _assessModel.OnPostDoneAsync(ProcessId, "Done");
@@ -381,11 +450,19 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Invalid_HpdUsageId_Then_No_Record_Is_Saved()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                .Returns(true);
+
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
-                .Returns(true);
             _assessModel.Assessor = TestUser;
             _assessModel.Verifier = TestUser;
             _assessModel.Team = "HW";
@@ -396,13 +473,6 @@ namespace Portal.UnitTests
             _assessModel.IsOnHold = false;
             _assessModel.DataImpacts = new List<DataImpact>();
             _assessModel.StsDataImpact = new DataImpact() { HpdUsageId = 0 };
-
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
-                .Returns(true);
 
             var response = (StatusCodeResult)await _assessModel.OnPostSaveAsync(ProcessId);
 
@@ -416,11 +486,19 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_Given_StsDataUsage_Has_Valid_HpdUsageId_Then_Record_Is_Saved()
         {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
+                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                .Returns(true);
+
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
-                .Returns(true);
             _assessModel.Assessor = TestUser;
             _assessModel.Verifier = TestUser;
             _assessModel.Team = "HW";
@@ -443,13 +521,6 @@ namespace Portal.UnitTests
                 StsUsage = false
             };
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
-                .Returns(("TestUser2", "testuser2@foobar.com"));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
-                    A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
-                .Returns(true);
-
             var response = (StatusCodeResult)await _assessModel.OnPostSaveAsync(ProcessId);
 
             Assert.AreEqual((int)HttpStatusCode.OK, response.StatusCode);
@@ -468,13 +539,11 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Creates_A_Row_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
 
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
-                .Returns(true);
             _assessModel.Assessor = TestUser;
             _assessModel.Verifier = TestUser;
             _assessModel.Team = "HW";
@@ -487,6 +556,8 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
@@ -503,7 +574,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Updates_Existing_Row_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
@@ -554,7 +625,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_On_Hold_Adds_Comment_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
@@ -590,7 +661,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_That_Setting_Task_To_Off_Hold_Adds_Comment_On_Save()
+        public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _commentsHelper, _fakeAdDirectoryService,
                 _fakePageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
@@ -637,10 +708,11 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostDoneAsync_given_action_done_and_stsdataimpact_usage_not_selected_then_validation_error_message_is_present()
         {
-
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -687,7 +759,9 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -745,7 +819,9 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
             _hpDbContext.CarisProducts.Add(new CarisProduct
@@ -867,7 +943,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -895,7 +971,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present_On_Save()
+        public async Task Test_OnPostSaveAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -923,7 +999,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -947,7 +1023,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present_On_Save()
+        public async Task Test_OnPostSaveAsync_where_ProductActioned_ticked_and_ProductActionChangeDetails_entered_then_validation_error_message_is_not_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -971,7 +1047,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_on_Done()
+        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -996,7 +1072,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present_on_Save()
+        public async Task Test_OnPostSaveAsync_where_ProductActioned_not_ticked_then_validation_error_messages_are_not_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -1032,6 +1108,9 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((userFullName, userEmail));
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(userEmail))
+                .Returns(true);
 
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors(
                 null,
