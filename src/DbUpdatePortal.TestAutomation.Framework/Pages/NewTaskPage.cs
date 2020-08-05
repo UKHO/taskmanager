@@ -6,7 +6,7 @@ using OpenQA.Selenium.Support.UI;
 
 namespace DbUpdatePortal.TestAutomation.Framework.Pages
 {
-    public class NewTaskPage : PageBase
+    public class NewTaskPage : PageBase, INewTaskPage
     {
         public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
             : base(driver, wait, urlsConfig.DbUpdateNewTaskPageUrl)

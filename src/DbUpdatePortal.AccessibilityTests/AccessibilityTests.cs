@@ -65,5 +65,18 @@ namespace DbUpdatePortal.AccessibilityTests
 
             _axeResultAnalyser.AssertAxeViolations(axeResult);
         }
+
+        [Test]
+        public void NewTaskPageIsAccessible()
+        {
+            var newTaskPage = _objectContainer.Resolve<NewTaskPage>();
+            newTaskPage.NavigateTo();
+
+            Assert.IsTrue(newTaskPage.HasLoaded);
+
+            var axeResult = _axePageEvaluator.GetAxeResults();
+
+            _axeResultAnalyser.AssertAxeViolations(axeResult);
+        }
     }
 }
