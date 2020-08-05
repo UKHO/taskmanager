@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WorkflowDatabase.EF;
@@ -9,6 +10,7 @@ using WorkflowDatabase.EF.Models;
 
 namespace Portal.Pages.DbAssessment
 {
+    [Authorize]
     public class _OperatorsModel : PageModel
     {
 
