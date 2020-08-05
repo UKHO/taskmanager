@@ -1100,6 +1100,46 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostRejectVerifyAsync_Given_Valid_Workflow_Then_Workflow_Is_Rejected()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            var correlationId = Guid.NewGuid();
+            _dbContext.PrimaryDocumentStatus.Add(new PrimaryDocumentStatus()
+            {
+                ProcessId = ProcessId,
+                CorrelationId = correlationId
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            await _verifyModel.OnPostRejectVerifyAsync(ProcessId, "Reject");
+
+            var workflowInstance =
+                await _dbContext.WorkflowInstance.FirstOrDefaultAsync(wi => wi.ProcessId == ProcessId);
+
+            Assert.IsNotNull(workflowInstance);
+            Assert.AreEqual(WorkflowStatus.Updating.ToString(), workflowInstance.Status);
+            A.CallTo(() =>
+                _fakeEventServiceApiClient.PostEvent(
+                    nameof(ProgressWorkflowInstanceEvent),
+                    A<ProgressWorkflowInstanceEvent>.That.Matches(p =>
+                        p.CorrelationId == correlationId
+                        && p.ProcessId == ProcessId
+                        && p.FromActivity == WorkflowStage.Verify
+                        && p.ToActivity == WorkflowStage.Rejected
+                    ))).MustHaveHappened();
+            A.CallTo(() => _fakeCommentsHelper.AddComment(
+                "Task rejection has been triggered",
+                ProcessId,
+                workflowInstance.WorkflowInstanceId,
+                TestUser.UserPrincipalName)).MustHaveHappened();
+        }
+
+        [Test]
         public async Task Test_OnPostDoneAsync_That_Task_With_Verifier_Fails_Validation_If_CurrentUser_Not_Assigned()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
