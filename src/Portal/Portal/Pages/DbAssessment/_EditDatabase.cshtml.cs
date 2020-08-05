@@ -238,7 +238,7 @@ namespace Portal.Pages.DbAssessment
                                                             .Include(wi => wi.AssessmentData)
                                                             .FirstOrDefaultAsync(wi => wi.ProcessId == processId
                                                                                                         && wi.AssessmentData.SourceNature == "Graphical");
-            
+
             var primaryDocumentStatus = workflowInstance?.PrimaryDocumentStatus;
 
             if (primaryDocumentStatus != null &&
@@ -329,17 +329,24 @@ namespace Portal.Pages.DbAssessment
         private async Task UpdateCarisProjectWithAdditionalUser(int projectId, int processId, string taskStage)
         {
             var additionalUsername = await GetAdditionalUserToAssignedToCarisproject(processId, taskStage);
-            var hpdUsername = await GetHpdUser(additionalUsername.UserPrincipalName);  // which will also implicitly validate if the other user has been mapped to HPD account in our database
+            if (additionalUsername != null)
+            {
+                var hpdUsername =
+                    await GetHpdUser(additionalUsername
+                        .UserPrincipalName); // which will also implicitly validate if the other user has been mapped to HPD account in our database
 
-            try
-            {
-                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUsername.HpdUsername,
-                    _generalConfig.Value.CarisProjectTimeoutSeconds);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Project created but failed to assign {additionalUsername} ({hpdUsername.HpdUsername}) to Caris project: {projectId}");
-                throw new InvalidOperationException($"Project created but failed to assign {additionalUsername} ({hpdUsername.HpdUsername}) to Caris project: {projectId}. {e.Message}");
+                try
+                {
+                    await _carisProjectHelper.UpdateCarisProject(projectId, hpdUsername.HpdUsername,
+                        _generalConfig.Value.CarisProjectTimeoutSeconds);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e,
+                        $"Project created but failed to assign {additionalUsername} ({hpdUsername.HpdUsername}) to Caris project: {projectId}");
+                    throw new InvalidOperationException(
+                        $"Project created but failed to assign {additionalUsername} ({hpdUsername.HpdUsername}) to Caris project: {projectId}. {e.Message}");
+                }
             }
         }
 
@@ -347,7 +354,7 @@ namespace Portal.Pages.DbAssessment
         {
             var userAssignedToTask = await GetUserAssignedToTask(processId, taskStage);
 
-            if (userAssignedToTask.UserPrincipalName!=currentLoggedInUserEmail)
+            if (userAssignedToTask.UserPrincipalName != currentLoggedInUserEmail)
             {
                 LogContext.PushProperty("UserAssignedToTask", userAssignedToTask.UserPrincipalName);
                 _logger.LogError("{UserPrincipalName} is not assigned to this task with processId {ProcessId}, {UserAssignedToTask} is assigned to this task.");
@@ -355,7 +362,7 @@ namespace Portal.Pages.DbAssessment
             }
 
             if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
-                c.Name==carisWorkspace))
+                c.Name == carisWorkspace))
             {
                 _logger.LogError($"Current Caris Workspace {carisWorkspace} is invalid.");
                 throw new InvalidOperationException($"Current Caris Workspace {carisWorkspace} is invalid.");
@@ -407,7 +414,7 @@ namespace Portal.Pages.DbAssessment
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName == userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {
