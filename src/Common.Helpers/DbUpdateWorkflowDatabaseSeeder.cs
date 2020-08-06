@@ -32,7 +32,7 @@ namespace Common.Helpers
             PopulateChartingArea();
             PopulateUpdateType();
             PopulateProductAction();
-            //PopulateTaskInfo();
+            PopulateTaskInfo();
             //PopulateHpdUser();
 
             return this;
