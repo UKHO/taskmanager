@@ -1,8 +1,8 @@
-﻿using System;
-using DbUpdateWorkflowDatabase.EF.Models;
+﻿using DbUpdateWorkflowDatabase.EF.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DbUpdateWorkflowDatabase.EF
 {
@@ -58,7 +58,6 @@ namespace DbUpdateWorkflowDatabase.EF
                 .WithOne()
                 .HasPrincipalKey(p => new { p.ProcessId, p.TaskStageId })
                 .HasForeignKey(p => new { p.ProcessId, p.TaskStageId });
-
 
             modelBuilder.Entity<TaskInfo>()
                 .HasOne(x => x.TaskRole)

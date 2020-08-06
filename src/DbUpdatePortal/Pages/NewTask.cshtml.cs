@@ -7,14 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -90,9 +89,7 @@ namespace DbUpdatePortal.Pages
 
                 TaskName = "";
 
-                SetChartingAreas();
-                SetUpdateTypes();
-                SetProductActions();
+
 
                 TargetDate = null;
 
@@ -108,8 +105,9 @@ namespace DbUpdatePortal.Pages
             }
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            await PopulateDropDowns();
         }
 
 
@@ -180,6 +178,8 @@ namespace DbUpdatePortal.Pages
                 });
 
                 await _dbUpdateWorkflowDbContext.SaveChangesAsync();
+
+
                 _logger.LogInformation($"New Task created : {taskInfo.Entity.ProcessId}");
 
                 return (taskInfo.Entity.ProcessId);
@@ -243,43 +243,24 @@ namespace DbUpdatePortal.Pages
             return;
 
         }
-        private void SetChartingAreas()
+        private async Task PopulateDropDowns()
         {
-            if (!System.IO.File.Exists(@"Data\ChartingAreas.json"))
-                throw new FileNotFoundException(@"Data\ChartingAreas.json");
-
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\ChartingAreas.json");
-
-            var chartingAreas = JsonConvert.DeserializeObject<IEnumerable<ChartingArea>>(jsonString).Select(sc => sc.Name);
+            var chartingAreas = await _dbUpdateWorkflowDbContext.ChartingArea.OrderBy(i => i.ChartingAreaId).Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
 
             ChartingAreas = new SelectList(chartingAreas);
-        }
 
-        private void SetUpdateTypes()
-        {
-            if (!System.IO.File.Exists(@"Data\UpdateTypes.json"))
-                throw new FileNotFoundException(@"Data\UpdateTypes.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\UpdateTypes.json");
-
-            var updateTypes = JsonConvert.DeserializeObject<IEnumerable<UpdateType>>(jsonString)
-                .Select(u => u.Name);
+            var updateTypes = await _dbUpdateWorkflowDbContext.UpdateType.OrderBy(i => i.UpdateTypeId).Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
 
             UpdateTypes = new SelectList(updateTypes);
-        }
 
-        private void SetProductActions()
-        {
-            if (!System.IO.File.Exists(@"Data\ProductActions.json"))
-                throw new FileNotFoundException(@"Data\ProductActions.json");
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\ProductActions.json");
-
-            var productActions = JsonConvert.DeserializeObject<IEnumerable<ProductAction>>(jsonString)
-                .Select(u => u.Name);
+            var productActions = await _dbUpdateWorkflowDbContext.ProductAction.OrderBy(i => i.ProductActionId).Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
 
             ProductActions = new SelectList(productActions);
+
+
         }
 
         public async Task<JsonResult> OnGetUsersAsync()
