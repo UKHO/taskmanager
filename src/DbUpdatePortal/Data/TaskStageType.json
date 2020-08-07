@@ -1,31 +1,31 @@
 [
  {
     "TaskStageTypeId": 1,
-    "Name": "Compile Chart",
+    "Name": "Compile Database",
     "SequenceNumber": 1,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 2,
-    "Name": "V1",
+    "Name": "Verify Database",
     "SequenceNumber": 2,
     "AllowRework": true
   },
   {
     "TaskStageTypeId": 3,
-    "Name": "V1 Rework",
+    "Name": "Verification Rework",
     "SequenceNumber": 3,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 4,
-    "Name": "CPT",
+    "Name": "SNC",
     "SequenceNumber": 4,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 5,
-    "Name": "DCPT",
+    "Name": "ENC",
     "SequenceNumber": 5,
     "AllowRework": false
   }

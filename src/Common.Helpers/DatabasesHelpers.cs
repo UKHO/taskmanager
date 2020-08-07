@@ -129,6 +129,7 @@ namespace Common.Helpers
         {
             dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('TaskInfo', RESEED, 0)");
             dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('AdUser', RESEED, 0)");
+            dbContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT('TaskRole', RESEED, 0)");
         }
 
         public static void ClearDbUpdateWorkflowDbTables(DbUpdateWorkflowDbContext dbContext,
@@ -148,13 +149,12 @@ namespace Common.Helpers
             dbContext.TaskStageType.RemoveRange(dbContext.TaskStageType);
             dbContext.ChartingArea.RemoveRange(dbContext.ChartingArea);
             dbContext.UpdateType.RemoveRange(dbContext.UpdateType);
+            dbContext.ProductAction.RemoveRange(dbContext.ProductAction);
 
             dbContext.HpdUser.RemoveRange(dbContext.HpdUser);
-            //dbContext.AdUser.RemoveRange(dbContext.AdUser);
-
+            dbContext.AdUser.RemoveRange(dbContext.AdUser);
 
             if (reseedIdentity) ReseedDbUpdateWorkflowDbTables(dbContext);
-
 
             dbContext.SaveChanges();
         }

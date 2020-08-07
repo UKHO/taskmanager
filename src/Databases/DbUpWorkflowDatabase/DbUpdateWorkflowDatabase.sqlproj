@@ -74,6 +74,7 @@
     <Build Include="Tables\AdUser.sql" />
     <Build Include="Tables\CarisProjectDetails.sql" />
     <PostDeploy Include="Scripts\Post Deployment\DbUpdatePostDeployment.sql" />
+    <Build Include="Tables\ProductAction.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DbUpdateWorkflowDatabase.publish.xml" />

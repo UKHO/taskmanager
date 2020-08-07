@@ -4,6 +4,7 @@
     [Name] NVARCHAR(50) NULL,
     [UpdateType] NVARCHAR(50) NULL, 
     [ChartingArea] NVARCHAR(50) NULL,
+    [ProductAction] NVARCHAR(50) NULL,
     [TargetDate] DATETIME2 NULL, 
     [AssignedAdUserId] INT NOT NULL, 
     [AssignedDate] DATETIME2 NULL, 

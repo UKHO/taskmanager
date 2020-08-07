@@ -1,5 +1,8 @@
-﻿using Common.Helpers.Auth;
+﻿using Common.Helpers;
+using Common.Helpers.Auth;
 using DbUpdatePortal.Auth;
+using DbUpdatePortal.Configuration;
+using DbUpdatePortal.Enums;
 using DbUpdateWorkflowDatabase.EF;
 using DbUpdateWorkflowDatabase.EF.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
@@ -23,8 +27,9 @@ namespace DbUpdatePortal.Pages
         private readonly IDbUpdateUserDbService _dbUpdateUserDbService;
         private readonly DbUpdateWorkflowDbContext _dbContext;
         private readonly ILogger<IndexModel> _logger;
-
         private readonly IAdDirectoryService _adDirectoryService;
+        private readonly ICarisProjectHelper _carisProjectHelper;
+        private readonly IOptions<GeneralConfig> _generalConfig;
 
         private (string DisplayName, string UserPrincipalName) _currentUser;
 
@@ -44,14 +49,18 @@ namespace DbUpdatePortal.Pages
 
         public IndexModel(IDbUpdateUserDbService dbUpdateUserDbService,
                           DbUpdateWorkflowDbContext dbContext,
-                          ILogger<IndexModel> logger
-                          , IAdDirectoryService adDirectoryService
+                          ILogger<IndexModel> logger,
+                          IAdDirectoryService adDirectoryService,
+                          ICarisProjectHelper carisProjectHelper,
+                          IOptions<GeneralConfig> generalConfig
                           )
         {
             _dbUpdateUserDbService = dbUpdateUserDbService;
             _dbContext = dbContext;
             _logger = logger;
             _adDirectoryService = adDirectoryService;
+            _carisProjectHelper = carisProjectHelper;
+            _generalConfig = generalConfig;
 
             ValidationErrorMessages = new List<string>();
 
@@ -75,6 +84,14 @@ namespace DbUpdatePortal.Pages
         }
         public async Task<IActionResult> OnPostTaskNoteAsync(string taskNote, int processId)
         {
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("ActivityName", "TaskNote");
+            LogContext.PushProperty("TaskNote", taskNote);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostTaskNoteAsync));
+
+            _logger.LogInformation($"Entering Assign Note with: ProcessId: {processId}; Note : {taskNote};");
+
+
             taskNote = string.IsNullOrEmpty(taskNote) ? string.Empty : taskNote.Trim();
 
             var existingTaskNote = await _dbContext.TaskNote.FirstOrDefaultAsync(tn => tn.ProcessId == processId);
@@ -111,20 +128,39 @@ namespace DbUpdatePortal.Pages
         }
 
 
-        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrinciple)
+        public async Task<IActionResult> OnPostAssignTaskToUserAsync(int processId, string userName, string userPrincipal)
         {
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("ActivityName", "AssignUser");
+            LogContext.PushProperty("UserPrincipalName", userPrincipal);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostAssignTaskToUserAsync));
+
+            _logger.LogInformation($"Entering Assign Task with: ProcessId: {processId}; Principal : {userPrincipal};");
 
             ValidationErrorMessages.Clear();
 
             if (await _dbUpdateUserDbService.ValidateUserAsync(userName))
             {
-                var instance = await _dbContext.TaskInfo.FirstAsync(t => t.ProcessId == processId);
-                var user = await _dbUpdateUserDbService.GetAdUserAsync(userPrinciple);
+
+                var instance = await _dbContext.TaskInfo
+                    .Include(r => r.TaskRole)
+                    .ThenInclude(u => u.Compiler)
+                    .Include(r => r.TaskRole)
+                    .ThenInclude(u => u.Verifier)
+                    .Include(s => s.TaskStage)
+                    .ThenInclude(u => u.Assigned)
+                    .FirstAsync(t => t.ProcessId == processId);
+
+                var user = await _dbUpdateUserDbService.GetAdUserAsync(userPrincipal);
 
                 instance.Assigned = user;
                 instance.AssignedDate = DateTime.Now;
+
+                //Update the new user in task role and stages
+                UpdateTaskStageUser(instance, user);
+
+                //Update the caris Project with the current user if the caris project is created already
+                await UpdateCarisProject(processId, user);
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -141,6 +177,89 @@ namespace DbUpdatePortal.Pages
             }
 
             return StatusCode(200);
+        }
+
+
+        private void UpdateTaskStageUser(TaskInfo task, AdUser user)
+        {
+            _logger.LogInformation(
+                " Updating Task stage users from roles for task {ProcessId}.");
+
+
+            var taskInProgress = task.TaskStage.Find(t => t.Status == DbUpdateTaskStageStatus.InProgress.ToString());
+
+            //Assign the user to the role of the user who is in-charge of the task stage in progress
+            if (taskInProgress == null)
+                task.TaskRole.Compiler = user;
+            else
+            {
+                switch ((DbUpdateTaskStageType)taskInProgress.TaskStageTypeId)
+                {
+                    case DbUpdateTaskStageType.Compile:
+                    case DbUpdateTaskStageType.Verification_Rework:
+                        {
+                            task.TaskRole.Compiler = user;
+                            break;
+                        }
+                    case DbUpdateTaskStageType.Verify:
+                    case DbUpdateTaskStageType.SNC:
+                    case DbUpdateTaskStageType.ENC:
+
+                        {
+                            task.TaskRole.Verifier = user;
+                            break;
+                        }
+                    default:
+                        {
+                            task.TaskRole.Verifier = user;
+                            break;
+                        }
+                }
+            }
+
+
+            foreach (var stage in task.TaskStage.Where(s => s.Status != DbUpdateTaskStageStatus.Completed.ToString()))
+            {
+                //Assign the user according to the stage
+                stage.Assigned = (DbUpdateTaskStageType)stage.TaskStageTypeId switch
+                {
+                    DbUpdateTaskStageType.Verify => task.TaskRole.Verifier,
+                    DbUpdateTaskStageType.SNC => task.TaskRole.Verifier,
+                    DbUpdateTaskStageType.ENC => task.TaskRole.Verifier,
+                    _ => task.TaskRole.Compiler
+                };
+            }
+
+        }
+
+        private async Task UpdateCarisProject(int processId, AdUser user)
+        {
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+            if (carisProject != null)
+            {
+                var hpdUser = await GetHpdUser(user);
+                await _carisProjectHelper.UpdateCarisProject(carisProject.ProjectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds
+                    );
+
+            }
+        }
+
+        private async Task<HpdUser> GetHpdUser(AdUser user)
+        {
+
+            try
+            {
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser == user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"Unable to find HPD Username for {CurrentUser.DisplayName} in our system.");
+                throw new InvalidOperationException($"Unable to find HPD username for {user.DisplayName}  in our system.",
+                    ex.InnerException);
+            }
+
         }
 
         public async Task<JsonResult> OnGetUsersAsync()

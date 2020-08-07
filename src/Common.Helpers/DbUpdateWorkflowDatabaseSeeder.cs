@@ -31,6 +31,7 @@ namespace Common.Helpers
             PopulateTaskStageType();
             PopulateChartingArea();
             PopulateUpdateType();
+            PopulateProductAction();
             PopulateTaskInfo();
             //PopulateHpdUser();
 
@@ -96,6 +97,16 @@ namespace Common.Helpers
             var hpdUsers = JsonConvert.DeserializeObject<IEnumerable<HpdUser>>(jsonString);
 
             _context.HpdUser.AddRange(hpdUsers);
+        }
+
+        private void PopulateProductAction()
+        {
+            if (!File.Exists(@"Data\ProductActions.json")) throw new FileNotFoundException(@"Data\ProductActions.json");
+
+            var jsonString = File.ReadAllText(@"Data\ProductActions.json");
+            var productActions = JsonConvert.DeserializeObject<IEnumerable<ProductAction>>(jsonString);
+
+            _context.ProductAction.AddRange(productActions);
         }
 
         public void SaveChanges()

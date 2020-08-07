@@ -38,7 +38,7 @@ namespace DbUpdatePortal.Auth
             // TODO do we ever want to go and check AD then update database if we find a new user
             // TODO switch to a unique value instead of display name for validating when we switch over
 
-            return await _dbUpdateWorkflowDbContext.AdUser.AnyAsync(u => u.DisplayName.Equals(username, StringComparison.OrdinalIgnoreCase));
+            return await _dbUpdateWorkflowDbContext.AdUser.AnyAsync(u => u.DisplayName == username);
         }
 
         /// <summary>

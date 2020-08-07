@@ -1,8 +1,8 @@
-﻿using System;
-using DbUpdateWorkflowDatabase.EF.Models;
+﻿using DbUpdateWorkflowDatabase.EF.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DbUpdateWorkflowDatabase.EF
 {
@@ -36,8 +36,40 @@ namespace DbUpdateWorkflowDatabase.EF
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<AdUser> AdUser { get; set; }
 
+        public DbSet<ProductAction> ProductAction { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TaskInfo>()
+                .HasMany(x => x.TaskComment)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
+
+            modelBuilder.Entity<TaskInfo>()
+                .HasMany(x => x.TaskStage)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
+            modelBuilder.Entity<TaskStage>()
+                .HasMany(x => x.TaskStageComment)
+                .WithOne()
+                .HasPrincipalKey(p => new { p.ProcessId, p.TaskStageId })
+                .HasForeignKey(p => new { p.ProcessId, p.TaskStageId });
+
+            modelBuilder.Entity<TaskInfo>()
+                .HasOne(x => x.TaskRole)
+                .WithOne()
+                .HasForeignKey<TaskRole>(r => r.ProcessId);
+
+            modelBuilder.Entity<TaskInfo>()
+                .HasOne(n => n.TaskNote)
+                .WithOne()
+                .HasForeignKey<TaskNote>(n => n.ProcessId);
+
+
             modelBuilder.Entity<TaskStage>()
                 .HasKey(o => new { o.ProcessId, o.TaskStageId });
 
