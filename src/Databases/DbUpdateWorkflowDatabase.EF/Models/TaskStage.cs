@@ -24,7 +24,7 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public virtual bool IsReadOnly { get; set; } = false;
 
         public virtual AdUser Assigned { get; set; }
-        public int AssignedAdUserId { get; set; }
+        public int? AssignedAdUserId { get; set; }
     }
 
 }

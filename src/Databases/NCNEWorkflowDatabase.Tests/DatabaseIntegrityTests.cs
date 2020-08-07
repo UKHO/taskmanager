@@ -30,7 +30,6 @@ namespace NCNEWorkflowDatabase.Tests
             _dbContext = new NcneWorkflowDbContext(_dbContextOptions);
 
             DatabasesHelpers.ClearNcneWorkflowDbTables(_dbContext);
-
             TestUser = AdUserHelper.CreateTestUser(_dbContext);
             TestUser2 = AdUserHelper.CreateTestUser(_dbContext, 2);
 

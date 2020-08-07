@@ -90,13 +90,15 @@ namespace DbUpdatePortal
                     : s.GetService<IOptions<UriConfig>>().Value.DbUpdateLandingPageUrl,
                 s.GetService<HttpProvider>()));
 
-
             services.AddSingleton<AppVersionInfo>();
 
             services.AddScoped<IDbUpdateUserDbService,
                 DbUpdateUserDbService>(s => new DbUpdateUserDbService(s.GetService<DbUpdateWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
             services.AddScoped<IDbUpdateUserDbService, DbUpdateUserDbService>();
+            services.AddScoped<ICarisProjectHelper, CarisProjectHelper>();
+            services.AddScoped<IStageTypeFactory, StageTypeFactory>();
+            services.AddScoped<IPageValidationHelper, PageValidationHelper>();
 
             // Order of these two is important
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
@@ -141,8 +143,7 @@ namespace DbUpdatePortal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
-            DbUpdateWorkflowDbContext dbUpdateWorkflowDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSerilogRequestLogging(
                 options =>

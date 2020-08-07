@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
@@ -9,13 +10,11 @@ using NCNEPortal.Enums;
 using NCNEPortal.Helpers;
 using NCNEWorkflowDatabase.EF;
 using NCNEWorkflowDatabase.EF.Models;
-using Newtonsoft.Json;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -121,9 +120,6 @@ namespace NCNEPortal
                 ChartNo = "";
                 Country = "";
 
-                SetChartTypes();
-                SetWorkflowTypes();
-
                 PublicationDate = null;
 
                 ValidationErrorMessages = new List<string>();
@@ -138,8 +134,9 @@ namespace NCNEPortal
             }
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            await PopulateDropDowns();
         }
 
 
@@ -303,33 +300,23 @@ namespace NCNEPortal
             return;
 
         }
-        private void SetChartTypes()
+
+        private async Task PopulateDropDowns()
         {
-            if (!System.IO.File.Exists(@"Data\ChartTypes.json"))
-                throw new FileNotFoundException(@"Data\ChartTypes.json");
-
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\ChartTypes.json");
-
-            var chartTypes = JsonConvert.DeserializeObject<IEnumerable<ChartType>>(jsonString).Select(sc => sc.Name);
+            var chartTypes = await _ncneWorkflowDbContext.ChartType.OrderBy(i => i.ChartTypeId)
+                .Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
 
             ChartTypes = new SelectList(chartTypes);
-        }
 
-        private void SetWorkflowTypes()
-        {
-            if (!System.IO.File.Exists(@"Data\WorkflowTypes.json"))
-                throw new FileNotFoundException(@"Data\WorkflowTypes.json");
-
-
-            var jsonString = System.IO.File.ReadAllText(@"Data\WorkflowTypes.json");
-
-            var workflowTypes = JsonConvert.DeserializeObject<IEnumerable<WorkflowType>>(jsonString)
-                .Select(sc => sc.Name);
+            var workflowTypes = await _ncneWorkflowDbContext.WorkflowType.OrderBy(i => i.WorkflowTypeId)
+                .Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
 
             WorkflowTypes = new SelectList(workflowTypes);
-        }
 
+
+        }
         public JsonResult OnPostCalcPublishDate(DateTime dtRepromat)
         {
 
