@@ -20,7 +20,7 @@ namespace DbUpdatePortal.Helpers
         {
             var isValid = ValidateUserRoles(taskRole, validationErrorMessages);
 
-            if (string.IsNullOrEmpty(chartingArea))
+            if (string.IsNullOrEmpty(taskName))
             {
                 validationErrorMessages.Add("Task Information: Task Name cannot be empty");
                 isValid = false;
