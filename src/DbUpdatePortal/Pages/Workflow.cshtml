@@ -1,0 +1,558 @@
+﻿@page
+@using System.Runtime.Intrinsics.X86
+@*@using Microsoft.CodeAnalysis.CSharp.Syntax*@
+@using DbUpdatePortal.Enums
+@using DbUpdateWorkflowDatabase.EF.Models
+@model DbUpdatePortal.WorkflowModel
+@{
+    ViewData["Title"] = "Database Update";
+}
+
+<div class="row pt-1 pb-1 align-items-center">
+    <div class="col-4 col-lg-3">
+        <a asp-page="./Index">
+            <img id="ukhoLogo" src="images/ukhologo.svg" alt="UKHO Logo" />
+        </a>
+    </div>
+    <div class="col-7 offset-1">
+        <h1 class="workflow-page-heading">
+            <span>@Model.Header</span>
+
+            @if (Model.IsReadOnly)
+            {
+                <br /><span class="red">Historical Task - @Model.TaskStatus</span>
+            }
+        </h1>
+    </div>
+</div>
+<div class="row pt-1 pb-1">
+    <div class="col-12">
+        <div class="row justify-content-between">
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-auto">
+                        <h2>Process ID : @Model.ProcessId </h2>
+                    </div>
+                    <div class="col">
+                        <div class="speech">
+                            <div class="speech bubble">
+                                <i class="fas fa-comment-alt"></i>
+                            </div>
+                            <a href="#CommentsSection">
+                                <div id="commentCount" class="speech count">
+                                    @Model.TaskComments.Count()
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row justify-content-end">
+                    <div class="col-auto">
+                        @if (!Model.IsReadOnly)
+                        {
+                            <button id="btnSave" class="btn btn-primary mr-2" style="min-width: 9em;">Save</button>
+                        }
+
+                        <button id="btnClose" class="btn btn-primary" style="min-width: 9em;">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@*--- START WORKFLOW CARD ---*@
+<div class="card mb-4 mt-3">
+    <h3>Workflow</h3>
+    <div>
+        <table class="table" id="workflow-table">
+            <thead class="mt-2">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Status</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Date expected</th>
+                    <th scope="col">Date completed</th>
+                    <th scope="col">
+
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center show-comments">
+                                <div class="mr-auto">Action</div>
+                                <span>Show all task comments</span>
+                                <label class="switch ml-2 mb-auto">
+                                    <input type="checkbox" class="success" id="allcommentscheck">
+                                    <span class="slider allcommentslider" data-processid="@(Model.ProcessId)"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="workflow-row">
+                @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageTypeId))
+                {
+                    @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId, isReadOnly = Model.IsReadOnly })
+                    ;
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+@if (!Model.IsReadOnly)
+{
+    <div class="d-flex justify-content-end">
+
+        <div class="mt-3 mr-3">
+            <button id="btnTerminate" class="btn btn-block btn-secondary" style="min-width: 139px;">Terminate</button>
+        </div>
+
+        <div class="mt-3">
+            <button id="btnComplete" class="btn btn-block btn-secondary" @(Model.CompleteEnabled ? "" : "disabled") style="min-width: 139px;">Complete</button>
+        </div>
+    </div>
+}
+
+<form id="frmWorkflow" method="post" asp-page-handler="save">
+    <fieldset>
+        @Html.HiddenFor(m => m.IsCarisProjectCreated)
+        <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
+        <input type="hidden" asp-for="ProcessId" />
+        <input type="hidden" asp-for="ProductAction" />
+        <input type="hidden" asp-for="IsReadOnly" />
+
+        <!-- #endregion -->
+        @*--- START TASK INFORMATION ---*@
+        <div class="card mb-4 mt-3">
+            <h3>Task Information</h3>
+
+            <div class="col-12">
+                <div class="card-body pb-0 col-11">
+                    <h4>Task information</h4>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Name)</div>
+                                <div>
+                                    <span id="workflowType">
+                                        <h6>@Html.DisplayFor(model => model.Name, new { @class = "form-control form-text" }) </h6>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.UpdateType)</div>
+                                <div>
+                                    <span id="chartType">
+                                        <h6>@Html.DisplayFor(model => model.ChartingArea, new { @class = "form-control  form-text " })</h6>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ChartingArea)</div>
+                                <div>
+                                    <span id="chartType">
+                                        <h6>@Html.DisplayFor(model => model.ChartingArea, new { @class = "form-control  form-text " })</h6>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.ProductAction)</div>
+                                <div>
+                                    <span id="chartType">
+                                        <h6>@Html.DisplayFor(model => model.ProductAction, new { @class = "form-control  form-text " })</h6>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mt-2 mb-4" />
+                    <h4>Dates</h4>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.TargetDate, new { id = "lblTargetDate", @class = "col-form-label" })</div>
+                                <div>@Html.TextBoxFor(model => model.TargetDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mt-2 mb-4" />
+                    <h4>Job roles</h4>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Compiler, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Compiler.DisplayName, "",
+                                        new { placeholder = "Compiler", id = "Compiler", autocomplete = false, spellcheck = false, @class = "ta_compiler tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.Compiler.UserPrincipalName, new { @id = "CompilerUpn", @class = "CompilerUpn" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div>@Html.LabelFor(model => model.Verifier, new { @class = "col-form-label" })</div>
+                                <div>
+                                    @Html.TextBoxFor(model => model.Verifier.DisplayName, "",
+                                        new { placeholder = "Verifier1", id = "Verifier1", autocomplete = false, spellcheck = false, @class = "ta_v1 tt-query form-text-input" })
+                                    @Html.HiddenFor(m => m.Verifier.UserPrincipalName, new { @id = "Verifier1Upn", @class = "Verifier1Upn" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <hr class="mt-2 mb-4" />
+                </div>
+            </div>
+        </div>
+
+        @*--- END TASK INFORMATION ---*@
+
+
+        @*--- START EDIT DATABASE ---*@
+        <div class="card mb-4 mt-3">
+            <h3>Edit Database</h3>
+            <div class="col-12">
+                <div class="card-body pb-2 col-11">
+                    <h4>CARIS</h4>
+
+                    <div class="row align-items-end">
+                        <div class="col-12 mb-2 col-lg-4 mb-lg-0">
+                            <div class="row">
+                                <div class="col">
+                                    @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    @Html.TextBoxFor(model => model.CarisProjectName, "",
+                                        new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="row">
+                                <div class="col">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                        <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                                        Create CARIS Project
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
+
+                    <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                        <h5>
+                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                            <span>Caris project successfully created</span>
+                        </h5>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        @*--- END EDIT DATABASE ---*@
+
+
+        @*--- START TASK COMMENTS ---*@
+        <div class="card mb-4 mt-3">
+            <h3>
+                <div class="row">
+                    <div class="col">
+                        Task Comments
+                    </div>
+                    <div class="col text-right">
+                        <span class="fas fa-comment-alt mr-2"></span>
+                        <button type="button" style="color: white; padding-left: 0; padding-top: 0" class="btn btn-link btnAddTaskcomment" data-processid="@(Model.ProcessId)">Add a comment</button>
+                    </div>
+                </div>
+            </h3>
+
+            <div id="CommentsSection" class="card-body p-3">
+
+                <table id="TaskCommentsTable" class="table table-striped m-2">
+                    <tbody>
+                        @if (Model.TaskComments != null)
+                        {
+                            @foreach (var comment in Model.TaskComments)
+                            {
+                                <tr>
+                                    <td style="width: 200px">
+                                        <div class="mb-2">
+                                            <strong>@comment.AdUser.DisplayName</strong>
+                                        </div>
+                                        <div>
+                                            @comment.Created.ToLongDateString()
+                                        </div>
+                                    </td>
+                                    <td style="width: 20px">
+                                        @if (@comment.ActionIndicator)
+                                        {
+                                            <span class="fa fa-edit" style="color: #EF8123"> </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fas fa-comment-alt"></span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (@comment.ActionIndicator)
+                                        {
+                                            <span style="color: #ef8123">@comment.Comment</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-inline">@comment.Comment</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </fieldset>
+    @*--- END TASK COMMENTS ---*@
+</form>
+
+@* Modal Add Termination comment *@
+<div class="modal fade" id="ConfirmTerminate" tabindex="-1" role="dialog" aria-labelledby="ConfirmTerminate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="terminatingTask" asp-page-handler="TaskTerminate" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Terminate New Chart / New Edition</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Provide a reason for terminating this New Chart / New Edition?</p>
+                    <div id="modal-body">
+                        <input type="hidden" asp-for="ProcessId" />
+                        <textarea style="height: 100px;" id="txtTerminateComment" name="comment" class="form-control"></textarea>
+                        <br />
+                        <div id="ConfirmTerminateError"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-11 justify-content-end">
+                        <div class="col-5 pr-1"><button type="button" id="btnCancelTerminate" class="btn btn-outline-secondary btn-block" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel Terminate">Cancel</button></div>
+                        <div class="col-5 pl-1 pr-0"><button type="submit" id="btnConfirmTerminate" accesskey="a" class="btn btn-warning btn-block" data-toggle="tooltip" data-placement="left" title="Confirm Terminate">Terminate</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@*Modal Save Errors*@
+<div class="modal fade" id="modalSaveWorkflowErrors" tabindex="-1" role="dialog" aria-labelledby="SaveWorkflowErrors" aria-hidden="true">
+    <div class="modal-dialog error ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error while saving data</h3>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center align-content-center justify-content-center mb-1 mt-n1" style="overflow: hidden;">
+                    <div class="col-1 mr-4">
+                        <i class="fa fa-info-circle" style="font-size: 1.50rem;"></i>
+                    </div>
+                    <div id="workflowSaveErrorMessage" class="col-11">
+                        @if (Model.ValidationErrorMessages != null && Model.ValidationErrorMessages.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var message in Model.ValidationErrorMessages)
+                                {
+                                    <li>@message</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row col-11 justify-content-end">
+                    <div class="col-5 pr-1"><button type="button" id="btnSaveWorkflowErrorOk" class="btn btn-danger btn-block" accesskey="o" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Error Saving Data">Ok</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Edit stage comment *@
+<div class="modal fade" id="editStageCommentModal" tabindex="-1" role="dialog" aria-labelledby="EditStageComment" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Comment</h4>
+            </div>
+            <div class="modal-body">
+                <textarea style="height: 100px;" maxlength="4000" id="txtComment" name="txtComment" class="form-control"></textarea>
+                <input type="hidden" id="hdnCommentProcessId" name="commentProcessId" />
+                <input type="hidden" id="hdnStageId" name="StageId" />
+                <br />
+                <div id="editStageCommentError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClearComment" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                <button type="button" id="btnCancelComment" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmStageComment" id="btnPostComment" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Edit Task comment *@
+<div class="modal fade" id="editTaskCommentModal" tabindex="-1" role="dialog" aria-labelledby="EditTaskComment" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Comment</h4>
+            </div>
+            <div class="modal-body">
+                <textarea style="height: 100px;" maxlength="4000" id="txtTaskComment" name="txtTaskComment" class="form-control"></textarea>
+                <input type="hidden" id="hdnTaskCommentProcessId" name="TaskCommentProcessId" />
+                <br />
+                <div id="editTaskCommentError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClearTaskComment" class="btn btn-outline-secondary mr-auto pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button>
+                <button type="button" id="btnCancelTaskComment" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmTaskComment" id="btnPostTaskComment" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Save Task Note">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Confirmation Dialog *@
+<div class="modal fade" id="ConfirmModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Please Confirm</h4>
+            </div>
+            <div class="modal-body">
+                <h5 id="msgComplete"></h5>
+                <input type="hidden" id="hdnConfirmProcessId" name="ConfirmProcessId" />
+                <input type="hidden" id="hdnConfirmStageId" name="StageId" />
+                <input type="hidden" id="hdnAssignedUser" name="AssignedUser" />
+                <input type="hidden" id="Rework" name="Rework" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmConfirm" id="btnConfirm" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Chart Publish Dialog *@
+<div class="modal fade" id="PublishChartModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Publish Caris Chart</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdnPublishProcessId" name="ConfirmProcessId" />
+                <input type="hidden" id="hdnPublishStageId" name="publishStageId" />
+                <input type="hidden" id="hdnPublishUser" name="AssignedUser" />
+                <div class="row">
+                    <div class="col-6">Enter the Chart Version Id.</div>
+                    <div class="col-6">
+                        <input type="number" min="0" max="99999" style="width:7em" id="chartVersionNo" class="numberOnly" />
+                        <button type="button" id="btnGetChartDetails" class="btn btn-secondary">Get </button>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Chart Number :</div>
+                    <div class="col-6" id="chartNumber"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Title :</div>
+                    <div class="col-6" id="chartTitle"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Edition Number:</div>
+                    <div class="col-6" id="editionNumber"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-6">Version :</div>
+                    <div class="col-6" id="chartVersion"></div>
+                </div>
+                <div class="row">
+                    <section id="publishChartError" class="dialog error collapse mt-3">
+                        <h5>
+                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                            <span id="publishChartErrorMessage">Failed to load Source Documents</span>
+                        </h5>
+                    </section>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnPublishCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmPublish" id="btnPublish" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" disabled title="Publish">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Publish Confirmation Dialog *@
+<div class="modal fade" id="PublishConfirmModal" tabindex="-1" role="dialog" aria-labelledby="Confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Please Confirm</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="Complete" name="Complete" />
+                <h5 id="msgPublishComplete"></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPubConfCancel" class="btn btn-outline-secondary pl-4 pr-4" accesskey="c" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="Cancel & close this popup">Cancel</button>
+                <button type="button" form="frmConfirm" id="btnPublishConfirm" class="btn btn-primary pl-4 pr-4" accesskey="a" data-toggle="tooltip" data-placement="left" title="Continue">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="js/DesignCustomSelect.js" asp-append-version="true"></script>
+    <script src="js/Workflow.js" asp-append-version="true"></script>
+}

@@ -1,5 +1,7 @@
 ﻿using DbUpdatePortal.Auth;
+using DbUpdatePortal.Enums;
 using DbUpdateWorkflowDatabase.EF.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -77,6 +79,88 @@ namespace DbUpdatePortal.Helpers
                     isValid = false;
                 }
             }
+
+            return isValid;
+        }
+
+        public bool ValidateForCompletion(string assignedUser, string username, DbUpdateTaskStageType stageType,
+            TaskRole role, DateTime? targetDate,
+            List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to this stage and Save before completion");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Current user is not valid for completion of this task stage");
+                    isValid = false;
+                }
+            }
+
+            if (stageType == DbUpdateTaskStageType.Compile && (role.Verifier == null))
+            {
+                validationErrorMessages.Add("Please assign a user to Verifier role and Save before completing this stage");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        public bool ValidateForRework(string assignedUser, string username,
+            List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to this stage before sending this task for Rework");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Current user is not valid for sending this task for Rework");
+                    isValid = false;
+                }
+            }
+
+
+            return isValid;
+        }
+
+        public bool ValidateForCompleteWorkflow(string assignedUser, string username,
+            List<string> validationErrorMessages)
+        {
+            bool isValid = true;
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to the Verifier role and Save before completing the workflow");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Only users assigned to the Verifier role are allowed to complete the workflow.");
+                    isValid = false;
+                }
+            }
+
 
             return isValid;
         }

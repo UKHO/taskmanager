@@ -45,7 +45,7 @@ namespace DbUpdatePortal.Pages
         public SelectList ChartingAreas { get; set; }
 
         [BindProperty]
-        [DisplayName("Product Action Requirement")] public string ProductAction { get; set; }
+        [DisplayName("Product Action Required")] public string ProductAction { get; set; }
 
         public SelectList ProductActions { get; set; }
 
@@ -219,7 +219,7 @@ namespace DbUpdatePortal.Pages
                         ? DbUpdateTaskStageStatus.Open.ToString()
                         : DbUpdateTaskStageStatus.Inactive.ToString(),
                     DbUpdateTaskStageType.SNC =>
-                    selectedAction == DbUpdateProductAction.SNC && selectedAction == DbUpdateProductAction.Both
+                    selectedAction == DbUpdateProductAction.SNC || selectedAction == DbUpdateProductAction.Both
                         ? DbUpdateTaskStageStatus.Open.ToString()
                         : DbUpdateTaskStageStatus.Inactive.ToString(),
                     _ => DbUpdateTaskStageStatus.Inactive.ToString()

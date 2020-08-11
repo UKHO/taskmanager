@@ -7,7 +7,7 @@
         DateChange,
         CompilerChange,
         V1Change,
-        CarisPublish,
+        CarisProjectCreation,
         CompleteWorkflow
     }
 }
