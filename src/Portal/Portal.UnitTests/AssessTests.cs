@@ -943,6 +943,74 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = TestUser;
+            _assessModel.Verifier = TestUser;
+            _assessModel.Team = "HW";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.ProductActioned = true;
+            //Set ProductActionChangeDetails to 251 characters
+            _assessModel.ProductActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _assessModel.ProductActionChangeDetails += "0123456789";
+            }
+            _assessModel.ProductActionChangeDetails += "0";
+
+            var response = (JsonResult)await _assessModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneSave_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.Assessor = TestUser;
+            _assessModel.Verifier = TestUser;
+            _assessModel.Team = "HW";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.ProductActioned = true;
+            //Set ProductActionChangeDetails to 251 characters
+            _assessModel.ProductActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _assessModel.ProductActionChangeDetails += "0123456789";
+            }
+            _assessModel.ProductActionChangeDetails += "0";
+
+            var response = (JsonResult)await _assessModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)AssessCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
+
+        [Test]
         public async Task Test_OnPostDoneAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))

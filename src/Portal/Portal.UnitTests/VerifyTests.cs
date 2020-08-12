@@ -1162,6 +1162,66 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostSaveAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.ProductActioned = true;
+            _verifyModel.Team = "HW";
+            //Set ProductActionChangeDetails to 251 characters
+            _verifyModel.ProductActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _verifyModel.ProductActionChangeDetails += "0123456789";
+            }
+            _verifyModel.ProductActionChangeDetails += "0";
+
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.ProductActioned = true;
+            _verifyModel.Team = "HW";
+            //Set ProductActionChangeDetails to 251 characters
+            _verifyModel.ProductActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _verifyModel.ProductActionChangeDetails += "0123456789";
+            }
+            _verifyModel.ProductActionChangeDetails += "0";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
         public async Task Test_OnPostSaveAsync_where_ProductActioned_ticked_and_no_ProductActionChangeDetails_entered_then_validation_error_message_is_present()
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
