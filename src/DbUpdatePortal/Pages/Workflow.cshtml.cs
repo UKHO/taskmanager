@@ -221,10 +221,14 @@ namespace DbUpdatePortal
 
             Header = $"{taskInfo.Name}{(String.IsNullOrEmpty(taskInfo.ChartingArea) ? "" : $" - {taskInfo.ChartingArea}")}";
 
-            //Enable complete if all stages are either completed or Inactive.
-            CompleteEnabled = !TaskStages.Exists(t => t.Status == DbUpdateTaskStageStatus.Open.ToString()
-                                                     || t.Status == DbUpdateTaskStageStatus.Rework.ToString()
-                                                     || t.Status == DbUpdateTaskStageStatus.InProgress.ToString());
+            //Enable complete if Verify is completed and ENC and SNC are either completed ord Inactive 
+            CompleteEnabled = !TaskStages.Exists(t =>
+                (t.TaskStageTypeId == (int)DbUpdateTaskStageType.Verify &&
+                 t.Status == DbUpdateTaskStageStatus.Open.ToString()) ||
+                (t.TaskStageTypeId == (int)DbUpdateTaskStageType.SNC &&
+                 t.Status == DbUpdateTaskStageStatus.Open.ToString()) ||
+                (t.TaskStageTypeId == (int)DbUpdateTaskStageType.ENC &&
+                 t.Status == DbUpdateTaskStageStatus.Open.ToString()));
 
 
 
@@ -451,54 +455,54 @@ namespace DbUpdatePortal
             return new JsonResult(HttpStatusCode.OK);
         }
 
-        //public IActionResult OnPostValidateCompleteWorkflow(string username)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostValidateCompleteWorkflow));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+        public IActionResult OnPostValidateCompleteWorkflow(string username)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostValidateCompleteWorkflow));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    LogContext.PushProperty("AssignedUser", username);
+            LogContext.PushProperty("AssignedUser", username);
 
-        //    _logger.LogInformation("Entering ValidateCompleteWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
+            _logger.LogInformation("Entering ValidateCompleteWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
 
-        //    ValidationErrorMessages.Clear();
+            ValidationErrorMessages.Clear();
 
-        //    if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
-        //    {
-        //        return new JsonResult(this.ValidationErrorMessages)
-        //        {
-        //            StatusCode = (int)HttpStatusCode.InternalServerError
-        //        };
-        //    }
+            if (!(_pageValidationHelper.ValidateForCompleteWorkflow(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
 
-        //    _logger.LogInformation("Finished ValidateCompleteWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
+            _logger.LogInformation("Finished ValidateCompleteWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
 
-        //    return new JsonResult(HttpStatusCode.OK);
-        //}
+            return new JsonResult(HttpStatusCode.OK);
+        }
 
-        //public async Task<IActionResult> OnPostCompleteWorkflow(int processId)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("ProcessId", processId);
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostCompleteWorkflow));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+        public async Task<IActionResult> OnPostCompleteWorkflow(int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostCompleteWorkflow));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    _logger.LogInformation("Entering CompleteWorkflow for Workflow with: ProcessId: {ProcessId}");
+            _logger.LogInformation("Entering CompleteWorkflow for Workflow with: ProcessId: {ProcessId}");
 
-        //    var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
+            var taskInfo = _dbContext.TaskInfo.FirstOrDefaultAsync(t => t.ProcessId == processId).Result;
 
-        //    taskInfo.Status = NcneTaskStatus.Completed.ToString();
-        //    taskInfo.StatusChangeDate = DateTime.Now;
+            taskInfo.Status = DbUpdateTaskStatus.Completed.ToString();
+            taskInfo.StatusChangeDate = DateTime.Now;
 
-        //    var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
-        //    await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompleteWorkflow, processId, user, null, null, null);
+            var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            await _commentsHelper.AddTaskSystemComment(DbUpdateCommentType.CompleteWorkflow, processId, user, null, null, null);
 
-        //    await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
-        //    _logger.LogInformation("Finished CompleteWorkflow for Workflow with: ProcessId: {ProcessId}");
+            _logger.LogInformation("Finished CompleteWorkflow for Workflow with: ProcessId: {ProcessId}");
 
-        //    return new JsonResult(HttpStatusCode.OK);
-        //}
+            return new JsonResult(HttpStatusCode.OK);
+        }
 
         public async Task<IActionResult> OnPostCompleteAsync(int processId, int stageId, bool isRework)
         {
@@ -584,33 +588,30 @@ namespace DbUpdatePortal
                 "Stage {StageId} of task {ProcessId} is completed.");
 
 
-            //var v2 = await taskStages.SingleAsync(t => t.ProcessId == processId &&
-            //                                t.TaskStageTypeId == (int)DbUpdateTaskStageType.V2);
-
-            //bool v2Available = (v2.Status != DbUpdateTaskStageStatus.Inactive.ToString());
-
-
-            var nextStage = (DbUpdateTaskStageType)currentStage.TaskStageTypeId switch
+            var nextStageTypeId = (DbUpdateTaskStageType)currentStage.TaskStageTypeId switch
             {
                 DbUpdateTaskStageType.Compile => (int)DbUpdateTaskStageType.Verify,
-                DbUpdateTaskStageType.Verify => (int)DbUpdateTaskStageType.SNC,
+                DbUpdateTaskStageType.Verify => (int)DbUpdateTaskStageType.ENC,
                 DbUpdateTaskStageType.Verification_Rework => (int)DbUpdateTaskStageType.Verify,
-                DbUpdateTaskStageType.SNC => (int)DbUpdateTaskStageType.ENC,
-                DbUpdateTaskStageType.ENC => 0,
+                DbUpdateTaskStageType.ENC => (int)DbUpdateTaskStageType.SNC,
+                DbUpdateTaskStageType.SNC => 0,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
             var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
-            if (nextStage > 0)
+            if (nextStageTypeId > 0)
             {
-                taskStages.First(t => t.TaskStageTypeId == (int)nextStage).Status =
-                    DbUpdateTaskStageStatus.InProgress.ToString();
 
-                var nextStageUser = taskStages.FirstOrDefault(t => t.TaskStageTypeId == (int)nextStage)?
-                    .Assigned;
+                var nextStage = taskStages.First(t => t.TaskStageTypeId == (int)nextStageTypeId);
 
-                taskInfo.Assigned = nextStageUser;
-                taskInfo.AssignedDate = DateTime.Now;
+                if (nextStage.Status != DbUpdateTaskStageStatus.Inactive.ToString())
+                {
+                    nextStage.Status =
+                        DbUpdateTaskStageStatus.InProgress.ToString();
+                    taskInfo.Assigned = nextStage.Assigned;
+                    taskInfo.AssignedDate = DateTime.Now;
+                }
+
             }
 
             var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;

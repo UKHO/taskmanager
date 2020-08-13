@@ -1,4 +1,5 @@
-﻿using DbUpdateWorkflowDatabase.EF;
+﻿using DbUpdatePortal.Enums;
+using DbUpdateWorkflowDatabase.EF;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DbUpdatePortal.ViewComponents
@@ -20,6 +21,13 @@ namespace DbUpdatePortal.ViewComponents
             var taskStage = _dbContext.TaskStage.Find(processId, taskStageId);
 
             taskStage.IsReadOnly = isReadOnly;
+
+            taskStage.TaskStageType.DisplayName = (DbUpdateTaskStageType)taskStage.TaskStageTypeId switch
+            {
+                DbUpdateTaskStageType.ENC => "Notify DCPT",
+                DbUpdateTaskStageType.SNC => "Notify CPT",
+                _ => taskStage.TaskStageType.Name
+            };
 
             return View(taskStage);
         }

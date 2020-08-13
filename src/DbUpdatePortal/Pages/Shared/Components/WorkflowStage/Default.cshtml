@@ -1,11 +1,12 @@
 ﻿@using DbUpdatePortal.Enums
 @model DbUpdateWorkflowDatabase.EF.Models.TaskStage
-
 @if (@Model.Status != DbUpdateTaskStageStatus.Inactive.ToString())
 {
     <tr class="workflow-row">
         <td>
-            <h4 class="@((Model.Status == DbUpdateTaskStageStatus.Open.ToString()) ? "Inactive" : "")">@Model.TaskStageType.Name</h4>
+            <h4 class="@((Model.Status == DbUpdateTaskStageStatus.Open.ToString()) ? "Inactive" : "")">
+                @Model.TaskStageType.DisplayName
+            </h4>
         </td>
         <td>
             @if (Model.Status == DbUpdateTaskStageStatus.InProgress.ToString() || Model.Status == DbUpdateTaskStageStatus.Rework.ToString())
@@ -46,7 +47,7 @@
 
 
             @if (Model.Status == DbUpdateTaskStageStatus.InProgress.ToString() &&
-              Model.IsReadOnly == false)
+     Model.IsReadOnly == false)
             {
                 <div class="d-flex justify-content-end">
                     @if (@Model.TaskStageType.AllowRework)
@@ -61,13 +62,15 @@
                         </div>
                     }
                     <div class="mt-3">
-                        <button id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete btn-stage-complete"
-                                data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
-                                data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
-                                data-StageName="@(Model.TaskStageType.Name)" style="min-width: 139px;">
-                            Mark Complete
-                        </button>
+                        <input type="button" value="Mark Complete"
+                               id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete btn-stage-complete"
+                               data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                               data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
+                               data-StageName="@(Model.TaskStageType.DisplayName)" style="min-width: 139px;">
+
+
                     </div>
+
                 </div>
             }
 

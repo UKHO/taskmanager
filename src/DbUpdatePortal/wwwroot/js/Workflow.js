@@ -659,6 +659,57 @@
     });
 
 
+    $("#btnPublishConfirm").click(function () {
+        var complete = $("#Complete").val();
+        var processId = $("#hdnProcessId").val();
+        if (complete === "true") {
+            completeWorkflow(processId);
+        } else {
+
+            var versionNo = $("#chartVersionNo").val();
+            processId = $("#hdnPublishProcessId").val();
+            var stageId = $("#hdnPublishStageId").val();
+            publishCarisChart(versionNo, processId, stageId);
+        }
+
+    });
+
+    function completeWorkflow(processId) {
+        $.ajax({
+            type: "POST",
+            url: "workflow/?handler=CompleteWorkflow",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: {
+                "processId": processId
+            },
+            success: function () {
+                $("#PublishConfirmModal").modal("hide");
+                window.location.href = '/Index';
+
+            },
+            error: function (error) {
+                var responseJson = error.responseJSON;
+                (this).checked = false;
+
+                if (responseJson != null) {
+                    $("#workflowSaveErrorMessage").html("");
+
+                    $("#workflowSaveErrorMessage").append("<ul/>");
+                    var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                    responseJson.forEach(function (item) {
+                        unOrderedList.append("<li>" + item + "</li>");
+                    });
+
+                    $("#modalSaveWorkflowErrors").modal("show");
+                }
+            }
+
+        });
+    }
 
     $("#btnComplete").click(function () {
        

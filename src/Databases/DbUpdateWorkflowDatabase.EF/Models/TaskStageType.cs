@@ -11,5 +11,7 @@ namespace DbUpdateWorkflowDatabase.EF.Models
         public int SequenceNumber { get; set; }
         public bool AllowRework { get; set; }
 
+        public virtual string DisplayName { get; set; }
+
     }
 }
