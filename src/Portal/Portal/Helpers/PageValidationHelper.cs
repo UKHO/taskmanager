@@ -631,6 +631,12 @@ namespace Portal.Helpers
                 return false;
             }
 
+            if (productActionChangeDetails.Length > 250)
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure product action change details does not exceed 250 characters");
+                return false;
+            }
+
             if (recordProductAction != null && recordProductAction.Count > 0)
             {
                 // Check at least one entry populated
