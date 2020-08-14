@@ -1161,8 +1161,9 @@ namespace Portal.UnitTests
             Assert.Contains("Task Information: Unable to Sign-off task.Take task off hold before signing-off and click Save.", _verifyModel.ValidationErrorMessages);
         }
 
-        [Test]
-        public async Task Test_OnPostSaveAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostSaveAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_And_ProductActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool productActioned)
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -1174,7 +1175,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Verifier = AdUser.Empty;
             _verifyModel.DataImpacts = new List<DataImpact>();
-            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActioned = productActioned;
             _verifyModel.Team = "HW";
             //Set ProductActionChangeDetails to 251 characters
             _verifyModel.ProductActionChangeDetails = string.Empty;
@@ -1191,8 +1192,9 @@ namespace Portal.UnitTests
             Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
         }
 
-        [Test]
-        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_And_ProductActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool productActioned)
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -1204,7 +1206,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Verifier = AdUser.Empty;
             _verifyModel.DataImpacts = new List<DataImpact>();
-            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActioned = productActioned;
             _verifyModel.Team = "HW";
             //Set ProductActionChangeDetails to 251 characters
             _verifyModel.ProductActionChangeDetails = string.Empty;
