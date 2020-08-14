@@ -942,8 +942,9 @@ namespace Portal.UnitTests
                                                             .MustHaveHappened();
         }
 
-        [Test]
-        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostDoneAsync_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_And_ProductActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool productActioned)
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -957,7 +958,7 @@ namespace Portal.UnitTests
             _assessModel.Verifier = TestUser;
             _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
-            _assessModel.ProductActioned = true;
+            _assessModel.ProductActioned = productActioned;
             //Set ProductActionChangeDetails to 251 characters
             _assessModel.ProductActionChangeDetails = string.Empty;
             for (int i = 0; i < 25; i++)
@@ -976,8 +977,9 @@ namespace Portal.UnitTests
                 .WithAnyArguments().MustNotHaveHappened();
         }
 
-        [Test]
-        public async Task Test_OnPostDoneSave_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_Then_Validation_Error_Message_Is_Present()
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostDoneSave_Given_ProductActionedChangeDetails_Exceeds_Character_Limit_And_ProductActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool productActioned)
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -991,7 +993,7 @@ namespace Portal.UnitTests
             _assessModel.Verifier = TestUser;
             _assessModel.Team = "HW";
             _assessModel.TaskType = "TaskType";
-            _assessModel.ProductActioned = true;
+            _assessModel.ProductActioned = productActioned;
             //Set ProductActionChangeDetails to 251 characters
             _assessModel.ProductActionChangeDetails = string.Empty;
             for (int i = 0; i < 25; i++)

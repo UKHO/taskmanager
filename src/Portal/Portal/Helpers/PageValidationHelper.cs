@@ -622,18 +622,18 @@ namespace Portal.Helpers
 
             var isValid = true;
 
+            if (productActionChangeDetails?.Length > 250)
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure product action change details does not exceed 250 characters");
+                return false;
+            }
+
             if (!productActioned)
                 return true;
 
             if (string.IsNullOrWhiteSpace(productActionChangeDetails))
             {
                 validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered product action change details");
-                return false;
-            }
-
-            if (productActionChangeDetails.Length > 250)
-            {
-                validationErrorMessages.Add($"{messagePrefix} Please ensure product action change details does not exceed 250 characters");
                 return false;
             }
 
