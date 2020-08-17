@@ -37,6 +37,9 @@
                         setControlState(true, false, false);
                     }
                 }
+
+                setImpactedProductHandler();
+
             },
             error: function (error) {
                 $("#recordProductActionError")
@@ -67,6 +70,7 @@
 
             if (index > 0) {
                 setDeleteHandler($(element).find(".deleteAction"));
+                setImpactedProductHandler();
             }
 
             var pageIdentity = $("#pageIdentity").val();
@@ -133,6 +137,7 @@
         }).show();
     }
 
+
     function setProductActionedCheckboxHandler() {
         $("#ProductActioned").change(function () {
             if ($("#ProductActioned").prop("checked")) {
@@ -145,6 +150,28 @@
                 }
             }
         });
+    }
+
+    function setImpactedProductHandler() {
+        $(".productActionImpactedProduct").on("keyup",
+            function (e) {
+
+                var currentImpactedProduct = $(e.currentTarget);
+                if ($(currentImpactedProduct).val() === "") {
+                    var currentProductActionType = $(currentImpactedProduct).parents(".recordProductAction").find(".productActionType");
+                    $(currentProductActionType).prop("selectedIndex", 0).change();
+                }
+
+                if ($("#ProductActioned").prop("checked")) {
+                    setControlState(true, true, true);
+                } else {
+                    if ($(".productActionImpactedProduct").val() !== "") {
+                        setControlState(true, false, true);
+                    } else {
+                        setControlState(true, false, false);
+                    }
+                }
+            });
     }
 
     function setControlState(enableProductActionedCheckbox, enableAddImpactButton, enableFirstRow) {
