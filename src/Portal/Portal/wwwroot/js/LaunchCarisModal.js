@@ -49,7 +49,7 @@ function attachUsagesSelectionCheckboxesHandler() {
         var usageName = $(this).data("usage-name");
 
         if (!$(this).prop('checked')) {
-            
+
             var selectedUsageElement = $(".selectedUsage[data-usage-name='" + usageName + "']");
             deselectUsage(selectedUsageElement);
             return;
@@ -122,6 +122,9 @@ function attachLaunchSourceEditorDownloadHandler() {
         var processId = Number($("#hdnProcessId").val());
         var pageIdentity = $("#pageIdentity").val();
         var sessionFilename = $(this).data("sessionfilename");
+
+        sessionFilename = generateUniqueSessionFileName(sessionFilename);
+
         var selectedHpdUsages = [];
         var selectedSources = [];
 
@@ -291,4 +294,21 @@ function addDummyRowsCallback(dataTable, pageLength, blankColumnCount) {
             $(body).append(tr);
         }
     }
+}
+
+function generateUniqueSessionFileName(filename) {
+    var date = new Date();
+    var arr = filename.split(".");
+
+    filename = arr[0].concat("_",
+        date.getFullYear().toString().substr(-2),
+        date.getMonth() + 1,
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
+        ".",
+        arr[1]);
+
+    return filename;
 }

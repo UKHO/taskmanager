@@ -161,7 +161,7 @@ namespace Portal.Pages.DbAssessment
 
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                                                                                 processId,
-                                                                                 CurrentUser.UserPrincipalName,
+                                                                                CurrentUser.UserPrincipalName,
                                                                                 taskStage,
                                                                                 carisProjectDetails,
                                                                                 selectedHpdUsages,
@@ -475,7 +475,7 @@ namespace Portal.Pages.DbAssessment
         {
             var filename = Path.GetFileNameWithoutExtension(_generalConfig.Value.SessionFilename);
             var ext = Path.GetExtension(_generalConfig.Value.SessionFilename);
-            return $"{filename}_{DateTime.Now:yyMMdd-HHmmss}{ext}"; // $"{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{ext}"
+            return $"{filename}{ext}";
         }
     }
 }
