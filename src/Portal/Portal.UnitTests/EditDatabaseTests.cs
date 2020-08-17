@@ -172,17 +172,6 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGet_Adds_timestamp_to_session_filename()
-        {
-
-            await SetupForOnGetAsync();
-
-            await _editDatabaseModel.OnGetAsync(ProcessId, "Assess");
-
-            Assert.IsTrue(_editDatabaseModel.SessionFilename.Contains(DateTime.Now.ToString("yyMMdd-HHmm")));
-        }
-
-        [Test]
         public async Task Test_OnGet_Retrieves_All_Usages()
         {
             _dbContext.HpdUsage.Add(new HpdUsage()
