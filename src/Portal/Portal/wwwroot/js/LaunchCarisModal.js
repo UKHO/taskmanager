@@ -307,6 +307,7 @@ function generateUniqueSessionFileName(filename) {
         date.getHours(),
         date.getMinutes(),
         date.getSeconds(),
+        date.getMilliseconds(),
         ".",
         arr[1]);
 
