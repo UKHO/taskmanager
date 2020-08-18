@@ -28,15 +28,10 @@
                 setProductActionedCheckboxHandler();
                 update();
 
-                if ($(".recordProductAction").length > 1) {
-                    setControlState(true, true, true);
-                } else {
-                    if ($(".productActionImpactedProduct").val() !== "") {
-                        setControlState(false, true, true);
-                    } else {
-                        setControlState(true, false, false);
-                    }
-                }
+                setControlState();
+
+                setImpactedProductHandler();
+
             },
             error: function (error) {
                 $("#recordProductActionError")
@@ -67,6 +62,7 @@
 
             if (index > 0) {
                 setDeleteHandler($(element).find(".deleteAction"));
+                setImpactedProductHandler();
             }
 
             var pageIdentity = $("#pageIdentity").val();
@@ -109,9 +105,7 @@
 
                 update();
 
-                if ($(".recordProductAction").length > 1) {
-                    setControlState(false, true, true);
-                }
+                setControlState();
             });
     }
 
@@ -121,52 +115,91 @@
 
             update();
 
-            if ($(".recordProductAction").length > 1) {
-                setControlState(false, true, true);
-            } else {
-                if ($(".productActionImpactedProduct").val() !== "") {
-                    setControlState(false, true, true);
-                } else {
-                    setControlState(true, false, false);
-                }
-            }
+            setControlState();
         }).show();
     }
 
+
     function setProductActionedCheckboxHandler() {
         $("#ProductActioned").change(function () {
-            if ($("#ProductActioned").prop("checked")) {
-                setControlState(true, true, true);
-            } else {
-                if ($(".productActionImpactedProduct").val() !== "") {
-                    setControlState(true, false, true);
-                } else {
-                    setControlState(true, false, false);
-                }
-            }
+            setControlState();
         });
     }
 
-    function setControlState(enableProductActionedCheckbox, enableAddImpactButton, enableFirstRow) {
+    function setImpactedProductHandler() {
+        $(".productActionImpactedProduct").on("input",
+            function (e) {
+
+                var currentImpactedProduct = $(e.currentTarget);
+                if ($(currentImpactedProduct).val() === "") {
+                    var currentProductActionType = $(currentImpactedProduct).parents(".recordProductAction").find(".productActionType");
+                    $(currentProductActionType).prop("selectedIndex", 0).change();
+                }
+
+                setControlState();
+            });
+    }
+
+    function setControlState() {
+
+        // disable Action if:
+        // 1) Any Impacted Product is populated
+        // 2) multiple rows
+
         $("#hdnProductActioned").val($("#ProductActioned").prop("checked"));
 
-        if (enableProductActionedCheckbox) {
+        var impactedProductRows = $(".recordProductAction").length;
+        var isActionChecked = $("#ProductActioned").prop("checked");
+       
+        if (!isActionChecked) {
             $("#ProductActioned").prop("disabled", false);
-        } else {
-            $("#ProductActioned").prop("disabled", true);
-        }
-        if (enableAddImpactButton) {
-            $("#btnAddImpact").prop("disabled", false);
-        } else {
             $("#btnAddImpact").prop("disabled", true);
-        }
-        if (enableFirstRow) {
-            $(".productActionImpactedProduct").prop("disabled", false);
-            $(".productActionType").prop("disabled", false);
-        } else {
             $(".productActionImpactedProduct").prop("disabled", true);
             $(".productActionType").prop("disabled", true);
+
+            return;
         }
+
+        if (impactedProductRows > 1) {
+            $("#ProductActioned").prop("disabled", true);
+            $("#btnAddImpact").prop("disabled", false);
+            $(".productActionImpactedProduct").prop("disabled", false);
+            $(".productActionType").prop("disabled", false);
+
+            return;
+        }
+        
+        var impactedProductHasValue = false;
+
+        $(".productActionImpactedProduct").each(function() {
+            if ($(this).val() !== "") {
+                impactedProductHasValue = true;
+                return false;
+            }
+        });
+
+        if (impactedProductHasValue) {
+            $("#ProductActioned").prop("disabled", true);
+            $("#btnAddImpact").prop("disabled", false);
+            $(".productActionImpactedProduct").prop("disabled", false);
+            $(".productActionType").prop("disabled", false);
+
+            return;
+        }
+
+        if (isActionChecked) {
+            $("#ProductActioned").prop("disabled", false);
+            $("#btnAddImpact").prop("disabled", false);
+            $(".productActionImpactedProduct").prop("disabled", false);
+            $(".productActionType").prop("disabled", false);
+
+            return;
+        }
+        
+        $("#ProductActioned").prop("disabled", false);
+        $("#btnAddImpact").prop("disabled", true);
+        $(".productActionImpactedProduct").prop("disabled", true);
+        $(".productActionType").prop("disabled", true);
     }
 
 });
