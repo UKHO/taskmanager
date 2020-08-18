@@ -52,7 +52,7 @@ end as [EXT DAYS TO DM END],
 ISNULL(dard.WorkspaceAffected, '') as [Chart Affected],
 ISNULL(tn.[Text], '') as COMMENTS,
 case 
-	when oh.OffHoldTime is null then 'YES' 
+	when oh.OnHoldTime is not null then 'YES' 
 	else '' 
 end as [ON HOLD],
 ISNULL(CONVERT(nvarchar(20), oh.OnHoldTime, 103), '') as [ON HOLD START],
@@ -62,8 +62,9 @@ ISNULL(ad.TeamDistributedTo, '') as [HW OR PR],
 case 
 	when wi.ActivityName = assessStage then 'Compilation'
 	when wi.ActivityName = verifyStage then 'Verification' 
-	else ''
+	else wi.[ActivityName]
 end as [TASK STAGE],
+wi.[Status] as [Status],
 case 
 	when wi.ActivityName = reviewStage then ISNULL(dardAssessorUser.DisplayName, '')
 	when wi.ActivityName = assessStage then ISNULL(daadAssessorUser.DisplayName, '')
@@ -99,7 +100,7 @@ left join dbo.DbAssessmentAssessData daad on wi.ProcessId = daad.ProcessId
 left join dbo.DbAssessmentVerifyData davd on wi.ProcessId = davd.ProcessId
 left join (select top (1) * from dbo.OnHold 
 			where OnHoldTime is not null 
-			and OffHoldTime is not null) oh
+			and OffHoldTime is null) oh
 on wi.ProcessId = oh.ProcessId
 
 left join dbo.AdUsers dardAssessorUser on dard.AssessorAdUserId = dardAssessorUser.AdUserId
