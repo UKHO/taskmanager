@@ -28,7 +28,7 @@
                 setProductActionedCheckboxHandler();
                 update();
 
-                setControlState1();
+                setControlState();
 
                 setImpactedProductHandler();
 
@@ -105,7 +105,7 @@
 
                 update();
 
-                setControlState1();
+                setControlState();
             });
     }
 
@@ -115,14 +115,14 @@
 
             update();
 
-            setControlState1();
+            setControlState();
         }).show();
     }
 
 
     function setProductActionedCheckboxHandler() {
         $("#ProductActioned").change(function () {
-            setControlState1();
+            setControlState();
         });
     }
 
@@ -136,11 +136,11 @@
                     $(currentProductActionType).prop("selectedIndex", 0).change();
                 }
 
-                setControlState1();
+                setControlState();
             });
     }
 
-    function setControlState1() {
+    function setControlState() {
 
         // disable Action if:
         // 1) Any Impacted Product is populated
