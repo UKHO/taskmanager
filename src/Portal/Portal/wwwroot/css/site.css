@@ -834,7 +834,7 @@ ol.error-list {
         display: inline-block;
     }
 
-    .checkbox-wrapper label::before {
+    .checkbox-wrapper > input + label::before {
         height: 22px;
         width: 22px;
         border: 2px solid #03284F;
@@ -842,7 +842,7 @@ ol.error-list {
         top: 0;
     }
 
-    .checkbox-wrapper label::after {
+    .checkbox-wrapper > input + label::after {
         color: #09315b;
         height: 6px;
         width: 13px;
@@ -852,6 +852,25 @@ ol.error-list {
         left: 5px;
         top: 7px;
     }
+
+.checkbox-wrapper > input:disabled + label::before {
+    height: 22px;
+    width: 22px;
+    border: 2px solid #7898ba;
+    left: 0;
+    top: 0;
+}
+
+.checkbox-wrapper > input:disabled + label::after {
+    color: #7898ba;
+    height: 6px;
+    width: 13px;
+    border-left: 3px solid;
+    border-bottom: 3px solid;
+    transform: rotate(-45deg);
+    left: 5px;
+    top: 7px;
+}
 
 .checkbox-wrapper input[type=checkbox] + label::after {
     content: none;
