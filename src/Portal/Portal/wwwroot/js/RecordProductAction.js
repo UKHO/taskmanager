@@ -138,6 +138,11 @@
 
                 setControlState();
             });
+
+        $(".productActionType").on("change",
+            function () {
+                setControlState();
+            });
     }
 
     function setControlState() {
@@ -178,7 +183,16 @@
             }
         });
 
-        if (impactedProductHasValue) {
+        var impactedProductTypeHasValue = false;
+
+        $(".productActionType").each(function () {
+            if ($(this).val() !== "") {
+                impactedProductTypeHasValue = true;
+                return false;
+            }
+        });
+
+        if (impactedProductHasValue || impactedProductTypeHasValue) {
             $("#ProductActioned").prop("disabled", true);
             $("#btnAddImpact").prop("disabled", false);
             $(".productActionImpactedProduct").prop("disabled", false);
