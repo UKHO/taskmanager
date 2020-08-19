@@ -7,6 +7,7 @@
         Verification_Rework = 3,
         ENC = 4,
         SNC = 5,
+        Awaiting_Publication = 6
 
     }
 }

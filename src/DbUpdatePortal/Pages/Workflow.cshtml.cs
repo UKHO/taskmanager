@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,8 @@ namespace DbUpdatePortal
         [DisplayName("Product Action Required")]
         [BindProperty]
         public string ProductAction { get; set; }
+
+        public SelectList ProductActions { get; set; }
 
         public bool IsReadOnly { get; set; }
 
@@ -121,60 +124,60 @@ namespace DbUpdatePortal
             ValidationErrorMessages = new List<string>();
         }
 
-        //public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("ProcessId", processId);
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostTaskTerminateAsync));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+        public async Task<IActionResult> OnPostTaskTerminateAsync(string comment, int processId)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostTaskTerminateAsync));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    LogContext.PushProperty("Comment", comment);
+            LogContext.PushProperty("Comment", comment);
 
-        //    _logger.LogInformation("Entering TaskTerminate for Workflow with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation("Entering TaskTerminate for Workflow with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-        //    if (string.IsNullOrWhiteSpace(comment))
-        //    {
-        //        _logger.LogError("Comment is null, empty or whitespace: {Comment}");
-        //        throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
-        //    }
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                _logger.LogError("Comment is null, empty or whitespace: {Comment}");
+                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+            }
 
-        //    if (processId < 1)
-        //    {
-        //        _logger.LogError("ProcessId is less than 1: {ProcessId}");
-        //        throw new ArgumentException($"{nameof(processId)} is less than 1");
-        //    }
+            if (processId < 1)
+            {
+                _logger.LogError("ProcessId is less than 1: {ProcessId}");
+                throw new ArgumentException($"{nameof(processId)} is less than 1");
+            }
 
-        //    _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-        //    var taskInfo = UpdateTaskAsTerminated(processId);
+            var taskInfo = UpdateTaskAsTerminated(processId);
 
-        //    var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
-        //    await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, user);
+            var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, user);
 
-        //    _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-        //    return RedirectToPage("/Index");
+            return RedirectToPage("/Index");
 
-        //}
+        }
 
-        //private TaskInfo UpdateTaskAsTerminated(int processId)
-        //{
-        //    var taskInfo = _dbContext.TaskInfo.FirstOrDefault(t => t.ProcessId == processId);
+        private TaskInfo UpdateTaskAsTerminated(int processId)
+        {
+            var taskInfo = _dbContext.TaskInfo.FirstOrDefault(t => t.ProcessId == processId);
 
-        //    if (taskInfo == null)
-        //    {
-        //        _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table");
-        //        throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the TaskInfo table");
-        //    }
+            if (taskInfo == null)
+            {
+                _logger.LogError("ProcessId {ProcessId} does not appear in the TaskInfo table");
+                throw new ArgumentException($"{nameof(processId)} {processId} does not appear in the TaskInfo table");
+            }
 
-        //    taskInfo.Status = NcneTaskStatus.Terminated.ToString();
-        //    taskInfo.StatusChangeDate = DateTime.Now;
-        //    _dbContext.SaveChanges();
+            taskInfo.Status = DbUpdateTaskStatus.Terminated.ToString();
+            taskInfo.StatusChangeDate = DateTime.Now;
+            _dbContext.SaveChanges();
 
-        //    return taskInfo;
-        //}
+            return taskInfo;
+        }
 
-        public void OnGetAsync(int processId)
+        public async Task OnGetAsync(int processId)
         {
             LogContext.PushProperty("ActivityName", "Workflow");
             LogContext.PushProperty("ProcessId", processId);
@@ -224,11 +227,13 @@ namespace DbUpdatePortal
             //Enable complete if Verify is completed and ENC and SNC are either completed ord Inactive 
             CompleteEnabled = !TaskStages.Exists(t =>
                 (t.TaskStageTypeId == (int)DbUpdateTaskStageType.Verify &&
+                 t.Status != DbUpdateTaskStageStatus.Completed.ToString()) ||
+                ((t.TaskStageTypeId == (int)DbUpdateTaskStageType.Awaiting_Publication &&
                  t.Status == DbUpdateTaskStageStatus.Open.ToString()) ||
-                (t.TaskStageTypeId == (int)DbUpdateTaskStageType.SNC &&
-                 t.Status == DbUpdateTaskStageStatus.Open.ToString()) ||
-                (t.TaskStageTypeId == (int)DbUpdateTaskStageType.ENC &&
-                 t.Status == DbUpdateTaskStageStatus.Open.ToString()));
+                 (t.TaskStageTypeId == (int)DbUpdateTaskStageType.Awaiting_Publication &&
+            t.Status == DbUpdateTaskStageStatus.InProgress.ToString())));
+
+
 
 
 
@@ -241,136 +246,119 @@ namespace DbUpdatePortal
 
             TaskStatus = taskInfo.Status;
 
+            var productActions = await _dbContext.ProductAction.OrderBy(i => i.ProductActionId).Select(st => st.Name)
+                .ToListAsync().ConfigureAwait(false);
+
+            ProductActions = new SelectList(productActions);
+
             _logger.LogInformation("Finished Get for Workflow with: ProcessId: {ProcessId}; Action: {Action};");
 
         }
 
-        //public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("ProcessId", processId);
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostCreateCarisProjectAsync));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+        public async Task<IActionResult> OnPostCreateCarisProjectAsync(int processId, string projectName)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostCreateCarisProjectAsync));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    LogContext.PushProperty("ProjectName", projectName);
+            LogContext.PushProperty("ProjectName", projectName);
 
-        //    _logger.LogInformation("Entering CreateCarisProject for Workflow with: ProcessId: {ProcessId} and Caris project name: {ProjectName}");
+            _logger.LogInformation("Entering CreateCarisProject for Workflow with: ProcessId: {ProcessId} and Caris project name: {ProjectName}");
 
-        //    var task = await _dbContext.TaskInfo.FindAsync(processId);
+            var task = await _dbContext.TaskInfo.FindAsync(processId);
 
-        //    if (string.IsNullOrWhiteSpace(task.ChartNumber))
-        //    {
-        //        throw new ArgumentException(" Please enter and save Chart Number before creating the Caris Project");
-        //    }
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Please provide a Caris Project Name.");
+            }
 
-        //    if (string.IsNullOrWhiteSpace(projectName))
-        //    {
-        //        throw new ArgumentException("Please provide a Caris Project Name.");
-        //    }
+            var projectId = await CreateCarisProject(processId, projectName);
 
-        //    var projectId = await CreateCarisProject(processId, projectName);
+            await UpdateCarisProjectDetails(processId, projectName, projectId);
 
-        //    await UpdateCarisProjectDetails(processId, projectName, projectId);
+            await _dbContext.SaveChangesAsync();
 
-        //    await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Finished CreateCarisProject for Workflow with: ProcessId: {ProcessId} and Caris project name: {ProjectName}");
 
-        //    _logger.LogInformation("Finished CreateCarisProject for Workflow with: ProcessId: {ProcessId} and Caris project name: {ProjectName}");
-
-        //    return StatusCode(200);
-        //}
+            return StatusCode(200);
+        }
 
 
 
-        //private async Task<int> CreateCarisProject(int processId, string projectName)
-        //{
+        private async Task<int> CreateCarisProject(int processId, string projectName)
+        {
 
-        //    var carisProjectDetails =
-        //        await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
+            var carisProjectDetails =
+                await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
 
-        //    if (carisProjectDetails != null)
-        //    {
-        //        return carisProjectDetails.ProjectId;
-        //    }
+            if (carisProjectDetails != null)
+            {
+                return carisProjectDetails.ProjectId;
+            }
 
-        //    var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
-        //    // which will also implicitly validate if the current user has been mapped to HPD account in our database
-        //    var hpdUser = await GetHpdUser(user);
+            // which will also implicitly validate if the current user has been mapped to HPD account in our database
+            var hpdUser = await GetHpdUser(user);
 
-        //    _logger.LogInformation(
-        //        "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
+            _logger.LogInformation(
+                "Creating Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
 
-        //    var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
-        //        hpdUser.HpdUsername, _generalConfig.Value.CarisNcneProjectType,
-        //        _generalConfig.Value.CarisNewProjectStatus,
-        //        _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
+            var projectId = await _carisProjectHelper.CreateCarisProject(processId, projectName,
+                hpdUser.HpdUsername, _generalConfig.Value.CarisDbUpdateProjectType,
+                _generalConfig.Value.CarisNewProjectStatus,
+                _generalConfig.Value.CarisNewProjectPriority, _generalConfig.Value.CarisProjectTimeoutSeconds);
 
-        //    //Add the users from other roles to the Caris Project
-        //    var role = await _dbContext.TaskRole.Include(c => c.Compiler)
-        //                                        .Include(c => c.VerifierOne)
-        //                                        .Include(c => c.VerifierTwo)
-        //                                        .Include(c => c.HundredPercentCheck)
-        //                                        .FirstOrDefaultAsync(t => t.ProcessId == processId);
-        //    if (role.Compiler != null && role.Compiler != user)
-        //    {
-        //        hpdUser = await GetHpdUser(role.Compiler);
-        //        await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //             _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
-        //    if (role.VerifierOne != null && role.VerifierOne != user)
-        //    {
-        //        hpdUser = await GetHpdUser(role.VerifierOne);
-        //        await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
-        //    if (role.VerifierTwo != null && role.VerifierTwo != user)
-        //    {
-        //        hpdUser = await GetHpdUser(role.VerifierTwo);
+            //Add the users from other roles to the Caris Project
+            var role = await _dbContext.TaskRole.Include(c => c.Compiler)
+                                                .Include(c => c.Verifier)
+                                                .FirstOrDefaultAsync(t => t.ProcessId == processId);
+            if (role.Compiler != null && role.Compiler != user)
+            {
+                hpdUser = await GetHpdUser(role.Compiler);
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                     _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            if (role.Verifier != null && role.Verifier != user)
+            {
+                hpdUser = await GetHpdUser(role.Verifier);
+                await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
+            return projectId;
+        }
 
-        //        await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
-        //    if (role.HundredPercentCheck != null && role.HundredPercentCheck != user)
-        //    {
-        //        hpdUser = await GetHpdUser(role.HundredPercentCheck);
-        //        await _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
+        private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
+        {
 
-
-        //    return projectId;
-        //}
-
-        //private async Task UpdateCarisProjectDetails(int processId, string projectName, int projectId)
-        //{
-
-        //    // If somehow the user has already created a project, remove it and create new row
-        //    var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
-        //    if (toRemove.Any())
-        //    {
-        //        _logger.LogInformation(
-        //            "Removing the Caris project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
-        //        _dbContext.CarisProjectDetails.RemoveRange(toRemove);
-        //        await _dbContext.SaveChangesAsync();
-        //    }
+            // If somehow the user has already created a project, remove it and create new row
+            var toRemove = await _dbContext.CarisProjectDetails.Where(cp => cp.ProcessId == processId).ToListAsync();
+            if (toRemove.Any())
+            {
+                _logger.LogInformation(
+                    "Removing the Caris project with ProcessId: {ProcessId}; ProjectName: {ProjectName}.");
+                _dbContext.CarisProjectDetails.RemoveRange(toRemove);
+                await _dbContext.SaveChangesAsync();
+            }
 
 
-        //    _logger.LogInformation(
-        //        "Adding Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}. with new details");
+            _logger.LogInformation(
+                "Adding Caris Project with ProcessId: {ProcessId}; ProjectName: {ProjectName}. with new details");
 
-        //    var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+            var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
-        //    _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
-        //    {
-        //        ProcessId = processId,
-        //        Created = DateTime.Now,
-        //        CreatedBy = user,
-        //        ProjectId = projectId,
-        //        ProjectName = projectName
-        //    });
+            _dbContext.CarisProjectDetails.Add(new CarisProjectDetails
+            {
+                ProcessId = processId,
+                Created = DateTime.Now,
+                CreatedBy = user,
+                ProjectId = projectId,
+                ProjectName = projectName
+            });
 
-        //    await _dbContext.SaveChangesAsync();
-        //}
+            await _dbContext.SaveChangesAsync();
+        }
 
         private async Task<HpdUser> GetHpdUser(AdUser user)
         {
@@ -588,17 +576,39 @@ namespace DbUpdatePortal
                 "Stage {StageId} of task {ProcessId} is completed.");
 
 
+            var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
+
+            if (!Enum.TryParse(taskInfo.ProductAction, true, out DbUpdateProductAction selectedAction))
+            {
+                selectedAction = DbUpdateProductAction.Both;
+            }
+
             var nextStageTypeId = (DbUpdateTaskStageType)currentStage.TaskStageTypeId switch
             {
                 DbUpdateTaskStageType.Compile => (int)DbUpdateTaskStageType.Verify,
-                DbUpdateTaskStageType.Verify => (int)DbUpdateTaskStageType.ENC,
+                DbUpdateTaskStageType.Verify =>
+                selectedAction switch
+                {
+                    DbUpdateProductAction.None => 0,
+                    DbUpdateProductAction.SNC => (int)DbUpdateTaskStageType.SNC,
+                    _ => (int)DbUpdateTaskStageType.ENC
+                }
+                ,
                 DbUpdateTaskStageType.Verification_Rework => (int)DbUpdateTaskStageType.Verify,
-                DbUpdateTaskStageType.ENC => (int)DbUpdateTaskStageType.SNC,
-                DbUpdateTaskStageType.SNC => 0,
+                DbUpdateTaskStageType.ENC =>
+                selectedAction switch
+                {
+                    DbUpdateProductAction.ENC => (int)DbUpdateTaskStageType.Awaiting_Publication,
+                    DbUpdateProductAction.SNC => (int)DbUpdateTaskStageType.SNC,
+                    DbUpdateProductAction.Both => (int)DbUpdateTaskStageType.SNC,
+                    _ => 0
+                },
+                DbUpdateTaskStageType.SNC => (int)DbUpdateTaskStageType.Awaiting_Publication,
+                DbUpdateTaskStageType.Awaiting_Publication => 0,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
+
             if (nextStageTypeId > 0)
             {
 
@@ -634,156 +644,157 @@ namespace DbUpdatePortal
             return inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion";
         }
 
-        //public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType, string chartNo)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("ProcessId", processId);
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostSaveAsync));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+        public async Task<IActionResult> OnPostSaveAsync(int processId, string productAction)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("dbUpdatePortalResource", nameof(OnPostSaveAsync));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    LogContext.PushProperty("ChartType", chartType);
-        //    LogContext.PushProperty("ChartNo", chartNo);
-
-        //    _logger.LogInformation("Entering Save for Workflow with: ProcessId: {ProcessId}, ChartType: {ChartType}, and ChartNo: {ChartNo}");
-
-        //    ValidationErrorMessages.Clear();
-
-        //    ChartNo = chartNo;
-        //    var role = new TaskRole()
-        //    {
-        //        ProcessId = processId,
-        //        Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
-        //        VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
-        //        VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
-        //        HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
-
-        //    };
-        //    var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
+            LogContext.PushProperty("ProductAction", productAction);
 
 
-        //    if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
-        //        ThreePSInfo,
-        //        ValidationErrorMessages)))
-        //    {
+            _logger.LogInformation("Entering Save for Workflow with: ProcessId: {ProcessId}, ChartType: {ChartType}, and ChartNo: {ChartNo}");
 
-        //        return new JsonResult(this.ValidationErrorMessages)
-        //        {
-        //            StatusCode = (int)HttpStatusCode.InternalServerError
-        //        };
-        //    }
+            ValidationErrorMessages.Clear();
 
-        //    var result = await UpdateTaskInformation(processId, chartType, role);
-
-        //    _logger.LogInformation("Finished Save for Workflow with: ProcessId: {ProcessId}, ChartType: {ChartType}, and ChartNo: {ChartNo}");
+            ProductAction = productAction;
+            var role = new TaskRole()
+            {
+                ProcessId = processId,
+                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
+                Verifier = string.IsNullOrEmpty(Verifier?.UserPrincipalName) ? null : await _dbUpdateUserDbService.GetAdUserAsync(Verifier.UserPrincipalName)
+            };
 
 
-        //    return new JsonResult(JsonConvert.SerializeObject(result));
-        //}
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, productAction, TargetDate, ValidationErrorMessages)))
+            {
 
-        //private async Task<DeadlineId> UpdateTaskInformation(int processId, string chartType, TaskRole role)
-        //{
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
 
-        //    _logger.LogInformation(
-        //        " Updating Task Information for process {ProcessId}.");
+            var result = await UpdateTaskInformation(processId, productAction, role);
 
-
-        //    var task =
-        //        await _dbContext.TaskInfo
-        //              .Include(t => t.TaskRole)
-        //              .ThenInclude(c => c.Compiler)
-        //              .Include(t => t.TaskRole)
-        //              .ThenInclude(v => v.VerifierOne)
-        //              .Include(t => t.TaskRole)
-        //              .ThenInclude(v => v.VerifierTwo)
-        //              .Include(t => t.TaskRole)
-        //              .ThenInclude(h => h.HundredPercentCheck)
-        //              .Include(s => s.TaskStage)
-        //              .ThenInclude(r => r.Assigned)
-        //              .FirstAsync(t => t.ProcessId == processId);
-        //    task.Ion = Ion;
-        //    task.ChartNumber = ChartNo;
-        //    task.Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
-
-        //    if (chartType == "Adoption" && RepromatDate != null)
-        //    {
-
-        //        PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
-
-        //    }
-
-        //    await AddSystemComments(task, processId, role);
-
-        //    task.RepromatDate = RepromatDate;
-
-        //    task.PublicationDate = PublicationDate;
-        //    task.AnnounceDate = AnnounceDate;
-        //    task.CommitDate = CommitToPrintDate;
-        //    task.CisDate = CISDate;
-        //    task.Country = Country;
-        //    task.ThreePs = SentTo3Ps;
-        //    task.SentDate3Ps = SendDate3ps;
-        //    task.ExpectedDate3Ps = ExpectedReturnDate3ps;
-        //    task.ActualDate3Ps = ActualReturnDate3ps;
-
-        //    var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == task.ProcessId);
-
-        //    if (carisProject != null)
-        //        UpdateCarisProjectUsers(task, role, carisProject.ProjectId);
-
-        //    UpdateRoles(task, role);
-
-        //    UpdateStatus(task, role);
-
-        //    UpdateTaskUser(task, role);
-
-        //    var deadLines = UpdateDeadlineDates(task);
-
-        //    await _dbContext.SaveChangesAsync();
-
-        //    return deadLines;
+            _logger.LogInformation("Finished Save for Workflow with: ProcessId: {ProcessId}, ChartType: {ChartType}, and ChartNo: {ChartNo}");
 
 
-        //}
+            return new JsonResult(JsonConvert.SerializeObject(result));
+        }
 
-        //private async Task AddSystemComments(TaskInfo task, int processId, TaskRole role)
-        //{
+        private async Task<IActionResult> UpdateTaskInformation(int processId, string productAction, TaskRole role)
+        {
 
-        //    _logger.LogInformation("Adding system comments for process {ProcessId}.");
+            _logger.LogInformation(
+                " Updating Task Information for process {ProcessId}.");
 
-        //    var currentUser = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
-        //    //update the system comment on changes
-        //    if (((PublicationDate != null) && (task.PublicationDate != PublicationDate)) ||
-        //        ((RepromatDate != null) && (task.RepromatDate != RepromatDate)) ||
-        //        (task.AnnounceDate != AnnounceDate) ||
-        //        (task.CommitDate != CommitToPrintDate) ||
-        //        (task.CisDate != CISDate))
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.DateChange, processId, currentUser, null,
-        //            null, null);
+            var task =
+                await _dbContext.TaskInfo
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(c => c.Compiler)
+                      .Include(t => t.TaskRole)
+                      .ThenInclude(v => v.Verifier)
+                      .Include(s => s.TaskStage)
+                      .ThenInclude(r => r.Assigned)
+                      .FirstAsync(t => t.ProcessId == processId);
 
-        //    if (role.Compiler != null && task.TaskRole?.Compiler != role.Compiler)
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.CompilerChange, processId, currentUser,
-        //            null, role.Compiler.DisplayName, null);
-        //    if (role.VerifierOne != null && task.TaskRole?.VerifierOne != role.VerifierOne)
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.V1Change, processId, currentUser,
-        //            null, role.VerifierOne.DisplayName, null);
-        //    if (role.VerifierTwo != null && task.TaskRole?.VerifierTwo != role.VerifierTwo)
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.V2Change, processId, currentUser,
-        //            null, role.VerifierTwo.DisplayName, null);
-        //    if (role.HundredPercentCheckAdUserId != null && task.TaskRole?.HundredPercentCheck != role.HundredPercentCheck)
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.HundredPcChange, processId, currentUser,
-        //            null, role.HundredPercentCheck.DisplayName, null);
 
-        //    if ((task.ThreePs != SentTo3Ps) || (task.SentDate3Ps != SendDate3ps)
-        //                                    || (task.ExpectedDate3Ps != ExpectedReturnDate3ps) ||
-        //                                    (task.ActualDate3Ps != ActualReturnDate3ps))
-        //    {
-        //        await _commentsHelper.AddTaskSystemComment(NcneCommentType.ThreePsChange, processId,
-        //            currentUser,
-        //            null, null, null);
-        //    }
-        //}
+            await AddSystemComments(task, processId, role);
 
+            task.TargetDate = TargetDate;
+            if (task.ProductAction != productAction)
+            {
+                UpdateTaskStageStatus(task, productAction);
+                task.ProductAction = productAction;
+            }
+
+
+
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == task.ProcessId);
+
+            if (carisProject != null)
+                UpdateCarisProjectUsers(task, role, carisProject.ProjectId);
+
+            UpdateRoles(task, role);
+
+            UpdateTaskUser(task, role);
+
+            await _dbContext.SaveChangesAsync();
+
+            return null;
+
+
+        }
+
+        private async Task AddSystemComments(TaskInfo task, int processId, TaskRole role)
+        {
+
+            _logger.LogInformation("Adding system comments for process {ProcessId}.");
+
+            var currentUser = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
+
+            //update the system comment on changes
+            if (TargetDate != null && task.TargetDate != TargetDate)
+                await _commentsHelper.AddTaskSystemComment(DbUpdateCommentType.DateChange, processId, currentUser, null,
+                    null, TargetDate);
+
+            if (role.Compiler != null && task.TaskRole?.Compiler != role.Compiler)
+                await _commentsHelper.AddTaskSystemComment(DbUpdateCommentType.CompilerChange, processId, currentUser,
+                    null, role.Compiler.DisplayName, null);
+
+            if (role.Verifier != null && task.TaskRole?.Verifier != role.Verifier)
+                await _commentsHelper.AddTaskSystemComment(DbUpdateCommentType.V1Change, processId, currentUser,
+                    null, role.Verifier.DisplayName, null);
+
+        }
+
+        private void UpdateTaskStageStatus(TaskInfo task, string productAction)
+        {
+            if (!Enum.TryParse(this.ProductAction, true, out DbUpdateProductAction selectedAction))
+            {
+                selectedAction = DbUpdateProductAction.Both;
+            }
+
+            foreach (var stage in task.TaskStage)
+            {
+                //Assign the status of the task stage 
+                switch ((DbUpdateTaskStageType)stage.TaskStageTypeId)
+                {
+                    case DbUpdateTaskStageType.Compile:
+                        break;
+                    case DbUpdateTaskStageType.Verify:
+                        break;
+                    case DbUpdateTaskStageType.Verification_Rework:
+                        break;
+                    case DbUpdateTaskStageType.ENC:
+                        stage.Status = (selectedAction == DbUpdateProductAction.ENC ||
+                                        selectedAction == DbUpdateProductAction.Both)
+                            ? DbUpdateTaskStageStatus.Open.ToString()
+                            : DbUpdateTaskStageStatus.Inactive.ToString();
+                        stage.Assigned = task.TaskRole.Verifier;
+                        break;
+                    case DbUpdateTaskStageType.SNC:
+                        stage.Status = (selectedAction == DbUpdateProductAction.SNC || selectedAction == DbUpdateProductAction.Both)
+                            ? DbUpdateTaskStageStatus.Open.ToString()
+                            : DbUpdateTaskStageStatus.Inactive.ToString();
+                        stage.Assigned = task.TaskRole.Verifier;
+                        break;
+                    case DbUpdateTaskStageType.Awaiting_Publication:
+                        stage.Status = (selectedAction == DbUpdateProductAction.None)
+                            ? DbUpdateTaskStageStatus.Inactive.ToString()
+                            : DbUpdateTaskStageStatus.Open.ToString();
+                        stage.Assigned = task.TaskRole.Verifier;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+
+        }
         //private void UpdateStatus(TaskInfo task, TaskRole role)
         //{
 
@@ -811,93 +822,65 @@ namespace DbUpdatePortal
         //    }
         //}
 
-        //private void UpdateCarisProjectUsers(TaskInfo task, TaskRole role, int projectId)
-        //{
+        private void UpdateCarisProjectUsers(TaskInfo task, TaskRole role, int projectId)
+        {
 
 
-        //    var hpdUser = GetHpdUser(role.Compiler).Result;
+            var hpdUser = GetHpdUser(role.Compiler).Result;
 
-        //    if (role.Compiler != null && role.Compiler != task.TaskRole.Compiler)
-        //        _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
+            if (role.Compiler != null && role.Compiler != task.TaskRole.Compiler)
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
 
-        //    if (role.VerifierOne != null && role.VerifierOne != task.TaskRole.VerifierOne)
-        //    {
-        //        hpdUser = GetHpdUser(role.VerifierOne).Result;
-        //        _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
+            if (role.Verifier != null && role.Verifier != task.TaskRole.Verifier)
+            {
+                hpdUser = GetHpdUser(role.Verifier).Result;
+                _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+            }
 
-        //    if (role.VerifierTwo != null && role.VerifierTwo != task.TaskRole.VerifierTwo)
-        //    {
-        //        hpdUser = GetHpdUser(role.VerifierTwo).Result;
-        //        _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
+        }
 
-        //    if (role.HundredPercentCheck != null &&
-        //        role.HundredPercentCheck != task.TaskRole.HundredPercentCheck)
-        //    {
-        //        hpdUser = GetHpdUser(role.HundredPercentCheck).Result;
-        //        _carisProjectHelper.UpdateCarisProject(projectId, hpdUser.HpdUsername,
-        //            _generalConfig.Value.CarisProjectTimeoutSeconds);
-        //    }
+        private void UpdateRoles(TaskInfo task, TaskRole role)
+        {
+
+            _logger.LogInformation("Updating Roles for for task {ProcessId}.");
 
 
-        //}
+            task.TaskRole = role;
 
-        //private void UpdateRoles(TaskInfo task, TaskRole role)
-        //{
+            foreach (var taskStage in task.TaskStage.Where
+                (s => s.Status != DbUpdateTaskStageStatus.Completed.ToString()))
+            {
+                taskStage.Assigned = (DbUpdateTaskStageType)taskStage.TaskStageTypeId switch
+                {
+                    DbUpdateTaskStageType.Compile => role.Compiler,
+                    DbUpdateTaskStageType.Verification_Rework => role.Compiler,
+                    _ => role.Verifier
+                };
+            }
+        }
 
-        //    _logger.LogInformation("Updating Roles for for task {ProcessId}.");
+        private void UpdateTaskUser(TaskInfo task, TaskRole role)
+        {
 
+            _logger.LogInformation("Updating Task stage users from roles for task {ProcessId}.");
 
-        //    task.TaskRole = role;
+            var taskInProgress = task.TaskStage.Find(t => t.Status == DbUpdateTaskStageStatus.InProgress.ToString());
 
-        //    foreach (var taskStage in task.TaskStage.Where
-        //        (s => s.Status != NcneTaskStageStatus.Completed.ToString()))
-        //    {
-        //        taskStage.Assigned = (NcneTaskStageType)taskStage.TaskStageTypeId switch
-        //        {
-        //            NcneTaskStageType.With_Geodesy => role.Compiler,
-        //            NcneTaskStageType.With_SDRA => role.Compiler,
-        //            NcneTaskStageType.Specification => role.Compiler,
-        //            NcneTaskStageType.Compile => role.Compiler,
-        //            NcneTaskStageType.V1_Rework => role.Compiler,
-        //            NcneTaskStageType.V2_Rework => role.Compiler,
-        //            NcneTaskStageType.V2 => role.VerifierTwo,
-        //            NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
-        //            _ => role.VerifierOne
-        //        };
-        //    }
-        //}
+            if (taskInProgress == null)
+                task.Assigned = role.Verifier;
+            else
+            {
+                task.Assigned = (DbUpdateTaskStageType)taskInProgress.TaskStageTypeId switch
+                {
+                    DbUpdateTaskStageType.Compile => role.Compiler,
+                    DbUpdateTaskStageType.Verification_Rework => role.Compiler,
+                    _ => role.Verifier
+                };
+            }
 
-        //private void UpdateTaskUser(TaskInfo task, TaskRole role)
-        //{
-
-        //    _logger.LogInformation("Updating Task stage users from roles for task {ProcessId}.");
-
-        //    var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
-        //                                                         && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
-        //    if (taskInProgress == null)
-        //        task.Assigned = role.HundredPercentCheck;
-        //    else
-        //    {
-        //        task.Assigned = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
-        //        {
-        //            NcneTaskStageType.With_SDRA => role.Compiler,
-        //            NcneTaskStageType.With_Geodesy => role.Compiler,
-        //            NcneTaskStageType.Specification => role.Compiler,
-        //            NcneTaskStageType.Compile => role.Compiler,
-        //            NcneTaskStageType.V1_Rework => role.Compiler,
-        //            NcneTaskStageType.V2_Rework => role.Compiler,
-        //            NcneTaskStageType.V2 => role.VerifierTwo,
-        //            NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
-        //            _ => role.VerifierOne
-        //        };
-        //    }
-
-        //}
+        }
 
 
         public async Task<JsonResult> OnGetUsersAsync()

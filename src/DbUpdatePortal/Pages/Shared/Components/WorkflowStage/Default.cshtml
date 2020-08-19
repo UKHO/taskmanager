@@ -31,7 +31,11 @@
             }
         </td>
         <td>@Model.Assigned?.DisplayName</td>
-        <td id="DtExp-@(Model.TaskStageId)">@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
+        <td>
+            <div class="form-group">
+                @*<div>@Html.TextBoxFor(model => model.DateExpected, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>*@
+            </div>
+        </td>
         <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
         <td>
 
@@ -47,7 +51,7 @@
 
 
             @if (Model.Status == DbUpdateTaskStageStatus.InProgress.ToString() &&
-     Model.IsReadOnly == false)
+  Model.IsReadOnly == false)
             {
                 <div class="d-flex justify-content-end">
                     @if (@Model.TaskStageType.AllowRework)

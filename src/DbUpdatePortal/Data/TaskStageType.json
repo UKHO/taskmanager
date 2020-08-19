@@ -28,5 +28,11 @@
     "Name": "SNC",
     "SequenceNumber": 5,
     "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 6,
+    "Name": "Awaiting Publication",
+    "SequenceNumber": 6,
+    "AllowRework": false
   }
 ]

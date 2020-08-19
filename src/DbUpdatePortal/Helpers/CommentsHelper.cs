@@ -37,7 +37,7 @@ namespace DbUpdatePortal.Helpers
             {
                 DbUpdateCommentType.CompleteStage => stageName + " Step completed",
                 DbUpdateCommentType.ReworkStage => stageName + " Step sent for Rework",
-                DbUpdateCommentType.DateChange => "Task Information dates changed",
+                DbUpdateCommentType.DateChange => "Target Date changed to " + dateChangedTo?.ToShortDateString(),
                 DbUpdateCommentType.CompilerChange => "Compiler role changed to " + roleName,
                 DbUpdateCommentType.V1Change => "Verifier role changed to " + roleName,
                 DbUpdateCommentType.CompleteWorkflow => "Workflow completed",

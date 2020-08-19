@@ -208,6 +208,7 @@ namespace DbUpdatePortal.Pages
                     selectedAction = DbUpdateProductAction.Both;
                 }
 
+
                 //Assign the status of the task stage 
                 taskStage.Status = (DbUpdateTaskStageType)taskStageType.TaskStageTypeId switch
                 {
@@ -222,6 +223,9 @@ namespace DbUpdatePortal.Pages
                     selectedAction == DbUpdateProductAction.SNC || selectedAction == DbUpdateProductAction.Both
                         ? DbUpdateTaskStageStatus.Open.ToString()
                         : DbUpdateTaskStageStatus.Inactive.ToString(),
+                    DbUpdateTaskStageType.Awaiting_Publication =>
+                    selectedAction == DbUpdateProductAction.None ? DbUpdateTaskStageStatus.Inactive.ToString() :
+                        DbUpdateTaskStageStatus.Open.ToString(),
                     _ => DbUpdateTaskStageStatus.Inactive.ToString()
                 };
 

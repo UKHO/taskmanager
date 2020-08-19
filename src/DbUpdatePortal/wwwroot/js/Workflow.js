@@ -57,42 +57,7 @@
     });
     
 
-    function completeWorkflow(processId) {
-        $.ajax({
-            type: "POST",
-            url: "workflow/?handler=CompleteWorkflow",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("RequestVerificationToken",
-                    $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "processId": processId
-            },
-            success: function () {
-                $("#PublishConfirmModal").modal("hide");
-                window.location.href = '/Index';
-
-            },
-            error: function(error) {
-                var responseJson = error.responseJSON;
-                (this).checked = false;
-
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function(item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-            }
-
-        });
-    }
+    
 
     function publishCarisChart(versionNo, processId, stageId) {
         $.ajax({
@@ -426,6 +391,8 @@
             $("#btnClose").prop("disabled", true);
             $("#btnSave").prop("disabled", true);
 
+            $("#hdnProductAction").val($("#ProductAction").val());
+
             var formData = $("#frmWorkflow").serialize();
             
             $.ajax({
@@ -444,15 +411,15 @@
                 },
                 success: function (result) {
                     formChanged = false;
-                    var chartNo = $("#ChartNo").val();
-                    var workflowType = $("#workflowType").text().trim();
-                    $('h1').text(workflowType + " - " + chartNo);
-                    //update Deadline dates
-                    var dateIds = JSON.parse(result);
-                    $("#DtExp-" + dateIds.FormsDate).html($("#AnnounceDate").val());
-                    $("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
-                    $("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
-                    $("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
+                    //var chartNo = $("#ChartNo").val();
+                    //var workflowType = $("#workflowType").text().trim();
+                    //$('h1').text(workflowType + " - " + chartNo);
+                    ////update Deadline dates
+                    //var dateIds = JSON.parse(result);
+                    //$("#DtExp-" + dateIds.FormsDate).html($("#AnnounceDate").val());
+                    //$("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
+                    //$("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
+                    //$("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
                     var processId = $("#hdnProcessId").val();
                     window.location.href = "/workflow?ProcessId="+processId;
 

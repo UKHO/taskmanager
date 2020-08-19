@@ -49,7 +49,7 @@ namespace DbUpdatePortal.Helpers
 
         private bool ValidateUserRoles(TaskRole taskRole, List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            var isValid = true;
 
 
             var userList = _dbUpdateUserDbService.GetUsersFromDbAsync().Result.ToList();
@@ -87,7 +87,7 @@ namespace DbUpdatePortal.Helpers
             TaskRole role, DateTime? targetDate,
             List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            var isValid = true;
 
 
 
@@ -118,7 +118,7 @@ namespace DbUpdatePortal.Helpers
         public bool ValidateForRework(string assignedUser, string username,
             List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            var isValid = true;
 
 
             if (string.IsNullOrEmpty(assignedUser))
@@ -143,7 +143,7 @@ namespace DbUpdatePortal.Helpers
         public bool ValidateForCompleteWorkflow(string assignedUser, string username,
             List<string> validationErrorMessages)
         {
-            bool isValid = true;
+            var isValid = true;
 
 
             if (string.IsNullOrEmpty(assignedUser))
@@ -161,6 +161,20 @@ namespace DbUpdatePortal.Helpers
                 }
             }
 
+
+            return isValid;
+        }
+
+        public bool ValidateWorkflowPage(TaskRole taskRole, string productAction, DateTime? targetDate, List<string> validationErrorMessages)
+        {
+
+            var isValid = ValidateUserRoles(taskRole, validationErrorMessages);
+
+            if (string.IsNullOrEmpty(productAction))
+            {
+                validationErrorMessages.Add("Task Information: Product Action Required cannot be empty");
+                isValid = false;
+            }
 
             return isValid;
         }
