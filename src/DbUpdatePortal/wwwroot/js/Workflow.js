@@ -375,7 +375,11 @@
         format: 'dd/mm/yyyy'
     }).datepicker('update');
 
-
+    $("#DateExpected").datepicker({
+        autoclose: true,
+        todayHighLight: true,
+        format: 'dd/mm/yyyy'
+    }).datepicker('update');
 
 
     $("#btnTerminate").on("click", function() {

@@ -123,7 +123,7 @@
         @Html.HiddenFor(m => m.IsCarisProjectCreated)
         <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
         <input type="hidden" asp-for="ProcessId" />
-        <input type="hidden" id="hdnProductAction" value="@Model.ProductAction" />
+        <input type="hidden" id="hdnProductAction" asp-for="ProductAction" value="@Model.ProductAction" />
         <input type="hidden" asp-for="IsReadOnly" />
 
         <!-- #endregion -->
