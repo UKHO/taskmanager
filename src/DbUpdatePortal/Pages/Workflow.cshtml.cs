@@ -36,7 +36,7 @@ namespace DbUpdatePortal
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly IDbUpdateUserDbService _dbUpdateUserDbService;
         private readonly IAdDirectoryService _adDirectoryService;
-        //private readonly IWorkflowStageHelper _workflowStageHelper;
+
         public int ProcessId { get; set; }
 
         [DisplayName("Task Name")] [BindProperty] public string Name { get; set; }
@@ -84,6 +84,8 @@ namespace DbUpdatePortal
 
         public bool CompleteEnabled { get; set; }
 
+        public bool VerifyCompleted { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private (string DisplayName, string UserPrincipalName) _currentUser;
@@ -107,8 +109,7 @@ namespace DbUpdatePortal
             IPageValidationHelper pageValidationHelper,
             IDbUpdateUserDbService dbUpdateUserDbService,
             IAdDirectoryService adDirectoryService
-            //,IWorkflowStageHelper workflowStageHelper
-            )
+        )
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -119,7 +120,7 @@ namespace DbUpdatePortal
             _pageValidationHelper = pageValidationHelper;
             _dbUpdateUserDbService = dbUpdateUserDbService;
             _adDirectoryService = adDirectoryService;
-            //_workflowStageHelper = workflowStageHelper;
+
 
             ValidationErrorMessages = new List<string>();
         }
@@ -233,9 +234,8 @@ namespace DbUpdatePortal
                  (t.TaskStageTypeId == (int)DbUpdateTaskStageType.Awaiting_Publication &&
             t.Status == DbUpdateTaskStageStatus.InProgress.ToString())));
 
-
-
-
+            VerifyCompleted = TaskStages.Exists(t => t.TaskStageTypeId == (int)DbUpdateTaskStageType.Verify &&
+                                                     t.Status == DbUpdateTaskStageStatus.Completed.ToString());
 
             IsReadOnly = taskInfo.Status == DbUpdateTaskStatus.Completed.ToString() ||
                          taskInfo.Status == DbUpdateTaskStatus.Terminated.ToString();
@@ -439,6 +439,30 @@ namespace DbUpdatePortal
             }
 
             _logger.LogInformation("Finished ValidateRework for Workflow with: ProcessId: {ProcessId}, AssignedUser: {AssignedUser}, and StageTypeId: {StageTypeId}");
+
+            return new JsonResult(HttpStatusCode.OK);
+        }
+
+        public IActionResult OnPostValidateTerminateWorkflow(string username)
+        {
+            LogContext.PushProperty("ActivityName", "Workflow");
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostValidateTerminateWorkflow));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+
+            LogContext.PushProperty("AssignedUser", username);
+            _logger.LogInformation("Entering ValidateTerminateWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
+
+            ValidationErrorMessages.Clear();
+
+            if (!(_pageValidationHelper.ValidateForTerminateWorkflow(username, CurrentUser.UserPrincipalName, ValidationErrorMessages)))
+            {
+                return new JsonResult(this.ValidationErrorMessages)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+
+            _logger.LogInformation("Finished ValidateTerminateWorkflow for Workflow with: ProcessId: {ProcessId}, and AssignedUser: {AssignedUser}");
 
             return new JsonResult(HttpStatusCode.OK);
         }

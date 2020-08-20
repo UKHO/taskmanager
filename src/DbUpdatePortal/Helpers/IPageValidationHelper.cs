@@ -20,6 +20,9 @@ namespace DbUpdatePortal.Helpers
         public bool ValidateForCompleteWorkflow(string assignedUser, string username,
             List<string> validationErrorMessages);
 
+        public bool ValidateForTerminateWorkflow(string assignedUser, string username,
+            List<string> validationErrorMessages);
+
         public bool ValidateWorkflowPage(TaskRole role, string productAction, DateTime? targetDate,
             List<string> validationErrorMessages);
     }

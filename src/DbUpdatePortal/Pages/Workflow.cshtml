@@ -123,7 +123,7 @@
         @Html.HiddenFor(m => m.IsCarisProjectCreated)
         <input type="hidden" id="hdnProcessId" value="@Model.ProcessId" />
         <input type="hidden" asp-for="ProcessId" />
-        <input type="hidden" id="hdnProductAction" asp-for="ProductAction" />
+        <input type="hidden" id="hdnProductAction" value="@Model.ProductAction" />
         <input type="hidden" asp-for="IsReadOnly" />
 
         <!-- #endregion -->
@@ -151,7 +151,7 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.UpdateType)</div>
                                 <div>
-                                    <span id="chartType">
+                                    <span id="updateType">
                                         <h6>@Html.DisplayFor(model => model.UpdateType, new { @class = "form-control  form-text " })</h6>
                                     </span>
                                 </div>
@@ -161,7 +161,7 @@
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.ChartingArea)</div>
                                 <div>
-                                    <span id="chartType">
+                                    <span id="chartingArea">
                                         <h6>@Html.DisplayFor(model => model.ChartingArea, new { @class = "form-control  form-text " })</h6>
                                     </span>
                                 </div>
@@ -170,17 +170,27 @@
                         <div class="col-3">
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.ProductAction)</div>
-
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="design-custom-select ">
-                                            <div class="arrow-icon-wrap">
-                                                <span class="fa fa-chevron-down arrow-icon"></span>
+                                @if (Model.VerifyCompleted)
+                                {
+                                    <div>
+                                        <span id="ProductAction">
+                                            <h6>@Html.DisplayFor(model => model.ProductAction, new { @class = "form-control  form-text " })</h6>
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="design-custom-select">
+                                                <div class="arrow-icon-wrap">
+                                                    <span class="fa fa-chevron-down arrow-icon"></span>
+                                                </div>
+                                                @Html.DropDownListFor(model => model.ProductAction, Model.ProductActions, Model.ProductAction, new { })
                                             </div>
-                                            @Html.DropDownListFor(model => model.ProductAction, Model.ProductActions, Model.ProductAction, new { })
                                         </div>
                                     </div>
-                                </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -165,6 +165,30 @@ namespace DbUpdatePortal.Helpers
             return isValid;
         }
 
+        public bool ValidateForTerminateWorkflow(string assignedUser, string username, List<string> validationErrorMessages)
+        {
+            var isValid = true;
+
+
+            if (string.IsNullOrEmpty(assignedUser))
+            {
+                validationErrorMessages.Add("Please assign a user to the Verifier role and Save before terminating the workflow");
+                isValid = false;
+
+            }
+            else
+            {
+                if ((assignedUser != username))
+                {
+                    validationErrorMessages.Add("Only users assigned to the Verifier role are allowed to terminate the workflow.");
+                    isValid = false;
+                }
+            }
+
+
+            return isValid;
+        }
+
         public bool ValidateWorkflowPage(TaskRole taskRole, string productAction, DateTime? targetDate, List<string> validationErrorMessages)
         {
 

@@ -379,9 +379,49 @@
 
 
     $("#btnTerminate").on("click", function() {
-            {
-                $("#ConfirmTerminate").modal("show");
-            }
+            
+           
+
+            var userName = $("#Verifier1Upn").val();
+
+            $.ajax({
+                type: "POST",
+                url: "Workflow/?handler=ValidateTerminateWorkflow",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "userName": userName
+
+                },
+
+                success: function (result) {
+                    $("#ConfirmTerminate").modal("show");
+                }
+                ,
+                error: function (error) {
+                    var responseJson = error.responseJSON;
+                    (this).checked = false;
+
+                    if (responseJson != null) {
+                        $("#workflowSaveErrorMessage").html("");
+
+                        $("#workflowSaveErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                        responseJson.forEach(function (item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalSaveWorkflowErrors").modal("show");
+                    }
+
+                }
+
+            });
+
+            
     });
 
     $("#btnSave").on("click",
@@ -391,7 +431,11 @@
             $("#btnClose").prop("disabled", true);
             $("#btnSave").prop("disabled", true);
 
-            $("#hdnProductAction").val($("#ProductAction").val());
+            if ($("#ProductAction").val() !== "") {
+                $("#hdnProductAction").val($("#ProductAction").val());
+            } else {
+                $("#ProductAction").val($("#hdnProductAction").val());
+            }
 
             var formData = $("#frmWorkflow").serialize();
             
