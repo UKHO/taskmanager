@@ -134,7 +134,8 @@ namespace DbUpdatePortal
 
             LogContext.PushProperty("Comment", comment);
 
-            _logger.LogInformation("Entering TaskTerminate for Workflow with: ProcessId: {ProcessId}; Comment: {Comment};");
+            _logger.LogInformation(
+                "Entering TaskTerminate for Workflow with: ProcessId: {ProcessId}; Comment: {Comment};");
 
             if (string.IsNullOrWhiteSpace(comment))
             {
@@ -154,6 +155,14 @@ namespace DbUpdatePortal
 
             var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
             await _commentsHelper.AddTaskComment($"Terminate comment: {comment}", taskInfo.ProcessId, user);
+
+            //Mark the Caris project as complete if its already created
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+            if (carisProject != null)
+                await _carisProjectHelper.MarkCarisProjectAsComplete(carisProject.ProjectId,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+
 
             _logger.LogInformation("Terminated successfully with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -508,6 +517,14 @@ namespace DbUpdatePortal
 
             var user = await _dbUpdateUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
             await _commentsHelper.AddTaskSystemComment(DbUpdateCommentType.CompleteWorkflow, processId, user, null, null, null);
+
+            //Mark the Caris project as complete if its already created
+            var carisProject = _dbContext.CarisProjectDetails.FirstOrDefault(c => c.ProcessId == processId);
+
+            if (carisProject != null)
+                await _carisProjectHelper.MarkCarisProjectAsComplete(carisProject.ProjectId,
+                    _generalConfig.Value.CarisProjectTimeoutSeconds);
+
 
             await _dbContext.SaveChangesAsync();
 
