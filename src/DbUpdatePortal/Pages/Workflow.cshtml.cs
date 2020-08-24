@@ -836,32 +836,6 @@ namespace DbUpdatePortal
 
 
         }
-        //private void UpdateStatus(TaskInfo task, TaskRole role)
-        //{
-
-        //    _logger.LogInformation("Updating task stage status for task {ProcessId}.");
-
-
-        //    var v2 = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2);
-        //    var v2Rework = task.TaskStage.FirstOrDefault(t => t.TaskStageTypeId == (int)NcneTaskStageType.V2_Rework);
-
-        //    if (role.VerifierTwo == null)
-        //    {
-        //        if (v2 != null) v2.Status = NcneTaskStageStatus.Inactive.ToString();
-        //        if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Inactive.ToString();
-        //    }
-        //    else
-        //    {
-        //        if (v2?.Status == NcneTaskStageStatus.Inactive.ToString())
-        //        {
-        //            if (v2 != null) v2.Status = NcneTaskStageStatus.Open.ToString();
-        //        }
-        //        if (v2Rework?.Status == NcneTaskStageStatus.Inactive.ToString())
-        //        {
-        //            if (v2Rework != null) v2Rework.Status = NcneTaskStageStatus.Open.ToString();
-        //        }
-        //    }
-        //}
 
         private void UpdateCarisProjectUsers(TaskInfo task, TaskRole role, int projectId)
         {
@@ -927,7 +901,7 @@ namespace DbUpdatePortal
         public async Task<JsonResult> OnGetUsersAsync()
         {
             LogContext.PushProperty("ActivityName", "Workflow");
-            LogContext.PushProperty("NCNEPortalResource", nameof(OnGetUsersAsync));
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnGetUsersAsync));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering GetUsers for Workflow");
@@ -947,7 +921,7 @@ namespace DbUpdatePortal
         public async Task<JsonResult> OnPostGetChartDetails(int versionNumber)
         {
             LogContext.PushProperty("ActivityName", "Workflow");
-            LogContext.PushProperty("NCNEPortalResource", nameof(OnPostGetChartDetails));
+            LogContext.PushProperty("DbUpdatePortalResource", nameof(OnPostGetChartDetails));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             LogContext.PushProperty("VersionNumber", versionNumber);
@@ -979,57 +953,7 @@ namespace DbUpdatePortal
             return new JsonResult(result);
         }
 
-        //public async Task<JsonResult> OnPostPublishCarisChart(int versionNumber, int processId, int stageId)
-        //{
-        //    LogContext.PushProperty("ActivityName", "Workflow");
-        //    LogContext.PushProperty("ProcessId", processId);
-        //    LogContext.PushProperty("NCNEPortalResource", nameof(OnPostPublishCarisChart));
-        //    LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
-        //    LogContext.PushProperty("VersionNumber", versionNumber);
-        //    LogContext.PushProperty("StageId", stageId);
-
-        //    _logger.LogInformation("Entering PublishCarisChart for Workflow with: ProcessId: {ProcessId}, VersionNumber: {VersionNumber}, and StageId: {StageId}");
-
-        //    try
-        //    {
-
-        //        var result = _carisProjectHelper.PublishCarisProject(versionNumber).Result;
-
-        //        if (result)
-        //        {
-        //            await CompleteStage(processId, stageId);
-
-        //            _logger.LogInformation("Caris chart with version {VersionNumber} published for task {ProcessId}.");
-
-        //            _logger.LogInformation("Finished PublishCarisChart for Workflow with: ProcessId: {ProcessId}, VersionNumber: {VersionNumber}, and StageId: {StageId}");
-
-        //            return new JsonResult(result)
-        //            { StatusCode = (int)HttpStatusCode.OK };
-        //        }
-        //        else
-        //        {
-        //            _logger.LogError("Error publishing Caris chart with version {VersionNumber} for task {ProcessId}.");
-
-
-        //            return new JsonResult(result)
-        //            {
-        //                StatusCode = (int)HttpStatusCode.InternalServerError
-        //            };
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        _logger.LogError(e,
-        //            "Publishing Caris chart with version {VersionNumber} for task {ProcessId} failed with error: " + e.InnerException?.Message);
-
-        //        return new JsonResult(e.InnerException?.Message)
-        //        {
-        //            StatusCode = (int)HttpStatusCode.InternalServerError
-        //        };
-        //    }
-
-        //}
 
         public async Task<JsonResult> OnPostTaskCommentAsync(string txtComment, int commentProcessId)
         {

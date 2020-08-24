@@ -170,7 +170,7 @@
                         <div class="col-3">
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.ProductAction)</div>
-                                @if (Model.VerifyCompleted)
+                                @if (Model.VerifyCompleted || Model.IsReadOnly)
                                 {
                                     <div>
                                         <span id="ProductAction">

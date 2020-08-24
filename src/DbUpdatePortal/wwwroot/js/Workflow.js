@@ -452,22 +452,12 @@
                 data:  formData,
                 complete: function () {
                     window.setTimeout(function () {
-                        //$("#modalWaitAssessDone").modal("hide");
                         $("#btnClose").prop("disabled", false);
                         $("#btnSave").prop("disabled", false);
                     }, 200);
                 },
                 success: function (result) {
                     formChanged = false;
-                    //var chartNo = $("#ChartNo").val();
-                    //var workflowType = $("#workflowType").text().trim();
-                    //$('h1').text(workflowType + " - " + chartNo);
-                    ////update Deadline dates
-                    //var dateIds = JSON.parse(result);
-                    //$("#DtExp-" + dateIds.FormsDate).html($("#AnnounceDate").val());
-                    //$("#DtExp-" + dateIds.CommitDate).html($("#CommitToPrintDate").val());
-                    //$("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
-                    //$("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
                     var processId = $("#hdnProcessId").val();
                     window.location.href = "/workflow?ProcessId="+processId;
 
