@@ -59,40 +59,40 @@
 
     
 
-    function publishCarisChart(versionNo, processId, stageId) {
-        $.ajax({
-            type: "POST",
-            url: "Workflow/?handler=PublishCarisChart",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("RequestVerificationToken",
-                    $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "versionNumber": versionNo,
-                "processId": processId,
-                "stageId": stageId
-            },
-            success: function (result) {
-                formChanged = false;
-                $("#PublishChartModal").modal("hide");
-                window.location.href = "/workflow?ProcessId=" + processId;
+    //function publishCarisChart(versionNo, processId, stageId) {
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "Workflow/?handler=PublishCarisChart",
+    //        beforeSend: function (xhr) {
+    //            xhr.setRequestHeader("RequestVerificationToken",
+    //                $('input:hidden[name="__RequestVerificationToken"]').val());
+    //        },
+    //        data: {
+    //            "versionNumber": versionNo,
+    //            "processId": processId,
+    //            "stageId": stageId
+    //        },
+    //        success: function (result) {
+    //            formChanged = false;
+    //            $("#PublishChartModal").modal("hide");
+    //            window.location.href = "/workflow?ProcessId=" + processId;
 
-            },
-            error: function (error) {
-                var responseJson = error.responseJSON;
-                if (responseJson != null) {
-                    $("#publishChartErrorMessage").text(responseJson);
-                    $("#publishChartError").collapse("show");
-                }
-                $("#PublishConfirmModal").modal("hide");
-                $("#btnPublish").prop("disabled", true);
-                $("#PublishChartModal").modal("show");
-            }
-        });
-    }
+    //        },
+    //        error: function (error) {
+    //            var responseJson = error.responseJSON;
+    //            if (responseJson != null) {
+    //                $("#publishChartErrorMessage").text(responseJson);
+    //                $("#publishChartError").collapse("show");
+    //            }
+    //            $("#PublishConfirmModal").modal("hide");
+    //            $("#btnPublish").prop("disabled", true);
+    //            $("#PublishChartModal").modal("show");
+    //        }
+    //    });
+    //}
 
     function validateCompleteRework(url,  processId,stageId,
-          username, stageTypeId,stageName, rework, publish ) {
+          username, stageTypeId,stageName, rework) {
         $.ajax({
             type: "POST",
             url: url,
@@ -102,37 +102,29 @@
             data: {
                 "processId": processId,
                 "username": username,
-                "stageTypeId": stageTypeId,
-                "publish" : publish
+                "stageTypeId": stageTypeId
             },
 
-            success: function (result) {
-                if (publish) {
-                    $("#hdnPublishProcessId").val(processId);
-                    $("#hdnPublishStageId").val(stageId);
-                    $("#hdnPublishUser").val(username);
+            success: function(result) {
 
-                    $("#PublishChartModal").modal("show");
 
+                $("#hdnConfirmProcessId").val(processId);
+                $("#hdnConfirmStageId").val(stageId);
+                $("#hdnAssignedUser").val(username);
+                $("#Rework").val(rework);
+
+                if (rework) {
+                    $("#msgComplete").html("Are you sure you want to send for <span id=stageName>" +
+                        stageName +
+                        "</span> Rework?");
                 } else {
 
-                    $("#hdnConfirmProcessId").val(processId);
-                    $("#hdnConfirmStageId").val(stageId);
-                    $("#hdnAssignedUser").val(username);
-                    $("#Rework").val(rework);
-
-                    if (rework) {
-                        $("#msgComplete").html("Are you sure you want to send for <span id=stageName>" +
-                            stageName +
-                            "</span> Rework?");
-                    } else {
-
-                        $("#msgComplete").html("Are you sure you want to mark <span id=stageName>" +
-                            stageName +
-                            "</span> as complete?");
-                    }
-                    $("#ConfirmModal").modal("show");
+                    $("#msgComplete").html("Are you sure you want to mark <span id=stageName>" +
+                        stageName +
+                        "</span> as complete?");
                 }
+                $("#ConfirmModal").modal("show");
+
 
             },
             error: function (error) {
@@ -166,7 +158,7 @@
 
         var url = "Workflow/?handler=ValidateRework";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true,false);
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true);
 
 
     });
@@ -665,17 +657,17 @@
 
 
     $("#btnPublishConfirm").click(function () {
-        var complete = $("#Complete").val();
+        //var complete = $("#Complete").val();
         var processId = $("#hdnProcessId").val();
-        if (complete === "true") {
+        //if (complete === "true") {
             completeWorkflow(processId);
-        } else {
+        //} else {
 
-            var versionNo = $("#chartVersionNo").val();
-            processId = $("#hdnPublishProcessId").val();
-            var stageId = $("#hdnPublishStageId").val();
-            publishCarisChart(versionNo, processId, stageId);
-        }
+        //    var versionNo = $("#chartVersionNo").val();
+        //    processId = $("#hdnPublishProcessId").val();
+        //    var stageId = $("#hdnPublishStageId").val();
+        //    publishCarisChart(versionNo, processId, stageId);
+        //}
 
     });
 

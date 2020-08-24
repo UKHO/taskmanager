@@ -387,7 +387,7 @@ namespace DbUpdatePortal
 
 
 
-        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId, bool publish)
+        public IActionResult OnPostValidateComplete(int processId, string username, int stageTypeId)
         {
             LogContext.PushProperty("ActivityName", "Workflow");
             LogContext.PushProperty("ProcessId", processId);
@@ -420,7 +420,7 @@ namespace DbUpdatePortal
                 };
             }
 
-            _logger.LogInformation("Finished ValidateComplete for Workflow with: ProcessId: {ProcessId}, AssignedUser: {AssignedUser}, StageTypeId: {StageTypeId}, and Publish: {Publish}");
+            _logger.LogInformation("Finished ValidateComplete for Workflow with: ProcessId: {ProcessId}, AssignedUser: {AssignedUser} and  StageTypeId: {StageTypeId}");
 
             return new JsonResult(HttpStatusCode.OK);
         }
