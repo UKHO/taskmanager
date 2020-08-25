@@ -6,6 +6,7 @@ using DbUpdatePortal.Enums;
 using DbUpdatePortal.Helpers;
 using DbUpdateWorkflowDatabase.EF;
 using DbUpdateWorkflowDatabase.EF.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,6 +26,7 @@ using System.Threading.Tasks;
 
 namespace DbUpdatePortal
 {
+    [Authorize]
     [TypeFilter(typeof(JavascriptError))]
     public class WorkflowModel : PageModel
     {
@@ -234,7 +236,7 @@ namespace DbUpdatePortal
 
             Header = $"{taskInfo.Name}{(String.IsNullOrEmpty(taskInfo.ChartingArea) ? "" : $" - {taskInfo.ChartingArea}")}";
 
-            //Enable complete if Verify is completed and ENC and SNC are either completed ord Inactive 
+            //Enable complete if Verify is completed and Awaiting Publication is either completed or Inactive 
             CompleteEnabled = !TaskStages.Exists(t =>
                 (t.TaskStageTypeId == (int)DbUpdateTaskStageType.Verify &&
                  t.Status != DbUpdateTaskStageStatus.Completed.ToString()) ||
