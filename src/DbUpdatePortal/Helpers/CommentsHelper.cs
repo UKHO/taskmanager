@@ -1,20 +1,19 @@
-﻿using NCNEPortal.Enums;
-using NCNEWorkflowDatabase.EF;
-using NCNEWorkflowDatabase.EF.Models;
+﻿using DbUpdatePortal.Enums;
+using DbUpdateWorkflowDatabase.EF;
+using DbUpdateWorkflowDatabase.EF.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace NCNEPortal.Helpers
+namespace DbUpdatePortal.Helpers
 {
     public class CommentsHelper : ICommentsHelper
     {
-        private readonly NcneWorkflowDbContext _dbContext;
+        private readonly DbUpdateWorkflowDbContext _dbContext;
 
-        public CommentsHelper(NcneWorkflowDbContext dbContext)
+        public CommentsHelper(DbUpdateWorkflowDbContext dbContext)
         {
             _dbContext = dbContext;
         }
-
 
         public async Task AddTaskComment(string comment, int processId, AdUser user)
         {
@@ -31,21 +30,18 @@ namespace NCNEPortal.Helpers
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task AddTaskSystemComment(NcneCommentType changeType, int processId, AdUser user, string stageName,
+        public async Task AddTaskSystemComment(DbUpdateCommentType changeType, int processId, AdUser user, string stageName,
             string roleName, DateTime? dateChangedTo)
         {
             var comment = changeType switch
             {
-                NcneCommentType.CompleteStage => stageName + " Step completed",
-                NcneCommentType.ReworkStage => stageName + " Step sent for Rework",
-                NcneCommentType.DateChange => "Task Information dates changed",
-                NcneCommentType.CompilerChange => "Compiler role changed to " + roleName,
-                NcneCommentType.V1Change => "V1 role changed to " + roleName,
-                NcneCommentType.V2Change => "V2 role changed to " + roleName,
-                NcneCommentType.HundredPcChange => "100% Check role changed to " + roleName,
-                NcneCommentType.CarisPublish => "Chart published in CARIS",
-                NcneCommentType.CompleteWorkflow => "Workflow completed",
-                NcneCommentType.ThreePsChange => "3PS Details changed",
+                DbUpdateCommentType.CompleteStage => stageName + " Step completed",
+                DbUpdateCommentType.ReworkStage => stageName + " Step sent for Rework",
+                DbUpdateCommentType.DateChange => "Target Date changed to " + dateChangedTo?.ToShortDateString(),
+                DbUpdateCommentType.CompilerChange => "Compiler role changed to " + roleName,
+                DbUpdateCommentType.V1Change => "Verifier role changed to " + roleName,
+                DbUpdateCommentType.CompleteWorkflow => "Workflow completed",
+                DbUpdateCommentType.CarisProjectCreation => "Caris Project created by : " + roleName,
                 _ => throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null)
             };
 

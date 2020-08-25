@@ -76,6 +76,7 @@ namespace DbUpdateWorkflowDatabase.EF
 
             modelBuilder.Entity<TaskRole>().HasIndex(i => i.ProcessId).IsUnique();
             modelBuilder.Entity<TaskStage>().Ignore(l => l.IsReadOnly);
+            modelBuilder.Entity<TaskStageType>().Ignore(l => l.DisplayName);
         }
     }
 }

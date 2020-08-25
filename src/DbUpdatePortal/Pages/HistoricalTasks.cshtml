@@ -1,0 +1,173 @@
+﻿@page
+@model DbUpdatePortal.Pages.HistoricalTasksModel
+@{
+    ViewData["Title"] = "Historical Tasks";
+}
+
+<script type="text/javascript" src="~/js/HistoricalTasks.js"></script>
+
+
+<div class="row mt-1">
+    <div class="col-4">
+        <a asp-page="/Index">
+            <img id="ukhoLogo" src="~/images/ukhologo.svg" class="img-responsive" alt="UKHO Logo" />
+        </a>
+    </div>
+
+    <div class="col-8">
+        <div class="row pt-2">
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Database Update</h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    <h1>Historical Tasks</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr />
+<div class="col-12">
+    <div class="row justify-content-end btn-size">
+        <div class="col-2"><input id="btnClose" type="button" class="btn btn-primary btn-block" value="Close" onclick="window.location.href = '/Index'" /></div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="card mb-4 mt-3">
+    <h3>Search</h3>
+    <div class="col-12">
+        <form id="frmSearchForHistoricalTasks" method="post">
+            <div class="card-body pb-0 pt-0">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ProcessId, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ProcessId, new { type = "number", @class = "form-control numberOnly historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.ChartingArea, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.ChartingArea, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.UpdateType, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.UpdateType, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Name, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Name, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Compiler, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Compiler, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                        <div class="form-row d-flex justify-content-start">
+                            <div class="col-3">@Html.LabelFor(model => model.SearchParameters.Verifier, new { @class = "col-form-label" })</div>
+                            <div class="col-7">@Html.TextBoxFor(model => model.SearchParameters.Verifier, new { @class = "form-control historicalTaskSearchField" })</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-start">
+
+                    <div id="historicalTasksErrorMessages" class="dialog error @((Model.ErrorMessages != null && Model.ErrorMessages.Count > 0) ? "show" : "collapse" )  mt-3 pb-1">
+                        <h5 class="mb-3">
+                            <i class="fas fa-times-circle" style="font-size: 1rem;"></i>
+                            <span>There's a problem</span>
+                        </h5>
+                        <ul>
+                            @{
+                                foreach (var error in Model.ErrorMessages)
+                                {
+                                    <li>@error</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex row justify-content-between btn-size">
+                        <div class="col-2"><button id="btnClearHistoricalTasksSearch" type="button" class="btn btn-outline-secondary btn-block" accesskey="c" data-toggle="tooltip" data-placement="left" title="Clear">Clear</button></div>
+                        <div class="col-2"><button id="btnSearch" type="submit" class="btn btn-primary btn-block">Search</button></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Search Results -->
+<div class="card mb-4 mt-3">
+    <h3>Historical Tasks Results</h3>
+    <div class="card-body" style="width:100%">
+        <table id="historicalTasks" class="table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Task Name</th>
+                    <th style="min-width: 3.6rem;">Update Type</th>
+                    <th style="max-width: 3.6rem;">Charting Area</th>
+                    <th style="max-width: 4.0rem;">Compiler</th>
+                    <th style="max-width: 4.0rem;">Verifier</th>
+                    <th style="min-width: 3.9rem;">Status</th>
+                    <th>Date Finished</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.DbUpdateTasks)
+                {
+                    <tr>
+                        <td>
+                            <a asp-page="Workflow" asp-route-ProcessId="@task.ProcessId">@task.ProcessId</a>
+                        </td>
+                        <td>
+                            @task.Name
+                        </td>
+                        <td>
+                            @task.UpdateType
+                        </td>
+                        <td>
+                            @task.ChartingArea
+                        </td>
+                        <td>
+                            @task.TaskRole.Compiler?.DisplayName
+                        </td>
+                        <td>
+                            @task.TaskRole.Verifier?.DisplayName
+                        </td>
+                        <td>
+                            @task.Status
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => task.StatusChangeDate)
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="modalWaitHistoricalTasks" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><span style="margin-right: 10px;" class="fas fa-crosshairs fa-spin"></span> Please Wait</h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Getting historical data from database ...</li>
+                    <li>Populating Historical Tasks list...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

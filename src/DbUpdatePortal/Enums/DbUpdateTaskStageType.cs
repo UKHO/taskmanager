@@ -5,8 +5,9 @@
         Compile = 1,
         Verify = 2,
         Verification_Rework = 3,
-        SNC = 4,
-        ENC = 5
+        ENC = 4,
+        SNC = 5,
+        Awaiting_Publication = 6
 
     }
 }
