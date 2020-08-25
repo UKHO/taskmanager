@@ -1,0 +1,124 @@
+﻿@using DbUpdatePortal.Enums
+@model DbUpdateWorkflowDatabase.EF.Models.TaskStage
+@if (@Model.Status != DbUpdateTaskStageStatus.Inactive.ToString())
+{
+    <tr class="workflow-row">
+        <td>
+            <h4 class="@((Model.Status == DbUpdateTaskStageStatus.Open.ToString()) ? "Inactive" : "")">
+                @Model.TaskStageType.DisplayName
+            </h4>
+        </td>
+        <td>
+            @if (Model.Status == DbUpdateTaskStageStatus.InProgress.ToString() || Model.Status == DbUpdateTaskStageStatus.Rework.ToString())
+            {
+
+                <div class="status inProgress">
+                    <span class="fa fa-edit"> </span>
+                    <span>@Model.Status</span>
+                </div>
+
+            }
+            else
+            {
+                @if (Model.Status == DbUpdateTaskStageStatus.Completed.ToString())
+                {
+                    <div class="status Complete">
+                        <span class="fa fa-edit"> </span>
+                        <span>@Model.Status</span>
+                    </div>
+                }
+
+            }
+        </td>
+        <td>@Model.Assigned?.DisplayName</td>
+        <td>
+            <div class="form-group">
+               @* <div>@Html.TextBoxFor(model => model.DateExpected,  "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input"})</div>*@
+            </div>
+        </td>
+        <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
+        <td>
+
+            <div class="d-flex justify-content-end align-items-center">
+                <div class="mr-4">
+                    <span>Comments</span>
+                    <label class="switch ml-1 mb-auto">
+                        <input type="checkbox" class="success" id="commentscheck-@(Model.TaskStageId)">
+                        <span class="slider commentslider" data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)"></span>
+                    </label>
+                </div>
+            </div>
+
+
+            @if (Model.Status == DbUpdateTaskStageStatus.InProgress.ToString() &&
+  Model.IsReadOnly == false)
+            {
+                <div class="d-flex justify-content-end">
+                    @if (@Model.TaskStageType.AllowRework)
+                    {
+                        <div class="mt-3 mr-3">
+                            <button id="btn@(Model.TaskStageId)Rework" class="btn btn-block btn-secondary btn-stage-rework"
+                                    data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                                    data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
+                                    data-StageName="@(Model.TaskStageType.Name)">
+                                Rework
+                            </button>
+                        </div>
+                    }
+                    <div class="mt-3">
+                        <input type="button" value="Mark Complete"
+                               id="btn@(Model.TaskStageId)Complete" class="btn btn-block btn-complete btn-stage-complete"
+                               data-TaskStageId="@(Model.TaskStageId)" data-ProcessId="@(Model.ProcessId)"
+                               data-StageTypeid="@(Model.TaskStageTypeId)" data-username="@(Model.Assigned?.UserPrincipalName)"
+                               data-StageName="@(Model.TaskStageType.DisplayName)" style="min-width: 139px;">
+
+
+                    </div>
+
+                </div>
+            }
+
+        </td>
+    </tr>
+
+    @*--- TASK STAGE COMMENTS---*@
+
+    <tr id="comment-@(Model.TaskStageId)" class="collapse hide">
+
+        <td colspan="6" class="pl-3 pr-3">
+            <div id="container-@(Model.TaskStageId)" class="container" style="overflow-y: auto; max-height: 150px;">
+                @foreach (var comment in Model.TaskStageComment.OrderByDescending(t => t.Created))
+                {
+                    <div class="row m-3">
+                        <div class="col-2">
+                            <div>
+                                @comment.Created.ToLongDateString()
+                            </div>
+                            <br />
+                            <div>
+                                <strong>@comment.AdUser.DisplayName</strong>
+                            </div>
+                        </div>
+                        <div class="col-10">
+                            @comment.Comment
+                        </div>
+                    </div>
+                    <br />
+                }
+            </div>
+            <div class="col text-right">
+                <span class="fas fa-comment-alt mr-2"></span>
+                <button style="border-color: white; padding-left: 0" class="btn btn-link btnAddcomment"
+                        data-taskstage="@(Model.TaskStageId)" data-processid="@(Model.ProcessId)"
+                        @(Model.IsReadOnly ? "disabled" : "")>
+                    Add a comment
+                </button>
+            </div>
+
+        </td>
+
+    </tr>
+
+
+
+}

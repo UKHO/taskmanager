@@ -28,7 +28,7 @@
 
     handleAssignTask();
 
-    //handleHistoricalTasks();
+    handleHistoricalTasks();
 
 
     function setupAssignedTasks() {
@@ -176,14 +176,13 @@
         );
     }
 
-    //function handleHistoricalTasks() {
-    //    $("#btnHistoricalTasks").click(function () {
+    function handleHistoricalTasks() {
+        $("#btnHistoricalTasks").click(function () {
 
-    //        //sessionStorage.setItem('historicalMenuItem', menuItem);
-    //        window.location.href = "/HistoricalTasks";
+            window.location.href = "/HistoricalTasks";
 
-    //    });
-    //}
+        });
+    }
 
     function handleAssignTask() {
 

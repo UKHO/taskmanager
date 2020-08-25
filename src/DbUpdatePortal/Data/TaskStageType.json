@@ -1,5 +1,5 @@
 [
- {
+  {
     "TaskStageTypeId": 1,
     "Name": "Compile Database",
     "SequenceNumber": 1,
@@ -19,14 +19,20 @@
   },
   {
     "TaskStageTypeId": 4,
-    "Name": "SNC",
+    "Name": "ENC",
     "SequenceNumber": 4,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 5,
-    "Name": "ENC",
+    "Name": "SNC",
     "SequenceNumber": 5,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 6,
+    "Name": "Awaiting Publication",
+    "SequenceNumber": 6,
     "AllowRework": false
   }
 ]
