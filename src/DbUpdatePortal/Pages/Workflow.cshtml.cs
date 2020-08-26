@@ -234,7 +234,7 @@ namespace DbUpdatePortal
             }
             else if (taskInfo != null) CarisProjectName = $"{taskInfo.Name}_{ProcessId}";
 
-            Header = $"{taskInfo.Name}{(String.IsNullOrEmpty(taskInfo.ChartingArea) ? "" : $" - {taskInfo.ChartingArea}")}";
+            Header = $"{taskInfo.Name}{(String.IsNullOrEmpty(taskInfo.UpdateType) ? "" : $" - {taskInfo.UpdateType}")}";
 
             //Enable complete if Verify is completed and Awaiting Publication is either completed or Inactive 
             CompleteEnabled = !TaskStages.Exists(t =>
