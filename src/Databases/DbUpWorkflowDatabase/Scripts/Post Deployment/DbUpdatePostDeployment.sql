@@ -16,7 +16,7 @@ merge [dbo].[ChartingArea] as target
 using (
 		values 
 				(1,'Home waters'),
-				(2, 'National responsiblity'),
+				(2, 'National responsibility'),
 				(3, 'Primary charting')
 ) as source ([ChartingAreaId], [Name])
 on (target.[ChartingAreaId] = source.[ChartingAreaId])
