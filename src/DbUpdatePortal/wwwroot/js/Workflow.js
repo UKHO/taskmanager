@@ -341,15 +341,17 @@
 
 
     $("#btnTerminate").on("click", function() {
-            
-           
+
+        if (formChanged) {
+            alert("Please save the changes before terminating the workflow");
+        } else {
 
             var userName = $("#Verifier1Upn").val();
 
             $.ajax({
                 type: "POST",
                 url: "Workflow/?handler=ValidateTerminateWorkflow",
-                beforeSend: function (xhr) {
+                beforeSend: function(xhr) {
                     xhr.setRequestHeader("RequestVerificationToken",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
@@ -358,11 +360,10 @@
 
                 },
 
-                success: function (result) {
+                success: function(result) {
                     $("#ConfirmTerminate").modal("show");
-                }
-                ,
-                error: function (error) {
+                },
+                error: function(error) {
                     var responseJson = error.responseJSON;
                     (this).checked = false;
 
@@ -372,7 +373,7 @@
                         $("#workflowSaveErrorMessage").append("<ul/>");
                         var unOrderedList = $("#workflowSaveErrorMessage ul");
 
-                        responseJson.forEach(function (item) {
+                        responseJson.forEach(function(item) {
                             unOrderedList.append("<li>" + item + "</li>");
                         });
 
@@ -382,8 +383,8 @@
                 }
 
             });
+        }
 
-            
     });
 
     $("#btnSave").on("click",
@@ -665,47 +666,50 @@
     }
 
     $("#btnComplete").click(function () {
-       
-        var userName = $("#Verifier1Upn").val();
 
-        $.ajax({
-            type: "POST",
-            url: "Workflow/?handler=ValidateCompleteWorkflow",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("RequestVerificationToken",
-                    $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                "userName" : userName
+        if (formChanged) {
+            alert("Please save the changes before completing the workflow");
+        } else {
 
-            },
+            var userName = $("#Verifier1Upn").val();
 
-            success: function (result) {
-                $("#Complete").val(true);
-                $("#msgPublishComplete").html("Are you sure you want to complete this workflow ?");
-                $("#PublishConfirmModal").modal("show");
+            $.ajax({
+                type: "POST",
+                url: "Workflow/?handler=ValidateCompleteWorkflow",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("RequestVerificationToken",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    "userName": userName
+
+                },
+
+                success: function(result) {
+                    $("#Complete").val(true);
+                    $("#msgPublishComplete").html("Are you sure you want to complete this workflow ?");
+                    $("#PublishConfirmModal").modal("show");
+                },
+                error: function(error) {
+                    var responseJson = error.responseJSON;
+                    (this).checked = false;
+
+                    if (responseJson != null) {
+                        $("#workflowSaveErrorMessage").html("");
+
+                        $("#workflowSaveErrorMessage").append("<ul/>");
+                        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+                        responseJson.forEach(function(item) {
+                            unOrderedList.append("<li>" + item + "</li>");
+                        });
+
+                        $("#modalSaveWorkflowErrors").modal("show");
+                    }
+
                 }
-            ,
-            error: function(error) {
-                var responseJson = error.responseJSON;
-                (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function(item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-
-            }
-
-        });
-
+            });
+        }
     });
 });
