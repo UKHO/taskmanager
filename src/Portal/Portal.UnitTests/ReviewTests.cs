@@ -107,12 +107,14 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService,
+                _fakePortalUserDbService);
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
-                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper, _fakePortalUserDbService);
+                _fakeCommentsHelper, _fakeAdDirectoryService, _fakeLogger, _pageValidationHelper,
+                _fakePortalUserDbService);
         }
 
         [TearDown]
@@ -122,7 +124,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_a_primary_tasktype_that_does_not_exist_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_a_primary_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
             {
@@ -148,7 +151,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_empty_primary_workspaceAffected_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_empty_primary_workspaceAffected_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -180,7 +184,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_invalid_primary_assessor_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_invalid_primary_assessor_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -188,7 +193,7 @@ namespace Portal.UnitTests
                 Name = "Simple"
             });
 
-            var testUser = new AdUser { DisplayName = "testing", UserPrincipalName = "test" };
+            var testUser = new AdUser {DisplayName = "testing", UserPrincipalName = "test"};
 
             var reviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(p => p.ProcessId == ProcessId);
             reviewData.Reviewer = testUser;
@@ -199,7 +204,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = new AdUser { DisplayName = "Unknown", UserPrincipalName = "unknown" }
+                Assessor = new AdUser {DisplayName = "Unknown", UserPrincipalName = "unknown"}
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -211,16 +216,20 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(testUser))
                 .Returns(true);
 
-            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored)).Returns(("testing", "test"));
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("testing", "test"));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Assessor to unknown user Unknown"));
+            Assert.IsTrue(
+                _reviewModel.ValidationErrorMessages.Contains(
+                    $"Assign Task 1: Unable to set Assessor to unknown user Unknown"));
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_invalid_primary_verifier_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_invalid_primary_verifier_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -252,7 +261,9 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.IsTrue(_reviewModel.ValidationErrorMessages.Contains($"Assign Task 1: Unable to set Verifier to unknown user Unknown"));
+            Assert.IsTrue(
+                _reviewModel.ValidationErrorMessages.Contains(
+                    $"Assign Task 1: Unable to set Verifier to unknown user Unknown"));
         }
 
         [Test]
@@ -288,7 +299,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_additional_tasktype_that_does_not_exist_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_additional_tasktype_that_does_not_exist_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -330,7 +342,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_empty_additional_workspaceAffected_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_empty_additional_workspaceAffected_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -371,7 +384,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_invalid_additional_assessor_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_invalid_additional_assessor_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -413,11 +427,13 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
-                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Assessor to unknown user Unknown"));
+                _reviewModel.ValidationErrorMessages.Contains(
+                    $"Additional Assign Task: Unable to set Assessor to unknown user Unknown"));
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_invalid_additional_verifier_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_invalid_additional_verifier_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -460,11 +476,13 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.IsTrue(
-                _reviewModel.ValidationErrorMessages.Contains($"Additional Assign Task: Unable to set Verifier to unknown user Unknown"));
+                _reviewModel.ValidationErrorMessages.Contains(
+                    $"Additional Assign Task: Unable to set Verifier to unknown user Unknown"));
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_an_empty_additional_assessor_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_an_empty_additional_assessor_results_in_validation_error_message()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
@@ -507,7 +525,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_when_primary_assign_task_has_note_it_should_be_copied_to_comments_not_within_portal()
+        public async Task
+            Test_OnPostDoneAsync_when_primary_assign_task_has_note_it_should_be_copied_to_comments_not_within_portal()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -533,7 +552,9 @@ namespace Portal.UnitTests
                 AdditionalAssignedTasks = new List<DbAssessmentAssignTask>()
             };
 
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
+                    _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -551,7 +572,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostDoneAsync_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
+        public async Task
+            Test_OnPostDoneAsync_when_primary_assign_task_has_no_note_it_should_not_be_copied_to_comments()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -599,7 +621,7 @@ namespace Portal.UnitTests
                 WorkspaceAffected = "Test Workspace",
                 Assessor = TestUser
             };
-            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" };
+            _reviewModel.Reviewer = new AdUser {DisplayName = "unknown", UserPrincipalName = "unknown"};
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -738,7 +760,8 @@ namespace Portal.UnitTests
 
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_invalid_username_for_reviewer_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_invalid_username_for_reviewer_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -778,7 +801,8 @@ namespace Portal.UnitTests
 
 
         [Test]
-        public async Task Test_OnPostDoneAsync_entering_empty_username_for_reviewer_results_in_validation_error_message()
+        public async Task
+            Test_OnPostDoneAsync_entering_empty_username_for_reviewer_results_in_validation_error_message()
         {
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -890,7 +914,9 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+            Assert.Contains(
+                "Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save",
+                _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -931,13 +957,16 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+            Assert.Contains(
+                $"Operators: {TestUser.DisplayName} is assigned to this task. Please assign the task to yourself and click Save",
+                _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_OnPostDoneAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -965,18 +994,20 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult)await _reviewModel.OnPostDoneAsync(ProcessId);
+            var result = (JsonResult) await _reviewModel.OnPostDoneAsync(ProcessId);
 
-            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
+            Assert.Contains(
+                $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_OnPostSaveAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -1004,18 +1035,20 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult)await _reviewModel.OnPostSaveAsync(ProcessId);
+            var result = (JsonResult) await _reviewModel.OnPostSaveAsync(ProcessId);
 
-            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
+            Assert.Contains(
+                $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
         }
 
         [Test]
         public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Creates_A_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -1038,7 +1071,9 @@ namespace Portal.UnitTests
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
+                    _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -1056,7 +1091,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Updates_Existing_Row()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _fakeCommentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -1080,7 +1116,9 @@ namespace Portal.UnitTests
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
+                    _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
@@ -1095,7 +1133,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_That_Setting_Task_To_On_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _fakePortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -1119,7 +1158,9 @@ namespace Portal.UnitTests
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
+                    _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -1137,7 +1178,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_That_Setting_Task_To_Off_Hold_Adds_Comment()
         {
-            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _commentsHelper, _fakeAdDirectoryService,
+            _reviewModel = new ReviewModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient,
+                _commentsHelper, _fakeAdDirectoryService,
                 _fakeLogger, _fakepageValidationHelper, _realPortalUserDbService);
 
             var primaryAssignTaskNote = "Testing primary";
@@ -1161,7 +1203,9 @@ namespace Portal.UnitTests
                 .Returns((TestUser2.DisplayName, TestUser2.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser2.UserPrincipalName))
                 .Returns(true);
-            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored, _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+            A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
+                    _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
@@ -1174,7 +1218,8 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnPostReviewTerminateAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
+        public async Task
+            Test_OnPostReviewTerminateAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
         {
             var invalidPrincipalName = "THIS-USER-PRINCIPAL-NAME-DOES-NOT-EXIST@example.com";
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
@@ -1182,36 +1227,44 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+            var result = (JsonResult) await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             // Assert
-            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
+            Assert.Contains(
+                $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
                 _reviewModel.ValidationErrorMessages);
 
-            A.CallTo(() => _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent", A<ProgressWorkflowInstanceEvent>.Ignored))
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent",
+                        A<ProgressWorkflowInstanceEvent>.Ignored))
                 .MustNotHaveHappened();
             Assert.IsFalse(await _dbContext.WorkflowInstance.AnyAsync(
                 wi => wi.ProcessId == ProcessId && wi.Status == WorkflowStatus.Updating.ToString()));
         }
 
         [Test]
-        public async Task Test_OnPostReviewTerminateAsync_Given_Task_Not_Assigned_To_User_Terminating_Returns_FailedValidation_Errors()
+        public async Task
+            Test_OnPostReviewTerminateAsync_Given_Task_Not_Assigned_To_User_Terminating_Returns_FailedValidation_Errors()
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("ThisUserIsNotTheReviewer", "thisuser@foobar.com"));
 
-            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+            var result = (JsonResult) await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             // Assert
-            Assert.AreEqual((int)ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
+            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save", _reviewModel.ValidationErrorMessages);
+            Assert.Contains(
+                "Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save",
+                _reviewModel.ValidationErrorMessages);
 
-            A.CallTo(() => _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent", A<ProgressWorkflowInstanceEvent>.Ignored))
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent("ProgressWorkflowInstanceEvent",
+                        A<ProgressWorkflowInstanceEvent>.Ignored))
                 .MustNotHaveHappened();
             Assert.IsFalse(await _dbContext.WorkflowInstance.AnyAsync(
                 wi => wi.ProcessId == ProcessId && wi.Status == WorkflowStatus.Updating.ToString()));
@@ -1273,12 +1326,15 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.", _reviewModel.ValidationErrorMessages);
+            Assert.Contains(
+                "Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.",
+                _reviewModel.ValidationErrorMessages);
 
         }
 
         [Test]
-        public async Task Test_OnPostReviewTerminateAsync_Terminating_Off_Hold_Task_Results_In_No_Validation_Error_Messages()
+        public async Task
+            Test_OnPostReviewTerminateAsync_Terminating_Off_Hold_Task_Results_In_No_Validation_Error_Messages()
         {
             var thisOnHold = _dbContext.OnHold.Single(oh => oh.ProcessId == ProcessId);
 
@@ -1289,6 +1345,34 @@ namespace Portal.UnitTests
             await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 0);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_Only_Entering_The_Team_Saves_Ok()
+        {
+            _reviewModel.Reviewer = null;
+            _reviewModel.ActivityCode = null;
+            _reviewModel.Ion = null;
+            _reviewModel.SourceCategory = null;
+            _reviewModel.Team = "HW";
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "test type",
+                WorkspaceAffected = "Test Workspace"
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns(("Test User", "test@email.com"));
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            await _reviewModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual(0, _reviewModel.ValidationErrorMessages.Count);
         }
     }
 }
