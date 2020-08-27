@@ -57,40 +57,6 @@
     });
     
 
-    
-
-    //function publishCarisChart(versionNo, processId, stageId) {
-    //    $.ajax({
-    //        type: "POST",
-    //        url: "Workflow/?handler=PublishCarisChart",
-    //        beforeSend: function (xhr) {
-    //            xhr.setRequestHeader("RequestVerificationToken",
-    //                $('input:hidden[name="__RequestVerificationToken"]').val());
-    //        },
-    //        data: {
-    //            "versionNumber": versionNo,
-    //            "processId": processId,
-    //            "stageId": stageId
-    //        },
-    //        success: function (result) {
-    //            formChanged = false;
-    //            $("#PublishChartModal").modal("hide");
-    //            window.location.href = "/workflow?ProcessId=" + processId;
-
-    //        },
-    //        error: function (error) {
-    //            var responseJson = error.responseJSON;
-    //            if (responseJson != null) {
-    //                $("#publishChartErrorMessage").text(responseJson);
-    //                $("#publishChartError").collapse("show");
-    //            }
-    //            $("#PublishConfirmModal").modal("hide");
-    //            $("#btnPublish").prop("disabled", true);
-    //            $("#PublishChartModal").modal("show");
-    //        }
-    //    });
-    //}
-
     function validateCompleteRework(url,  processId,stageId,
           username, stageTypeId,stageName, rework) {
         $.ajax({
@@ -657,18 +623,8 @@
 
 
     $("#btnPublishConfirm").click(function () {
-        //var complete = $("#Complete").val();
         var processId = $("#hdnProcessId").val();
-        //if (complete === "true") {
-            completeWorkflow(processId);
-        //} else {
-
-        //    var versionNo = $("#chartVersionNo").val();
-        //    processId = $("#hdnPublishProcessId").val();
-        //    var stageId = $("#hdnPublishStageId").val();
-        //    publishCarisChart(versionNo, processId, stageId);
-        //}
-
+        completeWorkflow(processId);
     });
 
     function completeWorkflow(processId) {
