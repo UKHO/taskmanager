@@ -146,6 +146,7 @@
 
     $('#txtGlobalSearch').keyup(function () {
         inFlightTasksTable.search($(this).val()).draw();
+        assignedTasksTable.search($(this).val()).draw();
     });
 
     $("#btnNewTask").click(function () { window.location.href = '/NewTask'; });
