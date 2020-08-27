@@ -132,8 +132,12 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -161,8 +165,11 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -180,6 +187,12 @@ namespace Portal.UnitTests
                 AssignedTaskTypeId = 1,
                 Name = "Simple"
             });
+
+            var testUser = new AdUser { DisplayName = "testing", UserPrincipalName = "test" };
+
+            var reviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(p => p.ProcessId == ProcessId);
+            reviewData.Reviewer = testUser;
+
             await _dbContext.SaveChangesAsync();
 
             _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
@@ -190,9 +203,15 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            _reviewModel.Reviewer = testUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(testUser))
+                .Returns(true);
+
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored)).Returns(("testing", "test"));
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
 
@@ -223,6 +242,7 @@ namespace Portal.UnitTests
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -254,7 +274,11 @@ namespace Portal.UnitTests
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
 
+            _reviewModel.Reviewer = TestUser;
+
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -290,7 +314,12 @@ namespace Portal.UnitTests
                 }
             };
 
+            _reviewModel.Reviewer = TestUser;
+
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -326,8 +355,11 @@ namespace Portal.UnitTests
                     Assessor = TestUser
                 }
             };
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -415,6 +447,7 @@ namespace Portal.UnitTests
                     }
                 }
             };
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -459,8 +492,11 @@ namespace Portal.UnitTests
                     Assessor = AdUser.Empty
                 }
             };
+            _reviewModel.Reviewer = TestUser;
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostDoneAsync(ProcessId);
@@ -659,7 +695,7 @@ namespace Portal.UnitTests
             };
             _reviewModel.Reviewer = AdUser.Empty;
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
-            
+
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
@@ -782,6 +818,8 @@ namespace Portal.UnitTests
         {
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+                .Returns(true);
 
             _dbContext.AssignedTaskType.Add(new AssignedTaskType
             {
@@ -839,6 +877,10 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+                .Returns(true);
+
             _reviewModel.Reviewer = TestUser;
             _reviewModel.Team = "HW";
 
@@ -876,6 +918,10 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+                .Returns(true);
+
             _reviewModel.Reviewer = TestUser2;
             _reviewModel.Team = "HW";
 

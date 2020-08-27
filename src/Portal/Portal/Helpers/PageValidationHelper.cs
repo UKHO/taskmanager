@@ -48,6 +48,11 @@ namespace Portal.Helpers
 
             if (action == "Done")
             {
+                if (!await ValidateOperators(reviewer, "Reviewer", validationErrorMessages))
+                {
+                    return false;
+                }
+
                 if (currentAssignedReviewerInDb.HasNoUserPrincipalName)
                 {
                     validationErrorMessages.Add($"Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
@@ -58,26 +63,21 @@ namespace Portal.Helpers
                     validationErrorMessages.Add($"Operators: {currentAssignedReviewerInDb.DisplayName} is assigned to this task. Please assign the task to yourself and click Save");
                     isValid = false;
                 }
-            }
 
-            if (!ValidateTaskType(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
-            {
-                isValid = false;
-            }
+                if (!ValidateTaskType(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
+                {
+                    isValid = false;
+                }
 
-            if (!await ValidateOperators(reviewer, "Reviewer", validationErrorMessages))
-            {
-                isValid = false;
-            }
+                if (!ValidateWorkspace(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
+                {
+                    isValid = false;
+                }
 
-            if (!ValidateWorkspace(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
-            {
-                isValid = false;
-            }
-
-            if (!await ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
-            {
-                isValid = false;
+                if (!await ValidateUsers(primaryAssignedTask, additionalAssignedTasks, validationErrorMessages))
+                {
+                    isValid = false;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(team))
