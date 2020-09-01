@@ -428,11 +428,20 @@ namespace Portal.Pages.DbAssessment
         {
             var currentReview = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
 
-            currentReview.Assessor = await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor.UserPrincipalName);
-            currentReview.Verifier = await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) ?
-                await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) : null;
+            currentReview.Assessor =
+                await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
+                    ? await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
+                    : null;
+            currentReview.Verifier = 
+                await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) ?
+                await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName)
+                    : null;
             currentReview.TaskType = PrimaryAssignedTask.TaskType;
-            currentReview.Reviewer = await _portalUserDbService.GetAdUserAsync(Reviewer.UserPrincipalName);
+            currentReview.Reviewer =
+                await _portalUserDbService.ValidateUserAsync(Reviewer?.UserPrincipalName)
+                    ? await _portalUserDbService.GetAdUserAsync(Reviewer?.UserPrincipalName)
+                    : null;
+
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
