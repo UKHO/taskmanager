@@ -1,4 +1,5 @@
 ﻿using DbUpdatePortal.Auth;
+using DbUpdatePortal.Enums;
 using DbUpdatePortal.Helpers;
 using DbUpdatePortal.UnitTests.Helper;
 using DbUpdateWorkflowDatabase.EF;
@@ -6,6 +7,7 @@ using DbUpdateWorkflowDatabase.EF.Models;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace DbUpdatePortal.UnitTests
@@ -247,6 +249,134 @@ namespace DbUpdatePortal.UnitTests
                     "None", validationErrorMessages);
             Assert.IsTrue(result);
             CollectionAssert.IsEmpty(validationErrorMessages);
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateWorkflowPage_with_Valid_data_Passes()
+        {
+            var validationErrorMessages = new List<string>();
+
+            A.CallTo(() => _fakeDbUpdateUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
+
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser,
+                Verifier = _testUser2
+            };
+
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "None", DateTime.Now,
+                validationErrorMessages);
+
+            Assert.IsTrue(result);
+            Assert.IsEmpty(validationErrorMessages);
+        }
+
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.Compile)]
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.Verify)]
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.Verification_Rework)]
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.SNC)]
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.ENC)]
+        [TestCase("", "Valid User1", DbUpdateTaskStageType.Awaiting_Publication)]
+        public void Validation_for_ValidateForCompletion_with_empty_user_fails(string assignedUser, string currentUser, DbUpdateTaskStageType stageType)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(assignedUser, currentUser, stageType, new TaskRole(), null, validationErrorMessages);
+
+            Assert.IsFalse(result);
+
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to this stage and Save before completion");
+
+        }
+
+        [TestCase(DbUpdateTaskStageType.Compile)]
+        [TestCase(DbUpdateTaskStageType.Verify)]
+        [TestCase(DbUpdateTaskStageType.Verification_Rework)]
+        [TestCase(DbUpdateTaskStageType.SNC)]
+        [TestCase(DbUpdateTaskStageType.ENC)]
+        [TestCase(DbUpdateTaskStageType.Awaiting_Publication)]
+        public void Validation_for_ValidateForCompletion_with_wrong_user_fails_for_all_stages_other_than_forms(DbUpdateTaskStageType stageType)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser2.UserPrincipalName, stageType, new TaskRole(),
+                    null, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Current user is not valid for completion of this task stage");
+
+        }
+
+        [Test]
+        public void Validation_for_ValidateForCompletion_fails_for_Compile_step_if_Verifier_not_assigned()
+        {
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            { Compiler = _testUser };
+
+            var result =
+                _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName, DbUpdateTaskStageType.Compile, role,
+                    null, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            CollectionAssert.Contains(validationErrorMessages, "Please assign a user to Verifier role and Save before completing this stage");
+
+        }
+
+        [TestCase(DbUpdateTaskStageType.Compile)]
+        [TestCase(DbUpdateTaskStageType.Verify)]
+        public void Validation_for_ValidateForCompletion_Passes_if_user_assigned_for_next_step(DbUpdateTaskStageType currentStage)
+        {
+
+            var validationErrorMessages = new List<string>();
+
+            var role = new TaskRole()
+            {
+                Compiler = _testUser2,
+                Verifier = _testUser
+            };
+
+            var result = _pageValidationHelper.ValidateForCompletion(_testUser.UserPrincipalName, _testUser.UserPrincipalName,
+                currentStage, role, null, validationErrorMessages);
+
+            Assert.IsTrue(result);
+
+        }
+
+        [TestCase("", "Valid User1", "Please assign a user to this stage before sending this task for Rework")]
+        [TestCase("Valid User2", "Valid User1", "Current user is not valid for sending this task for Rework")]
+        public void Validation_for_ValidateForRework_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForRework(assignedUser, currentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
+
+        }
+
+        [TestCase("", "Valid User1", "Please assign a user to the Verifier role and Save before completing the workflow")]
+        [TestCase("Valid User2", "Valid User1", "Only users assigned to the Verifier role are allowed to complete the workflow.")]
+        public void Validation_for_ValidateForCompleteWorkflow_with_Invalid_user_fails(string assignedUser, string currentUser, string errorMessage)
+        {
+            var validationErrorMessages = new List<string>();
+
+            var result =
+                _pageValidationHelper.ValidateForCompleteWorkflow(assignedUser, currentUser, validationErrorMessages);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, errorMessage);
+
 
         }
     }
