@@ -59,5 +59,11 @@ namespace DbUpdatePortal.TestAutomation.Framework
         {
             _objectContainer.RegisterTypeAs<NewTaskPage, INewTaskPage>();
         }
+
+        [BeforeScenario(Order = 19)]
+        public void RegisterHistoricalTaskPage()
+        {
+            _objectContainer.RegisterTypeAs<HistoricalTaskPage, IHistoricalTaskPage>();
+        }
     }
 }
