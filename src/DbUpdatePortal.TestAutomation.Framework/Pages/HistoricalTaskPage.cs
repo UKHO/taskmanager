@@ -10,7 +10,7 @@ namespace DbUpdatePortal.TestAutomation.Framework.Pages
     public class HistoricalTaskPage : PageBase, IHistoricalTaskPage
     {
         public HistoricalTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver, wait, urlsConfig.DbUpdateHistoricalTaskPageUrl)
+            : base(driver, wait, urlsConfig.DbUpdateHistoricalTasksPageUrl)
         {
         }
 
