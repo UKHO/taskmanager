@@ -1,4 +1,3 @@
-using System;
 using BoDi;
 using Common.TestAutomation.Framework;
 using Common.TestAutomation.Framework.Axe;
@@ -6,6 +5,7 @@ using Common.TestAutomation.Framework.Logging;
 using DbUpdatePortal.TestAutomation.Framework;
 using DbUpdatePortal.TestAutomation.Framework.Pages;
 using NUnit.Framework;
+using System;
 
 namespace DbUpdatePortal.AccessibilityTests
 {
@@ -66,11 +66,25 @@ namespace DbUpdatePortal.AccessibilityTests
             _axeResultAnalyser.AssertAxeViolations(axeResult);
         }
 
+        //[Test]
+        //public void NewTaskPageIsAccessible()
+        //{
+        //    var newTaskPage = _objectContainer.Resolve<NewTaskPage>();
+        //    newTaskPage.NavigateTo();
+
+        //    Assert.IsTrue(newTaskPage.HasLoaded);
+
+        //    var axeResult = _axePageEvaluator.GetAxeResults();
+
+        //    _axeResultAnalyser.AssertAxeViolations(axeResult);
+        //}
+
+
         [Test]
-        public void NewTaskPageIsAccessible()
+        public void WorkflowPageIsAccessible()
         {
-            var newTaskPage = _objectContainer.Resolve<NewTaskPage>();
-            newTaskPage.NavigateTo();
+            var newTaskPage = _objectContainer.Resolve<WorkflowPage>();
+            newTaskPage.NavigateToProcessId(3);
 
             Assert.IsTrue(newTaskPage.HasLoaded);
 
