@@ -420,4 +420,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="OffHoldByAdUserId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="fc812d76-4396-4b1a-beee-1e0cb85fb35e" ChangeDateTime="09/10/2020 14:30:27">
+    <Property Name="ElementName" Value="[dbo].[OpenAssessmentsToBeProcessedQueue]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[OpenAssessmentsQueue]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6f5807b8-0964-4510-830e-455f9246981f" ChangeDateTime="09/10/2020 14:31:08">
+    <Property Name="ElementName" Value="[dbo].[OpenAssessmentsQueue].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[OpenAssessmentsQueue]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OpenAssessmentsQueueId" />
+  </Operation>
 </Operations>

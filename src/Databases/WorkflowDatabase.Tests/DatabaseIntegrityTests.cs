@@ -715,6 +715,32 @@ namespace WorkflowDatabase.Tests
 
 
         }
+
+        [Test]
+        public async Task Ensure_OpenAssessmentsQueue_table_prevents_duplicate_PrimarySdocId_due_to_UQ()
+        {
+            await _dbContext.OpenAssessmentsQueue.AddAsync(new OpenAssessmentsQueue()
+            {
+                PrimarySdocId = 12345,
+                Timestamp = DateTime.Now
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            using (var newContext = new WorkflowDbContext(_dbContextOptions))
+            {
+                await newContext.OpenAssessmentsQueue.AddAsync(new OpenAssessmentsQueue
+                {
+                    PrimarySdocId = 12345,
+                    Timestamp = DateTime.Now
+                });
+
+                var ex = Assert.ThrowsAsync<DbUpdateException>(async () => await newContext.SaveChangesAsync());
+                Assert.That(ex.InnerException.Message.Contains("Cannot insert duplicate key row", StringComparison.OrdinalIgnoreCase));
+            }
+
+
+        }
     }
 }
 

@@ -85,6 +85,7 @@
     <Build Include="Tables\CarisProjectDetails.sql" />
     <Build Include="Tables\AdUsers.sql" />
     <Build Include="Views\DatabaseAssessmentWorkflowData.sql" />
+    <Build Include="Tables\OpenAssessmentsQueue.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
