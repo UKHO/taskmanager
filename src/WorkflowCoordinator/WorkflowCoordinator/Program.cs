@@ -24,7 +24,7 @@ namespace WorkflowCoordinator
         private static async Task Main(string[] args)
         {
             var (keyVaultAddress, keyVaultClient) = SecretsHelpers.SetUpKeyVaultClient();
-            var isLocalDebugging = false;
+            var isLocalDebugging = ConfigHelpers.IsLocalDevelopment;
 
             var builder = new HostBuilder()
                 .UseEnvironment(ConfigHelpers.HostBuilderEnvironment)
