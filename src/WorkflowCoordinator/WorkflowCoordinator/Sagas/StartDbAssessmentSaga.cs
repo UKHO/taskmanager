@@ -64,7 +64,8 @@ namespace WorkflowCoordinator.Sagas
             LogContext.PushProperty("Message", message.ToJSONSerializedString());
 
             _logger.LogInformation("Entering {EventName} handler with: {Message}");
-
+            
+            
             if (!Data.IsStarted)
             {
                 Data.IsStarted = true;
@@ -73,6 +74,8 @@ namespace WorkflowCoordinator.Sagas
 
                 _logger.LogInformation("Starting new saga for PrimarySdocId {PrimarySdocId}");
             }
+
+            _logger.LogInformation("Create k2 workflow instance for PrimarySdocId {PrimarySdocId}");
 
             if (Data.ProcessId == 0)
             {
@@ -95,7 +98,7 @@ namespace WorkflowCoordinator.Sagas
             _logger.LogInformation("Successfully create k2 workflow instance for PrimarySdocId {PrimarySdocId} with: ProcessId {ProcessId} and K2SerialNumber {K2SerialNumber}");
             _logger.LogInformation("Saving open assessment to our system: PrimarySdocId {PrimarySdocId}, ProcessId {ProcessId}, and K2SerialNumber {K2SerialNumber}");
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, Data.SourceDocumentId, serialNumber, WorkflowStatus.Started);
-            await RemoveSdocIdFromQueue(Data.ProcessId);
+            await RemoveSdocIdFromQueue(message.SourceDocumentId);
             await UpdateDbAssessmentReviewTable(Data.ProcessId, workflowInstanceId);
             await UpdatePrimaryDocumentStatus(Data.ProcessId, Data.SourceDocumentId, Data.CorrelationId, SourceDocumentRetrievalStatus.Started);
             _logger.LogInformation("Successfully Saved open assessment to our system: PrimarySdocId {PrimarySdocId}, ProcessId {ProcessId}, and K2SerialNumber {K2SerialNumber}");
@@ -137,7 +140,13 @@ namespace WorkflowCoordinator.Sagas
         /// <returns></returns>
         public async Task Handle(RetrieveAssessmentDataCommand message, IMessageHandlerContext context)
         {
-            _logger.LogInformation($"Handling {nameof(RetrieveAssessmentDataCommand)}: {message.ToJSONSerializedString()}");
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
+            LogContext.PushProperty("EventName", nameof(RetrieveAssessmentDataCommand));
+            LogContext.PushProperty("ProcessId", message.ProcessId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
             // Call DataServices to get the assessment data for the given sdoc Id
             var assessmentData =
@@ -167,6 +176,9 @@ namespace WorkflowCoordinator.Sagas
             await _dbContext.SaveChangesAsync();
 
             MarkAsComplete();
+
+            _logger.LogInformation("Successfully Completed Event {EventName} and Marked saga as completed: {Message}");
+
         }
 
         private async Task<int> UpdateWorkflowInstanceTable(int processId, int sourceDocumentId, string serialNumber, WorkflowStatus status)
