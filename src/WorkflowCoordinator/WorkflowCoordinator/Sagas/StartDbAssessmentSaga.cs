@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
+using Serilog.Context;
 using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
@@ -55,7 +56,14 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartDbAssessmentCommand message, IMessageHandlerContext context)
         {
-            _logger.LogInformation($"Handling {nameof(StartDbAssessmentCommand)}: {message.ToJSONSerializedString()}");
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("MessageCorrelationId", message.CorrelationId);
+            LogContext.PushProperty("EventName", nameof(StartDbAssessmentCommand));
+            LogContext.PushProperty("ProcessId", 0);
+            LogContext.PushProperty("PrimarySdocId", message.SourceDocumentId);
+            LogContext.PushProperty("Message", message.ToJSONSerializedString());
+
+            _logger.LogInformation("Entering {EventName} handler with: {Message}");
 
             if (!Data.IsStarted)
             {
@@ -63,8 +71,7 @@ namespace WorkflowCoordinator.Sagas
                 Data.CorrelationId = message.CorrelationId;
                 Data.SourceDocumentId = message.SourceDocumentId;
 
-                _logger.LogInformation($"Saved {Data.ToJSONSerializedString()} " +
-                          $"to {nameof(StartDbAssessmentSagaData)}");
+                _logger.LogInformation("Starting new saga for PrimarySdocId {PrimarySdocId}");
             }
 
             if (Data.ProcessId == 0)
@@ -73,19 +80,28 @@ namespace WorkflowCoordinator.Sagas
                 Data.ProcessId = await _workflowServiceApiClient.CreateWorkflowInstance(workflowId);
             }
 
+            LogContext.PushProperty("ProcessId", Data.ProcessId);
+
             var serialNumber = await _workflowServiceApiClient.GetWorkflowInstanceSerialNumber(Data.ProcessId);
 
             if (string.IsNullOrEmpty(serialNumber))
             {
-                _logger.LogError($"Failed to get data for K2 Task with ProcessId {Data.ProcessId}");
+                _logger.LogError("Failed to get K2 serial number for ProcessId {ProcessId}");
                 throw new ApplicationException($"Failed to get data for K2 Task with ProcessId {Data.ProcessId}");
             }
 
+            LogContext.PushProperty("K2SerialNumber", serialNumber);
+
+            _logger.LogInformation("Successfully create k2 workflow instance for PrimarySdocId {PrimarySdocId} with: ProcessId {ProcessId} and K2SerialNumber {K2SerialNumber}");
+            _logger.LogInformation("Saving open assessment to our system: PrimarySdocId {PrimarySdocId}, ProcessId {ProcessId}, and K2SerialNumber {K2SerialNumber}");
             var workflowInstanceId = await UpdateWorkflowInstanceTable(Data.ProcessId, Data.SourceDocumentId, serialNumber, WorkflowStatus.Started);
+            await RemoveSdocIdFromQueue(Data.ProcessId);
             await UpdateDbAssessmentReviewTable(Data.ProcessId, workflowInstanceId);
             await UpdatePrimaryDocumentStatus(Data.ProcessId, Data.SourceDocumentId, Data.CorrelationId, SourceDocumentRetrievalStatus.Started);
+            _logger.LogInformation("Successfully Saved open assessment to our system: PrimarySdocId {PrimarySdocId}, ProcessId {ProcessId}, and K2SerialNumber {K2SerialNumber}");
 
             _logger.LogInformation($"Sending {nameof(RetrieveAssessmentDataCommand)}");
+
             await context.SendLocal(new RetrieveAssessmentDataCommand
             {
                 CorrelationId = Data.CorrelationId,
@@ -110,7 +126,7 @@ namespace WorkflowCoordinator.Sagas
 
             ConstructAndSendLinkedDocumentRetrievalCommands(context);
 
-            _logger.LogInformation($"Finished handling {nameof(StartDbAssessmentCommand)}");
+            _logger.LogInformation("Successfully Completed Event {EventName}: {Message}");
         }
 
         /// <summary>
@@ -177,6 +193,19 @@ namespace WorkflowCoordinator.Sagas
             return newId;
         }
 
+        private async Task RemoveSdocIdFromQueue(int primarySdocId)
+        {
+            var openAssessmentsQueueItem =
+                await _dbContext.OpenAssessmentsQueue.SingleOrDefaultAsync(o => o.PrimarySdocId == primarySdocId);
+            if (openAssessmentsQueueItem != null)
+            {
+                _logger.LogInformation("Removing PrimarySdocId {PrimarySdocId} from the open assessment queue");
+
+                _dbContext.OpenAssessmentsQueue.Remove(openAssessmentsQueueItem);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
         private async Task UpdatePrimaryDocumentStatus(int processId, int sourceDocumentId, Guid correlationId, SourceDocumentRetrievalStatus status)
         {
             var existingInstance = await _dbContext.PrimaryDocumentStatus
@@ -189,7 +218,7 @@ namespace WorkflowCoordinator.Sagas
             {
                 CorrelationId = correlationId,
                 ProcessId = processId,
-                SdocId = sourceDocumentId,
+                SdocId = sourceDocumentId,  
                 Status = status.ToString(),
                 StartedAt = DateTime.Now
             };
