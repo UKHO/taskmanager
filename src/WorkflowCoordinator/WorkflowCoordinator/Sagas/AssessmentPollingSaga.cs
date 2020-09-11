@@ -10,6 +10,7 @@ using WorkflowCoordinator.Config;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowDatabase.EF;
+using WorkflowDatabase.EF.Models;
 using Task = System.Threading.Tasks.Task;
 
 namespace WorkflowCoordinator.Sagas
@@ -41,7 +42,12 @@ namespace WorkflowCoordinator.Sagas
 
         public async Task Handle(StartAssessmentPollingCommand message, IMessageHandlerContext context)
         {
-            _logger.LogInformation($"Handling {nameof(StartAssessmentPollingCommand)}");
+            LogContext.PushProperty("MessageId", context.MessageId);
+            LogContext.PushProperty("MessageCorrelationId", "");
+            LogContext.PushProperty("EventName", nameof(StartAssessmentPollingCommand));
+            LogContext.PushProperty("ProcessId", 0);
+
+            _logger.LogInformation("Handling {EventName}");
 
             Data.CorrelationId = message.CorrelationId;
             if (!Data.IsTaskAlreadyScheduled)
@@ -59,25 +65,22 @@ namespace WorkflowCoordinator.Sagas
             LogContext.PushProperty("MessageCorrelationId", "");
             LogContext.PushProperty("EventName", nameof(ExecuteAssessmentPollingTask));
             LogContext.PushProperty("ProcessId", 0);
-
-
-            _logger.LogInformation($"Handling timeout {nameof(ExecuteAssessmentPollingTask)}");
+            
+            _logger.LogInformation("Handling timeout {EventName}");
 
             var assessment = await GetAssessmentNotInWorkflowDatabase();
 
             if (assessment != null)
             {
-                var correlationId = Guid.NewGuid();
+                LogContext.PushProperty("PrimarySdocId", assessment.Id);
+                _logger.LogInformation("PrimarySdocId {PrimarySdocId} belongs to open assessment not in our system");
 
-                // Start new DB Assessment K2 workflow instance
-                // Then Get SDRA data from SDRA-DB and store it in WorkflowDatabase
-                var startDbAssessmentCommand = new StartDbAssessmentCommand()
-                {
-                    CorrelationId = correlationId,
-                    SourceDocumentId = assessment.Id
-                };
+                // Open assessment sdoc id not yet in our system
+                await AddSdocIdToQueue(assessment.Id);
 
-                await context.SendLocal(startDbAssessmentCommand).ConfigureAwait(false);
+                // Fire StartDbAssessmentCommand to create K2 workflow instance,
+                // get assessment data from SDRA, and update our DB
+                await FireStartDbAssessmentCommand(context, assessment.Id);
             }
 
             await RequestTimeout<ExecuteAssessmentPollingTask>(context,
@@ -85,20 +88,59 @@ namespace WorkflowCoordinator.Sagas
                 .ConfigureAwait(false);
         }
 
+        private async Task FireStartDbAssessmentCommand(IMessageHandlerContext context, int primarySdocId)
+        {
+            var correlationId = Guid.NewGuid();
+
+            LogContext.PushProperty("MessageCorrelationId", correlationId);
+
+            _logger.LogInformation(
+                "Firing StartDbAssessmentCommand for PrimarySdocId {PrimarySdocId} with MessageCorrelationId {MessageCorrelationId}");
+
+            var startDbAssessmentCommand = new StartDbAssessmentCommand()
+            {
+                CorrelationId = correlationId,
+                SourceDocumentId = primarySdocId
+            };
+
+            await context.SendLocal(startDbAssessmentCommand).ConfigureAwait(false);
+        }
+
         private async Task<DocumentObject> GetAssessmentNotInWorkflowDatabase()
         {
             var assessments = await _dataServiceApiClient.GetAssessments(_generalConfig.Value.CallerCode);
 
-            // Get first Open Assessment that does not exists in WorkflowDatabase
+            // Get first Open Assessment that does not exists in both OpenAssessmentsQueue and WorkflowDatabase
             foreach (var assessment in assessments)
             {
                 var isExists = await
+                    _dbContext.OpenAssessmentsQueue.AnyAsync(a => a.PrimarySdocId == assessment.Id);
+
+                if (isExists)
+                {
+                    continue;
+                }
+
+                isExists = await
                     _dbContext.WorkflowInstance.AnyAsync(a => a.PrimarySdocId == assessment.Id);
 
                 if (!isExists) return assessment;
             }
 
             return null;
+        }
+
+        private async Task AddSdocIdToQueue(int primarySdocId)
+        {
+            _logger.LogInformation("Adding PrimarySdocId {PrimarySdocId} to the open assessment queue");
+
+            await _dbContext.OpenAssessmentsQueue.AddAsync(new OpenAssessmentsQueue()
+            {
+                PrimarySdocId = primarySdocId,
+                Timestamp = DateTime.Now
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

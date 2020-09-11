@@ -42,6 +42,7 @@ namespace WorkflowDatabase.EF
         public DbSet<AdUser> AdUsers { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
+        public DbSet<OpenAssessmentsQueue> OpenAssessmentsQueue { get; set; }   
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -101,6 +102,7 @@ namespace WorkflowDatabase.EF
             modelBuilder.Entity<PrimaryDocumentStatus>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<LinkedDocument>().Ignore(l => l.ContentServiceUri);
             modelBuilder.Entity<DatabaseDocumentStatus>().Ignore(l => l.ContentServiceUri);
+            modelBuilder.Entity<OpenAssessmentsQueue>().HasIndex(o => o.PrimarySdocId).IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }
