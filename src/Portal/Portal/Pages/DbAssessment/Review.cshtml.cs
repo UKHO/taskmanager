@@ -122,7 +122,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostTerminateAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
 
@@ -214,7 +214,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             var action = "Save";
             LogContext.PushProperty("Action", action);
@@ -280,7 +280,7 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             var action = "Done";
             LogContext.PushProperty("Action", action);
@@ -355,7 +355,7 @@ namespace Portal.Pages.DbAssessment
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review, WorkflowStage.Assess);
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Assess has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task progression from {ActivityName} to Assess has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
             await _dbAssessmentCommentsHelper.AddComment("Task progression from Review to Assess has been triggered",
                 processId,
@@ -376,7 +376,7 @@ namespace Portal.Pages.DbAssessment
                 WorkflowStage.Terminated);
 
             _logger.LogInformation(
-                "Task termination from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task termination from {ActivityName} has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
             await _dbAssessmentCommentsHelper.AddComment("Task termination has been triggered",
                 processId,
@@ -432,7 +432,7 @@ namespace Portal.Pages.DbAssessment
                 await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
                     ? await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
                     : null;
-            currentReview.Verifier = 
+            currentReview.Verifier =
                 await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) ?
                 await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName)
                     : null;
