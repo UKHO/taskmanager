@@ -406,7 +406,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SaveAdditionalTasks(int processId)
         {
-            _logger.LogInformation("Saving additional task belonging to task with processId: {ProcessId}");
+            _logger.LogInformation("Saving additional tasks belonging to task with processId: {ProcessId}...");
 
             var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
@@ -415,6 +415,14 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var task in AdditionalAssignedTasks)
             {
+                LogContext.PushProperty("AdditionalAssignedTaskProcessId", task.ProcessId);
+                LogContext.PushProperty("AdditionalAssignedWorkspaceAffected", task.WorkspaceAffected);
+
+                _logger.LogInformation(
+                    "Saving additional task with processId {AdditionalAssignedTaskProcessId} " +
+                    "and workspace affected: {AdditionalAssignedWorkspaceAffected}, " +
+                    "belonging to task with processId {ProcessId} ");
+
                 task.ProcessId = processId;
                 task.Assessor = await _portalUserDbService.GetAdUserAsync(task.Assessor.UserPrincipalName);
                 task.Verifier = await _portalUserDbService.GetAdUserAsync(task.Verifier.UserPrincipalName);
