@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.BusinessLogic;
-using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
@@ -67,8 +66,6 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
-        public string SerialisedCustomHttpStatusCodes { get; set; }
-
         private (string DisplayName, string UserPrincipalName) _currentUser;
         public (string DisplayName, string UserPrincipalName) CurrentUser
         {
@@ -116,8 +113,6 @@ namespace Portal.Pages.DbAssessment
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentReviewData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Review;
-
-            SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<ReviewCustomHttpStatusCode>();
 
             await GetOnHoldData(processId);
         }
