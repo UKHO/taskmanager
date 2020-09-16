@@ -64,7 +64,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGetAsync_InvalidOperationException_thrown_when_no_assessmentdata_exists()
+        public void Test_OnGetAsync_InvalidOperationException_thrown_when_no_assessmentdata_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {
@@ -85,7 +85,7 @@ namespace Portal.UnitTests
         }
 
         [Test]
-        public async Task Test_OnGetAsync_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
+        public void Test_OnGetAsync_no_exception_thrown_when_no_primarydocumentstatus_row_exists()
         {
             _dbContext.WorkflowInstance.Add(new WorkflowInstance
             {

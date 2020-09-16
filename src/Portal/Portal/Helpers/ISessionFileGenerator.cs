@@ -7,6 +7,7 @@ namespace Portal.Helpers
 {
     public interface ISessionFileGenerator
     {
-        Task<SessionFile> PopulateSessionFile(int processId, string userPrincipalName, string taskStage, CarisProjectDetails carisProjectDetails, List<string> selectedHpdUsages, List<string> selectedSources);
+        Task<SessionFile> PopulateSessionFile(int processId, string userPrincipalName, string workspaceAffected,
+            CarisProjectDetails carisProjectDetails, List<string> selectedHpdUsages, List<string> selectedSources);
     }
 }
