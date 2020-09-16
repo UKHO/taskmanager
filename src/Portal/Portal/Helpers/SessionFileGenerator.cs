@@ -33,13 +33,12 @@ namespace Portal.Helpers
             _portalUserDbService = portalUserDbService;
         }
 
-        public async Task<SessionFile> PopulateSessionFile(
-                                                            int processId,
-                                                            string userPrincipalName,
-                                                            string taskStage,
-                                                            CarisProjectDetails carisProjectDetails,
-                                                            List<string> selectedHpdUsages,
-                                                            List<string> selectedSources)
+        public async Task<SessionFile> PopulateSessionFile(int processId,
+            string userPrincipalName,
+            string workspaceAffected,
+            CarisProjectDetails carisProjectDetails,
+            List<string> selectedHpdUsages,
+            List<string> selectedSources)
         {
             LogContext.PushProperty("PortalResource", nameof(PopulateSessionFile));
             LogContext.PushProperty("UserPrincipalName", userPrincipalName);
@@ -64,21 +63,11 @@ namespace Portal.Helpers
                     ex.InnerException);
             }
 
-            string workspaceAffected;
-
-            switch (taskStage)
+            if (!await _dbContext.CachedHpdWorkspace.AnyAsync(c =>
+                c.Name == workspaceAffected))
             {
-                case "Assess":
-                    var assessData = await _dbContext.DbAssessmentAssessData.FirstAsync(ad => ad.ProcessId == processId);
-                    workspaceAffected = assessData.WorkspaceAffected;
-                    break;
-                case "Verify":
-                    var verifyData = await _dbContext.DbAssessmentVerifyData.FirstAsync(ad => ad.ProcessId == processId);
-                    workspaceAffected = verifyData.WorkspaceAffected;
-                    break;
-                default:
-                    _logger.LogError($"ProcessId {processId}: Unable to get WorkspaceAffected as task is not at Assess or Verify.");
-                    throw new NotImplementedException($"Unable to establish Caris Workspace as task {processId} is at {taskStage}.");
+                _logger.LogError($"Current Caris Workspace {workspaceAffected} is invalid.");
+                throw new InvalidOperationException($"Current Caris Workspace {workspaceAffected} is invalid.");
             }
 
             var sources = new List<SessionFile.DataSourceNode>();
