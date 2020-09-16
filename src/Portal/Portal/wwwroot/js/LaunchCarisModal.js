@@ -120,7 +120,7 @@ function attachLaunchSourceEditorDownloadHandler() {
         $("#btnLaunchSourceEditorDownload").prop("disabled", true);
 
         var processId = Number($("#hdnProcessId").val());
-        var pageIdentity = $("#pageIdentity").val();
+        var workspaceAffected = $("#SelectedCarisWorkspace").val();
         var sessionFilename = $(this).data("sessionfilename");
 
         sessionFilename = generateUniqueSessionFileName(sessionFilename);
@@ -155,7 +155,7 @@ function attachLaunchSourceEditorDownloadHandler() {
             contentType: "application/json; charset=utf-8",
             data: {
                 "processId": processId,
-                "taskStage": pageIdentity,
+                "workspaceAffected": workspaceAffected,
                 "sessionFilename": sessionFilename,
                 "selectedHpdUsages": selectedHpdUsages,
                 "selectedSources": selectedSources

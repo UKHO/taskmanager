@@ -12,7 +12,9 @@
                 .prop("disabled", false);
         }
         if (enableLaunchSource) {
-            $("#btnOpenLaunchCarisSelectionModal").prop("disabled", false);
+            $("#SelectedCarisWorkspace")
+                .add("#btnOpenLaunchCarisSelectionModal")
+                .prop("disabled", false);
         }
     }
 
