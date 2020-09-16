@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Common.Helpers;
 using Common.Helpers.Auth;
@@ -13,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Portal.Auth;
 using Portal.BusinessLogic;
-using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
@@ -68,8 +66,6 @@ namespace Portal.Pages.DbAssessment
 
         public List<string> ValidationErrorMessages { get; set; }
 
-        public string SerialisedCustomHttpStatusCodes { get; set; }
-
         private (string DisplayName, string UserPrincipalName) _currentUser;
         public (string DisplayName, string UserPrincipalName) CurrentUser
         {
@@ -105,13 +101,18 @@ namespace Portal.Pages.DbAssessment
         {
             ProcessId = processId;
 
+            LogContext.PushProperty("ActivityName", "Review");
+            LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("PortalResource", nameof(OnGet));
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
+
+            _logger.LogInformation("Entering OnGet for {ActivityName} with: ProcessId: {ProcessId}");
+
             IsReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(ProcessId);
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             OperatorsModel = await _OperatorsModel.GetOperatorsDataAsync(currentReviewData, _dbContext).ConfigureAwait(false);
             OperatorsModel.ParentPage = WorkflowStage = WorkflowStage.Review;
-
-            SerialisedCustomHttpStatusCodes = EnumHandlers.EnumToString<ReviewCustomHttpStatusCode>();
 
             await GetOnHoldData(processId);
         }
@@ -122,68 +123,57 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostTerminateAsync));
             LogContext.PushProperty("Comment", comment);
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering terminate with: ProcessId: {ProcessId}; Comment: {Comment};");
 
-            ValidationErrorMessages.Clear();
+            if (!await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName))
+            {
+                ValidationErrorMessages.Add(
+                    "Operators: Your user account is not in the correct authorised group. Please contact system administrators");
+                _logger.LogError(
+                    "Unable to Terminate task with: ProcessId: {ProcessId} because current user {UserPrincipalName} is not in authorised");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 403 };
+            }
 
             if (string.IsNullOrWhiteSpace(comment))
             {
                 _logger.LogError("Comment is null, empty or whitespace: {Comment}");
-                throw new ArgumentException($"{nameof(comment)} is null, empty or whitespace");
+                ValidationErrorMessages.Add("Comment cannot by empty");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
             if (processId < 1)
             {
                 _logger.LogError("ProcessId is less than 1: {ProcessId}");
-                throw new ArgumentException($"{nameof(processId)} is less than 1");
+                ValidationErrorMessages.Add("Process ID is less than 1");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
             ProcessId = processId;
             await GetOnHoldData(processId);
 
-            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
-
-            if (isWorkflowReadOnly)
+            if (await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId))
             {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been terminated");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} has already been terminated");
-                throw appException;
+                ValidationErrorMessages.Add($"Workflow for process ID {processId} has already been terminated");
+                _logger.LogWarning("Workflow Instance for ProcessId {ProcessId} has already been terminated");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
-            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
-
-            if (!isUserValid)
-            {
-                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
-            }
-
-            var isAssignedToUser = await _dbContext.DbAssessmentReviewData.AnyAsync(r => r.ProcessId == processId && r.Reviewer.UserPrincipalName == CurrentUser.UserPrincipalName);
+            var isAssignedToUser = await _dbContext.DbAssessmentReviewData.AnyAsync(r =>
+                r.ProcessId == processId && r.Reviewer.UserPrincipalName == CurrentUser.UserPrincipalName);
             if (!isAssignedToUser)
             {
                 ValidationErrorMessages.Add("Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                };
+                _logger.LogWarning("Unable to Terminate task with: ProcessId: {ProcessId} because it is not assigned to current user");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
             if (IsOnHold)
             {
-                ValidationErrorMessages.Add("Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)VerifyCustomHttpStatusCode.FailedValidation
-                };
+                ValidationErrorMessages.Add("Task Information: Unable to Terminate task. Take task off hold before terminating and click Save.");
+                _logger.LogWarning("Unable to Terminate task with: ProcessId: {ProcessId} because it is on hold");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
             _logger.LogInformation("Terminating with: ProcessId: {ProcessId}; Comment: {Comment};");
@@ -194,76 +184,69 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                await MarkWorkflowInstanceAsStarted(processId);
-
                 _logger.LogError("Unable to terminate task {ProcessId}.", e);
 
-                ValidationErrorMessages.Add($"Unable to terminate task. Please retry later: {e.Message}");
+                await MarkWorkflowInstanceAsStarted(processId);
 
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
-                };
+                ValidationErrorMessages.Add($"Unable to terminate task. Please retry later.");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 500 };
             }
 
-            return StatusCode((int)HttpStatusCode.OK);
+            return new OkResult();
         }
+
 
         public async Task<IActionResult> OnPostSaveAsync(int processId)
         {
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostSaveAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             var action = "Save";
             LogContext.PushProperty("Action", action);
 
-            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
-
-            if (isWorkflowReadOnly)
-            {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been terminated");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} has already been terminated");
-                throw appException;
-            }
-
-            ValidationErrorMessages.Clear();
-
-            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
-
-            if (!isUserValid)
-            {
-                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
-            }
-
             _logger.LogInformation("Entering Save with: ProcessId: {ProcessId}; Action: {Action};");
 
-            var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
-
-            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentReviewData.Reviewer))
+            if (!await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName))
             {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
+                ValidationErrorMessages.Add(
+                    "Operators: Your user account is not in the correct authorised group. Please contact system administrators");
+                _logger.LogInformation(
+                    "Unable to Save task with: ProcessId: {ProcessId} because current user {UserPrincipalName} is not authorised");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 403 };
             }
 
-            ProcessId = processId;
+            if (await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId))
+            {
+                ValidationErrorMessages.Add($"Workflow for process ID {processId} has already been terminated.");
+                _logger.LogInformation("Workflow Instance for ProcessId {ProcessId} has already been terminated");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
+            }
 
-            PrimaryAssignedTask.ProcessId = ProcessId;
+            var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
+            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask,
+                AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName,
+                currentReviewData.Reviewer))
+            {
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
+            }
 
-            await UpdateOnHold(ProcessId, IsOnHold);
-            await UpdateDbAssessmentReviewData(ProcessId);
-            await SaveAdditionalTasks(ProcessId);
-            await UpdateAssessmentData(ProcessId);
+            PrimaryAssignedTask.ProcessId = ProcessId = processId;
 
+            try
+            {
+                await UpdateOnHold(ProcessId, IsOnHold);
+                await UpdateDbAssessmentReviewData(ProcessId);
+                await SaveAdditionalTasks(ProcessId);
+                await UpdateAssessmentData(ProcessId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Error updating records for ProcessId {ProcessId}", e);
+                ValidationErrorMessages.Add($"System error while updating records for process ID {processId}. Please try again later.");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 500 };
+            }
 
             await _dbAssessmentCommentsHelper.AddComment($"Review: Changes saved",
                 processId,
@@ -272,7 +255,7 @@ namespace Portal.Pages.DbAssessment
 
             _logger.LogInformation("Finished Save with: ProcessId: {ProcessId}; Action: {Action};");
 
-            return StatusCode((int)HttpStatusCode.OK);
+            return new OkResult();
         }
 
         public async Task<IActionResult> OnPostDoneAsync(int processId)
@@ -280,50 +263,43 @@ namespace Portal.Pages.DbAssessment
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
             LogContext.PushProperty("PortalResource", nameof(OnPostDoneAsync));
-            LogContext.PushProperty("UserFullName", CurrentUser.DisplayName);
+            LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             var action = "Done";
             LogContext.PushProperty("Action", action);
 
-            var isWorkflowReadOnly = await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId);
+            _logger.LogInformation("Entering {PortalResource} with ProcessId: {ProcessId}; Action: {Action};");
 
-            if (isWorkflowReadOnly)
+            if (!await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName))
             {
-                var appException = new ApplicationException($"Workflow Instance for {nameof(processId)} {processId} has already been terminated");
-                _logger.LogError(appException,
-                    "Workflow Instance for ProcessId {ProcessId} has already been terminated");
-                throw appException;
+                ValidationErrorMessages.Add(
+                    "Operators: Your user account is not in the correct authorised group. Please contact system administrators");
+                _logger.LogInformation(
+                    "Unable to Complete task with: ProcessId: {ProcessId} because current user {UserPrincipalName} is not in authorised");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 403 };
             }
 
-            ValidationErrorMessages.Clear();
-
-            var isUserValid = await _portalUserDbService.ValidateUserAsync(CurrentUser.UserPrincipalName);
-
-            if (!isUserValid)
+            if (await _workflowBusinessLogicService.WorkflowIsReadOnlyAsync(processId))
             {
-                ValidationErrorMessages.Add("Operators: Your user account is not in the correct authorised group. Please contact system administrators");
-
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
+                ValidationErrorMessages.Add($"Workflow for process ID {processId} has already been terminated");
+                _logger.LogInformation("Workflow Instance for ProcessId {ProcessId} has already been terminated");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
-
-            _logger.LogInformation("Entering Done with: ProcessId: {ProcessId}; Action: {Action};");
 
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
-
-            if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask, AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentReviewData.Reviewer))
+            if (!await _pageValidationHelper.CheckReviewPageForErrors(action,
+                PrimaryAssignedTask,
+                AdditionalAssignedTasks,
+                Team,
+                Reviewer,
+                ValidationErrorMessages,
+                CurrentUser.UserPrincipalName,
+                currentReviewData.Reviewer))
             {
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailedValidation
-                };
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
 
-            ProcessId = processId;
-
-            PrimaryAssignedTask.ProcessId = ProcessId;
+            PrimaryAssignedTask.ProcessId = ProcessId = processId;
 
             try
             {
@@ -331,21 +307,17 @@ namespace Portal.Pages.DbAssessment
             }
             catch (Exception e)
             {
-                await MarkWorkflowInstanceAsStarted(processId);
-
                 _logger.LogError("Unable to progress task {ProcessId} from Review to Assess.", e);
 
-                ValidationErrorMessages.Add($"Unable to progress task from Review to Assess. Please retry later: {e.Message}");
+                await MarkWorkflowInstanceAsStarted(processId);
 
-                return new JsonResult(this.ValidationErrorMessages)
-                {
-                    StatusCode = (int)ReviewCustomHttpStatusCode.FailuresDetected
-                };
+                ValidationErrorMessages.Add($"Unable to progress task from Review to Assess. Please retry later.");
+                return new JsonResult(this.ValidationErrorMessages) { StatusCode = 500 };
             }
 
-            _logger.LogInformation("Finished Done with: ProcessId: {ProcessId}; Action: {Action};");
+            _logger.LogInformation("Finished {PortalResource} with: ProcessId: {ProcessId}; Action: {Action};");
 
-            return StatusCode((int)HttpStatusCode.OK);
+            return new OkResult();
         }
 
         private async Task MarkTaskAsComplete(int processId)
@@ -355,7 +327,7 @@ namespace Portal.Pages.DbAssessment
             await PublishProgressWorkflowInstanceEvent(processId, workflowInstance, WorkflowStage.Review, WorkflowStage.Assess);
 
             _logger.LogInformation(
-                "Task progression from {ActivityName} to Assess has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task progression from {ActivityName} to Assess has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
             await _dbAssessmentCommentsHelper.AddComment("Task progression from Review to Assess has been triggered",
                 processId,
@@ -376,7 +348,7 @@ namespace Portal.Pages.DbAssessment
                 WorkflowStage.Terminated);
 
             _logger.LogInformation(
-                "Task termination from {ActivityName} has been triggered by {UserFullName} with: ProcessId: {ProcessId}; Action: {Action};");
+                "Task termination from {ActivityName} has been triggered by {UserPrincipalName} with: ProcessId: {ProcessId}; Action: {Action};");
 
             await _dbAssessmentCommentsHelper.AddComment("Task termination has been triggered",
                 processId,
@@ -406,7 +378,7 @@ namespace Portal.Pages.DbAssessment
 
         private async Task SaveAdditionalTasks(int processId)
         {
-            _logger.LogInformation("Saving additional task belonging to task with processId: {ProcessId}");
+            _logger.LogInformation("Saving additional tasks belonging to task with processId: {ProcessId}...");
 
             var toRemove = await _dbContext.DbAssessmentAssignTask.Where(at => at.ProcessId == processId).ToListAsync();
             _dbContext.DbAssessmentAssignTask.RemoveRange(toRemove);
@@ -415,6 +387,14 @@ namespace Portal.Pages.DbAssessment
 
             foreach (var task in AdditionalAssignedTasks)
             {
+                LogContext.PushProperty("AdditionalAssignedTaskProcessId", task.ProcessId);
+                LogContext.PushProperty("AdditionalAssignedWorkspaceAffected", task.WorkspaceAffected);
+
+                _logger.LogInformation(
+                    "Saving additional task with processId {AdditionalAssignedTaskProcessId} " +
+                    "and workspace affected: {AdditionalAssignedWorkspaceAffected}, " +
+                    "belonging to task with processId {ProcessId} ");
+
                 task.ProcessId = processId;
                 task.Assessor = await _portalUserDbService.GetAdUserAsync(task.Assessor.UserPrincipalName);
                 task.Verifier = await _portalUserDbService.GetAdUserAsync(task.Verifier.UserPrincipalName);
@@ -432,7 +412,7 @@ namespace Portal.Pages.DbAssessment
                 await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
                     ? await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Assessor?.UserPrincipalName)
                     : null;
-            currentReview.Verifier = 
+            currentReview.Verifier =
                 await _portalUserDbService.ValidateUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName) ?
                 await _portalUserDbService.GetAdUserAsync(PrimaryAssignedTask.Verifier?.UserPrincipalName)
                     : null;
@@ -465,17 +445,25 @@ namespace Portal.Pages.DbAssessment
         {
             if (onHold)
             {
+                _logger.LogInformation("Setting workflow instance on hold for ProcessId: {ProcessId} at Action: {Action};");
+
                 IsOnHold = true;
 
                 var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
                                                                                                          r.OffHoldTime == null);
                 if (existingOnHoldRecord != null)
                 {
+                    _logger.LogWarning("Existing on hold record already exists for ProcessId: {ProcessId}");
                     return;
                 }
 
                 var workflowInstance = _dbContext.WorkflowInstance
                     .FirstOrDefault(wi => wi.ProcessId == processId);
+                if (workflowInstance is null)
+                {
+                    _logger.LogWarning("No workflow instance found for ProcessId: {ProcessId}");
+                    return;
+                }
 
                 var onHoldRecord = new OnHold
                 {
@@ -488,6 +476,8 @@ namespace Portal.Pages.DbAssessment
                 await _dbContext.OnHold.AddAsync(onHoldRecord);
                 await _dbContext.SaveChangesAsync();
 
+                _logger.LogInformation("Successfully put task on hold for ProcessId: {ProcessId} at Action: {Action};");
+
                 await _dbAssessmentCommentsHelper.AddComment($"Task {processId} has been put on hold",
                     processId,
                     workflowInstance.WorkflowInstanceId,
@@ -495,12 +485,15 @@ namespace Portal.Pages.DbAssessment
             }
             else
             {
+                _logger.LogInformation("Taking workflow instance off hold for ProcessId: {ProcessId} at Action: {Action}");
+
                 IsOnHold = false;
 
                 var existingOnHoldRecord = await _dbContext.OnHold.FirstOrDefaultAsync(r => r.ProcessId == processId &&
                                                                                                      r.OffHoldTime == null);
                 if (existingOnHoldRecord == null)
                 {
+                    _logger.LogWarning("No existing on hold record found for ProcessId: {ProcessId}");
                     return;
                 }
 
@@ -508,6 +501,8 @@ namespace Portal.Pages.DbAssessment
                 existingOnHoldRecord.OffHoldBy = await _portalUserDbService.GetAdUserAsync(CurrentUser.UserPrincipalName);
 
                 await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation("Successfully took task off hold for ProcessId: {ProcessId} at Action: {Action}");
 
                 await _dbAssessmentCommentsHelper.AddComment($"Task {processId} taken off hold",
                     processId,
@@ -519,6 +514,8 @@ namespace Portal.Pages.DbAssessment
 
         private async Task<WorkflowInstance> MarkWorkflowInstanceAsUpdating(int processId)
         {
+            _logger.LogInformation("Marking workflow instance as Updating for ProcessId: {ProcessId} at Action: {Action}");
+
             var workflowInstance = await _dbContext.WorkflowInstance
                 .Include(w => w.PrimaryDocumentStatus)
                 .FirstAsync(wi => wi.ProcessId == processId);
@@ -527,11 +524,15 @@ namespace Portal.Pages.DbAssessment
             workflowInstance.ActivityChangedAt = DateTime.Today;
             await _dbContext.SaveChangesAsync();
 
+            _logger.LogInformation("Successfully marked workflow instance as Updating for ProcessId: {ProcessId} at Action: {Action}");
+
             return workflowInstance;
         }
 
         private async Task MarkWorkflowInstanceAsStarted(int processId)
         {
+            _logger.LogInformation("Marking workflow instance as Started for ProcessId: {ProcessId} at Action: {Action}");
+
             var workflowInstance = await _dbContext.WorkflowInstance
                 .Include(w => w.PrimaryDocumentStatus)
                 .FirstAsync(w => w.ProcessId == processId);
@@ -539,12 +540,13 @@ namespace Portal.Pages.DbAssessment
             workflowInstance.Status = WorkflowStatus.Started.ToString();
 
             await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation("Successfully marked workflow instance as Started for ProcessId: {ProcessId} at Action: {Action}");
         }
 
         private async Task GetOnHoldData(int processId)
         {
-            var onHoldRows = await _dbContext.OnHold.Where(r => r.ProcessId == processId).ToListAsync();
-            IsOnHold = onHoldRows.Any(r => r.OffHoldTime == null);
+            IsOnHold = await _dbContext.OnHold.Where(r => r.ProcessId == processId).AnyAsync(r => r.OffHoldTime == null);
         }
     }
 }
