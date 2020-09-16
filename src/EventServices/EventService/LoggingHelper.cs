@@ -44,6 +44,7 @@ namespace EventService
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 5)
                 .WriteTo.MSSqlServer(
                     connectionString: loggingConnectionString,
                     sinkOptions: new SinkOptions
