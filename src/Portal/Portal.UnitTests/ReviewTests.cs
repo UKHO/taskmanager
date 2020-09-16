@@ -193,7 +193,7 @@ namespace Portal.UnitTests
                 Name = "Simple"
             });
 
-            var testUser = new AdUser {DisplayName = "testing", UserPrincipalName = "test"};
+            var testUser = new AdUser { DisplayName = "testing", UserPrincipalName = "test" };
 
             var reviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(p => p.ProcessId == ProcessId);
             reviewData.Reviewer = testUser;
@@ -204,7 +204,7 @@ namespace Portal.UnitTests
             {
                 TaskType = "Simple",
                 WorkspaceAffected = "test workspace",
-                Assessor = new AdUser {DisplayName = "Unknown", UserPrincipalName = "unknown"}
+                Assessor = new AdUser { DisplayName = "Unknown", UserPrincipalName = "unknown" }
             };
 
             _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
@@ -621,7 +621,7 @@ namespace Portal.UnitTests
                 WorkspaceAffected = "Test Workspace",
                 Assessor = TestUser
             };
-            _reviewModel.Reviewer = new AdUser {DisplayName = "unknown", UserPrincipalName = "unknown"};
+            _reviewModel.Reviewer = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" };
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
@@ -994,9 +994,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult) await _reviewModel.OnPostDoneAsync(ProcessId);
+            var result = (JsonResult)await _reviewModel.OnPostDoneAsync(ProcessId);
 
-            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(
                 $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
@@ -1035,9 +1034,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult) await _reviewModel.OnPostSaveAsync(ProcessId);
+            var result = (JsonResult)await _reviewModel.OnPostSaveAsync(ProcessId);
 
-            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(
                 $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
@@ -1227,10 +1225,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(invalidPrincipalName))
                 .Returns(false);
 
-            var result = (JsonResult) await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             // Assert
-            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(
                 $"Operators: Your user account is not in the correct authorised group. Please contact system administrators",
@@ -1253,10 +1250,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns(("ThisUserIsNotTheReviewer", "thisuser@foobar.com"));
 
-            var result = (JsonResult) await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
+            var result = (JsonResult)await _reviewModel.OnPostTerminateAsync("Testing", ProcessId);
 
             // Assert
-            Assert.AreEqual((int) ReviewCustomHttpStatusCode.FailedValidation, result.StatusCode);
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(
                 "Operators: You are not assigned as the Reviewer of this task. Please assign the task to yourself and click Save",
@@ -1327,7 +1323,7 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_reviewModel.ValidationErrorMessages.Count, 1);
             Assert.Contains(
-                "Task Information: Unable to Terminate task.Take task off hold before terminating and click Save.",
+                "Task Information: Unable to Terminate task. Take task off hold before terminating and click Save.",
                 _reviewModel.ValidationErrorMessages);
 
         }

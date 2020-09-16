@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
     var isReadOnly = $("#IsReadOnly").val() === "True";
-    var customHttpStatusCodes = JSON.parse($("#SerialisedCustomHttpStatusCodes").val());
 
     $('#operators').find('div .operator:gt(0)').hide();
 
@@ -178,58 +177,41 @@
             },
             data: { "processId": processId, "comment": comment },
             complete: function () {
-                console.log("terminate complete");
                 mainButtonsEnabled(true);
-
             },
             success: function (result) {
-                console.log("terminate success");
                 formChanged = false;
 
                 window.location.replace("/Index");
             },
             error: function (error) {
-                console.log("terminate error");
                 processErrors(error);
             }
         });
     }
-    
+
     function processErrors(error) {
         var responseJson = error.responseJSON;
-        var statusCode = error.status;
 
         $("#modalReviewErrorMessage").html("");
 
         $("#modalReviewWait").hide();
 
-        var ulTag = "<ul class=\"mb-0 pb-0\" />";
-
-        if (responseJson == null) {
-            $("#modalReviewErrorMessage").append(ulTag);
-            var unOrderedList = $("#modalReviewErrorMessage ul");
-
-            unOrderedList.append("<li class=\"pt-1 pb-1\" >System error. Please try again later</li>");
-            $("#modalReviewErrors").show();
-            return;
-        }
-
-        if (statusCode === customHttpStatusCodes.FailedValidation) {
-            $("#modalReviewErrorMessage").append(ulTag);
-            var unOrderedList = $("#modalReviewErrorMessage ul");
-
-            responseJson.forEach(function (item) {
-                unOrderedList.append("<li class=\"pt-1 pb-1\" >" + item + "</li>");
-            });
-
-            $("#modalReviewErrors").show();
-            return;
-        }
-
+        const ulTag = '<ul class="mb-0 pb-0">';
         $("#modalReviewErrorMessage").append(ulTag);
         var unOrderedList = $("#modalReviewErrorMessage ul");
 
-        unOrderedList.append("<li class=\"pt-1 pb-1\" >" + responseJson + "</li>");
+        if (responseJson && Array.isArray(responseJson) && responseJson.length) {
+            responseJson.forEach(function(item) {
+                unOrderedList.append(`<li class="pt-1 pb-1" >${item}</li>`);
+            });
+        } else {
+            unOrderedList.append('<li class="pt-1 pb-1" >System error. Please try again later</li>');
+
+            $("#modalReviewErrorMessage").append(ulTag);
+
+            unOrderedList.append(`<li class="pt-1 pb-1" >${responseJson}</li>`);
+        }
 
         $("#modalReviewErrors").show();
     }
