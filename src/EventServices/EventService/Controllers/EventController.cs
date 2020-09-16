@@ -54,7 +54,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetEvent([FromRoute][Required]string eventName)
+        public virtual IActionResult GetEvent([FromRoute][Required] string eventName)
         {
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(Event));
@@ -150,7 +150,7 @@ namespace EventService.Controllers
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         [SwaggerResponse(statusCode: 503, type: typeof(DefaultErrorResponse), description: "Service Unavailable.")]
-        public virtual async Task<IActionResult> PostEvent([FromBody]object body, [FromRoute][Required]string eventName)
+        public virtual async Task<IActionResult> PostEvent([FromBody] object body, [FromRoute][Required] string eventName)
         {
             LogContext.PushProperty("ApiResource", nameof(PostEvent));
             LogContext.PushProperty("EventName", eventName);
@@ -220,14 +220,19 @@ namespace EventService.Controllers
 
             _logger.LogInformation("{ApiResource} publishing event {EventName}");
 
-            // Retries 3 times at 2, 4 and 6 seconds
+            /*
+            Retries 3 times after waits of 1, ~5.5 then ~46.5 seconds
+            Total coded prescribed delay is ~53.5 seconds to allow for execution timing
+            Assume default timeout of 100 seconds for HttpClient on clients
+            */
             var result = await Policy.Handle<Exception>()
-                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2),
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(retryAttempt, retryAttempt + 0.5)),
                     (exception, timeSpan, retryAttempt, context) =>
                     {
                         LogContext.PushProperty("RetryAttempt", retryAttempt);
+                        LogContext.PushProperty("RetryWait", TimeSpan.FromSeconds(Math.Pow(retryAttempt, retryAttempt + 0.5)));
 
-                        _logger.LogError(exception, "Failed to publish event {EventName}, attempting retry: {RetryAttempt}");
+                        _logger.LogError(exception, "Failed to publish event {EventName}, attempting retry {RetryAttempt} in {RetryWait} seconds.");
                     })
                 .ExecuteAndCaptureAsync(() => _messageSession.Publish(populatedEvent, new PublishOptions()));
 
