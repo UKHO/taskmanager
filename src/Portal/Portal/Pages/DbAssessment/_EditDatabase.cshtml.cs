@@ -124,17 +124,20 @@ namespace Portal.Pages.DbAssessment
             return new JsonResult(cachedHpdWorkspaces);
         }
 
-        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId, string taskStage, string sessionFilename,
-                                                                        List<string> selectedHpdUsages, List<string> selectedSources)
+        public async Task<IActionResult> OnGetLaunchSourceEditorAsync(int processId,
+            string workspaceAffected,
+            string sessionFilename,
+            List<string> selectedHpdUsages, List<string> selectedSources)
         {
-            LogContext.PushProperty("ActivityName", taskStage);
             LogContext.PushProperty("ProcessId", processId);
+            LogContext.PushProperty("WorkspaceAffected", workspaceAffected);
             LogContext.PushProperty("PortalResource", nameof(OnGetLaunchSourceEditorAsync));
             LogContext.PushProperty("SelectedHpdUsages", (selectedHpdUsages != null && selectedHpdUsages.Count > 0 ? string.Join(',', selectedHpdUsages) : ""));
             LogContext.PushProperty("SelectedSources", (selectedSources != null && selectedSources.Count > 0 ? string.Join(',', selectedSources) : ""));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering {PortalResource} for _EditDatabase with: ProcessId: {ProcessId}; " +
+                                   "WorkspaceAffected: {WorkspaceAffected}; " +
                                    "ActivityName: {ActivityName}; " +
                                    "with SelectedHpdUsages {SelectedHpdUsages}, " +
                                    "and SelectedSources {SelectedSources}");
@@ -162,7 +165,7 @@ namespace Portal.Pages.DbAssessment
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                                                                                 processId,
                                                                                 CurrentUser.UserPrincipalName,
-                                                                                taskStage,
+                                                                                workspaceAffected,
                                                                                 carisProjectDetails,
                                                                                 selectedHpdUsages,
                                                                                 selectedSources);

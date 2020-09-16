@@ -37,6 +37,7 @@ namespace Portal.UnitTests
         private IPortalUserDbService _fakePortalUserDbService;
 
         public int ProcessId { get; set; }
+        public string WorkspaceAffected { get; set; }
 
         public AdUser TestUser { get; set; }
 
@@ -60,6 +61,7 @@ namespace Portal.UnitTests
             _fakeCarisProjectNameGenerator = A.Fake<ICarisProjectNameGenerator>();
 
             ProcessId = 123;
+            WorkspaceAffected = "TestWorkspace";
             _generalConfig.Value.SessionFilename = "Testing.ext";
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
@@ -67,7 +69,7 @@ namespace Portal.UnitTests
 
             _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
             {
-                Name = "TestWorkspace"
+                Name = WorkspaceAffected
             });
             _dbContext.HpdUser.Add(new HpdUser
             {
@@ -583,12 +585,10 @@ namespace Portal.UnitTests
         [Test]
         public void Test_OnGetLaunchSourceEditor_Throws_ArgumentException_When_No_Usages_Supplied()
         {
-            var taskStage = "Assess";
-
             var ex = Assert.ThrowsAsync<ArgumentException>(
                 () => _editDatabaseModel.OnGetLaunchSourceEditorAsync(
                                                                             ProcessId,
-                                                                            taskStage,
+                                                                            WorkspaceAffected,
                                                                             "SomeFilename",
                                                                             null,
                                                                             null));
@@ -596,7 +596,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                                                                             ProcessId,
                                                                             TestUser.UserPrincipalName,
-                                                                            taskStage,
+                                                                            WorkspaceAffected,
                                                                             A<CarisProjectDetails>.Ignored,
                                                                             A<List<string>>.Ignored,
                                                                             A<List<string>>.Ignored)).MustNotHaveHappened();
@@ -606,8 +606,6 @@ namespace Portal.UnitTests
         [Test]
         public void Test_OnGetLaunchSourceEditor_Throws_ArgumentException_When_No_Caris_Project_Was_Created()
         {
-            var taskStage = "Assess";
-
             var selectedUsages = new List<string>()
             {
                 "Usage1",
@@ -617,7 +615,7 @@ namespace Portal.UnitTests
             var ex = Assert.ThrowsAsync<ArgumentException>(
                 () => _editDatabaseModel.OnGetLaunchSourceEditorAsync(
                     ProcessId,
-                    taskStage,
+                    WorkspaceAffected,
                     "SomeFilename",
                     selectedUsages,
                     null));
@@ -625,7 +623,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                taskStage,
+                WorkspaceAffected,
                 A<CarisProjectDetails>.Ignored,
                 A<List<string>>.Ignored,
                 A<List<string>>.Ignored)).MustNotHaveHappened();
@@ -635,7 +633,6 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnGetLaunchSourceEditor_When_Supplied_With_Correct_Data_Then_Generates_Session_File()
         {
-            var taskStage = "Assess";
             var sessionFilename = "SomeFilename";
 
             var selectedUsages = new List<string>()
@@ -660,7 +657,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                taskStage,
+                WorkspaceAffected,
                 carisproject,
                 selectedUsages,
                 A<List<string>>.Ignored)).Returns(new SessionFile()
@@ -672,8 +669,8 @@ namespace Portal.UnitTests
                 });
 
             var response = await _editDatabaseModel.OnGetLaunchSourceEditorAsync(
-                                                                                            ProcessId,
-                                                                                            taskStage,
+                                                                                            ProcessId, 
+                                                                                            WorkspaceAffected,
                                                                                             sessionFilename,
                                                                                             selectedUsages,
                                                                                             null);
@@ -681,7 +678,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakeSessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                taskStage,
+                WorkspaceAffected,
                 carisproject,
                 selectedUsages,
                 A<List<string>>.Ignored)).MustHaveHappened();

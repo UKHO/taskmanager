@@ -51,12 +51,11 @@ namespace Portal.UnitTests
             _sessionFileGenerator = new SessionFileGenerator(_dbContext,
                 _secretsConfig, _logger, _fakePortalUserDbService);
 
-            var assessData = new DbAssessmentAssessData
+            _dbContext.CachedHpdWorkspace.Add(new CachedHpdWorkspace
             {
-                ProcessId = 123,
-                WorkspaceAffected = "TestWorkspace"
-            };
-            _dbContext.DbAssessmentAssessData.Add(assessData);
+                Name = WorkspaceAffected
+            });
+
             await _dbContext.SaveChangesAsync();
         }
 
@@ -86,7 +85,33 @@ namespace Portal.UnitTests
                 () => _sessionFileGenerator.PopulateSessionFile(
                     ProcessId,
                     "unknownUserEmail",
-                    "Assess",
+                    WorkspaceAffected,
+                    new CarisProjectDetails(), null, null)
+            );
+        }
+
+        [Test]
+        public async Task Test_PopulateSessionFile_WorkspaceAffected_That_Does_Not_Exist_Throws_InvalidOperationException()
+        {
+            var hpdUsername = "TestUser1-Caris";
+            var hpdUser = new HpdUser()
+            {
+                HpdUserId = 1,
+                AdUser = TestUser,
+                HpdUsername = hpdUsername
+            };
+            await _dbContext.HpdUser.AddAsync(hpdUser);
+
+            await _dbContext.SaveChangesAsync();
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            Assert.ThrowsAsync(typeof(InvalidOperationException),
+                () => _sessionFileGenerator.PopulateSessionFile(
+                    ProcessId,
+                    TestUser.UserPrincipalName,
+                    "UnknownWorkspaceAffected",
                     new CarisProjectDetails(), null, null)
             );
         }
@@ -116,7 +141,7 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                "Assess",
+                WorkspaceAffected,
                 new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
@@ -163,7 +188,7 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                "Assess",
+                WorkspaceAffected,
                 carisproject, selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
@@ -211,12 +236,12 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                "Assess",
+                WorkspaceAffected,
                 new CarisProjectDetails(), selectedUsages, null);
 
             Assert.IsNotNull(sessionFile);
             Assert.IsNotNull(sessionFile.DataSources);
-            Assert.AreEqual("TestWorkspace", sessionFile.DataSources.DataSource[0].SourceParam.WORKSPACE);
+            Assert.AreEqual(WorkspaceAffected, sessionFile.DataSources.DataSource[0].SourceParam.WORKSPACE);
         }
 
         [Test]
@@ -259,7 +284,7 @@ namespace Portal.UnitTests
             var sessionFile = await _sessionFileGenerator.PopulateSessionFile(
                 ProcessId,
                 TestUser.UserPrincipalName,
-                "Assess",
+                WorkspaceAffected,
                 carisproject, selectedUsages, selectedSources);
 
             Assert.IsNotNull(sessionFile);
