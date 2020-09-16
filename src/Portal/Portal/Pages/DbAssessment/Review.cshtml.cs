@@ -103,7 +103,7 @@ namespace Portal.Pages.DbAssessment
 
             LogContext.PushProperty("ActivityName", "Review");
             LogContext.PushProperty("ProcessId", processId);
-            LogContext.PushProperty("PortalResource", nameof(OnPostTerminateAsync));
+            LogContext.PushProperty("PortalResource", nameof(OnGet));
             LogContext.PushProperty("UserPrincipalName", CurrentUser.UserPrincipalName);
 
             _logger.LogInformation("Entering OnGet for {ActivityName} with: ProcessId: {ProcessId}");
