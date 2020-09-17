@@ -446,17 +446,15 @@ namespace Portal.Pages.DbAssessment
             var carisProjectDetails = await _dbContext.CarisProjectDetails.FirstOrDefaultAsync(cp => cp.ProcessId == processId);
             var isCarisProjectCreated = carisProjectDetails != null;
 
+            currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
+            await _dbContext.SaveChangesAsync();
+
             if (isCarisProjectCreated)
             {
                 // just update Caris project Assigned users
                 await UpdateCarisProjectWithAdditionalUser(processId, currentAssess.Assessor);
                 await UpdateCarisProjectWithAdditionalUser(processId, currentAssess.Verifier);
-
-                return;
             }
-
-            currentAssess.WorkspaceAffected = SelectedCarisWorkspace;
-            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateCarisProjectWithAdditionalUser(int processId, AdUser user)
