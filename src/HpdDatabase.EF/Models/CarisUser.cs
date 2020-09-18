@@ -2,14 +2,13 @@
 
 namespace HpdDatabase.EF.Models
 {
-    [Table("HYDRODBUSERS", Schema = "HPDOWNER")]
+    [Table("HPD_USER", Schema = "HPDOWNER")]
     public class CarisUser
     {
-        [Column("HYDRODBUSERS_ID")]
+        [Column("USER_ID")]
         public int UserId { get; set; }
 
         [Column("USERNAME")]
-        public string Username { get; set; } 
+        public string Username { get; set; }
     }
 }
-    
