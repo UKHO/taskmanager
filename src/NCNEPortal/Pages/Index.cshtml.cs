@@ -85,11 +85,16 @@ namespace NCNEPortal.Pages
 
             foreach (var task in NcneTasks)
             {
-                task.FormDateStatus = (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
-                task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print, task.TaskStage);
-                task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
-                task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, NcneTaskStageType.Publication, task.TaskStage);
-
+                if (task.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                {
+                    task.FormDateStatus =
+                        (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
+                    task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print,
+                        task.TaskStage);
+                    task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
+                    task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate,
+                        NcneTaskStageType.Publication, task.TaskStage);
+                }
             }
         }
 
@@ -222,7 +227,7 @@ namespace NCNEPortal.Pages
             }
 
 
-            foreach (var stage in task.TaskStage.Where(s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
+            foreach (var stage in task.TaskStage.Where(s => s.Status != NcneTaskStageStatus.Completed.ToString()))
             {
                 //Assign the user according to the stage
                 stage.Assigned = (NcneTaskStageType)stage.TaskStageTypeId switch

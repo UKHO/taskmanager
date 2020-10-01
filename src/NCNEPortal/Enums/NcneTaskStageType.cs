@@ -19,7 +19,10 @@
         Publish_Chart = 15,
         Clear_Vector = 16,
         Retire_Old_Version = 17,
-        Consider_Withdrawn_Charts = 18
+        Consider_Withdrawn_Charts = 18,
+        Withdrawal_action = 19,
+        PMC_withdrawal = 20,
+        Consier_email_SDR = 21
 
     }
 }

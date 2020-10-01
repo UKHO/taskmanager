@@ -15,16 +15,31 @@ namespace NCNEPortal.Helpers
             _dbContext = dbContext;
         }
 
-        public List<TaskStageType> GetTaskStages(string chartType)
+        public List<TaskStageType> GetTaskStages(string chartType, string workflowType)
         {
             List<TaskStageType> taskStageTypes;
 
-            if (chartType == NcneChartType.Adoption.ToString())
-                taskStageTypes = _dbContext.TaskStageType.Select(t => t).ToList();
+            if (workflowType == NcneWorkflowType.Withdrawal.ToString())
+            {
+                taskStageTypes = _dbContext.TaskStageType.Where(t =>
+                    (t.TaskStageTypeId == (int)NcneTaskStageType.CIS ||
+                    t.TaskStageTypeId == (int)NcneTaskStageType.V1 ||
+                                 t.TaskStageTypeId == (int)NcneTaskStageType.V1_Rework ||
+                    t.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)).ToList();
+            }
             else
             {
-                taskStageTypes = _dbContext.TaskStageType
-                    .Where(t => t.TaskStageTypeId > (int)NcneTaskStageType.With_Geodesy).ToList();
+
+
+                if (chartType == NcneChartType.Adoption.ToString())
+                    taskStageTypes = _dbContext.TaskStageType
+                        .Where(t => t.TaskStageTypeId < (int)NcneTaskStageType.Withdrawal_action).ToList();
+                else
+                {
+                    taskStageTypes = _dbContext.TaskStageType
+                        .Where(t => t.TaskStageTypeId > (int)NcneTaskStageType.With_Geodesy
+                                             && t.TaskStageTypeId < (int)NcneTaskStageType.Withdrawal_action).ToList();
+                }
             }
 
             return taskStageTypes;

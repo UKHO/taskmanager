@@ -32,6 +32,9 @@
             <div class="col-6 pr-0">
                 <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
             </div>
+            <div class="col-6">
+                <button id="btnWithdrawal" class="btn btn-primary">Chart Withdrawal</button>
+            </div>
         </div>
     </div>
 </div>
@@ -230,8 +233,8 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                                  &&
-                                  (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+                             &&
+                             (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))

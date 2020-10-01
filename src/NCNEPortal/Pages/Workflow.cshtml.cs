@@ -557,23 +557,26 @@ namespace NCNEPortal
                 };
             }
 
-
-            if (stageTypeId >= (int)NcneTaskStageType.Publication)
+            if (task.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
             {
-                var formsStatus = _dbContext.TaskStage.Single(t => t.ProcessId == processId
-                                                             && t.TaskStageTypeId == (int)NcneTaskStageType.Forms)
-                    .Status;
-
-
-                if (!_pageValidationHelper.ValidateForPublishCarisChart(task.ThreePs, task.ActualDate3Ps,
-                    stageTypeId, formsStatus, ValidationErrorMessages))
+                if (stageTypeId >= (int)NcneTaskStageType.Publication)
                 {
-                    return new JsonResult(this.ValidationErrorMessages)
-                    {
-                        StatusCode = (int)HttpStatusCode.InternalServerError
-                    };
-                }
+                    var formsStatus = _dbContext.TaskStage.Single(t => t.ProcessId == processId
+                                                                       && t.TaskStageTypeId ==
+                                                                       (int)NcneTaskStageType.Forms)
+                        .Status;
 
+
+                    if (!_pageValidationHelper.ValidateForPublishCarisChart(task.ThreePs, task.ActualDate3Ps,
+                        stageTypeId, formsStatus, ValidationErrorMessages))
+                    {
+                        return new JsonResult(this.ValidationErrorMessages)
+                        {
+                            StatusCode = (int)HttpStatusCode.InternalServerError
+                        };
+                    }
+
+                }
             }
 
             _logger.LogInformation("Finished ValidateComplete for Workflow with: ProcessId: {ProcessId}, AssignedUser: {AssignedUser}, StageTypeId: {StageTypeId}, and Publish: {Publish}");
@@ -748,16 +751,22 @@ namespace NCNEPortal
             _logger.LogInformation(
                 "Stage {StageId} of task {ProcessId} is completed.");
 
-
-            var v2 = await taskStages.SingleAsync(t => t.ProcessId == processId &&
-                                            t.TaskStageTypeId == (int)NcneTaskStageType.V2);
-
-            bool v2Available = (v2.Status != NcneTaskStageStatus.Inactive.ToString());
-
-
-            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId, v2Available);
-
             var taskInfo = await _dbContext.TaskInfo.SingleAsync(t => t.ProcessId == processId);
+
+            var withdrawal = (taskInfo.WorkflowType == NcneWorkflowType.Withdrawal.ToString());
+
+            bool v2Available = false;
+
+            if (!withdrawal)
+            {
+                var v2 = await taskStages.SingleAsync(t => t.ProcessId == processId &&
+                                                           t.TaskStageTypeId == (int)NcneTaskStageType.V2);
+
+                v2Available = (v2.Status != NcneTaskStageStatus.Inactive.ToString());
+            }
+
+            var nextStages = _workflowStageHelper.GetNextStagesForCompletion((NcneTaskStageType)currentStage.TaskStageTypeId, v2Available,
+                                                           withdrawal);
             if (nextStages.Count > 0)
             {
                 foreach (var stage in nextStages)
@@ -773,18 +782,22 @@ namespace NCNEPortal
                 taskInfo.AssignedDate = DateTime.Now;
             }
 
-            var publishInProgress = taskStages.Count(t => t.TaskStageTypeId > (int)NcneTaskStageType.Publication
-                                                            && t.TaskStageTypeId != currentStage.TaskStageTypeId
-                                                            && t.Status != NcneTaskStageStatus.Completed.ToString());
-
-            var publishStage = taskStages.SingleAsync(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication).Result;
-
-            if (publishInProgress == 0 && publishStage.Status == NcneTaskStageStatus.InProgress.ToString())
+            if (!withdrawal)
             {
-                //complete the publication stage
-                publishStage.Status = NcneTaskStageStatus.Completed.ToString();
-                publishStage.DateCompleted = DateTime.Now;
-                publishStage.Assigned = user;
+                var publishInProgress = taskStages.Count(t => t.TaskStageTypeId > (int)NcneTaskStageType.Publication
+                                                              && t.TaskStageTypeId != currentStage.TaskStageTypeId
+                                                              && t.Status != NcneTaskStageStatus.Completed.ToString());
+
+                var publishStage = taskStages.SingleAsync(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication)
+                    .Result;
+
+                if (publishInProgress == 0 && publishStage.Status == NcneTaskStageStatus.InProgress.ToString())
+                {
+                    //complete the publication stage
+                    publishStage.Status = NcneTaskStageStatus.Completed.ToString();
+                    publishStage.DateCompleted = DateTime.Now;
+                    publishStage.Assigned = user;
+                }
             }
 
             var stageName = _dbContext.TaskStageType.SingleAsync(t => t.TaskStageTypeId == currentStage.TaskStageTypeId).Result.Name;
