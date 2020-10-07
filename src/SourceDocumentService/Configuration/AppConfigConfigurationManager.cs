@@ -8,5 +8,10 @@ namespace SourceDocumentService.Configuration
         {
             return ConfigurationManager.AppSettings[key];
         }
+
+        public string GetConnectionString(string key)
+        {
+            return ConfigurationManager.ConnectionStrings[key].ConnectionString;
+        }
     }
 }
