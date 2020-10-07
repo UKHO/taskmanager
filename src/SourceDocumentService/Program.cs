@@ -14,8 +14,14 @@ namespace SourceDocumentService
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(
+                    "log.txt",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 11,
+                    fileSizeLimitBytes: 1024 * 1024 * 20,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
+
 
             CreateHostBuilder(args).Build().Run();
         }
