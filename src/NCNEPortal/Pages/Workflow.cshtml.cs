@@ -2,7 +2,6 @@
 using Common.Helpers.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -64,6 +63,8 @@ namespace NCNEPortal
         [DisplayName("Duration")]
         public int Dating { get; set; }
 
+        public string Duration { get; set; }
+
         public bool IsReadOnly { get; set; }
 
         public string TaskStatus { get; set; }
@@ -98,7 +99,7 @@ namespace NCNEPortal
         [BindProperty]
         public AdUser Compiler { get; set; }
 
-        public SelectList CompilerList { get; set; }
+        //public SelectList CompilerList { get; set; }
 
         [DisplayName("Verifier V1")]
         [BindProperty]
@@ -276,10 +277,14 @@ namespace NCNEPortal
             ChartType = taskInfo?.ChartType;
             Country = taskInfo?.Country;
 
-            if (taskInfo.Duration == null)
+            if (taskInfo?.Duration == null)
                 Dating = 0;
             else
+            {
                 Dating = (int)Enum.Parse(typeof(DeadlineEnum), taskInfo.Duration);
+
+                Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
+            }
 
             RepromatDate = taskInfo.RepromatDate;
             PublicationDate = taskInfo.PublicationDate;
@@ -317,10 +322,12 @@ namespace NCNEPortal
             Header = $"{taskInfo.WorkflowType}{(String.IsNullOrEmpty(taskInfo.ChartNumber) ? "" : $" - {taskInfo.ChartNumber}")}";
 
             //Enable complete if Forms and Publication stages are completed.
-            CompleteEnabled = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
-                                                   t.Status == NcneTaskStageStatus.Completed.ToString()) &&
+            CompleteEnabled = (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Forms &&
+                                                      t.Status == NcneTaskStageStatus.Completed.ToString()) &&
                                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
-                                                      t.Status == NcneTaskStageStatus.Completed.ToString());
+                                                      t.Status == NcneTaskStageStatus.Completed.ToString()))
+                               || (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Consider_email_SDR &&
+                                                          t.Status == NcneTaskStageStatus.Completed.ToString()));
 
             IsPublished = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart &&
                                                  t.Status == NcneTaskStageStatus.Completed.ToString());
@@ -835,16 +842,57 @@ namespace NCNEPortal
 
             ValidationErrorMessages.Clear();
 
+            //var formCollection = await Request.ReadFormAsync();
+
+            //var dictionary = new Dictionary<string, StringValues>(formCollection.Count,
+            //    StringComparer.OrdinalIgnoreCase);
+            //foreach (var entry in formCollection)
+            //{
+            //    dictionary[entry.Key] = entry.Value;
+            //}
+
             ChartNo = chartNo;
+
             var role = new TaskRole()
             {
                 ProcessId = processId,
-                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
-                VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
-                VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
-                HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
-
+                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName)
+                    ? null
+                    : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
+                VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName)
+                    ? null
+                    : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
+                VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName)
+                    ? null
+                    : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
+                HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName)
+                    ? null
+                    : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
             };
+
+            //var role = new TaskRole()
+            //{
+            //    ProcessId = processId,
+            //    Compiler = string.IsNullOrEmpty(dictionary["TaskRole.Compiler.UserPrincipalName"])
+            //        ? null
+            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.Compiler.UserPrincipalName"]),
+            //    VerifierOne = string.IsNullOrEmpty(dictionary["TaskRole.VerifierOne.UserPrincipalName"])
+            //        ? null
+            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.VerifierOne.UserPrincipalName"])
+            //};
+            //if (dictionary["WorkflowType"] != NcneWorkflowType.Withdrawal.ToString())
+            //{
+            //    role.VerifierTwo = string.IsNullOrEmpty(dictionary["TaskRole.VerifierTwo.UserPrincipalName"])
+            //        ? null
+            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.VerifierTwo.UserPrincipalName"]);
+            //    role.HundredPercentCheck =
+            //        string.IsNullOrEmpty(dictionary["TaskRole.HundredPercentCheck.UserPrincipalName"])
+            //            ? null
+            //            : await _ncneUserDbService.GetAdUserAsync(
+            //                dictionary["TaskRole.HundredPercentCheck.UserPrincipalName"]);
+
+            //};
+
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
 
@@ -1054,6 +1102,7 @@ namespace NCNEPortal
                     NcneTaskStageType.V2_Rework => role.Compiler,
                     NcneTaskStageType.V2 => role.VerifierTwo,
                     NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    NcneTaskStageType.Withdrawal_action => role.Compiler,
                     _ => role.VerifierOne
                 };
             }
@@ -1067,7 +1116,7 @@ namespace NCNEPortal
             var taskInProgress = task.TaskStage.Find(t => t.Status == NcneTaskStageStatus.InProgress.ToString()
                                                                  && t.TaskStageTypeId != (int)NcneTaskStageType.Forms);
             if (taskInProgress == null)
-                task.Assigned = role.HundredPercentCheck;
+                task.Assigned = task.WorkflowType == NcneWorkflowType.Withdrawal.ToString() ? role.VerifierOne : role.HundredPercentCheck;
             else
             {
                 task.Assigned = (NcneTaskStageType)taskInProgress.TaskStageTypeId switch
@@ -1080,6 +1129,7 @@ namespace NCNEPortal
                     NcneTaskStageType.V2_Rework => role.Compiler,
                     NcneTaskStageType.V2 => role.VerifierTwo,
                     NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
+                    NcneTaskStageType.Withdrawal_action => role.Compiler,
                     _ => role.VerifierOne
                 };
             }

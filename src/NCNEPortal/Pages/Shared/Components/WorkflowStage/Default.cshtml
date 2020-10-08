@@ -1,17 +1,17 @@
 ﻿@using NCNEPortal.Enums
 @model NCNEWorkflowDatabase.EF.Models.TaskStage
-@{ var with_action = "(Legend / Consequential / Misc Action)";}
+@{ const string withAction = "(Legend / Consequential / Misc Action)";}
 @if (@Model.Status != NcneTaskStageStatus.Inactive.ToString())
 {
     <tr class="workflow-row">
         <td>
             @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication
-   || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
+|| Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
             {
                 <h4 class="@((Model.Status == NcneTaskStageStatus.Open.ToString()) ? "Inactive" : "")">
                     @if (Model.TaskStageTypeId == (int)NcneTaskStageType.Withdrawal_action)
                     {
-                        @Model.TaskStageType.Name<br />@with_action
+                        @Model.TaskStageType.Name<br />@withAction
 
 
                     }
@@ -54,7 +54,8 @@
         <td id="DtExp-@(Model.TaskStageId)">@Model.DateExpected?.ToString("dd/MM/yyyy")</td>
         <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
         <td>
-            @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
+            @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication
+              || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
             {
                 <div class="d-flex justify-content-end align-items-center">
                     <div class="mr-4">
@@ -67,7 +68,7 @@
                 </div>
             }
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication
-    || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
+ || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
             {
                 @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
 Model.IsReadOnly == false)

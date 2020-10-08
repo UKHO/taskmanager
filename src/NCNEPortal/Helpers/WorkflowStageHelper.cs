@@ -63,7 +63,7 @@ namespace NCNEPortal.Helpers
                         });
                     break;
                 case NcneTaskStageType.PMC_withdrawal:
-                    result.Add(NcneTaskStageType.Consier_email_SDR);
+                    result.Add(NcneTaskStageType.Consider_email_SDR);
                     break;
                 case NcneTaskStageType.Withdrawal_action:
                     result.Add(NcneTaskStageType.V1);
@@ -78,7 +78,7 @@ namespace NCNEPortal.Helpers
                     break;
                 case NcneTaskStageType.Consider_Withdrawn_Charts:
                     break;
-                case NcneTaskStageType.Consier_email_SDR:
+                case NcneTaskStageType.Consider_email_SDR:
                     break;
 
 

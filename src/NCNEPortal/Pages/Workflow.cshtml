@@ -131,10 +131,16 @@
         <input type="hidden" id="hdnChartNo" asp-for="ChartNo" />
         <input type="hidden" asp-for="IsReadOnly" />
         <input type="hidden" asp-for="IsPublished" />
+        <input type="hidden" id="hdnWorkflowType" asp-for="WorkflowType" />
+        <input type="hidden" id="hdnDating" asp-for="Dating" />
+
 
 
         <!-- #endregion -->
         @*--- START TASK INFORMATION ---*@
+
+        @*@await Component.InvokeAsync("TaskInfo", new { processid = Model.ProcessId, isReadOnly = Model.IsReadOnly })*@
+        @*@await Component.InvokeAsync("TaskInfo", new { workflow = Model })*@
         <div class="card mb-4 mt-3">
             <h3>Task Information</h3>
 
@@ -206,32 +212,55 @@
                                     @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
-                                        <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
-                                            <span class=@(Model.IsReadOnly ? "" : "fa fa-chevron-down arrow-icon")></span>
-                                        </div>
-                                        @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
-                                            , "", new { @class = "form-control" })
 
+                            @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                            {
+                                <div class="row" id="DateSting">
+                                    <div class="col">
+                                        @Html.TextBoxFor(model => model.Duration, "", new { @class = "form-control form-text-input" })
                                     </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            { <div class="row">
+                                    <div class="col">
+                                        <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
+                                            <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
+                                                <span class=@(Model.IsReadOnly ? "" : "fa fa-chevron-down arrow-icon")></span>
+                                            </div>
+                                            @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
+                                                , "", new { @class = "form-control" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
 
                         </div>
                         <div class="col-3">
                             <div class="form-group">
-                                <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                                @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                                {
+                                    <div><label class="col-form-label">Withdrawal Date</label> </div>
+                                }
+                                else
+                                {
+                                    <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                                }
+
                                 <div>@Html.TextBoxFor(model => model.PublicationDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                     <div class="row">
                         <div class="col-3">
@@ -278,26 +307,29 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
-                                <div>
-                                    @Html.TextBoxFor(model => model.Verifier2.DisplayName, "",
-                                        new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
-                                    @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
+                                    <div>
+                                        @Html.TextBoxFor(model => model.Verifier2.DisplayName, "",
+                                            new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                                        @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.HundredPercentCheck, new { @class = "col-form-label" })</div>
-                                <div>
-                                    @Html.TextBoxFor(model => model.HundredPercentCheck.DisplayName, "",
-                                        new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
-                                    @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.HundredPercentCheck, new { @class = "col-form-label" })</div>
+                                    <div>
+                                        @Html.TextBoxFor(model => model.HundredPercentCheck.DisplayName, "",
+                                            new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
+                                        @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                     @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
                     {
@@ -335,7 +367,6 @@
                 </div>
             </div>
         </div>
-
         @*--- END TASK INFORMATION ---*@
 
         @*--- START EDIT DATABASE ---*@

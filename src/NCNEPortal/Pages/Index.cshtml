@@ -28,12 +28,14 @@
                 <button id="btnNewTask" class="btn btn-primary">New Task</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-6 pr-0">
+        <div class="row mb-2">
+            <div class="col-8">
                 <input id="txtGlobalSearch" type="search" class="form-text-input" placeholder="Type search term..." aria-label="Search text for tasks" title="Search text for tasks" />
             </div>
-            <div class="col-6">
-                <button id="btnWithdrawal" class="btn btn-primary">Chart Withdrawal</button>
+            <div class="col-2">
+            </div>
+            <div class="col-2">
+                <button id="btnWithdrawal" class="btn btn-primary">Withdrawal</button>
             </div>
         </div>
     </div>
@@ -53,10 +55,10 @@
                     <th style="max-width: 3.9rem;">Chart Number</th>
                     <th style="min-width: 3.9rem;">Status</th>
                     <th>User</th>
-                    <th style="min-width: 7.0rem;">Forms</th>
+                    <th style="min-width: 7.0rem;">Forms / Withdrawal actions</th>
                     <th style="min-width: 7.0rem;">Commit to Print</th>
                     <th style="min-width: 7.0rem;">CIS</th>
-                    <th style="min-width: 7.0rem;">Publication</th>
+                    <th style="min-width: 7.0rem;">Publication / Withdrawal</th>
                     <th>Country</th>
                     <th style="max-width: 4.5rem;">Workflow Type</th>
                     <th><span class="screen-reader-only">Assign Tasks</span></th>
@@ -108,27 +110,32 @@
                             }
                         </td>
                         <td>
-                            @task.CommitDate?.ToShortDateString()
-                            @switch ((task.CommitDateStatus))
+                            @if (task.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                            {<a>N/A</a>}
+                            else
                             {
-                                case (int)ncneDateStatus.Green:
-                                    {
-                                        <i class="fa fa-check-circle" style=color:green></i>
-                                        break;
-                                    }
-                                case (int)ncneDateStatus.Amber:
-                                    {
-                                        <i class="fa fa-circle" style=color:darkorange></i>
-                                        <i class="fa fa-circle" style=color:darkorange></i>
-                                        break;
-                                    }
-                                case (int)ncneDateStatus.Red:
-                                    {
-                                        <i class="fa fa-circle" style=color:red></i>
-                                        <i class="fa fa-circle" style=color:red></i>
-                                        <i class="fa fa-circle" style=color:red></i>
-                                        break;
-                                    }
+                                @task.CommitDate?.ToShortDateString()
+                                @switch ((task.CommitDateStatus))
+                                {
+                                    case (int)ncneDateStatus.Green:
+                                        {
+                                            <i class="fa fa-check-circle" style=color:green></i>
+                                            break;
+                                        }
+                                    case (int)ncneDateStatus.Amber:
+                                        {
+                                            <i class="fa fa-circle" style=color:darkorange></i>
+                                            <i class="fa fa-circle" style=color:darkorange></i>
+                                            break;
+                                        }
+                                    case (int)ncneDateStatus.Red:
+                                        {
+                                            <i class="fa fa-circle" style=color:red></i>
+                                            <i class="fa fa-circle" style=color:red></i>
+                                            <i class="fa fa-circle" style=color:red></i>
+                                            break;
+                                        }
+                                }
                             }
 
                         </td>
@@ -233,8 +240,8 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-                             &&
-                             (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+            &&
+            (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))
