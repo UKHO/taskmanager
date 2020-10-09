@@ -39,6 +39,7 @@
     "dbAssessmentReviewData": {
       "processId": 445,
       "ion": "Ion",
+      "complexity" :  "Low",
       "activityCode": "78798",
       "reviewerAdUserId": 2,
       "assessorAdUserId": 1,
@@ -50,6 +51,7 @@
     "dbAssessmentAssessData": {
       "processId": 445,
       "ion": "Ion",
+      "complexity": "Low",
       "activityCode": "78798",
       "sourceCategory": "Engineering Drawings",
       "reviewerAdUserId": 2,
@@ -60,7 +62,7 @@
       "productActionChangeDetails": null,
       "workspaceAffected": "123",
       "CarisProjectName": "Sunrise"
-      },
+    },
     "dbAssessmentAssignTask": [
       {
         "processId": 445,
@@ -167,6 +169,7 @@
       "dbAssessmentReviewData": {
         "processId": 123,
         "ion": "Ion",
+        "complexity": "High",
         "activityCode": "78798",
         "reviewerAdUserId": 2,
         "assessorAdUserId": 1,
@@ -178,6 +181,7 @@
       "dbAssessmentAssessData": {
         "processId": 123,
         "ion": "Ion",
+        "complexity": "High",
         "activityCode": "78798",
         "sourceCategory": "Engineering Drawings",
         "reviewerAdUserId": 2,
@@ -304,6 +308,7 @@
       "dbAssessmentReviewData": {
         "processId": 632,
         "ion": "I899",
+        "complexity": "Medium",
         "activityCode": "78798",
         "reviewerAdUserId": 2,
         "assessorAdUserId": 1,
@@ -315,6 +320,7 @@
       "dbAssessmentAssessData": {
         "processId": 632,
         "ion": "Ion",
+        "complexity": "Medium",
         "activityCode": "78798",
         "sourceCategory": "Engineering Drawings",
         "reviewerAdUserId": 2,
