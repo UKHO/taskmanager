@@ -9,6 +9,7 @@ namespace WorkflowDatabase.EF.Models
         public int ProcessId { get; set; }
         public string Ion { get; set; }
         public string ActivityCode { get; set; }
+        public string Complexity { get; set; }
         public string SourceCategory { get; set; }
         [DisplayName("Task Type:")]
         public string TaskType { get; set; }
