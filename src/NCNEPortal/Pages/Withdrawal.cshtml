@@ -6,7 +6,7 @@
 @using NCNEPortal.Enums
 @model NCNEPortal.WithdrawalModel
 @{
-    ViewData["Title"] = "New Chart / New Edition New Task";
+    ViewData["Title"] = "New Chart / New Edition Withdrawal Task";
 
 }
 
@@ -40,7 +40,6 @@
         </div>
     </div>
 
-    <!--<div id="taskInformation"></div> -->
     <div class="table">
         <div class="card mb-4 mt-3">
             <h3>Task Information</h3>
@@ -98,13 +97,7 @@
 
                             <div class="row" id="wfType">
                                 <div class="col">
-                                    @*<div class="design-custom-select">
-                                        <div class="arrow-icon-wrap">
-                                            <span class="fa fa-chevron-down arrow-icon"></span>
-                                        </div>
-                                        @Html.DropDownListFor(m => m.WorkflowType, Model.WorkflowTypes, "", new { })*@
                                     @Html.TextBoxFor(model => model.WorkflowType, "", new { @class = "form-control form-text-input" })
-                                    @*</div>*@
                                 </div>
                             </div>
 

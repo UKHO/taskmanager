@@ -17,36 +17,40 @@ namespace NCNEPortal.UnitTests
 
         }
 
-        [TestCase(NcneTaskStageType.With_SDRA, NcneTaskStageType.With_Geodesy)]
-        [TestCase(NcneTaskStageType.With_Geodesy, NcneTaskStageType.Specification)]
-        [TestCase(NcneTaskStageType.Specification, NcneTaskStageType.Compile)]
-        [TestCase(NcneTaskStageType.Compile, NcneTaskStageType.V1)]
-        [TestCase(NcneTaskStageType.V1, NcneTaskStageType.V2)]
-        [TestCase(NcneTaskStageType.V1_Rework, NcneTaskStageType.V1)]
-        [TestCase(NcneTaskStageType.V2_Rework, NcneTaskStageType.V2)]
-        [TestCase(NcneTaskStageType.V2, NcneTaskStageType.Final_Updating)]
-        [TestCase(NcneTaskStageType.Final_Updating, NcneTaskStageType.Hundred_Percent_Check)]
-        [TestCase(NcneTaskStageType.Hundred_Percent_Check, NcneTaskStageType.Commit_To_Print)]
-        [TestCase(NcneTaskStageType.Commit_To_Print, NcneTaskStageType.CIS)]
+        [TestCase(NcneTaskStageType.With_SDRA, NcneTaskStageType.With_Geodesy, false)]
+        [TestCase(NcneTaskStageType.With_Geodesy, NcneTaskStageType.Specification, false)]
+        [TestCase(NcneTaskStageType.Specification, NcneTaskStageType.Compile, false)]
+        [TestCase(NcneTaskStageType.Compile, NcneTaskStageType.V1, false)]
+        [TestCase(NcneTaskStageType.V1, NcneTaskStageType.V2, false)]
+        [TestCase(NcneTaskStageType.V1_Rework, NcneTaskStageType.V1, false)]
+        [TestCase(NcneTaskStageType.V2_Rework, NcneTaskStageType.V2, false)]
+        [TestCase(NcneTaskStageType.V2, NcneTaskStageType.Final_Updating, false)]
+        [TestCase(NcneTaskStageType.Final_Updating, NcneTaskStageType.Hundred_Percent_Check, false)]
+        [TestCase(NcneTaskStageType.Hundred_Percent_Check, NcneTaskStageType.Commit_To_Print, false)]
+        [TestCase(NcneTaskStageType.Commit_To_Print, NcneTaskStageType.CIS, false)]
+        [TestCase(NcneTaskStageType.Withdrawal_action, NcneTaskStageType.V1, true)]
+        [TestCase(NcneTaskStageType.V1, NcneTaskStageType.CIS, true)]
+        [TestCase(NcneTaskStageType.CIS, NcneTaskStageType.PMC_withdrawal, true)]
+        [TestCase(NcneTaskStageType.PMC_withdrawal, NcneTaskStageType.Consider_email_SDR, true)]
 
-
-        public void Validate_Get_NextStep_for_Completion_return_single_step(NcneTaskStageType currentStage, NcneTaskStageType nextStage)
+        public void Validate_Get_NextStep_for_Completion_return_single_step(NcneTaskStageType currentStage, NcneTaskStageType nextStage, bool withdrawal)
         {
-            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, false);
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, withdrawal);
 
             Assert.AreEqual(result.Count, 1);
             Assert.AreEqual(result[0], nextStage);
         }
 
-        [TestCase(NcneTaskStageType.Forms)]
-        [TestCase(NcneTaskStageType.Publication)]
-        [TestCase(NcneTaskStageType.Publish_Chart)]
-        [TestCase(NcneTaskStageType.Clear_Vector)]
-        [TestCase(NcneTaskStageType.Retire_Old_Version)]
-        [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts)]
-        public void Validate_Get_NextStep_for_Completion_return_no_next_step(NcneTaskStageType currentStage)
+        [TestCase(NcneTaskStageType.Forms, false)]
+        [TestCase(NcneTaskStageType.Publication, false)]
+        [TestCase(NcneTaskStageType.Publish_Chart, false)]
+        [TestCase(NcneTaskStageType.Clear_Vector, false)]
+        [TestCase(NcneTaskStageType.Retire_Old_Version, false)]
+        [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts, false)]
+        [TestCase(NcneTaskStageType.Consider_email_SDR, true)]
+        public void Validate_Get_NextStep_for_Completion_return_no_next_step(NcneTaskStageType currentStage, bool withdrawal)
         {
-            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, false);
+            var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, withdrawal);
 
             Assert.AreEqual(result.Count, 0);
 

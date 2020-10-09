@@ -6,7 +6,7 @@
         makeFormReadOnly($("#frmWorkflow"));
     }
 
-    $('#DateSting *').prop('disabled', true);
+    $('#DateString *').prop('disabled', true);
 
     $('.ta_compiler').on('typeahead:selected', function (eventObject, suggestionObject) {
         $('#CompilerUpn').val(suggestionObject.userPrincipalName);

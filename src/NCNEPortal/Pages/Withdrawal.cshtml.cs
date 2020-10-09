@@ -29,7 +29,7 @@ namespace NCNEPortal
         private readonly IStageTypeFactory _stageTypeFactory;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
-        private readonly ILogger<NewTaskModel> _logger;
+        private readonly ILogger<WithdrawalModel> _logger;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -86,7 +86,7 @@ namespace NCNEPortal
 
         public WithdrawalModel(NcneWorkflowDbContext ncneWorkflowDbContext,
                             IMilestoneCalculator milestoneCalculator,
-                            ILogger<NewTaskModel> logger,
+                            ILogger<WithdrawalModel> logger,
                             INcneUserDbService ncneUserDbService,
                             IStageTypeFactory stageTypeFactory,
                             IPageValidationHelper pageValidationHelper)
@@ -120,7 +120,7 @@ namespace NCNEPortal
             {
 
                 ValidationErrorMessages.Add(ex.Message);
-                _logger.LogError(ex, "Error while initializing the new task page");
+                _logger.LogError(ex, "Error while initializing the withdrawal page");
 
             }
         }

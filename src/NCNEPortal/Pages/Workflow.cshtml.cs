@@ -99,7 +99,6 @@ namespace NCNEPortal
         [BindProperty]
         public AdUser Compiler { get; set; }
 
-        //public SelectList CompilerList { get; set; }
 
         [DisplayName("Verifier V1")]
         [BindProperty]

@@ -111,7 +111,7 @@
                         </td>
                         <td>
                             @if (task.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
-                            {<a>N/A</a>}
+                            {<span>N/A</span>}
                             else
                             {
                                 @task.CommitDate?.ToShortDateString()
@@ -240,8 +240,8 @@
             <tbody>
 
                 @foreach (var task in Model.NcneTasks.Where(t => t.Status == NcneTaskStatus.InProgress.ToString()
-            &&
-            (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
+           &&
+           (t.TaskRole.VerifierOne?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.Compiler?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.VerifierTwo?.UserPrincipalName == Model.CurrentUser.UserPrincipalName
 || t.TaskRole.HundredPercentCheck?.UserPrincipalName == Model.CurrentUser.UserPrincipalName)))

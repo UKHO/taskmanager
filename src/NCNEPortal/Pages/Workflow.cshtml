@@ -138,9 +138,6 @@
 
         <!-- #endregion -->
         @*--- START TASK INFORMATION ---*@
-
-        @*@await Component.InvokeAsync("TaskInfo", new { processid = Model.ProcessId, isReadOnly = Model.IsReadOnly })*@
-        @*@await Component.InvokeAsync("TaskInfo", new { workflow = Model })*@
         <div class="card mb-4 mt-3">
             <h3>Task Information</h3>
 
@@ -215,7 +212,7 @@
 
                             @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
                             {
-                                <div class="row" id="DateSting">
+                                <div class="row" id="DateString">
                                     <div class="col">
                                         @Html.TextBoxFor(model => model.Duration, "", new { @class = "form-control form-text-input" })
                                     </div>
