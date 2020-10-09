@@ -66,6 +66,9 @@ namespace Portal.Pages.DbAssessment
         public string ActivityCode { get; set; }
 
         [BindProperty]
+        public string Complexity { get; set; }
+
+        [BindProperty]
         public string SourceCategory { get; set; }
 
         [BindProperty]
