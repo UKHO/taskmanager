@@ -842,56 +842,16 @@ namespace NCNEPortal
 
             ValidationErrorMessages.Clear();
 
-            //var formCollection = await Request.ReadFormAsync();
-
-            //var dictionary = new Dictionary<string, StringValues>(formCollection.Count,
-            //    StringComparer.OrdinalIgnoreCase);
-            //foreach (var entry in formCollection)
-            //{
-            //    dictionary[entry.Key] = entry.Value;
-            //}
-
             ChartNo = chartNo;
 
             var role = new TaskRole()
             {
                 ProcessId = processId,
-                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName)
-                    ? null
-                    : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
-                VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName)
-                    ? null
-                    : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
-                VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName)
-                    ? null
-                    : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
-                HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName)
-                    ? null
-                    : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
+                Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
+                VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
+                VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
+                HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
             };
-
-            //var role = new TaskRole()
-            //{
-            //    ProcessId = processId,
-            //    Compiler = string.IsNullOrEmpty(dictionary["TaskRole.Compiler.UserPrincipalName"])
-            //        ? null
-            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.Compiler.UserPrincipalName"]),
-            //    VerifierOne = string.IsNullOrEmpty(dictionary["TaskRole.VerifierOne.UserPrincipalName"])
-            //        ? null
-            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.VerifierOne.UserPrincipalName"])
-            //};
-            //if (dictionary["WorkflowType"] != NcneWorkflowType.Withdrawal.ToString())
-            //{
-            //    role.VerifierTwo = string.IsNullOrEmpty(dictionary["TaskRole.VerifierTwo.UserPrincipalName"])
-            //        ? null
-            //        : await _ncneUserDbService.GetAdUserAsync(dictionary["TaskRole.VerifierTwo.UserPrincipalName"]);
-            //    role.HundredPercentCheck =
-            //        string.IsNullOrEmpty(dictionary["TaskRole.HundredPercentCheck.UserPrincipalName"])
-            //            ? null
-            //            : await _ncneUserDbService.GetAdUserAsync(
-            //                dictionary["TaskRole.HundredPercentCheck.UserPrincipalName"]);
-
-            //};
 
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
