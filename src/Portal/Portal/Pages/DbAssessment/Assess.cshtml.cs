@@ -48,6 +48,9 @@ namespace Portal.Pages.DbAssessment
         public string ActivityCode { get; set; }
 
         [BindProperty]
+        public string Complexity { get; set; }
+
+        [BindProperty]
         public string SourceCategory { get; set; }
 
         [BindProperty]
@@ -80,7 +83,7 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public List<DataImpact> DataImpacts { get; set; }
-        
+
         [BindProperty]
         public DataImpact StsDataImpact { get; set; }
 
