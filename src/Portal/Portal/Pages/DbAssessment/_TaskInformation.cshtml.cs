@@ -64,6 +64,9 @@ namespace Portal.Pages.DbAssessment
         [DisplayName("Activity Code:")]
         public string ActivityCode { get; set; }
 
+        [DisplayName("Complexity:")]
+        public string Complexity { get; set; }
+
         [DisplayName("Source Category:")]
         public string SourceCategory { get; set; }
         public SelectList SourceCategories { get; set; }
@@ -119,7 +122,7 @@ namespace Portal.Pages.DbAssessment
             var activityName = workflowInstanceRow.ActivityName;
 
             DmReceiptDate = workflowInstanceRow.StartedAt;
-            
+
             var taskData = await _taskDataHelper.GetTaskData(activityName, ProcessId);
 
             ActivityCode = taskData?.ActivityCode;
@@ -127,19 +130,19 @@ namespace Portal.Pages.DbAssessment
             SourceCategory = taskData?.SourceCategory;
             TaskType = taskData?.TaskType;
             Teams = new SelectList(_generalConfig.Value.GetTeams());
-            
+
             var assessmentData = await _dbContext.AssessmentData.SingleOrDefaultAsync(ad => ad.ProcessId == ProcessId);
             if (assessmentData != null)
             {
                 EffectiveReceiptDate = assessmentData.EffectiveStartDate != null ?
-                                        assessmentData.EffectiveStartDate.Value : (DateTime?) null;
+                                        assessmentData.EffectiveStartDate.Value : (DateTime?)null;
                 Team = string.IsNullOrWhiteSpace(assessmentData.TeamDistributedTo) ? "" : assessmentData.TeamDistributedTo;
 
                 DmEndDate = taskData != null && assessmentData.EffectiveStartDate != null ? _dmEndDateCalculator.CalculateDmEndDate(assessmentData.EffectiveStartDate.Value,
-                                taskData.TaskType, activityName).dmEndDate : (DateTime?) null;
+                                taskData.TaskType, activityName).dmEndDate : (DateTime?)null;
 
                 ExternalEndDate = assessmentData.EffectiveStartDate != null ?
-                                    assessmentData.EffectiveStartDate.Value.AddDays(_generalConfig.Value.ExternalEndDateDays) : (DateTime?) null;
+                                    assessmentData.EffectiveStartDate.Value.AddDays(_generalConfig.Value.ExternalEndDateDays) : (DateTime?)null;
 
             }
         }
