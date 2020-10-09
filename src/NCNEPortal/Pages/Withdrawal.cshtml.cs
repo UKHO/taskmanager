@@ -60,10 +60,6 @@ namespace NCNEPortal
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? PublicationDate { get; set; }
 
-        [BindProperty]
-        [DisplayName("Repromat received date")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime? RepromatDate { get; set; }
 
         [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -85,17 +81,6 @@ namespace NCNEPortal
         [BindProperty]
         [DisplayName("Verifier V1")]
         public AdUser Verifier1 { get; set; }
-
-
-        [BindProperty]
-        [DisplayName("Verifier V2")]
-        public AdUser Verifier2 { get; set; }
-
-
-        [BindProperty]
-        [DisplayName("100% Check")]
-        public AdUser HundredPercentCheck { get; set; }
-
 
         public List<string> ValidationErrorMessages { get; set; }
 
@@ -161,8 +146,8 @@ namespace NCNEPortal
                 {
                     Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
                     VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
-                    VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
-                    HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
+                    VerifierTwo = null,
+                    HundredPercentCheck = null,
                 };
 
                 if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
@@ -204,7 +189,7 @@ namespace NCNEPortal
                 ChartType = this.ChartType,
                 WorkflowType = this.WorkflowType,
                 Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
-                RepromatDate = this.RepromatDate,
+                RepromatDate = null,
                 PublicationDate = this.PublicationDate,
                 AnnounceDate = this.AnnounceDate,
                 CommitDate = this.CommitToPrintDate,
@@ -226,8 +211,6 @@ namespace NCNEPortal
         }
         private void ReCalculateDeadlineDates()
         {
-            if (RepromatDate != null)
-                PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
 
             if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
             {
@@ -303,13 +286,6 @@ namespace NCNEPortal
             WorkflowTypes = new SelectList(workflowTypes);
 
 
-        }
-        public JsonResult OnPostCalcPublishDate(DateTime dtRepromat)
-        {
-
-            PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtRepromat);
-
-            return new JsonResult(PublicationDate?.ToShortDateString());
         }
 
         public async Task<JsonResult> OnGetUsersAsync()

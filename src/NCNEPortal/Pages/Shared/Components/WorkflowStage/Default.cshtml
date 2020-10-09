@@ -30,7 +30,8 @@
             @if (Model.Status == NcneTaskStageStatus.InProgress.ToString()
 || Model.Status == NcneTaskStageStatus.Rework.ToString())
             {
-                @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication)
+                @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication ||
+                    Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
                 {
                     <div class="status inProgress">
                         <span class="fa fa-edit"> </span>
@@ -55,7 +56,7 @@
         <td>@Model.DateCompleted?.ToString("dd/MM/yyyy")</td>
         <td>
             @if (Model.TaskStageTypeId <= (int)NcneTaskStageType.Publication
-              || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
+             || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
             {
                 <div class="d-flex justify-content-end align-items-center">
                     <div class="mr-4">
@@ -68,7 +69,7 @@
                 </div>
             }
             @if (Model.TaskStageTypeId < (int)NcneTaskStageType.Publication
- || Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
+|| Model.TaskStageTypeId >= (int)NcneTaskStageType.Withdrawal_action)
             {
                 @if (Model.Status == NcneTaskStageStatus.InProgress.ToString() &&
 Model.IsReadOnly == false)
