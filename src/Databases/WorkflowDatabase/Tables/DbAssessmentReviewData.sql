@@ -4,6 +4,7 @@
     [ProcessId] INT NOT NULL, 
     [Ion] NVARCHAR(50) NULL, 
     [ActivityCode] NVARCHAR(50) NULL, 
+    [Complexity] NVARCHAR(50) NULL, 
     [SourceCategory] NVARCHAR(255) NULL, 
     [WorkflowInstanceId] INT NOT NULL, 
     [ReviewerAdUserId] INT NULL, 
