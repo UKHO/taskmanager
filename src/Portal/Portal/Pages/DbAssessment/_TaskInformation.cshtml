@@ -3,82 +3,86 @@
 
 @{ Layout = null; }
 
-    <div class="card mb-4 mt-3">
-        <h6>Task Information</h6>
-        <div class="col-12">
-            <div class="card-body pb-0">
-                <div class="row justify-content-between">
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-7 p-0">@Html.LabelFor(model => model.ProcessId)</div>
-                            <div class="col-4">@Html.DisplayFor(model => model.ProcessId)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-7 p-0">@Html.LabelFor(model => model.DmEndDate)</div>
-                            <div class="col-4">@Html.DisplayFor(model => model.DmEndDate)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-8 p-0">@Html.LabelFor(model => model.EffectiveReceiptDate)</div>
-                            <div class="col-4">@Html.DisplayFor(model => model.EffectiveReceiptDate)</div>
-                        </div>
+<div class="card mb-4 mt-3">
+    <h6>Task Information</h6>
+    <div class="col-12">
+        <div class="card-body pb-0">
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7 p-0">@Html.LabelFor(model => model.ProcessId)</div>
+                        <div class="col-4">@Html.DisplayFor(model => model.ProcessId)</div>
                     </div>
-                    <div class="col-7">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-5 p-0">@Html.LabelFor(model => model.DmReceiptDate)</div>
-                            <div class="col-7">@Html.DisplayFor(model => model.DmReceiptDate)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-5 p-0">@Html.LabelFor(model => model.ExternalEndDate)</div>
-                            <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-5 p-0">@Html.LabelFor(model => model.OnHoldDays)</div>
-                            <div class="col-7" style="padding-left: 0;">
-                                <label class="switch ml-2 mb-auto">
-                                    <input type="checkbox" id="onHoldToggle" name="IsOnHold" class="success" @(Model.IsOnHold ? "checked" : "") value="true" aria-label="On Hold">
-                                    <span class="slider"></span>
-                                </label>
-                                @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
+                    <div class="form-group row justify-content-between">
+                        <div class="col-7 p-0">@Html.LabelFor(model => model.DmEndDate)</div>
+                        <div class="col-4">@Html.DisplayFor(model => model.DmEndDate)</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-8 p-0">@Html.LabelFor(model => model.EffectiveReceiptDate)</div>
+                        <div class="col-4">@Html.DisplayFor(model => model.EffectiveReceiptDate)</div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5 p-0">@Html.LabelFor(model => model.DmReceiptDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.DmReceiptDate)</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5 p-0">@Html.LabelFor(model => model.ExternalEndDate)</div>
+                        <div class="col-7">@Html.DisplayFor(model => model.ExternalEndDate)</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-5 p-0">@Html.LabelFor(model => model.OnHoldDays)</div>
+                        <div class="col-7" style="padding-left: 0;">
+                            <label class="switch ml-2 mb-auto">
+                                <input type="checkbox" id="onHoldToggle" name="IsOnHold" class="success" @(Model.IsOnHold ? "checked" : "") value="true" aria-label="On Hold">
+                                <span class="slider"></span>
+                            </label>
+                            @Html.DisplayFor(model => model.OnHoldDays)&nbsp;
 
-                                @if (Model.IsOnHold)
-                                {
-                                    <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "color: green" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red": "")"></i>
-                                    <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "display:none" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red" : "")"></i>
-                                    <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysRed ? "color: red": "display: none")"></i>
-                                }
-                            </div>
+                            @if (Model.IsOnHold)
+                            {
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "color: green" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red": "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysGreen ? "display:none" : "") @(Model.OnHoldDaysAmber ? "color: darkorange" : "") @(Model.OnHoldDaysRed ? "color: red" : "")"></i>
+                                <i class="fa fa-circle onHoldIcon" style="@(Model.OnHoldDaysRed ? "color: red": "display: none")"></i>
+                            }
                         </div>
                     </div>
                 </div>
-                <hr class="mt-1 mb-4" />
-                <div class="row justify-content-between">
-                    <div class="col-3">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-4 p-0">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-4 p-0">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
-                        </div>
+            </div>
+            <hr class="mt-1 mb-4" />
+            <div class="row justify-content-between">
+                <div class="col-3">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-4 p-0">@Html.LabelFor(model => model.Ion, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.TextBoxFor(model => model.Ion, new { @class = "form-control" })</div>
                     </div>
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-3 p-0">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, "", new { @class = "form-control" })</div>
-                        </div>
-                        <div class="form-group row justify-content-between">
-                            <div class="col-3 p-0">@Html.LabelFor(model => model.TaskType, new { @class = "col-form-label taskTypeLabel" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.TaskType, Model.TaskTypes, "", new { @class = "form-control taskTypeDropdown" })</div>
-                        </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-4 p-0">@Html.LabelFor(model => model.ActivityCode, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.TextBoxFor(model => model.ActivityCode, new { @class = "form-control" })</div>
                     </div>
-                    <div class="col-4">
-                        <div class="form-group row justify-content-between">
-                            <div class="col-3 p-0">@Html.LabelFor(model => model.Team, new { @class = "col-form-label" })</div>
-                            <div class="col-7">@Html.DropDownListFor(model => model.Team, Model.Teams, "", new { @class = "form-control" })</div>
-                        </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-3 p-0">@Html.LabelFor(model => model.SourceCategory, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.SourceCategory, Model.SourceCategories, "", new { @class = "form-control" })</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-3 p-0">@Html.LabelFor(model => model.TaskType, new { @class = "col-form-label taskTypeLabel" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.TaskType, Model.TaskTypes, "", new { @class = "form-control taskTypeDropdown" })</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group row justify-content-between">
+                        <div class="col-3 p-0">@Html.LabelFor(model => model.Team, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.Team, Model.Teams, "", new { @class = "form-control" })</div>
+                    </div>
+                    <div class="form-group row justify-content-between">
+                        <div class="col-3 p-0">@Html.LabelFor(model => model.Complexity, new { @class = "col-form-label" })</div>
+                        <div class="col-7">@Html.DropDownListFor(model => model.Complexity, Model.ComplexityList, "", new { @class = "form-control" })</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
