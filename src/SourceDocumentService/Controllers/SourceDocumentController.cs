@@ -1,14 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.IO.Abstractions;
+using System.Security;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using SourceDocumentService.HttpClients;
-using System.IO;
-using System.Security;
-using Microsoft.AspNetCore.Authorization;
 using SourceDocumentService.Configuration;
+using SourceDocumentService.HttpClients;
 
 namespace SourceDocumentService.Controllers
 {
@@ -51,29 +51,50 @@ namespace SourceDocumentService.Controllers
             // Retrieve file from DFS
             try
             {
+                _logger.LogInformation($"{nameof(PostSourceDocumentToContentService)}: Reading file content '{filename}'; " +
+                                                $"from '{filestorePath}'; with ProcessId {processId}, sdocId {sdocId}.");
+
                 fileBytes = await _fileSystem.File.ReadAllBytesAsync(Path.Combine(filestorePath, filename));
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError(ex, $"No permissions to read file: {filename}.");
+                _logger.LogError(ex, $"{nameof(PostSourceDocumentToContentService)}: No permissions to read file: {filename}; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}.");
                 throw;
             }
             catch (SecurityException ex)
             {
-                _logger.LogError(ex, $"No permissions to read file: {filename}.");
+                _logger.LogError(ex, $"{nameof(PostSourceDocumentToContentService)}: No permissions to read file: {filename}; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}.");
                 throw;
             }
             catch (FileNotFoundException ex)
             {
-                _logger.LogError(ex, $"Unable to find file: {filename}");
+                _logger.LogError(ex, $"{nameof(PostSourceDocumentToContentService)}: Unable to find file: {filename}; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}");
                 throw;
             }
 
-            // Post to Content Service
-            var contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(filename));
 
-            _logger.LogInformation($"PostSourceDocumentToContentService invoked with ProcessId {processId}, sdocId {sdocId} and filepath {filename}. " +
-                                   $"Returned Guid: {contentServiceId}");
+            // Post to Content Service
+            var contentServiceId = Guid.Empty;
+
+            try
+            {
+                _logger.LogInformation($"{nameof(PostSourceDocumentToContentService)}: Uploading file content '{filename}' to contents service; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}.");
+
+                contentServiceId = await _contentServiceApiClient.Post(fileBytes, Path.GetFileName(filename));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{nameof(PostSourceDocumentToContentService)}: Unable to find file: {filename}; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}");
+                throw;
+            }
+
+            _logger.LogInformation($"{nameof(PostSourceDocumentToContentService)}: Successfully Uploaded file content '{filename}' to contents service; " +
+                                                    $"with ProcessId {processId}, sdocId {sdocId}.");
 
             return Ok(contentServiceId);
         }

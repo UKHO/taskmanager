@@ -29,6 +29,7 @@ $ConfigData.AllNodes = @(
             ContentServiceBaseUrl = "http://at2.csp.api.engineering.ukho.gov.uk/Content/PCP-DEV1/V1/"
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
+            CuiaDatabaseConnectionString = "Data Source=OWPDev1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-DEV1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
         }
     }
     @{
@@ -57,6 +58,7 @@ $ConfigData.AllNodes = @(
             ContentServiceBaseUrl = "http://at2.csp.api.engineering.ukho.gov.uk/Content/PCP-DEV1/V1/"
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
+            CuiaDatabaseConnectionString = "Data Source=OWPDev1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-DEV1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
         }
     }
 )
