@@ -105,6 +105,14 @@ namespace Portal.Pages
                 task.OnHoldDaysRed = redIcon;
 
                 var taskType = GetTaskType(instance);
+                task.Complexity
+                = instance.ActivityName switch
+                {
+                    "Review" => instance.DbAssessmentReviewData.Complexity ?? string.Empty,
+                    "Assess" => instance.DbAssessmentAssessData.Complexity ?? string.Empty,
+                    "Verify" => instance.DbAssessmentVerifyData.Complexity ?? string.Empty,
+                    _ => throw new NotImplementedException($"'{instance.ActivityName}' not implemented")
+                };
 
                 if (instance.AssessmentData?.EffectiveStartDate != null)
                 {
@@ -335,7 +343,7 @@ namespace Portal.Pages
         {
             try
             {
-                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName==userPrincipalName);
+                return await _dbContext.HpdUser.SingleAsync(u => u.AdUser.UserPrincipalName == userPrincipalName);
             }
             catch (InvalidOperationException ex)
             {
