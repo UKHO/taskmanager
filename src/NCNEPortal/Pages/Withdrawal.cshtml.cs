@@ -22,14 +22,14 @@ using System.Threading.Tasks;
 namespace NCNEPortal
 {
     [Authorize]
-    public class NewTaskModel : PageModel
+    public class WithdrawalModel : PageModel
     {
         private readonly INcneUserDbService _ncneUserDbService;
         private readonly IPageValidationHelper _pageValidationHelper;
         private readonly IStageTypeFactory _stageTypeFactory;
         private readonly NcneWorkflowDbContext _ncneWorkflowDbContext;
         private readonly IMilestoneCalculator _milestoneCalculator;
-        private readonly ILogger<NewTaskModel> _logger;
+        private readonly ILogger<WithdrawalModel> _logger;
 
         [BindProperty]
         [DisplayName("ION")] public string Ion { get; set; }
@@ -53,15 +53,13 @@ namespace NCNEPortal
         [BindProperty]
         [DisplayName("Duration")] public int Dating { get; set; }
 
+        public string Duration { get; set; }
+
         [BindProperty]
-        [DisplayName("Publication date")]
+        [DisplayName("Withdrawal date")]
         [DisplayFormat(DataFormatString = "{0:d}")]
         public DateTime? PublicationDate { get; set; }
 
-        [BindProperty]
-        [DisplayName("Repromat received date")]
-        [DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime? RepromatDate { get; set; }
 
         [DisplayName("H Forms/Announce:")]
         [DisplayFormat(DataFormatString = "{0:d}")]
@@ -84,22 +82,11 @@ namespace NCNEPortal
         [DisplayName("Verifier V1")]
         public AdUser Verifier1 { get; set; }
 
-
-        [BindProperty]
-        [DisplayName("Verifier V2")]
-        public AdUser Verifier2 { get; set; }
-
-
-        [BindProperty]
-        [DisplayName("100% Check")]
-        public AdUser HundredPercentCheck { get; set; }
-
-
         public List<string> ValidationErrorMessages { get; set; }
 
-        public NewTaskModel(NcneWorkflowDbContext ncneWorkflowDbContext,
+        public WithdrawalModel(NcneWorkflowDbContext ncneWorkflowDbContext,
                             IMilestoneCalculator milestoneCalculator,
-                            ILogger<NewTaskModel> logger,
+                            ILogger<WithdrawalModel> logger,
                             INcneUserDbService ncneUserDbService,
                             IStageTypeFactory stageTypeFactory,
                             IPageValidationHelper pageValidationHelper)
@@ -119,6 +106,10 @@ namespace NCNEPortal
                 Ion = "";
                 ChartNo = "";
                 Country = "";
+                WorkflowType = "Withdrawal";
+                Dating = (int)DeadlineEnum.ThreeWeeks;
+
+                Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
 
                 PublicationDate = null;
 
@@ -129,7 +120,7 @@ namespace NCNEPortal
             {
 
                 ValidationErrorMessages.Add(ex.Message);
-                _logger.LogError(ex, "Error while initializing the new task page");
+                _logger.LogError(ex, "Error while initializing the withdrawal page");
 
             }
         }
@@ -155,8 +146,8 @@ namespace NCNEPortal
                 {
                     Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
                     VerifierOne = string.IsNullOrEmpty(Verifier1?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier1.UserPrincipalName),
-                    VerifierTwo = string.IsNullOrEmpty(Verifier2?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Verifier2.UserPrincipalName),
-                    HundredPercentCheck = string.IsNullOrEmpty(HundredPercentCheck?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(HundredPercentCheck.UserPrincipalName)
+                    VerifierTwo = null,
+                    HundredPercentCheck = null,
                 };
 
                 if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
@@ -171,9 +162,7 @@ namespace NCNEPortal
 
                 ReCalculateDeadlineDates();
 
-                var currentStageId = (int)(ChartType == NcneChartType.Adoption.ToString()
-                    ? NcneTaskStageType.With_SDRA
-                    : NcneTaskStageType.Specification);
+                var currentStageId = (int)NcneTaskStageType.Withdrawal_action;
 
                 var currentStage = _ncneWorkflowDbContext.TaskStageType.Find(currentStageId).Name;
 
@@ -200,7 +189,7 @@ namespace NCNEPortal
                 ChartType = this.ChartType,
                 WorkflowType = this.WorkflowType,
                 Duration = Enum.GetName(typeof(DeadlineEnum), Dating),
-                RepromatDate = this.RepromatDate,
+                RepromatDate = null,
                 PublicationDate = this.PublicationDate,
                 AnnounceDate = this.AnnounceDate,
                 CommitDate = this.CommitToPrintDate,
@@ -222,8 +211,6 @@ namespace NCNEPortal
         }
         private void ReCalculateDeadlineDates()
         {
-            if (RepromatDate != null)
-                PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)RepromatDate);
 
             if ((PublicationDate != null) && Enum.IsDefined(typeof(DeadlineEnum), this.Dating))
             {
@@ -242,7 +229,7 @@ namespace NCNEPortal
         {
 
 
-            foreach (var taskStageType in _stageTypeFactory.GetTaskStages(ChartType, ""))
+            foreach (var taskStageType in _stageTypeFactory.GetTaskStages(ChartType, NcneWorkflowType.Withdrawal.ToString()))
             {
                 var taskStage = _ncneWorkflowDbContext.TaskStage.Add(new TaskStage()).Entity;
 
@@ -252,31 +239,15 @@ namespace NCNEPortal
                 //Assign the status of the task stage 
                 taskStage.Status = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.With_SDRA => NcneTaskStageStatus.InProgress.ToString(),
-                    NcneTaskStageType.Specification => (this.ChartType == NcneChartType.Adoption.ToString()
-                               ? NcneTaskStageStatus.Open.ToString() :
-                               NcneTaskStageStatus.InProgress.ToString()),
-                    NcneTaskStageType.V2 => (role.VerifierTwo == null
-                        ? NcneTaskStageStatus.Inactive.ToString()
-                        : NcneTaskStageStatus.Open.ToString()),
-                    NcneTaskStageType.V2_Rework => (role.VerifierTwo == null
-                        ? NcneTaskStageStatus.Inactive.ToString()
-                        : NcneTaskStageStatus.Open.ToString()),
-                    NcneTaskStageType.Forms => NcneTaskStageStatus.InProgress.ToString(),
+                    NcneTaskStageType.Withdrawal_action => NcneTaskStageStatus.InProgress.ToString(),
                     _ => NcneTaskStageStatus.Open.ToString()
                 };
 
                 //Assign the user according to the stage
                 taskStage.Assigned = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.With_Geodesy => role.Compiler,
-                    NcneTaskStageType.With_SDRA => role.Compiler,
-                    NcneTaskStageType.Specification => role.Compiler,
-                    NcneTaskStageType.Compile => role.Compiler,
+                    NcneTaskStageType.Withdrawal_action => role.Compiler,
                     NcneTaskStageType.V1_Rework => role.Compiler,
-                    NcneTaskStageType.V2_Rework => role.Compiler,
-                    NcneTaskStageType.V2 => role.VerifierTwo,
-                    NcneTaskStageType.Hundred_Percent_Check => role.HundredPercentCheck,
                     _ => role.VerifierOne
                 };
 
@@ -284,10 +255,9 @@ namespace NCNEPortal
                 //set the Expected Date of completion for Forms, Commit to print , CIS and publication
                 taskStage.DateExpected = (NcneTaskStageType)taskStageType.TaskStageTypeId switch
                 {
-                    NcneTaskStageType.Forms => this.AnnounceDate,
-                    NcneTaskStageType.Commit_To_Print => this.CommitToPrintDate,
                     NcneTaskStageType.CIS => this.CISDate,
-                    NcneTaskStageType.Publication => this.PublicationDate,
+                    NcneTaskStageType.PMC_withdrawal => this.PublicationDate,
+                    NcneTaskStageType.Withdrawal_action => this.AnnounceDate,
                     _ => null
                 };
 
@@ -313,16 +283,9 @@ namespace NCNEPortal
                 .Select(st => st.Name)
                 .ToListAsync().ConfigureAwait(false);
 
-            WorkflowTypes = new SelectList(workflowTypes.GetRange(0, 5));
+            WorkflowTypes = new SelectList(workflowTypes);
 
 
-        }
-        public JsonResult OnPostCalcPublishDate(DateTime dtRepromat)
-        {
-
-            PublicationDate = _milestoneCalculator.CalculatePublishDate((DateTime)dtRepromat);
-
-            return new JsonResult(PublicationDate?.ToShortDateString());
         }
 
         public async Task<JsonResult> OnGetUsersAsync()

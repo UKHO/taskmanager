@@ -85,11 +85,24 @@ namespace NCNEPortal.Pages
 
             foreach (var task in NcneTasks)
             {
-                task.FormDateStatus = (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
-                task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print, task.TaskStage);
-                task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
-                task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate, NcneTaskStageType.Publication, task.TaskStage);
-
+                if (task.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                {
+                    task.FormDateStatus =
+                        (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Withdrawal_action, task.TaskStage);
+                    task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
+                    task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate,
+                        NcneTaskStageType.PMC_withdrawal, task.TaskStage);
+                }
+                else
+                {
+                    task.FormDateStatus =
+                        (int)GetDeadLineStatus(task.AnnounceDate, NcneTaskStageType.Forms, task.TaskStage);
+                    task.CommitDateStatus = (int)GetDeadLineStatus(task.CommitDate, NcneTaskStageType.Commit_To_Print,
+                        task.TaskStage);
+                    task.CisDateStatus = (int)GetDeadLineStatus(task.CisDate, NcneTaskStageType.CIS, task.TaskStage);
+                    task.PublishDateStatus = (int)GetDeadLineStatus(task.PublicationDate,
+                        NcneTaskStageType.Publication, task.TaskStage);
+                }
             }
         }
 
@@ -188,7 +201,12 @@ namespace NCNEPortal.Pages
 
             //Assign the user to the role of the user who is in-charge of the task stage in progress
             if (taskInProgress == null)
-                task.TaskRole.HundredPercentCheck = user;
+            {
+                if (task.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                    task.TaskRole.VerifierOne = user;
+                else
+                    task.TaskRole.HundredPercentCheck = user;
+            }
             else
             {
                 switch ((NcneTaskStageType)taskInProgress.TaskStageTypeId)
@@ -199,6 +217,7 @@ namespace NCNEPortal.Pages
                     case NcneTaskStageType.Compile:
                     case NcneTaskStageType.V1_Rework:
                     case NcneTaskStageType.V2_Rework:
+                    case NcneTaskStageType.Withdrawal_action:
                         {
                             task.TaskRole.Compiler = user;
                             break;
@@ -222,7 +241,7 @@ namespace NCNEPortal.Pages
             }
 
 
-            foreach (var stage in task.TaskStage.Where(s=>s.Status!=NcneTaskStageStatus.Completed.ToString()))
+            foreach (var stage in task.TaskStage.Where(s => s.Status != NcneTaskStageStatus.Completed.ToString()))
             {
                 //Assign the user according to the stage
                 stage.Assigned = (NcneTaskStageType)stage.TaskStageTypeId switch
@@ -235,6 +254,7 @@ namespace NCNEPortal.Pages
                     NcneTaskStageType.V2_Rework => task.TaskRole.Compiler,
                     NcneTaskStageType.V2 => task.TaskRole.VerifierTwo,
                     NcneTaskStageType.Hundred_Percent_Check => task.TaskRole.HundredPercentCheck,
+                    NcneTaskStageType.Withdrawal_action => task.TaskRole.Compiler,
                     _ => task.TaskRole.VerifierOne
                 };
             }

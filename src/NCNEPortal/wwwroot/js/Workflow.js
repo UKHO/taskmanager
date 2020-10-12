@@ -6,6 +6,8 @@
         makeFormReadOnly($("#frmWorkflow"));
     }
 
+    $('#DateString *').prop('disabled', true);
+
     $('.ta_compiler').on('typeahead:selected', function (eventObject, suggestionObject) {
         $('#CompilerUpn').val(suggestionObject.userPrincipalName);
     });
@@ -577,15 +579,16 @@
 
 
     var chartType = $("#chartType").text();
-    if (chartType.trim() === "Adoption") {
-        $("#PublicationDate").prop("disabled", true);
-    }
-    else
-    {
+    var workflowType = $("#workflowType").text();
+    if (workflowType.trim() !== "Withdrawal") {
+        if (chartType.trim() === "Adoption") {
+            $("#PublicationDate").prop("disabled", true);
+        } else {
 
-        $("#RepromatDate").hide();
-         $("#lblRepDate").hide();
-     }
+            $("#RepromatDate").hide();
+            $("#lblRepDate").hide();
+        }
+    }
 
 
     if (isPublished) {
@@ -695,7 +698,7 @@
 
     $("#PublicationDate").change(function () {
         var dtPublish = $(this).val();
-        var deadLine = $("#Dating").val();
+        var deadLine = $("#hdnDating").val();
         if ((dtPublish !== "") && (deadLine>0)) {
             $.ajax({
                 type: "POST",

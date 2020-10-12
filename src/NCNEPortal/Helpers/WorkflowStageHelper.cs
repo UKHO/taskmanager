@@ -5,7 +5,7 @@ namespace NCNEPortal.Helpers
 {
     public class WorkflowStageHelper : IWorkflowStageHelper
     {
-        public List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available)
+        public List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available, bool withdrawal)
         {
             List<NcneTaskStageType> result = new List<NcneTaskStageType>();
 
@@ -24,7 +24,10 @@ namespace NCNEPortal.Helpers
                     result.Add(NcneTaskStageType.V1);
                     break;
                 case NcneTaskStageType.V1:
-                    result.Add(v2Available ? NcneTaskStageType.V2 : NcneTaskStageType.Final_Updating);
+                    if (withdrawal)
+                        result.Add(NcneTaskStageType.CIS);
+                    else
+                        result.Add(v2Available ? NcneTaskStageType.V2 : NcneTaskStageType.Final_Updating);
                     break;
                 case NcneTaskStageType.V1_Rework:
                     result.Add(NcneTaskStageType.V1);
@@ -47,14 +50,23 @@ namespace NCNEPortal.Helpers
                     result.Add(NcneTaskStageType.CIS);
                     break;
                 case NcneTaskStageType.CIS:
-                    result.AddRange(new List<NcneTaskStageType>()
-                    {
-                        NcneTaskStageType.Publication,
-                        NcneTaskStageType.Publish_Chart,
-                        NcneTaskStageType.Clear_Vector,
-                        NcneTaskStageType.Retire_Old_Version,
-                        NcneTaskStageType.Consider_Withdrawn_Charts
-                    });
+                    if (withdrawal)
+                        result.Add(NcneTaskStageType.PMC_withdrawal);
+                    else
+                        result.AddRange(new List<NcneTaskStageType>()
+                        {
+                            NcneTaskStageType.Publication,
+                            NcneTaskStageType.Publish_Chart,
+                            NcneTaskStageType.Clear_Vector,
+                            NcneTaskStageType.Retire_Old_Version,
+                            NcneTaskStageType.Consider_Withdrawn_Charts
+                        });
+                    break;
+                case NcneTaskStageType.PMC_withdrawal:
+                    result.Add(NcneTaskStageType.Consider_email_SDR);
+                    break;
+                case NcneTaskStageType.Withdrawal_action:
+                    result.Add(NcneTaskStageType.V1);
                     break;
                 case NcneTaskStageType.Publication:
                     break;
@@ -66,6 +78,10 @@ namespace NCNEPortal.Helpers
                     break;
                 case NcneTaskStageType.Consider_Withdrawn_Charts:
                     break;
+                case NcneTaskStageType.Consider_email_SDR:
+                    break;
+
+
             }
 
             return result;
@@ -73,7 +89,7 @@ namespace NCNEPortal.Helpers
 
         public NcneTaskStageType GetNextStageForRework(NcneTaskStageType currentStage)
         {
-            NcneTaskStageType result = (NcneTaskStageType) 0;
+            NcneTaskStageType result = (NcneTaskStageType)0;
 
             if (currentStage == NcneTaskStageType.V1)
                 result = NcneTaskStageType.V1_Rework;

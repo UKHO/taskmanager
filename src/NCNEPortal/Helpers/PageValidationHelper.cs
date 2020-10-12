@@ -42,7 +42,7 @@ namespace NCNEPortal.Helpers
         {
             bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
 
-            if (threePsInfo.SentTo3Ps == true)
+            if (threePsInfo.SentTo3Ps)
             {
                 if (!ValidateThreePs(threePsInfo.SendDate3ps, threePsInfo.ExpectedReturnDate3ps,
                     threePsInfo.ActualReturnDate3ps, validationErrorMessages))
@@ -118,6 +118,15 @@ namespace NCNEPortal.Helpers
                         validationErrorMessages.Add(
                             "Please assign a user to V1 role and Save before completing this stage");
                         isValid = false;
+                    }
+
+                    if (stageType == NcneTaskStageType.Withdrawal_action && (role.VerifierOne == null))
+                    {
+                        validationErrorMessages.Add(
+                            "Please assign a user to V1 role and Save before completing this stage");
+                        isValid = false;
+
+
                     }
                 }
             }

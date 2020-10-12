@@ -6,7 +6,8 @@ namespace NCNEPortal.Helpers
     public interface IWorkflowStageHelper
     {
 
-        List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available);
+        List<NcneTaskStageType> GetNextStagesForCompletion(NcneTaskStageType currentStage, bool v2Available,
+            bool withdrawal);
 
         NcneTaskStageType GetNextStageForRework(NcneTaskStageType currentStage);
     }
