@@ -29,6 +29,7 @@ $ConfigData.AllNodes = @(
             ContentServiceBaseUrl = "http://at2.csp.api.engineering.ukho.gov.uk/Content/PCP-AT1/V1/"
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
+            CuiaDatabaseConnectionString = "Data Source=OWPAT1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-AT1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
         }
     }
 )
