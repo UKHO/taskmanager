@@ -26,85 +26,103 @@
   {
     "TaskStageTypeId": 5,
     "Name": "V1",
-    "SequenceNumber": 5,
+    "SequenceNumber": 6,
     "AllowRework": true
   },
   {
     "TaskStageTypeId": 6,
     "Name": "V1 Rework",
-    "SequenceNumber": 6,
+    "SequenceNumber": 7,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 7,
     "Name": "V2",
-    "SequenceNumber": 7,
+    "SequenceNumber": 8,
     "AllowRework": true
   },
   {
     "TaskStageTypeId": 8,
     "Name": "V2 Rework",
-    "SequenceNumber": 8,
+    "SequenceNumber": 9,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 9,
     "Name": "Forms",
-    "SequenceNumber": 9,
+    "SequenceNumber": 10,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 10,
     "Name": "Final Updating",
-    "SequenceNumber": 10,
+    "SequenceNumber": 11,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 11,
     "Name": "100% Check",
-    "SequenceNumber": 11,
+    "SequenceNumber": 12,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 12,
     "Name": "Commit to Print",
-    "SequenceNumber": 12,
+    "SequenceNumber": 13,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 13,
     "Name": "CIS",
-    "SequenceNumber": 13,
+    "SequenceNumber": 14,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 14,
     "Name": "Publication",
-    "SequenceNumber": 14,
+    "SequenceNumber": 15,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 15,
     "Name": "Publish Chart",
-    "SequenceNumber": 15,
+    "SequenceNumber": 16,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 16,
     "Name": "Clear vector on new minor version",
-    "SequenceNumber": 16,
+    "SequenceNumber": 17,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 17,
     "Name": "Retire old minor version",
-    "SequenceNumber": 17,
+    "SequenceNumber": 18,
     "AllowRework": false
   },
   {
     "TaskStageTypeId": 18,
     "Name": "Consider withdrawn charts",
-    "SequenceNumber": 18,
+    "SequenceNumber": 19,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 19,
+    "Name": "Withdrawal action",
+    "SequenceNumber": 5,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 20,
+    "Name": "PMC withdrawal",
+    "SequenceNumber": 20,
+    "AllowRework": false
+  },
+  {
+    "TaskStageTypeId": 21,
+    "Name": "Consider Email SDR",
+    "SequenceNumber": 21,
     "AllowRework": false
   }
 ]

@@ -97,7 +97,7 @@
                 </tr>
             </thead>
             <tbody class="workflow-row">
-                @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageTypeId))
+                @foreach (var taskStage in Model.TaskStages.OrderBy(t => t.TaskStageType.SequenceNumber))
                 {
                     @await Component.InvokeAsync("WorkflowStage", new { processId = Model.ProcessId, taskStageId = taskStage.TaskStageId, isReadOnly = Model.IsReadOnly })
                     ;
@@ -131,6 +131,9 @@
         <input type="hidden" id="hdnChartNo" asp-for="ChartNo" />
         <input type="hidden" asp-for="IsReadOnly" />
         <input type="hidden" asp-for="IsPublished" />
+        <input type="hidden" id="hdnWorkflowType" asp-for="WorkflowType" />
+        <input type="hidden" id="hdnDating" asp-for="Dating" />
+
 
 
         <!-- #endregion -->
@@ -206,32 +209,55 @@
                                     @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
-                                        <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
-                                            <span class=@(Model.IsReadOnly ? "" : "fa fa-chevron-down arrow-icon")></span>
-                                        </div>
-                                        @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
-                                            , "", new { @class = "form-control" })
 
+                            @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                            {
+                                <div class="row" id="DateString">
+                                    <div class="col">
+                                        @Html.TextBoxFor(model => model.Duration, "", new { @class = "form-control form-text-input" })
                                     </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            { <div class="row">
+                                    <div class="col">
+                                        <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
+                                            <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
+                                                <span class=@(Model.IsReadOnly ? "" : "fa fa-chevron-down arrow-icon")></span>
+                                            </div>
+                                            @Html.DropDownListFor(mode => Model.Dating, Html.GetEnumSelectList(typeof(DeadlineEnum))
+                                                , "", new { @class = "form-control" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
 
                         </div>
                         <div class="col-3">
                             <div class="form-group">
-                                <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                                @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                                {
+                                    <div><label class="col-form-label">Withdrawal Date</label> </div>
+                                }
+                                else
+                                {
+                                    <div>@Html.LabelFor(model => model.PublicationDate, new { id = "lblPubDate", @class = "col-form-label" })</div>
+                                }
+
                                 <div>@Html.TextBoxFor(model => model.PublicationDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.RepromatDate, new { id = "lblRepDate", @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.RepromatDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                     <div class="row">
                         <div class="col-3">
@@ -278,120 +304,126 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
-                                <div>
-                                    @Html.TextBoxFor(model => model.Verifier2.DisplayName, "",
-                                        new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
-                                    @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.Verifier2, new { @class = "col-form-label" })</div>
+                                    <div>
+                                        @Html.TextBoxFor(model => model.Verifier2.DisplayName, "",
+                                            new { placeholder = "Verifier2", id = "Verifier2", autocomplete = false, spellcheck = false, @class = "ta_v2 tt-query form-text-input" })
+                                        @Html.HiddenFor(m => m.Verifier2.UserPrincipalName, new { @id = "Verifier2Upn", @class = "Verifier2Upn" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.HundredPercentCheck, new { @class = "col-form-label" })</div>
+                                    <div>
+                                        @Html.TextBoxFor(model => model.HundredPercentCheck.DisplayName, "",
+                                            new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
+                                        @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                    {
+                        <hr class="mt-2 mb-4" />
+                        <div class="row" align="center">
+                            <h4>3PS</h4>
+
+                            <label class="switch ml-2 mb-auto">
+                                <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.SendDate3ps, new { @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.SendDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps, new { @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.ExpectedReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.ActualReturnDate3ps, new { @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.ActualReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.HundredPercentCheck, new { @class = "col-form-label" })</div>
-                                <div>
-                                    @Html.TextBoxFor(model => model.HundredPercentCheck.DisplayName, "",
-                                        new { placeholder = "HundredPercentCheck", id = "HundredPercentCheck", autocomplete = false, spellcheck = false, @class = "ta_100pCheck tt-query form-text-input" })
-                                    @Html.HiddenFor(m => m.HundredPercentCheck.UserPrincipalName, new { @id = "HundredPCheckUpn", @class = "HundredPCheckUpn" })
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mt-2 mb-4" />
-                    <div class="row" align="center">
-                        <h4>3PS</h4>
-
-                        <label class="switch ml-2 mb-auto">
-                            <input type="checkbox" id="3psToggle" name="SentTo3Ps" class="success" @(Model.SentTo3Ps ? "checked" : "") value="true">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.SendDate3ps, new { @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.SendDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.ExpectedReturnDate3ps, new { @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.ExpectedReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.ActualReturnDate3ps, new { @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.ActualReturnDate3ps, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mt-2 mb-4" />
-
+                        <hr class="mt-2 mb-4" />
+                    }
                 </div>
             </div>
         </div>
-
         @*--- END TASK INFORMATION ---*@
 
-
         @*--- START EDIT DATABASE ---*@
-        <div class="card mb-4 mt-3">
-            <h3>Edit Database</h3>
-            <div class="col-12">
-                <div class="card-body pb-2 col-11">
-                    <h4>CARIS</h4>
+        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+        {
 
-                    <div class="row align-items-end">
-                        <div class="col-12 mb-2 col-lg-4 mb-lg-0">
-                            <div class="row">
-                                <div class="col">
-                                    @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+            <div class="card mb-4 mt-3">
+                <h3>Edit Database</h3>
+                <div class="col-12">
+                    <div class="card-body pb-2 col-11">
+                        <h4>CARIS</h4>
+
+                        <div class="row align-items-end">
+                            <div class="col-12 mb-2 col-lg-4 mb-lg-0">
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.LabelFor(model => model.CarisProjectName, new { @class = "col-form-label" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        @Html.TextBoxFor(model => model.CarisProjectName, "",
+                                            new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    @Html.TextBoxFor(model => model.CarisProjectName, "",
-                                        new { id = "txtCarisProject", placeholder = "ProcessID_Chart Type_Chart Number", maxlength = 50, @class = "form-control form-text-input" })
+                            <div class="col-auto">
+                                <div class="row">
+                                    <div class="col">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" id="btnCreateCarisProject" class="btn btn-block btn-primary">
+                                            <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
+                                            Create CARIS Project
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+
+
                         </div>
-                        <div class="col-auto">
-                            <div class="row">
-                                <div class="col">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <button type="button" id="btnCreateCarisProject" class="btn btn-block btn-primary">
-                                        <span id="createCarisProjectSpinner" class="fas fa-crosshairs fa-spin" style="margin-right: 10px; display: none;"></span>
-                                        Create CARIS Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <section id="createCarisProjectError" class="dialog error collapse mt-3">
+                            <h5>
+                                <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
+                                <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
+                            </h5>
+                        </section>
 
-
+                        <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
+                            <h5>
+                                <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                                <span>Caris project successfully created</span>
+                            </h5>
+                        </section>
                     </div>
-                    <section id="createCarisProjectError" class="dialog error collapse mt-3">
-                        <h5>
-                            <i class="fas fa-times-circle" style="font-size: 1.25rem;"></i>
-                            <span id="createCarisProjectErrorMessage">Failed to load Source Documents</span>
-                        </h5>
-                    </section>
-
-                    <section id="createCarisProjectSuccess" class="dialog success collapse mt-3">
-                        <h5>
-                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
-                            <span>Caris project successfully created</span>
-                        </h5>
-                    </section>
                 </div>
             </div>
-        </div>
-
+        }
         @*--- END EDIT DATABASE ---*@
 
 

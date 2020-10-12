@@ -128,6 +128,7 @@
 
     $("#btnNewTask").click(function () { window.location.href = '/NewTask'; });
 
+    $("#btnWithdrawal").click(function() { window.location.href = "/Withdrawal"; });
 
 
     function applyDatatableFilter() {
