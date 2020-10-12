@@ -59,12 +59,11 @@
             "lengthMenu": [5, 10, 25, 50],
             'columnDefs': [
                 {
-                    'targets': [11],
-                    'orderable': false,
+                    'targets': [12],
                     'searchable': false
                 },
                 {
-                    'targets': [12],
+                    'targets': [13],
                     'visible': false,
                     'searchable': false
                 }
@@ -91,17 +90,21 @@
                     'searchable': false
                 },
                 {
-                    'targets': [12],
+                    'targets': [12], // complexity
+                    'searchable': false
+                },
+                {
+                    'targets': [13], // assign task icon
                     'orderable': false,
                     'searchable': false
                 },
                 {
-                    'targets': [13],
+                    'targets': [14], // edit take note icon
                     'orderable': false,
                     'searchable': false
                 },
                 {
-                    'targets': [14],
+                    'targets': [15], // task note text
                     'visible': false,
                     'searchable': false
                 }

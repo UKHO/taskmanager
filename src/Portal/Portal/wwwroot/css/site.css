@@ -394,7 +394,41 @@ table > tbody > tr > th {
 }
 
 .alertText.green {
+     background-color: #008000;
+}
+
+/* COMPLEXITY */
+
+.complexity {
+    text-align: center;
+    padding-left: 1px !important;
+}
+
+.complexity > span {
+    display: inline-block;
+    border-radius: .25rem;
+    font-weight: 400;
+    min-width: 1.2rem;
+    max-width: 1.2rem;
+    max-height: 1.25rem;
+    line-height: 1.2rem;
+    margin-right: 0px !important;
+}
+
+.complexity.High > span {
+    background-color: #cd2026;
+    font-weight: 500;
+    color: white;
+}
+
+.complexity.Medium > span {
+    background-color: #ffbf00;
+    color: black;
+}
+
+.complexity.Low > span{
     background-color: #008000;
+    color: white;
 }
 
 /* Footer start */

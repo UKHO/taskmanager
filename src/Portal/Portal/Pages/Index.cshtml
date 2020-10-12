@@ -55,6 +55,7 @@
                     <th>Assessor</th>
                     <th>Verifier</th>
                     <th>Team</th>
+                    <th><span class="screen-reader-only">Complexity</span></th>
                     <th><span class="screen-reader-only">Assign Tasks</span></th>
                 </tr>
             </thead>
@@ -70,8 +71,8 @@
                             @Html.DisplayFor(model => task.DmEndDate)
 
                             @if (task.DaysToDmEndDateRedAlert ||
-                                task.DaysToDmEndDateAmberAlert ||
-                                task.DaysToDmEndDateGreenAlert)
+                             task.DaysToDmEndDateAmberAlert ||
+                             task.DaysToDmEndDateGreenAlert)
                             {
                                 <div class="right mr-1
                                  @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "")
@@ -112,6 +113,32 @@
                         <td>
                             @task.Team
                         </td>
+                        @if (!string.IsNullOrEmpty(task.Complexity))
+                        {
+                            string sortValue = "0";
+                            switch (task.Complexity)
+                            {
+                                case "Low":
+                                    sortValue = "1";
+                                    break;
+                                case "Medium":
+                                    sortValue = "2";
+                                    break;
+                                case "High":
+                                    sortValue = "3";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            <td data-sort="@(sortValue)" class="@($"complexity {task.Complexity}")">
+                                <span>@(task.Complexity[0])</span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
                         <td>
                             <div data-toggle="tooltip" data-placement="top" title="Assign Task">
                                 <a class="assignTaskItem" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">
@@ -147,6 +174,7 @@
                     <th>Assessor</th>
                     <th>Verifier</th>
                     <th>Team</th>
+                    <th><span class="screen-reader-only">Complexity</span></th>
                     <th><span class="screen-reader-only">Assign Tasks</span></th>
                     <th><span class="screen-reader-only">Edit Task Notes</span></th>
                 </tr>
@@ -211,6 +239,32 @@
                         <td>
                             @task.Team
                         </td>
+                        @if (!string.IsNullOrEmpty(task.Complexity))
+                        {
+                            string sortValue = "0";
+                            switch (task.Complexity)
+                            {
+                                case "Low":
+                                    sortValue = "1";
+                                    break;
+                                case "Medium":
+                                    sortValue = "2";
+                                    break;
+                                case "High":
+                                    sortValue = "3";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            <td data-sort="@(sortValue)" class="@($"complexity {task.Complexity}")">
+                                <span>@(task.Complexity[0])</span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
                         <td>
                             <div data-toggle="tooltip" data-placement="top" title="Assign Task">
                                 <a class="assignTaskItem pr-1" data-processid="@task.ProcessId" data-taskstage="@task.TaskStage" aria-label="Assign Task" href="#" style="cursor: pointer;">

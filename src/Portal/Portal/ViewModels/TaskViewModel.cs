@@ -30,6 +30,7 @@ namespace Portal.ViewModels
         public AdUser Assessor { get; set; }
         public AdUser Verifier { get; set; }
         public string Team { get; set; }
+        public string Complexity { get; set; }
         public string TaskNoteText { get; set; }
         public List<Comment> Comment { get; set; }
     }
