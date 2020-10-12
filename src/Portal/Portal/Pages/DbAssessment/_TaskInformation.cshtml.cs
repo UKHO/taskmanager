@@ -55,17 +55,20 @@ namespace Portal.Pages.DbAssessment
         public bool OnHoldDaysAmber { get; set; }
         public bool OnHoldDaysRed { get; set; }
 
-        [DisplayName("On Hold:")]
-        public int OnHoldDays { get; set; }
+        [DisplayName("On Hold:")] public int OnHoldDays { get; set; }
 
-        [DisplayName("ION:")]
-        public string Ion { get; set; }
+        [DisplayName("ION:")] public string Ion { get; set; }
 
-        [DisplayName("Activity Code:")]
-        public string ActivityCode { get; set; }
+        [DisplayName("Activity Code:")] public string ActivityCode { get; set; }
 
-        [DisplayName("Complexity:")]
-        public string Complexity { get; set; }
+        [DisplayName("Complexity:")] public string Complexity { get; set; }
+        public SelectList ComplexityList =>
+            new SelectList(new List<string>
+            {
+                "Low",
+                "Medium",
+                "High"
+            });
 
         [DisplayName("Source Category:")]
         public string SourceCategory { get; set; }
