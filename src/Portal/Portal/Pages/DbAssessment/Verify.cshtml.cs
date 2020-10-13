@@ -641,6 +641,7 @@ namespace Portal.Pages.DbAssessment
 
             currentVerify.Verifier = await _portalUserDbService.GetAdUserAsync(Verifier.UserPrincipalName); ;
             currentVerify.Ion = Ion;
+            currentVerify.Complexity = Complexity;
             currentVerify.ActivityCode = ActivityCode;
             currentVerify.SourceCategory = SourceCategory;
 
