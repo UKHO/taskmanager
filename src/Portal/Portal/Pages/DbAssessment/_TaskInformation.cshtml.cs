@@ -130,6 +130,7 @@ namespace Portal.Pages.DbAssessment
 
             ActivityCode = taskData?.ActivityCode;
             Ion = taskData?.Ion;
+            Complexity = taskData?.Complexity;
             SourceCategory = taskData?.SourceCategory;
             TaskType = taskData?.TaskType;
             Teams = new SelectList(_generalConfig.Value.GetTeams());
