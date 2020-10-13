@@ -428,6 +428,7 @@ namespace Portal.Pages.DbAssessment
             currentReview.Notes = PrimaryAssignedTask.Notes;
             currentReview.WorkspaceAffected = PrimaryAssignedTask.WorkspaceAffected;
             currentReview.Ion = Ion;
+            currentReview.Complexity = Complexity;
             currentReview.ActivityCode = ActivityCode;
             currentReview.SourceCategory = SourceCategory;
 

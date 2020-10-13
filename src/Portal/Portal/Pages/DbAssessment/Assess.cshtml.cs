@@ -405,6 +405,7 @@ namespace Portal.Pages.DbAssessment
             currentAssess.Assessor = await _portalUserDbService.GetAdUserAsync(Assessor.UserPrincipalName);
             currentAssess.Verifier = await _portalUserDbService.GetAdUserAsync(Verifier.UserPrincipalName);
             currentAssess.Ion = Ion;
+            currentAssess.Complexity = Complexity;
             currentAssess.ActivityCode = ActivityCode;
             currentAssess.SourceCategory = SourceCategory;
             currentAssess.TaskType = TaskType;
