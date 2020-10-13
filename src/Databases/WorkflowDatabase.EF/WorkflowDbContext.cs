@@ -41,6 +41,7 @@ namespace WorkflowDatabase.EF
         public DbSet<HpdUser> HpdUser { get; set; }
         public DbSet<AdUser> AdUsers { get; set; }
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
+        public DbSet<CachedHpdEncProduct> CachedHpdEncProduct { get; set; }
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
         public DbSet<OpenAssessmentsQueue> OpenAssessmentsQueue { get; set; }   
 
