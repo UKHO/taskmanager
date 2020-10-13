@@ -147,7 +147,7 @@ namespace Portal.UnitTests
         [TestCase(null, "Save", ExpectedResult = true)]
         [TestCase("INVALID", "Done", ExpectedResult = false)]
         [TestCase("3454", "Done", ExpectedResult = false)]
-        public async Task<bool> Test_CheckAssessPageForErrors_with_valid_and_invalid_complexity_returns_expected_result(string complexity, string action)
+        public async Task<bool> Test_CheckVerifyPageForErrors_with_valid_and_invalid_complexity_returns_expected_result(string complexity, string action)
         {
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
