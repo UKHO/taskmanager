@@ -20,6 +20,11 @@ case
 	when wi.ActivityName = assessStage then ISNULL(daad.TaskType, '')
 	when wi.ActivityName = verifyStage then ISNULL(davd.TaskType, '')
 end as [TASK TYPE],
+case 
+	when wi.ActivityName = reviewStage then ISNULL(dard.Complexity, '')
+	when wi.ActivityName = assessStage then ISNULL(daad.Complexity, '')
+	when wi.ActivityName = verifyStage then ISNULL(davd.Complexity, '')
+end as [COMPLEXITY],
 ISNULL(CONVERT(nvarchar(20), ad.ReceiptDate, 103), '') as [RECEIPT DATE],
 ISNULL(CONVERT(nvarchar(20), ad.ToSdoDate, 103), '') as [TO SDO DATE],
 ISNULL(CONVERT(nvarchar(20), wi.StartedAt, 103), '') as [DM RECEIPT],
