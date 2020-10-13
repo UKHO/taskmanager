@@ -57,6 +57,7 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlRaw("delete from [WorkflowInstance]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [AdUsers]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [CachedHpdWorkspace]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [CachedHpdEncProduct]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [OpenAssessmentsQueue]");
 
             ReSeedWorkflowDbTables(workflowDbContext);
