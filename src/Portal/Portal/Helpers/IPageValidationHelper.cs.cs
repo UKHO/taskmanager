@@ -26,31 +26,17 @@ namespace Portal.Helpers
                                             AdUser reviewer,
                                             List<string> validationErrorMessages,
                                             string currentUserEmail,
-                                            AdUser currentAssignedReviewerInDb);
+                                            AdUser currentAssignedReviewerInDb,
+                                            string complexity);
 
         /// <summary>
         /// Used in Assess page
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="ion"></param>
-        /// <param name="activityCode"></param>
-        /// <param name="sourceCategory"></param>
-        /// <param name="taskType"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="ProductActionChangeDetails"></param>
-        /// <param name="recordProductAction"></param>
-        /// <param name="dataImpacts"></param>
-        /// <param name="stsDataImpact"></param>
-        /// <param name="team"></param>
-        /// <param name="assessor"></param>
-        /// <param name="verifier"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="currentUsername"></param>
-        /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
         Task<bool> CheckAssessPageForErrors(
                                             string action,
                                             string ion,
+                                            string complexity,
                                             string activityCode,
                                             string sourceCategory,
                                             string taskType,
@@ -82,24 +68,9 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify page
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="ion"></param>
-        /// <param name="activityCode"></param>
-        /// <param name="sourceCategory"></param>
-        /// <param name="formDataAssignedVerifier"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="ProductActionChangeDetails"></param>
-        /// <param name="recordProductAction"></param>
-        /// <param name="dataImpacts"></param>
-        /// <param name="stsDataImpact"></param>
-        /// <param name="team"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="currentUsername"></param>
-        /// <param name="currentAssignedVerifierInDb"></param>
-        /// <param name="isOnHold"></param>
-        /// <returns></returns>
         Task<bool> CheckVerifyPageForErrors(string action,
             string ion,
+            string complexity,
             string activityCode,
             string sourceCategory,
             AdUser formDataAssignedVerifier,

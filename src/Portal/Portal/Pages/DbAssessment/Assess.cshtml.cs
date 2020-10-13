@@ -172,6 +172,7 @@ namespace Portal.Pages.DbAssessment
             if (!await _pageValidationHelper.CheckAssessPageForErrors(
                 action,
                 Ion,
+                Complexity,
                 ActivityCode,
                 SourceCategory,
                 TaskType,
@@ -233,6 +234,7 @@ namespace Portal.Pages.DbAssessment
                     if (!await _pageValidationHelper.CheckAssessPageForErrors(
                         action,
                         Ion,
+                        Complexity,
                         ActivityCode,
                         SourceCategory,
                         TaskType,
