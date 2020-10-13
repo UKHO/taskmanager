@@ -230,7 +230,7 @@ namespace Portal.Pages.DbAssessment
             var currentReviewData = await _dbContext.DbAssessmentReviewData.FirstAsync(r => r.ProcessId == processId);
             if (!await _pageValidationHelper.CheckReviewPageForErrors(action, PrimaryAssignedTask,
                 AdditionalAssignedTasks, Team, Reviewer, ValidationErrorMessages, CurrentUser.UserPrincipalName,
-                currentReviewData.Reviewer))
+                currentReviewData.Reviewer, Complexity))
             {
                 return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }
@@ -297,7 +297,8 @@ namespace Portal.Pages.DbAssessment
                 Reviewer,
                 ValidationErrorMessages,
                 CurrentUser.UserPrincipalName,
-                currentReviewData.Reviewer))
+                currentReviewData.Reviewer,
+                Complexity))
             {
                 return new JsonResult(this.ValidationErrorMessages) { StatusCode = 400 };
             }

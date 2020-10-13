@@ -188,6 +188,7 @@ namespace Portal.Pages.DbAssessment
 
             if (!await _pageValidationHelper.CheckVerifyPageForErrors(action,
                 Ion,
+                Complexity,
                 ActivityCode,
                 SourceCategory,
                 Verifier,
@@ -276,6 +277,7 @@ namespace Portal.Pages.DbAssessment
                     if (!await _pageValidationHelper.CheckVerifyPageForErrors(// from submitted form data
                         action,
                         Ion,
+                        Complexity,
                         ActivityCode,
                         SourceCategory,
                         Verifier,
