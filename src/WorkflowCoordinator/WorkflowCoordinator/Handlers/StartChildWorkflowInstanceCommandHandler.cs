@@ -262,7 +262,7 @@ namespace WorkflowCoordinator.Handlers
                 await _dbContext.DbAssessmentAssessData.FirstOrDefaultAsync(a => a.ProcessId == childProcessId);
 
             var isNew = childAssessData == null;
-            
+
             if (isNew)
             {
                 childAssessData = new DbAssessmentAssessData();
@@ -273,6 +273,7 @@ namespace WorkflowCoordinator.Handlers
 
             childAssessData.ActivityCode = parentReviewData.ActivityCode;
             childAssessData.Ion = parentReviewData.Ion;
+            childAssessData.Complexity = parentReviewData.Complexity;
             childAssessData.SourceCategory = parentReviewData.SourceCategory;
             childAssessData.WorkspaceAffected = additionalAssignedTaskData.WorkspaceAffected;
             childAssessData.TaskType = additionalAssignedTaskData.TaskType;

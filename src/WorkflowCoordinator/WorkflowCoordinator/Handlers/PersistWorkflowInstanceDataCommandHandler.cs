@@ -211,10 +211,11 @@ namespace WorkflowCoordinator.Handlers
 
             assessData.ActivityCode = reviewData.ActivityCode;
             assessData.Ion = reviewData.Ion;
+            assessData.Complexity = reviewData.Complexity;
             assessData.SourceCategory = reviewData.SourceCategory;
             assessData.WorkspaceAffected = reviewData.WorkspaceAffected;
             assessData.TaskType = reviewData.TaskType;
-            assessData.Reviewer =  reviewData.Reviewer;
+            assessData.Reviewer = reviewData.Reviewer;
             assessData.Assessor = reviewData.Assessor;
             assessData.Verifier = reviewData.Verifier;
 
@@ -263,6 +264,7 @@ namespace WorkflowCoordinator.Handlers
 
             assessData.ActivityCode = verifyData.ActivityCode;
             assessData.Ion = verifyData.Ion;
+            assessData.Complexity = verifyData.Complexity;
             assessData.SourceCategory = verifyData.SourceCategory;
             assessData.WorkspaceAffected = verifyData.WorkspaceAffected;
             assessData.TaskType = verifyData.TaskType;
@@ -303,6 +305,7 @@ namespace WorkflowCoordinator.Handlers
 
             verifyData.ActivityCode = assessData.ActivityCode;
             verifyData.Ion = assessData.Ion;
+            verifyData.Complexity = assessData.Complexity;
             verifyData.SourceCategory = assessData.SourceCategory;
             verifyData.WorkspaceAffected = assessData.WorkspaceAffected;
             verifyData.TaskType = assessData.TaskType;
