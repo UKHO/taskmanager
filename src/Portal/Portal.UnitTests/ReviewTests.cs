@@ -123,6 +123,54 @@ namespace Portal.UnitTests
             _dbContext.Database.EnsureDeleted();
         }
 
+
+        [TestCase("High", "Save", ExpectedResult = true)]
+        [TestCase("High", "Done", ExpectedResult = true)]
+        [TestCase("Medium", "Save", ExpectedResult = true)]
+        [TestCase("Medium", "Done", ExpectedResult = true)]
+        [TestCase("Low", "Save", ExpectedResult = true)]
+        [TestCase("Low", "Done", ExpectedResult = true)]
+        [TestCase("", "Save", ExpectedResult = true)]
+        [TestCase("  ", "Save", ExpectedResult = true)]
+        [TestCase(null, "Save", ExpectedResult = true)]
+        [TestCase("INVALID", "Done", ExpectedResult = false)]
+        [TestCase("3454", "Done", ExpectedResult = false)]
+        public async Task<bool> Test_CheckReviewPageForErrors_with_valid_and_invalid_complexity_returns_expected_result(string complexity, string action)
+        {
+            _dbContext.AssignedTaskType.Add(new AssignedTaskType
+            {
+                AssignedTaskTypeId = 1,
+                Name = "Simple"
+            });
+            await _dbContext.SaveChangesAsync();
+
+            _reviewModel.PrimaryAssignedTask = new DbAssessmentReviewData
+            {
+                TaskType = "Simple",
+                WorkspaceAffected = "test workspace",
+                Assessor = TestUser,
+                Verifier = TestUser
+            };
+
+            _reviewModel.AdditionalAssignedTasks = new List<DbAssessmentAssignTask>();
+            _reviewModel.Reviewer = TestUser;
+
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
+                .Returns(true);
+
+            var valid = await _pageValidationHelper.CheckReviewPageForErrors(action,
+                _reviewModel.PrimaryAssignedTask,
+                _reviewModel.AdditionalAssignedTasks,
+                "dummy team",
+                _reviewModel.Reviewer,
+                A.Dummy<List<string>>(),
+                TestUser.UserPrincipalName,
+                TestUser,
+                complexity);
+
+            return valid;
+        }
+
         [Test]
         public async Task
             Test_OnPostDoneAsync_entering_a_primary_tasktype_that_does_not_exist_results_in_validation_error_message()
@@ -554,7 +602,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
                     _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
-                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
@@ -1071,7 +1119,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
                     _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
-                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -1116,7 +1164,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
                     _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
-                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);
@@ -1158,7 +1206,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
                     _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
-                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             _dbContext.OnHold.RemoveRange(_dbContext.OnHold.First());
@@ -1203,7 +1251,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             A.CallTo(() => _fakepageValidationHelper.CheckReviewPageForErrors(A<string>.Ignored,
                     _reviewModel.PrimaryAssignedTask, A<List<DbAssessmentAssignTask>>.Ignored, A<string>.Ignored,
-                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
+                    A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<string>.Ignored))
                 .Returns(true);
 
             await _reviewModel.OnPostSaveAsync(ProcessId);

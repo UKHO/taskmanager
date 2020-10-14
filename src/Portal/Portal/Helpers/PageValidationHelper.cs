@@ -28,21 +28,12 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Review page
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="primaryAssignedTask"></param>
-        /// <param name="additionalAssignedTasks"></param>
-        /// <param name="team"></param>
-        /// <param name="reviewer"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="currentUsername"></param>
-        /// <param name="currentAssignedReviewerInDb"></param>
-        /// <returns></returns>
         public async Task<bool> CheckReviewPageForErrors(string action, DbAssessmentReviewData primaryAssignedTask,
             List<DbAssessmentAssignTask> additionalAssignedTasks,
             string team,
             AdUser reviewer,
             List<string> validationErrorMessages, string currentUserEmail,
-            AdUser currentAssignedReviewerInDb)
+            AdUser currentAssignedReviewerInDb, string complexity)
         {
             var isValid = true;
 
@@ -86,31 +77,22 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
+            if (!ValidateComplexity(complexity, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+
             return isValid;
         }
 
         /// <summary>
         /// Used in Assess page
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="ion"></param>
-        /// <param name="activityCode"></param>
-        /// <param name="sourceCategory"></param>
-        /// <param name="taskType"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="productActionChangeDetails"></param>
-        /// <param name="recordProductAction"></param>
-        /// <param name="dataImpacts"></param>
-        /// <param name="stsDataImpact"></param>
-        /// <param name="team"></param>
-        /// <param name="assessor"></param>
-        /// <param name="verifier"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="currentUsername"></param>
-        /// <param name="currentAssignedAssessorInDb"></param>
         /// <returns></returns>
         public async Task<bool> CheckAssessPageForErrors(string action,
             string ion,
+            string complexity,
             string activityCode,
             string sourceCategory,
             string taskType,
@@ -162,6 +144,11 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
+            if (!ValidateComplexity(complexity, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
             if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
             {
                 isValid = false;
@@ -207,24 +194,9 @@ namespace Portal.Helpers
         /// <summary>
         /// Used in Verify page
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="ion"></param>
-        /// <param name="activityCode"></param>
-        /// <param name="sourceCategory"></param>
-        /// <param name="formDataAssignedVerifier"></param>
-        /// <param name="productActioned"></param>
-        /// <param name="productActionChangeDetails"></param>
-        /// <param name="recordProductAction"></param>
-        /// <param name="dataImpacts"></param>
-        /// <param name="stsDataImpact"></param>
-        /// <param name="team"></param>
-        /// <param name="validationErrorMessages"></param>
-        /// <param name="currentUsername"></param>
-        /// <param name="currentAssignedVerifierInDb"></param>
-        /// <param name="isOnHold"></param>
-        /// <returns></returns>
         public async Task<bool> CheckVerifyPageForErrors(string action,
             string ion,
+            string complexity,
             string activityCode,
             string sourceCategory,
             AdUser formDataAssignedVerifier,
@@ -271,6 +243,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
+
             if (!ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
@@ -282,6 +255,11 @@ namespace Portal.Helpers
             }
 
             if (!ValidateStsDataImpact(stsDataImpact, action, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!ValidateComplexity(complexity, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -794,5 +772,21 @@ namespace Portal.Helpers
             return true;
         }
 
+        /// <summary>
+        /// Used in Review, Assess and Verify pages.
+        /// <remarks>Valid complexity types includes null or whitespace.</remarks>
+        /// </summary>
+        private bool ValidateComplexity(string complexity, List<string> validationErrorMessages)
+        {
+            var valid = string.IsNullOrWhiteSpace(complexity) ||
+                        new string[] { "High", "Medium", "Low" }.Contains(complexity, StringComparer.OrdinalIgnoreCase);
+
+            if (!valid)
+            {
+                validationErrorMessages.Add("Invalid complexity. Must be High, Medium, Low or left blank.");
+            }
+
+            return valid;
+        }
     }
 }

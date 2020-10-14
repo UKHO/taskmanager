@@ -130,6 +130,47 @@ namespace Portal.UnitTests
             _dbContext.Database.EnsureDeleted();
         }
 
+        [TestCase("High", "Save", ExpectedResult = true)]
+        [TestCase("High", "Done", ExpectedResult = true)]
+        [TestCase("Medium", "Save", ExpectedResult = true)]
+        [TestCase("Medium", "Done", ExpectedResult = true)]
+        [TestCase("Low", "Save", ExpectedResult = true)]
+        [TestCase("Low", "Done", ExpectedResult = true)]
+        [TestCase("", "Save", ExpectedResult = true)]
+        [TestCase("  ", "Save", ExpectedResult = true)]
+        [TestCase(null, "Save", ExpectedResult = true)]
+        [TestCase("INVALID", "Done", ExpectedResult = false)]
+        [TestCase("3454", "Done", ExpectedResult = false)]
+        public async Task<bool> Test_CheckAssessPageForErrors_with_valid_and_invalid_complexity_returns_expected_result(string complexity, string action)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
+                .Returns(true);
+
+            var valid = await _pageValidationHelper.CheckAssessPageForErrors(
+                action,
+                "ion",
+                complexity,
+                "activity",
+                "source category",
+                "task type",
+                A.Dummy<bool>(),
+                A.Dummy<string>(),
+                A.Dummy<List<ProductAction>>(),
+                A.Dummy<List<DataImpact>>(),
+                A.Dummy<DataImpact>(),
+                "team",
+                TestUser,
+                TestUser,
+                A.Dummy<List<string>>(),
+               TestUser.UserPrincipalName,
+                TestUser);
+
+
+            return valid;
+        }
+
         [Test]
         public async Task Test_OnPostSaveAsync_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_assessor_results_in_validation_error_message()
         {
@@ -336,7 +377,7 @@ namespace Portal.UnitTests
             _assessModel.Team = "HW";
             _assessModel.Assessor = TestUser;
             _assessModel.Verifier = new AdUser { DisplayName = "unknown", UserPrincipalName = "unknown" }; ;
-            
+
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
@@ -455,7 +496,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
                 .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -491,7 +532,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
                 .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -559,7 +600,7 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
                 .Returns(true);
             A.CallTo(() => _fakePortalUserDbService.GetAdUserAsync(A<string>.Ignored)).Returns(TestUser);
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -595,7 +636,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -646,7 +687,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -680,7 +721,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
-            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
+            A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors("Save", A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<ProductAction>>.Ignored,
                     A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<AdUser>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored))
                 .Returns(true);
@@ -912,6 +953,7 @@ namespace Portal.UnitTests
 
             // Assert
             A.CallTo(() => _pageValidationHelper.CheckAssessPageForErrors(A<string>.Ignored,
+                                                                                A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<string>.Ignored,
@@ -1183,6 +1225,7 @@ namespace Portal.UnitTests
                 .Returns(true);
 
             A.CallTo(() => _fakePageValidationHelper.CheckAssessPageForErrors(
+                null,
                 null,
                 null,
                 null,
