@@ -6,11 +6,10 @@ using System;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class NewTaskPage : PageBase, ILandingPage
-
+    public class WithdrawalPage : PageBase, ILandingPage
     {
-        public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver, wait, urlsConfig.NcneNewTaskPageUrl)
+        public WithdrawalPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig) : base(driver, wait,
+            urlsConfig.NcneWithdrawalPageUrl)
         {
         }
 
