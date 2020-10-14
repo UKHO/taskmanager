@@ -112,7 +112,7 @@
             "order": [[2, 'asc']],
             "scrollX": true,
             "createdRow": function (row, data, dataIndex) {
-                if (data[14] === "") {
+                if (data[15] === "") {
                     $("td.details-control", row).removeClass("details-control");
                     $("td.details-control i", row).removeClass("fa");
                 }
@@ -163,7 +163,7 @@
     }
 
     function format(data) {
-        return '<span class="note-formatting">' + data[14] + '</span>';
+        return '<span class="note-formatting">' + data[15] + '</span>';
     }
 
     function handleDisplayTaskNotes() {
