@@ -1,4 +1,32 @@
 ﻿$(document).ready(function () {
+    // Intentionally global variables
+    var newTaskCount = 0;
+    var newTaskNotifyElement = document.getElementById("newTaskNotify");
+    var newTaskCounterElement = document.getElementById("newTaskCounter");
+
+    $(newTaskCounterElement).text(0);
+    $(newTaskNotifyElement).hide();
+    $(newTaskCounterElement).hide();
+
+    var connection = new signalR.HubConnectionBuilder().withUrl("/tasksupdate").withAutomaticReconnect().build();
+    connection.on("newReviewTask", function () {
+
+        if (newTaskCount === 0) {
+            $(newTaskNotifyElement).show();
+            $(newTaskCounterElement).show();
+        }
+
+        newTaskCount++;
+        $(newTaskCounterElement).text(newTaskCount);
+        $(newTaskNotifyElement).addClass("notifyPulse").delay(1000).queue(function () {
+            $(this).removeClass("notifyPulse").dequeue();
+        });
+    });
+
+    connection.start().then(function () {
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
 
     // Required unless we refactor behaviour around errors
     var usersFetched = false;
