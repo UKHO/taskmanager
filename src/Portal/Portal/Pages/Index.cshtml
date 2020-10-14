@@ -71,8 +71,8 @@
                             @Html.DisplayFor(model => task.DmEndDate)
 
                             @if (task.DaysToDmEndDateRedAlert ||
-                             task.DaysToDmEndDateAmberAlert ||
-                             task.DaysToDmEndDateGreenAlert)
+                            task.DaysToDmEndDateAmberAlert ||
+                            task.DaysToDmEndDateGreenAlert)
                             {
                                 <div class="right mr-1
                                  @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "")
@@ -164,8 +164,8 @@
                 <tr>
                     <th><span class="screen-reader-only">Task Notes</span></th>
                     <th>ID</th>
-                    <th style="min-width: 6.5rem;">DM End Date</th>
-                    <th style="min-width: 5.0rem;">Days On Hold</th>
+                    <th style="min-width: 6.7rem;">DM End Date</th>
+                    <th style="min-width: 4.8rem;">Days On Hold</th>
                     <th>RSDRA No.</th>
                     <th>Source Name</th>
                     <th>Workspace</th>
@@ -192,8 +192,8 @@
                             @Html.DisplayFor(model => task.DmEndDate)
 
                             @if (task.DaysToDmEndDateRedAlert ||
-                                task.DaysToDmEndDateAmberAlert ||
-                                task.DaysToDmEndDateGreenAlert)
+                               task.DaysToDmEndDateAmberAlert ||
+                               task.DaysToDmEndDateGreenAlert)
                             {
                                 <div class="right mr-1
                                  @(task.DaysToDmEndDateGreenAlert ? "alertText green" : "")
