@@ -23,6 +23,8 @@
                 if (isReadOnly) {
                     return;
                 }
+                
+                initialiseImpactedProductsTypeahead();
 
                 setCreateHandler();
                 setProductActionedCheckboxHandler();
@@ -31,7 +33,6 @@
                 setControlState();
 
                 setImpactedProductHandler();
-
             },
             error: function (error) {
                 $("#recordProductActionError")
@@ -93,6 +94,9 @@
     function setCreateHandler() {
         $("#btnAddImpact").on("click",
             function (e) {
+                //Destroy typeahead before cloning
+                destroyImpactedProductsTypeahead();
+
                 var currentCount = $(".recordProductAction").length;
                 var newThing = $($(".recordProductAction")[0]).clone();
 
@@ -102,6 +106,8 @@
 
                 $("#productActions").append(newThing);
                 $(newThing).show();
+
+                initialiseImpactedProductsTypeahead();
 
                 update();
 
@@ -214,6 +220,48 @@
         $("#btnAddImpact").prop("disabled", true);
         $(".productActionImpactedProduct").prop("disabled", true);
         $(".productActionType").prop("disabled", true);
+    }
+
+    function initialiseImpactedProductsTypeahead() {
+        $('.impactedProductsTypeaheadError').collapse("hide");
+        // Constructing the suggestion engine
+        var impactedProduct = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            prefetch: {
+                url: "_RecordProductAction/?handler=ImpactedProducts",
+                ttl: 600000
+            },
+            initialize: false
+        });
+
+        var promise = impactedProduct.initialize();
+        promise.fail(function () {
+            $('.impactedProductsTypeaheadError').collapse("show");
+        });
+
+        // Initializing the typeahead
+        $('.productActionImpactedProduct').typeahead({
+                hint: true,
+                highlight: true, /* Enable substring highlighting */
+
+                minLength:
+                    3 /* Specify minimum characters required for showing result */
+            },
+            {
+                name: 'impactedProduct',
+                source: impactedProduct,
+                limit: 100,
+                templates: {
+                    notFound: '<div>No results</div>'
+                }
+            });
+
+        $('.productActionImpactedProduct.tt-hint').removeClass("productActionImpactedProduct");
+    }
+
+    function destroyImpactedProductsTypeahead() {
+        $('.productActionImpactedProduct').typeahead('destroy');
     }
 
 });

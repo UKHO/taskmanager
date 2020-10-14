@@ -31,8 +31,6 @@ namespace Portal.Pages.DbAssessment
 
         public List<ProductAction> ProductActions { get; set; }
 
-        public SelectList ImpactedProducts { get; set; }
-
         public SelectList ProductActionTypes { get; set; }
 
         public _RecordProductActionModel(WorkflowDbContext dbContext, ITaskDataHelper taskDataHelper)
@@ -41,36 +39,25 @@ namespace Portal.Pages.DbAssessment
             _taskDataHelper = taskDataHelper;
         }
 
-
         public async Task OnGetAsync(int processId, string taskStage)
         {
             ProcessId = processId;
 
-            SetHpdProducts();
             await PopulateProductActionTypes();
             await SetProductActionFromDb();
             await SetProductActionDataFromDb(taskStage);
+        }
+
+        public async Task<JsonResult> OnGetImpactedProductsAsync()
+        {
+            var cachedHpdEncProduct = await _dbContext.CachedHpdEncProduct.Select(c => c.Name).ToListAsync();
+            return new JsonResult(cachedHpdEncProduct);
         }
 
         private async Task PopulateProductActionTypes()
         {
             var productActionTypes = await _dbContext.ProductActionType.ToListAsync();
             ProductActionTypes = new SelectList(productActionTypes, nameof(ProductActionType.ProductActionTypeId), nameof(ProductActionType.Name));
-        }
-
-        private void SetHpdProducts()
-        {
-            //TODO: Change to read from real data.
-
-            ImpactedProducts = new SelectList(
-                new List<ImpactedProduct>
-                {
-                    new ImpactedProduct {ProductId = 0, Product = "Select..."},
-                    new ImpactedProduct {ProductId = 1, Product = "GB123456"},
-                    new ImpactedProduct {ProductId = 2, Product = "GB111222"},
-                    new ImpactedProduct {ProductId = 3, Product = "GB987651"}
-                }, "ProductId", "Product");
-
         }
 
         private async Task SetProductActionFromDb()
@@ -101,10 +88,5 @@ namespace Portal.Pages.DbAssessment
             }
 
         }
-
-
-
-         
-
     }
 }
