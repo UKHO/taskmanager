@@ -27,6 +27,7 @@ using Portal.Configuration;
 using Portal.Helpers;
 using Portal.HostedServices;
 using Portal.HttpClients;
+using Portal.Hubs;
 using Portal.MappingProfiles;
 using Serilog;
 using Serilog.Events;
@@ -84,6 +85,9 @@ namespace Portal
             services.AddOptions<SecretsConfig>()
                 .Bind(Configuration.GetSection("HpdDbSection"));
 
+            services.AddOptions<SqlListenerSecretsConfig>()
+                .Bind(Configuration.GetSection("SqlListener"));
+
             services.AddOptions<StartupSecretsConfig>()
                 .Bind(Configuration.GetSection("NsbDbSection"))
                 .Bind(Configuration.GetSection("LoggingDbSection"))
@@ -110,8 +114,8 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddSignalR();
 
             var startupConfig = new StartupConfig();
             Configuration.GetSection("urls").Bind(startupConfig);
@@ -188,6 +192,7 @@ namespace Portal
                 services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
             services.AddHostedService<HpdEncProductUpdateService>();
+            services.AddHostedService<SqlListenerService>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc =>
@@ -249,6 +254,7 @@ namespace Portal
             {
                 endpoints.MapRazorPages();
                 endpoints.MapHealthChecks("/health");
+                endpoints.MapHub<TasksHub>("/tasksupdate");
             });
 
             app.UseAzureAppConfiguration();
