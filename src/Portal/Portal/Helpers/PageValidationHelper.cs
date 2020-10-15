@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
-using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
 using WorkflowDatabase.EF;
@@ -15,13 +14,12 @@ namespace Portal.Helpers
     public class PageValidationHelper : IPageValidationHelper
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly HpdDbContext _hpdDbContext;
         private readonly IPortalUserDbService _portalAduserDbService;
 
-        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IAdDirectoryService adDirectoryService, IPortalUserDbService portalAduserDbService)
+        public PageValidationHelper(WorkflowDbContext dbContext, IAdDirectoryService adDirectoryService,
+            IPortalUserDbService portalAduserDbService)
         {
             _dbContext = dbContext;
-            _hpdDbContext = hpdDbContext;
             _portalAduserDbService = portalAduserDbService;
         }
 
@@ -139,7 +137,7 @@ namespace Portal.Helpers
                 isValid = false;
             }
 
-            if (!ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -244,7 +242,7 @@ namespace Portal.Helpers
             }
 
 
-            if (!ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
+            if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, action, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -572,9 +570,9 @@ namespace Portal.Helpers
         /// <param name="validationErrorMessages"></param>
         /// <param name="productActioned"></param>
         /// <returns></returns>
-        private bool ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, string action, List<string> validationErrorMessages)
         {
-            var isValid = ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
+            var isValid = await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages);
 
             if (action != "Done")
             {
@@ -594,7 +592,7 @@ namespace Portal.Helpers
             return isValid;
         }
 
-        private bool ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
+        private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
             const string messagePrefix = "Record Product Action:";
 
@@ -632,6 +630,16 @@ namespace Portal.Helpers
                 {
                     validationErrorMessages.Add($"{messagePrefix} More than one of the same Impacted Products selected");
                     isValid = false;
+                }
+
+                foreach (var productAction in recordProductAction)
+                {
+                    if (!await _dbContext.CachedHpdEncProduct.AnyAsync(c =>
+                        c.Name == productAction.ImpactedProduct))
+                    {
+                        validationErrorMessages.Add($"{messagePrefix} Impacted Product {productAction.ImpactedProduct} does not exist");
+                        isValid = false;
+                    }
                 }
             }
 

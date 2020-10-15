@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using FakeItEasy;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,7 +25,6 @@ namespace Portal.UnitTests
     public class ReviewTests
     {
         private WorkflowDbContext _dbContext;
-        private HpdDbContext _hpDbContext;
         private ReviewModel _reviewModel;
         private int ProcessId { get; set; }
         private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
@@ -96,18 +94,12 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var hpdDbContextOptions = new DbContextOptionsBuilder<HpdDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
-                .Options;
-
-            _hpDbContext = new HpdDbContext(hpdDbContextOptions);
-
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
 
             _fakeLogger = A.Dummy<ILogger<ReviewModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService,
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeAdDirectoryService,
                 _fakePortalUserDbService);
 
             _fakepageValidationHelper = A.Fake<IPageValidationHelper>();
