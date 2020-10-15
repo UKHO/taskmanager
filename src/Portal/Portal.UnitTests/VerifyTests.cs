@@ -309,6 +309,35 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostSaveAsync_entering_invalid_impactedProducts_in_productAction_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.ProductActioned = true;
+            _verifyModel.ProductActionChangeDetails = "Some change details";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordProductAction = new List<ProductAction>()
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
+            };
+
+            _verifyModel.Team = "HW";
+
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 2);
+            Assert.Contains($"Record Product Action: Impacted Product {_verifyModel.RecordProductAction[0].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Record Product Action: Impacted Product {_verifyModel.RecordProductAction[1].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
         public async Task Test_OnPostSaveAsync_Given_CurrentUser_Is_Not_Valid_Then_Returns_Validation_Error_Message()
         {
             _verifyModel = new VerifyModel(_dbContext, _fakeWorkflowBusinessLogicService, _fakeEventServiceApiClient, _fakeCommentsHelper, _fakeAdDirectoryService,

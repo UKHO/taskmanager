@@ -339,6 +339,38 @@ namespace Portal.UnitTests
         }
 
         [Test]
+        public async Task Test_OnPostSaveAsync_entering_invalid_impactedProducts_in_productAction_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "HW";
+            _assessModel.Assessor = TestUser;
+            _assessModel.Verifier = TestUser;
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
+            _assessModel.RecordProductAction = new List<ProductAction>
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
+            };
+
+            await _assessModel.OnPostSaveAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 2);
+            Assert.Contains($"Record Product Action: Impacted Product {_assessModel.RecordProductAction[0].ImpactedProduct} does not exist", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Record Product Action: Impacted Product {_assessModel.RecordProductAction[1].ImpactedProduct} does not exist", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
+
+        [Test]
         public async Task Test_OnPostSaveAsync_entering_invalid_username_for_assessor_results_in_validation_error_message()
         {
             _assessModel.Ion = "Ion";
