@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Helpers.Auth;
-using HpdDatabase.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Portal.Auth;
 using WorkflowDatabase.EF;
@@ -15,13 +14,12 @@ namespace Portal.Helpers
     public class PageValidationHelper : IPageValidationHelper
     {
         private readonly WorkflowDbContext _dbContext;
-        private readonly HpdDbContext _hpdDbContext;
         private readonly IPortalUserDbService _portalAduserDbService;
 
-        public PageValidationHelper(WorkflowDbContext dbContext, HpdDbContext hpdDbContext, IAdDirectoryService adDirectoryService, IPortalUserDbService portalAduserDbService)
+        public PageValidationHelper(WorkflowDbContext dbContext, IAdDirectoryService adDirectoryService,
+            IPortalUserDbService portalAduserDbService)
         {
             _dbContext = dbContext;
-            _hpdDbContext = hpdDbContext;
             _portalAduserDbService = portalAduserDbService;
         }
 
