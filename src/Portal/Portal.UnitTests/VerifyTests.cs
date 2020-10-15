@@ -8,7 +8,6 @@ using Common.Helpers;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using FakeItEasy;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,7 +29,6 @@ namespace Portal.UnitTests
     public class VerifyTests
     {
         private WorkflowDbContext _dbContext;
-        private HpdDbContext _hpDbContext;
         private VerifyModel _verifyModel;
         private int ProcessId { get; set; }
         private IWorkflowBusinessLogicService _fakeWorkflowBusinessLogicService;
@@ -104,11 +102,6 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var hpdDbContextOptions = new DbContextOptionsBuilder<HpdDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
-                .Options;
-
-            _hpDbContext = new HpdDbContext(hpdDbContextOptions);
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
             _commentsHelper = new CommentsHelper(_dbContext, _fakePortalUserDbService);
@@ -116,7 +109,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<VerifyModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
 
             _verifyModel = new VerifyModel(_dbContext,
                 _fakeWorkflowBusinessLogicService,
@@ -282,9 +275,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct()
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -385,11 +377,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -422,12 +412,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
-
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -474,11 +461,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -513,11 +498,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -548,11 +531,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -587,11 +568,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -624,11 +603,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
@@ -665,11 +642,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<AdUser>.Ignored))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _verifyModel.Ion = "Ion";
             _verifyModel.ActivityCode = "ActivityCode";
