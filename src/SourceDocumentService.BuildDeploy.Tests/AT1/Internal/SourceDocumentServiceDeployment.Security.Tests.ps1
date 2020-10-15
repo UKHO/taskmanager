@@ -1,6 +1,8 @@
 Describe "UKHO.SourceDocumentService Deployment Security Tests" {  
     
-    $expectedADGroups = @("AG_PCPAT1IISSVC-GG")
+    $expectedADGroups = @(
+                            "AG_PCPAT1IISSVC-GG", 
+                            "AG_Cuiaworkspace-AT1_RW-GG")
     $adServiceAccount = "SVC_TMSdocSvcPoolUAT"
 
     Context "Source Document Service adheres to principle of least privilege by" {      
