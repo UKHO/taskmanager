@@ -57,6 +57,9 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneTaskStageType.Clear_Vector)]
         [TestCase(NcneTaskStageType.Retire_Old_Version)]
         [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts)]
+        [TestCase(NcneTaskStageType.Withdrawal_action)]
+        [TestCase(NcneTaskStageType.PMC_withdrawal)]
+        [TestCase(NcneTaskStageType.Consider_email_SDR)]
         public async Task Adding_System_Comments_for_Completion_of_stage_adds_New_Comment(NcneTaskStageType stageType)
         {
             var changeType = NcneCommentType.CompleteStage;
@@ -116,5 +119,36 @@ namespace NCNEPortal.UnitTests
             Assert.IsTrue(_dbContext.TaskComment.Single(p => p.ProcessId == processId).ActionIndicator);
         }
 
+        [Test]
+        public async Task Adding_Task_comments_add_new_user_comment()
+        {
+            //create a random processId
+            var processId = 400;
+            var commentText = "User Comment";
+
+            await _commentsHelper.AddTaskComment(commentText, processId, testUser);
+
+            await _dbContext.SaveChangesAsync();
+
+            Assert.That(_dbContext.TaskComment.Single(p => p.ProcessId == processId).Comment,
+                Is.EqualTo(commentText));
+            Assert.IsFalse(_dbContext.TaskComment.Single(p => p.ProcessId == processId).ActionIndicator);
+        }
+
+        [TestCase(NcneTaskStageType.Withdrawal_action)]
+        public async Task Adding_TaskStage_comments_add_new_comment_for_the_stage(NcneTaskStageType taskStageType)
+        {
+            //create a random processId
+            var processId = 500 + (int)taskStageType;
+            var commentText = "User Comment";
+
+            await _commentsHelper.AddTaskStageComment(commentText, processId, (int)taskStageType, testUser);
+
+            await _dbContext.SaveChangesAsync();
+
+            Assert.That(_dbContext.TaskStageComment.Single(p => p.ProcessId == processId).Comment,
+                Is.EqualTo(commentText));
+
+        }
     }
 }

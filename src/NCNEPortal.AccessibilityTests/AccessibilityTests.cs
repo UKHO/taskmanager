@@ -41,7 +41,7 @@ namespace NCNEPortal.AccessibilityTests
             _configSupport.RegisterLandingPage();
             _configSupport.RegisterWorkflowPage();
             _configSupport.RegisterNewTaskPage();
-            //_configSupport.RegisterWithdrawalPage();
+            _configSupport.RegisterWithdrawalPage();
 
             _webDriverSupport.InitializeWebDriver();
             _webDriverSupport.SetLoginCookies();
