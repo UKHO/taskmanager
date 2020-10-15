@@ -30,7 +30,7 @@ $ConfigData.AllNodes = @(
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
             CuiaDatabaseConnectionString = "Data Source=OWPDev1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-DEV1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
-            CuiaDatabaseTimeoutInSeconds = 30
+            CuiaDatabaseTimeoutInSeconds = "30"
         }
     }
     @{
@@ -60,7 +60,7 @@ $ConfigData.AllNodes = @(
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
             CuiaDatabaseConnectionString = "Data Source=OWPDev1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-DEV1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
-            CuiaDatabaseTimeoutInSeconds = 30
+            CuiaDatabaseTimeoutInSeconds = "30"
         }
     }
 )
