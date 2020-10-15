@@ -68,6 +68,9 @@ namespace Portal
             services.AddOptions<AdUserUpdateServiceConfig>()
                 .Bind(Configuration.GetSection("portal"));
 
+            services.AddOptions<HpdEncProductUpdateServiceConfig>()
+                .Bind(Configuration.GetSection("portal"));
+
             services.AddOptions<GeneralConfig>()
                 .Bind(Configuration.GetSection("portal"))
                 .Bind(Configuration.GetSection("apis"))
@@ -184,6 +187,7 @@ namespace Portal
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
+            services.AddHostedService<HpdEncProductUpdateService>();
 
             // Auto mapper config
             var mappingConfig = new MapperConfiguration(mc =>

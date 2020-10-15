@@ -8,7 +8,6 @@ using Common.Helpers;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using FakeItEasy;
-using HpdDatabase.EF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,7 +28,6 @@ namespace Portal.UnitTests
     public class AssessTests
     {
         private WorkflowDbContext _dbContext;
-        private HpdDbContext _hpDbContext;
         private AssessModel _assessModel;
         private int ProcessId { get; set; }
         private ILogger<AssessModel> _fakeLogger;
@@ -104,12 +102,6 @@ namespace Portal.UnitTests
 
             _dbContext.SaveChanges();
 
-            var hpdDbContextOptions = new DbContextOptionsBuilder<HpdDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
-                .Options;
-
-            _hpDbContext = new HpdDbContext(hpdDbContextOptions);
-
             _fakeAdDirectoryService = A.Fake<IAdDirectoryService>();
             _fakePortalUserDbService = A.Fake<IPortalUserDbService>();
 
@@ -118,7 +110,7 @@ namespace Portal.UnitTests
 
             _fakeLogger = A.Dummy<ILogger<AssessModel>>();
 
-            _pageValidationHelper = new PageValidationHelper(_dbContext, _hpDbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
+            _pageValidationHelper = new PageValidationHelper(_dbContext, _fakeAdDirectoryService, _fakePortalUserDbService);
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
 
             _assessModel = new AssessModel(_dbContext, _fakeEventServiceApiClient, _fakeLogger, _fakeDbAssessmentCommentsHelper, _fakeAdDirectoryService, _pageValidationHelper, _fakeCarisProjectHelper, _generalConfig, _fakePortalUserDbService);
@@ -174,9 +166,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_entering_an_empty_ion_activityCode_sourceCategory_tasktype_team_assessor_results_in_validation_error_message()
         {
-            _hpDbContext.CarisProducts.Add(new CarisProduct()
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() {Name = "GB1234"});
+            await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -306,9 +297,8 @@ namespace Portal.UnitTests
         [Test]
         public async Task Test_OnPostSaveAsync_entering_duplicate_impactedProducts_in_productAction_results_in_validation_error_message()
         {
-            _hpDbContext.CarisProducts.Add(new CarisProduct()
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            await _dbContext.SaveChangesAsync();
 
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
                 .Returns(true);
@@ -333,6 +323,38 @@ namespace Portal.UnitTests
 
             Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 1);
             Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _assessModel.ValidationErrorMessages);
+            A.CallTo(() =>
+                    _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
+                .WithAnyArguments().MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_entering_invalid_impactedProducts_in_productAction_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _assessModel.Ion = "Ion";
+            _assessModel.ActivityCode = "ActivityCode";
+            _assessModel.SourceCategory = "SourceCategory";
+            _assessModel.TaskType = "TaskType";
+            _assessModel.Team = "HW";
+            _assessModel.Assessor = TestUser;
+            _assessModel.Verifier = TestUser;
+            _assessModel.DataImpacts = new List<DataImpact>();
+            _assessModel.ProductActioned = true;
+            _assessModel.ProductActionChangeDetails = "Some change details";
+            _assessModel.RecordProductAction = new List<ProductAction>
+            {
+                new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1},
+                new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1}
+            };
+
+            await _assessModel.OnPostSaveAsync(ProcessId);
+
+            Assert.GreaterOrEqual(_assessModel.ValidationErrorMessages.Count, 2);
+            Assert.Contains($"Record Product Action: Impacted Product {_assessModel.RecordProductAction[0].ImpactedProduct} does not exist", _assessModel.ValidationErrorMessages);
+            Assert.Contains($"Record Product Action: Impacted Product {_assessModel.RecordProductAction[1].ImpactedProduct} does not exist", _assessModel.ValidationErrorMessages);
             A.CallTo(() =>
                     _fakeEventServiceApiClient.PostEvent(A<string>.Ignored, A<ProgressWorkflowInstanceEvent>.Ignored))
                 .WithAnyArguments().MustNotHaveHappened();
@@ -756,9 +778,8 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            await _dbContext.SaveChangesAsync();
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -805,11 +826,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             _assessModel.Ion = "Ion";
             _assessModel.ActivityCode = "ActivityCode";
@@ -865,12 +884,9 @@ namespace Portal.UnitTests
             A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser))
                 .Returns(true);
 
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1234", ProductStatus = "Active", TypeKey = "ENC" });
-            _hpDbContext.CarisProducts.Add(new CarisProduct
-            { ProductName = "GB1235", ProductStatus = "Active", TypeKey = "ENC" });
-            await _hpDbContext.SaveChangesAsync();
-
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
 
             var primaryDocumentStatus =
                 await _dbContext.PrimaryDocumentStatus.FirstOrDefaultAsync(pds => pds.ProcessId == ProcessId);

@@ -4,6 +4,7 @@
 
 [AssessmentData](#assessmentdata)  
 [AssignedTaskType](#assignedtasksourcetype)  
+[CachedHpdEncProduct](#CachedHpdEncProduct)  
 [CachedHpdWorkspace](#CachedHpdWorkspace)  
 [CarisProjectDetails](#CarisProjectDetails)  
 [Comment](#comment)  
@@ -62,6 +63,19 @@ It gets populated via Post Deployment script
 |Name             |NVARCHAR(50)            |No           |                                                                                                 |
 
 `AssignedTaskTypeId` column is not an Identity column, this is to allow a better control of that column's values. There is a Unique constraint on the Name column.
+
+[Go To Tables](#tables)
+
+### CachedHpdEncProduct
+
+`CachedHpdEncProduct` table caches the ENC Products from CARIS, this done at the `Portal` startup where this table is first emptied then populated from CARIS.
+
+| Column Name            | Datatype      | Allow nulls | Description                                                                                     |
+|------------------------|---------------|-------------|-------------------------------------------------------------------------------------------------|
+|CachedHpdEncProductId   |INT            |No           |PRIMARY KEY                                                                                      |
+|Name                    |NVARCHAR(100)  |No           |                                                                                                 |
+
+There is a Unique Index for `Name`
 
 [Go To Tables](#tables)
 
