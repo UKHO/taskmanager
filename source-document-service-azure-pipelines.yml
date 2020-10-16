@@ -150,9 +150,24 @@ stages:
           modifyOutputPath: false
           zipAfterPublish: false
 
-      - task: CmdLine@2
+      - task: PowerShell@2
         inputs:
-          script: 'dependency-check --project "SourceDocumentService - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml"'
+          targetType: 'inline'
+          script: |
+            $maxAttempts = 2
+            $outPath = "$(Build.SourcesDirectory)\DCReport"
+            for ($i = 0; $i -lt $maxAttempts; $i++) {
+                write-host "Attempt $i"
+                dependency-check --project "SourceDocumentService - $(Build.SourceBranchName)" --scan "$(System.DefaultWorkingDirectory)/publish_output" --out "$outPath" --suppression "$(Build.SourcesDirectory)\NVDSuppressions.xml"
+                if ((test-path $outPath) -and (get-childitem $outPath | Measure-Object | select-object -ExpandProperty Count) -gt 0) {
+                    write-host "Attempt $i successful"
+                    break
+                }
+                write-host "Attempt $i failed, so purge dependency-check database"
+                dependency-check --purge
+                start-sleep -seconds 5
+            }
+          pwsh: true
         displayName: "Run NVD Checker"
 
       - task: PublishPipelineArtifact@1
