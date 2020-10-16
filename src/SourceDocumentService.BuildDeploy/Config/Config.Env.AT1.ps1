@@ -30,6 +30,7 @@ $ConfigData.AllNodes = @(
             ContentServiceUsername = $ConfigData.NonNodeData.ServiceCred.UserName
             ContentServicePassword = $contentServicePassword
             CuiaDatabaseConnectionString = "Data Source=OWPAT1_List.engineering.ukho.gov.uk;initial catalog=Cuiaworkspace-AT1;Integrated Security=True;MultiSubnetFailover=True;MultipleActiveResultSets=True"
+            CuiaDatabaseTimeoutInSeconds = "30"
         }
     }
 )
