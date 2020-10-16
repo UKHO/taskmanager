@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portal.Configuration;
 using Portal.Hubs;
+using Serilog.Context;
 
 namespace Portal.HostedServices
 {
@@ -35,10 +36,19 @@ namespace Portal.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            SqlDependency.Stop(_connectionString);
-            SqlDependency.Start(_connectionString);
+            LogContext.PushProperty("PortalResource", nameof(SqlListenerService));
 
-            StartListeningNewWorkflowInstance();
+            try
+            {
+                SqlDependency.Stop(_connectionString);
+                SqlDependency.Start(_connectionString);
+
+                StartListeningNewWorkflowInstance();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to start SQLDependency. Users will NOT be notified of new tasks at Review.", e);
+            }
 
             return Task.CompletedTask;
         }
