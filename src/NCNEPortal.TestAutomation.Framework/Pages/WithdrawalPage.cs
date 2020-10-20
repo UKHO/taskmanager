@@ -6,7 +6,7 @@ using System;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class WithdrawalPage : PageBase, ILandingPage
+    public class WithdrawalPage : PageBase, IPage
     {
         public WithdrawalPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig) : base(driver, wait,
             urlsConfig.NcneWithdrawalPageUrl)

@@ -101,7 +101,7 @@ namespace NCNEPortal.UnitTests
 
         [TestCase(null)]
         [TestCase("")]
-        public void Validation_for_ValidateNewTaskPage_missing_ChartNoe_fails_for_Withdrawal(string chartNo)
+        public void Validation_for_ValidateNewTaskPage_missing_ChartNo_fails_for_Withdrawal(string chartNo)
         {
             var validationErrorMessages = new List<string>();
 

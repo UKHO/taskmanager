@@ -1,6 +1,6 @@
 ﻿namespace Common.TestAutomation.Framework.Pages
 {
-    public interface ILandingPage
+    public interface IPage
     {
         void NavigateTo();
     }

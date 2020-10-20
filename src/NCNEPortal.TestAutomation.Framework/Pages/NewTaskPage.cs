@@ -6,7 +6,7 @@ using System;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class NewTaskPage : PageBase, ILandingPage
+    public class NewTaskPage : PageBase, IPage
 
     {
         public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)

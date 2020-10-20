@@ -51,7 +51,7 @@ namespace NCNEPortal.TestAutomation.Framework
         [BeforeScenario(Order = 19)]
         public void RegisterLandingPage()
         {
-            _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
+            _objectContainer.RegisterTypeAs<LandingPage, IPage>();
         }
 
         [BeforeScenario(Order = 19)]
@@ -63,13 +63,13 @@ namespace NCNEPortal.TestAutomation.Framework
         [BeforeScenario(Order = 19)]
         public void RegisterWithdrawalPage()
         {
-            _objectContainer.RegisterTypeAs<WithdrawalPage, ILandingPage>();
+            _objectContainer.RegisterTypeAs<WithdrawalPage, IPage>();
         }
 
         [BeforeScenario(Order = 19)]
         public void RegisterNewTaskPage()
         {
-            _objectContainer.RegisterTypeAs<NewTaskPage, ILandingPage>();
+            _objectContainer.RegisterTypeAs<NewTaskPage, IPage>();
         }
     }
 }
