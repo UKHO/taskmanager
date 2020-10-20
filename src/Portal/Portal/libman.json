@@ -67,8 +67,8 @@
       ]
     },
     {
-      "library": "datatables.net-plugins@1.10.20",
       "provider": "jsdelivr",
+      "library": "datatables.net-plugins@1.10.20",
       "destination": "wwwroot/lib/datatables.net-plugins/",
       "files": [
         "sorting/datetime-moment.js",
@@ -150,6 +150,10 @@
         "moment.min.js",
         "moment.js"
       ]
+    },
+    {
+      "library": "microsoft-signalr@3.1.8",
+      "destination": "wwwroot/lib/microsoft-signalr/"
     }
   ]
 }

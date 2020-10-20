@@ -182,6 +182,55 @@ h2, .h2 {
     padding: 0 15px;
 }
 
+/* Begin new review task notifications */
+
+.newTaskNotify {
+    display: inline-block;
+    margin-top: 0.25rem;
+    padding: 0rem 0.5rem 0 0.5rem;
+    line-height: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.25rem;
+    background-color: #cd2026;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    
+    25% {
+        -ms-transform: scale(1.25);
+        -webkit-transform: scale(1.25);
+        transform: scale(1.25);
+    }
+
+    50% {
+        -ms-transform: scale(0.9);
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+
+
+    75% {
+        -ms-transform: scale(1.25);
+        -webkit-transform: scale(1.25);
+        transform: scale(1.25);
+    }
+}
+
+.notifyPulse {
+    animation-name: pulse;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    overflow:visible;
+}
+
+/* End new review task notifications */
+
+
 /* On Hold switch */
 
 .switch {
