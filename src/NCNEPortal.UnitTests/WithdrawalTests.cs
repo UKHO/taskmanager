@@ -63,15 +63,15 @@ namespace NCNEPortal.UnitTests
 
 
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-                    A<string>.Ignored, A<List<string>>.Ignored))
+                    A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(
                 A<TaskRole>.That.Matches(task => task.Compiler == user),
                 "Withdrawal",
                 "Adoption",
-                A<List<string>>.That.IsEmpty())).Returns(true);
+                A<List<string>>.That.IsEmpty(), A<string>.Ignored)).Returns(true);
             A.CallTo(() => _fakencneUserDbService.GetAdUserAsync(user.UserPrincipalName)).Returns(user);
 
             await _withdrawalModel.OnPostSaveAsync();
@@ -83,9 +83,9 @@ namespace NCNEPortal.UnitTests
         public async Task OnPostSaveAsync_gives_validation_errors_when_invalid()
         {
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored)).Returns(false);
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored))
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
 
             await _withdrawalModel.OnPostSaveAsync();
@@ -121,7 +121,7 @@ namespace NCNEPortal.UnitTests
                 }, new TaskStageType()
                 {
                     AllowRework = false,
-                    Name = "Consider Email SDR",
+                    Name = "Consider Email to SDR",
                     SequenceNumber = 21,
                     TaskStageTypeId = 21
 
@@ -131,7 +131,7 @@ namespace NCNEPortal.UnitTests
             _dbContext.SaveChanges();
 
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
-                A<string>.Ignored, A<List<string>>.Ignored)).Returns(true);
+                A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await _withdrawalModel.OnPostSaveAsync();
             var statusCode = (StatusCodeResult)result;
