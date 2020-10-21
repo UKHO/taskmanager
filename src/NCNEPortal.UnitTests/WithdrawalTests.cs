@@ -15,16 +15,16 @@ using System.Threading.Tasks;
 namespace NCNEPortal.UnitTests
 {
     [TestFixture]
-    public class NewTaskTests
+    public class WithdrawalTests
     {
         private NcneWorkflowDbContext _dbContext;
-        private NewTaskModel _newTaskModel;
-        private ILogger<NewTaskModel> _fakeLogger;
+        private WithdrawalModel _withdrawalModel;
+        private ILogger<WithdrawalModel> _fakeLogger;
         private INcneUserDbService _fakencneUserDbService;
         private IMilestoneCalculator _milestoneCalculator;
         private IPageValidationHelper _fakePageValidationHelper;
         private IStageTypeFactory _fakeStageTypeFactory;
-        private int ProcessId { get; set; }
+
 
         [SetUp]
         public void Setup()
@@ -38,15 +38,16 @@ namespace NCNEPortal.UnitTests
 
 
 
-            ProcessId = 123;
 
             _fakePageValidationHelper = A.Fake<IPageValidationHelper>();
-            _fakeLogger = A.Fake<ILogger<NewTaskModel>>();
+            _fakeLogger = A.Fake<ILogger<WithdrawalModel>>();
             _fakencneUserDbService = A.Fake<INcneUserDbService>();
             _milestoneCalculator = A.Fake<IMilestoneCalculator>();
             _fakeStageTypeFactory = A.Fake<IStageTypeFactory>();
 
-            _newTaskModel = new NewTaskModel(_dbContext, _milestoneCalculator, _fakeLogger, _fakencneUserDbService, _fakeStageTypeFactory, _fakePageValidationHelper);
+            _withdrawalModel = new WithdrawalModel(_dbContext, _milestoneCalculator, _fakeLogger,
+                _fakencneUserDbService,
+                _fakeStageTypeFactory, _fakePageValidationHelper);
         }
 
         [Test]
@@ -55,9 +56,9 @@ namespace NCNEPortal.UnitTests
 
             var user = AdUserHelper.CreateTestUser(_dbContext);
 
-            _newTaskModel.Compiler = user;
-            _newTaskModel.ChartType = "Adoption";
-            _newTaskModel.WorkflowType = "NE";
+            _withdrawalModel.Compiler = user;
+            _withdrawalModel.ChartType = "Adoption";
+            _withdrawalModel.WorkflowType = "Withdrawal";
 
 
 
@@ -68,14 +69,14 @@ namespace NCNEPortal.UnitTests
                 .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(
                 A<TaskRole>.That.Matches(task => task.Compiler == user),
-                "NE",
+                "Withdrawal",
                 "Adoption",
                 A<List<string>>.That.IsEmpty(), A<string>.Ignored)).Returns(true);
             A.CallTo(() => _fakencneUserDbService.GetAdUserAsync(user.UserPrincipalName)).Returns(user);
 
-            await _newTaskModel.OnPostSaveAsync();
+            await _withdrawalModel.OnPostSaveAsync();
 
-            Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 0);
+            Assert.AreEqual(_withdrawalModel.ValidationErrorMessages.Count, 0);
         }
 
         [Test]
@@ -87,10 +88,10 @@ namespace NCNEPortal.UnitTests
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored))
                 .Invokes(call => call.Arguments.Get<List<string>>("validationErrorMessages").Add("This is an error message"));
 
-            await _newTaskModel.OnPostSaveAsync();
+            await _withdrawalModel.OnPostSaveAsync();
 
-            Assert.AreEqual(_newTaskModel.ValidationErrorMessages.Count, 1);
-            CollectionAssert.Contains(_newTaskModel.ValidationErrorMessages, "This is an error message");
+            Assert.AreEqual(_withdrawalModel.ValidationErrorMessages.Count, 1);
+            CollectionAssert.Contains(_withdrawalModel.ValidationErrorMessages, "This is an error message");
         }
 
         [Test]
@@ -99,23 +100,30 @@ namespace NCNEPortal.UnitTests
             _dbContext.TaskStageType.AddRange(new TaskStageType()
             {
                 AllowRework = false,
-                Name = "With SDRA",
-                SequenceNumber = 1,
-                TaskStageTypeId = 1
+                Name = "Withdrawal action",
+                SequenceNumber = 5,
+                TaskStageTypeId = 19
+            }, new TaskStageType()
+            {
+                AllowRework = false,
+                Name = "Consider withdrawn charts",
+                SequenceNumber = 19,
+                TaskStageTypeId = 18
+
             },
                 new TaskStageType()
                 {
                     AllowRework = false,
-                    Name = "With Geodesy",
-                    SequenceNumber = 2,
-                    TaskStageTypeId = 2
+                    Name = "PMC withdrawal",
+                    SequenceNumber = 20,
+                    TaskStageTypeId = 20
 
                 }, new TaskStageType()
                 {
                     AllowRework = false,
-                    Name = "Specification",
-                    SequenceNumber = 3,
-                    TaskStageTypeId = 3
+                    Name = "Consider Email to SDR",
+                    SequenceNumber = 21,
+                    TaskStageTypeId = 21
 
                 }
             );
@@ -125,10 +133,11 @@ namespace NCNEPortal.UnitTests
             A.CallTo(() => _fakePageValidationHelper.ValidateNewTaskPage(A<TaskRole>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var result = await _newTaskModel.OnPostSaveAsync();
+            var result = await _withdrawalModel.OnPostSaveAsync();
             var statusCode = (StatusCodeResult)result;
 
             Assert.AreEqual(200, statusCode.StatusCode);
         }
+
     }
 }

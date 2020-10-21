@@ -182,9 +182,21 @@
                         <div class="col-3">
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.ChartNo, new { @class = "col-form-label" })</div>
+
                                 <div>
-                                    @Html.TextBoxFor(model => model.ChartNo, "",
-                                        new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                                    @if (Model.AllowEditChartNo)
+                                    {
+                                        @Html.TextBoxFor(model => model.ChartNo, "",
+                                            new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input" })
+                                    }
+                                    else
+                                    {
+
+
+                                        @Html.TextBoxFor(model => model.ChartNo, "",
+                                            new { placeholder = "Chart Number", @maxlength = 10, @class = "form-control form-text-input", @readonly = "readonly" })
+
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -202,24 +214,16 @@
                     <hr class="mt-2 mb-4" />
                     <h4>Dates</h4>
                     <div class="row">
-                        <div class="col-3">
-
-                            <div class="row">
-                                <div class="col">
-                                    @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
-                                </div>
-                            </div>
-
-                            @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
-                            {
-                                <div class="row" id="DateString">
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="row">
                                     <div class="col">
-                                        @Html.TextBoxFor(model => model.Duration, "", new { @class = "form-control form-text-input" })
+                                        @Html.LabelFor(model => model.Dating, new { @class = "col-form-label" })
                                     </div>
                                 </div>
-                            }
-                            else
-                            { <div class="row">
+
+                                <div class="row">
                                     <div class="col">
                                         <div class=@(Model.IsReadOnly ? "" : "design-custom-select")>
                                             <div class=@(Model.IsReadOnly ? "" : "arrow-icon-wrap")>
@@ -232,9 +236,10 @@
                                     </div>
                                 </div>
 
-                            }
+                            </div>
+                        }
 
-                        </div>
+
                         <div class="col-3">
                             <div class="form-group">
                                 @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
@@ -262,16 +267,26 @@
                     <div class="row">
                         <div class="col-3">
                             <div class="form-group">
-                                <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
+                                @if (Model.WorkflowType == NcneWorkflowType.Withdrawal.ToString())
+                                {
+                                    <div><label class="col-form-label">Forms/Withdrawal actions</label> </div>
+                                }
+                                else
+                                {
+                                    <div>@Html.LabelFor(model => model.AnnounceDate, new { @class = "col-form-label" })</div>
+                                }
                                 <div>@Html.TextBoxFor(model => model.AnnounceDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
-                                <div>@Html.TextBoxFor(model => model.CommitToPrintDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                        @if (Model.WorkflowType != NcneWorkflowType.Withdrawal.ToString())
+                        {
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <div>@Html.LabelFor(model => model.CommitToPrintDate, new { @class = "col-form-label" })</div>
+                                    <div>@Html.TextBoxFor(model => model.CommitToPrintDate, "{0:dd/MM/yyyy}", new { @class = "form-control form-text-input" })</div>
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div class="col-3">
                             <div class="form-group">
                                 <div>@Html.LabelFor(model => model.CISDate, new { @class = "col-form-label" })</div>

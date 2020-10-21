@@ -106,7 +106,7 @@ namespace NCNEPortal
                 Ion = "";
                 ChartNo = "";
                 Country = "";
-                WorkflowType = "Withdrawal";
+                WorkflowType = NcneWorkflowType.Withdrawal.ToString();
                 Dating = (int)DeadlineEnum.ThreeWeeks;
 
                 Duration = Enum.GetName(typeof(DeadlineEnum), Dating);
@@ -150,7 +150,7 @@ namespace NCNEPortal
                     HundredPercentCheck = null,
                 };
 
-                if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages))
+                if (!(_pageValidationHelper.ValidateNewTaskPage(role, WorkflowType, ChartType, ValidationErrorMessages, ChartNo))
                 )
                 {
 

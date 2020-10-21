@@ -22,7 +22,7 @@
         Consider_Withdrawn_Charts = 18,
         Withdrawal_action = 19,
         PMC_withdrawal = 20,
-        Consider_email_SDR = 21
+        Consider_email_to_SDR = 21
 
     }
 }

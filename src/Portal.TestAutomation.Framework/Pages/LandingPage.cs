@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.TestAutomation.Framework.PageElements;
 using Common.TestAutomation.Framework.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Portal.TestAutomation.Framework.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Portal.TestAutomation.Framework.Pages
 {
-    public class LandingPage : PageBase, ILandingPage
+    public class LandingPage : PageBase, IPage
     {
         public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
             : base(driver,
@@ -34,7 +34,7 @@ namespace Portal.TestAutomation.Framework.Pages
             UnassignedTaskTable.FindElements(By.XPath("//*[@id='unassignedTasks']/tbody/tr"))
                 .Where(r => r.FindElements(By.TagName("td")).Count > 1)
                 .ToList();
-        
+
         public override bool HasLoaded
         {
             get

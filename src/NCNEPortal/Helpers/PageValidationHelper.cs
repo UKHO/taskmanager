@@ -16,7 +16,8 @@ namespace NCNEPortal.Helpers
             _ncneUserDbService = ncneUserDbService;
         }
 
-        public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType, List<string> validationErrorMessages)
+        public bool ValidateNewTaskPage(TaskRole taskRole, string workflowType, string chartType,
+            List<string> validationErrorMessages, string chartNo = "")
         {
             bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
 
@@ -31,16 +32,26 @@ namespace NCNEPortal.Helpers
                 isValid = false;
             }
 
+            if (workflowType == NcneWorkflowType.Withdrawal.ToString() && string.IsNullOrEmpty(chartNo))
+            {
+                validationErrorMessages.Add("Task Information: Chart Number cannot be empty");
+                isValid = false;
+            }
+
             return isValid;
         }
 
-        public bool ValidateWorkflowPage(TaskRole taskRole, DateTime? publicationDate, DateTime? repromatDate,
-            int dating,
-            string chartType,
+        public bool ValidateWorkflowPage(TaskRole taskRole, string workflowType,string chartNo,
             (bool SentTo3Ps, DateTime? SendDate3ps, DateTime? ExpectedReturnDate3ps, DateTime? ActualReturnDate3ps)
                 threePsInfo, List<string> validationErrorMessages)
         {
             bool isValid = ValidateUserRoles(taskRole, validationErrorMessages);
+
+            if (workflowType == NcneWorkflowType.Withdrawal.ToString() && string.IsNullOrEmpty(chartNo))
+            {
+                validationErrorMessages.Add("Task Information: Chart Number cannot be empty");
+                isValid = false;
+            }
 
             if (threePsInfo.SentTo3Ps)
             {
