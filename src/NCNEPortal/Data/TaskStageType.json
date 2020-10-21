@@ -121,7 +121,7 @@
   },
   {
     "TaskStageTypeId": 21,
-    "Name": "Consider Email SDR",
+    "Name": "Consider Email to SDR",
     "SequenceNumber": 21,
     "AllowRework": false
   }

@@ -1,12 +1,12 @@
-﻿using System;
-using Common.TestAutomation.Framework.Pages;
+﻿using Common.TestAutomation.Framework.Pages;
 using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System;
 
 namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class NewTaskPage : PageBase
+    public class NewTaskPage : PageBase, IPage
 
     {
         public NewTaskPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)

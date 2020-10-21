@@ -73,7 +73,7 @@ namespace Portal.TestAutomation.Framework.Setup
 
         private static void InitialiseWorkflowDbContext(string workflowDbConnectionString)
         {
-           
+
             var dbContextOptions = new DbContextOptionsBuilder<WorkflowDbContext>()
                 .UseSqlServer(workflowDbConnectionString)
                 .Options;
@@ -100,7 +100,7 @@ namespace Portal.TestAutomation.Framework.Setup
         [BeforeScenario(Order = 19)]
         public void RegisterLandingPage()
         {
-            _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
+            _objectContainer.RegisterTypeAs<LandingPage, IPage>();
         }
     }
 }

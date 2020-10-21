@@ -57,62 +57,9 @@ namespace NCNEPortal.UnitTests
         [Test]
         public async Task Test_OnGet_returns_Terminated_or_Completed_Tasks()
         {
-            var terminatedTask = new TaskInfo()
-            {
-                ProcessId = 2,
-                Status = NcneTaskStatus.Terminated.ToString(),
-                Assigned = testUser,
-                AssignedDate = new DateTime(2020, 01, 01),
-                StatusChangeDate = new DateTime(2020, 01, 01).Date,
-                ChartNumber = "100",
-                ChartType = "Primary",
-                WorkflowType = "NE"
-            };
 
-            var completedTask = new TaskInfo()
-            {
-                ProcessId = 4,
-                Status = NcneTaskStatus.Completed.ToString(),
-                Assigned = testUser,
-                AssignedDate = new DateTime(2020, 01, 01),
-                StatusChangeDate = new DateTime(2020, 01, 01).Date,
-                ChartNumber = "200",
-                ChartType = "Primary",
-                WorkflowType = "NC"
-            };
 
-            await _dbContext.TaskInfo.AddRangeAsync(new List<TaskInfo>()
-            {
-                terminatedTask,
-                new TaskInfo()
-                {
-                    ProcessId = 1,
-                    Status = NcneTaskStatus.InProgress.ToString(),
-                    Assigned = testUser,
-                    AssignedDate = new DateTime(2020, 01, 01),
-                    StatusChangeDate = new DateTime(2020, 01, 01).Date,
-                    ChartNumber = "200",
-                    ChartType = "Primary",
-                    WorkflowType = "NC"
-                },
-                completedTask,
-                new TaskInfo()
-                {
-                    ProcessId = 3,
-                    Status = NcneTaskStatus.InProgress.ToString(),
-                    Assigned = testUser,
-                    AssignedDate = new DateTime(2020, 01, 01),
-                    StatusChangeDate = new DateTime(2020, 01, 01).Date,
-                    ChartNumber = "200",
-                    ChartType = "Primary",
-                    WorkflowType = "NC"
-                }
-
-            });
-
-            await _dbContext.SaveChangesAsync();
-
-            var filteredTasks = new List<TaskInfo> { completedTask, terminatedTask };
+            await CreateTasks();
 
 
             await _historicalTasksModel.OnGetAsync();
@@ -132,67 +79,14 @@ namespace NCNEPortal.UnitTests
         {
             _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 2;
 
-            var terminatedTask1 = new TaskInfo()
-            {
-                ProcessId = 1,
-                Status = NcneTaskStatus.Terminated.ToString(),
-                Assigned = testUser,
-                AssignedDate = new DateTime(2020, 01, 01),
-                StatusChangeDate = new DateTime(2020, 05, 01).Date,
-                ChartNumber = "100",
-                ChartType = "Primary",
-                WorkflowType = "NE"
-            };
-
-            var terminatedTask2 = new TaskInfo()
-            {
-                ProcessId = 2,
-                Status = NcneTaskStatus.Terminated.ToString(),
-                Assigned = testUser,
-                AssignedDate = new DateTime(2020, 01, 01),
-                StatusChangeDate = new DateTime(2020, 04, 01).Date,
-                ChartNumber = "200",
-                ChartType = "Primary",
-                WorkflowType = "NC"
-            };
-
-            await _dbContext.TaskInfo.AddRangeAsync(new List<TaskInfo>()
-            {
-                terminatedTask1,
-                new TaskInfo()
-                {
-                    ProcessId = 3,
-                    Status = NcneTaskStatus.Completed.ToString(),
-                    Assigned = testUser,
-                    AssignedDate = new DateTime(2020, 01, 01),
-                    StatusChangeDate = new DateTime(2020, 03, 01).Date,
-                    ChartNumber = "200",
-                    ChartType = "Primary",
-                    WorkflowType = "NC"
-                },
-                terminatedTask2,
-                new TaskInfo()
-                {
-                    ProcessId = 4,
-                    Status = NcneTaskStatus.Completed.ToString(),
-                    Assigned = testUser,
-                    AssignedDate = new DateTime(2020, 01, 01),
-                    StatusChangeDate = new DateTime(2020, 02, 01).Date,
-                    ChartNumber = "200",
-                    ChartType = "Primary",
-                    WorkflowType = "NC"
-                }
-
-            });
-
-            await _dbContext.SaveChangesAsync();
+            await CreateTasks();
 
             await _historicalTasksModel.OnGetAsync();
 
             Assert.AreEqual(_generalConfig.Value.HistoricalTasksInitialNumberOfRecords,
                 _historicalTasksModel.NcneTasks.Count);
-            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 2));
-            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 4));
+            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 2 || h.ProcessId == 4));
+            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 3));
 
         }
 
@@ -457,6 +351,156 @@ namespace NCNEPortal.UnitTests
             Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 2));
             Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 4));
 
+        }
+
+        [Test]
+        public async Task
+            Test_OnPost_when_ProcesId_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
+
+            await CreateTasks();
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
+            {
+                ProcessId = 2
+            };
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(1,
+                _historicalTasksModel.NcneTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 2));
+            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 1 || h.ProcessId == 4));
+
+        }
+
+        [Test]
+        public async Task
+            Test_OnPost_when_ChartNo_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
+
+            await CreateTasks();
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
+            {
+                ChartNo = "200"
+            };
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(1,
+                _historicalTasksModel.NcneTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 4));
+            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 3 || h.ProcessId == 1 || h.ProcessId == 2));
+
+        }
+
+        [Test]
+        public async Task
+            Test_OnPost_when_ChartType_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
+
+            await CreateTasks();
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
+            {
+                ChartType = "Primary"
+            };
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(2,
+                _historicalTasksModel.NcneTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 4 || h.ProcessId == 2));
+            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 3));
+
+        }
+
+        [Test]
+        public async Task
+            Test_OnPost_when_Country_in_search_parameters_are_populated_returns_Latest_Terminated_or_Completed_Tasks_that_fulfill_search_criteria()
+        {
+            _generalConfig.Value.HistoricalTasksInitialNumberOfRecords = 4;
+
+            await CreateTasks();
+
+            _historicalTasksModel.SearchParameters = new HistoricalTasksSearchParameters()
+            {
+                Country = "UK"
+            };
+
+            await _historicalTasksModel.OnPostAsync();
+
+            Assert.AreEqual(1,
+                _historicalTasksModel.NcneTasks.Count);
+            Assert.IsTrue(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 2));
+            Assert.IsFalse(_historicalTasksModel.NcneTasks.Any(h => h.ProcessId == 1 || h.ProcessId == 3 || h.ProcessId == 4));
+
+        }
+
+        private async Task CreateTasks()
+        {
+            var terminatedTask = new TaskInfo()
+            {
+                ProcessId = 2,
+                Status = NcneTaskStatus.Terminated.ToString(),
+                Assigned = testUser,
+                AssignedDate = new DateTime(2020, 01, 01),
+                StatusChangeDate = new DateTime(2020, 01, 01).Date,
+                ChartNumber = "100",
+                ChartType = "Primary",
+                WorkflowType = "NE",
+                Country = "UK"
+            };
+
+            var completedTask = new TaskInfo()
+            {
+                ProcessId = 4,
+                Status = NcneTaskStatus.Completed.ToString(),
+                Assigned = testUser,
+                AssignedDate = new DateTime(2020, 01, 01),
+                StatusChangeDate = new DateTime(2020, 01, 01).Date,
+                ChartNumber = "200",
+                ChartType = "Primary",
+                WorkflowType = "NC",
+                Country = "France"
+            };
+
+            await _dbContext.TaskInfo.AddRangeAsync(new List<TaskInfo>()
+            {
+                terminatedTask,
+                new TaskInfo()
+                {
+                    ProcessId = 1,
+                    Status = NcneTaskStatus.InProgress.ToString(),
+                    Assigned = testUser,
+                    AssignedDate = new DateTime(2020, 01, 01),
+                    StatusChangeDate = new DateTime(2020, 01, 01).Date,
+                    ChartNumber = "300",
+                    ChartType = "Primary",
+                    WorkflowType = "NC",
+                    Country = "Italy"
+                },
+                completedTask,
+                new TaskInfo()
+                {
+                    ProcessId = 3,
+                    Status = NcneTaskStatus.InProgress.ToString(),
+                    Assigned = testUser,
+                    AssignedDate = new DateTime(2020, 01, 01),
+                    StatusChangeDate = new DateTime(2020, 01, 01).Date,
+                    ChartNumber = "400",
+                    ChartType = "Primary",
+                    WorkflowType = "NC",
+                    Country = "Spain"
+                }
+
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

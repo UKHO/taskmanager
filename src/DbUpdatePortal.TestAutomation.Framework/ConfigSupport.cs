@@ -51,7 +51,7 @@ namespace DbUpdatePortal.TestAutomation.Framework
         [BeforeScenario(Order = 19)]
         public void RegisterLandingPage()
         {
-            _objectContainer.RegisterTypeAs<LandingPage, ILandingPage>();
+            _objectContainer.RegisterTypeAs<LandingPage, IPage>();
         }
 
         [BeforeScenario(Order = 19)]

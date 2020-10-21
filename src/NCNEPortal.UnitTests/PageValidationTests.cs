@@ -99,6 +99,28 @@ namespace NCNEPortal.UnitTests
 
         }
 
+        [TestCase(null)]
+        [TestCase("")]
+        public void Validation_for_ValidateNewTaskPage_missing_ChartNo_fails_for_Withdrawal(string chartNo)
+        {
+            var validationErrorMessages = new List<string>();
+
+            A.CallTo(() => _fakeNcneUserDbService.GetUsersFromDbAsync())
+                .Returns(_validUsers);
+
+            var taskRole = new TaskRole
+            {
+                Compiler = _testUser
+            };
+
+            var result =
+                _pageValidationHelper.ValidateNewTaskPage(taskRole, NcneWorkflowType.Withdrawal.ToString(), "Adoption", validationErrorMessages, chartNo);
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(validationErrorMessages.Count, 1);
+            CollectionAssert.Contains(validationErrorMessages, "Task Information: Chart Number cannot be empty");
+
+        }
 
 
         [Test]
@@ -295,13 +317,11 @@ namespace NCNEPortal.UnitTests
 
             DateTime? invalidDate = null;
 
-            DateTime? publicationDate = null;
-
 
 
             var ThreePSInfo = (true, invalidDate, DateTime.Now, invalidDate);
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "", "", ThreePSInfo,
                 validationErrorMessages);
 
             Assert.IsFalse(result);
@@ -330,13 +350,9 @@ namespace NCNEPortal.UnitTests
 
             DateTime? invalidDate = null;
 
-            DateTime? publicationDate = null;
-
-
-
             var ThreePSInfo = (true, invalidDate, invalidDate, DateTime.Now);
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "", "", ThreePSInfo,
                 validationErrorMessages);
 
             Assert.IsFalse(result);
@@ -363,11 +379,9 @@ namespace NCNEPortal.UnitTests
 
             DateTime? invalidDate = null;
 
-            DateTime? publicationDate = null;
-
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now.AddDays(-2), invalidDate);
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "", "", ThreePSInfo,
                 validationErrorMessages);
 
             Assert.IsFalse(result);
@@ -392,11 +406,9 @@ namespace NCNEPortal.UnitTests
                 HundredPercentCheck = _testUser2
             };
 
-            DateTime? publicationDate = null;
-
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now.AddDays(-2));
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "", "", ThreePSInfo,
                 validationErrorMessages);
 
             Assert.IsFalse(result);
@@ -422,11 +434,10 @@ namespace NCNEPortal.UnitTests
                 HundredPercentCheck = _testUser2
             };
 
-            DateTime? publicationDate = null;
 
             var ThreePSInfo = (true, DateTime.Now, DateTime.Now, DateTime.Now);
 
-            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, publicationDate, DateTime.Now, 1, "Adoption", ThreePSInfo,
+            var result = _pageValidationHelper.ValidateWorkflowPage(taskRole, "", "", ThreePSInfo,
                 validationErrorMessages);
 
             Assert.IsTrue(result);

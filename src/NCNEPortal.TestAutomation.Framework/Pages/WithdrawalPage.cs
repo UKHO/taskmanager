@@ -1,15 +1,15 @@
 ﻿using Common.TestAutomation.Framework.Pages;
-using DbUpdatePortal.TestAutomation.Framework.Configs;
+using NCNEPortal.TestAutomation.Framework.Configs;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 
-namespace DbUpdatePortal.TestAutomation.Framework.Pages
+namespace NCNEPortal.TestAutomation.Framework.Pages
 {
-    public class LandingPage : PageBase, IPage
+    public class WithdrawalPage : PageBase, IPage
     {
-        public LandingPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig)
-            : base(driver, wait, urlsConfig.DbUpdateLandingPageUrl)
+        public WithdrawalPage(IWebDriver driver, WebDriverWait wait, UrlsConfig urlsConfig) : base(driver, wait,
+            urlsConfig.NcneWithdrawalPageUrl)
         {
         }
 

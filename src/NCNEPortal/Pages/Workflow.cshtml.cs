@@ -146,6 +146,8 @@ namespace NCNEPortal
 
         public bool IsPublished { get; set; }
 
+        public bool AllowEditChartNo { get; set; }
+
         public List<string> ValidationErrorMessages { get; set; }
 
         private (string DisplayName, string UserPrincipalName) _currentUser;
@@ -325,11 +327,23 @@ namespace NCNEPortal
                                                       t.Status == NcneTaskStageStatus.Completed.ToString()) &&
                                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
                                                       t.Status == NcneTaskStageStatus.Completed.ToString()))
-                               || (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Consider_email_SDR &&
+                               || (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Consider_email_to_SDR &&
                                                           t.Status == NcneTaskStageStatus.Completed.ToString()));
 
             IsPublished = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart &&
                                                  t.Status == NcneTaskStageStatus.Completed.ToString());
+
+            if (taskInfo.WorkflowType == NcneWorkflowType.Withdrawal.ToString() &&
+                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.V1 &&
+                                     t.Status == NcneTaskStageStatus.Completed.ToString())
+            )
+            {
+                AllowEditChartNo = false;
+            }
+            else
+            {
+                AllowEditChartNo = true;
+            }
 
             IsReadOnly = taskInfo.Status == NcneTaskStatus.Completed.ToString() ||
                          taskInfo.Status == NcneTaskStatus.Terminated.ToString();
@@ -827,7 +841,7 @@ namespace NCNEPortal
             return inProgress.Any() ? inProgress.First().TaskStageType.Name : "Awaiting Completion";
         }
 
-        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType, string chartNo)
+        public async Task<IActionResult> OnPostSaveAsync(int processId, string chartType, string chartNo, string workflowType)
         {
             LogContext.PushProperty("ActivityName", "Workflow");
             LogContext.PushProperty("ProcessId", processId);
@@ -843,7 +857,7 @@ namespace NCNEPortal
 
             ChartNo = chartNo;
 
-            var role = new TaskRole()
+            var role = new TaskRole
             {
                 ProcessId = processId,
                 Compiler = string.IsNullOrEmpty(Compiler?.UserPrincipalName) ? null : await _ncneUserDbService.GetAdUserAsync(Compiler.UserPrincipalName),
@@ -855,9 +869,7 @@ namespace NCNEPortal
             var ThreePSInfo = (SentTo3Ps, SendDate3ps, ExpectedReturnDate3ps, ActualReturnDate3ps);
 
 
-            if (!(_pageValidationHelper.ValidateWorkflowPage(role, PublicationDate, RepromatDate, Dating, chartType,
-                ThreePSInfo,
-                ValidationErrorMessages)))
+            if (!(_pageValidationHelper.ValidateWorkflowPage(role, workflowType, chartNo, ThreePSInfo, ValidationErrorMessages)))
             {
 
                 return new JsonResult(this.ValidationErrorMessages)
@@ -1108,6 +1120,7 @@ namespace NCNEPortal
                 switch ((NcneTaskStageType)taskStage.TaskStageTypeId)
                 {
                     case NcneTaskStageType.Forms:
+                    case NcneTaskStageType.Withdrawal_action:
                         {
                             taskStage.DateExpected = AnnounceDate;
                             result.FormsDate = taskStage.TaskStageId;
@@ -1129,6 +1142,7 @@ namespace NCNEPortal
                         }
 
                     case NcneTaskStageType.Publication:
+                    case NcneTaskStageType.PMC_withdrawal:
                         {
                             taskStage.DateExpected = PublicationDate;
                             result.PublishDate = taskStage.TaskStageId;
