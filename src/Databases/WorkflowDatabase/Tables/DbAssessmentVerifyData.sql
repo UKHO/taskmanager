@@ -13,6 +13,8 @@
 	[WorkflowInstanceId] INT NOT NULL, 
 	[ProductActioned] BIT NULL, 
 	[ProductActionChangeDetails] NVARCHAR(MAX) NULL, 
+	[SncActioned] BIT NULL, 
+	[SncActionChangeDetails] NVARCHAR(MAX) NULL, 
 	[WorkspaceAffected] NVARCHAR(100) NULL,
 	CONSTRAINT [FK_DbAssessmentVerifyData_WorkflowInstance] FOREIGN KEY ([WorkflowInstanceId]) REFERENCES [WorkflowInstance]([WorkflowInstanceId]),
 	CONSTRAINT [FK_DbAssessmentVerifyData_ReviewerAdUserId] FOREIGN KEY ([ReviewerAdUserId]) REFERENCES [AdUsers]([AdUserId]),

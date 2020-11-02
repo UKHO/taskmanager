@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -34,6 +34,7 @@ namespace Common.Helpers
             PopulateHpdUser();
             PopulateHpdUsage();
             PopulateProductActionType();
+            PopulateSncActionType();
             PopulateAssignedTaskSourceType();
             PopulateWorkflowInstance();
 
@@ -91,6 +92,18 @@ namespace Common.Helpers
             using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
             workflowDbContext.ProductActionType.AddRange(productActionType);
             workflowDbContext.SaveChanges();
+        }
+
+        private void PopulateSncActionType()
+        {
+            if (!File.Exists(@"Data\SncActionType.json")) throw new FileNotFoundException(@"Data\SncActionType.json");
+
+            var jsonString = File.ReadAllText(@"Data\SncActionType.json");
+            var sncActionType = JsonConvert.DeserializeObject<IEnumerable<SncActionType>>(jsonString);
+            using var workflowDbContext = new WorkflowDbContext(_dbContextOptions);
+            workflowDbContext.SncActionType.AddRange(sncActionType);
+            workflowDbContext.SaveChanges();
+
         }
 
         private void PopulateAssignedTaskSourceType()

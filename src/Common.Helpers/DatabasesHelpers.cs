@@ -48,6 +48,8 @@ namespace Common.Helpers
             workflowDbContext.Database.ExecuteSqlRaw("delete from [DatabaseDocumentStatus]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [ProductAction]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [ProductActionType]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [SncAction]");
+            workflowDbContext.Database.ExecuteSqlRaw("delete from [SncActionType]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [AssignedTaskType]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [DataImpact]");
             workflowDbContext.Database.ExecuteSqlRaw("delete from [HpdUser]");

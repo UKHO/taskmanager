@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+using System;
 using WorkflowDatabase.EF.Models;
 
 namespace WorkflowDatabase.EF
@@ -35,6 +35,8 @@ namespace WorkflowDatabase.EF
         public DbSet<HpdUsage> HpdUsage { get; set; }
         public DbSet<ProductAction> ProductAction { get; set; }
         public DbSet<ProductActionType> ProductActionType { get; set; }
+        public DbSet<SncAction> SncAction { get; set; }
+        public DbSet<SncActionType> SncActionType { get; set; }
         public DbSet<DbAssessmentAssignTask> DbAssessmentAssignTask { get; set; }
         public DbSet<AssignedTaskType> AssignedTaskType { get; set; }
         public DbSet<DataImpact> DataImpact { get; set; }
@@ -43,7 +45,7 @@ namespace WorkflowDatabase.EF
         public DbSet<CachedHpdWorkspace> CachedHpdWorkspace { get; set; }
         public DbSet<CachedHpdEncProduct> CachedHpdEncProduct { get; set; }
         public DbSet<CarisProjectDetails> CarisProjectDetails { get; set; }
-        public DbSet<OpenAssessmentsQueue> OpenAssessmentsQueue { get; set; }   
+        public DbSet<OpenAssessmentsQueue> OpenAssessmentsQueue { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,6 +82,12 @@ namespace WorkflowDatabase.EF
 
             modelBuilder.Entity<WorkflowInstance>()
                 .HasMany(x => x.ProductAction)
+                .WithOne()
+                .HasPrincipalKey(p => p.ProcessId)
+                .HasForeignKey(p => p.ProcessId);
+
+            modelBuilder.Entity<WorkflowInstance>()
+                .HasMany(x => x.SncAction)
                 .WithOne()
                 .HasPrincipalKey(p => p.ProcessId)
                 .HasForeignKey(p => p.ProcessId);
