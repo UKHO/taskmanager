@@ -50,6 +50,7 @@ stages:
         displayName: 'Setup [Net.SecurityProtocolType]::Tls12'
         enabled: true
         inputs:
+          pwsh: false
           targetType: 'inline'
           failOnStderr: true
           script: '[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bOR [Net.SecurityProtocolType]::Tls12'
@@ -58,6 +59,7 @@ stages:
         displayName: 'Re-Register PS Repo on agent (Enable if needed)'
         enabled: false
         inputs:
+          pwsh: false
           targetType: 'inline'
           failOnStderr: true
           script: |
@@ -101,6 +103,7 @@ stages:
         displayName: 'Install PSModuleInstaller on Build Agent'
         enabled: false
         inputs:
+          pwsh: false
           targetType: 'inline'
           failOnStderr: true
           script: |
@@ -123,6 +126,7 @@ stages:
         displayName: 'Install PoSHPackages on Build Agent'
         enabled: false
         inputs:
+          pwsh: false
           targetType: 'inline'
           failOnStderr: true
           script: |
@@ -289,6 +293,59 @@ stages:
         runOnce:
           deploy:
             steps:
+
+              - task: PowerShell@2
+                displayName: "Setup [Net.SecurityProtocolType]::Tls12"
+                inputs:
+                  pwsh: false
+                  targetType: 'inline'
+                  failOnStderr: true
+                  script: '[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bOR [Net.SecurityProtocolType]::Tls12'
+              
+              - task: PowerShell@2
+                displayName: "Re-Register PS Repository on Release Agent (Enable if needed)"
+                enabled: false
+                inputs:
+                  pwsh: false
+                  targetType: 'inline'
+                  failOnStderr: true
+                  script: |
+                    # Re-Register PS Repository on Release Agent
+                    # Get $ConfigData
+                    Write-Host "Loading config"
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\\UKHO.SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$(Release.EnvironmentName)"
+                    
+                    #Iterate and register PoSHRepositories
+                    $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+                    
+                        Write-Host "Attempting to re-register PS Repo"
+                             
+                        $repo = (Get-PSRepository -Name $_.Name -ErrorAction SilentlyContinue)
+                    
+                        if ($repo) { 
+                            Write-Host "Unregistering  PS Repo"
+                    
+                            Unregister-PSRepository -Name $_.Name -ErrorAction SilentlyContinue
+                            
+                            Write-Host "Unregistered  PS Repo"
+                        }
+                        else {
+                            Write-Host " PS Repo does not exists"
+                        }
+                    
+                        Write-Host "Registering  PS Repo"
+                    
+                        Register-PSRepository -Name $_.Name `
+                            -SourceLocation $_.SourceUri `
+                            -PublishLocation $_.SourceUri `
+                            -PackageManagementProvider Nuget `
+                            -InstallationPolicy Trusted `
+                            -ErrorAction Continue
+                    
+                        Write-Host "Registered  PS Repo"
+                    }
+
               - task: PowerShell@2
                 displayName: "Install PoSHPackages on Release Agent"
                 env:
@@ -297,6 +354,7 @@ stages:
                 inputs:
                   pwsh: false
                   targetType: inline
+                  failOnStderr: true
                   script: |    
                     # Get $ConfigData
                     $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\Config\Config.Base.ps1"
