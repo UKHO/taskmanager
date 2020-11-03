@@ -434,4 +434,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="OpenAssessmentsQueueId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="89f53e68-3407-45b7-9c9d-e34b61b2c3d0" ChangeDateTime="10/27/2020 12:13:23">
+    <Property Name="ElementName" Value="[dbo].[SncAction].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SncAction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SncActionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3ddd16e6-39d8-4d0a-8a7a-381688273ec3" ChangeDateTime="10/27/2020 12:15:54">
+    <Property Name="ElementName" Value="[dbo].[SncActionType].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SncActionType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SncActionTypeId" />
+  </Operation>
 </Operations>

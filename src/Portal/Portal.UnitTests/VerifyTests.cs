@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using FakeItEasy;
@@ -20,6 +14,12 @@ using Portal.Helpers;
 using Portal.HttpClients;
 using Portal.Pages.DbAssessment;
 using Portal.UnitTests.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -95,6 +95,13 @@ namespace Portal.UnitTests
                 Verified = false
             });
 
+            _dbContext.SncAction.Add(new SncAction
+            {
+                ProcessId = ProcessId,
+                SncActionType = new SncActionType { Name = "test" },
+                Verified = false
+            });
+
             _dbContext.DataImpact.Add(new DataImpact
             {
                 ProcessId = ProcessId
@@ -157,6 +164,9 @@ namespace Portal.UnitTests
                 A.Dummy<bool>(),
                 A.Dummy<string>(),
                 A.Dummy<List<ProductAction>>(),
+                A.Dummy<bool>(),
+                A.Dummy<string>(),
+                A.Dummy<List<SncAction>>(),
                 A.Dummy<List<DataImpact>>(),
                 A.Dummy<DataImpact>(),
                 "team",
@@ -297,7 +307,38 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Record Product Action: More than one of the same Impacted Products selected", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Record Enc Action: More than one of the same Enc Impacted Products selected", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_entering_duplicate_impactedProducts_in_sncAction_results_in_validation_error_message()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            await _dbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.SncActioned = true;
+            _verifyModel.SncActionChangeDetails = "Some change details";
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordSncAction = new List<SncAction>
+            {
+                new SncAction() { SncActionId = 1, ImpactedProduct = "GB1234", SncActionTypeId = 1},
+                new SncAction() { SncActionId = 2, ImpactedProduct = "GB1234", SncActionTypeId = 1}
+            };
+
+            _verifyModel.Team = "HW";
+
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record Snc Action: More than one of the same Snc Impacted Products selected", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -325,8 +366,8 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 2);
-            Assert.Contains($"Record Product Action: Impacted Product {_verifyModel.RecordProductAction[0].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
-            Assert.Contains($"Record Product Action: Impacted Product {_verifyModel.RecordProductAction[1].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Record Enc Action: Impacted Product {_verifyModel.RecordProductAction[0].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Record Enc Action: Impacted Product {_verifyModel.RecordProductAction[1].ImpactedProduct} does not exist", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -399,7 +440,40 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains($"Record Product Action: All Product Actions must be verified", _verifyModel.ValidationErrorMessages);
+            Assert.Contains($"Record ENC Action: All ENC Actions must be verified", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_given_action_done_and_unverified_sncactions_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1234" });
+            _dbContext.CachedHpdEncProduct.Add(new CachedHpdEncProduct() { Name = "GB1235" });
+            await _dbContext.SaveChangesAsync();
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.RecordSncAction = new List<SncAction>
+            {
+                new SncAction() { SncActionId = 1, ImpactedProduct = "GB1234", SncActionTypeId = 1},
+                new SncAction() { SncActionId = 2, ImpactedProduct = "GB1234", SncActionTypeId = 1}
+            };
+
+            _verifyModel.Team = "HW";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains($"Record SNC Action: All SNC Actions must be verified", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -577,12 +651,18 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
             _verifyModel.Verifier = TestUser;
+            _verifyModel.RecordSncAction = new List<SncAction>
+            {
+                new SncAction() { SncActionId = 1, ImpactedProduct = "GB1234", SncActionTypeId = 1,Verified = true},
+                new SncAction() { SncActionId = 2, ImpactedProduct = "GB1235", SncActionTypeId = 1, Verified = true}
+            };
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() { ProductActionId = 1, ImpactedProduct = "GB1234", ProductActionTypeId = 1, Verified = true},
                 new ProductAction() { ProductActionId = 2, ImpactedProduct = "GB1235", ProductActionTypeId = 1, Verified = true}
             };
+
 
             _verifyModel.DataImpacts = new List<DataImpact>();
 
@@ -612,6 +692,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
             _verifyModel.Verifier = TestUser;
+            _verifyModel.RecordSncAction = new List<SncAction>();
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -651,6 +732,7 @@ namespace Portal.UnitTests
             _verifyModel.SourceCategory = "SourceCategory";
             _verifyModel.Team = "HW";
             _verifyModel.Verifier = TestUser;
+            _verifyModel.RecordSncAction = new List<SncAction>();
 
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
@@ -889,6 +971,7 @@ namespace Portal.UnitTests
                                                                                 A<bool>.Ignored,
                                                                                 A<string>.Ignored,
                                                                                 A<List<ProductAction>>.Ignored,
+                                                                                A.Dummy<bool>(), A.Dummy<string>(), A.Dummy<List<SncAction>>(),
                                                                                 A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                                                             .MustNotHaveHappened();
 
@@ -924,6 +1007,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -936,7 +1020,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                     A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored,
-                    A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
+                    A<List<ProductAction>>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<SncAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
                     A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored))
                 .Returns(true);
 
@@ -965,13 +1049,14 @@ namespace Portal.UnitTests
             };
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.IsOnHold = false;
+            _verifyModel.RecordSncAction = new List<SncAction>();
 
             A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
                 .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
 
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored,
-                A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
+                A<List<ProductAction>>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<SncAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored)).Returns(Task.FromResult(true));
 
             await _dbContext.OnHold.AddAsync(new OnHold
@@ -1004,6 +1089,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -1016,7 +1102,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored,
-                A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
+                A<List<ProductAction>>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<SncAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored)).Returns(Task.FromResult(true));
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
@@ -1038,6 +1124,7 @@ namespace Portal.UnitTests
                 .Returns(true);
             _verifyModel.Verifier = TestUser;
             _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
             _verifyModel.RecordProductAction = new List<ProductAction>()
             {
                 new ProductAction() {ImpactedProduct = "GB1234", ProcessId = 123, ProductActionTypeId = 1}
@@ -1050,7 +1137,7 @@ namespace Portal.UnitTests
 
             A.CallTo(() => _fakePageValidationHelper.CheckVerifyPageForErrors(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,
                 A<string>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored, A<string>.Ignored,
-                A<List<ProductAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
+                A<List<ProductAction>>.Ignored, A<bool>.Ignored, A<string>.Ignored, A<List<SncAction>>.Ignored, A<List<DataImpact>>.Ignored, A<DataImpact>.Ignored,
                 A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<AdUser>.Ignored, A<bool>.Ignored)).Returns(Task.FromResult(true));
 
             _dbContext.OnHold.Add(new OnHold()
@@ -1222,6 +1309,7 @@ namespace Portal.UnitTests
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = productActioned;
             _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
             //Set ProductActionChangeDetails to 251 characters
             _verifyModel.ProductActionChangeDetails = string.Empty;
             for (int i = 0; i < 25; i++)
@@ -1234,7 +1322,39 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+            Assert.Contains("Record Enc Action: Please ensure Enc action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostSaveAsync_Given_SncActionedChangeDetails_Exceeds_Character_Limit_And_SncActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool sncActioned)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.SncActioned = sncActioned;
+            _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
+            //Set SncActionChangeDetails to 251 characters
+            _verifyModel.SncActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _verifyModel.SncActionChangeDetails += "0123456789";
+            }
+            _verifyModel.SncActionChangeDetails += "0";
+
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Snc Action: Please ensure Snc action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
         }
 
         [TestCase(false)]
@@ -1253,6 +1373,7 @@ namespace Portal.UnitTests
             _verifyModel.DataImpacts = new List<DataImpact>();
             _verifyModel.ProductActioned = productActioned;
             _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
             //Set ProductActionChangeDetails to 251 characters
             _verifyModel.ProductActionChangeDetails = string.Empty;
             for (int i = 0; i < 25; i++)
@@ -1265,7 +1386,39 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Record Product Action: Please ensure product action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+            Assert.Contains("Record Enc Action: Please ensure Enc action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Test_OnPostDoneAsync_Given_SncActionedChangeDetails_Exceeds_Character_Limit_And_SncActioned_Is_Provided_Then_Validation_Error_Message_Is_Present(bool sncActioned)
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.SncActioned = sncActioned;
+            _verifyModel.Team = "HW";
+            _verifyModel.RecordSncAction = new List<SncAction>();
+            //Set SncActionChangeDetails to 251 characters
+            _verifyModel.SncActionChangeDetails = string.Empty;
+            for (int i = 0; i < 25; i++)
+            {
+                _verifyModel.SncActionChangeDetails += "0123456789";
+            }
+            _verifyModel.SncActionChangeDetails += "0";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Snc Action: Please ensure Snc action change details does not exceed 250 characters", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -1289,7 +1442,31 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
+            Assert.Contains("Record Enc Action: Please ensure you have entered Enc action change details", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_where_SncActioned_ticked_and_no_SncActionChangeDetails_entered_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.SncActioned = true;
+            _verifyModel.SncActionChangeDetails = "";
+            _verifyModel.Team = "HW";
+
+            var response = (JsonResult)await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Snc Action: Please ensure you have entered Snc action change details", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -1313,7 +1490,31 @@ namespace Portal.UnitTests
 
             Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
             Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
-            Assert.Contains("Record Product Action: Please ensure you have entered product action change details", _verifyModel.ValidationErrorMessages);
+            Assert.Contains("Record Enc Action: Please ensure you have entered Enc action change details", _verifyModel.ValidationErrorMessages);
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_SncActioned_ticked_and_no_SncActionChangeDetails_entered_then_validation_error_message_is_present()
+        {
+            A.CallTo(() => _fakeAdDirectoryService.GetUserDetails(A<ClaimsPrincipal>.Ignored))
+                .Returns((TestUser.DisplayName, TestUser.UserPrincipalName));
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(TestUser.UserPrincipalName))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Verifier = AdUser.Empty;
+            _verifyModel.DataImpacts = new List<DataImpact>();
+            _verifyModel.SncActioned = true;
+            _verifyModel.SncActionChangeDetails = "";
+            _verifyModel.Team = "HW";
+
+            var response = (JsonResult)await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            Assert.AreEqual((int)VerifyCustomHttpStatusCode.FailedValidation, response.StatusCode);
+            Assert.GreaterOrEqual(_verifyModel.ValidationErrorMessages.Count, 1);
+            Assert.Contains("Record Snc Action: Please ensure you have entered Snc action change details", _verifyModel.ValidationErrorMessages);
         }
 
         [Test]
@@ -1335,7 +1536,29 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
 
-            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Enc Action: Please ensure you have entered Enc action change details");
+        }
+
+        [Test]
+        public async Task Test_OnPostSaveAsync_where_SncActioned_ticked_and_SncActionChangeDetails_entered_then_validation_error_message_is_not_present()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.SncActioned = true;
+            _verifyModel.SncActionChangeDetails = "Test change details";
+
+            _verifyModel.RecordSncAction = new List<SncAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Snc Action: Please ensure you have entered Snc action change details");
         }
 
         [Test]
@@ -1357,7 +1580,29 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
 
-            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Enc Action: Please ensure you have entered Enc action change details");
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_SncActioned_ticked_and_SncActionChangeDetails_entered_then_validation_error_message_is_not_present()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.SncActioned = true;
+            _verifyModel.SncActionChangeDetails = "Test change details";
+
+            _verifyModel.RecordSncAction = new List<SncAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostDoneAsync(ProcessId, "Done");
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Snc Action: Please ensure you have entered Snc action change details");
         }
 
         [Test]
@@ -1378,9 +1623,33 @@ namespace Portal.UnitTests
 
             await _verifyModel.OnPostSaveAsync(ProcessId);
 
-            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure you have entered product action change details");
-            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: Please ensure impacted product is fully populated");
-            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Product Action: More than one of the same Impacted Products selected");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Enc Action: Please ensure you have entered Enc action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Enc Action: Please ensure Enc impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Enc Action: More than one of the same Enc Impacted Products selected");
+
+        }
+
+        [Test]
+        public async Task Test_OnPostDoneAsync_where_SncActioned_not_ticked_then_validation_error_messages_are_not_present()
+        {
+            A.CallTo(() => _fakePortalUserDbService.ValidateUserAsync(A<string>.Ignored))
+                .Returns(true);
+
+            _verifyModel.Ion = "Ion";
+            _verifyModel.ActivityCode = "ActivityCode";
+            _verifyModel.SourceCategory = "SourceCategory";
+            _verifyModel.Team = "HW";
+            _verifyModel.Verifier = TestUser;
+            _verifyModel.SncActioned = false;
+
+            _verifyModel.RecordSncAction = new List<SncAction>();
+            _verifyModel.DataImpacts = new List<DataImpact>();
+
+            await _verifyModel.OnPostSaveAsync(ProcessId);
+
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Snc Action: Please ensure you have entered Snc action change details");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Snc Action: Please ensure Snc impacted product is fully populated");
+            CollectionAssert.DoesNotContain(_verifyModel.ValidationErrorMessages, "Record Snc Action: More than one of the same Snc Impacted Products selected");
 
         }
     }
