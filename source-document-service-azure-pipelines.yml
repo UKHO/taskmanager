@@ -30,6 +30,22 @@ stages:
           packageType: sdk
           version: 3.1.x
           installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+      - task: PowerShell@2
+        displayName: 'Check package licenses'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $InformationPreference = "Continue"
+            Show-PackageLicences -pathToSource $(build.sourcesdirectory) -nugetFeedUrl "https://proget.ukho.gov.uk/nuget/operations/"
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)\\src\\SourceDocumentService\\SourceDocumentService.csproj'
+          feedsToUse: 'select'
+        displayName: 'dotnet restore SourceDocumentService'
+
       - task: PowerShell@2
         displayName: 'Re-Register PS Repo on agent (Enable if needed)'
         enabled: false
@@ -92,21 +108,25 @@ stages:
                 -MaximumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MaximumVersion `
                 -Repository $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.Repository `
                 -Force
-          failOnStderr: true
+
       - task: PowerShell@2
-        displayName: 'Check package licenses'
+        displayName: 'Install PoSHPackages on Build Agent'
+        enabled: false
         inputs:
           targetType: 'inline'
           script: |
-            $InformationPreference = "Continue"
-            Show-PackageLicences -pathToSource $(build.sourcesdirectory) -nugetFeedUrl "https://proget.ukho.gov.uk/nuget/operations/"
-
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)\\src\\SourceDocumentService\\SourceDocumentService.csproj'
-          feedsToUse: 'select'
-        displayName: 'dotnet restore SourceDocumentService'
+            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            . ($pathToConfig)
+            
+            # Get Min/Max version for UKHO.PSModuleInstaller
+            $psModuleInstallerMinVer = $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MinimumVersion
+            $psModuleInstallerMaxVer = $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MaximumVersion
+            
+            Import-Module UKHO.PSModuleInstaller -MinimumVersion $psModuleInstallerMinVer -MaximumVersion  $psModuleInstallerMaxVer 
+            
+            # Installing packages tagged with Usage of Build
+            $packages = ($ConfigData.NonNodeData.PoSHPackages | Where-Object {$_.Usages.Contains("Build")})
+            Install-PSModules -PSModules $packages
 
       - task: DotNetCoreCLI@2
         inputs:
