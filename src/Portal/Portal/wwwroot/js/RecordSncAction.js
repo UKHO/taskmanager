@@ -217,46 +217,4 @@
         $(".sncActionType").prop("disabled", true);
     }
 
-    //function initialiseImpactedProductsTypeahead() {
-    //    $('.impactedProductsTypeaheadError').collapse("hide");
-    //    // Constructing the suggestion engine
-    //    var impactedProduct = new Bloodhound({
-    //        datumTokenizer: Bloodhound.tokenizers.whitespace,
-    //        queryTokenizer: Bloodhound.tokenizers.whitespace,
-    //        prefetch: {
-    //            url: "_RecordProductAction/?handler=ImpactedProducts",
-    //            ttl: 600000
-    //        },
-    //        initialize: false
-    //    });
-
-        //var promise = impactedProduct.initialize();
-        //promise.fail(function () {
-        //    $('.impactedProductsTypeaheadError').collapse("show");
-        //});
-
-        // Initializing the typeahead
-    //    $('.productActionImpactedProduct').typeahead({
-    //            hint: true,
-    //            highlight: true, /* Enable substring highlighting */
-
-    //            minLength:
-    //                3 /* Specify minimum characters required for showing result */
-    //        },
-    //        {
-    //            name: 'impactedProduct',
-    //            source: impactedProduct,
-    //            limit: 100,
-    //            templates: {
-    //                notFound: '<div>No results</div>'
-    //            }
-    //        });
-
-    //    $('.productActionImpactedProduct.tt-hint').removeClass("productActionImpactedProduct");
-    //}
-
-    //function destroyImpactedProductsTypeahead() {
-    //    $('.productActionImpactedProduct').typeahead('destroy');
-    //}
-
 });
