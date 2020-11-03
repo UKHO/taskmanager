@@ -371,7 +371,9 @@ stages:
                                              -MinimumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MinimumVersion `
                                              -MaximumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MaximumVersion `
                                              -Repository $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.Repository `
-                                             -Force  -Scope CurrentUser
+                                             -Force `
+                                             -AllowClobber `
+                                             -Scope CurrentUser
 
               - task: PowerShell@2
                 displayName: "Install PoSHPackages on Release Agent"
