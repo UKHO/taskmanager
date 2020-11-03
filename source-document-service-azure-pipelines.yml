@@ -73,6 +73,27 @@ stages:
             }
 
       - task: PowerShell@2
+        displayName: 'Install PSModuleInstaller on Build Agent'
+        enabled: false
+        inputs:
+          targetType: 'inline'
+          script: |
+            # Install UKHO.PSModuleInstaller on build agent
+            # Get $ConfigData
+            Write-Host "Loading config"
+            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            . ($pathToConfig)  -Environment $environment
+            
+            #Iterate and register PoSHRepositories
+            #Install UKHO.PSModuleInstaller
+            Write-Host "Installing 'UKHO.PSModuleInstaller'"
+            Install-Module -Name "UKHO.PSModuleInstaller" `
+                -MinimumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MinimumVersion `
+                -MaximumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MaximumVersion `
+                -Repository $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.Repository `
+                -Force
+          failOnStderr: true
+      - task: PowerShell@2
         displayName: 'Check package licenses'
         inputs:
           targetType: 'inline'
