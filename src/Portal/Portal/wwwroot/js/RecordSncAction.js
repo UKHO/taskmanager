@@ -34,7 +34,7 @@
             },
             error: function (error) {
                 $("#recordSncActionError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Product Actions.</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load SNC Actions.</div>");
             }
         });
     }

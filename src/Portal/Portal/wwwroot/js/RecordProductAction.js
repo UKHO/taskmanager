@@ -36,7 +36,7 @@
             },
             error: function (error) {
                 $("#recordProductActionError")
-                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load Product Actions.</div>");
+                    .html("<div class=\"alert alert-danger\" role=\"alert\">Failed to load ENC Actions.</div>");
             }
         });
     }
