@@ -30,6 +30,47 @@ stages:
           packageType: sdk
           version: 3.1.x
           installationPath: $(Agent.ToolsDirectory)\\dotnet
+      - task: PowerShell@2
+        displayName: 'Re-Register PS Repo on agent (Enable if needed)'
+        enabled: false
+        inputs:
+          targetType: 'inline'
+          script: |
+            # Re-Register PS Repository on Build Agent
+            # Get $ConfigData
+            Write-Host "Loading config"
+            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            . ($pathToConfig)  -Environment $environment
+            
+            #Iterate and register PoSHRepositories
+            $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
+            
+                Write-Host "$($env:computername): Attempting to re-register $($_.Name)"
+                    
+                $repo = (Get-PSRepository -Name $_.Name -ErrorAction SilentlyContinue)
+            
+                if ($repo) { 
+                    Write-Host "$($env:computername): Unregistering  $($_.Name)"
+            
+                    Unregister-PSRepository -Name $_.Name -ErrorAction SilentlyContinue
+                    
+                    Write-Host "$($env:computername): Unregistered  $($_.Name)"
+                }
+                else {
+                    Write-Host "$($env:computername):  $($_.Name) does not exists"
+                }
+            
+                Write-Host "$($env:computername): Registering  $($_.Name)"
+            
+                Register-PSRepository -Name $_.Name `
+                    -SourceLocation $_.SourceUri `
+                    -PublishLocation $_.SourceUri `
+                    -PackageManagementProvider Nuget `
+                    -InstallationPolicy Trusted `
+                    -ErrorAction Continue
+            
+                Write-Host "$($env:computername): Registered  $($_.Name)"
+            }
 
       - task: PowerShell@2
         displayName: 'Check package licenses'
