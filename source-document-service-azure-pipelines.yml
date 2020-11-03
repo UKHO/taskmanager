@@ -305,6 +305,9 @@ stages:
               - task: PowerShell@2
                 displayName: "Re-Register PS Repository on Release Agent (Enable if needed)"
                 enabled: false
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Dev1"
                 inputs:
                   pwsh: false
                   targetType: 'inline'
@@ -314,7 +317,7 @@ stages:
                     # Get $ConfigData
                     Write-Host "Loading config"
                     $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\\UKHO.SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
-                    . ($pathToConfig)  -Environment "$(Release.EnvironmentName)"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
                     
                     #Iterate and register PoSHRepositories
                     $ConfigData.NonNodeData.PoSHRepositories | ForEach-Object {
@@ -345,6 +348,30 @@ stages:
                     
                         Write-Host "Registered  PS Repo"
                     }
+
+              - task: PowerShell@2
+                displayName: "Install PSModuleInstaller on Release Agent"
+                enabled: false
+                env:
+                  BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
+                  DEPLOY_ENVIRONMENT_NAME: "Dev1"
+                inputs:
+                  pwsh: false
+                  targetType: 'inline'
+                  failOnStderr: true
+                  script: |
+                    # Get $ConfigData
+                    Write-Host "Loading config"
+                    $pathToConfig = "$($env:BUILD_ARTIFACT_ROOT_FOLDER)\UKHO.SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
+                    . ($pathToConfig)  -Environment "$($env:DEPLOY_ENVIRONMENT_NAME)"
+                    
+                    #Install UKHO.PSModuleInstaller
+                    Write-Host "Installing 'UKHO.PSModuleInstaller'"
+                    Install-Module -Name "UKHO.PSModuleInstaller" `
+                                             -MinimumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MinimumVersion `
+                                             -MaximumVersion $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.MaximumVersion `
+                                             -Repository $ConfigData.NonNodeData.PoSHPackages.Where{ $_.Name -eq "UKHO.PSModuleInstaller" }.Repository `
+                                             -Force  #-Scope CurrentUser
 
               - task: PowerShell@2
                 displayName: "Install PoSHPackages on Release Agent"
