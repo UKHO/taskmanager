@@ -350,8 +350,8 @@ stages:
                     }
 
               - task: PowerShell@2
-                displayName: "Install PSModuleInstaller on Release Agent"
-                enabled: true
+                displayName: "Install PSModuleInstaller on Release Agent (Enable if needed)"
+                enabled: false
                 env:
                   BUILD_ARTIFACT_ROOT_FOLDER: "$(Pipeline.Workspace)"
                   DEPLOY_ENVIRONMENT_NAME: "Dev1"
