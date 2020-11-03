@@ -47,10 +47,19 @@ stages:
         displayName: 'dotnet restore SourceDocumentService'
 
       - task: PowerShell@2
+        displayName: 'Setup [Net.SecurityProtocolType]::Tls12'
+        enabled: true
+        inputs:
+          targetType: 'inline'
+          failOnStderr: true
+          script: '[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bOR [Net.SecurityProtocolType]::Tls12'
+
+      - task: PowerShell@2
         displayName: 'Re-Register PS Repo on agent (Enable if needed)'
         enabled: false
         inputs:
           targetType: 'inline'
+          failOnStderr: true
           script: |
             # Re-Register PS Repository on Build Agent
             # Get $ConfigData
@@ -93,6 +102,7 @@ stages:
         enabled: false
         inputs:
           targetType: 'inline'
+          failOnStderr: true
           script: |
             # Install UKHO.PSModuleInstaller on build agent
             # Get $ConfigData
@@ -114,6 +124,7 @@ stages:
         enabled: false
         inputs:
           targetType: 'inline'
+          failOnStderr: true
           script: |
             $pathToConfig = "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
             . ($pathToConfig)
