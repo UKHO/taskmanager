@@ -32,6 +32,7 @@ stages:
           installationPath: $(Agent.ToolsDirectory)\\dotnet
 
       - task: PowerShell@2
+        displayName: 'Check package licenses'
         inputs:
           targetType: 'inline'
           script: |
