@@ -55,7 +55,7 @@ stages:
             # Re-Register PS Repository on Build Agent
             # Get $ConfigData
             Write-Host "Loading config"
-            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            $pathToConfig = "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
             . ($pathToConfig)  -Environment $environment
             
             #Iterate and register PoSHRepositories
@@ -97,7 +97,7 @@ stages:
             # Install UKHO.PSModuleInstaller on build agent
             # Get $ConfigData
             Write-Host "Loading config"
-            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            $pathToConfig = "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
             . ($pathToConfig)  -Environment $environment
             
             #Iterate and register PoSHRepositories
@@ -115,7 +115,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            $pathToConfig = "$(build.sourcesdirectory)\UKHO.*.BuildDeploy\Config\Config.Base.ps1"
+            $pathToConfig = "$(Build.SourcesDirectory)\\src\\SourceDocumentService.BuildDeploy\\Config\\Config.Base.ps1"
             . ($pathToConfig)
             
             # Get Min/Max version for UKHO.PSModuleInstaller
