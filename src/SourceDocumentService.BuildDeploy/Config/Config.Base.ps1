@@ -19,14 +19,14 @@ $ConfigData =
             @{
                 Name = "UKHO.PSGallery"
                 Type = "Proget"
-                SourceUri = "http://proget.ukho.gov.uk/nuget/ukho.psgallery/"
+                SourceUri = "https://proget.ukho.gov.uk/nuget/ukho.psgallery/"
                 InstallationPolicy = "Trusted"
             }
         );
         PoSHPackages = @(
             @{
                 Name="UKHO.WebsiteDSC"
-                RequiredVersion = "4.0.0"
+                RequiredVersion = "4.0.1"
                 Repository = "UKHO.PSGallery"
                 DSCResource = $true
                 Usages = @("Release", "Node")
@@ -47,23 +47,22 @@ $ConfigData =
             },
             @{
                 Name="UKHO.PSModuleInstaller"
-                MinimumVersion = "1.1.0"
+                MinimumVersion = "1.4.114283"
                 MaximumVersion = "1.9999.99999"
                 Repository = "UKHO.PSGallery"
-                # Get installed separately
                 Usages = @("")
             },
             @{
                 Name="UKHO.Operations.BuildDeployTools"
-                MinimumVersion = "3.7.8"
+                MinimumVersion = "3.7.11"
                 MaximumVersion = "3.9999.99999"
                 Repository = "UKHO.PSGallery"
                 Usages = @("Build", "Release")
             },
             @{
                 Name="UKHO.BuildAndDeploy"
-                MinimumVersion = "6.0.0"
-                MaximumVersion = "6.9999.99999"
+                MinimumVersion = "7.1.0"
+                MaximumVersion = "7.9999.99999"
                 Repository = "UKHO.PSGallery"
                 Usages = @("Release", "Node")
             }
