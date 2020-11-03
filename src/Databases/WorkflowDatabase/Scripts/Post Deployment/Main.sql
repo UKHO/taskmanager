@@ -11,3 +11,4 @@ Post-Deployment Script Template
 */
 :r .\AssignedTaskType.sql
 :r .\ProductActionType.sql
+:r .\SncActionType.sql

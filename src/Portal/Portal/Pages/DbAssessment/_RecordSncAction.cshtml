@@ -1,0 +1,60 @@
+﻿@page
+@model Portal.Pages.DbAssessment._RecordSncActionModel
+
+@{ Layout = null;}
+
+<div class="card mb-4">
+    <h6>
+        <span>Record SNC Action</span>
+    </h6>
+    <div class="col-12">
+        <div class="form-group row justify-content-start">
+            <div class="col-2">@Html.LabelFor(model => model.SncActionChangeDetails, new { @class = "col-form-label" })</div>
+            <div class="col-9">@Html.TextAreaFor(model => model.SncActionChangeDetails, new { @class = "form-control", @placeholder = "Enter change details...", @maxlength = 250 })</div>
+        </div>
+        <div class="form-group card-body p-0">
+            <div class="row justify-content-start align-items-center mb-1">
+                <div class="col-2"><label class="col-form-label">@Html.DisplayNameFor(model => model.SncActioned)</label></div>
+                <div class="col-1">
+                    @Html.HiddenFor(m => m.SncActioned, new { @id = "hdnSncActioned" })
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="SncActioned" id="SncActioned" @(Model.SncActioned ? "checked" : "") value="true">
+                        <label for="SncActioned"><span class="screen-reader-only">Action</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sncActions">
+                @foreach (var row in Model.SncActions)
+                {
+                    <div class="form-group row justify-content-start align-items-center recordSncAction">
+                        <div class="col-2">@Html.LabelFor(model => row.ImpactedProduct, new { @class = "col-form-label sncActionImpactedProductLabel" })</div>
+                        <div class="col-2">
+                            @Html.TextBoxFor(model => row.ImpactedProduct, new { @class = "form-control sncActionImpactedProduct", @maxlength = "100" })
+                            @*<input type="text" asp-for="@row.ImpactedProduct" class="typeahead tt-query form-text-input form-control sncActionImpactedProduct" maxlength="100" autocomplete="off" spellcheck="false">*@
+
+                        </div>
+
+                        <div class="row col-8 align-items-center">
+                            <div class="col-3">@Html.LabelFor(model => row.SncActionTypeId, new { @class = "col-form-label sncActionTypeLabel" })</div>
+                            <div class="col-3">@Html.DropDownListFor(model => row.SncActionTypeId, Model.SncActionTypes, "", new { @class = "form-control sncActionType" })</div>
+                            <div class="col-2"><label class="col-form-label">@Html.DisplayNameFor(model => row.Verified)</label></div>
+                            <div class="col-1">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sncActionVerified" id="sncActionVerified-0" @(row.Verified ? "checked" : "") value="true">
+                                    <label class="custom-control-label sncActionVerifiedLabel" for="sncActionVerified-0"><span class="screen-reader-only">Verified</span></label>
+                                </div>
+                            </div>
+
+                            <div class="col-1"><i class="fa fa-times-circle deleteSncAction" style="color: red;"></i></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row justify-content-start">
+                <div class="col-5"><button id="btnAddSncImpact" class="btn btn-primary" type="button">Add Impact</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+

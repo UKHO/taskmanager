@@ -15,6 +15,8 @@ namespace WorkflowDatabase.EF.Models
         public int WorkflowInstanceId { get; set; }
         public bool ProductActioned { get; set; }
         public string ProductActionChangeDetails { get; set; }
+        public bool SncActioned { get; set; }
+        public string SncActionChangeDetails { get; set; }
         [DisplayName("Caris Workspace:")]
         public string WorkspaceAffected { get; set; }
 

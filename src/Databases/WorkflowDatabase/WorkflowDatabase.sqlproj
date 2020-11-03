@@ -87,6 +87,8 @@
     <Build Include="Views\DatabaseAssessmentWorkflowData.sql" />
     <Build Include="Tables\OpenAssessmentsQueue.sql" />
     <Build Include="Tables\CachedHpdEncProduct.sql" />
+    <Build Include="Tables\SncAction.sql" />
+    <Build Include="Tables\SncActionType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.SQL.refactorlog" />
@@ -101,5 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post Deployment\Main.sql" />
+    <None Include="Scripts\Post Deployment\SncActionType.sql" />
   </ItemGroup>
 </Project>

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Common.Helpers.Auth;
+using Microsoft.EntityFrameworkCore;
+using Portal.Auth;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Helpers.Auth;
-using Microsoft.EntityFrameworkCore;
-using Portal.Auth;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -97,6 +97,9 @@ namespace Portal.Helpers
             bool productActioned,
             string productActionChangeDetails,
             List<ProductAction> recordProductAction,
+            bool sncActioned,
+            string SncActionChangeDetails,
+            List<SncAction> recordSncAction,
             List<DataImpact> dataImpacts,
             DataImpact stsDataImpact,
             string team,
@@ -138,6 +141,11 @@ namespace Portal.Helpers
             }
 
             if (!await ValidateRecordProductAction(productActioned, productActionChangeDetails, recordProductAction, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
+            if (!ValidateRecordSncAction(sncActioned, SncActionChangeDetails, recordSncAction, validationErrorMessages))
             {
                 isValid = false;
             }
@@ -201,6 +209,9 @@ namespace Portal.Helpers
             bool productActioned,
             string productActionChangeDetails,
             List<ProductAction> recordProductAction,
+            bool sncActioned,
+            string sncActionChangeDetails,
+            List<SncAction> recordSncAction,
             List<DataImpact> dataImpacts,
             DataImpact stsDataImpact,
             string team,
@@ -246,6 +257,12 @@ namespace Portal.Helpers
             {
                 isValid = false;
             }
+
+            if (!ValidateRecordSncAction(sncActioned, sncActionChangeDetails, recordSncAction, action, validationErrorMessages))
+            {
+                isValid = false;
+            }
+
 
             if (!ValidateDataImpact(dataImpacts, validationErrorMessages))
             {
@@ -560,6 +577,37 @@ namespace Portal.Helpers
             return true;
         }
 
+        /// <summary>
+        /// Used in Verify pages
+        /// </summary>
+        /// <param name="sncActionChangeDetails"></param>
+        /// <param name="recordSncAction"></param>
+        /// <param name="action"></param>
+        /// <param name="validationErrorMessages"></param>
+        /// <param name="sncActioned"></param>
+        /// <returns></returns>
+        private bool ValidateRecordSncAction(bool sncActioned, string sncActionChangeDetails, List<SncAction> recordSncAction, string action, List<string> validationErrorMessages)
+        {
+            var isValid = ValidateRecordSncAction(sncActioned, sncActionChangeDetails, recordSncAction, validationErrorMessages);
+
+            if (action != "Done")
+            {
+                return isValid;
+            }
+
+            if (recordSncAction != null && recordSncAction.Count > 0)
+            {
+                if (!recordSncAction.All(pa => pa.Verified))
+                {
+                    validationErrorMessages.Add(
+                        $"Record SNC Action: All SNC Actions must be verified");
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
 
         /// <summary>
         /// Used in Verify pages
@@ -584,23 +632,66 @@ namespace Portal.Helpers
                 if (!recordProductAction.All(pa => pa.Verified))
                 {
                     validationErrorMessages.Add(
-                        $"Record Product Action: All Product Actions must be verified");
+                        $"Record ENC Action: All ENC Actions must be verified");
                     isValid = false;
                 }
             }
 
             return isValid;
         }
+        private bool ValidateRecordSncAction(bool sncActioned, string sncActionChangeDetails, List<SncAction> recordSncAction, List<string> validationErrorMessages)
+        {
+            const string messagePrefix = "Record Snc Action:";
 
+            var isValid = true;
+
+            if (sncActionChangeDetails?.Length > 250)
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure Snc action change details does not exceed 250 characters");
+                return false;
+            }
+
+            if (!sncActioned)
+                return true;
+
+            if (string.IsNullOrWhiteSpace(sncActionChangeDetails))
+            {
+                validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered Snc action change details");
+                return false;
+            }
+
+            if (recordSncAction != null && recordSncAction.Count > 0)
+            {
+                // Check at least one entry populated
+                if (recordSncAction.Any(r =>
+                    string.IsNullOrWhiteSpace(r.ImpactedProduct)
+                    || r.SncActionTypeId == 0))
+                {
+                    validationErrorMessages.Add($"{messagePrefix} Please ensure Snc impacted product is fully populated");
+                    return false;
+                }
+
+                if (recordSncAction.GroupBy(p => p.ImpactedProduct)
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key).Any())
+                {
+                    validationErrorMessages.Add($"{messagePrefix} More than one of the same Snc Impacted Products selected");
+                    isValid = false;
+                }
+
+            }
+
+            return isValid;
+        }
         private async Task<bool> ValidateRecordProductAction(bool productActioned, string productActionChangeDetails, List<ProductAction> recordProductAction, List<string> validationErrorMessages)
         {
-            const string messagePrefix = "Record Product Action:";
+            const string messagePrefix = "Record Enc Action:";
 
             var isValid = true;
 
             if (productActionChangeDetails?.Length > 250)
             {
-                validationErrorMessages.Add($"{messagePrefix} Please ensure product action change details does not exceed 250 characters");
+                validationErrorMessages.Add($"{messagePrefix} Please ensure Enc action change details does not exceed 250 characters");
                 return false;
             }
 
@@ -609,7 +700,7 @@ namespace Portal.Helpers
 
             if (string.IsNullOrWhiteSpace(productActionChangeDetails))
             {
-                validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered product action change details");
+                validationErrorMessages.Add($"{messagePrefix} Please ensure you have entered Enc action change details");
                 return false;
             }
 
@@ -620,7 +711,7 @@ namespace Portal.Helpers
                     string.IsNullOrWhiteSpace(r.ImpactedProduct)
                     || r.ProductActionTypeId == 0))
                 {
-                    validationErrorMessages.Add($"{messagePrefix} Please ensure impacted product is fully populated");
+                    validationErrorMessages.Add($"{messagePrefix} Please ensure Enc impacted product is fully populated");
                     return false;
                 }
 
@@ -628,7 +719,7 @@ namespace Portal.Helpers
                     .Where(g => g.Count() > 1)
                     .Select(y => y.Key).Any())
                 {
-                    validationErrorMessages.Add($"{messagePrefix} More than one of the same Impacted Products selected");
+                    validationErrorMessages.Add($"{messagePrefix} More than one of the same Enc Impacted Products selected");
                     isValid = false;
                 }
 

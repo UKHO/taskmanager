@@ -1,0 +1,52 @@
+[
+  {
+    "SncActionTypeId": 1,
+    "Name": "Imm Act - Critical NM"
+  },
+  {
+    "SncActionTypeId": 2,
+    "Name": "Imm Act - Critical NM Block"
+  },
+  {
+    "SncActionTypeId": 3,
+    "Name": "Imm Act - Critical PNM"
+  },
+  {
+    "SncActionTypeId": 4,
+    "Name": "Imm Act - Critical TNM"
+  },
+  {
+    "SncActionTypeId": 5,
+    "Name": "Imm Act - NM"
+  },
+  {
+    "SncActionTypeId": 6,
+    "Name": "Imm Act - NM Block"
+  },
+  {
+    "SncActionTypeId": 7,
+    "Name": "Imm Act - PNM"
+  },
+  {
+    "SncActionTypeId": 8,
+    "Name": "Imm Act - TNM"
+  },
+  {
+    "SncActionTypeId": 9,
+    "Name": "Imm Act - Miscellaneous NM"
+  },
+  {
+    "SncActionTypeId": 10,
+    "Name": "LTA"
+  },
+  {
+    "SncActionTypeId": 11,
+    "Name": "No action"
+  },
+  {
+    "SncActionTypeId": 12,
+    "Name": "Scale too small"
+  }
+]
+
+  

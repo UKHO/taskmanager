@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +14,11 @@ using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -85,6 +85,16 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string ProductActionChangeDetails { get; set; }
+
+        [BindProperty]
+        public List<SncAction> RecordSncAction { get; set; }
+
+        [BindProperty]
+        public bool SncActioned { get; set; }
+
+        [BindProperty]
+        public string SncActionChangeDetails { get; set; }
+
 
         [BindProperty]
         public string SelectedCarisWorkspace { get; set; }
@@ -195,6 +205,9 @@ namespace Portal.Pages.DbAssessment
                 ProductActioned,
                 ProductActionChangeDetails,
                 RecordProductAction,
+                SncActioned,
+                SncActionChangeDetails,
+                RecordSncAction,
                 DataImpacts,
                 StsDataImpact,
                 Team,
@@ -284,6 +297,9 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
+                        SncActioned,
+                        SncActionChangeDetails,
+                        RecordSncAction,
                         DataImpacts,
                         StsDataImpact,
                         Team,
@@ -474,6 +490,7 @@ namespace Portal.Pages.DbAssessment
             await UpdateOnHold(processId, IsOnHold);
             await UpdateTaskInformation(processId);
             await UpdateProductAction(processId);
+            await UpdateSncAction(processId);
             await UpdateAssessmentData(processId);
 
             try
@@ -656,6 +673,36 @@ namespace Portal.Pages.DbAssessment
             currentAssessment.TeamDistributedTo = Team;
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateSncAction(int processId)
+        {
+            try
+            {
+
+                var currentVerify = await _dbContext.DbAssessmentVerifyData.FirstAsync(r => r.ProcessId == processId);
+
+                currentVerify.SncActioned = SncActioned;
+                currentVerify.SncActionChangeDetails = SncActionChangeDetails;
+
+                var toRemove = await _dbContext.SncAction.Where(at => at.ProcessId == processId).ToListAsync();
+                _dbContext.SncAction.RemoveRange(toRemove);
+
+                foreach (var sncAction in RecordSncAction)
+                {
+                    sncAction.ProcessId = processId;
+                    _dbContext.SncAction.Add(sncAction);
+                }
+
+                await _dbContext.SaveChangesAsync();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
         }
 
         private async Task UpdateProductAction(int processId)

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Helpers.Auth;
 using Common.Messages.Events;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +13,11 @@ using Portal.Extensions;
 using Portal.Helpers;
 using Portal.HttpClients;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using WorkflowDatabase.EF;
 using WorkflowDatabase.EF.Models;
 
@@ -72,6 +72,16 @@ namespace Portal.Pages.DbAssessment
 
         [BindProperty]
         public string ProductActionChangeDetails { get; set; }
+
+        [BindProperty]
+        public List<SncAction> RecordSncAction { get; set; }
+
+        [BindProperty]
+        public bool SncActioned { get; set; }
+
+        [BindProperty]
+        public string SncActionChangeDetails { get; set; }
+
 
         [BindProperty]
         public string SelectedCarisWorkspace { get; set; }
@@ -179,7 +189,7 @@ namespace Portal.Pages.DbAssessment
                 ProductActioned,
                 ProductActionChangeDetails,
                 RecordProductAction,
-                DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
+                SncActioned, SncActionChangeDetails, RecordSncAction, DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
             {
                 return new JsonResult(this.ValidationErrorMessages)
                 {
@@ -241,7 +251,7 @@ namespace Portal.Pages.DbAssessment
                         ProductActioned,
                         ProductActionChangeDetails,
                         RecordProductAction,
-                        DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
+                        SncActioned, SncActionChangeDetails, RecordSncAction, DataImpacts, StsDataImpact, Team, Assessor, Verifier, ValidationErrorMessages, CurrentUser.UserPrincipalName, currentAssessData.Assessor))
                     {
                         return new JsonResult(this.ValidationErrorMessages)
                         {
@@ -375,6 +385,7 @@ namespace Portal.Pages.DbAssessment
             await UpdateOnHold(ProcessId, IsOnHold);
             await UpdateTaskInformation(processId);
             await UpdateProductAction(processId);
+            await UpdateSncAction(processId);
             await UpdateAssessmentData(processId);
 
             try
@@ -439,6 +450,29 @@ namespace Portal.Pages.DbAssessment
                 {
                     productAction.ProcessId = processId;
                     _dbContext.ProductAction.Add(productAction);
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateSncAction(int processId)
+        {
+
+            var currentAssess = await _dbContext.DbAssessmentAssessData.FirstAsync(r => r.ProcessId == processId);
+
+            currentAssess.SncActioned = SncActioned;
+            currentAssess.SncActionChangeDetails = SncActionChangeDetails;
+
+            var toRemove = await _dbContext.SncAction.Where(s => s.ProcessId == processId).ToListAsync();
+            _dbContext.SncAction.RemoveRange(toRemove);
+
+            if (RecordSncAction != null)
+            {
+                foreach (var sncAction in RecordSncAction)
+                {
+                    sncAction.ProcessId = processId;
+                    _dbContext.SncAction.Add(sncAction);
                 }
             }
 
