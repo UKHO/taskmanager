@@ -11,7 +11,7 @@
 	[VerifierAdUserId] INT NULL, 
 	[TaskType] NVARCHAR(50) NULL, 
 	[WorkflowInstanceId] INT NOT NULL, 
-	[ProductActioned] BIT NULL DEFAULT 0, 
+	[ProductActioned] BIT NOT NULL DEFAULT 0, 
 	[ProductActionChangeDetails] NVARCHAR(MAX) NULL, 
 	[SncActioned] BIT NOT NULL DEFAULT 0, 
 	[SncActionChangeDetails] NVARCHAR(MAX) NULL, 
