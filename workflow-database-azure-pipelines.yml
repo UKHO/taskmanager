@@ -91,6 +91,7 @@ stages:
                   DatabaseName: '$(DatabaseNameUAT)'
                   aadSqlUsername: '$(SQLUsernameUAT)'
                   aadSqlPassword: '$(SQLPasswordUAT)'
+                  AdditionalArguments: '/p:GenerateSmartDefaults=$(AdditionalSqlArgGenerateSmartDefaults)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployPre
@@ -113,6 +114,7 @@ stages:
                   DatabaseName: '$(DatabaseNamePre)'
                   aadSqlUsername: '$(SQLUsernamePre)'
                   aadSqlPassword: '$(SQLPasswordPre)'
+                  AdditionalArguments: '/p:GenerateSmartDefaults=$(AdditionalSqlArgGenerateSmartDefaults)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
 
 - stage: DeployPrd
@@ -135,4 +137,5 @@ stages:
                   DatabaseName: '$(DatabaseNamePrd)'
                   aadSqlUsername: '$(SQLUsernamePrd)'
                   aadSqlPassword: '$(SQLPasswordPrd)'
+                  AdditionalArguments: '/p:GenerateSmartDefaults=$(AdditionalSqlArgGenerateSmartDefaults)'
                   DacpacFile: '$(Pipeline.Workspace)/workflowdatabase/WorkflowDatabase.dacpac'
