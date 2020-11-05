@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus.Testing;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UKHO.Events;
 using WorkflowCoordinator.Handlers;
 using WorkflowCoordinator.HttpClients;
@@ -291,6 +291,10 @@ namespace WorkflowCoordinator.UnitTests
                 ActivityChangedAt = currentActivityChangedAt,
                 SerialNumber = "ASSESS_SERIAL_NUMBER",
                 ProductAction = new List<ProductAction> { new ProductAction
+                {
+                    Verified = true
+                }},
+                SncAction = new List<SncAction> { new SncAction
                 {
                     Verified = true
                 }},
