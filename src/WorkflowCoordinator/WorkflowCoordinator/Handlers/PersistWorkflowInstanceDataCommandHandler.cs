@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.Messages.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using Serilog.Context;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkflowCoordinator.HttpClients;
 using WorkflowCoordinator.Messages;
 using WorkflowCoordinator.Models;
@@ -170,6 +170,7 @@ namespace WorkflowCoordinator.Handlers
             var workflowInstance = await _dbContext.WorkflowInstance
                 .Include(wi => wi.PrimaryDocumentStatus)
                 .Include(wi => wi.ProductAction)
+                .Include(wi => wi.SncAction)
                 .Include(wi => wi.DataImpact)
                 .FirstAsync(wi => wi.ProcessId == processId);
 
@@ -237,6 +238,11 @@ namespace WorkflowCoordinator.Handlers
             foreach (var productAction in workflowInstance.ProductAction)
             {
                 productAction.Verified = false;
+            }
+
+            foreach (var sncAction in workflowInstance.SncAction)
+            {
+                sncAction.Verified = false;
             }
 
             foreach (var dataImpact in workflowInstance.DataImpact)
@@ -311,6 +317,8 @@ namespace WorkflowCoordinator.Handlers
             verifyData.TaskType = assessData.TaskType;
             verifyData.ProductActioned = assessData.ProductActioned;
             verifyData.ProductActionChangeDetails = assessData.ProductActionChangeDetails;
+            verifyData.SncActioned = assessData.SncActioned;
+            verifyData.SncActionChangeDetails = assessData.SncActionChangeDetails;
             verifyData.Reviewer = assessData.Reviewer;
             verifyData.Assessor = assessData.Assessor;
             verifyData.Verifier = assessData.Verifier;
