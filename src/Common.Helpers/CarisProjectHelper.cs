@@ -1,11 +1,11 @@
-﻿using System;
+﻿using HpdDatabase.EF.Models;
+using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using HpdDatabase.EF.Models;
-using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Common.Helpers
 {
@@ -261,7 +261,7 @@ namespace Common.Helpers
                                          "v_priority_id hpdowner.project.spy_priority_id%type := :projectPriorityId; " +
                                          "v_geom hpdowner.project.geom % type := NULL; " +
                                          "v_external_id hpdowner.project.external_id%type := :k2processId; " +
-                                         "v_assigned_user1 CONSTANT hpdowner.hydrodbusers.HYDRODBUSERS_ID%TYPE := :userId; " +
+                                         "v_assigned_user1 CONSTANT hpdowner.hpd_user.USER_ID%TYPE := :userId; " +
                                          "v_assigned_users hpdowner.hpdnumber$table_type := hpdowner.hpdnumber$table_type(); " +
                                          "v_default_usage hpdowner.usage.usage_id%type := NULL; " +
                                          "BEGIN " +
@@ -272,7 +272,7 @@ namespace Common.Helpers
                                          "v_start_date, v_process_time, " +
                                          "v_type_id, v_status_id, " +
                                          "v_priority_id, v_geom, " +
-                                         "v_external_id, NULL, " +
+                                         "v_external_id, " +
                                          "v_assigned_users, v_default_usage); " +
                                          "END; ";
 
@@ -316,7 +316,7 @@ namespace Common.Helpers
 
                     var projectCommand = "declare "
                                          + "in_project_id CONSTANT INTEGER:= :projectId; "
-                                         + "v_assigned_user CONSTANT hpdowner.HYDRODBUSERS.HYDRODBUSERS_ID % TYPE := :assignedUserId; "
+                                         + "v_assigned_user CONSTANT hpdowner.HPD_USER.USER_ID % TYPE := :assignedUserId; "
                                          + "v_assigned_users hpdowner.HPDNUMBER$TABLE_TYPE:= hpdowner.hpdnumber$table_type(); "
                                          + "n integer := 0; "
                                          + "c integer; "
