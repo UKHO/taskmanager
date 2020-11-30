@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using AutoMapper;
 using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
@@ -31,8 +27,10 @@ using Portal.Hubs;
 using Portal.MappingProfiles;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using WorkflowDatabase.EF;
-using WorkflowDatabase.EF.Models;
 
 namespace Portal
 {
@@ -70,6 +68,9 @@ namespace Portal
                 .Bind(Configuration.GetSection("portal"));
 
             services.AddOptions<HpdEncProductUpdateServiceConfig>()
+                .Bind(Configuration.GetSection("portal"));
+
+            services.AddOptions<HpdWorkspaceUpdateServiceConfig>()
                 .Bind(Configuration.GetSection("portal"));
 
             services.AddOptions<GeneralConfig>()
@@ -192,6 +193,7 @@ namespace Portal
                 services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
             services.AddHostedService<HpdEncProductUpdateService>();
+            services.AddHostedService<HpdWorkspaceUpdateService>();
             services.AddHostedService<SqlListenerService>();
 
             // Auto mapper config
@@ -258,27 +260,6 @@ namespace Portal
             });
 
             app.UseAzureAppConfiguration();
-
-            try
-            {
-                var hpdWorkspaces = hpdDbContext.CarisWorkspaces
-                    .Select(cw => cw.Name.Trim()) //trim to prevent unique constraint errors
-                    .Distinct()
-                    .Select(cw => new CachedHpdWorkspace { Name = cw })
-                    .OrderBy(cw => cw.Name)
-                    .ToList();
-
-                Log.Logger.Information($"Deleting all workspace rows in WorkflowDatabase table CachedHpdWorkspace");
-                workflowDbContext.Database.ExecuteSqlRaw("DELETE FROM [CachedHpdWorkspace]");
-
-                Log.Logger.Information($"Adding {hpdWorkspaces.Count} workspace from HPD, to WorkflowDatabase");
-                workflowDbContext.CachedHpdWorkspace.AddRange(hpdWorkspaces);
-                workflowDbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                Log.Logger.Error(e, "Failed to update CachedHpdWorkspace");
-            }
 
         }
 
