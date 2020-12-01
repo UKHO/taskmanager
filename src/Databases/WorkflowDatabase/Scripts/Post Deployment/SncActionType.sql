@@ -22,7 +22,8 @@ using (
             (9,'Imm Act - Miscellaneous NM'),
             (10,'LTA'),
             (11,'No action'),
-            (12,'Scale too small')
+            (12,'Scale too small'),
+            (13, 'UNE')
 ) as source([SncActionTypeId],[Name])
 on (target.[SncActionTypeId]=source.[SncActionTypeId])
 when matched THEN

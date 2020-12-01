@@ -16,7 +16,8 @@ using (
 				(2, 'CPTS/LTA'),
 				(3, 'CPTS/LTA M_COVR'),
 				(4, 'Product only'),
-				(5, 'Scale too small')
+				(5, 'Scale too small'),
+				(6, 'LTA')
 ) as source ([ProductActionTypeId], [Name])
 on (target.[ProductActionTypeId] = source.[ProductActionTypeId])
 when matched THEN

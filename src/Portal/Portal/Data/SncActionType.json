@@ -46,7 +46,12 @@
   {
     "SncActionTypeId": 12,
     "Name": "Scale too small"
+  },
+  {
+    "SncActionTypeId": 13,
+    "Name": "UNE"
   }
+ 
 ]
 
   
