@@ -18,5 +18,9 @@
   {
     "ProductActionTypeId": 5,
     "Name": "Scale too small"
+  },
+  {
+    "ProductActionTypeId": 6,
+    "Name": "LTA"
   }
 ]
