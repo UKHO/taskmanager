@@ -36,7 +36,9 @@ using (
 				(2, 'Update from Source'),
 				(3, 'Initial Population'),
                 (4, 'Wrecks'),
-                (5, 'Continuous improvement')
+                (5, 'Continuous improvement'),
+                (6, 'Production Order'),
+                (7, 'Appraisal')
 ) as source ([UpdateTypeId], [Name])
 on (target.[UpdateTypeId] = source.[UpdateTypeId])
 when matched THEN
