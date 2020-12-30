@@ -30,6 +30,7 @@ using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using WorkflowDatabase.EF;
 
 namespace Portal
@@ -160,6 +161,12 @@ namespace Portal
             {
                 options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
                 options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
+                options.UseTokenLifetime = false;
+            });
+
+            services.Configure<CookieAuthenticationOptions>(AzureADDefaults.CookieScheme, options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromSeconds(5);
             });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
