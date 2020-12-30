@@ -167,6 +167,7 @@ namespace Portal
             services.Configure<CookieAuthenticationOptions>(AzureADDefaults.CookieScheme, options =>
             {
                 options.ExpireTimeSpan = TimeSpan.FromSeconds(5);
+                options.Cookie.MaxAge = TimeSpan.FromSeconds(5);
             });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
