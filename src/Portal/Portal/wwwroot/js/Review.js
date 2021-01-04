@@ -298,6 +298,14 @@
         $("#modalReviewWaitMessage").html("");
 
         var ulTag = "<ul class=\"mb-0 pb-0\" />";
+
+        $("#modalReviewWaitMessage").append(ulTag);
+        var unOrderedList = $("#modalReviewWaitMessage ul");
+
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Verifying Data...</li>");
+        unOrderedList.append("<li class=\"pt-1 pb-1\" >Progressing Task...</li>");
+
+        $("#modalReviewWait").show();
     }
 
 
