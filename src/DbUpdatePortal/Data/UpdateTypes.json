@@ -18,5 +18,13 @@
   {
     "UpdateTypeId": 5,
     "Name": "Continuous improvement"
+  },
+  {
+    "UpdateTypeId": 6,
+    "Name": "Production Order"
+  },
+  {
+    "UpdateTypeId": 7,
+    "Name": "Appraisal"
   }
 ]
