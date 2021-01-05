@@ -84,11 +84,14 @@ namespace WorkflowCoordinator.UnitTests
                 _handler.Handle(completeAssessmentCommand, _handlerContext));
         }
 
-        [TestCase("Simple", "Imm Act - NM")]
-        [TestCase("LTA (Product only)", "Longer-term Action")]
-        [TestCase("LTA", "Longer-term Action")]
+        [TestCase("Simple", "Imm Act - NM", true)]
+        [TestCase("LTA (Product only)", "Longer-term Action", true)]
+        [TestCase("LTA", "Longer-term Action", true)]
+        [TestCase("Simple", "No Action", false)]
+        [TestCase("LTA (Product only)", "No Action", false)]
+        [TestCase("LTA", "No Action", false)]
         [Test]
-        public async Task Test_Handle_Given_SdocId_Not_Assessed_For_ProcessId_Then_Action_Is_Generated_based_On_TaskType(string taskType, string action)
+        public async Task Test_Handle_Given_SdocId_Not_Assessed_For_ProcessId_Then_Action_Is_Generated_based_On_TaskType(string taskType, string action, bool isProductActioned)
         {
             //Given
             var fromActivity = WorkflowStage.Verify;
@@ -113,6 +116,7 @@ namespace WorkflowCoordinator.UnitTests
                 WorkflowInstanceId = workflowInstanceId,
                 ProcessId = processId,
                 TaskType = taskType,
+                ProductActioned = isProductActioned,
                 ProductActionChangeDetails = productActionChangeDetails
             };
             await _dbContext.DbAssessmentVerifyData.AddAsync(verifyData);
