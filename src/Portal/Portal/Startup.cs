@@ -117,26 +117,6 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //IdentityModelEventSource.ShowPII = true; //Uncomment for extra extra logging
-
-            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAd");
-
-            services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            }).AddMicrosoftIdentityUI();
-
-            services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-            {
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.IsEssential = true;
-                options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                options.SlidingExpiration = true;
-
-            });
 
             services.AddSignalR();
 
@@ -210,6 +190,25 @@ namespace Portal
             services.AddHealthChecks();
 
             services.AddSingleton<AppVersionInfo>();
+
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAd");
+
+            services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
+
+            services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.IsEssential = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(startupConfig.CookieTimeoutHours);
+                options.SlidingExpiration = true;
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
