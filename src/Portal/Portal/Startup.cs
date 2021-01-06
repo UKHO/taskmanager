@@ -1,21 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using AutoMapper;
 using Common.Factories.DocumentStatusFactory;
 using Common.Factories.Interfaces;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using Portal.Auth;
 using Portal.BusinessLogic;
 using Portal.Calculators;
@@ -27,9 +31,6 @@ using Portal.Hubs;
 using Portal.MappingProfiles;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using WorkflowDatabase.EF;
 
 namespace Portal
@@ -115,7 +116,18 @@ namespace Portal
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddRazorPages().AddRazorRuntimeCompilation();
+            //IdentityModelEventSource.ShowPII = true; //Uncomment for extra extra logging
+
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAd");
+
+            services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
+
             services.AddSignalR();
 
             var startupConfig = new StartupConfig();
@@ -141,26 +153,6 @@ namespace Portal
 
             services.AddHttpClient<IEventServiceApiClient, EventServiceApiClient>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5));
-
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options =>
-                {
-                    options.ClientId = startupConfig.AzureAdClientId;
-                    options.Instance = "https://ukho.onmicrosoft.com";
-                    options.CallbackPath = "/signin-oidc";
-                    options.TenantId = startupConfig.TenantId;
-                    options.Domain = "ukho.onmicrosoft.com";
-
-                });
-
-
-            //  services.AddAuthorization(options => options.);
-
-            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-            {
-                options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
-                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
-            });
 
             services.AddScoped<IDocumentStatusFactory, DocumentStatusFactory>();
             services.AddScoped<IOnHoldCalculator, OnHoldCalculator>();
