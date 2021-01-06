@@ -78,9 +78,13 @@ namespace WorkflowCoordinator.Handlers
             try
             {
                 var sdocId = workflowInstance.PrimaryDocumentStatus.SdocId;
-                var action = workflowInstance.DbAssessmentVerifyData.TaskType=="Simple" ? "Imm Act - NM" : "Longer-term Action";
+                var action = GetSdraActionValue(workflowInstance);
                 var change = string.IsNullOrWhiteSpace(workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails) ? "n/a" : workflowInstance.DbAssessmentVerifyData.ProductActionChangeDetails;
 
+                LogContext.PushProperty("SdraAction", action);
+                LogContext.PushProperty("SdraChange", change);
+                _logger.LogInformation("Calling SDRA Api to mark PrimarySdocIds {SdocId} as Assessed; ProcessId {ProcessId}, Action '{SdraAction}', Change '{SdraChange}'");
+                
                 await _dataServiceApiClient.MarkAssessmentAsAssessed(workflowInstance.ProcessId.ToString(), sdocId, action, change);
 
                 // Update all occurrences of this sdocId in PrimaryDocumentStatus with status SourceDocumentRetrievalStatus.Assessed
@@ -100,6 +104,21 @@ namespace WorkflowCoordinator.Handlers
             }
         }
 
+        private string GetSdraActionValue(WorkflowInstance workflowInstance)
+        {
+            if (!workflowInstance.DbAssessmentVerifyData.ProductActioned)
+            {
+                return "No Action";
+            }
+
+            if (workflowInstance.DbAssessmentVerifyData.TaskType == "Simple")
+            {
+                return "Imm Act - NM";
+            }
+
+            return "Longer-term Action";
+        }
+
         private async Task UpdateSdraAssessmentAsCompleted(WorkflowInstance workflowInstance)
         {
             _logger.LogInformation("Marking PrimarySdocIds {SdocId} as Completed, triggered by ProcessId {ProcessId}");
@@ -111,6 +130,9 @@ namespace WorkflowCoordinator.Handlers
                 var terminateComment = workflowInstance.Comments.FirstOrDefault(c => c.Text.Contains("Terminate"));
                 var comment = (terminateComment == null || string.IsNullOrWhiteSpace(terminateComment.Text)) ? "Marked Completed via TM2" : terminateComment.Text;
 
+                LogContext.PushProperty("SdraComment", comment);
+                _logger.LogInformation("Calling SDRA Api to mark PrimarySdocIds {SdocId} as Completed; ProcessId {ProcessId}, Comment '{SdraComment}'");
+                
                 await _dataServiceApiClient.MarkAssessmentAsCompleted(sdocId, comment);
 
                 // Update all occurrences of this sdocId in PrimaryDocumentStatus with status SourceDocumentRetrievalStatus.Completed
