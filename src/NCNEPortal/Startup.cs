@@ -1,19 +1,20 @@
-using System.Collections.Generic;
-using System.Globalization;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using HpdDatabase.EF.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using NCNEPortal.Auth;
 using NCNEPortal.Calculators;
 using NCNEPortal.Configuration;
@@ -22,6 +23,9 @@ using NCNEPortal.HostedServices;
 using NCNEWorkflowDatabase.EF;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace NCNEPortal
@@ -105,24 +109,6 @@ namespace NCNEPortal
                 services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
 
-
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options =>
-                {
-                    options.ClientId = startupConfig.AzureAdClientId;
-                    options.Instance = "https://ukho.onmicrosoft.com";
-                    options.CallbackPath = "/signin-oidc";
-                    options.TenantId = startupConfig.TenantId;
-                    options.Domain = "ukho.onmicrosoft.com";
-
-                });
-
-            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-            {
-                options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
-                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
-            });
-
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                     isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.NcneWorkflowDbName);
 
@@ -140,6 +126,25 @@ namespace NCNEPortal
                 options.UseOracle(hpdConnection));
 
             services.AddSingleton<AppVersionInfo>();
+
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "NCNEPortalAzureAd");
+
+            services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
+
+            services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.IsEssential = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(startupConfig.CookieTimeoutHours);
+                options.SlidingExpiration = true;
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
