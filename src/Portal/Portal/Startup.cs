@@ -191,7 +191,7 @@ namespace Portal
 
             services.AddSingleton<AppVersionInfo>();
 
-            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAd");
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "PortalAzureAd");
 
             services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
             {
