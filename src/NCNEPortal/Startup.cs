@@ -67,7 +67,6 @@ namespace NCNEPortal
             services.AddOptions<StartupSecretsConfig>()
                 .Bind(Configuration.GetSection("NcnePortalSection"));
 
-            services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddHealthChecks();
 
             var startupConfig = new StartupConfig();
