@@ -10,5 +10,6 @@ namespace DbUpdatePortal.Configuration
         public Uri AzureDbTokenUrl { get; set; }
         public string TenantId { get; set; }
         public string AzureAdClientId { get; set; }
+        public int CookieTimeoutHours { get; set; }
     }
 }

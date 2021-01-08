@@ -1,3 +1,4 @@
+using System;
 using Common.Helpers;
 using Common.Helpers.Auth;
 using DbUpdatePortal.Auth;
@@ -6,9 +7,6 @@ using DbUpdatePortal.Helpers;
 using DbUpdatePortal.HostedServices;
 using DbUpdateWorkflowDatabase.EF;
 using HpdDatabase.EF.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +19,12 @@ using Serilog;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 namespace DbUpdatePortal
 {
@@ -92,6 +96,25 @@ namespace DbUpdatePortal
 
             services.AddSingleton<AppVersionInfo>();
 
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "DbUpdatePortalAzureAd");
+
+            services.AddRazorPages().AddRazorRuntimeCompilation().AddMvcOptions(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
+
+            services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.IsEssential = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(startupConfig.CookieTimeoutHours);
+                options.SlidingExpiration = true;
+
+            });
+
             services.AddScoped<IDbUpdateUserDbService,
                 DbUpdateUserDbService>(s => new DbUpdateUserDbService(s.GetService<DbUpdateWorkflowDbContext>(), s.GetService<IAdDirectoryService>()));
 
@@ -105,25 +128,6 @@ namespace DbUpdatePortal
             if (ConfigHelpers.IsLocalDevelopment || ConfigHelpers.IsAzureUat)
                 services.AddHostedService<DatabaseSeedingService>();
             services.AddHostedService<AdUserUpdateService>();
-
-
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options =>
-                {
-                    options.ClientId = startupConfig.AzureAdClientId;
-                    options.Instance = "https://ukho.onmicrosoft.com";
-                    options.CallbackPath = "/signin-oidc";
-                    options.TenantId = startupConfig.TenantId;
-                    options.Domain = "ukho.onmicrosoft.com";
-
-                });
-
-            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-            {
-                options.Authority = $"https://login.microsoftonline.com/{startupConfig.TenantId}/v2.0/";
-                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified for development - TODO)
-            });
-
 
             var workflowDbConnectionString = DatabasesHelpers.BuildSqlConnectionString(isLocalDevelopment,
                 isLocalDevelopment ? startupConfig.LocalDbServer : startupConfig.WorkflowDbServer, startupConfig.DbUpdateWorkflowDbName);
