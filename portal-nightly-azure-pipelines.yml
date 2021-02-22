@@ -12,7 +12,7 @@ schedules:
   displayName: Portal Nightly Test Run
   branches:
     include:
-    - master
+    - main
   always: true
 
 jobs:
