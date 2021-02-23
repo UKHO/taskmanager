@@ -1,6 +1,6 @@
 ﻿# Task Manager
 
-![Build Status](https://ukhogov.visualstudio.com/Pipelines/_apis/build/status/UKHO.TaskManager.Portal?branchName=master)
+![Build Status](https://ukhogov.visualstudio.com/Pipelines/_apis/build/status/UKHO.TaskManager.Portal?branchName=main)
 
 Replacement for the existing Task Manager application.
 

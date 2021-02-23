@@ -9,7 +9,7 @@ trigger:
 pr:
   branches:
     include:
-    - master
+    - main
   paths:
     include:
     - src/Databases/WorkflowDatabase*
