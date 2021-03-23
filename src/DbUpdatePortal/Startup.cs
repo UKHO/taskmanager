@@ -110,7 +110,6 @@ namespace DbUpdatePortal
             {
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.IsEssential = true;
-                options.ExpireTimeSpan = TimeSpan.FromHours(startupConfig.CookieTimeoutHours);
                 options.SlidingExpiration = true;
 
             });
