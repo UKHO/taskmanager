@@ -1,8 +1,8 @@
-﻿using DbUpdateWorkflowDatabase.EF.Models;
+﻿using System;
+using DbUpdateWorkflowDatabase.EF.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace DbUpdateWorkflowDatabase.EF
 {
@@ -10,13 +10,16 @@ namespace DbUpdateWorkflowDatabase.EF
     {
         public DbUpdateWorkflowDbContext(DbContextOptions<DbUpdateWorkflowDbContext> options) : base(options)
         {
-            var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
-            var isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
-            var azureDevOpsBuild = environmentName.Equals("AzureDevOpsBuild", StringComparison.OrdinalIgnoreCase);
+            if (!Database.IsSqlServer()) return;
 
-            if (!isLocalDevelopment && !azureDevOpsBuild)
+            if (Database.GetDbConnection() is SqlConnection dbConnection)
             {
-                (this.Database.GetDbConnection() as SqlConnection).AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+                dbConnection.AccessToken = new AzureServiceTokenProvider()
+                    .GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
+            else
+            {
+                throw new ApplicationException("Could not configure Db AccessToken as the DbConnection is null");
             }
         }
 

@@ -1,6 +1,7 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 using WorkflowDatabase.EF.Models;
 
 namespace WorkflowDatabase.EF
@@ -10,14 +11,16 @@ namespace WorkflowDatabase.EF
         public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options)
             : base(options)
         {
-            var environmentName = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "";
-            var isLocalDevelopment = environmentName.Equals("LocalDevelopment", StringComparison.OrdinalIgnoreCase);
-            var azureDevOpsBuild = environmentName.Equals("AzureDevOpsBuild", StringComparison.OrdinalIgnoreCase);
+            if (!Database.IsSqlServer()) return;
 
-            if (!isLocalDevelopment && !azureDevOpsBuild)
+            if (Database.GetDbConnection() is SqlConnection dbConnection)
             {
-                var dbConnection = this.Database.GetDbConnection() as Microsoft.Data.SqlClient.SqlConnection;
-                dbConnection.AccessToken = new AzureServiceTokenProvider().GetAccessTokenAsync("https://database.windows.net/").Result;
+                dbConnection.AccessToken = new AzureServiceTokenProvider()
+                    .GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
+            else
+            {
+                throw new ApplicationException("Could not configure Db AccessToken as the DbConnection is null");
             }
         }
 
