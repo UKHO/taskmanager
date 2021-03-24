@@ -304,6 +304,9 @@
 
     $("#assignTaskModal").on("shown.bs.modal",
         function () {
+
+            removeAssignUserErrors();
+
             $("#assignTaskTypeaheadError").hide();
             $("#assignTaskErrorMsg").text("");
             $("#txtUserName").focus();
@@ -312,6 +315,8 @@
         });
 
     $("#btnAssignTaskToUser").on("click", function () {
+
+        removeAssignUserErrors();
 
         if ($("#txtUserName").val() === "") {
             $("#assignTaskTypeaheadError").show();
