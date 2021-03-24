@@ -292,6 +292,7 @@
                 "userPrincipal": userPrincipalName
             },
             success: function (result) {
+               // removeAssignUserErrors();
                 $("#assignTaskModal").modal("hide");
                 $("body").removeClass("modal-open");
                 $(".modal-backdrop").remove();
@@ -369,6 +370,7 @@
 
     function displayAssignUserErrors(errorStringArray) {
 
+        $("#assignTaskErrorList").empty();
         var orderedList = $("#assignTaskErrorList");
 
         // == to catch undefined and null
