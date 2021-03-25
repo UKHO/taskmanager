@@ -182,18 +182,7 @@
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
+                displaySaveDoneErrors(responseJson);
             }
 
         });
@@ -285,19 +274,7 @@
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-
+                displaySaveDoneErrors(responseJson);
             }
         });
     }
@@ -743,8 +720,6 @@
                     var responseJson = error.responseJSON;
                     displayDatesErrors(responseJson);
                 }
-
-
             });
         }
     });
@@ -762,7 +737,6 @@
 
             removeSaveWorkErrors();
 
-            $("#workflowSaveErrorMessage").html("");
             $("#btnClose").prop("disabled", true);
             $("#btnSave").prop("disabled", true);
 
@@ -801,18 +775,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-
-                    if (responseJson != null) {
-                        $("#workflowSaveErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalSaveWorkflowErrors").modal("show");
-                    }
-
+                    displaySaveDoneErrors(responseJson);
                 }
             });
 
@@ -987,6 +950,22 @@
         $("#datesErrorMessages").collapse("show");
     }
 
+    function displaySaveDoneErrors(responseJson) {
+
+        $("#workflowSaveErrorMessage").append("<ul/>");
+        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+        if (responseJson == null) {
+            unOrderedList.append("<li>System error. Please try again later</li>");
+        } else {
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li>" + item + "</li>");
+            });
+        }
+
+        $("#modalSaveWorkflowErrors").modal("show");
+    }
+
 
     $("#Compiler").on('focus', function () {
         if ($(this).val === "") {
@@ -1035,32 +1014,17 @@
                 "userName": userName
 
             },
-
             success: function (result) {
                 $("#Complete").val(true);
                 $("#msgPublishComplete").html("Are you sure you want to complete this workflow ?");
                 $("#PublishConfirmModal").modal("show");
-            }
-            ,
+            },
             error: function (error) {
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-
+                displaySaveDoneErrors(responseJson);
             }
-
         });
 
     });
