@@ -670,7 +670,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    //TODO: add similar to displayAssignRoleErrors(responseJson);
                 }
 
 
@@ -704,7 +704,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    //TODO: add similar to displayAssignRoleErrors(responseJson);
                 }
 
 
@@ -741,7 +741,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    //TODO: add similar to displayAssignRoleErrors(responseJson);
                 }
 
 
@@ -934,7 +934,6 @@
                 removedAssignRoleErrors();
             })
             .fail(function () {
-                $('#assignRoleErrorMessages').collapse("show");
                 var errorArray = ["Failed to look up users. Try refreshing the page"];
                 displayAssignRoleErrors(errorArray);
             });
