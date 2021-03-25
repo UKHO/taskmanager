@@ -315,7 +315,7 @@
         $("#chartVersionNo").val("");
 
         removePublishChartErrorErrors();
-        
+
         $("#btnPublishInCaris").prop("disabled", true);
 
         var url = "Workflow/?handler=ValidateComplete";
@@ -644,7 +644,7 @@
 
     $("#Dating").change(function () {
 
-        removedAssignRoleErrors();
+        removeDatesErrors();
 
         var dtPublish = $("#PublicationDate").val();
         var deadLine = $(this).val();
@@ -670,7 +670,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    //TODO: add similar to displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
 
 
@@ -681,7 +681,7 @@
 
     $("#RepromatDate").change(function () {
 
-        removedAssignRoleErrors();
+        removeDatesErrors();
 
         var dtRepromat = $(this).val();
         if (dtRepromat !== "") {
@@ -704,7 +704,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    //TODO: add similar to displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
 
 
@@ -714,7 +714,7 @@
 
     $("#PublicationDate").change(function () {
 
-        removedAssignRoleErrors();
+        removeDatesErrors();
 
         var dtPublish = $(this).val();
         var deadLine = $("#hdnDating").val();
@@ -741,7 +741,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    //TODO: add similar to displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
 
 
@@ -931,10 +931,10 @@
         var promise = users.initialize();
         promise
             .done(function () {
-                removedAssignRoleErrors();
+                removeAssignRoleErrors();
             })
             .fail(function () {
-                var errorArray = ["Failed to look up users. Try refreshing the page"];
+                var errorArray = "Failed to look up users. Try refreshing the page";
                 displayAssignRoleErrors(errorArray);
             });
 
@@ -971,11 +971,20 @@
         if (errorStringArray == null)
             orderedList.append("<li> An unknown error has occured</li>");
         else {
-            errorStringArray.forEach(function (item) {
-                orderedList.append("<li>" + item + "</li>");
-            });
+            orderedList.append("<li>" + errorStringArray + "</li>");
         }
         $("#assignRoleErrorMessages").collapse("show");
+    }
+
+    function displayDatesErrors(errorStringArray) {
+        var orderedList = $("#datesErrorList");
+
+        if (errorStringArray == null)
+            orderedList.append("<li> An unknown error has occured</li>");
+        else {
+            orderedList.append("<li>" + errorStringArray + "</li>");
+        }
+        $("#datesErrorMessages").collapse("show");
     }
 
 
@@ -1056,7 +1065,12 @@
 
     });
 
-    function removedAssignRoleErrors() {
+    function removeDatesErrors() {
+        $("#datesErrorList").empty();
+        $("#datesErrorMessages").collapse("hide");
+    }
+
+    function removeAssignRoleErrors() {
         $("#assignRoleErrorList").empty();
         $("#assignRoleErrorMessages").collapse("hide");
     }
