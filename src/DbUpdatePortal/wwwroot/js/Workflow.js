@@ -236,9 +236,12 @@
 
                     },
                     error: function (error) {
-                        var responseJson = error.responseJSON;
-                        $("#editTaskCommentError").append(responseJson);
-
+                        $("#editTaskCommentError")
+                            .html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+                        $('#txtTaskComment').focus();
+                    },
+                    complete: function(data) {
+                        $("#btnPostTaskComment").prop("disabled", false);
                     }
                 });
             }
@@ -308,13 +311,13 @@
                         '</div > </div ><br />');
 
                     $("#editStageCommentModal").modal("hide");
-
-
                 },
                 error: function(error) {
-                    var responseJson = error.responseJSON;
-                    $("#editStageCommentError").append(responseJson);
-
+                    $("#editStageCommentError").html("<div class=\"alert alert-danger\" role=\"alert\">Error adding comment. Please try again later.</div>");
+                    $('#txtComment').focus();
+                },
+                complete: function(data) {
+                    $("#btnPostComment").prop("disabled", false);
                 }
             });
         }
@@ -366,27 +369,12 @@
                 error: function(error) {
                     var responseJson = error.responseJSON;
                     (this).checked = false;
-
-                    if (responseJson != null) {
-                        $("#workflowSaveErrorMessage").html("");
-
-                        $("#workflowSaveErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                        responseJson.forEach(function(item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalSaveWorkflowErrors").modal("show");
-                    }
-
+                    displayErrors(responseJson);
                 }
-
             });
         }
-
     });
-
+    
     $("#btnSave").on("click",
         function() {
 
@@ -424,22 +412,9 @@
                 error: function (error) {
                     var responseJson = error.responseJSON;
 
-                    if (responseJson != null) {
-                        $("#workflowSaveErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalSaveWorkflowErrors").modal("show");
-                    }
-
+                    displayErrors(responseJson);
                 }
             });
-
-
-
         });
 
     $("#btnClose").on("click",
@@ -640,28 +615,17 @@
                 "processId": processId
             },
             success: function () {
-                $("#PublishConfirmModal").modal("hide");
                 window.location.href = '/Index';
-
             },
             error: function (error) {
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
+                displayErrors(responseJson);
+            },
+            complete: function (data) {
+                $("#PublishConfirmModal").modal("hide");
             }
-
         });
     }
 
@@ -682,7 +646,6 @@
                 },
                 data: {
                     "userName": userName
-
                 },
 
                 success: function(result) {
@@ -694,22 +657,26 @@
                     var responseJson = error.responseJSON;
                     (this).checked = false;
 
-                    if (responseJson != null) {
-                        $("#workflowSaveErrorMessage").html("");
-
-                        $("#workflowSaveErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                        responseJson.forEach(function(item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalSaveWorkflowErrors").modal("show");
-                    }
-
+                    displayErrors(responseJson);
                 }
 
             });
         }
     });
+
+    function displayErrors(responseJson)
+    {
+        $("#workflowSaveErrorMessage").html("");
+        $("#workflowSaveErrorMessage").append("<ul/>");
+        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+        if (responseJson == null) {
+            unOrderedList.append("<li>System error. Please try again later</li>");
+        } else {
+            responseJson.forEach(function(item) {
+                unOrderedList.append("<li>" + item + "</li>");
+            });
+        }
+        $("#modalSaveWorkflowErrors").modal("show");
+    }
 });
