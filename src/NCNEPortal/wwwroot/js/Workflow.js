@@ -35,9 +35,9 @@
 
     var formChanged = false;
     $("#frmWorkflow").change(function () { formChanged = true; });
-    
 
-    $(".allcommentslider").click(function() {
+
+    $(".allcommentslider").click(function () {
         var check = $("#allcommentscheck").prop('checked');
 
         if (check) {
@@ -55,7 +55,7 @@
 
     });
 
-    $(".commentslider").click(function() {
+    $(".commentslider").click(function () {
 
         var stage = $(this).data("taskstage");
         var processid = $(this).data("processid");
@@ -71,7 +71,7 @@
 
     });
 
-    $(".chk_publish_step").change(function() {
+    $(".chk_publish_step").change(function () {
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
         var username = $(this).data("username");
@@ -80,15 +80,14 @@
         (this).checked = false;
         var url = "Workflow/?handler=ValidateComplete";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId,stageName, false, false);
-         
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false, false);
+
     });
 
     $("#btnGetChartDetails").click(function () {
         var versionNo = $("#chartVersionNo").val();
-        $("#publishChartErrorMessage").text("");
-        $("#publishChartError").collapse("hide");
 
+        removePublishChartErrorErrors();
 
         $.ajax({
             type: "POST",
@@ -124,13 +123,14 @@
 
     });
 
-    $("#btnPublishCancel").click(function() {
+    $("#btnPublishCancel").click(function () {
         $("#btnPublishInCaris").prop("disabled", false);
     });
 
-    $("#btnPublish").click(function() {
-        $("#publishChartErrorMessage").text("");
-        $("#publishChartError").collapse("hide");
+    $("#btnPublish").click(function () {
+
+        removePublishChartErrorErrors();
+
         $("#Complete").val(false);
         $("#msgPublishComplete").html("This will publish Chart Number <span id=chartNo>" +
             $("#chartNumber").html() +
@@ -144,6 +144,7 @@
 
 
     $("#btnPublishConfirm").click(function () {
+
         var complete = $("#Complete").val();
         var processId = $("#hdnProcessId").val();
         if (complete === "true") {
@@ -159,10 +160,13 @@
     });
 
     function completeWorkflow(processId) {
+
+        removeSaveWorkErrors();
+
         $.ajax({
             type: "POST",
             url: "workflow/?handler=CompleteWorkflow",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -174,28 +178,20 @@
                 window.location.href = '/Index';
 
             },
-            error: function(error) {
+            error: function (error) {
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function(item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
+                displaySaveDoneErrors(responseJson);
             }
 
         });
     }
 
     function publishCarisChart(versionNo, processId, stageId) {
+
+        removePublishChartErrorErrors();
+
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=PublishCarisChart",
@@ -227,8 +223,11 @@
         });
     }
 
-    function validateCompleteRework(url,  processId,stageId,
-          username, stageTypeId,stageName, rework, publish ) {
+    function validateCompleteRework(url, processId, stageId,
+        username, stageTypeId, stageName, rework, publish) {
+
+        removeSaveWorkErrors();
+
         $.ajax({
             type: "POST",
             url: url,
@@ -239,7 +238,7 @@
                 "processId": processId,
                 "username": username,
                 "stageTypeId": stageTypeId,
-                "publish" : publish
+                "publish": publish
             },
 
             success: function (result) {
@@ -275,24 +274,12 @@
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function (item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-
+                displaySaveDoneErrors(responseJson);
             }
         });
     }
 
-    $(".btn-caris-publish").click(function() {
+    $(".btn-caris-publish").click(function () {
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
         var username = $(this).data("username");
@@ -303,19 +290,20 @@
         $("#editionNumber").html("");
         $("#chartVersion").html("");
         $("#chartVersionNo").val("");
-        $("#publishChartErrorMessage").text("");
-        $("#publishChartError").collapse("hide");
+
+        removePublishChartErrorErrors();
+
         $("#btnPublishInCaris").prop("disabled", true);
 
         var url = "Workflow/?handler=ValidateComplete";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false,true);
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false, true);
 
         $("#btnPublishInCaris").prop("disabled", false);
 
     });
 
-    $(".btn-stage-rework").click(function() {
+    $(".btn-stage-rework").click(function () {
         var processId = $(this).data("processid");
         var stageId = $(this).data("taskstageid");
         var username = $(this).data("username");
@@ -324,7 +312,7 @@
 
         var url = "Workflow/?handler=ValidateRework";
 
-        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true,false);
+        validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, true, false);
 
 
     });
@@ -339,10 +327,10 @@
         var url = "Workflow/?handler=ValidateComplete";
 
         validateCompleteRework(url, processId, stageId, username, stageTypeId, stageName, false);
-        
+
     });
 
-    $("#btnConfirm").click(function() {
+    $("#btnConfirm").click(function () {
         $(this).prop('disabled', true);
         var processId = $("#hdnConfirmProcessId").val();
         var stageId = $("#hdnConfirmStageId").val();
@@ -351,16 +339,16 @@
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=Complete",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: {
                 "processId": processId,
                 "stageId": stageId,
-                "isRework" :rework
+                "isRework": rework
             },
-            success: function(result) {
+            success: function (result) {
                 formChanged = false;
                 window.location.href = "/workflow?ProcessId=" + processId;
             }
@@ -368,7 +356,7 @@
 
     });
 
-    $(".btnAddTaskcomment").click(function() {
+    $(".btnAddTaskcomment").click(function () {
         var processId = $(this).data("processid");
         $("#hdnTaskCommentProcessId").val(processId);
         $("#btnPostTaskComment").prop("disabled", false);
@@ -391,7 +379,7 @@
 
 
     $("#btnPostTaskComment").on("click",
-        function() {
+        function () {
             var comment = $("#txtTaskComment").val();
             $("#editTaskCommentError").html("");
             if (comment.trim().length === 0) {
@@ -416,7 +404,7 @@
                     data: {
                         "txtComment": comment,
                         "commentProcessId": processId
-                       
+
                     },
                     success: function (result) {
 
@@ -488,7 +476,7 @@
                 type: "POST",
                 url: "Workflow/?handler=StageComment",
 
-                beforeSend: function(xhr) {
+                beforeSend: function (xhr) {
                     xhr.setRequestHeader("RequestVerificationToken",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
@@ -497,21 +485,21 @@
                     "commentProcessId": processid,
                     "stageId": stageid
                 },
-                success: function(result) {
+                success: function (result) {
                     $('#container-' +
                         stageid.toString()).prepend(' <div class="row m-3"><div class= "col-2" ><div>' +
-                        result[1] +
-                        '</div > <br /> <div><strong>' +
-                        result[0] +
-                        '</strong ></div ></div > <div class="col-10">' +
-                        comment +
-                        '</div > </div ><br />');
+                            result[1] +
+                            '</div > <br /> <div><strong>' +
+                            result[0] +
+                            '</strong ></div ></div > <div class="col-10">' +
+                            comment +
+                            '</div > </div ><br />');
 
                     $("#editStageCommentModal").modal("hide");
 
 
                 },
-                error: function(error) {
+                error: function (error) {
                     var responseJson = error.responseJSON;
                     $("#editStageCommentError").append(responseJson);
 
@@ -520,13 +508,13 @@
         }
     });
 
-        
+
     window.onbeforeunload = function () {
         if (formChanged) {
             return "Changes detected";
         }
     };
-    
+
     $("#RepromatDate").datepicker({
         autoclose: true,
         todayHighLight: true,
@@ -537,19 +525,19 @@
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update' );
+    }).datepicker('update');
 
     $("#AnnounceDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update' );
+    }).datepicker('update');
 
     $("#CommitToPrintDate").datepicker({
         autoclose: true,
         todayHighLight: true,
         format: 'dd/mm/yyyy'
-    }).datepicker('update' );
+    }).datepicker('update');
 
     $("#CISDate").datepicker({
         autoclose: true,
@@ -601,7 +589,7 @@
     }
 
     $("#3psToggle").on("change",
-        function() {
+        function () {
             set3psStatus();
         });
 
@@ -614,14 +602,14 @@
             $("#SendDate3ps").prop("disabled", false);
             $("#ExpectedReturnDate3ps").prop("disabled", false);
             $("#ActualReturnDate3ps").prop("disabled", false);
-            
+
         }
         else {
 
             $("#SendDate3ps").val("").datepicker("update");
             $("#ExpectedReturnDate3ps").val("").datepicker("update");
             $("#ActualReturnDate3ps").val("").datepicker("update");
-            
+
             $("#SendDate3ps").prop("disabled", true);
             $("#ExpectedReturnDate3ps").prop("disabled", true);
             $("#ActualReturnDate3ps").prop("disabled", true);
@@ -631,7 +619,9 @@
     }
 
 
-    $("#Dating").change(function() {
+    $("#Dating").change(function () {
+
+        removeDatesErrors();
 
         var dtPublish = $("#PublicationDate").val();
         var deadLine = $(this).val();
@@ -657,7 +647,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
 
 
@@ -667,6 +657,9 @@
     );
 
     $("#RepromatDate").change(function () {
+
+        removeDatesErrors();
+
         var dtRepromat = $(this).val();
         if (dtRepromat !== "") {
             $.ajax({
@@ -678,9 +671,9 @@
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
                 data: {
-                    "deadLine" : 0,
+                    "deadLine": 0,
                     "dtInput": dtRepromat,
-                    "IsPublish" : false
+                    "IsPublish": false
                 },
                 success: function (result) {
                     $("#PublicationDate").datepicker("update", result[0]);
@@ -688,7 +681,7 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
 
 
@@ -697,9 +690,12 @@
     });
 
     $("#PublicationDate").change(function () {
+
+        removeDatesErrors();
+
         var dtPublish = $(this).val();
         var deadLine = $("#hdnDating").val();
-        if ((dtPublish !== "") && (deadLine>0)) {
+        if ((dtPublish !== "") && (deadLine > 0)) {
             $.ajax({
                 type: "POST",
                 url: "Workflow/?handler=CalcMilestones",
@@ -709,9 +705,9 @@
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
                 data: {
-                    "deadLine"  : deadLine,
+                    "deadLine": deadLine,
                     "dtInput": dtPublish,
-                    "IsPublish" : true
+                    "IsPublish": true
                 },
                 success: function (result) {
                     $("#AnnounceDate").datepicker("setDate", result[0]);
@@ -722,40 +718,39 @@
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-                    displayAssignRoleErrors(responseJson);
+                    displayDatesErrors(responseJson);
                 }
-
-
             });
         }
     });
 
 
 
-    $("#btnTerminate").on("click", function() {
-            {
-                $("#ConfirmTerminate").modal("show");
-            }
+    $("#btnTerminate").on("click", function () {
+        {
+            $("#ConfirmTerminate").modal("show");
+        }
     });
 
     $("#btnSave").on("click",
-        function() {
+        function () {
 
-            $("#workflowSaveErrorMessage").html("");
+            removeSaveWorkErrors();
+
             $("#btnClose").prop("disabled", true);
             $("#btnSave").prop("disabled", true);
 
             $("#hdnChartNo").val($("#ChartNo").val());
 
             var formData = $("#frmWorkflow").serialize();
-            
+
             $.ajax({
                 type: "POST",
                 url: "Workflow/?handler=Save",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data:  formData,
+                data: formData,
                 complete: function () {
                     window.setTimeout(function () {
                         //$("#modalWaitAssessDone").modal("hide");
@@ -775,23 +770,12 @@
                     $("#DtExp-" + dateIds.CisDate).html($("#CISDate").val());
                     $("#DtExp-" + dateIds.PublishDate).html($("#PublicationDate").val());
                     var processId = $("#hdnProcessId").val();
-                    window.location.href = "/workflow?ProcessId="+processId;
+                    window.location.href = "/workflow?ProcessId=" + processId;
 
                 },
                 error: function (error) {
                     var responseJson = error.responseJSON;
-
-                    if (responseJson != null) {
-                        $("#workflowSaveErrorMessage").append("<ul/>");
-                        var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                        responseJson.forEach(function (item) {
-                            unOrderedList.append("<li>" + item + "</li>");
-                        });
-
-                        $("#modalSaveWorkflowErrors").modal("show");
-                    }
-
+                    displaySaveDoneErrors(responseJson);
                 }
             });
 
@@ -803,11 +787,11 @@
         function () {
             if (isReadOnly === true)
                 window.location.href = '/HistoricalTasks';
-                else
-            window.location.href = '/Index';
+            else
+                window.location.href = '/Index';
         });
 
-    $("#terminatingTask").submit(function(event) {
+    $("#terminatingTask").submit(function (event) {
         if ($("#txtTerminateComment").val().trim() === "") {
             $("#ConfirmTerminateError")
                 .html("<div class=\"alert alert-danger\" role=\"alert\">Please enter a comment.</div>");
@@ -827,12 +811,13 @@
     } else {
         setControlState(true);
     }
-    
+
     $("#btnCreateCarisProject").on("click",
-        function() {
+        function () {
 
             $("#createCarisProjectSuccess").collapse("hide");
             $("#createCarisProjectError").collapse("hide");
+            $("#createCarisProjectErrorMessage").empty();
 
 
             setControlState(false);
@@ -845,7 +830,7 @@
             $.ajax({
                 type: "POST",
                 url: "Workflow/?handler=CreateCarisProject",
-                beforeSend: function(xhr) {
+                beforeSend: function (xhr) {
                     xhr.setRequestHeader("RequestVerificationToken",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
@@ -854,11 +839,11 @@
                     "projectName": projectName
 
                 },
-                success: function(data) {
+                success: function (data) {
                     $("#createCarisProjectSuccess").collapse("show");
-                    
+
                 },
-                error: function(error) {
+                error: function (error) {
                     setControlState(true);
                     var errorMessage = error.getResponseHeader("Error");
 
@@ -866,7 +851,7 @@
                         .text("Failed to complete Caris Project creation. " + errorMessage);
                     $("#createCarisProjectError").collapse("show");
                 },
-                complete: function() {
+                complete: function () {
                     $("#createCarisProjectSpinner").hide();
                 }
             });
@@ -894,10 +879,10 @@
     function initialiseAssignRoleTypeahead() {
         $('#assignRoleTypeaheadError').collapse("hide");
         // Constructing the suggestion engine
-        var users = new Bloodhound({ 
+        var users = new Bloodhound({
             datumTokenizer: function (d) {
                 return Bloodhound.tokenizers.nonword(d.displayName);
-            },             
+            },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: "/Workflow/?handler=Users",
@@ -908,21 +893,20 @@
 
         var promise = users.initialize();
         promise
-            .done(function() {
-                removedAssignRoleErrors();
+            .done(function () {
+                removeAssignRoleErrors();
             })
-            .fail(function() {
-                $('#assignRoleErrorMessages').collapse("show");
-                var errorArray = ["Failed to look up users. Try refreshing the page"];
+            .fail(function () {
+                var errorArray = "Failed to look up users. Try refreshing the page";
                 displayAssignRoleErrors(errorArray);
             });
 
         // Initializing the typeahead
         $('.ta_compiler').add('.ta_v1').add('.ta_v2').add('.ta_100pCheck').typeahead({
-                hint: true,
-                highlight: true, /* Enable substring highlighting */
-                minLength: 3 /* Specify minimum characters required for showing result */
-            },
+            hint: true,
+            highlight: true, /* Enable substring highlighting */
+            minLength: 3 /* Specify minimum characters required for showing result */
+        },
             {
                 name: 'users',
                 source: users,
@@ -931,7 +915,7 @@
                 valueKey: 'userPrincipalName',
                 templates: {
                     empty: '<div>No results</div>',
-                    suggestion: function(users) {
+                    suggestion: function (users) {
                         return "<p><span class='displayName'>" + users.displayName + "</span><br/><span class='email'>" + users.userPrincipalName + "</span></p>";
                     }
                 }
@@ -944,23 +928,42 @@
         fieldset.prop("disabled", true);
     }
 
-
-    function removedAssignRoleErrors() {
-        $("#assignRoleErrorList").empty();
-        $("#assignRoleErrorMessages").collapse("hide");
-    }
-
     function displayAssignRoleErrors(errorStringArray) {
         var orderedList = $("#assignRoleErrorList");
 
         if (errorStringArray == null)
             orderedList.append("<li> An unknown error has occured</li>");
         else {
-            errorStringArray.forEach(function (item) {
-                orderedList.append("<li>" + item + "</li>");
-            });
+            orderedList.append("<li>" + errorStringArray + "</li>");
         }
         $("#assignRoleErrorMessages").collapse("show");
+    }
+
+    function displayDatesErrors(errorStringArray) {
+        var orderedList = $("#datesErrorList");
+
+        if (errorStringArray == null)
+            orderedList.append("<li> An unknown error has occured</li>");
+        else {
+            orderedList.append("<li>" + errorStringArray + "</li>");
+        }
+        $("#datesErrorMessages").collapse("show");
+    }
+
+    function displaySaveDoneErrors(responseJson) {
+
+        $("#workflowSaveErrorMessage").append("<ul/>");
+        var unOrderedList = $("#workflowSaveErrorMessage ul");
+
+        if (responseJson == null) {
+            unOrderedList.append("<li>System error. Please try again later</li>");
+        } else {
+            responseJson.forEach(function (item) {
+                unOrderedList.append("<li>" + item + "</li>");
+            });
+        }
+
+        $("#modalSaveWorkflowErrors").modal("show");
     }
 
 
@@ -995,47 +998,54 @@
 
 
     $("#btnComplete").click(function () {
-       
+
+        removeSaveWorkErrors();
+
         var userName = $("#Verifier1Upn").val();
 
         $.ajax({
             type: "POST",
             url: "Workflow/?handler=ValidateCompleteWorkflow",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: {
-                "userName" : userName
+                "userName": userName
 
             },
-
             success: function (result) {
                 $("#Complete").val(true);
                 $("#msgPublishComplete").html("Are you sure you want to complete this workflow ?");
                 $("#PublishConfirmModal").modal("show");
-                }
-            ,
-            error: function(error) {
+            },
+            error: function (error) {
                 var responseJson = error.responseJSON;
                 (this).checked = false;
 
-                if (responseJson != null) {
-                    $("#workflowSaveErrorMessage").html("");
-
-                    $("#workflowSaveErrorMessage").append("<ul/>");
-                    var unOrderedList = $("#workflowSaveErrorMessage ul");
-
-                    responseJson.forEach(function(item) {
-                        unOrderedList.append("<li>" + item + "</li>");
-                    });
-
-                    $("#modalSaveWorkflowErrors").modal("show");
-                }
-
+                displaySaveDoneErrors(responseJson);
             }
-
         });
 
     });
+
+    function removeDatesErrors() {
+        $("#datesErrorList").empty();
+        $("#datesErrorMessages").collapse("hide");
+    }
+
+    function removeAssignRoleErrors() {
+        $("#assignRoleErrorList").empty();
+        $("#assignRoleErrorMessages").collapse("hide");
+    }
+
+    function removePublishChartErrorErrors() {
+        $("#publishChartError").collapse("hide");
+        $("#publishChartErrorMessage").empty();
+    }
+
+    function removeSaveWorkErrors() {
+        $("#modalSaveWorkflowErrors").collapse("hide");
+        $("#workflowSaveErrorMessage").empty();
+    }
 });
