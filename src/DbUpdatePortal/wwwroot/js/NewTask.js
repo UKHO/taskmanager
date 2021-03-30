@@ -119,7 +119,7 @@
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: "/NewTask/?handler=Users",
-                ttl: 6
+                ttl: 600000
             },
             initialize: false
         });
