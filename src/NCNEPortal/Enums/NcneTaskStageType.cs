@@ -21,8 +21,6 @@
         Retire_Old_Version = 17,
         Consider_Withdrawn_Charts = 18,
         Withdrawal_action = 19,
-        PMC_withdrawal = 20,
-        Consider_email_to_SDR = 21
-
+        PMC_withdrawal = 20
     }
 }

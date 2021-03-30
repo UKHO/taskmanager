@@ -31,7 +31,6 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneTaskStageType.Withdrawal_action, NcneTaskStageType.V1, true)]
         [TestCase(NcneTaskStageType.V1, NcneTaskStageType.CIS, true)]
         [TestCase(NcneTaskStageType.CIS, NcneTaskStageType.PMC_withdrawal, true)]
-        [TestCase(NcneTaskStageType.PMC_withdrawal, NcneTaskStageType.Consider_email_to_SDR, true)]
 
         public void Validate_Get_NextStep_for_Completion_return_single_step(NcneTaskStageType currentStage, NcneTaskStageType nextStage, bool withdrawal)
         {
@@ -47,7 +46,7 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneTaskStageType.Clear_Vector, false)]
         [TestCase(NcneTaskStageType.Retire_Old_Version, false)]
         [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts, false)]
-        [TestCase(NcneTaskStageType.Consider_email_to_SDR, true)]
+        [TestCase(NcneTaskStageType.PMC_withdrawal, true)]
         public void Validate_Get_NextStep_for_Completion_return_no_next_step(NcneTaskStageType currentStage, bool withdrawal)
         {
             var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, withdrawal);
