@@ -292,7 +292,6 @@
         function () {
 
             $("#btnAssignTaskToUser").prop("disabled", false);
-            $("#AssignTaskError").html("");
 
             var processId = $(this).data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
