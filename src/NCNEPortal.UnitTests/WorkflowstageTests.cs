@@ -9,7 +9,6 @@ namespace NCNEPortal.UnitTests
     {
         private IWorkflowStageHelper _workWorkflowStageHelper;
 
-
         [SetUp]
         public void Setup()
         {
@@ -36,8 +35,8 @@ namespace NCNEPortal.UnitTests
         {
             var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, withdrawal);
 
-            Assert.AreEqual(result.Count, 1);
-            Assert.AreEqual(result[0], nextStage);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(nextStage, result[0]);
         }
 
         [TestCase(NcneTaskStageType.Forms, false)]
@@ -51,25 +50,22 @@ namespace NCNEPortal.UnitTests
         {
             var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, withdrawal);
 
-            Assert.AreEqual(result.Count, 0);
-
+            Assert.AreEqual(0, result.Count);
         }
 
         [Test]
         public void Validate_Get_NextStep_for_Completion_return_multiple_steps()
         {
-
             NcneTaskStageType currentStage = NcneTaskStageType.CIS;
 
             var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, true, false);
 
-            Assert.AreEqual(result.Count, 5);
+            Assert.AreEqual(5, result.Count);
             CollectionAssert.Contains(result, NcneTaskStageType.Publication);
             CollectionAssert.Contains(result, NcneTaskStageType.Publish_Chart);
             CollectionAssert.Contains(result, NcneTaskStageType.Clear_Vector);
             CollectionAssert.Contains(result, NcneTaskStageType.Retire_Old_Version);
             CollectionAssert.Contains(result, NcneTaskStageType.Consider_Withdrawn_Charts);
-             
         }
 
         [Test]
@@ -79,7 +75,7 @@ namespace NCNEPortal.UnitTests
 
             var result = _workWorkflowStageHelper.GetNextStagesForCompletion(currentStage, false, false);
 
-            Assert.AreEqual(result.Count, 1);
+            Assert.AreEqual(1, result.Count);
             CollectionAssert.Contains(result, NcneTaskStageType.Final_Updating);
         }
 
@@ -90,8 +86,6 @@ namespace NCNEPortal.UnitTests
             var result = _workWorkflowStageHelper.GetNextStageForRework(currentStage);
 
             Assert.AreEqual(nextStage, result);
-
         }
-
     }
 }
