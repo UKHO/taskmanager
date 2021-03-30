@@ -25,4 +25,31 @@
     <cve>CVE-2020-1171</cve>
     <cve>CVE-2020-1192</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Threading.Tasks.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks@.*$</packageUrl>
+    <cve>CVE-2020-22475</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Threading.Tasks.Dataflow.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Dataflow@.*$</packageUrl>
+    <cve>CVE-2020-22475</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Threading.Tasks.Parallel.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Parallel@.*$</packageUrl>
+    <cve>CVE-2020-22475</cve>
+  </suppress>
 </suppressions>
