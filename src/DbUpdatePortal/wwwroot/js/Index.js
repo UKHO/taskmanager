@@ -189,8 +189,6 @@
 
         $("#assignTaskModal").on("shown.bs.modal",
             function () {
-                $("#assignTaskTypeaheadError").hide();
-                $("#assignTaskErrorMsg").text("");
                 $("#txtUserName").focus();
                 $('.typeahead').typeahead('val', "");
                 $('.typeahead').typeahead('close');
@@ -294,7 +292,6 @@
         function () {
 
             $("#btnAssignTaskToUser").prop("disabled", false);
-            $("#AssignTaskError").html("");
 
             var processId = $(this).data("processid");
             $("#hdnAssignTaskProcessId").val(processId);
@@ -304,11 +301,6 @@
 
     $("#assignTaskModal").on("shown.bs.modal",
         function () {
-
-            removeAssignUserErrors();
-
-            $("#assignTaskTypeaheadError").hide();
-            $("#assignTaskErrorMsg").text("");
             $("#txtUserName").focus();
             $('.typeahead').typeahead('val', "");
             $('.typeahead').typeahead('close');
@@ -316,10 +308,8 @@
 
     $("#btnAssignTaskToUser").on("click", function () {
 
-        removeAssignUserErrors();
-
         if ($("#txtUserName").val() === "") {
-            $("#assignTaskTypeaheadError").show();
+            $("#assignTaskErrorMessages").collapse("show");
             $("#assignTaskErrorMsg").text("Please enter a user.");
             return;
         }
@@ -363,7 +353,7 @@
 
     function initialiseAssignTaskTypeahead() {
 
-        $('#assignTaskTypeaheadError').collapse("hide");
+        $('#assignTaskErrorMessages').collapse("hide");
 
         var users = new Bloodhound({
             datumTokenizer: function (d) {
@@ -382,7 +372,7 @@
                 $("#btnAssignTaskToUser").prop("disabled", false);
                 $("#txtUserName").prop("disabled", false);
 
-                $('#assignTaskTypeaheadError').collapse("hide");
+                $('#assignTaskErrorMessages').collapse("hide");
 
                 removeAssignUserErrors();
 
@@ -392,7 +382,8 @@
                 $("#btnAssignTaskToUser").prop("disabled", true);
                 $("#txtUserName").prop("disabled", true);
 
-                $('#assignTaskTypeaheadError').collapse("show");
+                var errorArray = ["Failed to look up users. Try refreshing the page."];
+                displayAssignUserErrors(errorArray);
 
                 usersFetched = false;
             });

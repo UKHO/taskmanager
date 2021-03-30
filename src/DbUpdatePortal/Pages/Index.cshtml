@@ -123,9 +123,9 @@
             <tbody>
 
                 @foreach (var task in Model.DbUpdateTasks.Where(t => t.Status == DbUpdateTaskStatus.InProgress.ToString()
-                                                   &&
-                                                   (t.TaskRole.Verifier?.DisplayName == Model.CurrentUser.DisplayName
-            || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
+                                               &&
+                                               (t.TaskRole.Verifier?.DisplayName == Model.CurrentUser.DisplayName
+        || t.TaskRole.Compiler.DisplayName == Model.CurrentUser.DisplayName)))
                 {
                     <tr>
                         <td>
@@ -206,8 +206,6 @@
                     </div>
                     <input type="hidden" id="hdnAssignTaskProcessId" name="processId" />
                     <input type="hidden" id="hdnAssignTaskUpn" name="userPrincipalName" />
-                    <br />
-                    <div id="AssignTaskError"></div>
                 </div>
             </div>
             <div class="modal-footer">
