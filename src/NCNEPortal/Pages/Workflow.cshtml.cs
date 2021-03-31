@@ -327,7 +327,7 @@ namespace NCNEPortal
                                                       t.Status == NcneTaskStageStatus.Completed.ToString()) &&
                                TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publication &&
                                                       t.Status == NcneTaskStageStatus.Completed.ToString()))
-                               || (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Consider_email_to_SDR &&
+                               || (TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.PMC_withdrawal &&
                                                           t.Status == NcneTaskStageStatus.Completed.ToString()));
 
             IsPublished = TaskStages.Exists(t => t.TaskStageTypeId == (int)NcneTaskStageType.Publish_Chart &&

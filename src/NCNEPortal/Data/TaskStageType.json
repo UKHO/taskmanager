@@ -118,11 +118,5 @@
     "Name": "PMC withdrawal",
     "SequenceNumber": 20,
     "AllowRework": false
-  },
-  {
-    "TaskStageTypeId": 21,
-    "Name": "Consider Email to SDR",
-    "SequenceNumber": 21,
-    "AllowRework": false
   }
 ]

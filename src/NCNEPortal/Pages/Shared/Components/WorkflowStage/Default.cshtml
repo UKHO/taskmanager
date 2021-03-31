@@ -1,6 +1,6 @@
 ﻿@using NCNEPortal.Enums
 @model NCNEWorkflowDatabase.EF.Models.TaskStage
-@{ const string withAction = "(Legend / Consequential / Misc Action)";}
+@{ const string withAction = "(Legend / Consequential / Misc Action / Consider Email to SDR)";}
 @if (@Model.Status != NcneTaskStageStatus.Inactive.ToString())
 {
     <tr class="workflow-row">

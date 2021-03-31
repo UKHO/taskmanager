@@ -75,8 +75,7 @@ using (
          (17, 'Retire old minor version', 18, 0),
          (18, 'Consider withdrawn charts', 19, 0),
          (19, 'Withdrawal action', 5,0),
-         (20, 'PMC Withdrawal', 20,0),
-         (21, 'Consider Email to SDR', 21,0)
+         (20, 'PMC Withdrawal', 20,0)
 
 ) as source ([TaskStageTypeId], [Name], [SequenceNumber], [AllowRework])
 on (target.[TaskStageTypeId] = source.[TaskStageTypeId])

@@ -59,7 +59,6 @@ namespace NCNEPortal.UnitTests
         [TestCase(NcneTaskStageType.Consider_Withdrawn_Charts)]
         [TestCase(NcneTaskStageType.Withdrawal_action)]
         [TestCase(NcneTaskStageType.PMC_withdrawal)]
-        [TestCase(NcneTaskStageType.Consider_email_to_SDR)]
         public async Task Adding_System_Comments_for_Completion_of_stage_adds_New_Comment(NcneTaskStageType stageType)
         {
             var changeType = NcneCommentType.CompleteStage;

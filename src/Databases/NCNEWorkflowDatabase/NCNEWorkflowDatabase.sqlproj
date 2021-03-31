@@ -76,6 +76,7 @@
     <Build Include="Tables\HpdUser.sql" />
     <Build Include="Tables\AdUser.sql" />
     <Build Include="Views\NewChartNewEditionWorkflowData.sql" />
+    <None Include="Scripts\2021-03-30 Remove Consider Email to SDR TaskStageType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="NCNEWorkflowDatabase.refactorlog" />
